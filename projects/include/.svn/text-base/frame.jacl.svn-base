@@ -1,0 +1,120 @@
+#!../bin/jacl
+
+constant 	game_version	1
+constant	game_title		"My Game"
+constant	game_author		"Me"
+constant	ifid			"JACL-000"
+
+{+intro
+style bold
+write "^^" game_title 
+style normal
+write " by " game_author "^^"
+
+if here hasnt OUTDOORS
+   move north_wall to here
+   move south_wall to here
+   move east_wall to here
+   move west_wall to here
+endall
+move ground to here
+look
+}
+
+{+movement
+ifall destination != nowhere : destination hasnt OUTDOORS
+   move north_wall to destination
+   move south_wall to destination
+   move east_wall to destination
+   move west_wall to destination
+endif
+return false
+}
+
+object kryten: myself self me
+ has		ANIMATE
+ short		name "yourself"
+ capacity	42
+ parent		;PUT THE LABEL OF THE STARTING LOCATION HERE
+ player
+
+{examine
+write "As beautiful as ever.^"
+execute "+inventory"
+}
+
+{take
+write "...seriously?^"
+set time = false
+}
+
+
+{+no_light
+write "It is too dark to see.^"
+set time = false
+}
+
+{+title
+style subheader
+write here{The} ^
+style normal
+if player has SITTING
+   write "(sitting)^"
+endif
+}
+
+object north_wall: north north wall
+ has			NO_TAB
+ plural			walls
+ short          the "north wall"
+
+object south_wall: south southern wall
+ has			NO_TAB
+ plural			walls
+ short          the "south wall"
+
+object east_wall: east eastern wall
+ has			NO_TAB
+ plural			walls
+ short          the "east wall"
+
+object west_wall: west western wall
+ has			NO_TAB
+ plural			walls
+ short          the "west wall"
+
+object ground: ground floor
+ has            SURFACE NO_TAB
+ short          the "ground"
+
+integer status_window 3
+integer OFFSET
+
+string status_text
+
+{+update_status_window 
+style reverse
+padstring status_text " " status_width
+write status_text
+cursor 0 1
+write status_text
+cursor 0 2
+write status_text
+cursor 1 1
+write here{The}
+setstring status_text "Score: " score " Moves: " total_moves
+set OFFSET = status_width
+length INDEX status_text
+set OFFSET - INDEX
+set OFFSET - 1
+cursor OFFSET 1
+write status_text
+style normal
+}
+
+#debug "debug.library"
+#include "webinterface.library"
+#include "webinterface.css"
+#include "npc.library"
+#include "utils.library"
+#include "verbs.library"

@@ -1,0 +1,148 @@
+<html>
+<head>
+	<title>The JACL Author's Guide</title>
+	<meta name="description" content="Documention for the JACL Adventure Creation Language.">
+	<meta name="keywords" content="JACL,programming,programmers,guide,manual,documention,instructions">
+	<link rel=stylesheet type="text/css" href="styles.css">
+</head>
+<body>
+
+<h1><a class="title" name="library0">Creating New Verbs</a></h1>
+
+<p>Although the implementation of a large number of standard verbs is available in <b>verbs.library</b>, almost all large games will find the need to define custom verbs. New verbs are defined using <B>grammar</B> statements and their default implementation is provided in a global function. This chapter contains information on making your custom verbs as robust and complete as possible.
+
+<p>When adding a new verb, it is important to be sure that you are doing a good thing. Adding a new verb simply to facilitate a guess-the-word type puzzle is definitely a bad thing. On the other hand, having an obvious verb missing is almost as annoying for the player as being made to guess an obscure one. Also consider that adding a new verb doesn't always mean adding a new function. You may find that a required verb is simply a synonym for an existing verb. In this case, simply add a new <b>grammar</b> statement with the synonym and point it to an existing function. In the library file you will find many functions that are mapped to from more than one <b>grammar</b> statement. For example, here is the start of the global function <b>+insert</b> and its matching <b>grammar</b> statements:
+
+<pre>
+grammar insert *held on *present      >insert_on
+grammar put *held on *present         >insert_on
+
+{+insert_on 
+if +reach&lt;noun2 = true
+return true
+endif
+...
+</pre>
+
+<p>Another possibility is to define "put" as an actual <b>synonym</b> of "insert". There are potential dangers with this method that are described in the section on <a href="definitions.html#definitions6">Synonyms</a>.
+
+<P>Now for a few general rules. Each verb that involves touching an object should check that the object does not have the attribute <B>OUT_OF_REACH</B> before allowing the player to manipulate it. This, of course, does not apply to verbs that can only be performed on objects that are being held. The following line of code is an example from the top of the <B>+take</B> function:
+
+<pre>
+{+take
+...
+if +reach&lt;noun1 = true
+   return true
+endif
+...
+}
+</pre>
+
+<P>These above lines tell the JACL interpreter to return <b>true</B> if the function <B>+reach</B> returns <b>true</b>. In practice, this means that if the object is unreachable by the player, nothing beyond this line will be executed. Below is the content of the <B>+reach</B> function from <B>verbs.library</B>:
+
+<pre>
+{+reach
+if arg[0] has OUT_OF_REACH
+   write  arg[0]{The} " " arg[0]{is} " out of reach.^"
+   set time = false
+   return true
+endif
+return false
+}
+</pre>
+
+<p>This function simply tests if the specified object has the attribute <b>OUT_OF_REACH</b>. If so, an appropriate message is displayed, the variable <b>time</b> is set to <b>false</b> and the function returns <b>true</b>. If the object does not have the attribute <b>OUT_OF_REACH</b>, the function will return <b>false</b>.
+
+<p>Most verbs will also make a similar call to the function <b>+darkness</b>. This function tests whether the player is currently in darkness or not. Actions that require the player to see should have the lines:
+
+<pre>
+if +darkness = true
+   return true
+endif
+</pre>
+
+<p>Finally, all verbs should contain a code block that calls the function <b>+important</b>. This function tests whether the passed object has the attribute <b>NOT_IMPORTANT</b> and displays a suitable <b>You don't have to worry about that.</b> type message. If the verb you are adding refers to two objects, you may need to call this function twice, one for each object. If one of the objects in the command needs to be an object that is <b>*held</b>, you will only need to call <b>+important</b> for the other object, as objects with the attribute <b>NOT_IMPORTANT</b> can't be taken due to the <b>take</b> verb stopping when it reaches this same test. Below is an example of a call to <b>+important</b>:
+
+<pre>
+if +important&lt;noun1 = true
+   return true
+endif
+</pre>
+
+<P>If your verb causes the object to be moved, such as the <B>take</B> verb, you must also ensure that the object is given the attribute <B>TOUCHED</B> if the move was successful. This will ensure that any tests as to whether the object has been moved from its initial position or not will be accurate. This time an example from the end of the <b>+take</b> function:
+
+<pre>
+...
+override
+write "You take " noun1{the} .^
+move noun1 to player
+ensure noun1 has TOUCHED
+}
+</pre>
+
+<P>If the verb performs any tests to check whether the move should be successfully completed under the current circumstances or not, an <B>override</B> command should be added directly before any effects are coded, such as in the example above. This allows <B>override</B> functions to be associated with objects in order to change the default outcome while still taking advantage of the tests you have coded. Below is an example of the types of tests that the default action for a verb should perform. Of course, the exacts tests you will require are specific to the nature of the verb you are coding.
+
+<pre>
+grammar ask *present for *carried             >ask_for
+
+{+ask_for
+if here has UNDER_WATER
+   write "Talking under water isn't very easy.^"
+   set TIME = false
+   return     
+endif 
+if noun1 hasnt ANIMATE
+   write noun1{The} " seem" noun1{s} " to be ignoring "
+   write "your request.^"
+   return     
+endif 
+if noun1 has DEAD
+   write noun1{The} " " noun1{is} " a bit too dead to "
+   write "respond.^"
+   set TIME = false
+   return     
+endif 
+if noun1 = player
+   write "I think it might be time to take a break and "
+   write "get a cup of tea.^"
+   set TIME = false
+   return     
+endif
+</pre>
+
+<P>As you will have seen above, it is also important that the variable <B>TIME</B> is set to <B>false</B> if the move typed by the player could not be performed. Setting <b>TIME</b> to <b>false</b> tells the interpreter that the <B>eachturn</B> functions should not be executed. In other words, if the player's move is not possible, time should not pass.
+
+<P>One last thing to keep in mind when adding <B>grammar</B> statements is whether its scope indicators are going to clash with any other existing <B>grammar</B> statements. For example, consider the following two lines:
+
+
+<pre>
+grammar give *present grief &gt;hassle
+
+grammar give *held to *present &gt;give_to
+</pre>
+
+<P>The vocabulary for each game is stored as a tree. The following tree is a representation of the two <B>grammar</B> statements above. 
+
+<p>
+<center>
+    <img align="center" src="grammar.png" alt="A tree representing the two grammar statements above">
+</center>
+
+<p>Given the two <b>grammar</b> statements above, the command
+
+<pre>
+give sword to troll
+</pre>
+
+<P>would produce the message 
+
+<pre>
+You can't use the word &quot;to&quot; in that context.
+</pre>
+
+<P>This is because <B>sword</B> is a match for <B>*present</B>, therefore causing the parser to branch down a path that only allows to word <B>grief</B> to be used next. This is obviously not the desired effect. Using <b>$text</b> in a <b>grammar</b> statement is equally dangerous. As an extreme example, using <b>$text</b> as the first word of the first <b>grammar</b> statement will prevent any others from ever matching. It is therefore important to bare in mind that <b>grammar</b> statements are tested in the order they appear in the game file, starting from the top. To have a <b>grammar</b> statement checked last, add it to your game file after the line including <b>verbs.library</b>.
+
+<!-- END OF BODY -->
+<p><a href="index.html">Back to Contents</b>
+</body>
+</html>

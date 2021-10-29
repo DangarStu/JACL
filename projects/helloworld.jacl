@@ -1,0 +1,6 @@
+#!../bin/jacl
+
+{+intro
+  write "Hello world!^"
+  terminate
+}

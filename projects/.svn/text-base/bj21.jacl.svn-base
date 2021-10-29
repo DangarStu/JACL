@@ -1,0 +1,1030 @@
+#!../bin/jacl
+
+#                                                                     BLACKJACL 
+# -----------------------------------------------------------------------------
+# Copyright (C) Stuart Allen 2001. All rights resevered.
+# -----------------------------------------------------------------------------
+
+integer INDEX
+integer COUNTER
+integer NODE1
+integer NODE2
+integer cardA
+integer cardB
+integer cardC
+integer CHECK_STRATEGY 0
+
+integer OFFSET
+integer INDEX
+string status_text "temp"
+
+{+update_status_window # THIS MIMICS THE INTERNALLY GENERATED STATUS LINE
+style reverse
+padstring status_text " " status_width
+write status_text
+cursor 1 0
+write "BlackJACL"
+setstring status_text "Bankroll: $" score 
+set OFFSET = status_width
+length INDEX status_text
+set OFFSET - INDEX
+set OFFSET - 1
+cursor OFFSET 0
+write status_text
+style normal
+}
+
+{+set_node1
+set NODE1 = shoe
+set COUNTER = random
+set COUNTER + 4
+repeat
+   set NODE1 = NODE1(next)
+   set COUNTER - 1;
+until COUNTER = 0
+}
+
+{+set_node2
+set NODE2 = end
+set COUNTER = random
+set COUNTER + 4
+repeat
+   set NODE2 = NODE2(previous)
+   set COUNTER - 1;
+until COUNTER = 0
+}
+
+# Optional rules
+integer SOFT_SEVENTEEN		false	; DEALER HITS ON A SOFT SEVENTEEN
+integer DAS				true	; ALLOWED TO DOUBLE AFTER SPIT
+
+location casino : casino
+
+{look
+execute "+display_table"
+}
+
+{+display_table
+if GAME_PHASE = place_bet
+  write "^No cards will be dealt until you place a bet. "
+  write "Use the command 'bet [amount]'.^"
+  return
+endif
+
+# Display the dealer's cards
+
+if dealers_hand(cards) = 1
+   write "Dealer's card is "
+else
+   write "Dealer's cards are "
+endif
+
+execute "+clean_contents<dealers_hand"
+
+if current_player(hands) = 1
+   write "^Your hand is "
+else
+   write "^Your first hand is "
+endif
+
+execute "+clean_contents<hand_one"
+
+write " totalling " hand_one(total) ".^"
+
+# Display the player's first hand
+
+if current_player(hands) = 2
+   ; Display the player's second hand
+   write "^Second hand -- Total: " hand_two(total)
+   write " -- Bet: $" hand_two(bet)
+
+   execute "+clean_contents<hand_two"
+   write " totalling " hand_two(total) ".^"
+endif
+}
+
+#include "card_shoe.library"
+
+integer best_move
+integer last_move
+
+	constant hit			0
+    string   MOVE_TYPE		hit
+	constant split			1
+    string   MOVE_TYPE		split
+	constant stay			2
+    string   MOVE_TYPE		stayed
+	constant double			3
+    string   MOVE_TYPE		doubled
+
+integer current_hand
+
+	constant bet			1
+	constant result			2
+	constant total			3
+	constant aces			4
+	constant aces_as_one	5
+	constant cards			6
+
+integer current_player
+
+	constant money			1
+	constant hands			2
+	constant insurance		3
+
+integer PREVIOUS_GAME_PHASE
+integer GAME_PHASE
+
+	constant place_bet		1
+	constant players_turn	2
+	constant dealers_turn	3
+
+grammar coach on >coach_on
+
+{+coach_on
+set CHECK_STRATEGY = 1
+write "Basic strategy coach on.^^"
+if GAME_PHASE != place_bet
+   execute "+display_table"
+endif
+}
+
+grammar coach off >coach_off
+
+{+coach_off
+set CHECK_STRATEGY = 0
+write "Basic strategy coach off.^^"
+if GAME_PHASE != place_bet
+   execute "+display_table"
+endif
+}
+
+grammar blankjacl	>view_table
+grammar look		>view_table	
+
+
+{+view_table
+execute "+display_table"
+}
+
+grammar help			>help
+grammar instructions	>help
+
+{+help
+print:
+   The aim of Blackjack is to have a hand with a total value closer
+   to 21 than the dealer without going over 21. Ten, Jack, Queen and King
+   are all worth 10, an Ace is worth 11 or 1, and all other cards are worth
+   their face value. An Ace is treated as 11 unless it would put your
+   hand over 21, in which case it is treated as 1.^^
+
+   There are two phases to the game of Blackjack. Firstly your must
+   place your bet, then you must playout the hand you are dealt.
+   When you are playing your hand, the commands available to you will be
+   displayed based on the current game situation. Unless your hand has
+   bust (gone over a total value of 21), you will always be able to 'hit'
+   (receive another card) or 'stay', (finish playing that hand).^^
+
+   If the dealers first card is an ace, you will be given the option to
+   take insurance against the dealer getting blackjack by typing the
+   command 'insurance'. This must be done before any other action
+   regarding your hand is taken.^^
+
+   If your two cards are of equal value, you will also be given the
+   opportunity to split your hand. This takes your two initial cards
+   and makes two one-card hands from them. This is done using the 'split'
+   command. These two hands are then played out one at a time as normal.
+   Be sure to pay attention to the indicator at the bottom of the screen
+   telling you which card you are currently playing.^^
+
+   If the first two card of any hand total 9, 10 or 11, you will be
+   given the opportunity to 'double'. In this case your initial bet will
+   be doubled and you will receive one more card only.^^
+.
+}
+
+grammar about >about
+
+{+about
+print:
+   BlackJACL^"
+   Copyright (c) 2001-2008 Stuart Allen^^"
+
+   This program is free software; you can redistribute it and/or "
+   modify it under the terms of the GNU General Public License "
+   as published by the Free Software Foundation; either version 2 "
+   of the License, or (at your option) any later version.^"
+
+   This program is distributed in the hope that it will be useful, "
+   but WITHOUT ANY WARRANTY; without even the implied warranty of "
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the "
+   GNU General Public License for more details.^^"
+
+   You should have received a copy of the GNU General Public License "
+   along with this program; if not, write to the Free Software "
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, "
+   USA.^"
+.
+}
+
+grammar insurance	>insurance
+
+{+insurance
+if GAME_PHASE = place_bet
+   execute "+display_table"
+   return
+endif
+set INDEX = current_hand(bet)
+set INDEX / 2
+set current_player(insurance) = INDEX
+set current_player(money) - INDEX
+execute "+display_table"
+}
+
+grammar double	>double
+
+{+double
+if GAME_PHASE = place_bet
+   execute "+display_table"
+   return
+endif
+set current_player(money) - current_hand(bet)
+set current_hand(bet) * 2
+execute "+basic_strategy_code"
+set last_move = double
+execute "+deal_card<current_hand"
+if current_player(hands) = 1 
+   execute "+play_out_dealer"
+   return
+endif
+if current_hand = hand_one
+   set current_hand = hand_two
+   execute "+display_table"
+else
+   execute "+play_out_dealer"
+endif
+}
+
+grammar hit	>hit
+
+{+hit
+if GAME_PHASE = place_bet
+   write "You must place a bet first.^"
+   return
+endif
+execute "+basic_strategy_code"
+set last_move = hit
+execute "+deal_card<current_hand"
+if current_hand(total) > 20
+   if current_player(hands) = 1 
+      if current_hand(total) = 21
+         execute "+play_out_dealer"
+	  else
+	     execute "+hand_finished"
+      endif
+      return
+   endif
+   if current_hand = hand_one
+      set current_hand = hand_two
+   else
+	  if current_hand(total) = 21 : hand_one(total) < 22
+         execute "+play_out_dealer"
+	  else
+         execute "+hand_finished"
+	  endif
+      return
+   endif
+endif
+}
+
+grammar stay	>stay
+
+{+stay
+if GAME_PHASE = place_bet
+   write "You must place a bet first.^"
+   return
+endif
+execute "+basic_strategy_code"
+set last_move = stay
+if current_player(hands) = 1 
+   execute "+play_out_dealer"
+   return
+endif
+if current_hand = hand_one
+   set current_hand = hand_two
+   write "Now playing your second hand.^"
+else
+   execute "+play_out_dealer"
+endif
+}
+
+grammar split	>split
+
+{+split
+if GAME_PHASE = place_bet
+   write "You must place a bet first.^"
+   return
+endif
+execute "+basic_strategy_code"
+set last_move = split
+set hand_two(bet) = hand_one(bet)
+set current_player(money) - hand_two(bet)
+set current_player(hands) = 2
+set hand_one(aces_as_one) = 0
+set hand_one(cards) = 1
+set hand_two(aces_as_one) = 0
+set hand_two(cards) = 1
+set FIRST = false
+set INDEX = FIRST_CARD
+repeat
+   if INDEX(parent) = current_hand
+      if FIRST = false
+         set FIRST = INDEX
+      else
+         set SECOND = INDEX
+      endif
+   endif
+   set INDEX = INDEX(next)
+until INDEX = PAST_LAST
+set SECOND(parent) = hand_two
+if SECOND(value) = 11
+   set hand_two(aces) = 1
+   set hand_one(aces) - 1
+   if FIRST(value) = 11
+	  ; Splitting aces...
+      set hand_one(total) = 11
+      set hand_two(total) = 11
+      write "You are splitting aces so you only get one more card per hand.^"
+      write "Playing first hand.^"
+	  execute "+deal_card<hand_one"
+      write "Playing second hand.^"
+	  execute "+deal_card<hand_two"
+	  set current_hand = hand_two
+	  execute "+play_out_dealer"
+	  return
+   endif
+endif
+set hand_one(total) - SECOND(value)
+set hand_two(total) + SECOND(value)
+execute "+display_table"
+}
+
+integer FIRST_CARD			;The first card of this hand
+integer PAST_LAST			;The last card of this hand
+integer NEAR_END			;The card twenty five cards from the end
+integer PASSED_NEAR_END	;The twenty fifth card from the end been reached
+
+{+shuffle_decks
+; Shuffle INDEX number of times
+set HIGH-LOW-COUNT = 0
+set KO-COUNT = 0
+set OMEGA2-COUNT = 0
+set INDEX = 300
+repeat
+	execute +set_node1
+	execute +set_node2
+	set cardA = shoe(next)
+	set cardB = NODE1(previous)
+	set cardC = NODE2(next)
+	set shoe(next) = NODE1
+	set NODE1(previous) = shoe
+	set cardB(next) = cardC
+	set cardC(previous) = cardB
+	set cardA(previous) = NODE2
+	set NODE2(next) = cardA
+	set INDEX - 1
+until INDEX = 0
+set CURRENT_CARD = shoe
+set FIRST_CARD_OF_HAND = shoe
+execute +set_near_end
+set PASSED_NEAR_END = false
+}
+
+{+set_near_end
+set NEAR_END = end
+set INDEX = 0
+repeat
+   set NEAR_END = NEAR_END(previous)
+   set INDEX + 1
+until INDEX = 25
+}
+
+integer CURRENT_CARD
+
+integer HIGH-LOW-COUNT
+integer KO-COUNT
+integer OMEGA2-COUNT
+
+{+deal_card
+set CURRENT_CARD = CURRENT_CARD(next)
+if arg[0] = dealers_hand
+   write "The dealer is dealt " CURRENT_CARD{list} ".^"
+else
+   write "You are dealt " CURRENT_CARD{list} ".^"
+endif
+set PAST_LAST = CURRENT_CARD(next)
+set CURRENT_CARD(parent) = noun4
+execute "+increase_total<arg[0]"
+set HIGH-LOW-COUNT + CURRENT_CARD(high-low)
+set KO-COUNT + CURRENT_CARD(ko)
+set OMEGA2-COUNT + CURRENT_CARD(omega2)
+if CURRENT_CARD = NEAR_END
+   set PASSED_NEAR_END = true
+endif
+}
+
+{+increase_total
+set noun4(total) + CURRENT_CARD(value)
+set noun4(cards) + 1
+if CURRENT_CARD(value) = 11
+   set noun4(aces) + 1
+endif
+if noun4(total) < 22
+   return
+endif
+if noun4(aces) > noun4(aces_as_one)
+   set noun4(total) - 10
+   set noun4(aces_as_one) + 1
+endif
+}
+
+integer FIRST
+integer SECOND
+
+{+is_pair
+set FIRST = 0
+set INDEX = FIRST_CARD
+
+repeat
+   if INDEX(parent) = current_hand
+      if FIRST = 0
+         set FIRST = INDEX(value)
+      else
+         set SECOND = INDEX(value)
+         return
+      endif
+   endif
+   set INDEX = INDEX(next)
+until INDEX = PAST_LAST
+}
+
+{+intro
+set status_window = 0
+set max_rand = end
+set max_rand - d1_two_diamonds
+set max_rand / 2
+set max_rand - 8
+
+if interpreter = GLK
+   write "shuffing...^"
+endif
+execute "+shuffle_decks"
+
+# Set the number of hands for the player back to one (dealer can only have one)
+set current_player = kryten
+set current_player(hands) = 1
+set current_hand = hand_one
+set GAME_PHASE = place_bet
+set PREVIOUS_GAME_PHASE = place_bet
+
+clear
+style bold
+write "^^Welcome to BlackJACL^^"
+style normal
+write "Type 'help' for instructions.^"
+}
+
+{+play_out_dealer
+if SOFT_SEVENTEEN = true
+   execute "+soft"
+else
+   execute "+hard"
+endif
+execute "+hand_finished"
+}
+
+{+hand_finished
+execute "+determine_winner<hand_one
+if current_player(hands) = 2
+   execute "+determine_winner<hand_two"
+endif
+execute "+display_final"
+if PASSED_NEAR_END = true
+   write "Nearing the end of the shoe, all cards will be shuffled and returned to the shoe.^"
+endif
+set GAME_PHASE = place_bet
+}
+
+{+soft
+if dealers_hand(total) < 18
+   if dealers_hand(total) = 17
+      if dealers_hand(aces) = dealers_hand(aces_as_one)
+         return
+      endif
+   endif
+   execute "+deal_card<dealers_hand"
+   execute "+soft"
+endif
+}
+
+{+hard
+if dealers_hand(total) < 17
+   repeat
+      execute "+deal_card<dealers_hand"
+   until dealers_hand(total) > 16
+endif
+}
+
+integer RESULT
+
+{+determine_winner
+; Player bust...
+if noun4(total) > 21 
+   set noun4(result) = 1
+   return
+endif
+
+; Player got Blackjack...
+if noun4(total) = 21
+   if noun4(cards) = 2
+      if current_player(hands) = 1 
+         if dealers_hand(total) = 21
+            if dealers_hand(cards) = 2
+               ; ...and so did the dealer...
+   			set current_player(money) + noun4(bet)
+   			; Pay two to one on insurance
+   			set current_player(money) + current_player(insurance)
+   			set current_player(money) + current_player(insurance)
+               set noun4(result) = 2
+               return
+            endif
+         endif
+         set INDEX = noun4(bet)
+         set INDEX / 2
+         set COUNTER = noun4(bet)
+         set COUNTER * 2
+         set COUNTER + INDEX
+         set current_player(money) + COUNTER
+   	     set noun4(result) = 3
+         return
+      endif
+   endif
+endif
+
+; The dealer got Blackjack
+if dealers_hand(total) = 21
+   if dealers_hand(cards) = 2
+      set noun4(result) = 4
+ 	  ; Pay two to one on insurance
+	  set current_player(money) + current_player(insurance)
+      set current_player(money) + current_player(insurance)
+      return
+   endif
+endif
+
+; Player equal with dealer...
+if noun4(total) = dealers_hand(total)
+   set current_player(money) + noun4(bet)
+   set noun4(result) = 2
+   return
+endif
+
+; Dealer bust...
+if dealers_hand(total) > 21
+   set current_player(money) + noun4(bet)
+   set current_player(money) + noun4(bet)
+   set noun4(result) = 5
+   return
+endif
+
+; Player higher than delear...
+if noun4(total) > dealers_hand(total)
+   set current_player(money) + noun4(bet)
+   set current_player(money) + noun4(bet)
+   set noun4(result) = 6
+   return
+endif
+
+; Player not bust, dealer not bust, player lower than dealer...
+set noun4(result) = 7
+}
+
+{+display_result
+if noun4(result) = 1
+   write "Sorry, you bust.^"
+   return
+endif
+if noun4(result) = 2
+   write "The hands a draw.^"
+   return
+endif
+if noun4(result) = 3
+   write "You got Blackjack!^"
+   return
+endif
+if noun4(result) = 4
+   write "The dealer got Blackjack.^"
+   return
+endif
+if noun4(result) = 5
+   write "The dealer bust.^"
+   return
+endif
+if noun4(result) = 6
+   write "You won.^"
+   return
+endif
+if noun4(result) = 7
+   write "The dealer won.^"
+   return
+endif
+}
+
+{+deal_initial
+# Set the number of hands for the player back to one (dealer can only have one)
+set current_player(hands) = 1
+set current_player(insurance) = 0
+set current_hand = hand_one
+
+; Reset the player's stats
+set dealers_hand(aces) = 0
+set dealers_hand(aces_as_one) = 0
+set dealers_hand(total) = 0
+set dealers_hand(cards) = 0
+
+set hand_one(aces) = 0
+set hand_one(aces_as_one) = 0
+set hand_one(total) = 0
+set hand_one(cards) = 0
+
+set hand_two(aces) = 0
+set hand_two(aces_as_one) = 0
+set hand_two(total) = 0
+set hand_two(cards) = 0
+
+if PASSED_NEAR_END = true
+   execute "+shuffle_decks"
+endif
+
+; Deal the initial cards out in the correct order
+execute "+deal_card<current_hand"
+set FIRST_CARD = CURRENT_CARD
+execute "+deal_card<dealers_hand"
+execute "+deal_card<current_hand"
+
+if current_hand(total) = 21
+   execute "+play_out_dealer"
+endif
+}
+
+integer THIS_HAND
+
+{+display_final
+; Display the dealer's cards
+write "The dealer's hand totals " dealers_hand(total) ".^"
+
+; Display the player's first hand
+set current_hand = hand_one
+if current_player(hands) = 1
+   write "Your hand totals " hand_one(total) ".^"
+else
+   write "Your first hand totals " hand_one(total) ".^"
+endif
+#write " -- Bet: $" hand_one(bet)
+execute "+display_result<hand_one"
+
+if current_player(hands) = 2
+   ; Display the player's second hand
+   write "Your second hand totals " hand_two(total) ".^"
+   #write " -- Bet: $" hand_two(bet)
+   execute "+display_result<hand_two"
+endif
+}
+
+grammar omega2	>omega2
+
+{+omega2
+write "The current Omega-II count is "
+execute "+display_count<OMEGA2-COUNT"
+write ".^"
+execute "+display_table"
+}
+
+grammar highlow	>highlow
+
+{+highlow
+write "The current HIGH-LOW count is "
+execute "+display_count<HIGH-LOW-COUNT"
+write ".^"
+execute "+display_table"
+}
+
+grammar ko	>ko
+
+{+ko
+write "The current KO count is "
+execute "+display_count<KO-COUNT"
+write ".^"
+execute "+display_table"
+}
+
+{+display_count
+if arg[0] < 1
+   write arg[0]
+else
+   write "+" arg[0]
+endif
+}
+
+grammar bet >bet_only
+
+{+bet_only
+if GAME_PHASE = players_turn
+   write "You can't place a bet until the start of the next hand.^"
+   return
+endif
+write "You must follow a bet command with the number of dollars you "
+write "wish to bet. For example, to bet twenty five dollars, type ~bet 25.~^"
+}
+
+integer FIRST_CARD_OF_HAND
+
+grammar bet $integer	>bet
+
+{+bet
+if GAME_PHASE = players_turn
+   write "You can't place a bet until the start of the next hand.^"
+   return
+endif
+if $integer < 25 : $integer > 1000
+   write "This table has a minimum bet of $25 and a maximum bet of $1000.^"
+   return
+endif
+set GAME_PHASE = players_turn
+set current_player(money) - $integer
+set current_hand(bet) = $integer
+
+# Clear the old card ownership
+set INDEX = FIRST_CARD_OF_HAND
+repeat
+   set INDEX(parent) = nowhere
+   set INDEX + 1
+until INDEX > CURRENT_CARD
+
+set FIRST_CARD_OF_HAND = CURRENT_CARD
+execute "+deal_initial"
+}
+
+object dealer : dealer
+  static
+  short			name "dealer"
+
+object dealers_hand : dealer_hand
+ 
+object kryten: myself self me james bond
+  has			ANIMATE
+  short			name "player one"
+  quantity		42
+  money			2000
+  parent		casino
+  player
+
+object hand_one : hand one
+  short			name "first hand"
+
+object hand_two : hand two
+  short			name "second hand"
+
+integer TEMP
+integer BACKUP
+
+{+basic_strategy_check
+if PREVIOUS_GAME_PHASE = place_bet : CHECK_STRATEGY = 0
+   return
+endif
+if last_move != best_move
+   write "^You should have " MOVE_TYPE[best_move] !^
+endif
+#write " (LAST: " MOVE_TYPE[last_move] "  BEST: " MOVE_TYPE[best_move] ")^"
+}
+
+{+basic_strategy_table
+set current_hand(cards) = 3; DONT DO THE PAIRS CHECK AS THERE ARE NO REAL CARDS
+set current_hand(aces) = 0;
+set current_hand(aces_as_one) = 0;
+
+set current_hand(total) = 4
+# PLAYER LOOP
+repeat
+   execute "+dealer_loop" 
+   set current_hand(total) + 1
+until current_hand(total) = 21
+}
+
+{+dealer_loop
+set dealers_hand(total) = 2
+repeat
+   execute "+basic_strategy_code"
+   if best_move = stay
+      write "S "
+   endif
+   if best_move = hit
+      write "H "
+   endif
+   if best_move = double
+      write "D "
+   endif
+   set dealers_hand(total) + 1
+until dealers_hand(total) = 12
+write "^"
+}
+
+{+basic_strategy_code
+execute "+is_pair"
+if current_hand(cards) = 2
+   if FIRST = SECOND
+      # CURRENT HAND IS A PAIR
+      if FIRST = 11
+         set best_move = split
+         return
+      endif
+      if FIRST = 10
+         set best_move = stay
+         return
+      endif
+      if FIRST = 9
+         if dealers_hand(total) = 7 : dealers_hand(total) > 9
+            set best_move = stay
+         else 
+            set best_move = split
+         endif
+         return
+      endif
+      if FIRST = 8
+         set best_move = split
+         return
+      endif
+      if FIRST = 7
+         if dealers_hand(total) > 7
+            set best_move = hit
+         else 
+            set best_move = split
+         endif
+         return
+      endif
+      if FIRST = 6
+         if dealers_hand(total) = 2 : dealers_hand(total) > 6
+            set best_move = hit
+         else
+            set best_move = split
+         endif
+         return
+      endif
+      if FIRST = 5
+         if dealers_hand(total) > 9
+            set best_move = hit
+         else
+            set best_move = double
+         endif
+         return
+      endif
+      if FIRST = 4
+         if dealers_hand(total) = 5 : dealers_hand(total) = 6
+            set best_move = split
+         else
+            set best_move = hit
+         endif
+         return
+      endif
+      # MUST BE A PAIR OF 3s OR 2s. BOTH HAVE SAME STRATEGY
+      if dealers_hand(total) < 5 : dealers_hand(total) > 7
+         set best_move = hit
+      else
+         set best_move = split
+      endif
+      return
+   endif
+endif
+if current_hand(aces) > current_hand(aces_as_one)
+   # CURRENT HAND IS A SOFT TOTAL
+   if current_hand(total) > 18
+      set best_move = stay
+      return
+   endif
+   if current_hand(total) = 18
+      if dealers_hand(total) > 8
+         set best_move = hit
+      else
+         set best_move = stay
+      endif
+      return
+   endif
+   set best_move = hit 
+   return
+endif
+# CURRENT HAND IS A HARD TOTAL
+if current_hand(total) > 16
+   set best_move = stay
+   return
+endif
+if current_hand(total) > 12
+   # HAND IS 13 TO 16
+   if dealers_hand(total) < 7
+      set best_move = stay
+   else
+      set best_move = hit
+   endif
+   return
+endif
+if current_hand(total) = 12
+   if dealers_hand(total) < 4 : dealers_hand(total) > 6
+      set best_move = hit
+      return
+   endif
+   set best_move = stay
+endif
+if current_hand(total) = 11
+   if dealers_hand(total) = 11
+      set best_move = hit
+   else
+      set best_move = double
+   endif
+   return
+endif
+if current_hand(total) = 10
+   if dealers_hand(total) > 9
+      set best_move = hit
+   else
+      set best_move = double
+   endif
+   return
+endif
+if current_hand(total) = 9
+   if dealers_hand(total) = 2 : dealers_hand(total) > 6
+      set best_move = hit
+   else
+      set best_move = double
+   endif
+   return
+endif
+set best_move = hit
+}
+
+{+top
+set PREVIOUS_GAME_PHASE = GAME_PHASE
+}
+
+{+bottom
+execute "+basic_strategy_check"
+if GAME_PHASE = place_bet
+   write "^You currently have " current_player(money) " dollars.^"
+endif
+if GAME_PHASE = place_bet
+   write "^At this point in the game you can place your bet."
+endif
+if GAME_PHASE = players_turn
+   if current_player(hands) = 2
+      write " (currently playing " current_hand{the} ")"
+   endif
+   write "^You can:"
+   if current_hand(cards) = 2
+      if current_player(hands) = 1
+         if dealers_hand(cards) = 1
+            if dealers_hand(total) = 11
+               if current_player(insurance) = 0
+                  write " insurance"
+			   endif
+            endif
+         endif
+      endif
+   endif
+   if current_hand(cards) = 2
+      if current_player(hands) = 1
+         execute "+is_pair" 
+         if FIRST = SECOND
+            write " split"
+         endif
+      endif
+   endif
+   if current_hand(total) = 9 : current_hand(total) = 10 : current_hand(total) = 11
+      if current_player(hands) = 2
+         if current_hand(cards) = 1
+			if DAS = 1 
+               write " double"
+			endif
+         endif
+      else
+         if current_hand(cards) = 2
+            write " double"
+         endif
+      endif
+   endif
+   write " hit stay"
+endif
+write "^"
+set score = current_player(money) 
+}
+
+
+#include "utils.library"
+#include "verbs.library"

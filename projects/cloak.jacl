@@ -1,0 +1,222 @@
+#!../bin/jacl
+#------------------------------------------------------------------------------
+#                                                             CLOAK OF DARKNESS
+
+constant game_title     "Cloak of Darkness"
+constant game_author    "Stuart Allen"
+constant game_version   1
+
+integer blundered_in	1
+
+{+intro
+clear
+write "^^"
+style bold
+write game_title
+style normal
+write " ported by " game_author "^^"
+write "^^"
+print:
+   Hurrying through the rainswept July night, you're glad to see the
+   bright lights of the Opera House. It's surprising that there aren't more
+   people about but, hey, what do you expect from a quick port of a cheap
+   demo game...?^^
+.
+execute "+look_around"
+}
+
+location foyer : foyer
+ short		the "foyer of the Opera House"
+ north		outside
+ south		bar
+ west		cloak_room
+
+{look
+print:
+   You are standing in a spacious hall, spendidly decorated in red
+   and gold, with glittering chandeliers overhead. The entrance from
+   the street is to the north, and there are doorways south and west.^
+.
+}
+
+{movement
+if destination = outside
+   print:
+      You've only just arrived, and besides, the weather outside seems
+      to be getting worse.^
+   .
+   return
+endif
+return false
+}
+
+location outside : street outside
+ short		the "street outside"
+
+location cloak_room : small cloak room storage closet
+ short		the "cloak room"
+ east		foyer
+
+{look
+print:
+   The walls of this small room were clearly once lined with hooks,
+   though now only one remains. The exit is a door to the east.^
+.
+}
+
+object hook : small brass hook peg
+ short		a "small brass hook"
+ has		SURFACE
+ capacity	25
+
+{examine
+write "It's just a small brass hook, "
+if cloak(parent) = hook
+   write "with a cloak hanging on it.^"
+else
+   write "screwed to the wall.^"
+endif
+}
+
+location bar : bar
+ short		the "foyer bar"
+ has		DARK
+ north		foyer
+
+{look
+print:
+   The bar, much rougher that you'd have guessed after the opulence of
+   the foyer to the north, is completely empty. There seems to be some 
+   sort of message scrawled in the sawdust on the floor.^
+.
+}
+
+{movement
+if here has DARKNESS
+   if destination != foyer
+      write "Blundering around in the dark isn't a good idea!^"
+      set bar(blundered_in) + 1
+      return
+   endif
+endif
+return false
+}
+
+object message : message sawdust floor
+ short		a "scrawled message"
+
+{read : examine
+if bar(blundered_in) < 2
+   print:
+      The message, neatly marking in the sawdust, reads...^^
+      ~You have won!~^
+   .
+   points 50
+   execute "+game_over"
+else
+   print:
+      The message has been carelessly trampled, making it difficult
+      to read. You can just distinguish the words...^^
+      ~You have lost.~^
+   .
+   execute "+game_over"
+endif
+}
+
+{+eachturn
+if here hasnt OUTDOORS
+   move north_wall to here
+   move south_wall to here
+   move east_wall to here
+   move west_wall to here
+endall
+}
+
+object kryten: myself self me
+ has		ANIMATE
+ short		name "yourself"
+ quantity	42
+ parent		foyer
+ player
+
+{examine_override
+execute "+inventory"
+}
+
+object cloak : dark black velvet cloak
+ short		a "velvet cloak"
+ long		"Lying on the ground is a handsome velvet coat."
+ has		WEARABLE WORN
+ parent		kryten
+ mass		5
+
+{examine_override
+print:
+   A handsome cloak, velvet trimmed with satin, and slightly spattered
+   with raindrops. Its blackness is so deep that it alsmost seems to suck
+   light from the room.^
+.
+}
+
+{drop
+if here != cloak_room
+   write "This isn't the best place to leave a smart cloak lying around.^"
+else
+   proxy "hang cloak on hook"
+endif
+}
+
+{insert_on_hook_override
+write "You hang the cloak on the hook.^"
+move cloak to hook
+ensure bar hasnt DARK
+if hook hasnt SCORED
+   points 50
+   ensure hook has SCORED
+endif
+}
+
+{take_override
+write "You take the cloak back off the hook.^"
+move cloak to player
+ensure bar has DARK
+}
+
+grammar hang *held on *present	>insert_on
+
+{+no_light
+print:
+   It's very dark in here. Perhaps you should just leave before you
+   do any damage.^
+.
+set bar(blundered_in) + 1
+set time = false
+}
+
+{+title
+if player has SITTING
+   write "(sitting)^"
+endif
+}
+
+object north_wall: north north wall
+ has			NO_TAB
+ short          the "north wall"
+
+object south_wall: south southern wall
+ has			NO_TAB
+ short          the "south wall"
+
+object east_wall: east eastern wall
+ has			NO_TAB
+ short          the "east wall"
+
+object west_wall: west western wall
+ has			NO_TAB
+ short          the "west wall"
+
+object ground: ground floor
+ has            SURFACE NO_TAB
+ short          the "ground"
+
+#include "verbs.library"

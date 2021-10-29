@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 34
+/svn/!svn/ver/247/trunk/src/WinGlk
+END
+winglk_main.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/245/trunk/src/WinGlk/winglk_main.c
+END
+WinGlk.h
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/!svn/ver/245/trunk/src/WinGlk/WinGlk.h
+END
+libglk.a
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/!svn/ver/247/trunk/src/WinGlk/libglk.a
+END
+glk.h
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/svn/!svn/ver/245/trunk/src/WinGlk/glk.h
+END
+gi_dispa.h
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/!svn/ver/245/trunk/src/WinGlk/gi_dispa.h
+END
+gi_blorb.h
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/!svn/ver/245/trunk/src/WinGlk/gi_blorb.h
+END
+WinGlk.html
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/245/trunk/src/WinGlk/WinGlk.html
+END

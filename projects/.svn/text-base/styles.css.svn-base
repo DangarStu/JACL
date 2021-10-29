@@ -1,0 +1,162 @@
+BODY	{	
+			background-color: #ddddff;
+		}
+ 
+A		{	
+			font-size: 12pt;
+			color: black
+		}
+
+DIV.header {
+			background-color: #bbbbee;
+			width: 100%;
+			overflow: auto;
+		}
+DIV.header_left	{
+			float: left;
+			background-color: #bbbbee;
+			height: 98px;
+			padding: 5px;
+			width: 10%;
+		}
+DIV.header_right {
+			float: right;
+			background-color: #bbbbee;
+			height: 98px;
+			padding: 5px;
+		}
+DIV.content	{
+			width: 90%;
+			margin: 1cm;
+		}
+DIV.footer	{
+			background-color: #bbbbee;
+			left: 0px;
+			height: 100px;
+			width: 99%;
+		}
+A.visited	{	
+			font-size: 12pt;
+			color: black
+		}
+
+A.section	{	
+			font-size: 18pt;
+		    color: black;
+			font-weight: bold;
+			}
+
+A.title		{	
+			font-family: Helvetica, Arial, Sans;
+		 	font-size: 24pt;
+			text-align: right;
+			margin-top: 1cm;
+			margin-bottom: 1cm
+			}
+
+IMG		{ 	
+			border: 0px;
+			border-style: none;
+		}
+
+TABLE.infowarn	{ 	
+			margin-top: 12pt;
+			margin-bottom: 12pt;
+			padding: 10;
+			border-style: none;
+				}
+
+DIV.spacer	{ 	
+			margin-top: 12pt;
+			margin-bottom: 12pt;
+			}
+
+TABLE	{ 	
+			margin-top: 12pt;
+			margin-bottom: 12pt;
+			padding: 5px;
+			border-style: solid;
+			border-width: 1px;
+		}
+
+TD		{	
+			font-family: Georgia;
+		 	font-size: 12pt;
+			vertical-align: top;
+		}
+
+TH		{	
+			font-family: Helvetica, Garamond, Arial, Sans;
+		 	font-size: 12pt;
+			font-weight: bold;
+			color: white;
+			padding: 5px;
+			background-color: gray
+		}
+
+P		{	
+			font-family: Helvetica, Arial, Sans;
+		 	font-size: 12pt
+		}
+
+P.centred	{	
+			font-family: Helvetica, Arial, Sans;
+		 	font-size: 12pt;
+			text-align: center
+		}
+
+CODE	{	
+			font-family: Courier new, Monospace;
+		 	font-size: 12pt;
+		}
+
+PRE		{	
+			font-family: Courier new, Monospace;
+		 	font-size: 12pt;
+			margin-left: 12pt;
+			margin-top: 20pt;
+			margin-bottom: 20pt;
+		}
+
+PRE.CODE	{	
+			font-family: Courier new, Monospace;
+		 	font-size: 12pt;
+			}
+
+OL		{	
+			font-family: Helvetica, Arial, Sans;
+		 	font-size: 12pt
+		}
+
+LI		{	
+			font-family: Helvetica, Arial, Sans;
+		 	font-size: 12pt
+		}
+
+H1		{	
+			font-family: Helvetica, Arial, Sans;
+		 	font-size: 24pt;
+			text-align: right;
+			margin-top: 1cm;
+			margin-bottom: 1cm;
+			margin-right: 1cm;
+		}
+
+H2		{	
+			font-family: Helvetica, Arial, Sans;
+		 	font-size: 20pt;
+			text-align: left;
+			margin-top: 2cm;
+		}
+
+H3		{	
+			font-family: Helvetica, Arial, Sans;
+		 	font-size: 15pt;
+			text-align: left;
+			margin-top: 0.5cm;
+			margin-bottom: 1cm
+		}
+
+LI		{
+			margin-top: 0.5cm;
+		}

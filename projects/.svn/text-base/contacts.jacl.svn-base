@@ -1,0 +1,327 @@
+#!../bin/cgijacl
+
+# -----------------------------------------------------------------------------
+
+constant status_window 0
+constant game_title		"Contacts Database"
+constant game_author	"Stuart Allen"
+constant game_release    1
+constant game_build      1
+constant ifid			"JACL-002"
+
+# -----------------------------------------------------------------------------
+
+integer temp
+integer INDEX
+integer last_id			0
+integer editing
+integer errors
+
+constant SEARCH         1
+constant CREATE         2
+constant VIEW           3
+constant EDIT           4
+
+string tab_names "Contacts" "Search" "Add" "List" "Edit"
+
+string id_data
+string firstname_data
+string firstname_error
+string surname_data
+string surname_error
+string email_data
+string email_error
+string home_phone_data
+string home_phone_error
+string mobile_phone_data
+string mobile_phone_error
+string address_data
+string address_error
+string search_data
+string search_error
+
+parameter id           id_data
+parameter firstname    firstname_data
+parameter surname      surname_data
+parameter email        email_data
+parameter home_phone   home_phone_data
+parameter mobile_phone mobile_phone_data
+parameter address      address_data
+parameter search       search_data
+
+{+links_div
+write "a JACL proof-of-concept"
+}
+
+{+intro
+set player = you
+# GET THE LAST ID
+iterate data
+   if field[0] > last_id
+      set last_id = field[0]
+   endif
+enditerate
+execute "+display_search"
+}
+
+grammar delete $integer >delete
+
+{+delete
+update data
+   if field[0] != $integer
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
+   endif
+endupdate
+write "Record " $integer " deleted.^^"
+}
+
+grammar edit $integer >edit
+
+{+edit
+set editing = true
+execute "+skip_to_record<$integer"
+execute "+edit_form"
+}
+
+{+skip_to_record
+iterate data
+   if field[0] = $integer
+      return
+   endif
+enditerate
+}
+
+{+edit_form
+write "<form>"
+execute "+text<First name<firstname<30<field[1]"
+execute "+text<Surname<surname<30<field[2]"
+execute "+text<Email address<email<50<field[3]"
+execute "+text<Home phone<home_phone<50<field[4]"
+execute "+text<Mobile phone<mobile_phone<50<field[5]"
+execute "+text<Address<address<50<field[6]"
+
+write "<div class=~row~>"
+write "<div class=~label~>&nbsp;</div>
+write "<div class=~input~><input type=~submit~></div>"
+write "</div>
+write "<input type=~hidden~ name=~command~ value=~update " field[0] "~/>"
+hidden
+write "</form>
+}
+
+grammar update $integer >update
+
+{+update
+if errors != 0
+   # THERE WERE ERRORS, DISPLAY THE FORM AGAIN
+   execute "+edit"
+   return
+endif
+update data
+   if field[0] = $integer
+      insert field[0] firstname_data surname_data email_data home_phone_data mobile_phone_data address_data
+   else
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
+   endif
+endupdate
+write "Record " $integer " updated.^^"
+set editing = true
+}
+
+{+before
+if WEBAPP_mode = SEARCH
+   execute "+display_search"
+endif
+return false
+}
+
+{+after
+if WEBAPP_mode = CREATE
+   execute "+create_form"
+endif
+if WEBAPP_mode = VIEW
+   execute "+display_contacts"
+endif
+ifall WEBAPP_mode = EDIT : editing = false
+   write "To edit a record, select it from the <b>List</b> or "
+   write "<b>Search</b> tabs by clicking the <b>Edit</b> link "
+   write "beside the contact you wish to edit.^"
+endif
+set editing = false
+
+# CLEAR THE PARAMETERS
+setstring id_data        		""
+setstring firstname_data    	""
+setstring firstname_error		""
+setstring surname_data      	""
+setstring surname_error			""
+setstring email_data        	""
+setstring email_error			""
+setstring address_data      	""
+setstring address_error			""
+setstring home_phone_data   	""
+setstring home_phone_error		""
+setstring mobile_phone_data		""
+setstring mobile_phone_error	""
+setstring search_data       	""
+setstring search_error			""
+
+set errors = 0
+}
+
+{+display_search
+write "<form>"
+execute "+text_submit<Search<search<60<search_data"
+write "<input type=~hidden~ name=~command~ value=~search~/>"
+hidden
+write "</form>"
+write "^<hr>"
+}
+
+{+create_form
+write "<form>"
+execute "+text<First name<firstname<30"
+execute "+text<Surname<surname<30"
+execute "+text<Email address<email<50"
+execute "+text<Home phone<home_phone<50"
+execute "+text<Mobile phone<mobile_phone<50"
+execute "+text<Address<address<50"
+
+write "<div class=~row~>"
+write "<div class=~label~>&nbsp;</div>"
+write "<div class=~input~>"
+write "<input type=~submit~>"
+write "</div>"
+write "</div>"
+
+write "^^<input type=~hidden~ name=~command~ value=~add~/>"
+hidden
+write "</form>
+}
+
+grammar add >add_record
+
+{+before_add_record : +before_update
+if +validate_email<email_data == false
+   setstring email_error "Invalid e-mail address."
+   set errors + 1
+endif 
+return false
+}
+
+{+add_record
+if errors != 0
+   # THERE WERE ERRORS, DISPLAY THE FORM AGAIN
+   return
+endif
+set last_id + 1
+append data last_id firstname_data surname_data email_data home_phone_data mobile_phone_data address_data
+write firstname_data " " surname_data " added to database.^^"
+}
+
+integer matches
+
+string action
+
+grammar search >search
+
+{+search
+set WEBAPP_mode = SEARCH
+set matches = 0
+write "<table width=~100%~ class=~customer~>"
+write "<tr>"
+write "<th>ID</th>"
+write "<th>First name</th>"
+write "<th>Surname</th>"
+write "<th>Email address</th>"
+write "<th>Home phone</th>"
+write "<th>Mobile phone</th>"
+write "<th>Address</th>"
+write "<th>ACTION</th>"
+write "</tr>"
+
+iterate data
+   ifstring field[1] contains search_data : field[2] contains search_data : field[3] contains search_data : field[4] contains search_data : field[5] contains search_data : field[6] contains search_data
+      write "<tr>"
+      write "<td>" field[0] "</td>"
+      write "<td>" field[1] "</td>"
+      write "<td>" field[2] "</td>"
+      write "<td>" field[3] "</td>"
+      write "<td>" field[4] "</td>"
+      write "<td>" field[5] "</td>"
+      write "<td>" field[6] "</td>"
+      write "<td>"
+      setstring action "delete " field[0]
+      hyperlinkNE "Delete" action
+      write "<br>"
+      setstring action "edit " field[0] "&mode=" EDIT
+      hyperlinkNE "Edit" action
+      write "</td>"
+      write "</tr>"
+      set matches + 1 
+   endif
+enditerate
+write "</table>"
+
+if matches = 0
+   write "^No matching records found.^"
+endif
+if matches = 1
+   write "^1 matching record found.^"
+endif
+if matches > 1
+   write "^" matches " matching records found.^"
+endif
+}
+
+{+display_contacts
+write "<table width=~100%~ class=~customer~>"
+write "<tr>"
+write "<th>ID</th>"
+write "<th>First name</th>"
+write "<th>Surname</th>"
+write "<th>Email address</th>"
+write "<th>Home phone</th>"
+write "<th>Mobile phone</th>"
+write "<th>Address</th>"
+write "<th>ACTION</th>"
+write "</tr>"
+iterate data
+   write "<tr>"
+   write "<td>" field[0] "</td>"
+   write "<td>" field[1] "</td>"
+   write "<td>" field[2] "</td>"
+   write "<td>" field[3] "</td>"
+   write "<td>" field[4] "</td>"
+   write "<td>" field[5] "</td>"
+   write "<td>" field[6] "</td>"
+   write "<td>"
+   setstring action "delete " field[0]
+   hyperlinkNE "Delete" action
+   write "<br>"
+   setstring action "edit " field[0] "&mode=" EDIT
+   hyperlinkNE "Edit" action
+   write "</td>"
+   write "</tr>"
+enditerate
+write "</table>"
+}
+
+constant title_values "Mr" "Mrs" "Ms" "Miss" "Dr"
+
+location boardroom
+
+object you
+
+constant title_image		"none"
+constant footer_image		"none"
+constant header_colour		"#000000"
+constant header_height		87
+constant linkbar_colour		"#c0b098"
+constant maintext_colour	"#dddddd"
+constant tab_colour			"#60594e"
+
+#include "forms.library"
+#include "webapp.library"
+#include "webapp.css"
+#include "validation.library"

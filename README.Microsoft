@@ -1,0 +1,8 @@
+JACL Adventure Creation Language v4.0
+
+For a quick-start look at some of the games included with this distribution,
+change into the 'bin' directory and type, for example: 
+'garjacl ..\projects\grail.jacl'
+
+For instructions and installation information see the appropriate chapter 
+in the Author's Guide (guide/installation.html).

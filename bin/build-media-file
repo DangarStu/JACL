@@ -1,0 +1,49 @@
+#!/usr/bin/awk -f
+
+BEGIN {
+    PREFIX="images/";
+    IGNORECASE=1;
+}
+
+
+/[ \"\~]+(.*\.jpg)[ \"\~]+/ {
+    match( $0, "[^ \"\~]*\.jpg");
+    vname=substr( $0, RSTART, RLENGTH );
+    fname=PREFIX vname;
+    gsub( "//", "/", fname );
+    print vname " image/jpeg " fname ; 
+}
+
+/[ \"\~]+(.*\.gif)[ \"\~]+/ {
+    match( $0, "[^ \"\~]*\.gif");
+    vname=substr( $0, RSTART, RLENGTH );
+    fname=PREFIX vname;
+    gsub( "//", "/", fname );
+    print vname " image/gif " fname ; 
+}
+
+/[ \"\~]+(.*\.png)[ \"\~]+/ {
+    match( $0, "[^ \"\~]*\.png");
+    vname=substr( $0, RSTART, RLENGTH );
+    fname=PREFIX vname;
+    gsub( "//", "/", fname );
+    print vname " image/png " fname ; 
+}
+
+/[ \"\~]+(.*\.js)[ \"\~]+/ {
+    match( $0, "[^ \"\~]*\.js");
+    vname=substr( $0, RSTART, RLENGTH );
+    fname=PREFIX vname;
+    gsub( "//", "/", fname );
+    print vname " application/x-javascript " fname ; 
+}
+
+/[ \"\~]+(.*\.htm)[ \"\~]+/ {
+    match( $0, "[^ \"\~]*\.htm");
+    vname=substr( $0, RSTART, RLENGTH );
+    fname=PREFIX vname;
+    gsub( "//", "/", fname );
+    print vname " text/html " fname ; 
+}
+
+

@@ -1,0 +1,247 @@
+<html>
+<head>
+<title>The JACL Author's Guide</title>
+<meta name="description" content="Documention for the JACL Adventure Creation Language.">
+<meta name="keywords" content="JACL,programming,programmers,guide,manual,documention,instructions">
+<link rel=stylesheet type="text/css" href="styles.css">
+</head>
+<body>
+
+<h1 class="centred">Contents</h1>
+
+<ol>
+
+<li><a class="chapter" href="introduction.html#introduction0">Introduction</a>
+
+<li><a class="chapter" href="typo.html#typo0">Typographical Conventions</a>
+
+<li><a class="chapter" href="installation.html#installation0">Installation</a>
+<ol>
+	<li><a href="installation.html#installation1">Compilation</a>
+	<li><a href="installation.html#installation5">Playing the Sample Games</a>
+	</ol>
+
+<li><a class="chapter" href="playing.html#playing0">Playing Interactive Fiction</a>
+<ol>
+	<li><a href="playing.html#playing1">Moving Around</a>
+	<li><a href="playing.html#playing2">Manipulating Objects</a>
+	<li><a href="playing.html#playing3">Interacting with Characters</a>
+	<li><a href="playing.html#playing4">Meta Commands</a>
+</ol>
+
+<li><a class="chapter" href="tutorial.html#tutorial0">Tutorial Game</a>
+<ol>
+	<li><a href="tutorial.html#tutorial1">Language Syntax</a>
+	<li><a href="tutorial.html#tutorial2">Program Structure</a>
+	<li><a href="tutorial.html#tutorial3">Getting Started</a>
+	<li><a href="tutorial.html#tutorial4">Locations</a>
+	<li><a href="tutorial.html#tutorial5">The Player</a>
+	<li><a href="tutorial.html#tutorial6">Some Introductory Text</a>
+	<li><a href="tutorial.html#tutorial7">Objects</a>
+	<li><a href="tutorial.html#tutorial8">Verbs and Functions</a>
+	<li><a href="tutorial.html#tutorial9">Overriding Functions</a>
+	<li><a href="tutorial.html#tutorial10">Doors</a>
+	<li><a href="tutorial.html#tutorial11">Non-player Characters</a>
+	<li><a href="tutorial.html#tutorial12">The Passing of Time</a>
+	<li><a href="tutorial.html#tutorial13">Winning and Losing the Game</a>
+</ol>
+
+<li><a class="chapter" href="debugging.html#debugging0">Testing, Debugging and Releasing</a>
+<ol>
+	<li><a href="debugging.html#debugging1">The WALKTHRU Command</a>
+	<li><a href="debugging.html#debugging2">The DEBUG Command</a>
+	<li><a href="debugging.html#debugging3">The INSPECT Command</a>
+	<li><a href="debugging.html#debugging4">The Verb VALUEOF</a>
+	<li><a href="debugging.html#debugging6">The Verb FETCH</a>
+	<li><a href="debugging.html#debugging8">Releasing Your Game</a>
+</ol>
+
+<li><a class="chapter" href="screendisplay.html#screendisplay0">Screen Display</a>
+<ol>
+	<li><a href="screendisplay.html#screendisplay1">The WRITE Command</a>
+	<ol>
+		<li><a href="screendisplay.html#screendisplay2">Special Characters</a>
+		<li><a href="screendisplay.html#screendisplay3">Printing the Value of Variables</a>
+		<li><a href="screendisplay.html#screendisplay4">Printing the Value of Item Elements</a>
+		<li><a href="screendisplay.html#screendisplay5">Printing the Names and descriptions of Objects</a>
+		<li><a href="screendisplay.html#screendisplay6">Sentences Referring to Varying Objects</a>
+		<li><a href="screendisplay.html#screendisplay7">Custom Macros</a>
+		<li><a href="screendisplay.html#screendisplay8">Printing the Value of String Constants</a>
+	</ol>
+	<li><a href="screendisplay.html#screendisplay9">The PRINT Command</a>
+	<li><a href="screendisplay.html#screendisplay10">The LOOK Command</a>
+	<li><a href="screendisplay.html#screendisplay11">The LOOK Command</a>
+	<li><a href="screendisplay.html#screendisplay12">The MORE Command</a>
+</ol>
+
+<li><a class="chapter" href="multimedia.html#multimedia0">Glk and Multimedia</a>
+
+<ol>
+	<li><a href="multimedia.html#multimedia1">Blorb Files and BLC</a></h2>
+	<li><a href="multimedia.html#multimedia2">The IMAGE Command</a></h2>
+	<li><a href="multimedia.html#multimedia3">The SOUND Command</a></h2>
+	<li><a href="multimedia.html#multimedia4">The VOLUME Command</a></h2>
+	<li><a href="multimedia.html#multimedia5">The STOP Command</a></h2>
+	<li><a href="multimedia.html#multimedia6">The TIMER Command</a></h2>
+	<li><a href="multimedia.html#multimedia7">The STYLE Command</a></h2>
+	<li><a href="multimedia.html#multimedia8">The Status Window</a></h2>
+	<li><a href="multimedia.html#multimedia9">The UPDATESTATUS Command</a></h2>
+</ol>
+
+<li><a class="chapter" href="http.html#http0">HTTP and HTML</a>
+<ol>
+	<li><a href="http.html#http1">Document Structure</a>
+	<li><a href="http.html#http2">Linebreaks</a>
+	<li><a href="http.html#http3">The Player's User ID</a>
+	<li><a href="http.html#http4">The Player's Commands</a>
+	<li><a href="http.html#http5">Ajax Requests</a>
+	<li><a href="http.html#http6">The BUTTON Command</a>
+	<li><a href="http.html#http7">The HYPERLINK Command</a>
+	<li><a href="http.html#http8">The CONTROL Command</a>
+	<li><a href="http.html#http9">The OPTION Command</a>
+	<li><a href="http.html#http10">The IMAGE Command</a>
+	<li><a href="http.html#http11">The Media File</a>
+</ol>
+
+<li><a class="chapter" href="webinterface.html#webinterface0">GUI Web Interface</a>
+<ol>
+	<li><a href="webinterface.html#webinterface1">Using the Interface</a>
+</ol>
+
+<li><a class="chapter" href="flowcontrol.html#flowcontrol0">Flow Control</a>
+
+<ol>
+	<li><a href="flowcontrol.html#flowcontrol1">The IF, IFALL, ENDIF and ENDALL Commands</a>
+	<li><a href="flowcontrol.html#flowcontrol2">The IFSTRING Command</a>
+	<li><a href="flowcontrol.html#flowcontrol3">The IFEXECUTE Command</a>
+	<li><a href="flowcontrol.html#flowcontrol4">The ELSE Command</a>
+	<li><a href="flowcontrol.html#flowcontrol5">The LOOP and ENDLOOP Commands</a>
+	<li><a href="flowcontrol.html#flowcontrol6">The SELECT and ENDSELECT Commands</a>
+	<li><a href="flowcontrol.html#flowcontrol7">The REPEAT and UNTIL Commands</a>
+	<li><a href="flowcontrol.html#flowcontrol8">The WHILE and ENDWHILE Commands</a>
+	<li><a href="flowcontrol.html#flowcontrol9">The RETURN Command</a>
+</ol>
+
+<li><a class="chapter" href="set.html#set0">Changing Data</a>
+<ol>
+	<li><a href="set.html#set1">The SET Command</a>
+	<li><a href="set.html#set2">Type Casting</a>
+	<li><a href="set.html#set3">The SETSTRING and ADDSTRING Commands</a>
+	<li><a href="set.html#set4">The PADSTRING Command</a>
+
+</ol>
+
+<li><a class="chapter" href="movement.html#movement0">Movement</a>
+
+<ol>
+	<li><a href="movement.html#movement1">The MOVE Command</a>
+	<li><a href="movement.html#movement2">The TRAVEL Command</a>
+	<li><a href="movement.html#movement3">Moving Non-player Characters</a>
+	<li><a href="movement.html#movement4">The DIR_TO and NPC_TO Commands</a>
+</ol>
+
+<li><a class="chapter" href="special.html#special0">Special-Purpose Commands</a>
+
+<ol>
+	<li><a href="special.html#special1">The POINTS Command</a>
+	<li><a href="special.html#special2">The PROXY Command</a>
+	<li><a href="special.html#special3">Trigonometry</a>
+	<ol>
+		<li><a href="special.html#special4">The POSITION Command</a>
+		<li><a href="special.html#special5">The BEARING Command</a>
+		<li><a href="special.html#special6">The DISTANCE Command</a>
+	</ol>
+	<li><a href="special.html#special7">The ASKNUMBER and GETNUMBER Commands</a>
+	<li><a href="special.html#special8">The GETSTRING Command</a>
+	<li><a href="special.html#special9">The GETYESORNO Command</a>
+	<li><a href="special.html#special10">The SAVEGAME and RESTOREGAME Commands</a>
+	<li><a href="special.html#special12">The TERMINATE Command</a>
+	<li><a href="special.html#special13">The UNDOMOVE Command</a>
+
+</ol>
+
+<li><a class="chapter" href="attributes.html#attributes0">Attributes</a>
+
+<ol>
+	<li><a href="attributes.html#attributes1">The ENSURE Command</a>
+	<li><a href="attributes.html#attributes2">Object Attributes</a>
+	<li><a href="attributes.html#attributes3">Location Attributes</a>
+	<li><a href="attributes.html#attributes4">User Attributes</a>
+</ol>
+
+<li><a class="chapter" href="functions.html#functions0">Functions</a>
+
+<ol>
+	<li><a href="functions.html#functions1">The EXECUTE and CALL Commands</a>
+
+	<ol>
+		<li><a href="functions.html#functions2">Passing Arguments to a Function</a>
+	</ol>
+
+	<li><a href="functions.html#functions3">The function-call count</a>
+	<li><a href="functions.html#functions4">The RETURN Command</a>
+	<li><a href="functions.html#functions5">Responding to the Player's Moves</a>
+
+	<li><a href="functions.html#functions6">Special Functions</a>
+	<li><a href="functions.html#functions7">Utility Functions</a>
+
+</ol>
+
+<li><a class="chapter" href="library.html#library0">Creating New Verbs</a>
+<li><a class="chapter" href="pointers.html#pointers0">Pointers</a>
+
+<ol>
+	<li><a href="pointers.html#pointers1">Object Pointers</a>
+	<li><a href="pointers.html#pointers2">Location Pointers</a>
+</ol>
+
+<li><a class="chapter" href="resolution.html#resolution0">Object Resolution</a>
+
+<ol>
+	<li><a href="resolution.html#resolution1">Object Naming</a>
+	<li><a href="resolution.html#resolution2">Disambiguation</a>
+</ol>
+
+<li><a class="chapter" href="definitions.html#definitions0">Definitions in Detail</a>
+
+<ol>
+	<li><a href="definitions.html#definitions1">Objects</a>
+	<li><a href="definitions.html#definitions2">Locations</a>
+	<li><a href="definitions.html#definitions3">Integer Variables</a>
+	<ol>
+		<li><a href="definitions.html#definitions4">Internal Integer Variables</a>
+	</ol>
+	<li><a href="definitions.html#definitions5">String Variables</a>
+	<li><a href="definitions.html#definitions6">Arrays</a>
+	<li><a href="definitions.html#definitions7">Constants</a>
+	<li><a href="definitions.html#definitions8">Synonyms</a>
+	<li><a href="definitions.html#definitions9">Filters</a>
+	<li><a href="definitions.html#definitions10">Grammar Statements</a>
+	<li><a href="definitions.html#definitions11">User Attributes</a>
+	<li><a href="definitions.html#definitions12">Parameters</a>
+</ol>
+
+<li><a class="chapter" href="internals.html#internals0">Internals</a>
+
+<ol>
+	<li><a href="internals.html#internals1">Constants and Random</a>
+	<li><a href="internals.html#internals2">Internal Commands</a>
+</ol>
+
+<li><a class="chapter" href="menu.html#menu0">The Menu Library</a>
+
+<li><a class="chapter" href="csv.html#csv0">CSV Files</a>
+<ol>
+	<li><a href="csv.html#csv1">The ITERATE and ENDITERATE Commands</a>
+	<li><a href="csv.html#csv2">The UPDATE, ENDUPDATE and INSERT Commands</a>
+	<li><a href="csv.html#csv3">The APPEND Command</a>
+</ol>
+
+<li><a href="attributessummary.html#attributesummary0">Appendix A: JACL Attributes</a>
+<li><a href="verbfunctions.html#verbfunctions0">Appendix B: Library Verb Functions</a>
+<li><a href="tutorialsource.html#tutorialsource0">Appendix C: Tutorial Game Source Code</a>
+<li><a class="chapter" href="glossary.html#glossary0">Glossary</a>
+
+</ol>
+
+</body></html>

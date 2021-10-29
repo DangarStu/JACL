@@ -1,0 +1,20 @@
+location sea 
+
+object i
+  velocity	5
+  player
+
+{+west
+set i(bearing) - 15
+}
+
+{+east
+set i(bearing) + 15
+}
+
+{+eachturn
+position i
+write i(x) "," i(y) ^
+}
+
+#include "verbs.library"

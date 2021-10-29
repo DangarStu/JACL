@@ -1,0 +1,8 @@
+# ignore all logs
+*.log
+.DS_Store
+*.j2
+*.swp
+*.csv
+*.auto
+*.save

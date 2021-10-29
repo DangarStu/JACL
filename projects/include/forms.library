@@ -1,0 +1,100 @@
+# FORMS library
+
+integer FORMS_length
+integer FORMS_index
+string  FORMS_string
+string  FORMS_error
+string  FORMS_data
+
+{+textarea
+# arg[0] = field name
+# arg[1] = columns
+# arg[2] = rows
+
+write "<textarea name=~" string_arg[0] "~ class=~jaclform~ rows=~" arg[2] "~ cols=~" arg[1] "~ maxlength=~255~>"
+write "</textarea>"
+}
+
+{+text : +text_submit
+# arg[0] = label
+# arg[1] = field name
+# arg[2] = size
+# arg[3] = optional starting value
+
+setstring FORMS_error string_arg[1] "_error"
+setstring FORMS_data string_arg[1] "_data"
+
+write "<div class=~row~>"
+write "<div class=~label~>" string_arg[0] ":</div>"
+write "<div class=~input~>"
+if @arg = 4
+   if errors = 0
+      write "<input type=~text~ name=~" string_arg[1] "~ value=~" string_arg[3] "~ class=~jaclform~ size=~" arg[2] "~ maxlength=~254~/>"
+   else
+      write "<input type=~text~ name=~" string_arg[1] "~ value=~" %FORMS_data "~ class=~jaclform~ size=~" arg[2] "~ maxlength=~254~/>"
+   endif
+else
+   if errors = 0
+      write "<input type=~text~ name=~" string_arg[1] "~ class=~jaclform~ size=~" arg[2] "~ maxlength=~254~/>"
+   else
+      write "<input type=~text~ name=~" string_arg[1] "~ value=~" %FORMS_data "~ class=~jaclform~ size=~" arg[2] "~ maxlength=~254~/>"
+   endif
+endif
+write "</div>"
+ifstring function_name = "+text_submit"
+   write "<div class=~input~><input type=~submit~></div>"
+endif
+ifstring %FORMS_error != ""
+   write "<div class=~error~>" %FORMS_error "</div>"
+endif
+write "</div>"
+}
+
+{+select : +select_num
+# arg[0] = label
+# arg[1] = field name
+# arg[2] = starting value as integer
+
+setstring FORMS_error string_arg[1] "_error"
+setstring FORMS_data string_arg[1] "_data"
+
+write "<div class=~row~>"
+write "<div class=~label~>" string_arg[0] ":</div>"
+write "<div class=~input~>"
+write "<select name=~" string_arg[1] "~ class=~jaclform~>"
+# GET THE NUMBER OF OPTIONS TO DISPLAY
+setstring FORMS_string "@" string_arg[1] "_values"
+set FORMS_length = FORMS_string
+
+set FORMS_index = 0
+while FORMS_index < FORMS_length
+   setstring FORMS_string string_arg[1] "_values[" FORMS_index "]"
+   ifstring function_name = "+select_num"
+      ifall @arg = 3 : FORMS_index = arg[2]
+         write "<option selected=~selected~ value=~" FORMS_index "~>" %FORMS_string "</option>^"
+      else
+         write "<option value=~" FORMS_index "~>" %FORMS_string "</option>^"
+      endif
+   else
+      write "<option value=~" %FORMS_string "~>" %FORMS_string "</option>^"
+   endif
+   set FORMS_index + 1
+endwhile
+write "</select>"
+write "</div>"
+write "</div>"
+}
+
+{+radio
+# arg[0] = field name
+# arg[1] = value
+
+write "<input type=~radio~ class=~jaclradio~ name=~" string_arg[0] "~/>" string_arg[1]
+}
+
+{+checkbox
+# arg[0] = field name
+# arg[1] = value
+
+write "<input type=~checkbox~ class=~jaclform~ name=~" string_arg[0] "~/>" string_arg[1]
+}

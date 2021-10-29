@@ -1,0 +1,14 @@
+<IfModule mod_fastcgi.c>
+  AddHandler fastcgi-script .fcgi
+
+  ScriptAlias /fastcgi-bin/ "/usr/local/jacl/projects/"
+
+  <Location /fastcgi-bin>	
+    ErrorDocument 500 /server_error.html
+    SetHandler fastcgi-script
+    Options ExecCGI
+    Require all granted
+  </Location>
+
+  FastCgiIpcDir /var/lib/apache2/fastcgi
+</IfModule>

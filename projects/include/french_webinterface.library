@@ -1,0 +1,257 @@
+# STANDARD HEADERS AND FOOTERS FOR WEB-BASED INTERACTIVE FICTION
+
+parameter interface gui_mode
+
+integer gui_mode STANDARD
+
+string current_image "none"
+
+constant STANDARD	1
+constant GUI		2
+constant MOBILE		3
+
+grammar standard >standard
+
+{+standard
+set gui_mode = STANDARD
+set time = false
+write "L'interface passe en mode standard.^"
+}
+
+{+header
+set linebreaks = false
+print:
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"^
+  "http://www.w3.org/TR/html4/loose.dtd">^
+.
+write "<html><head>"
+write "<meta HTTP-EQUIV=~Content-Type~ CONTENT=~text/html; charset=UTF-8~>"
+write "<title>" game_title "</title>"
+execute "+styles"
+print:
+   <script language=~JavaScript~>^
+   <!--^
+   function changeInterface() {^
+      document.JACLInterfaceForm.submit(); }^
+   function putFocus(formInst, elementInst) {^
+      if (document.forms.length > 0) {^
+         document.forms[formInst].elements[elementInst].focus(); }}^
+.
+if gui_mode = STANDARD : gui_mode = MOBILE
+   print:
+      function userCommand() { ^
+      var xhReq = createXMLHttpRequest();^
+      if(xhReq == null) { return true; }^
+      var user_id = document.JACLGameForm.user_id.value;^
+      var command = document.JACLGameForm.command.value;^
+      xhReq.open("GET",
+   .
+   write "~" $url
+   print:
+      ?user_id="+user_id+"&command="+command+"&ajax=true", false);^
+      xhReq.send(null);^
+      var serverResponse = xhReq.responseText;^
+      var maintext = document.getElementById("maintext");^
+      maintext.innerHTML += "<br><b>&gt;" + command + "</b><br>" + serverResponse;^
+      var main = document.getElementById("main");^
+      main.scrollTop = main.scrollHeight;^
+      document.JACLGameForm.command.value = "";^
+.
+if gui_mode = MOBILE
+   write "putFocus(0, 0);^"
+else
+   write "putFocus(1, 0);^"
+endif
+print:
+      return false; }^
+      function createXMLHttpRequest() {^
+      try { return new XMLHttpRequest(); } catch(e) {}^
+      try { return new ActiveXObject("Msxml2.XMLHTTP"); } catch (e) {}^
+      alert("XMLHttpRequest not supported");^
+      return null; }^
+   .
+endif
+write "-->"
+write "</script>^"
+write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
+write "</head>^"
+if gui_mode = MOBILE
+   write "<body onLoad=~putFocus(0, 0);~>^"
+else
+   write "<body onLoad=~putFocus(1, 0);~>^"
+endif
+write "<div id=~header~>"
+ifstring title_image = "none"
+  write "<h1>" game_title "</h1>"
+else
+  write "<img class=~titleimage~ alt=~" game_title "~ src=~" title_image "~>"
+endif
+if gui_mode != MOBILE
+   write "<form name=~JACLInterfaceForm~ method=get>^"
+   write "<div class=~links~>
+   write "| "
+   write "Interface: "
+   write "Standard<input type=~radio~ name=~interface~ value=~1~"
+   if gui_mode = STANDARD
+      write " checked onclick=~return changeInterface();~>"
+   else 
+      write " onclick=~return changeInterface();~>"
+   endif
+   write " GUI<input type=~radio~ name=~interface~ value=~2~"
+   if gui_mode = GUI
+      write " checked onclick=~return changeInterface();~>"
+   else 
+      write " onclick=~return changeInterface();~>"
+   endif
+   write " Mobile<input type=~radio~ name=~interface~ value=~3~"
+   if gui_mode = MOBILE
+      write " checked onclick=~return changeInterface();~>"
+   else 
+      write " onclick=~return changeInterface();~>"
+   endif
+   hidden
+   write "<input type=~hidden~ name=~command~ value=~look~>"
+   write " | "
+   hyperlink "Instructions" "instructions" "header"
+   write " | "
+   hyperlink "À propos" "about" "header"
+   write " | "
+   hyperlink "Recommencer" "restart" "header"
+   write " | "
+   hyperlink "Astuces" "hint" "header"
+   write " |"
+   write "</div>^"
+   write "</form>^"
+endif
+write "</div>^"
+write "<div id=~main~>^"
+write "<div id=~maintext~ class=~maintext~>^"
+set linebreaks = true
+}
+
+{+footer
+set linebreaks = false
+write "</div>"
+write "</div>"
+if gui_mode != MOBILE
+   ifstring current_image != "none"
+      write "<div class=~picture~>"
+      write "<img class=~main~ src=~" current_image "~>"
+      write "</div>"
+   endif
+endif
+write "<div id=~footer~>^"
+   write "<div class=~directions~>"
+   execute "+exits"
+   write "</div>"
+if gui_mode = STANDARD : gui_mode = MOBILE
+   if gui_mode = STANDARD
+      write "<form name=~JACLGameForm~ method=get onsubmit=~return userCommand();~>^"
+      write "<div class=~prompt_text~>"
+      write command_prompt
+      write "</div>^"
+   else
+      write "<form name=~JACLGameForm~ method=get>^"
+   endif
+   write "<div class=~command_prompt~>^"
+   prompt
+endif
+if gui_mode = GUI
+   write "<form name=~JACLGameForm~ method=get>^"
+   write "<div class=~interface~>^"
+   button "regarder" "/images/buttons/fr/look.png"
+   button "prendre" "/images/buttons/fr/take.png"
+   button "laisser" "/images/buttons/fr/drop.png"
+   write "<br>"
+   button "utiliser" "/images/buttons/fr/use.png"
+   button "ouvrir" "/images/buttons/fr/open.png"
+   button "fermer" "/images/buttons/fr/close.png"
+   write "<br>"
+   button "parler à" "/images/buttons/fr/talkto.png"
+   button "wear" "/images/buttons/fr/wear.png"
+   button "retirer" "/images/buttons/fr/remove.png"
+   write "<br>"
+   button "toucher" "/images/buttons/fr/touch.png"
+   button "attendre" "/images/buttons/fr/wait.png"
+   button "donner" "/images/buttons/fr/give.png"
+   write "<br>"
+   button "casser" "/images/buttons/fr/break.png"
+   button "manger" "/images/buttons/fr/consume.png"
+   button "entrer" "/images/buttons/fr/enter.png"
+   write "</div>"
+   write "<div class=~interface~>^"
+   write "<b>Vous pouvez voir :</b><br>^"
+   write "<select name=~noun~ size=8>"
+   loop
+      ifall here grandof noun3 : player !grandof noun3 : noun3 hasnt LOCATION
+         option noun3
+      else
+         if noun3 = player
+            option noun3
+         endif
+      endif
+   endloop
+   write "</select>"
+   write "</div>"
+   write "<div class=~interface~>^"
+   write "<b>Vous portez :</b><br>^"
+   write "<select name=~noun~ size=8>"
+   loop
+      ifall player grandof noun3 : noun3 != player
+         option noun3
+      endif
+   endloop
+   write "</select>"
+   hidden
+   write "</div>"
+   write "<div class=~compass~>"
+   ifall here(northwest) != nowhere : here(northwest) != NO_GO
+      hyperlink "<img class=~compass~ src=~/images/compass/northwest_blue.png~>" "nw"
+   else
+      write "<img src=~/images/compass/northwest.png~>"
+   endif
+   ifall here(north) != nowhere : here(north) != NO_GO
+      hyperlink "<img class=~compass~ src=~/images/compass/north_blue.png~>" "n"
+   else
+      write "<img src=~/images/compass/north.png~>"
+   endif
+   ifall here(northeast) != nowhere : here(northeast) != NO_GO
+      hyperlink "<img class=~compass~ src=~/images/compass/northeast_blue.png~>" "ne"
+   else
+      write "<img src=~/images/compass/northeast.png~>"
+   endif
+   write "<br>"
+   ifall here(west) != nowhere : here(west) != NO_GO
+      hyperlink "<img class=~compass~ src=~/images/compass/west_blue.png~>" "w"
+   else
+      write "<img src=~/images/compass/west.png~>"
+   endif
+   write "<img src=~/images/compass/centre.png~>"
+   ifall here(east) != nowhere : here(east) != NO_GO
+      hyperlink "<img class=~compass~ src=~/images/compass/east_blue.png~>" "east"
+   else
+      write "<img src=~/images/compass/east.png~>"
+   endif
+   write "<br>"
+   ifall here(southwest) != nowhere : here(southwest) != NO_GO
+      hyperlink "<img class=~compass~ src=~/images/compass/southwest_blue.png~>" "sw"
+   else
+      write "<img src=~/images/compass/southwest.png~>"
+   endif
+   ifall here(south) != nowhere : here(south) != NO_GO
+      hyperlink "<img class=~compass~ src=~/images/compass/south_blue.png~>" "s"
+   else
+      write "<img src=~/images/compass/south.png~>"
+   endif
+   ifall here(southeast) != nowhere : here(southeast) != NO_GO
+      hyperlink "<img class=~compass~ src=~/images/compass/southeast_blue.png~>" "se"
+   else
+      write "<img src=~/images/compass/southeast.png~>"
+   endif
+   write "</div>^"
+endif   
+write "</div>"
+write "</form></div>^"
+write "</body></html>^"
+set linebreaks = true
+}

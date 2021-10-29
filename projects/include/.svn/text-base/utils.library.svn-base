@@ -1,0 +1,371 @@
+# UTILS.library
+
+string UTILS_length
+string UTILS_text
+string UTILS_nexttext
+string UTILS_dimensions
+
+integer UTILS_dimension_count
+integer UTILS_temp
+integer UTILS_count
+integer UTILS_checksum
+integer UTILS_index
+integer UTILS_next
+integer UTILS_total_needed
+integer UTILS_current_offset
+integer UTILS_array_size
+integer UTILS_argument
+integer UTILS_found
+
+integer UTILS_stack_size
+
+{+print_right
+set UTILS_temp = status_width
+length UTILS_index string_arg[0]
+set UTILS_temp - UTILS_index
+set UTILS_temp - 1
+cursor UTILS_temp arg[1]
+write string_arg[0]
+}
+
+{+print_centred
+set UTILS_temp = status_width
+length UTILS_index string_arg[0]
+set UTILS_temp - UTILS_index
+set UTILS_temp / 2
+cursor UTILS_temp arg[1]
+write string_arg[0]
+}
+
+{+reverse_window
+style reverse
+padstring UTILS_text " " status_width
+set UTILS_temp = 0
+while UTILS_temp < status_height
+  cursor 0 UTILS_temp
+  write UTILS_text
+  set UTILS_temp + 1
+endwhile
+style normal
+}
+
+string LCNumber zero one two three four five six seven eight nine ten
+string UCNumber Zero One Two Three Four Five Six Seven Eight Nine Ten
+
+{+number_upper
+if arg[0] < 0 : arg[0] > 10
+   write arg[0]
+else
+   write UCNumber[arg[0]]
+endif
+}
+
+{+number_lower
+if arg[0] < 0 : arg[0] > 10
+   write arg[0]
+else
+   write LCNumber[arg[0]]
+endif
+}
+
+{+random_number
+# arg[0] = lower bound
+# arg[1] = upper bound
+if arg[1] > arg[0]
+   set max_rand = arg[1] - arg[0]
+   set UTILS_temp = arg[0] + random
+   return UTILS_temp
+else
+   error "+random_number must be passed a lower bound and an upper bound for the number required.^"
+   return false
+endif
+}
+
+{+init_array
+# string_arg[0] = name of array
+
+setstring UTILS_text "@" string_arg[0]
+set UTILS_count = UTILS_text # Get the value of @array_name.
+
+setstring UTILS_dimensions "@" string_arg[0] "_dimensions"
+set UTILS_dimension_count = UTILS_dimensions
+set UTILS_dimension_count - 1 # Move to the index of the final dimension
+
+set UTILS_total_needed = 1
+
+# Calculate the total space requested
+while UTILS_dimension_count > -1
+   # Find the integer value of each of the dimentions
+   setstring UTILS_text string_arg[0] "_dimensions[" UTILS_dimension_count "]"
+   set UTILS_total_needed * UTILS_text
+   set UTILS_dimension_count - 1
+endwhile
+
+if UTILS_total_needed > UTILS_count
+   error "size requested (" UTILS_total_needed ") is larger than the size available (" UTILS_count ").^"
+   return false
+endif
+
+# Calculate the one-dimensional offsets
+set UTILS_dimension_count = UTILS_dimensions
+set UTILS_dimension_count - 1
+set UTILS_current_offset = 1
+while UTILS_dimension_count > -1
+   # Set the offset for the current dimension
+   setstring UTILS_text string_arg[0] "_offsets[" UTILS_dimension_count "]"
+   set UTILS_text = UTILS_current_offset
+
+   # Find the integer value of each of the dimentions
+   setstring UTILS_text string_arg[0] "_dimensions[" UTILS_dimension_count "]"
+   set UTILS_temp = UTILS_text
+   set UTILS_current_offset * UTILS_temp
+
+   set UTILS_dimension_count - 1
+endwhile
+}
+
+{+get_array
+# string_arg[0] = name of array
+# arg[1] -->    = one or more array co-ordinate(s)
+# return code   = value of array element
+
+setstring UTILS_dimensions "@" string_arg[0] "_dimensions"
+set UTILS_dimension_count = UTILS_dimensions
+
+set UTILS_checksum = @arg - 1 # The number of dimensions supplied as arguments
+
+if UTILS_dimension_count = UTILS_checksum
+   set UTILS_dimension_count - 1 # Move to the index of the final dimension
+   set UTILS_index = 0 # Reset the one-dimensional index
+
+   # Calculate the one dimensional index
+   while UTILS_dimension_count > -1
+      setstring UTILS_text string_arg[0] "_offsets[" UTILS_dimension_count "]"
+      set UTILS_argument = UTILS_dimension_count + 1
+      set UTILS_temp = UTILS_text * arg[UTILS_argument]
+      set UTILS_index + UTILS_temp
+      set UTILS_dimension_count - 1
+   endwhile 
+
+   setstring UTILS_text string_arg[0] "[" UTILS_index "]"
+   return UTILS_text
+else
+   write "Number of dimensions supplied (" UTILS_checksum ") does not match array (" UTILS_dimension_count ").^"
+   return -1
+endif
+}
+
+{+set_array
+# string_arg[0] = name of array
+# arg[1] -->    = one or more array co-ordinate(s)
+# return code   = value of array element
+
+setstring UTILS_dimensions "@" string_arg[0] "_dimensions"
+set UTILS_dimension_count = UTILS_dimensions
+
+set UTILS_checksum = @arg - 2 # The number of dimensions supplied as arguments
+
+if UTILS_dimension_count = UTILS_checksum
+   set UTILS_dimension_count - 1 # Move to the index of the final dimension
+   set UTILS_index = 0 # Reset the one-dimensional index
+
+   # Calculate the one dimensional index
+   while UTILS_dimension_count > -1
+      setstring UTILS_text string_arg[0] "_offsets[" UTILS_dimension_count "]"
+      set UTILS_argument = UTILS_dimension_count + 2
+      set UTILS_temp = UTILS_text * arg[UTILS_argument]
+      set UTILS_index + UTILS_temp
+      set UTILS_dimension_count - 1
+   endwhile 
+
+   setstring UTILS_text string_arg[0] "[" UTILS_index "]"
+   set UTILS_text = arg[1]
+   return true
+else
+   write "Number of dimensions supplied (" UTILS_checksum ") does not match array (" UTILS_dimension_count ").^"
+   return -1
+endif
+}
+
+{+pop_stack
+# string_arg[0] = name of stack
+
+# GET THE INDEX OF THE LAST INTEGER PUSHED ONTO THE STACK
+setstring UTILS_text string_arg[0] "_index"
+set UTILS_temp = UTILS_text
+if UTILS_temp = 0
+   error "stack underflow.^"
+   return false
+endif
+set UTILS_temp - 1		; The first integer is at index 0.
+set UTILS_text - 1 		; Decrement the index as the integer has been popped.
+setstring UTILS_text string_arg[0] "[" UTILS_temp "]"
+return UTILS_text
+}
+
+{+push_stack
+# string_arg[0] = name of stack
+
+# GET THE INDEX OF THE LAST INTEGER PUSHED ONTO THE STACK
+# START BY GETTING THE MAXIMUM SIZE OF THE ARRAY
+setstring UTILS_text "@" string_arg[0]
+set UTILS_count = UTILS_text
+
+# FETCH THE INDEX OF THE CURRENT ARRAY SLOT TO USE
+setstring UTILS_text string_arg[0] "_index"
+set UTILS_temp = UTILS_text
+if UTILS_temp = UTILS_count
+   error "Stack overflow.^"
+   return false
+endif
+
+set UTILS_text + 1 		; INCREMENT THE INDEX AS AN INTEGER HAS BEEN PUSHED.
+setstring UTILS_text string_arg[0] "[" UTILS_temp "]"
+set UTILS_text = arg[1]
+return true
+}
+
+{+add_to_set
+# string_arg[0] = name of set array
+# arg[1] = value to add
+
+setstring UTILS_text "+is_in_set<" string_arg[0] "<" arg[1]
+
+if UTILS_text = true
+   return ; NO NEED TO CONTINUE, THIS VALUE IS ALREADY IN THE SET
+endif
+
+# GET THE INDEX OF THE LAST INTEGER ADDED TO THE SET
+# START BY GETTING THE MAXIMUM SIZE OF THE SET
+setstring UTILS_text "@" string_arg[0]
+set UTILS_count = UTILS_text
+
+# FETCH THE INDEX OF THE CURRENT ARRAY SLOT TO USE
+setstring UTILS_text string_arg[0] "_index"
+set UTILS_temp = UTILS_text
+if UTILS_temp = UTILS_count
+   error "Stack overflow.^"
+   return false
+endif
+
+set UTILS_text + 1      ; AN INTEGER HAS BEEN ADDED TO THE SET
+setstring UTILS_text string_arg[0] "[" UTILS_temp "]"
+set UTILS_text = arg[1]
+return true
+}
+
+{+delete_from_set
+# string_arg[0] = name of set array
+# arg[1] = value to remove
+
+setstring UTILS_text "+is_in_set<"
+addstring UTILS_text string_arg[0] "<" string_arg[1]
+if UTILS_text = false
+   #write arg[1] " is not in " string_arg[0] "^"
+   return false # NO NEED TO CONTINUE, THIS VALUE IS NOTE SET
+endif
+
+# GET THE INDEX OF THE LAST INTEGER ADDED TO THE SET
+setstring UTILS_length string_arg[0] "_index"
+set UTILS_count = UTILS_length
+
+set UTILS_found = 0 # THE ENTRY TO BE REMOVED ISNT FOUND YET
+set UTILS_index = 0
+while UTILS_index < UTILS_count
+   set UTILS_next = UTILS_index + 1
+   setstring UTILS_text string_arg[0] "[" UTILS_index "]"
+   set UTILS_temp = UTILS_text
+   if UTILS_temp = arg[1]
+      set UTILS_found = true
+   endif
+   if UTILS_found = true
+      # IS THIS THE LAST SLOT?
+      if UTILS_next < UTILS_length
+         # NO, DO A SWAP (IF IT IS THE LAST, NOTHING NEEDS TO BE DONE)
+         setstring UTILS_nexttext string_arg[0] "[" UTILS_next "]"
+         set UTILS_temp = UTILS_nexttext
+         set UTILS_text = UTILS_temp
+      endif
+   endif
+   set UTILS_index + 1
+endwhile
+
+# DECREMENT THE INDEX AS AN INTEGER HAS BEEN REMOVED FROM THE SET
+set UTILS_length - 1 
+
+return true
+}
+
+integer UTILS_first
+integer UTILS_second
+integer UTILS_first_val
+integer UTILS_second_val
+string  UTILS_first_str
+string  UTILS_second_str
+
+{+sort_set
+# string_arg[0] = name of set to sort
+
+# GET THE INDEX OF THE LAST INTEGER PUSHED ONTO THE STACK
+setstring UTILS_text string_arg[0] "_index"
+set UTILS_count = UTILS_text
+
+if UTILS_count < 2
+   return 	# NOTHING TO SORT!
+endif
+
+repeat
+   set UTILS_found = false # WERE TWO ELEMENTS OUT OF ORDER FOUND?
+   set UTILS_first = 0
+   set UTILS_second = UTILS_first + 1
+   while UTILS_second < UTILS_count
+     setstring UTILS_first_str  string_arg[0] "[" UTILS_first  "]"
+     setstring UTILS_second_str string_arg[0] "[" UTILS_second "]"
+     set UTILS_first_val = UTILS_first_str
+     set UTILS_second_val = UTILS_second_str
+     if UTILS_first_str > UTILS_second_str
+        # SWAP THE TWO ELEMENTS
+        set UTILS_second_str = UTILS_first_val
+        set UTILS_first_str = UTILS_second_val
+        set UTILS_found = true
+     endif 
+     set UTILS_first + 1 
+     set UTILS_second + 1 
+   endwhile
+until UTILS_found = false
+}
+
+{+is_in_set
+# string_arg[0] = name of set
+# arg[1] = value to check for
+
+# GET THE INDEX OF THE LAST INTEGER PUSHED ONTO THE STACK
+setstring UTILS_text string_arg[0] "_index"
+set UTILS_count = UTILS_text
+set UTILS_index = 0
+while UTILS_index < UTILS_count
+   setstring UTILS_text string_arg[0] "[" UTILS_index "]"
+   if UTILS_text = arg[1]
+      return true
+   endif
+   set UTILS_index + 1
+endwhile
+
+return false
+}
+
+{+random_from_set
+# string_arg[0] = name of set
+
+# GET THE INDEX OF THE LAST INTEGER ADDED TO THE SET
+setstring UTILS_length string_arg[0] "_index"
+set UTILS_count = UTILS_length
+if UTILS_count = 0
+   return false
+endif
+set max_rand = UTILS_count
+set UTILS_temp = random - 1
+setstring UTILS_text string_arg[0] "[" UTILS_temp "]"
+set UTILS_index = UTILS_text
+return UTILS_index
+}

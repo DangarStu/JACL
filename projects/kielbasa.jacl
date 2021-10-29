@@ -1,0 +1,601 @@
+#!../bin/jacl
+
+integer     INDEX
+integer     selected_key	-1
+
+constant 	game_version	1
+constant	game_title		"Kielbasa"
+constant	game_author		"Stuart Allen"
+constant	ifid			"JACL-009"
+
+parameter   mode			MUSIC_mode
+
+# KEYBOARD LAYOUT
+# C C# D D# E F F# G  G#  A  A# B  C  C# D  D# E  F  F# G  G# A  A#
+# 3 4  5 6  7 8 9  10 11  12 13 14 15 16 17 18 19 20 21 22 23 24 25
+
+constant    blackKeys  4 6 -1 9 11 13 -1 16 18 -1 21 23 25
+constant    whiteKeys  3 5  7 8 10 12 14 15 17 19 20 22 24 26
+
+grammar chord mode >chord_mode
+
+{+chord_mode
+set MUSIC_mode = CHORD
+}
+
+grammar scale mode >scale_mode
+
+{+scale_mode
+set MUSIC_mode = SCALE
+}
+
+grammar about >about
+
+{+about
+style bold
+write game_title 
+style normal
+write " by " game_author ", copyright 2011.^^"
+write "Kielbasa is written using the JACL Adventure Creation Language.^"
+if interpreter = CGI
+   write "Visit <a class=~main~ href=~http://code.google.com/p/jacl~>http://code.google.com/p/jacl</a> "
+   write "for more information.^"
+   write "Visit my blog at <a class=~main~ href=~http://dangarstu.com/fastcgi-bin/dangarstu.jacl~>http://dangarstu.com</a>."
+else
+   write "Visit http://code.google.com/p/jacl for more information.^"
+endif
+set time = false
+}
+
+grammar help >instructions
+grammar instructions >instructions
+
+{+instructions
+if interpreter != CGI
+   write "^^"
+endif
+style bold
+write "Kielbasa "
+style normal
+print:
+   is a music theory tool for answering questions such as: what key is this
+   song in?; what are all the chords in that key?; and, what notes are in those
+   chords?^^
+   It is used by entering the known notes of the song you wish to find out about.
+.
+if interpreter = CGI
+   print:
+      Notes can be added either by clicking on the piano keyboard in
+      the bottom right, or selecting a chord from the list on the
+      bottom left and then clicking
+   .
+   style bold
+   write "Add chord"
+   style normal
+   write ". "
+   print:
+      Adding a chord causes all the notes of the chord to be added
+      to the song.^^
+      Once notes have been added to the song they can be removed
+      again by clicking the word
+   .
+   style bold
+   write "Delete "
+   style normal
+   print:
+      below the note. As notes are added and removed from the song
+   .
+   style bold
+   write "Kielbasa "
+   style normal
+   print:
+      will determine which keys contain all the notes in the song.
+      Clicking
+   .
+   style bold
+   write "Display "
+   style normal
+   print:
+      beneath a key will show all the chords in that key. Beneath
+      each chord are the notes that make up that chord.^
+   .
+else
+   print:
+      Notes can be added using the
+   .
+   style input
+   write "add"
+   style normal
+   print:
+      |command followed by the name of either a note or chord.
+      Adding a chord causes all the notes of the chord to be added
+      to the song.^^
+      Once notes have been added to the song they can be removed
+      again by using the
+   .
+   style input
+   write "delete"
+   style normal
+   print:
+      |command followed by the name of the note you wish to remove.^^
+      Following commands can also be used:^^
+   .
+   write "  "
+   style input
+   write "show song"
+   style normal
+   write " will display all the notes have have been added.^  " 
+   style input
+   write "determine key"
+   style normal
+   write " will show the keys the song could be in.^  "
+   style input
+   write "show key"
+   style normal
+   write " "
+   style note
+   write "<SCALE>"
+   style normal
+   write " will show the keys the song could be in.^"
+endif
+set time = false
+}
+
+integer temp_key
+
+{+after
+if interpreter != CGI : time = false
+   return
+endif
+set MUSIC_verbx = -42
+set MUSIC_verby = -42
+# UPDATE THE DISPLAY
+write "<h1>"
+if MUSIC_mode = SCALE
+   execute "+show_song"
+   write "^"
+   execute "+what_key"
+   write "^^"
+   if selected_key != -1
+       write "<div class=~section~>Chords in " selected_key{note} " Major: </div>"
+       execute "+display_chords<selected_key<MAJOR"
+   endif
+else
+   set temp_key = MUSIC_scale_key
+   if MUSIC_chord_types_index != 0
+      set MUSIC_type = MUSIC_chord_types[0]
+      set MUSIC_scale_key = MUSIC_chord_roots[0] % 12
+   endif
+   execute "+show_chord"
+   if MUSIC_chord_index != 0
+      write "^("
+      set INDEX = 0
+      while INDEX < MUSIC_intervals_index
+         set MUSIC_temp = MUSIC_intervals[INDEX]
+         set INDEX + 1
+         if MUSIC_temp != -1
+            write interval_names[MUSIC_temp]
+            if MUSIC_intervals[INDEX] != -1
+               write ", "
+            endif
+         endif
+      endwhile
+      write ")^"
+   endif
+   if MUSIC_chord_types_index != 0
+      write "^Chord is:^"
+      if MUSIC_chord_bass[0] != -1
+        write MUSIC_chord_bass[0]{note} "/" MUSIC_chord_roots[0]{note} " " chord_names[MUSIC_type] "^"
+      else
+        write MUSIC_chord_roots[0]{note} " " chord_names[MUSIC_type] "^"
+      endif
+   endif
+   set MUSIC_scale_key = temp_key
+endif
+write "</h1>"
+}
+
+string MUSIC_note_name
+
+grammar look >show_song
+grammar show >show_song
+grammar show song >show_song
+grammar display >show_song
+grammar display song >show_song
+
+string temp
+
+{+show_song
+if interpreter = CGI
+   write "<div class=~section~>Notes in song: </div>"
+   if MUSIC_scale_index = 0
+      write "Song is empty.^"
+      return
+   endif
+   set MUSIC_index = 0
+   while MUSIC_index < MUSIC_scale_index
+     write "<div class=~notes~>"
+     write MUSIC_scale[MUSIC_index]{note} "^"
+     write "<div class=~delete~>"
+     setstring temp "delete " MUSIC_scale[MUSIC_index]{note}
+     hyperlink "Remove" temp "control"
+     write "</div>"
+     set MUSIC_index + 1
+   write "</div>"
+   endwhile
+   write "^"
+else
+   write "Notes in song: "
+   execute "+display_song"
+   write "^" 
+endif
+}
+
+{+show_chord
+if interpreter = CGI
+   write "<form name=~JACLGameForm~ method=get>"
+   write "<div class=~section~>Notes in chord: "
+   if MUSIC_chord_index = 0
+      write "</div>Chord is empty.^"
+      return
+   else
+      button "Add to song"
+      button "Clear chord"
+      hidden
+      write "</div>"
+   endif
+   set MUSIC_index = 0
+   while MUSIC_index < MUSIC_chord_index
+     write "<div class=~notes~>"
+     write MUSIC_chord[MUSIC_index]{note} "^"
+     write "<div class=~delete~>"
+     setstring temp "delete " MUSIC_chord[MUSIC_index]
+     hyperlink "Remove" temp "control"
+     write "</div>"
+     write "</div>"
+     set MUSIC_index + 1
+   endwhile
+   write "^"
+else
+   write "Notes in song: "
+   execute "+display_song"
+   write "^" 
+endif
+write "</form>"
+}
+
+integer key
+integer left
+integer right
+integer pressed
+
+grammar delete $integer		>delete_int
+
+{+delete_int
+execute "+delete_note<$integer[0]"
+}
+
+grammar delete **anywhere >delete
+
+{+delete
+if noun1(class) = CHORD
+   execute "+delete_note<noun1(rootnote)
+   return
+endif
+if noun1(class) = NOTE
+   execute "+delete_note<noun1(rootnote)
+   return
+endif
+}
+
+grammar blankjacl >blankjacl
+
+{+blankjacl
+if MUSIC_verbx != -42
+   # CONSIDER THIS A KEYBOARD CLICK
+   # CHECK IF THE CLICK FALLS IN A BLACK KEY FIRST
+   if MUSIC_verby < 70
+      # CLICKED HIGHER THAN THE BOTTOM OF THE BLACK KEYS,
+      set key = 0
+      repeat
+         # CALCULATE THE LEFT AND RIGHT LIMITS FOR EACH OF THE BLACK KEY SPACES
+         # NOTE, SOME OF THE BLACK KEY SPACES MAY NOT HAVE AN ACTUAL KEY THERE
+         set left = 30 * key + 20;
+         set right = 30 * key + 40;
+         ifall MUSIC_verbx > left : MUSIC_verbx < right
+            # CLICK IS IN THIS KEY
+            if blackKeys[key] ==  -1
+               # THERE IS NO BLACK KEY IN THIS SPACE, MUST
+               # HAVE CLICKED ONE OF THE WHITE KEYS
+               set key = 12
+            else
+               # ADD THE NOTE TO THE SONG
+               set pressed = blackKeys[key] 
+               execute "+toggle_note<pressed"
+               return
+            endif
+         endif
+         set key + 1
+      until key = 13
+   endif
+
+   # NO BLACK KEY WAS CLICKED, NOW CHECK ALL THE WHITE KEYS
+   set key = 0
+   repeat
+      # CALCULATE THE LEFT AND RIGHT LIMITS FOR EACH OF
+      # THE FOURTEEN WHITE KEY SPACES
+      set left = 30 * key
+      set right = 30 * key + 30;
+      ifall MUSIC_verbx > left : MUSIC_verbx < right
+         # ADD THIS NOTE TO THE SONG
+         set pressed = whiteKeys[key] 
+         execute "+toggle_note<pressed"
+         break
+      endif
+      set key + 1
+   until key = 14
+
+   # HMMM.. SHOULDN'T EVER GET TO HERE
+endif
+}
+
+grammar key *anywhere			>set_key
+grammar set key to *anywhere	>set_key
+grammar set key *anywhere		>set_key
+
+{+set_key
+if noun1(class) = CHORD
+   set MUSIC_scale_key = noun1(rootnote)
+   write "Setting the key of the song to " noun1(rootnote){note} ".^"
+   return
+endif
+if noun1(class) = NOTE
+   set MUSIC_scale_key = noun1(rootnote)
+   write "Setting the key of the song to " noun1(rootnote){note} ".^"
+   return
+endif
+write noun1{The} " is not a note. The key can only be set to a root note.^"
+}
+
+grammar show chord **anywhere	>show_chord
+
+{+show_chord
+if noun1(class) = NOTE
+   write "The chord " noun1(rootnote){note} " Major has the notes: "
+   execute "+display_chord<noun1(rootnote)<MAJOR"
+   write "^"
+   return
+endif
+if noun1(class) = CHORD
+   write "The chord " noun1{chord} " has the notes: "
+   execute "+display_chord<noun1(rootnote)<noun1(chordtype)"
+   write "^"
+   return
+endif
+write noun1{The} " is not a note or chord.^"
+}
+
+grammar display scale **anywhere >display_scale_web
+
+{+display_scale_web
+if noun1(class) = NOTE
+   set selected_key = noun1(rootnote)
+   set MUSIC_scale_key = noun1(rootnote)
+   return
+endif
+if noun1(class) = CHORD
+   set selected_key = noun1(rootnote)
+   set MUSIC_scale_key = noun1(rootnote)
+   return
+endif
+}
+
+grammar show scale **anywhere >show_scale
+grammar show key **anywhere >show_scale
+
+{+show_scale
+if noun1(class) = NOTE
+   execute "+display_chords<noun1(rootnote)<MAJOR"
+   return
+endif
+if noun1(class) = CHORD
+   execute "+display_chords<noun1(rootnote)<noun1(chordtype)"
+   return
+endif
+write noun1{The} " is not a note or scale.^"
+}
+
+grammar show chords **anywhere >show_chords
+grammar show chords in **anywhere >show_chords
+grammar show all chords **anywhere >show_chords
+
+{+show_chords
+if noun1(class) = NOTE
+   execute "+display_chords<noun1(rootnote)<MAJOR"
+   return
+endif
+if noun1(class) = CHORD
+   execute "+display_chords<noun1(rootnote)<noun1(chordtype)"
+   return
+endif
+write noun1{The} " is not a note or scale.^"
+}
+
+grammar clear chord >clear_chord
+
+{+clear_chord
+set MUSIC_chord_index = 0
+set MUSIC_chord_types_index = 0
+set MUSIC_chord_roots_index = 0
+set MUSIC_chord_bass_index = 0
+}
+
+grammar add to song >add_to_song
+
+{+add_to_song
+set INDEX = 0
+while INDEX < MUSIC_chord_index
+  set MUSIC_temp = MUSIC_chord[INDEX] % 12
+  execute "+add_to_set<MUSIC_scale<MUSIC_temp
+  set INDEX + 1
+endwhile
+execute "+determine_key"
+}
+
+grammar add **anywhere >add_action
+grammar add chord **anywhere >add_action
+
+{+add_action
+if noun1(class) = NOTE
+   if interpreter != CGI
+      write "Adding " noun1{note_obj} " to song.^"
+   endif
+   execute "+add_note_obj<noun1"
+   return
+endif
+if noun1(class) = CHORD
+   if interpreter != CGI
+      write "Adding " noun1{chord_obj} " to song.^"
+   endif
+   execute "+add_chord_obj<noun1"
+   return
+endif
+write noun1{The} " is not a chord or note.^"
+return false
+}
+
+grammar key >what_key
+grammar what key >what_key
+grammar determine key >what_key
+grammar determine scale >what_key
+
+{+what_key
+# IF THERE IS ONLY ONE KEY IN THE POSSIBLE KEYS SET, SET THE KEY OF THE SONG TO THAT KEY
+if MUSIC_keys_index = 0
+   write "Song is in an unknown key.^"
+   return
+endif
+if MUSIC_keys_index = 1
+   set MUSIC_scale_key = MUSIC_keys[0]
+endif
+if interpreter = CGI
+   write "<div class=~section~>Song could be in: </div>"
+   set INDEX = 0
+   repeat
+      write "<div class=~keys~>"
+         write MUSIC_keys[INDEX]{key} " Major"
+         write "<div class=~display~>"
+         setstring temp "display scale " MUSIC_keys[INDEX]{note}
+         hyperlink "Display" temp "control"
+         write "</div>"
+      write "</div>"
+      set INDEX + 1
+   until INDEX = MUSIC_keys_index
+else
+   if MUSIC_keys_index = 1
+      write "Song is in " MUSIC_keys[0]{key} " Major.^"
+      return
+   endif 
+   set INDEX = MUSIC_keys_index - 1
+   repeat
+      write MUSIC_keys[INDEX]{key} " Major"
+      execute "+or_structure"
+      set INDEX - 1
+   until INDEX < 0
+   write ".^"
+endif
+}
+
+{+or_structure
+if INDEX > 1
+   write ", "
+endif
+if INDEX = 1
+   write " or "
+endif
+}
+
+{+intro
+execute "+instructions"
+set MUSIC_chord_type_count = @chord_intervals / 7
+}
+
+location studio : studio
+
+{look
+print:
+  Kielbasa is a multi-purpose music theory tool.^^
+.
+}
+
+{+movement
+ifall destination != nowhere : destination hasnt OUTDOORS
+   move north_wall to destination
+   move south_wall to destination
+   move east_wall to destination
+   move west_wall to destination
+endif
+return false
+}
+
+object kryten: myself self me
+ has		ANIMATE
+ short		name "yourself"
+ capacity	42
+ parent		studio
+ player
+
+{examine
+write "As beautiful as ever.^"
+execute "+inventory"
+}
+
+{take
+write "...seriously?^"
+set time = false
+}
+
+integer status_window 3
+integer OFFSET
+
+string status_text
+
+{+update_status_window 
+style reverse
+padstring status_text " " status_width
+write status_text
+cursor 0 1
+write status_text
+cursor 0 2
+write status_text
+cursor 1 1
+write Kielbasa
+setstring status_text "Vicki says we are all winners."
+set OFFSET = status_width
+length INDEX status_text
+set OFFSET - INDEX
+set OFFSET - 1
+cursor OFFSET 1
+write status_text
+style normal
+}
+
+{+bootstrap
+if interpreter = CGI
+   setstring command_prompt "Type your command: "
+endif
+}
+
+# CONSTANTS FOR THE WEB INTERFACE LIBRARY
+constant title_image "/images/kielbasa.png"
+constant footer_image "none"
+constant header_colour "#000000"
+constant header_height 87
+constant linkbar_colour "#c0b098"
+constant maintext_colour "#dddddd"
+
+#debug "debug.library"
+#include "musicinterface.library"
+#include "musicinterface.css"
+#include "utils.library"
+#include "music.library"

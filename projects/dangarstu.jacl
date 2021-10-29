@@ -1,0 +1,236 @@
+#!/usr/local/jacl/bin/fcgijacl
+
+# -----------------------------------------------------------------------------
+
+constant status_window	0
+constant game_title		"DangarStu"
+constant game_author	"Stuart Allen"
+constant game_release    1
+constant game_build      1
+constant ifid			"JACL-002"
+
+# -----------------------------------------------------------------------------
+
+integer temp
+integer INDEX
+
+constant SONGS			1
+constant NEWS			2
+constant LYRICS			3
+constant ABOUT			4
+constant REMIX			5
+constant WRITING			6
+
+string tab_names "DangarStu" "Songs" "News" "Lyrics" "About" "Remix" "Writing"
+
+{+links_div
+print:
+  <a href="https://twitter.com/DangarStu" class="twitter-follow-button" data-show-count="false">Follow @DangarStu</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+.
+}
+
+{+intro
+print:
+   <div class="fb-like" data-href="http://dangarstu.com" data-send="true" data-width="450" data-show-faces="false"></div><br>
+.
+execute "+display_songs"
+}
+                                                                                                
+{+before
+print:
+   <div class="fb-like" data-href="http://dangarstu.com" data-send="true" data-width="450" data-show-faces="false"></div><br>
+.
+if WEBAPP_mode = SONGS
+   execute "+display_songs"
+endif
+if WEBAPP_mode = LYRICS
+   execute "+display_lyrics"
+endif
+if WEBAPP_mode = NEWS
+   execute "+display_news"
+endif
+if WEBAPP_mode = ABOUT
+   execute "+display_about"
+endif
+if WEBAPP_mode = REMIX
+   execute "+display_remix"
+endif
+if WEBAPP_mode = WRITING
+   execute "+display_writing"
+endif
+return false
+} 
+
+{+display_writing
+print:
+   <p>As well as working on my music I am also starting to write what I hope will one
+   day become a novel, or at least a reasonably complete short story. This is mostly as an
+   excuse to play with my typewriters. Below is a photo of the first page, and pretty
+   much sets the tone. Unfortunately.</p>
+.
+image "/images/Prologue.jpg" centre "[Prologue page]"
+}
+
+{+display_remix
+image "/images/cc.logo.png" left "[CC Logo]"
+image "/images/by-nc-sa.png" right "[CC BY-NC-SA]"
+print:
+  <p>All of my music is released under the Creative Commons license 
+  “Attribution-NonCommercial-ShareAlike”. As a result you are 
+  welcome to remix them to make your own unique tracks provided they are
+  also released under the same license conditions. To help with remixing, this
+  page contains ZIP files for download that contain all the individual tracks
+  as WAV files. You may also find the chord sheets available on the Lyrics tab
+  handy if you are layering extra instruments. Finally, if you do make any
+  remixes don't forget to send me a link on Twitter or SoundCloud!</p>
+  <hr>
+.
+write "<p><table><tr>"
+write "<td>Miracles</td>"
+write "<td><a href=~/downloads/stems/Miracles.zip~>Download individual tracks</a></td>"
+write "</tr><tr>"
+write "<td>The Glass Slipper</td>"
+write "<td><a href=~/downloads/stems/TheGlassSlipper.zip~>Download individual tracks</a></td>"
+write "</tr><tr>"
+write "<td>Stars</td>"
+write "<td><a href=~/downloads/stems/Stars.zip~>Download individual tracks</a></td>"
+write "</tr><tr>"
+write "<td>Immortaility</td>"
+write "<td><a href=~/downloads/stems/Immortality.zip~>Download individual tracks</a></td>"
+write "</tr><tr>"
+write "<td>The Invisible Woman</td>"
+write "<td><a href=~/downloads/stems/TheInvisibleWoman.zip~>Download individual tracks</a></td>"
+write "</tr></table>
+}
+
+{+display_about
+image "/images/InStudioSmall.jpg" left "[Stuart in Studio]"
+print:
+  <p>For a long time now I have enjoyed writing and recording songs. 
+  In the past I have recorded more guitar-based versions of my songs but 
+  have recently discovered that using Ableton Live I am able to get something 
+  closer to that sound I have always heard in my head. I am currently a solo
+  artist although I do enjoy collaborating with others when our tastes overlap 
+  and skill sets don't. My songs, like everyone's, are affected by my 
+  influences which range from U2 to The Mighty Boosh. My interest in loop-based 
+  music was originally inspired by seeing Mr Percival perform live. I guess you 
+  could describe my music as a combination of Synthpop or Electropop with a 
+  touch of Folktronica.</p>
+.
+image "/images/cc.logo.png" left "[CC Logo]"
+image "/images/by-nc-sa.png" right "[CC BY-NC-SA]"
+print:
+  <p>All of my music is released under the Creative Commons license, 
+  “Attribution-NonCommercial-ShareAlike”. Catchy, hey? This means that you can download 
+  my songs, not just stream them, and you are free to share them with your friends as 
+  long as you give me credit for having made them. You can also make new versions so 
+  long as you release those remixes under the same license. You can’t, however, use these 
+  songs for any commercial purpose under this license.</p>
+  <p>If you do wish to use one of my songs for a commercial purpose, or even just say hello,
+  you can contact me by email at <a href="mailto:dangarstu@gmail.com">dangarstu@gmail.com</a>.</p>
+  <hr>
+  <p>All portrait and header photographs by Mel Anderson, 
+  <a href="http://www.melanderson.com.au/">http://www.melanderson.com.au</a>
+  Attribution information for individual song images contained with in the mp3 tag data. 
+.
+}
+
+{+display_news
+print:
+<div style="float: left; width: 260px; margin-top: 10px;">
+<script charset="utf-8" src="http://widgets.twimg.com/j/2/widget.js"></script>
+<script>
+new TWTR.Widget({
+  version: 2,
+  type: 'profile',
+  rpp: 6,
+  interval: 30000,
+  width: 250,
+  height: 500,
+  theme: {
+    shell: {
+      background: '#333333',
+      color: '#ffffff' },
+    tweets: {
+      background: '#000000',
+      color: '#ffffff',
+      links: '#f5e63f' } },
+  features: {
+    scrollbar: false,
+    loop: false,
+    live: false,
+    behavior: 'all' } }).render().setUser('DangarStu').start();
+</script>
+</div>
+<div style="position: absolute; left: 285px; padding-right: 15px;">
+    <a class="title" href="http://dangarstu.tumblr.com/">Tumblr feed</a></h2>
+	<hr>
+    <script type="text/javascript" src="http://dangarstu.tumblr.com/js"></script>
+</div>
+.
+}
+
+{+display_lyrics
+image "/images/Tapes.jpeg" left "[Blank Tapes]"
+print:
+   <p>This page contains all the lyrics and chords for my songs. The "Lyrics and Chords" link will take 
+   you to an HTML version suitable for viewing or printing while the "Download ChordPro file" link will take
+   you to a marked-up version suitable loading into any ChordPro-compatible software.</p> 
+   <hr>
+.
+write "<p><table><tr>"
+write "<td>The Glass Slipper</td>"
+write "<td><a href=~/cgi-bin/webchord.pl?chordpro=TheGlassSlipper.pro~ target=~_blank~>Lyrics and chords</a></td>"
+write "<td><a href=~/downloads/chordpro/TheGlassSlipper.pro~>Download ChordPro file</a></td>"
+write "</tr><tr>"
+write "<td>Stars</td>"
+write "<td><a href=~/cgi-bin/webchord.pl?chordpro=Stars.pro~ target=~_blank~>Lyrics and chords</a></td>"
+write "<td><a href=~/downloads/chordpro/Stars.pro~>Download ChordPro file</a></td>"
+write "</tr><tr>"
+write "<td>Immortaility</td>"
+write "<td><a href=~/cgi-bin/webchord.pl?chordpro=Immortality.pro~ target=~_blank~>Lyrics and chords</a></td>"
+write "<td><a href=~/downloads/chordpro/Immortality.pro~>Download ChordPro file</a></td>"
+write "</tr><tr>"
+write "<td>The Invisible Woman</td>"
+write "<td><a href=~/cgi-bin/webchord.pl?chordpro=TheInvisibleWoman.pro~ target=~_blank~>Lyrics and chords</a></td>"
+write "<td><a href=~/downloads/chordpro/TheInvisibleWoman.pro~>Download ChordPro file</a></td>"
+write "</tr></table>
+}
+
+{+display_songs
+print:
+<a href='http://soundcloud.com/dangarstu/follow' style='text-align: left; display: block; margin: 0 auto 4px auto; width: 246px; height: 27px; font-size: 11px; padding: 36px 0 0 104px; background: transparent url(http://a1.sndcdn.com/images/badges/fmonsc/horizontal/white.png?04ad178) top left no-repeat; color: #0000ff; text-decoration: none; font-family: "Lucida Grande", Helvetica, Arial, sans-serif; line-height: 1.3em; outline: 0;' class='soundcloud-badge'><span style="display: block; width: 230px; white-space: nowrap; height: 20px; margin: 0 0 0 0; overflow: hidden; -o-text-overflow: ellipsis; text-overflow: ellipsis;">http://soundcloud.com/dangarstu</span></a>
+   <iframe width="100%" height="450" scrolling="no" frameborder="no" src="http://w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Fplaylists%2F995985&show_artwork=true"></iframe>
+.
+}
+
+{+soundcloud_follow_button
+print:
+   <a href='http://soundcloud.com/dangarstu/follow' style='text-align: left; display: block; margin: 0 auto 4px auto; width: 246px; height: 27px; font-size: 11px; padding: 36px 0 0 104px; background: transparent url(http://a1.sndcdn.com/images/badges/fmonsc/horizontal/white.png?a9a4a49) top left no-repeat; color: #ffffff; text-decoration: none; font-family: "Lucida Grande", Helvetica, Arial, sans-serif; line-height: 1.3em; outline: 0;' class='soundcloud-badge'><span style="display: block; width: 230px; white-space: nowrap; height: 20px; margin: 0 0 0 0; overflow: hidden; -o-text-overflow: ellipsis; text-overflow: ellipsis;">http://soundcloud.com/dangarstu</span></a>
+.
+}
+
+grammar blankjacl >blankjacl
+
+{+blankjacl
+}
+
+location studio
+
+object you
+  player
+
+constant title_image		"/images/BandPage.jpg"
+constant footer_image		"none"
+constant header_colour		"#000000"
+constant header_height		200
+#constant linkbar_colour		"#c0b098"
+constant linkbar_colour		"#000000"
+constant maintext_colour	"#dddddd"
+constant tab_colour		"#60594e"
+
+#include "forms.library"
+#include "dangarstu.library"
+#include "dangarstu.css"
+#include "validation.library"

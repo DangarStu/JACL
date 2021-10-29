@@ -1,0 +1,84 @@
+#!../bin/jacl
+
+integer temp
+integer chunknum
+integer epoch
+
+integer day
+integer month
+integer year
+
+string tester
+string pointer
+string finalvalue
+
+string date_txt
+
+string partstr "this is a test."
+
+string_array chunk  20
+
+{+intro
+setstring date_txt "4/3/1972"
+
+if "+validate_date<date_txt" = true
+   write "yes, valid date^"
+else
+   write "bad date^"
+endif
+
+
+set epoch = +parse_date<date_txt
+
+write "EPOCH = " epoch "^"
+
+write "DATE = " epoch{full_date} "^"
+
+
+write "^^--------^^"
+
+setstring pointer "tester"
+setstring tester "finalvalue"
+setstring finalvalue "hooray"
+
+write "String = " "pointer" "^"
+write "String = " pointer "^"
+write "String = " %pointer "^"
+write "String = " %%pointer "^"
+
+ifstring partstr contains "is a"
+   write "Good!^"
+else
+   write "Bad!^"
+endif
+
+ifstring partstr beginswith "this"
+   write "Good!^"
+else
+   write "Bad!^"
+endif
+
+ifstring partstr !beginswith "there"
+   write "Good!^"
+else
+   write "Bad!^"
+endif
+
+ifstring partstr beginswith "there"
+   write "Bad!^"
+else
+   write "Good!^"
+endif
+
+ifstring partstr !beginswith "this"
+   write "Bad!^"
+else
+   write "Good!^"
+endif
+
+terminate
+
+}
+
+#include "time.library"
+#include "validation.library"

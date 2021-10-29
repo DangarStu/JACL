@@ -1,0 +1,78 @@
+<html>
+<head>
+	<title>The JACL Author's Guide</title>
+	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<link rel=stylesheet type="text/css" href="styles.css">
+</head>
+<body>
+
+<h1><a class="title" name="pointers0">Pointers</a></h1>
+
+<P>Wherever an object or a location label can be used, so too can a number of special purpose pointers. When a command referring to a pointer is processed, the pointer will be substituted with the label of the item that it currently points to. This avoids the repetition of code and the associated problems of code-bloat and inconsistency. Below is a function demonstrating the use of pointers:
+
+<pre>
+{+where_is
+loop noun3
+   if noun3 hasnt LOCATION
+      noun4 = noun3(parent)
+      write noun3{The} 
+      write " is in " noun4{the} ^
+   endif
+endloop
+}
+</pre>
+
+<p>The above function loops through all the objects defined in the game and displays their current whereabouts. The <b>loop</b> command sets the object pointer <b>noun3</b> to each of the objects in turn, while the pointer <b>noun4</b> is manually set to each object's parent. 
+
+<table class="infowarn"><TR>
+<td><img src="info.png" alt="Information"></td>
+<td>Internally, an object pointer is nothing more than an integer variable, and any integer variable, constant or element can be set to an object's label and then used anywhere an object is expected.</td>
+</tr></table>
+
+<p>The two tables below detail each of the internal object and location pointers:
+
+<h2><a class="section" name="pointers1">Object Pointers</a></h2>
+
+<table cellpadding=3 width=100%><tr>
+<th width=20%>Pointer</th>
+<th>Description</th>
+</tr><tr>
+<td><B>player</TD>
+<td>This pointer is set to the object that currently represents the player in the game.</td>
+</tr><tr>
+<td><b>noun1</b></td>
+<td>This pointer is set to the first object referred to in the player's last move.</td>
+</tr><tr>
+<td><b>noun2</b></td>
+<td>This pointer is set to the second object referred to in the player's last move.</td>
+</tr><tr>
+<td><b>self</b> or <b>this</b></td>
+<td>This pointer is set to the object that the currently executing function is associated with.</td>
+</tr></table>
+
+<h2><a class="section" name="pointers2">Location Pointers</a></h2>
+
+<table cellpadding=3 width=100%><tr>
+<th width=20%>Pointer</th>
+<th>Description</th>
+</tr><tr>
+<td><b>here</b></td>
+<td>This pointer represents the location that the player is currently in. It is synonymous to the element <B>player(parent)</b>.</td>
+</tr><tr>
+<td><b>destination</b></td>
+<td>This represents the location that the player is attempting to move into. The value of <B>destination</B> can be tested in the <B>+movement</B> function before the move is completed. Once the move is complete, <B>destination</B> will equal <B>here</B> until the next move is attempted. This is a read-only pointer and therefore cannot be used as the <I>container</I> parameter of a <B>set</B> command.</td>
+</tr><tr>
+<td><b>self</b> or <b>this</b></td>
+<td>This pointer is set to the location that the currently executing function is associated with.</td>
+</tr></table>
+
+<table class="infowarn"><TR>
+<td><img src="warning.png" alt="Warning"></td>
+<td>Be sure your code never makes use of a pointer in place of an object or location while it does not point to a valid object or location. A pointer is not pointing to a valid object or location if it is set to a number less than one or greater than the number of objects and locations in the game.</td>
+</tr></table>
+
+<!-- END OF BODY -->
+<p><a href="index.html">Back to Contents</b>
+</body>
+</html>

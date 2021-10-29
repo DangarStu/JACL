@@ -1,0 +1,106 @@
+{+styles
+print:
+   <style>
+     <!--
+     p { 		
+            font-family: Verdana, Arial, Sanserif;
+   			color: black; font-size: 12pt}^
+     a { 		
+            font-family: Verdana, Arial, Sanserif;
+   			color: white; font-size: 12pt}^
+     h1 { 		
+            font-family: Verdana, Arial, Sanserif;
+   			color: black; font-size: 24pt}^
+     h2 {	 	
+            font-family: Verdana, Arial, Sanserif;
+   			color: black; font-size: 12pt;
+   			font-weight: bold; }^
+     input.button {
+            margin-top: 7px;
+            margin-left: 5px; }^
+     input.dir_button {
+            margin-top: 0px;
+            margin-left: 0px; }^
+     div.header { 		
+            font-family: Verdana, Arial, Sanserif;
+			height: 85px;
+.
+write "     background: " header_colour "; }^"
+print:
+     div.links { 		
+			opacity: 0.7;
+			position: relative;
+			opacity: 50%;
+			top: -20px;
+			height: 20px;
+            font-family: Verdana, Arial, Sanserif;
+			padding-right: 10px;
+			text-align: right;
+.
+write "     background: " linkbar_colour "; }^"
+print:
+     div.directions { 		
+			height: 20px;
+            font-family: Verdana, Arial, Sanserif;
+			padding-right: 10px;
+			text-align: right;
+			color: white;
+.
+write "     background: " linkbar_colour "; }^"
+print:
+	 img.main { width: 400px;
+			  height: 400px; }
+     div.picture { 
+			position: absolute;
+			right: 8px;
+			top: 93px;
+			width: 400px;
+			height: 400px;
+			float: right;
+			background: grey; }
+     div.maintext {
+     		font-family: Verdana, Arial, Sanserif;
+			height: 400px; 
+			padding-top: 30px;
+			padding-left: 50px;
+			padding-right: 50px;
+			overflow: auto;
+.
+ifstring current_image != "none"
+   write "  margin-right: 400px;"
+endif
+write "     background: " maintext_colour "; }^"
+print:
+     div.footer {
+     		font-family: Verdana, Arial, Sanserif;
+			height: 188px; 
+.
+ifstring footer_image != "none"
+   write "background-image: url('" footer_image "');"
+   write "background-repeat:no-repeat;"
+endif
+write "     background-color: " header_colour "; }^"
+print:
+     div.interface {
+			position: relative;
+			padding-top: 10px;
+			padding-left: 10px;
+			padding-right: 10px;
+			padding-bottom: 10px;
+			float: left;}
+     div.compass {
+			background: white;
+			border-style: solid;
+			border-width: 2px;
+			border-color: black;
+			padding-left: 0px;
+			passing-right: 0px;
+			passing-top: 0px;
+			passing-bottom: 0px;
+			float: right;}
+	select {
+		width: 175px;}
+     -->
+   </style>
+.
+}

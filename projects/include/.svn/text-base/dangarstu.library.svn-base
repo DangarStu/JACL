@@ -1,0 +1,92 @@
+# HEADERS AND FOOTERS FOR MUSIC RELATED APPLICATIONS
+
+string current_image "none"
+
+integer WEBAPP_mode 1
+integer WEBAPP_index
+
+parameter "mode" WEBAPP_mode
+
+grammar change mode $integer >change_mode
+
+{+change_mode 
+set WEBAPP_mode = $integer
+}
+
+grammar standard >standard
+
+{+header
+set linebreaks = false
+print:
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"^
+  "http://www.w3.org/TR/html4/loose.dtd">^
+   <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US"
+         xmlns:fb="https://www.facebook.com/2008/fbml">
+   <head>
+   <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+   <meta name="description" content="Music website for DangarStu." />
+   <meta name="keywords" content="DangarStu,Music,Stuart Allen" />
+   <meta name="author" content="Stuart Allen" />
+   <meta property="og:description" content="DangarStu music website." />
+   <meta property="og:title" content="DangarStu" />
+   <meta property="og:type" content="musician" />
+   <meta property="og:url" content="http://dangarstu.com" />
+   <meta property="og:image" content="http://dangarstu.com/images/InStudioSmall.jpg" />
+   <meta property="og:site_name" content="DangarStu" />
+   <meta property="fb:admins" content="725658316" />
+.
+write "<title>" game_title "</title>"
+execute "+styles"
+print:
+   <style type='text/css'>a.soundcloud-badge:hover {background-position: bottom left !important;} *html a.soundcloud-badge {background-image: none !importan
+t; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='(http://a1.sndcdn.com/images/badges/fmonsc/horizontal/white.png?04ad178)', sizingMetho
+d='crop') !important;}</style>
+   <script src="/include/jquery-1.7.min.js"></script>
+   <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+   </head><body>^
+   <div id="fb-root"></div>
+   <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+      fjs.parentNode.insertBefore(js, fjs); }
+      (document, 'script', 'facebook-jssdk'));                                                  
+   </script>                                                                                    
+   <div id="header">
+.
+ifstring title_image = "none"
+  write "<h1>&nbsp;" game_title "</h1>"
+else
+  write "<img class=~titleimage~ alt=~" game_title "~ src=~" title_image "~>"
+endif
+write "<div class=~links~>
+call "+links_div"
+write "</div>^"
+write "</div>^"
+if @tab_names > 1
+	write "<div class=~mode~>^"
+    set WEBAPP_index = 1 
+    while WEBAPP_index < @tab_names 
+  	   if WEBAPP_mode = WEBAPP_index
+	      write "<div class=~selectedtab~>" tab_names[WEBAPP_index] "</div>"
+	   else
+	      write "<div class=~tab~>"
+	      write "<a class=~tablink~ href=~" $url "?user_id=" $user_id 
+	      write "&command=change mode " WEBAPP_index "&mode=" WEBAPP_index "~>" tab_names[WEBAPP_index] "</a>"
+	      write "</div>
+	  endif
+      set WEBAPP_index + 1
+    endwhile
+	write "</div>"
+endif
+write "<div id=~main~>^"
+set linebreaks = true
+}
+
+{+footer
+set linebreaks = false
+write "</div>"
+write "</body></html>^"
+set linebreaks = true
+}

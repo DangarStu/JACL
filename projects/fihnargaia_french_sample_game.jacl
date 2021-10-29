@@ -1,0 +1,898 @@
+#!../bin/jacl
+
+constant 	game_version	1
+constant	game_title		"Le Roi de Fihnargaia"
+constant	game_author		"Eric Forgeot"
+constant	ifid			"JACL-000"
+
+# CONSTANTS FOR RESOURCES IN BLORB FILE
+constant image_fihnargaia 1
+constant image_chope 2
+
+#### NEW DEFINITIONS #######
+
+attribute INVISIBLE
+
+{+object_descriptions
+loop
+   ifall noun3(parent) = here : noun3(mass) < scenery : noun3 hasnt LOCATION : noun3 hasnt INVISIBLE
+      write ^ noun3{long}
+   endif
+endloop
+}
+
+attribute TALKED_TO
+
+grammar chanter 		>sing_only
+
+{+sing_only
+write "Vous chantez un petit air qui vous passe par la tête.^"
+}
+
+
+#### GAME ######
+
+
+{+about
+style bold
+write game_title
+style normal
+write " par " game_author
+write "^^" 
+write "^Special thanks to " 
+write "Stuart Allen, for making JACL available.^"
+
+set time = false
+}
+
+{+intro
+clear
+if interpreter = GLK 
+   if graphics_supported = false
+        style bold
+   		write ^ game_title
+   		style normal
+   		write " par " game_author "^^"
+   else
+      image image_fihnargaia
+      style bold
+   		write ^ game_title
+   		style normal
+   		write " par " game_author "^^"
+   endif
+endif
+if here hasnt OUTDOORS
+endall
+move ground to here
+look
+}
+
+{+movement
+ifall destination != nowhere : destination hasnt OUTDOORS
+# todo ?
+endif
+return false
+}
+
+object kryten: kryten myself self me moi moi-même moi-meme joueur
+ has		ANIMATE
+ short		name "moi"
+ capacity	42
+ parent		couloir1
+ player
+
+{examine
+write "Vous êtes comme d'habitude, et n'avez pas trop le temps de penser à votre apparence comme ces elfes délicats...^"
+execute "+inventory"
+}
+
+{take
+write "... vraiment ?^"
+set time = false
+}
+
+
+{+no_light
+write "Il fait trop sombre pour voir.^"
+set time = false
+}
+
+{+title
+style subheader
+write here{The} ^
+style normal
+if player has SITTING
+   write "(sitting)^"
+endif
+}
+
+
+
+
+object tablier: tablier mauve
+ has		WEARABLE WORN
+ short		un "tablier"
+ long		function
+ definite	le
+ parent 	kryten
+ mass		1
+ 
+{give_to_reine
+write "Vous détachez votre tablier pour le présenter à la Reine, mais maladroit comme vous l'êtes, vous détachez en même temps votre pantalon qui tombe à vos pied. La Reine n'a pas l'air intéressé. Le Roi, malgré sa bonhommie légendaire, s'en offusque (ou est vaguement jaloux), et il vous fait jeter dans les cachots sombres de Fihnargaia.^Six mois plus tard, vous revoilà devant lui.^"
+ensure roi hasnt TALKED_TO
+}
+
+{examine
+	write "Un tablier mauve, avec une petite poche bleue cousue sur le devant.^"
+}
+
+{long
+	proxy "examine tablier"
+}
+
+
+{throw_at_reine
+write "De rage mais sans raison apparente, vous jetez votre tablier à la figure de la Reine. Son époux, malgré sa bonhommie légendaire, s'en offusque, et il vous fait jeter dans les cachots sombres de Fihnargaia. ^Six mois plus tard, vous revoilà devant lui.^"
+ensure roi hasnt TALKED_TO
+}
+
+object poche: petite poche bleue
+ has		FEMALE CONTAINER
+ short		une "poche"
+ long		"Une poche."
+ definite	la
+ parent 	tablier
+ mass		2
+
+ 
+
+## Grand Hall ##
+
+location hall1: grand hall de Fihnargaia fihnargaia
+  short       name "Grand Hall de Fihnargaia"
+  south        couloir1
+
+{look
+if here hasnt VISITED
+   print:
+      Le Grand Hall de Fihnargaia est luxueusement meublé, vous ne vous lassez jamais de ce spectable grandiose. Vous semblez attendu. L'unique sortie est au sud.^
+   .
+else
+   print:
+      Le Grand Hall de Fihnargaia est luxueusement meublé. L'unique sortie est au sud.^
+   .
+endif
+}
+
+### MURS ###
+
+object murs: murs mur pierres pierre
+ has        PLURAL
+ short      des "murs"
+ definite	les
+ long       "Des murs.^"
+ mass       scenery
+
+{examine
+write "Il serait inconvenant de tourner ainsi votre dos aux monarques.^"
+}
+
+### Meubles ###
+
+object meubles: meubles luxueux meuble trone trones estrade
+ has        PLURAL
+ short      des "meubles"
+ definite	les
+ long       "Des meubles.^"
+ mass       scenery
+
+{open
+write "Vous n'êtes pas chez vous ici, et vous ne pouvez pas non plus vous permettre de faire comme chez vous devant la famille royale et ses nombreux gardes.^"
+}
+
+
+### ROI ###
+
+object roi: roi homme barbe monarque monarques
+ has		ANIMATE POSSESSIVE
+ long		function
+ short		name "le roi de Fihnargaia"
+ mass		heavy 
+ quantity	20
+ 
+{long
+   write "Le Roi de Fihnargaia est assis là."
+}
+
+{examine
+	write "Le roi des nains vous regarde avec bienveillance. Il a une longue barbe tressée qui lui arrive jusqu'à la poitrine. Bâti plus puissamment que le plus fort de ses gardes, il inspire puissance, respect et confiance.^"
+}
+
+{aider
+	style note
+	write "~C'est gentil de vouloir m'aider, la seule chose que je demande, c'est que tu puisses nous refaire de cette succulente hydromel !~^"
+	style normal
+}
+
+{consoler
+	style note
+	write "~Pas la faire de faire semblant de me plaindre ! Je veux seulement un peu d'hydromel, tu devrais savoir faire ça je pense ?~^"
+	style normal
+}	
+
+integer ALEATOIRE
+
+{+macro_fete
+set max_rand = 5
+set ALEATOIRE = random
+if ALEATOIRE = 1
+   setstring return_value "Räz-Trepft"
+endif
+if ALEATOIRE = 2
+   setstring return_value "Krahpi-Lhu"
+endif
+if ALEATOIRE = 3
+   setstring return_value "Vrödak-Pal"
+endif
+if ALEATOIRE = 4
+   setstring return_value "Räz-Ghru"
+endif
+if ALEATOIRE = 5
+   setstring return_value "Krep-Ahröd"
+endif
+}
+
+{+macro_ambassadeur
+set max_rand = 4
+set ALEATOIRE = random
+if ALEATOIRE = 1
+   setstring return_value "Flianglii"
+endif
+if ALEATOIRE = 2
+   setstring return_value "Vranglii"
+endif
+if ALEATOIRE = 3
+   setstring return_value "Pouadi"
+endif
+if ALEATOIRE = 4
+   setstring return_value "Grüiki"
+endif
+}
+
+
+{talk_to
+if roi has TALKED_TO
+	write "Il fait un petit signe de la main pour vous indiquer qu'il vous congédie et qu'il vous faut retourner au travail.^"
+else
+	style note
+	 write "~Bienvenue à toi Gjörfon, et merci de t'être présenté aussi promptement à ma requête. Si je t'ai fait quérir, c'est parce que je connais ton dévouement et ta fidélité en tant que cuisinier en chef de notre domaine.^"
+	 write "Le mois dernier, tu nous avais servi un excellent hydromel lors de la fête de " player{fete} ", et je viens d'apprendre que l'ambassadeur de la tribu des " player{ambassadeur} 
+	 write " devait venir ici à Fihnargaia en délégation spéciale, dès demain.^" 
+	 write "Pour le recevoir comme il se doit, je souhaite lui présenter cet hydromel qui représente tout notre savoir-faire artisanal.~^"
+	style normal
+	ensure roi has TALKED_TO
+}
+
+{ask_for_tablier
+write "Le roi vous rend votre tablier, en vous demandant d'être un peu plus consistant dans les cadeaux que vous lui faites, pour ne pas reprendre une chose déjà offerte, ce qui est plutôt impoli.^"
+move tablier to kryten
+}
+
+### REINE ###
+
+object reine: reine femme
+ has		ANIMATE FEMALE POSSESSIVE
+ long		function
+ short		name "la reine de Fihnargaia"
+ mass		heavy 
+ quantity	20
+ 
+{long
+   write "La Reine de Fihnargaia est à ses côtés."
+}
+
+{talk_to
+   write "Elle baille et ne semble pas intéressée par la conversation qui se tient là.^"
+}
+
+{salute_at
+	write "Vous saluez la Reine, mais sans le faire exprès, votre geste est pris pour un bras d'honneur. Le Roi, malgré sa bonhommie légendaire, s'en offusque, et il vous fait jeter dans les cachots sombres de Fihnargaia.^Six mois plus tard, vous revoilà devant lui.^"
+	ensure roi hasnt TALKED_TO
+}
+ 
+ 
+{kiss
+	write "Sans raison apparente, vous vous jetez comme un malotru au cou de la Reine, et l'embrassez sur la bouche. Le Roi, malgré sa bonhommie légendaire, s'en offusque, et il vous fait jeter dans les cachots sombres de Fihnargaia. ^Six mois plus tard, vous revoilà devant lui.^"
+	ensure roi hasnt TALKED_TO
+}
+
+{attack
+	write "Vous montez sur l'estrade où se trouve le couple royal, mettez votre poing comme un marteau et l'abattez de toute vos forces sur la tête de la reine. Malgré sa bonhommie légendaire, son époux s'en offusque (ou est vaguement jaloux, n'ayant jamais osé le faire lui-même), et il vous fait jeter dans les cachots sombres de Fihnargaia. ^Six mois plus tard, vous revoilà devant lui.^"
+	ensure roi hasnt TALKED_TO
+}
+
+{examine
+	write "Assez jolie, elle est réputé pour son caractère bien trempé, et son désintéret des choses politiques. ^La reine fixe les pierres du mur d'en face.^"
+}
+
+
+### GARDES ###
+
+object gardes: gardes garde habits
+ has		ANIMATE PLURAL POSSESSIVE 
+ long		function
+ short		des "gardes"
+ definite 	les
+ mass		heavy 
+ quantity	20
+ 
+{long
+   write "Des gardes en habits chamarrés se tiennent près des monarques.^"
+}
+
+{attack
+	write "Vous vous approchez des gardes, et faites votre plus vilaine grimace pour leur faire peur. Ils répondent en grimaçant et en vous félicitant pour vos efforts, même s'il y a encore des progrès à faire pour arriver à leur niveau.^"
+}
+
+## Void ##
+
+location void: void
+  short       name "void"
+
+object hydromel: hydromel l'hydromel boisson
+ has		FEMALE LIQUID
+ short		une "hydromel"
+ definite	de l'
+ long		"De l'hydromel.^"
+ quantity	1	
+ parent 	void
+ mass		2 
+ 
+
+{smell
+	write "Une bonne odeur miellée...^"
+}
+
+{drink
+	write "C'est très bon.^"
+	move hydromel to void
+}
+
+object hydromel2: hydromel2
+ has		 FEMALE 
+ long		"" #hydromel.^
+ short		la "hydromel"
+ definite	la
+ mass		1 
+ quantity	4
+  
+## Petit Couloir ##
+
+location couloir1: petit couloir
+  short       name "Petit couloir"
+  north        hall1 
+  east        cuisines1 
+  south		couloir2
+  
+{look
+ifall here has VISITED : roi has TALKED_TO
+   print:
+      Les murs sont couverts de lampes brillant de mille feux. Au nord se trouve le grand hall, tandis que ce couloir oblique vers l'est, vers vos cuisines. La sortie est au sud.^
+   .
+else
+   print:
+      Les murs sont couverts de lampes brillant de mille feux. Au nord se trouve le grand hall où vous attend le roi, tandis que le couloir où vous êtes actuellement oblique vers l'est, vers vos cuisines. La sortie, le dernier endroit où vous devez vous rendre pour le moment, est au sud.^
+   .
+endif
+}
+
+### Lampes ###
+
+object lampes: lampes lampe
+ has        PLURAL FEMALE ON BURNING FLAMMABLE
+ short      des "lampes"
+ definite	les
+ long       "Des lampes.^"
+ mass       scenery
+
+#TODO light ?
+{turn_off_override
+if lampes has ON
+   write "Vous éteignez les lampes."
+      ensure lamp hasnt ON
+else
+   write "Les lampes sont déjà éteintes.^" 
+endif
+}
+
+{turn_on_override
+if lampes has ON
+   write "Les lampes sont déjà allumées.^" 
+else
+      write "Vous allumer les lampes."
+      ensure lamp has ON
+endif
+}
+
+## Couloir 2 ## 
+
+location couloir2: petit couloir
+  short       name "Petit couloir"
+  north        couloir1 
+  southwest        couloir3 
+  
+{look
+if here has VISITED
+   print:
+      Ce couloir mène vers la sortie.^
+   .
+else
+   print:
+      Ce couloir mène vers la sortie, en direction du plateau de Grah-Zahzin.^
+   .
+endif
+}
+  
+
+
+
+## Couloir 3 ## 
+
+location couloir3: petit couloir dehors sortie château chateau
+  short       name "Sortie du château"
+  northeast        couloir2 
+  
+{look
+if here has VISITED
+   print:
+      C'est la sortie du château mais vous n'avez pas le temps de vous balader à l'extérieur malheureusement.^
+   .
+else
+   print:
+      Le plateau de Grah-Zahzin est entouré des montagnes blanches et grises de la chaîne de Khrak-Zahzin, où vos parents autrefois mineurs allaient chercher gloire et richesses.^
+   .
+endif
+}
+  
+{movement
+if compass = south : compass = southeast : compass = southwest
+   write "Vous n'avez pas le temps d'aller vous balader dehors, votre travail n'attend pas.^"
+   return
+endif
+return false
+}
+
+
+### Montagnes au loin ###
+
+object montagnes: montagnes montagne monts mont collines colline loin
+ has        PLURAL FEMALE 
+ short      des "montagnes"
+ definite	les
+ long       "Des montagnes.^"
+ mass       scenery
+ 
+## Cuisines ##
+
+location cuisines1: cuisines cuisine
+  short       name "Cuisines"
+  west        couloir1 
+  
+{look
+if here has VISITED
+   print:
+      Vous revoilà dans les cuisines. Votre univers est continuellement empli de vapeurs et d'effluves agréables, et une dizaines de commis s'activent aux fourneaux ou derrière de succulentes pâtisseries.^
+   .
+else
+   print:
+      Votre univers est continuellement empli de vapeurs et d'effluves agréables, et une dizaines de commis s'activent aux fourneaux ou derrière de succulentes pâtisseries.^
+   .
+endif
+}
+
+### COMMIS ### 
+
+object commis: commis hommes gens
+ has		ANIMATE POSSESSIVE PLURAL
+ long		"Les commis s'activent dans la cuisine."
+ short		name "commis"
+ mass		heavy 
+ quantity	20
+
+{listen_to
+	write "Ils chantonnent tout en travaillant, et parfois certains disent du mal de vous. Sans doute ne vous ont-il pas entendu arriver.^"
+}
+
+{talk_to
+	write "Vous murmurez rapidement quelques ordres à vos commis pour arranger les derniers détails du repas en cours.^"
+}
+
+{embrasser
+	write "Mouarf, ils ont trop de barbe à votre goût, et surtout pas assez de poitrine !^"
+}
+
+### PÂTISSERIES ###
+
+object patisseries: patisseries patisserie pâtisserie gateau gâteau gateaux gâteaux
+ has		 PLURAL FEMALE #INVISIBLE
+ long		"Il y a là des pâtisseries qui semblent succulentes.^"
+ short		des "pâtisseries"
+ definite	les
+ parent 	shelves
+ mass		1 
+ quantity	4
+
+
+{smell
+	write "Une bonne odeur appétissante...^"
+}
+
+{eat
+	write "C'est très bon.^"
+	move patisseries to void
+}
+
+
+### ÉTAGÈRES ### 
+
+object shelves: shelves étagères etageres etagere étagère
+ has		SURFACE PLURAL FEMALE
+ short		des "étagères"
+  long		"Des étagères supportent divers objets et accessoires."
+ definite	les
+ quantity	30
+ mass	heavy
+
+
+## Bidule ##
+
+object bidule : truc machin petit bidule symbole
+ short		un "petit bidule amusant qui ne sert à rien.^"
+ long		"Il y a un petit bidule ici."
+ parent		shelves
+ definite	le
+ mass 5
+
+{examine
+	write "C'est un petit bidule inutile avec un symbole étrange marqué dessus."
+points 10
+}
+
+{secouer
+	write "Cela fait un peu de musique.^"
+}
+
+
+
+### Boite ###
+
+object box: box petite boite en bois boîte
+ has        CLOSABLE CONTAINER CLOSED FEMALE
+ short      une "petite boîte en bois"
+ definite	la
+ long       "Il y a une petite boîte en bois ici.^"
+ parent		shelves
+ mass       25
+ capacity   20
+ 
+# TODO : in the case the name of the noun is not in the synonyms, a reference to noun1 won't work (only to noun1{the} )
+
+{frotter
+	write "Aucun génie n'en sort.^"
+}
+
+{casser
+	write "Elle est trop solide pour être cassée ainsi.^"
+}
+ 
+### GRIMOIRE ###
+
+object grimoire: livre grimoire bouquin
+ has		FLAMMABLE
+ long		"Un grimoire est posé dans un coin.^" 
+ short		un "grimoire"
+ definite	le
+ parent		shelves
+ mass		1 
+ quantity	4
+
+
+{consult_hydromel
+#TODO
+	write "Pour préparer de l'hydromel, il faut mettre ensemble de l'eau, du miel et des levures, et faire ensuite le rituel de Târ Ru Thrin, qui consiste à monter sur le tonneau et dire les phrases consacrées (seul un maître cuisinier peut le faire).^"
+}
+
+{read
+   write "Vous pouvez consulter le grimoire au sujet du sujet qui vous intéresse, mais c'est sans doute le thème de l'hydromel qui vous préoccupe le plus en ce moment...^"
+}
+
+{open
+   proxy "read " noun1
+}
+
+{examine
+	write "Ce sont des recettes de cuisine.^"
+}
+
+
+
+### CHAISE ###
+
+object chaise: simple chaise en bois
+ has		FEMALE
+ short		une "simple chaise en bois"
+ definite	la
+ long		function
+ mass		25
+
+{long
+if chaise hasnt TOUCHED
+   write "Une simple chaise en bois se trouve près du tonneau."
+else
+   write "Il y a une chaise ici."
+}
+
+{sit_on_override
+if player has SITTING
+   write "Vous êtes déjà assis.^"
+   return
+endall
+write "Vous vous asseyez sur la chaise.^"
+ensure player has SITTING
+}
+
+{examine
+write "Cette chaise est interdite à vos commis, on ne travaille bien que debout !^"
+}
+
+{turn
+write "Vous connaissiez un gnome qui faisait tourner de petites tables, mais les chaises, jamais !^ "
+}
+
+### TONNEAU ###
+
+object tonneau: tonneau
+ has		CONTAINER
+ short		un "tonneau"
+ definite	le
+ long		"Un tonneau.^"
+ quantity	20
+# parent 	long_bar
+ mass		scenery
+ 
+{examine
+write "Un gros tonneau grand deux fois comme vous, qui vous sert à brasser de la bière ou de l'hydromel. Il y a un petit robinet à son extrémité.^"
+}
+
+{smell
+write "Ça sent un peu un mélange de vin, de bière, d'hydromel, de schnapps, de krüdik...^Mais il paraît que c'est ça qui donne le bon goût à vos préparations !^"
+}
+
+{dig_in
+	write "Le robinet n'est pas là que pour décorer !^"
+}
+
+{lock_with_clef
+write "Cela aurait vraiment été une bonne idée de pouvoir empêcher quiconque de se servir dans le tonneau, car parfois on croirait que ce qu'il contient à tendance à s'évaporer, mais le tonnelier n'était pas assez habile pour y poser un verrou.^"
+}
+
+{climb_up
+if miel(parent) != tonneau 
+	write "Vous escaladez le grand tonneau et faites un peu le pitre dessus pour amuser vos employés, en gesticulant, chantant et grimaçant. Puis, la comédie terminée, vous redescendez au sol.^"
+else
+	if levure(parent) != tonneau 
+		write "Vous escaladez le grand tonneau et faites un peu le pitre dessus pour amuser vos employés, en dansant, gesticulant et grimaçant. Puis, ceci terminé, vous redescendez au sol, mais vous avez l'impression qu'il manque encore quelque chose pour que le rituel soit complet.^"
+	else
+		write "Vous escaladez le grand tonneau et faites un peu le pitre dessus pour amuser vos employés, en dansant, chantant et grimaçant. Puis, le rituel terminé, vous redescendez au sol. La magie a sans doute opéré, comme d'habitude.^"
+		move hydromel to tonneau
+	endif
+endif
+}
+
+#### ROBINET ####
+
+object robinet: robinet
+ has		CONTAINER
+ short		un "robinet"
+ definite	le
+ long		"Un robinet.^"
+ quantity	1
+ parent 	tonneau
+ mass		2
+
+#TODO prendre robinet
+
+{tourner
+if hydromel(parent) != tonneau 
+	write "Il n'y a rien de bon à prendre là-dedans pour le moment.^"
+else
+	write "Vous prenez une chope et la remplissez avec de l'hydromel.^"
+	move hydromel to chope
+	move chope to kryten
+	points 50
+}
+
+### EAU ###
+
+object eau: eau eaux
+ has		FEMALE LIQUID 
+ short		une "eau"
+ definite	de l'
+ long		"De l'eau.^"
+ quantity	1	
+ parent 	tonneau
+ mass		2 
+ 
+
+{smell
+	write "Cela sent comme de l'eau, fade, plate, triste comme un elfe...^"
+}
+
+{drink
+	write "Pouah ! Boire de l'eau devant tout ce monde, et c'est l'assurance d'être la risée de Fihnargaia en très peu de temps. Il ne sera pas dit que Drâh Bar Ruhk s'abreuve d'eau, les gens n'auraient plus confiance dans sa cuisine !^"
+}
+
+{swim_in
+	write "Voilà ! C'est exactement à cela que sert l'eau, et à cela uniquement. Par contre, il n'y en reste qu'un fond dans ce tonneau, et cela servira malgré tout à brasser l'hydromel."
+}
+
+### ARMOIRE ###
+
+object armoire: armoire
+ has		CONTAINER FEMALE LOCKED CLOSED CLOSABLE #LOCKABLE ?
+ short		une "armoire"
+ definite	l'
+ long		"Une armoire se trouve contre le mur opposé à l'entrée de la cuisine.^"
+ quantity	1	
+    capacity		20
+ mass		22
+ 
+{unlock_with_clef
+write "Vous déverrouillez l'armoire avec votre clef.^"
+ensure armoire hasnt LOCKED
+ensure armoire hasnt CLOSED
+}
+
+{lock_with_clef
+write "Vous verrouillez l'armoire avec votre clef.^"
+ensure armoire has LOCKED
+ensure armoire has CLOSED
+}
+ 
+### CLEF ###
+
+object clef: clef cle clé
+ has		FEMALE
+ short		une "clef"
+ definite	la
+ long		"Une clef.^"
+ parent		poche
+ quantity	1	
+ mass		1
+
+### MIEL ###
+
+object miel: pot de miel
+ short		un "pot de miel"
+ definite	le
+ long		"Un pot de miel.^"
+ quantity	1	
+ parent 	armoire
+ mass		2
+
+{eat_miel
+	write "Cela ne serait pas de refus, mais cela pourrait servir pour l'hydromel, alors cela serait du gâchis de ne plus en avoir assez ensuite.^"
+}
+
+### LEVURE ###
+
+object levure: pot de levure levures
+ short		un "pot de levure"
+ definite	le
+ long		"Un pot de levure.^"
+ quantity	1	
+ parent 	armoire
+ mass		2 
+
+### CHOPE ###
+
+object chope: chope verre
+ has        CONTAINER FEMALE
+ short      une "chope"
+ definite	la
+ long       "Il y a une petite chope ici.^"
+ parent 	armoire
+ mass       5
+ capacity   5
+ 
+{examine
+   if graphics_supported = false
+   #write "blip"
+   #write image_chope
+   else
+   #setstring current_image "/images/fihnargaia/chope.png"
+
+      image image_chope
+   endif
+write "Une simple chope comme on en trouve des dizaines dans chaque foyer nain.^"
+}
+
+{give_to_roi
+if hydromel(parent) == chope
+	write "Vous tendez la chope à votre souverain, qui la porte a ses lèvres, et boit une longue rasade d'hydromel d'un air satisfait. Puis il passe la chope à son épouse pour qu'elle goûte également.^Il sourit largement et vous remercie pour vos efforts. ^^Vous avez gagné !"
+	points 50
+else
+	write "En contemplant la coupe vide, le roi demande si vous vous moquez de lui. Il vous fait jeter aux cachots et vous n'en sortirez pas avant de longues années.^^Vous avez perdu !"
+endif
+	execute "+game_over"
+}
+
+{give_to_reine
+if hydromel(parent) == chope
+	write "Vous tendez la chope à la royale souveraine, qui boit l'hydromel d'une seule traite. Elle se lève, titubante, et tombe ivre morte. Malgré sa bonhommie légendaire, son époux s'en offusque, et il vous fait jeter dans les cachots sombres de Fihnargaia.^^Six mois plus tard, vous revoilà devant lui.^"
+	ensure roi hasnt TALKED_TO
+else
+	write "La reine vous demande si vous vous moquez d'elle."
+endif
+}
+
+
+	
+
+object ground: ground sol carrelage
+ has            SURFACE NO_TAB
+ short          un "sol"
+ definite		le
+
+integer status_window 3
+integer OFFSET
+
+string status_text
+
+{+update_status_window 
+style reverse
+padstring status_text " " status_width
+write status_text
+cursor 0 1
+write status_text
+cursor 0 2
+write status_text
+cursor 1 1
+write here{The}
+setstring status_text "Score : " score " Moves: " total_moves
+set OFFSET = status_width
+length INDEX status_text
+set OFFSET - INDEX
+set OFFSET - 1
+cursor OFFSET 1
+write status_text
+style normal
+}
+
+
+{+bootstrap
+if interpreter = CGI
+   setstring command_prompt "Tapez votre commande > "
+endif
+}
+
+
+constant title_image "/images/fihnargaia.png"
+constant footer_image "none"
+constant header_colour "#535F38"
+constant linkbar_colour "#748768"
+constant maintext_colour "#D2DDD0"
+
+
+#debug "debug.library"
+#include "french_webinterface.library"
+#include "webinterface.css"
+#include "npc.library"
+#include "utils.library"
+#--include "verbs.library"
+#include "french_verbs.library"
+
+
+# TODO : voir pour ^ à la fin de la description "long" en fct des objets
+
+

@@ -1,0 +1,78 @@
+<html>
+<head>
+	<title>The JACL Author's Guide</title>
+	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<link rel=stylesheet type="text/css" href="styles.css">
+</head>
+<body>
+
+<h1><a class="title" name="menu0">The Menu Library</a></h1>
+
+<p>There are many situations where it is desirable to present the player with a menu of options from which they can select. The <b>menu.library</b> contains a set of functions that assist in the display of menus and this chapter details their use.
+
+<p>There are two fundamental types of menu that can be created using <b>menu.library</b>. The first displays the menu options then returns the player to the normal game prompt. From there, if they type a command that contains only a single integer it is treated as the selection of one of the menu options. The second type of menu directly prompts the player to select an option using the <b>asknumber</b> command and then re-displays the menu options for a further selection. This type of menu can be further customised by setting the variable <b>MENU_MODAL</b> to either <b>true</b> or <b>false</b>. If <b>MENU_MODAL</b> is set to <b>true</b> the menu can only be exited by selecting an explicit option that breaks out of the menu loop. If <b>MENU_MODAL</b> is set to <b>false</b> the menu will exit if the player simply presses enter or types <b>0</b>.
+
+<p>Both types of menus can be configured to work in one of two modes: proxy or execute. In proxy mode, the string attached to a menu option is treated as a command and is issued as if typed by the player when that option is selected. In execute mode, the string attached to a menu option is treated as the name of a function to execute when that option is selected. The mode of the menu is determined by setting the variable <b>MENU_MODE</b> to either <b>MENU_PROXY</b> or <b>MENU_EXECUTE</b> before displaying the menu.
+
+<p>We will start by demonstrating the creation of a menu that uses the normal game prompt for selecting options. Below is an example function that creates a simple three-option menu:
+
+<pre>
+{+display_menu
+set MENU_MODE = MENU_PROXY
+execute &quot;+menu_clear_options&quot;
+execute &quot;+menu_add_option&lt;Quietly open the door&lt;open door&quot;
+execute &quot;+menu_add_option&lt;Sneak out the front door&lt;out&quot;
+execute &quot;+menu_add_option&lt;Pick up the book&lt;take book&quot;
+}
+</pre>
+
+<p>The first thing this function does is set the variable <b>MENU_MODE</b> to <b>MENU_PROXY</b>. This indicates that the final argument passed to the function <b>+menu_add_option</b> is a command to be proxied on the player's behalf.
+
+<p>The second line calls the function <b>+menu_clear_options</b>. This function simply erases any previous menu options so a new menu can be build from scratch.
+
+<p>The final three lines add options to the menu by calling the function <b>+menu_add_option</b>. This function takes two arguments: the text to be displayed for the menu option and either the in-game command to issue or the function to execute if this option is selected.
+
+<p>When this function is executed it will display:
+
+<pre>
+1. Quietly open the door
+2. Sneak out the front door
+3. Pick up the book
+
+&gt; 
+</pre>
+
+<p>Typing <b>1</b>, <b>2</b> or <b>3</b> from the command prompt will cause the appropriate command to be issued. This menu is considered active until it is erased by calling the function <b>+menu_clear_options</b>.
+
+<p>A looping menu is created by calling the function <b>+menu_prompt</b> and passing the name of the function that displays the menu options as an argument. For example, the following command will display the same menu as above, only using the <b>asknumber</b> command to prompt for a selection until the menu is exited:
+
+<pre>
+set MENU_MODAL = false
+execute "+menu_prompt&lt;+display_menu"
+</pre>
+
+<p>Using this approach, the player will not be able to perform any action other than select an option from the menu. The function <b>+menu_prompt</b> calls the function <b>+menu_clear_options</b> before calling the supplied function to build the menu. For this reason the function <b>+menu_clear_options</b> does not need to be called manually before adding options.
+
+<p>With the variable <b>MENU_MODAL</b> set to <b>false</b>, the menu can be exited at any time by simply pressing enter or selecting 0. If the variable <b>MENU_MODAL</b> was to be set to <b>true</b>, only a valid menu option can be selected. If you need to provide a mechanism for the player to exit the menu when <b>MENU_MODAL</b> is set to <b>true</b>, this is done by adding a menu option that sets the variable <b>MENU_IN_LOOP</b> to <b>false</b> when it is selected.
+
+<p>Below is an example of a menu displayed by calling <b>+menu_prompt</b>:
+
+<pre>
+&gt; menu
+
+MAIN MENU:
+
+1. About
+2. Instructions
+3. Restore saved game
+4. Save game in progress
+5. Exit menu
+
+Type a number between 1 and 5: 
+</pre>
+
+<!-- END OF BODY -->
+<p><a href="index.html">Back to Contents</b>
+</body>
+</html>

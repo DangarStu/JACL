@@ -1,0 +1,8 @@
+The order tasks and test are done is worth writing down. For example, you can 
+clean a carburettor, put it back on the engine to see if the problem has gone 
+away, and find it hasn't. You then put a new fuel hose in but it still doesn't 
+run. It could be that the old fuel hose blocked the carburettor again on the 
+first test start and therefore needs cleaning again now the new hose is in. 
+From the video it sounds a bit like the idle circuit isn't working in the 
+carburettor. In this case both tasks required to fix this outboard were done,
+just in the wrong order therefore requiring the first to be done again.

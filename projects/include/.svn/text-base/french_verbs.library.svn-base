@@ -1,0 +1,5459 @@
+# --- JACL INCLUDE FILE: french_verbs.library
+# Copyright (c) Stuart Allen 1992-2010.
+# Copyright (c) Eric Forgeot 2010.
+
+#include "french.library"
+
+constant	library_version		27
+
+filter the
+#filter a
+#filter à
+filter le
+filter la
+filter un
+filter une
+filter les
+filter des
+#TODO POSE PB : filter de
+#TODO POSE PB : filter du
+# mettre synonym à la place ?
+#TODO POSE PB
+#filter au
+#filter l'
+
+integer COUNTER
+integer INDEX
+integer TEMP
+integer RETURN_VALUE
+integer OXYGEN_LEFT
+integer direction
+
+synonym onto            on
+synonym into            in
+synonym inside          in
+synonym using           with
+synonym gentleman       man
+
+
+
+synonym sur            on
+synonym dans            in
+synonym dedans          in
+synonym avec           with
+synonym monsieur       man
+
+synonym de            of
+synonym du	      of
+
+
+synonym one				1
+synonym two				2
+synonym three			3
+synonym four			4
+synonym five			5
+synonym six				6
+synonym seven			7
+synonym eight			8
+synonym nine			9
+synonym ten				10
+synonym eleven			11
+synonym twelve			12
+synonym thirteen		13
+synonym fourteen		14
+synonym fifteen			15
+synonym sixteen			16
+synonym seventeen		17
+synonym eighteen		18
+synonym nineteen		19
+synonym twenty			20
+
+synonym un				1
+synonym deux				2
+synonym trois			3
+synonym quatre		4
+synonym cinq			5
+synonym six				6
+synonym sept			7
+synonym huit			8
+synonym neuf			9
+synonym dix				10
+synonym onze			11
+synonym douze			12
+synonym treize		13
+synonym quatorze		14
+synonym quinze			15
+synonym seize			16
+synonym dix-sept		17
+synonym dix-huit		18
+synonym dix-neuf		19
+synonym vingt			20
+
+synonym taje            take
+synonym taek            take
+synonym all             everything
+synonym speak           talk
+synonym depress         press
+synonym w               west
+synonym o				west
+synonym ouest			west
+synonym e               east
+synonym est				east
+synonym s               south
+synonym sud				south
+#synonym se              southeast
+synonym sudest              southeast
+synonym sud-est              southeast
+synonym sw              southwest
+synonym sudouest             southwest
+synonym sud-ouest             southwest
+synonym so				southwest
+synonym n               north
+synonym ne              northeast
+synonym nordest              northeast
+synonym nord-est              northeast
+synonym nw              northwest
+synonym no				northwest
+synonym nordouest				northwest
+synonym nord-ouest				northwest
+synonym u               up
+synonym d               down
+synonym haut               up
+synonym bas               down
+synonym h               up
+synonym b               down
+synonym l               look
+synonym r               look
+synonym beneath         under
+synonym sous         under
+synonym dessous         under
+
+synonym dedans         in
+synonym dehors         out
+
+synonym depuis         from
+
+synonym non         no
+synonym oui         yes
+
+
+# inversé car déjà défini dans french.library
+synonym quit         quitter
+synonym undo         annuler
+synonym walkthru	 solution
+synonym again		encore
+synonym restart		recommencer
+
+# non inversé car pas défini dans french.library
+synonym restaurer       restore
+synonym	charger			restore
+
+
+synonym	aux			au
+synonym aupres 		auprès
+
+
+
+
+integer_array available_exits 12 0
+string dir_command nord sud est ouest nord-est nord-ouest
+string dir_command sud-est sud-ouest haut bas dedans dehors
+
+#string dir_command north south east west northeast northwest
+#string dir_command southeast southwest up down in out
+
+{+macro_es
+      if arg[0] has FEMALE
+   			if arg[0] has PLURAL
+    			setstring return_value "es"
+    		else 
+    			setstring return_value "e"
+    		endif
+      	else
+      		if arg[0] has PLURAL
+      			setstring return_value "s"
+      		else
+      			setstring return_value ""
+      		endif
+      	endif
+}
+
+{+macro_nt
+   	if arg[0] has PLURAL
+    	setstring return_value "nt"
+    else 
+    	setstring return_value ""
+    endif
+}
+
+grammar about >about
+grammar "apropos" >about
+
+{+about
+style note
+write game_title
+style normal
+write ", Copyright (c) " game_author "^"
+write "Release " game_release " / build " game_build 
+write " / JACL verb.library version " library_version "^^"
+}
+
+constant NO_GO 22000
+
+grammar exits >exits
+grammar sorties >exits
+
+{+exits
+execute "+calculate_exits"
+write "Vous pouvez aller au "
+if INDEX = 0 
+   write "nulle part !^"
+   set time = false
+   return true
+endif
+set COUNTER = 0
+repeat
+   if available_exits[COUNTER] != nowhere
+      hyperlink dir_command[COUNTER] dir_command[COUNTER]
+      if available_exits[COUNTER] has KNOWN
+         write " vers " available_exits[COUNTER]{the}
+      endif
+      set INDEX - 1
+      execute "+or_structure"
+   endif
+   set COUNTER + 1
+until COUNTER = 12
+write ".^"
+set time = false
+}
+
+{+calculate_exits
+execute "+clear_list"
+# LOOP THROUGH ALL THE EXITS OF THE CURRENT LOCATION
+set COUNTER = 0
+set INDEX = 0
+repeat
+   ifall here(COUNTER) != nowhere : here(COUNTER) != NO_GO : +in_list<here(COUNTER) = false
+      set available_exits[COUNTER] = here(COUNTER)
+      set INDEX + 1 # THIS IS COUNTING THE NUMBER OF EXITS FOR PUNCTUATION
+   else
+      set available_exits[COUNTER] = 0
+   endif
+   set COUNTER + 1
+until COUNTER = 12
+}
+
+{+in_list
+set TEMP = 0
+repeat
+   if available_exits[TEMP] = arg[0]
+      return true
+   endif
+   set TEMP + 1
+until TEMP = 12
+return false
+}
+
+{+clear_list
+set TEMP = 0
+repeat
+   set available_exits[TEMP] = 0
+   set TEMP + 1
+until TEMP = 12
+}
+
+{+darkness
+if here has DARKNESS
+   execute "+no_light"
+   return true
+endif
+return false
+}
+
+{+can_talk
+if here has UNDER_WATER
+   write "Parler sous l'eau n'est pas très facile.^"
+   set time = false
+   return true
+endif
+if arg[0] = player
+   write "C'est un des premiers signes de démence vous savez...^"
+   set time = false
+   return true
+endif
+if arg[0] hasnt ANIMATE
+   write "Je ne pense pas que cela vous aidera beaucoup de parler avec " arg[0]{the} ""
+   write ".^"
+   set time = false
+   return true
+endif
+if arg[0] has DEAD
+   write  arg[0]{The} " " arg[0]{is} " un peu trop mort pour répondre.^"
+   set time = false
+   return true
+endif
+return false
+}
+
+{+important
+if arg[0] has NOT_IMPORTANT
+   write  arg[0]{The} " ne " arg[0]{is} " pas important, ce n'est pas la peine de se "
+   write "préoccuper de cela.^"
+   set time = false
+   return true
+endif
+return false
+}
+
+{+reach
+if arg[0] has OUT_OF_REACH
+   write  arg[0]{The} " " arg[0]{is} " hors de porté.^"
+   set time = false
+   return true
+endif
+return false
+}
+
+{+possessed
+set INDEX grandof noun1
+ifall INDEX has ANIMATE : INDEX != player : noun1 != INDEX
+   write INDEX{The} " refuse" INDEX{nt} " de vous donner " noun1{the} .^
+   set time = false
+   return true
+else
+   return false
+endif
+}
+
+# Open an object if possible in order to perform typed command.
+{+closed
+if arg[0] hasnt CLOSED
+   return false
+endif
+proxy "open " arg[0]{names}
+if arg[0] has CLOSED
+   set time = false
+   return true
+endif
+return false
+}
+
+# Stop wearing an object if possible in order to perform typed command.
+{+worn
+if arg[0] hasnt WORN
+   return false
+endif
+proxy "remove " arg[0]{names}
+if arg[0] has WORN
+   set time = false
+   return true
+endif
+return false
+}
+
+# Take an object if possible in order to perform typed command.
+{+not_held
+if arg[0] is *held
+   return false
+endif
+proxy "take " arg[0]{names}
+if arg[0] isnt *held
+   set time = false
+   return true
+endif
+return false
+}
+
+location limbo : limbo
+
+grammar shake >shake_only
+
+{+shake_only
+write "Peur ?^"
+set time = false
+}
+
+grammar shake *held   >shake
+grammar wave *held    >shake
+
+grammar secouer *held    >secouer
+{+secouer
+	proxy "shake " noun1
+}
+
+# HOWTO verbes en français pour l'auteur
+# utiliser noun1 sans le {the} accolé
+# mettre obligatoirement la version fr avant la version traduite avec le verbe anglais
+# les objets doivent avoir comme mots alternatif le nom de l'objets
+# les verbes synonymes doivent être rajoutés en synonyme, pas en autre forme de verbe
+# (ou sinon c'est fastidieux)
+
+grammar secouer *held    >shake
+
+{+shake
+if +not_held<noun1 = true
+   return
+endif
+write "Considérez cela comme étant fait.^"
+#TODO améliorer ?...
+}
+
+
+
+grammar say xyzzy >xyzzy
+grammar xyzzy     >xyzzy
+
+{+xyzzy
+set time = false
+if @+xyzzy != 1
+   write "~Allez-vous en. Laissez-nous tranquille.~^"
+   return true
+endif
+write "« C'est le mot de passe, ouvre la porte. »^^"
+write "« Tu es certain de ce que tu fais ? Je ne reconnais pas cette voix. »^^"
+write "« Allez, ne discute pas, ouvre la porte ! »^^"
+write "Une porte auparavant invisible s'ouvre devant vous. Derrière cette porte vous pouvez "
+write "voir ce qui ressemble à un fantastique atelier.^^"
+write "write ~Zut ! Je t'avais dit que cela n'était pas lui !" caret "~;^" 
+write "set bouncer_1(panic) + 5;^"
+write "write ~Vite ! Ferme la porte." caret "~;^"
+write "set poo(parent) = bouncer_2s_trousers;^"
+write "ensure magic_door has CLOSED;^"
+write "^La porte se ferme et disparaît à nouveau. "
+write "Peut-être un autre jour...^"
+}
+
+grammar save $string >named_save
+
+grammar sauver $string >named_save
+grammar sauvegarder $string >named_save
+
+{+named_save
+savegame INDEX $string
+if INDEX = true
+   write "Jeu sauvegardé.^"
+endif
+set time = false
+}
+
+grammar restore $string >named_restore
+grammar charger $string >named_restore
+grammar restaurer $string >named_restore
+
+{+named_restore
+restoregame INDEX $string
+if INDEX = true
+   write "Jeu chargé.^^"
+   ensure here hasnt VISITED
+   execute "+display_location"
+endif
+set time = false
+}
+
+string filename
+
+{+load_saved
+repeat
+   write "Voulez vous charger un jeu sauvegardé ?^"
+   getyesorno TEMP
+   if TEMP = true
+       write "^Entrez le nom du fichier sauvegardé : "
+       getstring filename
+       restoregame INDEX filename 
+       if INDEX = true
+          write "Jeu chargé.^^"
+          return
+       endif
+   endif
+until TEMP = false
+}
+
+grammar save >save_game
+grammar sauvegarder >save_game
+grammar sauver >save_game
+
+{+save_game
+savegame INDEX
+if INDEX = true
+   write "Jeu sauvegardé.^"
+endif
+set time = false
+}
+
+grammar restore >restore_game
+grammar charger >restore_game
+grammar restaurer >restore_game
+
+{+restore_game
+restoregame INDEX
+if INDEX = true
+   write "Jeu chargé.^^"
+   ensure here hasnt VISITED
+   execute "+display_location"
+endif
+set time = false
+}
+
+grammar status on >status_on
+
+{+status_on
+if status_window = 1
+write "The status window is already turned on.^"
+else
+set status_window = 1
+write "Status window turned on.^"
+endif
+set time = false
+}
+
+grammar status off >status_off
+
+{+status_off
+if status_window = 0
+write "The status window is already turned off.^"
+else
+set status_window = 0
+write "Status window turned off.^"
+endif
+set time = false
+}
+
+grammar sound on >sound_on
+grammar music on >sound_on
+grammar musique on >sound_on
+
+
+{+sound_on
+if sound_enabled = true
+write "Le son est déjà activé.^"
+else
+set sound_enabled = true
+write "Son activé.^"
+endif
+set time = false
+}
+
+grammar sound off >sound_off
+grammar music off >sound_off
+grammar musique off >sound_off
+grammar stop musique >sound_off
+
+{+sound_off
+if sound_enabled = false
+write "Le son est déjà désactivé.^"
+else
+set sound_enabled = false
+write "Son désactivé.^"
+stop 0
+stop 1
+stop 2
+stop 3
+endif
+set time = false
+}
+
+grammar graphics on >graphics_on
+
+{+graphics_on
+if graphics_enabled = true
+write "Graphics are already enabled.^"
+else
+set graphics_enabled = true
+write "Graphics enabled.^"
+endif
+set time = false
+}
+
+grammar graphics off >graphics_off
+
+{+graphics_off
+if graphics_enabled = false
+write "Graphics are already disabled.^"
+else
+set graphics_enabled = false
+write "Graphics disabled.^"
+endif
+set time = false
+}
+
+grammar timer on >timer_on
+
+{+timer_on
+if timer_enabled = true
+write "The timer is already enabled.^"
+else
+set timer_enabled = true
+write "Timer enabled.^"
+endif
+set time = false
+}
+
+grammar timer off >timer_off
+
+{+timer_off
+if timer_enabled = false
+write "The timer is already disabled.^"
+else
+set timer_enabled = false
+write "Timer disabled.^"
+endif
+set time = false
+}
+
+grammar verbose >verbose
+
+{+verbose
+if display_mode = 1
+   write "Display mode already set to verbose.^"
+   set time = false
+   return true
+endif
+write "Display mode set to verbose.^^"
+set display_mode = 1
+look
+set time = false
+}
+
+grammar brief >brief
+
+{+brief
+if display_mode = 0
+   write "Display mode already set to brief.^"
+   set time = false
+   return true
+endif
+write "Display mode set to brief.^"
+set display_mode = 0
+set time = false
+}
+
+grammar help *present           >help_other
+
+grammar aider *held    >aider
+{+aider
+	proxy "help " noun1
+}
+
+grammar aider *present           >help_other
+grammar donner coup of main à *present >help_other
+grammar donner coup of main a *present >help_other
+
+{+help_other
+write "Comment comptez-vous aider " noun1{the} " ?^"
+}
+
+grammar hint *present	>hint_nonum
+grammar hint			>hint_nonum
+
+grammar astuces *present >hint_nonum
+grammar astuces  >hint_nonum
+
+
+{+hint_nonum
+if noun1 = false
+   proxy "hint 1"
+else
+   proxy "hint 1 " noun1{names} 
+endif
+}
+
+grammar hint $integer *present	>hint
+grammar hint $integer			>hint
+
+{+hint
+if noun1 = false
+   write "Il n'y a pas d'astuce spécifique pour cet endroit.^"
+else
+   write "Il n'y a pas d'astuce spécifique pour " noun1{the} .^
+endif
+set time = false
+}
+
+grammar help games >help_games
+grammar aide de jeu >help_games
+
+{+help_games
+write "`GAMES' REFERS TO MODELS, SIMULATIONS AND GAMES WHICH HAVE TACTICAL "
+write "AND STRATEGIC APPLICATIONS.^"
+}
+
+grammar hug			>hug_only
+grammar comfort		>hug_only
+grammar cuddle		>hug_only
+grammar console		>hug_only
+
+grammar consoler		>hug_only
+#grammar embrasser		>hug_only
+
+
+{+hug_only
+if +get_animate != 0
+   proxy "hug " candidate{names}
+   return
+endif
+write "Qui voulez-vous consoler ?^"
+setstring question "consoler "
+set time = false
+}
+
+grammar hug *present     >hug
+grammar comfort *present >hug
+grammar cuddle *present  >hug
+grammar console *present >hug
+
+grammar consoler *present    >consoler
+{+consoler
+	proxy "hug " noun1
+}
+
+grammar consoler *present >hug
+synonym conforter 	consoler
+
+#grammar embr-asser *present >hug
+
+{+hug
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+if noun1 hasnt ANIMATE
+   write "Bizarre.^"
+   return true
+endif
+write "Il est certain que " noun1{the} " se sent" " bien mieux maintenant.^"
+}
+
+grammar kiss	>kiss_only
+grammar pash	>kiss_only
+grammar snog	>kiss_only
+
+grammar embrasser	>kiss_only
+# <!> conflit avec hug
+
+{+kiss_only
+if +get_animate != 0
+   proxy "kiss " candidate{names}
+   return
+endif
+write "Qui voulez-vous embrasser ?^"
+setstring question "kiss "
+set time = false
+}
+
+grammar kiss *present >kiss
+grammar pash *present >kiss
+grammar snog *present >kiss
+
+grammar embrasser *present    >embrasser
+{+embrasser
+	proxy "kiss " noun1
+}
+
+grammar embrasser *present >kiss
+
+{+kiss
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Hmmmmmm...^"
+}
+
+grammar dig *present			>dig_in
+grammar dig in *present			>dig_in
+grammar dig up *present			>dig_in
+grammar dig through *present	>dig_in
+
+grammar creuser *present    >creuser
+{+creuser
+	proxy "dig " noun1
+}
+
+grammar creuser *present	>dig_in
+grammar creuser in *present	>dig_in
+#TODO
+
+{+dig_in
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Vous ne pouvez creuser dans " noun1{the} ".^"
+set time = false
+}
+
+grammar dig >dig
+
+grammar creuser >dig
+
+{+dig
+if here hasnt OUTDOORS
+   print:
+      Vous ne pouvez creuser ici.^
+   .
+else
+   print:
+      Il n'est pas nécessaire de creuser ici.^
+   .
+endif
+set time = false
+}
+
+grammar pick >pick_only
+
+#grammar prendre >pick_only
+#déjà utilisé avec get ?
+
+{+pick_only
+write "What did you want to pick?^"
+setstring question "pick "
+set time = false
+}
+
+grammar pick *present >pick_one
+
+{+pick_one
+if +get_dropable != 0
+   proxy "pick " noun1{the} " with " candidate{names}
+   return
+endif
+write "What did you want to pick " noun1{the} " with?^"
+setstring question "pick " noun1{the} " with "
+set time = false
+}
+
+grammar pick *present with *held >pick_with
+
+{+pick_with
+if +not_held<noun2 = true
+   return
+endif
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "You can't pick " noun1{the} " with " noun2{the} .^
+}
+
+grammar rub *present    >rub
+grammar pat *present    >rub
+
+grammar frotter *present    >frotter
+{+frotter
+	proxy "rub " noun1
+}
+
+grammar frotter *present    >rub
+
+{+rub
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true 
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Je suis certain que " noun1{the} " se sent mieux maintenant.^"
+}
+#TODO : default answer only relevant for animate?
+
+grammar rub *held on *present         >rub_on
+
+{+rub_on
+if +not_held<noun1 = true
+   return
+endif
+if +important<noun2 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+override
+proxy "rub " noun2{names} " with " noun1{names}
+}
+
+grammar rub *present with *held    >rub_with
+
+#TODO : french?
+
+grammar frotter *present with *held    >rub_with
+
+{+rub_with
+if +not_held<noun2 = true
+   return
+endif
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Ils sont juste un peu plus chaud.^"
+}
+
+grammar lick *present  >lick
+grammar taste *present >lick
+
+#déjà avec taste ?
+
+{+lick
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Yeuucck!^"
+}
+
+grammar pull **present >pull
+grammar tug **present  >pull
+
+grammar tirer *present    >tirer
+{+tirer
+	proxy "pull " noun1
+}
+
+grammar tirer **present  >pull
+
+{+pull
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Vous ne pouvez tirer " noun1{the} .^
+}
+
+grammar cut *present  >cut
+grammar chop *present >cut
+grammar stab *present >cut
+
+grammar couper *present    >couper
+{+couper
+	proxy "cut " noun1
+}
+
+grammar couper *present >cut
+
+{+cut
+write "Avec quoi voulez-vous couper " noun1{the} " ?^"
+setstring question "couper " noun1{names} " avec "
+set time = false
+}
+
+grammar cut *present with *held       >cut_with
+grammar chop *present with *held      >cut_with
+grammar stab *present with *held      >cut_with
+
+grammar couper *present with *held      >cut_with
+grammar decouper *present with *held      >cut_with
+grammar découper *present with *held      >cut_with
+
+# TODO : obligé de marquer les 2 formes
+
+{+cut_with
+if +not_held<noun2 = true
+   return
+endif
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+if noun1 has ANIMATE
+   proxy "attack " noun1{names} " with " noun2{names}
+   return true
+endif
+write "Vandale !^"
+set time = false
+}
+
+grammar peel *present		>peel
+grammar skin *present		>peel
+
+grammar peler *present    >peler
+{+peler
+	proxy "peel " noun1
+}
+
+grammar peler *present		>peel
+
+{+peel
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Vous ne pouvez peler " noun1{the} ".^"
+set time = false
+}
+
+grammar break *present		>break
+grammar smash *present		>break
+grammar crush *present		>break
+grammar destroy *present	>break
+grammar wreck *present		>break
+grammar crack *present		>break
+grammar tear **present		>break
+grammar tear up **present	>break
+grammar tear **present up	>break
+grammar tear off **present	>break
+grammar tear **present off	>break
+grammar rip **present		>break
+grammar rip up **present	>break
+grammar rip **present up	>break
+grammar rip off **present	>break
+grammar rip **present off	>break
+
+grammar casser *present    >casser
+{+casser
+	proxy "break " noun1
+}
+
+grammar casser **present 	>break
+
+synonym déchirer	casser
+synonym dechirer	casser
+synonym detruire	casser
+synonym detruire	casser
+
+#grammar déchirer **present 	>break
+#grammar détruire **present	>break
+#grammar dechirer **present 	>break
+#grammar detruire **present 	>break
+
+{+break
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+if noun1 has ANIMATE
+   write "Ne soyez pas si aggressif.^"
+else
+   write "Ne soyez pas si destructeur.^"
+endif
+set time = false
+}
+
+grammar clean *present        >clean
+grammar wash *present         >clean
+grammar wipe *present         >clean
+grammar scrub *present        >clean
+grammar polish *present       >clean
+
+grammar nettoyer *present    >nettoyer
+{+nettoyer
+	proxy "clean " noun1
+}
+
+grammar nettoyer *present        >clean
+
+{+clean
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 has LIQUID
+   write "Comment voulez-vous nettoyez un liquide ?^"
+   set time = false
+   return true
+endif
+override
+write "C'est très gentil de votre part.^"
+}
+
+grammar clean *present with *held     >clean_with
+grammar wipe *present with *held      >clean_with
+grammar scrub *present with *held     >clean_with
+grammar brush *present with *held     >clean_with
+
+grammar nettoyer *present with *held     >clean_with
+
+{+clean_with
+if +not_held<noun2 = true
+   return
+endif
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+if noun1 has LIQUID
+   write "Comment voulez-vous nettoyez un liquide ?^"
+   set time = false
+   return true
+endif
+override
+write "Vous ne pouvez pas nettoyer " noun1{the} " avec " noun2{the} .^
+set time = false
+}
+
+grammar yell at *present      >yell_at
+grammar scream at *present    >yell_at
+
+grammar crier on *present    >yell_at
+grammar crier vers *present    >yell_at
+grammar hurler on *present    >yell_at
+grammar hurler vers *present    >yell_at
+
+# on utilise "on" car "sur" a été défini comme synonyme de "on" plus haut.
+
+{+yell_at
+write "Oooh, ça fait peur...^"
+}
+
+grammar yell      >yell
+grammar scream    >yell
+
+grammar crier    >yell
+grammar hurler    >yell
+
+
+
+{+yell
+write "Vous avez maintenant mal à la gorge.^"
+}
+
+grammar pay *present       >pay
+
+grammar payer *present       >pay
+
+{+pay
+write "Vous ne pouvez payer pour " noun1{the} .^
+}
+
+grammar order *anywhere       >order
+grammar buy *anywhere         >order
+
+grammar acheter *anywhere         >order
+
+{+order
+write "Votre commande est tombée dans l'oreille d'un sourd.^"
+# Your order appears to have fallen on deaf ears
+}
+
+grammar knock on *present     >knock_on
+grammar tap on *present       >knock_on
+grammar tap *present          >knock_on
+
+#grammar frapper *present          >knock_on
+# doublon avec hit/attack
+
+{+knock_on
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+if noun1 has ANIMATE
+   proxy "attack " noun1{names}
+   endif
+endif
+if noun1 has LIQUID
+   write "Une main mouillée est votre seule récompense.^"
+   return true
+endif
+write "You gently tap on " noun1{the}.^"
+}
+
+grammar smoke *present >smoke
+
+grammar fumer *present >smoke
+
+{+smoke
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Vous ne pouvez fumer " noun1{the} .^
+set time = false
+}
+
+grammar play *present	>play
+grammar sound *present	>play
+grammar ring *present	>play
+
+grammar jouer *present	>play
+
+
+
+{+play
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Vous ne pouvez jouer " noun1{the} .^
+# You can't play
+set time = false
+}
+
+grammar play *present with *held	>play_with
+grammar sound *present with *held	>play_with
+grammar ring *present with *held	>play_with
+
+grammar jouer *present with *held	>play_with
+
+{+play_with
+if +not_held<noun2 = true
+   return
+endif
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Vous ne pouvez jouer " noun1{the} " avec " noun1{the} .^
+set time = false
+}
+
+grammar pump *present >pump
+
+grammar pomper *present >pump
+
+{+pump
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Vous ne pouvez pomper " noun1{the} .^
+set time = false
+}
+
+grammar unload *here    >empty
+grammar empty *here     >empty
+
+grammar vider *here     >empty
+
+{+empty
+proxy "take all from " noun1{names}
+}
+
+grammar extract **here with *held	>take_with
+grammar get **here with *held		>take_with
+grammar take **here with *held		>take_with
+grammar take out **here with *held	>take_with
+grammar hold **here with *held		>take_with
+grammar empty **present with *held	>take_with
+
+{+take_with
+if +not_held<noun2 = true
+   return
+endif
+proxy "fill " noun2{names} " with " noun1{names}
+}
+
+grammar fill *held from *present      >fill_from
+
+grammar remplir *held from *present      >fill_from
+# nuance non pertinente en français ?
+
+{+fill_from
+if +not_held<noun1 = true
+   return
+endif
+if +important<noun2 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +contains_liquid?<noun2 == false
+   write  noun2{The} " " noun2{doesnt} " contient pas un liquide permettant de remplir " noun1{the}
+   write ".^"
+   set time = false
+   return true
+endif
+proxy "fill " noun1{names} " with " CHILD{names}
+}
+
+grammar fill *held with *present >fill_with
+
+grammar remplir *held with *present >fill_with
+grammar emplir *held with *present >fill_with
+
+{+fill_with
+if +not_held<noun1 = true
+   return
+endif
+if +important<noun2 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun2 = true
+   return true
+endif
+if noun2 hasnt LIQUID 
+   if +contains_liquid?<noun2 = true
+      set noun2 = CHILD
+   else
+      write "Vous ne pouvez remplir " noun1{the} " qu'avec un liquide.^"
+      return true
+   endif
+endif
+if noun1 hasnt CONTAINER
+	if noun1 has PLURAL
+		write  noun1{The} " " noun1{isnt} " un contenant et ne peuvent être "
+		write "rempli" noun1{e} ".^"
+	else
+		write  noun1{The} " " noun1{isnt} " un contenant et ne peut être "
+		write "rempli" noun1{e} ".^"
+	endif
+   
+#TODO pluriel + grammaire
+   return true
+endif
+if noun1 has CLOSED
+   write "Vous ne pouvez remplir " noun1{the} " tandis "
+   if noun1 has PLURAL
+      write "qu'ils sont fermés"
+   else
+      write "qu'il est fermé"
+   endif
+   write ".^"
+#TODO feminin
+   set time = false
+   return true
+endif
+if +contains_liquid?<noun1 = true
+   write  noun1{The} " already contains " CHILD{the} ". If you were to also "
+   write "add " noun2{the} " they would mix together.^"
+   set time = false
+   return true
+endif
+if noun1(quantity) < noun2(mass)
+   write  noun1{The} " " noun1{isnt} " large enough to hold " 
+   write noun2{the} .^
+   set time = false
+   return true
+endif
+override
+write "Vous remplissez " noun1{the} " avec " noun2{the} .^
+move noun2 to noun1
+}
+
+{+contains_liquid?
+# CHECK IF THE SPECIFIED OBJECT CONTAINS ANY LIQUIDS
+select LIQUID CHILD
+   if CHILD(parent) = arg[0]
+      return true
+   endif
+endselect
+return false
+}
+
+grammar fill *held >fill
+
+grammar emplir *held >fill
+grammar remplir *held >fill
+
+{+fill
+if +important<noun1 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+override
+write "Avec quoi vouliez vous remplir " noun1{the} " ?^"
+setstring question "fill " noun1{names} " with "
+set time = false
+}
+
+grammar stand         >stand
+grammar stand up      >stand
+grammar get up        >stand
+
+#grammar southeast lever	>stand
+grammar se lever	>stand
+grammar me lever	>stand
+
+{+stand
+if player has SITTING
+   write "Vous vous relevez.^"
+   ensure player hasnt SITTING
+   return true
+endif
+write "Vous êtes déjà debout.^"
+}
+
+grammar sleep         >sleep
+
+grammar dormir		>sleep
+
+{+sleep
+write "Vous aurez le temps de faire cela plus tard...^"
+set time = false
+}
+
+grammar lie on *present       >lie_on
+grammar lie down on *present  >lie_on
+grammar sleep on *present     >lie_on
+grammar sleep in *present     >lie_on
+
+grammar se coucher on *present     >lie_on
+grammar me coucher on *present     >lie_on
+
+
+{+lie_on
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write  noun1{The} " " noun1{doesnt} " semble pas être le meilleur endroit pour "
+write "faire un somme.^"
+}
+
+grammar sit			>sit
+grammar sit down	>sit
+grammar squat		>sit
+grammar squat down	>sit
+
+grammar s'asseoir	>sit
+grammar m'asseoir	>sit
+
+{+sit
+set time = false
+if player has SITTING
+   write "Vous êtes déjà assis.^"
+   return true
+endif
+if here has UNDER_WATER
+   write "Sous l'eau ?^"
+   return true
+endif
+if here has ON_WATER
+   write "Sur l'eau ?^"
+   return true
+endif
+write "Vous vous asseyez.^"
+ensure player has SITTING
+}
+
+grammar sit *here	  >sit_on
+grammar sit on *here  >sit_on
+grammar sit in *here  >sit_on
+
+grammar s'assoir on *here  >sit_on
+grammar m'assoir on *here  >sit_on
+
+grammar s'assoir in *here  >sit_on
+grammar m'assoir in *here  >sit_on
+
+{+sit_on
+if +important<noun1 = true
+   return true
+endif
+if noun1 is *held
+   write "C'est difficile de s'asseoir sur quelque chose que l'on tient en main.^"
+   set time = false
+   return
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write  noun1{The} " " noun1{doesnt} " semble pas très confortable.^"
+}
+
+grammar kick *present           >kick
+
+grammar botter *present           >kick
+
+{+kick
+if +worn<noun1 = true
+   return true
+endif
+override
+if noun1 has ANIMATE
+   proxy "attack " noun1{names}
+   return
+endif
+if noun1(mass) = scenery
+   if noun1 grandof player
+      write "Cette contortion est au delà de vos forces.^"
+      set time = false
+      return
+   else
+      proxy "attack " noun1{names}
+      return
+   endif
+endif
+write "Vous bottez " noun1{the} " à une courte distance.^"
+move noun1 to here
+}
+
+grammar throw *held	>throw
+grammar lob *held	>throw
+grammar hurl *held	>throw
+grammar pitch *held	>throw
+grammar cast *held	>throw
+
+grammar jeter *held	>throw
+grammar lancer *held	>throw
+
+{+throw
+if +not_held<noun1 = true
+   return
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+if here has MID_WATER : here has ON_WATER
+   write "Vous jetez " noun1{the} " qui coule rapidement"
+   write ".^"
+   move noun1 to limbo
+   return true
+endif
+write "Vous jetez " noun1{the} " à une petite distance.^"
+move noun1 to here
+}
+
+grammar drop 		>drop_only
+grammar put down	>drop_only
+
+grammar laisser	>drop_only
+
+{+drop_only
+if +get_dropable != 0
+   proxy "drop " candidate{names}
+   return
+endif
+write "Que voulez-vous laisser ?^"
+setstring question "drop "
+set time = false
+}
+
+grammar drop **held		>drop
+grammar put **held down	>drop
+grammar put down **held	>drop
+
+grammar laisser **held	>drop
+grammar se débarrasser **held	>drop
+grammar me débarrasser **held	>drop
+
+grammar se debarrasser **held	>drop
+grammar me debarrasser **held	>drop
+
+{+drop
+if noun1 isnt *held
+   write "Vous ne portez pas " noun1{the} ".^"
+   set time = false
+   return
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+if here has MID_WATER : here has ON_WATER
+   write "Vous laissez " noun1{the} " qui coule rapidement"
+   write ".^"
+   move noun1 to limbo
+   return true
+endif
+write "Vous laissez " noun1{the} .^
+move noun1 to here
+}
+
+grammar take 		>take_only
+grammar take out	>take_only
+grammar hold 		>take_only
+grammar pick		>take_only
+grammar pick		>take_only
+grammar get			>take_only
+
+grammar prendre		>take_only
+grammar ramasser		>take_only
+
+{+take_only
+if +get_takeable != 0
+   proxy "prendre " candidate{names}
+   return
+endif
+write "Que voulez-vous prendre ?^"
+setstring question "prendre "
+set time = false
+}
+
+grammar take **here		>take
+grammar take out **here	>take
+grammar hold **here		>take
+grammar pick up **here	>take
+grammar pick **here up	>take
+grammar get **here		>take
+grammar prendre **here  >take
+
+synonym pr	prendre
+synonym cueillir	prendre
+synonym attraper	prendre
+
+
+{+take
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if +possessed<noun1 = true
+   return
+endif
+if noun1 is *held
+   write "Vous avez déjà " noun1{the} ".^"
+   set time = false
+   return
+endif
+if player has SITTING
+   write "Vous devez d'abord vous lever.^"
+   set time = false
+   return true
+endif
+if noun1 has ANIMATE
+   write "Je ne pense pas qu'" noun1{sub}
+   if noun1 has PLURAL
+   		write " apprécieraient cela.^"
+   	else
+   		write " apprécierait cela.^"
+   	endif
+   set time = false
+   return true
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if noun1(mass) > player(quantity)
+   write "Vous transportez déjà trop de choses pour pouvoir prendre en plus " noun1{the} .^
+   set time = false
+   return true
+endif
+if noun1 has LIQUID
+   write  "" noun1{The} " coule" noun1{nt} 
+   write " entre vos doigts.^"
+   return true
+endif
+override
+write "Vous prenez " noun1{the} .^
+move noun1 to player
+ensure noun1 has TOUCHED
+}
+
+{+move_scenery
+if arg[0] has LOCATION
+   write "Cela demanderait une force incroyable.^"
+   set time = false
+   return true
+endif
+if arg[0](mass) => heavy
+   set noun3 = noun1(parent)
+   set INDEX = noun3
+   if noun3 has LOCATION
+      write "Vous ne pouvez prendre " noun1{the} ".^"
+      return true
+   else
+      write noun1{The} " " noun1{is} " attaché à " noun3{the} .^
+   endif
+   set time = false
+   return true
+endif
+return false
+}
+
+grammar insert **held on *present	>insert_on
+grammar put **held on *present		>insert_on
+grammar place **held on *present	>insert_on
+
+#Mettre ?
+
+{+insert_on
+if +important<noun2 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun2 = true
+   return true
+endif
+if noun2 = noun1
+   write "Mettre " noun1{the} " sur "
+   if noun1 has PLURAL
+      write "eux-même ?"
+   else
+      write "lui-même ?"
+      # TODO feminin
+   endif
+   write " Je ne pense pas.^"
+   set time = false
+   return true
+endif
+if noun2(parent) = noun1
+   write "Je suis désolé, ce n'est pas possible.^"
+   set time = false
+   return true
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if noun2 hasnt SURFACE
+   write "Il n'y a pas assez de surface sur " noun2{the} .^
+   set time = false
+   return true
+endif
+if noun2(quantity) < noun1(mass)
+   write "Il n'y a pas assez de place dan " noun2{the} " pour y mettre " noun1{the} .^
+   set time = false
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+write "Vous mettez " noun1{the} " sur " noun2{the} .^
+move noun1 to noun2
+}
+
+grammar insert **held under *present	>insert_under
+grammar put **held under *present		>insert_under
+grammar place **held under *present		>insert_under
+
+{+insert_under
+if +important<noun2 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun2 = true
+   return true
+endif
+if noun2 = noun1
+   write "Mettre " noun1{the} " sous "
+   if noun1 has PLURAL
+      write "cela ?"
+   else
+      write "cela ?"
+#TODO feminin pluriel... ?
+   endif
+   write " Je ne pense pas.^"
+   set time = false
+   return true
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+override
+proxy "drop " noun1{names}
+}
+
+grammar insert **held in *present	>insert_in
+grammar put **held in *present		>insert_in
+grammar place **held in *present	>insert_in
+
+grammar mettre **held in *present	>insert_in
+grammar inserer **held in *present	>insert_in
+
+{+insert_in
+if +important<noun2 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun2 = true
+   return true
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if noun2 = noun1
+   write "Mettre " noun1{the} " dans "
+   if noun1 has PLURAL
+      write "themselves?"
+   else
+   if noun1 has FEMALE
+      write "elle-même ?"
+   else
+      write "lui-même ?"
+      endif
+   endif
+   write " Je ne pense pas.^"
+   set time = false
+   return true
+endif
+if noun2(parent) = noun1
+   write "Je suis désolé cela n'est pas possible.^"
+   set time = false
+   return true
+endif
+if noun2 = player
+   write "Non !"
+   write "^"
+   set time = false
+   return true
+endif
+if noun2 hasnt CONTAINER
+   write noun2{The} " " noun2{isnt} " conçu" noun1{es} " pour recevoir " 
+   write noun1{the} .^
+   set time = false
+   return true
+endif
+if +closed<noun2 = true
+   return true
+endif
+if noun2(quantity) < noun1(mass)
+   write "Il n'y a pas assez de place dans " noun2{the} " pour y mettre " noun1{the} .^
+   set time = false
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+write "Vous mettez " noun1{the} " dans " noun2{the} .^
+move noun1 to noun2
+}
+
+{+encumbered
+if INDEX = 0
+   write "Vous ne portez rien.^"
+#You are not carrying anything
+   set time = false
+endif
+}
+
+grammar ask *present for **inside			>ask_for
+grammar tell *present to give me **inside	>ask_for
+
+grammar demander *present to **inside	>ask_for
+
+{+ask_for
+if +can_talk<noun1 = true
+   return true
+endif
+if noun1 !grandof noun2
+   write  noun1{The} " " noun1{doesnt} " ne semble pas avoir " noun2{the} .^
+   set time = false
+   return true
+endif
+if +possessed<noun1 = true
+   return
+endif
+if noun2(mass) > player(quantity)
+   write "Avec ce que vous portez, vous ne pouvez accepter"
+   write noun2{the} .^
+   set time = false
+   return true
+endif
+override
+move noun2 to player
+if noun2 has WORN
+   write  noun1{The} " retire"  noun1{nt}  
+   write " " noun2{the} " puis vous donne"  noun1{nt} 
+   if noun2 has PLURAL
+      write " cela"
+   else
+      write " cela"
+   endif
+   write ".^" 
+   ensure noun2 hasnt WORN
+   return true
+endif
+write  noun1{The} " vous donne"  noun1{nt} 
+write " noun2{the}.^
+}
+
+grammar tell *present about *anywhere		>tell_about
+grammar talk to *present about *anywhere	>tell_about
+grammar talk *present about *anywhere		>tell_about
+grammar talk with *present about *anywhere	>tell_about
+
+{+tell_about
+if +can_talk<noun1 = true
+   return true
+endif
+override
+write  noun1{The} " seem" noun1{s} " fascinated by your story about "
+write noun2{the} .^
+}
+
+grammar ask *present about *anywhere  >ask_about
+
+{+ask_about
+if +can_talk<noun1 = true
+   return true
+endif
+override
+if noun2 = noun1
+   write noun1{The}
+   if noun1 has PLURAL
+      write " sont trop timides pour parler de cela.^"
+   else
+      write " est trop timide pour parler de cela.^"
+   endif
+   return true
+endif
+   if noun1 has PLURAL
+      write noun1{The} " n'ont rien à dire à propos de " noun2{the}
+   else
+      write noun1{The} " n'a rien à dire à propos de " noun2{the}
+   endif
+write ".^"
+}
+
+grammar offer *held to *present			>give_to
+grammar give *held to *present			>give_to
+grammar give *held over to *present		>give_to
+grammar pass *held to *present			>give_to
+grammar pass *held up to *present		>give_to
+grammar pass *held down to *present		>give_to
+grammar pass *held over to *present		>give_to
+grammar hand *held to *present			>give_to
+grammar hand *held up to *present		>give_to
+grammar hand *held down to *present		>give_to
+grammar hand *held over to *present		>give_to
+grammar heave *held to *present			>give_to
+grammar heave *held up to *present		>give_to
+grammar heave *held over to *present	>give_to
+grammar lower *held down to *present	>give_to
+
+#grammar donner *held *present	>give_to
+# MARCHE PAS
+grammar donner *held to *present	>give_to
+grammar donner *held au *present	>give_to
+grammar donner *held aux *present	>give_to
+grammar donner *held à *present	>give_to
+grammar donner *held a *present	>give_to
+
+
+{+give_to
+if +not_held<noun1 = true
+   return
+endif
+if noun2 hasnt ANIMATE
+   write "Vous ne pouvez pas donner " noun1{the} " à " noun2 .^
+   set time = false
+   return true
+endif
+if noun2 = player
+	write "Vous ne pouvez le donner à vous-même.^"
+#   write "I think it might be time to take a break and get a cup of "
+#   write "tea.^"
+   return true
+endif
+if +reach<noun2 = true
+   return true
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+move noun1 to noun2
+if noun2 hasnt FEMALE
+   write "Vous donnez " noun1{the} " au " noun2 .^
+else
+   write "Vous donnez " noun1{the} " à " noun2{the} .^
+endif
+}
+
+grammar wiggle *present	>move
+grammar jiggle *present	>move
+grammar move *present	>move
+grammar push *present	>move
+
+#grammar pousser *present	>move
+# authors probably need the "push" action
+
+grammar push **present >push
+grammar tug **present  >push
+
+grammar pousser *present    >pousser
+{+pousser
+	proxy "push " noun1
+}
+
+grammar pousser **present  >push
+
+{+push
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Vous ne pouvez pousser " noun1{the} .^
+}
+
+
+
+{+move
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if player has SITTING
+   write "Vous devez vous lever auparavant.^"
+   set time = false
+   return true
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if noun1 has LIQUID
+   write  noun1{The} " coule entre vos doigts.^"
+   return true
+endif
+if noun1(parent) = player
+   override
+   write "You juggle " noun1{the} " in your hands.^"
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+write "Vous déplacez un peu " noun1{the} ".^"
+ensure noun1 has TOUCHED
+}
+
+grammar read *present >read
+
+grammar lire *present >read
+
+{+read
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+write "Il n'y a rien à lire sur " noun1{the} ".^"
+}
+
+grammar look down >look_down
+
+grammar regarder en down >look_down
+
+{+look_down
+if +darkness = true
+   return true
+endif
+if here has TIGHT_ROPE : here has MID_AIR
+   write "Vous voyez le sol loin vers le bas.^"
+   return true
+endif
+if here has ON_WATER
+   write "Vous ne pouvez voir sous la surface de l'eau.^"
+   return true
+endif
+write "Vous passez un moment à admirer vos pieds.^"
+}
+
+grammar look up >look_up
+
+{+look_up
+if +darkness = true
+   return true
+endif
+override
+if here hasnt OUTDOORS
+   write "Vous ne voyez rien de spécial.^"
+else
+   write "Vous ne voyez que le ciel.^"
+endif
+}
+
+grammar look up *anywhere in *present         >look_up_in
+grammar look for *anywhere in *present        >look_up_in
+
+{+look_up_in
+if +important<noun1 = true
+   return true
+endif
+if +important<noun2 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+write "You don't find any reference to " noun1{the} " in " noun2{the} .^
+}
+
+grammar consult *present about *anywhere      >consult
+grammar consult *present re *anywhere         >consult
+grammar consult *present on *anywhere         >consult
+
+grammar consulter *present au sujet *anywhere         >consult
+grammar consulter *present on *anywhere         >consult
+
+{+consult
+proxy "look up " noun2{names} " in " noun1{names}
+}
+
+grammar feel *present  >feel
+grammar touch *present >feel
+
+grammar toucher *present >feel
+
+{+feel
+if +reach<noun1 = true
+   return true
+endif
+if noun1 has ANIMATE
+   write "Je ne pense pas que cela serait très poli.^"
+   return true
+endif
+write "C'est comme " noun1{list} .^
+}
+
+grammar smell		>sniff
+grammar sniff		>sniff
+
+grammar sentir		>sniff
+
+{+sniff
+if here has UNDER_WATER
+   write "Vous ne pouvez rien sentir tant que vous êtes sous l'eau.^"
+   return
+endif
+write "Vous ne sentez rien de particulier.^"
+}
+
+grammar smell *present	>smell
+grammar sniff *present	>smell
+
+grammar sentir *present	>smell
+
+{+smell
+if here has UNDER_WATER
+   write "Vous ne pouvez rien sentir tant que vous êtes sous l'eau.^"
+   return
+endif
+if noun1 has ANIMATE
+   write "Cela serait moins que courtois.^"
+   return true
+endif
+write "Cela sent comme " noun1{list} .^
+}
+
+grammar taste *present >taste
+grammar lick *present  >taste
+
+grammar goûter *present  >taste
+grammar gouter *present  >taste
+grammar lécher *present  >taste
+grammar lecher *present  >taste
+
+{+taste
+if +reach<noun1 = true
+   return true
+endif
+if noun1 has ANIMATE
+   write "You are one sick puppy.^"
+   return true
+endif
+write "Cela a un goût de " noun1{list} ".^"
+}
+
+grammar look in *present      >look_in
+
+#grammar regarder in *present      >look_in
+# voir search
+
+{+look_in
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 hasnt CONTAINER
+   write "Il n'y a rien dans " noun1{the} .^
+   return true
+endif
+if noun1 has CLOSED
+   write  noun1{The} " " noun1{is} " currently closed.^"
+   return true
+endif
+set INDEX = +child_count<noun1
+if INDEX = 0
+   write "There is nothing in " noun1{the} .^
+   return true
+endif
+execute "+details<noun1"
+write "^"
+}
+
+grammar search *present		>search
+
+grammar fouiller *present		>search
+grammar regarder in *present		>search
+
+{+search
+ifexecute "noun1.search"
+   return
+else
+   if noun1 has ANIMATE
+       write "Je ne pense pas que cela serait très poli.^"
+       return true
+   else
+        proxy "examine " noun1{names}
+   endif
+endif
+}
+
+grammar look *present		>examine
+grammar look at *present	>examine
+grammar l at *present		>examine
+grammar look on *present	>examine
+grammar examine *present	>examine
+grammar x *present			>examine
+grammar l *present			>examine
+grammar watch *present		>examine
+
+grammar examiner *present	>examine
+grammar regarder *present	>examine
+
+
+{+examine
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+override
+if noun1 has LOCATION
+   proxy "look"
+   return
+endif
+ifall noun1 hasnt CLOSABLE : noun1 hasnt CONTAINER : noun1 hasnt SURFACE
+   write "Il n'y a rien de particulier concernant " noun1{the} .^
+   return true
+endif
+if noun1 has CLOSABLE
+   execute "+details<noun1"
+   write "^"
+   return true
+endif
+set INDEX = 0
+select noun1
+   if noun3(mass) != scenery
+      set INDEX + 1
+   endif
+endselect
+if INDEX = 0
+   write "Il n'y a rien de particulier concernant " noun1{the} .^
+   return true
+endif
+execute "+details<noun1"
+write "^"
+}
+
+{+details
+if arg[0] has CLOSABLE 
+   if arg[0] hasnt CLOSED
+      if arg[0] has FEMALE
+   			if arg[0] has PLURAL
+    			write  noun1{The} " " arg[0]{is} " ouvertes"
+    		else 
+    			write  noun1{The} " " arg[0]{is} " ouverte"
+    		endif
+      	else
+      		if arg[0] has PLURAL
+      			write  noun1{The} " " arg[0]{is} " ouverts"
+      		else
+      			write  noun1{The} " " arg[0]{is} " ouvert"
+      		endif
+      	endif
+   else
+   		if arg[0] has FEMALE
+   			if arg[0] has PLURAL
+    			write  noun1{The} " " arg[0]{is} " fermées."
+    		else 
+    			write  noun1{The} " " arg[0]{is} " fermée."
+    		endif
+      	else
+      		if arg[0] has PLURAL
+      			write  noun1{The} " " arg[0]{is} " fermés."
+      		else
+      			write  noun1{The} " " arg[0]{is} " fermé."
+      		endif
+      	endif
+      return true
+   endif
+endif
+if arg[0] has CONTAINER : arg[0] has SURFACE
+   execute "+contents<arg[0]"
+endif
+}
+
+{+contents
+set INDEX = +child_count<arg[0]
+if INDEX = 0 : arg[0] has CONCEALING 
+   ifall arg[0] has CONTAINER : arg[0] has CLOSABLE
+      write "."
+   endif
+   return true
+endif
+execute "+list_items<arg[0]"
+}
+
+{+clean_contents
+set INDEX = 0
+select arg[0]
+   if noun3(mass) != scenery
+      set INDEX + 1
+   endif
+endselect
+if INDEX = 0 : arg[0] has CONCEALING 
+   return true
+endif
+execute "+list_items<arg[0]"
+}
+
+{+list_items
+if INDEX = 0 : arg[0] has CONCEALING
+   return true
+endif
+if arg[0] has ANIMATE
+   write arg[0]{The} " " arg[0]{is} " en train de porter "
+endif
+if arg[0] has SURFACE
+   write "Sur " arg[0]{the} " il y a " 
+endif
+if arg[0] has CONTAINER
+   if arg[0] has CLOSABLE
+      		if arg[0] has PLURAL
+    		  write " et contiennent "
+    		else 
+    			write " et contient "
+    		endif
+   else
+         	if arg[0] has PLURAL
+				write arg[0]{The} " contiennent "
+    		else 
+    			write arg[0]{The} " contient "
+    		endif
+   endif
+endif
+select arg[0] CHILD
+   if CHILD(mass) != scenery
+      set INDEX - 1
+      write CHILD{list}
+      execute "+object_info<CHILD"
+      execute "+list_structure"
+      if INDEX = 0
+	     return true
+      endif
+   endif
+endselect
+}
+
+{+spaced_contents
+set INDEX = 0
+select arg[0]
+   if noun3(mass) != scenery
+      set INDEX + 1
+   endif
+endselect
+if INDEX = 0
+   return true
+endall
+write "^"
+execute "+list_items<arg[0]"
+write "^"
+}
+
+integer CHILD
+
+{+first_child
+select arg[0] CHILD
+   return true
+endselect
+return false
+}
+
+{+child_count
+set INDEX = 0
+select arg[0] CHILD
+   if CHILD(mass) != scenery
+      set INDEX + 1
+   endif
+endselect
+return INDEX
+}
+
+grammar i   >list_inventory
+grammar list  >list_inventory
+
+integer INVENTORY
+
+{+list_inventory
+set INDEX = 0
+select player
+   if noun3(mass) != scenery
+      set INDEX + 1
+   endif
+endselect
+if INDEX = 0
+   write "Vous avez les mains vides.^"
+   return true
+endif
+write "Vous avez :^"
+select player INVENTORY
+   if INVENTORY(mass) != scenery
+      if interpreter = GLK
+         write "  " INVENTORY{list}
+      else
+         write "&nbsp;&nbsp;" INVENTORY{list}
+      endif
+      execute "+object_info<INVENTORY"
+      if INVENTORY has CONTAINER : INVENTORY has SURFACE
+         ifall INVENTORY hasnt CLOSED : +child_count<INVENTORY != 0
+			write ", qui contient :^"
+	        execute "+object_children<INVENTORY"
+         else
+            write "^"
+         endif
+      else
+         write "^"
+	  endif
+   endif
+endselect
+set time = false
+}
+
+integer CHILDREN
+
+{+object_children
+set INDEX = 0
+select arg[0] CHILDREN
+   if CHILDREN(mass) != scenery
+      set INDEX + 1
+      if interpreter = GLK
+         write "    " CHILDREN{list}
+      else
+         write "&nbsp;&nbsp;&nbsp;&nbsp;" CHILDREN{list}
+      endif
+      execute "+object_info<CHILDREN"
+      write "^"
+   endif
+endselect
+if INDEX = 0
+   if interpreter = GLK
+      write "    rien^"
+   else
+      write "&nbsp;&nbsp;&nbsp;nothing^"
+   endif
+endif
+}
+
+grammar inventory	>inventory
+grammar inv			>inventory
+
+grammar inventaire			>inventory
+
+{+inventory
+set time = false
+set INDEX = +child_count<player
+if INDEX = 0
+   write "Vous n'avez rien.^"
+   return true
+endif
+write "Vous avez "
+select player INVENTORY
+   if INVENTORY(mass) != scenery
+      set INDEX - 1
+      write INVENTORY{list}
+      execute "+object_info<INVENTORY"
+      execute "+list_structure"
+      if INDEX = 0
+	     write "^"
+	     return true
+      endif
+   endif
+endselect
+}
+
+{+or_structure
+if INDEX > 1
+   write ", "
+endif
+if INDEX = 1
+   write " ou "
+endif
+}
+
+{+list_structure
+if INDEX > 1
+   write ", "
+endif
+if INDEX = 1
+   write " et "
+endif
+if INDEX = 0
+   write "."
+endif
+}
+
+{+object_info
+if arg[0] has WORN
+    if arg[0] has FEMALE
+        write " (portée)"
+    else
+        write " (porté)"
+    endif
+endif
+if arg[0] has LUMINOUS
+   write " (fournissant de la lumière)"
+endif
+if arg[0] has ON
+   write " (allumé)"
+endif
+ifall arg[0] has CLOSABLE : arg[0] hasnt CLOSED
+   write " (ouvert)"
+endif
+}
+
+grammar sorry >sorry
+
+grammar desole >sorry
+grammar désolé >sorry
+
+{+sorry
+write "Ça va...^"
+}
+
+grammar thanks        >thankyou
+grammar thank you     >thankyou
+
+grammar merci     >thankyou
+
+{+thankyou
+write "De rien.^"
+}
+
+grammar notify >notify
+
+{+notify
+if notify = false
+   set notify = true
+   write "Notification de score activée.^"
+else   
+   set notify = false
+   write "Notification de score désactivée.^"
+endif
+set time = false
+}
+
+grammar notify on >notify_on
+
+{+notify_on
+if notify = true
+    write "Notification de score déjà activée.^"
+else
+    set notify = true
+    write "Notification de score activée.^"
+endif
+set time = false
+}
+
+grammar notify off >notify_off
+
+{+notify_off
+if notify = false
+    write "Notification de score déjà désactivée.^"
+else
+    set notify = false
+    write "Notification de score désactivée.^"
+endif
+set time = false
+}
+
+grammar debug >debug
+
+{+debug
+if debug = false
+   set debug = true
+   write "Debug messages set to on.^"
+else   
+   set debug = false
+   write "Debug messages set to off.^"
+endif
+set time = false
+}
+
+grammar debug on >debug_on
+
+{+debug_on
+if debug = true
+    write "Debug messages are already set to on.^"
+else
+    set debug = true
+    write "Debug messages set to on.^"
+endif
+set time = false
+}
+
+grammar debug off >debug_off
+
+{+debug_off
+if debug = false
+    write "Debug messages are already set to off.^"
+else
+    set debug = false
+    write "Debug messages set to off.^"
+endif
+set time = false
+}
+
+grammar score >score_command
+grammar points >score_command
+
+{+score_command
+execute "+score"
+}
+
+{+score
+set time = false
+if total_moves = 1
+   write "Votre score est de " score "% en 1 tour.^"
+else
+   write "Votre score est de " score "% en " total_moves " tours.^"
+endif
+}
+
+grammar loosen	>open_only
+grammar open 	>open_only
+
+grammar ouvrir 	>open_only
+
+
+
+{+open_only
+if +get_openable != 0
+   proxy "open " candidate{names}
+   return
+endif
+write "Que voulez-vous ouvrir ?^"
+setstring question "ouvrir "
+set time = false
+}
+
+grammar loosen *present	>open
+grammar open *present	>open
+
+grammar ouvrir *present	>open
+
+{+open
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 has LOCKED
+   write  noun1{The} " " noun1{is} " verrouillé" noun1{es} ".^"
+   set time = false
+   return true
+endif
+if noun1 hasnt CLOSABLE
+   write "Vous ne pouvez ouvrir " noun1{the} .^
+   set time = false
+   return true
+endif
+if noun1 hasnt CLOSED
+	write  noun1{The} " " noun1{is} " déjà ouvert" noun1{es} ".^"
+   set time = false
+   return true
+endif
+override
+ensure noun1 hasnt CLOSED
+if noun1 has CONTAINER
+   execute "+revealing"
+   return true
+endif
+write "Vous ouvrez " noun1{the} .^
+}
+
+{+revealing
+set INDEX = 0
+select noun1
+   set INDEX + 1
+endselect
+write "Vous ouvrez " noun1{the}
+if INDEX = 0
+   write ", qui " noun1{is} " vide.^"
+   return true
+endif
+write " révélant "
+select noun1
+   set INDEX - 1
+   write noun3{list}
+   execute "+object_info<noun3"
+   execute "+list_structure"
+   if INDEX = 0
+      write "^"
+      return true
+   endif
+endselect
+}
+
+grammar tighten	>close_only
+grammar close	>close_only
+grammar shut	>close_only
+
+grammar fermer	>close_only
+
+{+close_only
+if +get_closable != 0
+   proxy "close " candidate{names}
+   return
+endif
+write "Que voulez-vous fermer ?^"
+setstring question "fermer "
+set time = false
+}
+
+grammar tighten	*present	>close
+grammar close *present		>close
+grammar shut *present		>close
+
+grammar fermer *present		>close
+
+{+close
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 hasnt CLOSABLE
+   write "Vous ne pouvez fermer " noun1{the} .^
+   set time = false
+   return true
+endif
+if noun1 has CLOSED
+   write  noun1{The} " " noun1{is} " déjà fermé.^"
+   set time = false
+   return true
+endif
+override
+write "Vous fermez " noun1{the} .^
+ensure noun1 has CLOSED
+}
+
+grammar lock *present >lock
+
+grammar verrouiller *present >lock
+
+{+lock
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+ifall noun1 has LOCKABLE : noun1 has LOCKED
+   write  noun1{The} " " noun1{is} " déjà verrouillé.^"
+   return true
+endif
+ifall noun1 has CLOSABLE : noun1 hasnt CLOSED
+   write "Vous ne pouvez verrouiller " noun1{the} " tandis "
+   if noun1 has PLURAL
+      write "qu'ils sont ouverts"
+   else
+      write "qu'il est ouvert"
+   endif
+   write ".^"
+# TODO female
+   set time = false
+   return true
+endif
+if noun1 hasnt LOCKABLE
+   write "Vous ne pouvez verrouiller " noun1{the} .^
+   return true
+endif
+override
+write "Avec quoi vouliez-vous verrouiller " noun1{the} " ?^"
+setstring "lock " noun1{names} " with " 
+set time = false
+}
+
+grammar lock *present with *held >lock_with
+
+grammar verrouiller *present with *held >lock_with
+
+
+{+lock_with
+if +important<noun1 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if noun1 hasnt LOCKABLE
+   write "Vous ne pouvez verrouiller " noun1{the} .^
+   set time = false
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 has LOCKED
+   write  noun1{The} " " noun1{is} " déjà verrouillé.^"
+   return true
+endif
+ifall noun1 has CLOSABLE : noun1 hasnt CLOSED
+   write "You can't lock " noun1{the} " while "
+   if noun1 has PLURAL
+      write "they are"
+   else
+      write "it is"
+   endif
+   write " open.^"
+   set time = false
+   return true
+endif
+override
+write "You can't lock " noun1{the} " with " noun2{the} .^
+set time = false
+}
+
+grammar unlock >unlock_only
+
+grammar déverrouiller >unlock_only
+grammar deverrouiller >unlock_only
+
+{+unlock_only
+write "Que vouliez-vous déverrouiller ?^"
+setstring question "unlock "
+set time = false
+}
+
+grammar unlock *present >unlock
+
+grammar déverrouiller *present >unlock
+grammar deverrouiller *present >unlock
+
+{+unlock
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 hasnt LOCKABLE
+   write "Vous ne pouvez déverrouiller " noun1{the} .^
+   set time = false
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 hasnt LOCKED
+   write noun1{The} " " noun1{is} " déjà déverrouillé.^"
+   #TODO FEMALE
+   set time = false
+   return true
+endif
+override
+write "Que vouliez-vous déverrouiller " noun1{the} " ?^"
+setstring question "unlock " noun1{names} " with "
+set time = false
+}
+
+grammar unlock *present with *held    >unlock_with
+grammar open *present with *held      >unlock_with
+
+grammar déverrouiller *present with *held      >unlock_with
+grammar deverrouiller *present with *held      >unlock_with
+grammar ouvrir *present with *held      >unlock_with
+
+{+unlock_with
+if +not_held<noun2 = true
+   return
+endif
+if noun1 hasnt LOCKABLE
+   write "Vous ne pouvez déverrouiller " noun1{the} .^
+   set time = false
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 hasnt LOCKED
+   write  noun1{The} " " noun1{is} " déjà déverrouillé.^"
+   #TODO female
+   return true
+endif
+override
+write "Vous ne pouvez déverrouiller " noun1{the} " avec " noun2{the} .^
+set time = false
+}
+
+grammar show *held	>show
+
+{+show
+write "Who did you want to show " noun1{the} " to?^"
+setstring question "show " noun1{names} " to "
+set time = false
+}
+
+grammar show *held to *present        >show_to
+
+grammar montrer *held to *present	>show_to
+grammar montrer *held au *present	>show_to
+grammar montrer *held à *present	>show_to
+grammar montrer *held a *present	>show_to
+
+{+show_to
+if +important<noun2 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if noun1 = noun2
+   write "Vous ne pouvez"
+   if noun1 has PLURAL
+     write " leur "
+   else
+      write " lui "
+   endif
+   write "montrer " noun1{the} ".^"
+   set time = false
+   return true
+endif
+override
+write noun2{The} " " noun2{doesnt} " semble pas très impressionné" noun2{es}
+write " par " 
+write noun1{the} .^
+}
+#TODO female
+
+grammar untie	>untie_only
+grammar free	>untie_only
+grammar undo	>untie_only
+
+{+untie_only
+write "What did you want to untie?^"
+setstring question "untie "
+set time = false
+}
+
+grammar untie *present        >untie
+grammar free *present         >untie
+grammar undo *present         >untie
+
+grammar défaire *present         >untie
+
+
+{+untie
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+write  noun1{The} " " noun1{is} " pas attaché à quoi que ce soit.^"
+#TODO grammaire
+set time = false
+}
+
+grammar tie *held     >tie
+grammar attach *held  >tie
+
+{+tie
+if +important<noun1 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+write "Avec quoi voulez-vous attacher " noun1{the} " ?^"
+setstring question "tie " noun1{names} " to "
+set time = false
+}
+
+grammar fix *present	>repair
+grammar repair *present	>repair
+
+grammar réparer *present	>repair
+
+{+repair
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Vous ne savez pas comment réparer " noun1{the} ".^"
+set time = false
+}
+
+grammar tie *held to *present         >tie_to
+grammar fix *held to *present         >tie_to
+grammar attach *held to *present      >tie_to
+
+grammar attacher *held to *present      >tie_to
+
+{+tie_to
+if +important<noun2 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun2 = true
+   return true
+endif
+override
+write "Vous ne pouvez attacher " noun1{the} " à " noun2{the} .^
+set time = false
+}
+
+grammar attack *present       >attack
+grammar hit *present          >attack
+grammar fight *present        >attack
+grammar kill *present         >attack
+grammar murder *present       >attack
+grammar punch *present        >attack
+
+grammar attaquer *present        >attack
+grammar frapper *present        >attack
+
+{+attack
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+ifall noun1 has ANIMATE : noun1 has DEAD
+   write  noun1{The} " " noun1{is} " déjà mort.^"
+    #TODO morte
+   set time = false
+   return true
+endif
+override
+write "Attaquer " noun1{the} " avec vos mains nues aura peu "
+write "d'effet.^"
+set time = false
+}
+
+grammar attack *present with *held	>attack_with
+grammar hit *present with *held		>attack_with
+grammar fight *present with *held	>attack_with
+grammar kill *present with *held	>attack_with
+grammar murder *present with *held	>attack_with
+grammar stab *present with *held	>attack_with
+grammar poke *present with *held	>attack_with
+grammar break *present with	*held	>attack_with
+grammar smash *present with *held	>attack_with
+grammar crush *present with *held	>attack_with
+grammar destroy *present with *held	>attack_with
+grammar wreck *present with *held	>attack_with
+
+grammar attaquer *present with *held      >attack_with
+
+{+attack_with
+if +important<noun1 = true
+   return true
+endif
+if +not_held<noun2 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun2 has LIQUID
+   write  noun2{The} " run" noun2{s} " through your fingers.^"
+   return true
+endif
+ifall noun1 has ANIMATE : noun1 has DEAD
+   write  noun1{The} " " noun1{is} " déjà mort.^"
+   #TODO morte
+   set time = false
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+write "Attaquer " noun1{the} " avec " noun2{the} " aura peu "
+write "d'effet.^"
+set time = false
+}
+
+grammar wave  >wave
+
+{+wave
+write "You wave your arms around a bit.^"
+}
+
+grammar wave to *present      >wave_to
+
+{+wave_to
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 hasnt ANIMATE
+   write "Not surprisingly, you get no response.^"
+   return true
+endif
+write  noun1{The} " barely raises an eye brow.^"
+}
+
+grammar salute 	>salute
+
+{+salute
+print:
+   You fire off one of your snappiest saltues.^
+.
+}
+
+grammar salute *present		>salute_at
+grammar salute at *present	>salute_at
+grammar salute to *present	>salute_at
+
+grammar saluer *present	>salute_at
+
+{+salute_at
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 hasnt ANIMATE
+   write "Sans surprise, vous m'obtenez pas de réponse.^"
+   return true
+endif
+override
+write "Vous saluez " noun1{the} ".^"
+}
+
+grammar jump on to *here >jump_on
+grammar jump on *here    >jump_on
+grammar hop on *here     >jump_on
+grammar stand on *here   >jump_on
+
+grammar sauter on *here   >jump_on
+
+{+jump_on
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 is *held
+   write "Il est difficile de sauter sur quelque chose que vous tenez.^"
+   set time = false
+   return
+endif
+set time = false
+if noun1 hasnt SURFACE
+   write "Vous ne pouvez sauter sur " noun1{the} .^
+   return true
+endif
+write "Cela ne fera pas grand chose.^"
+}
+
+grammar jump over *here       >jump_over
+grammar sauter par dessus *here       >jump_over
+grammar sauter au dessus *here       >jump_over
+
+{+jump_over
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 is *held
+   write "Il est difficile de sauter au dessus de quelque chose que vous tenez.^"
+   set time = false
+   return
+endif
+override
+write "Vous ne pouvez sauter au dessus de " noun1{the} .^
+set time = false
+}
+
+grammar jump             >jump
+grammar sauter		>jump
+
+{+jump
+if here has MID_AIR
+   write "Pas vraiment."
+   return true
+endif
+if here has TIGHT_ROPE
+   write "Quelque chose me dit que c'est dangereux, voire même "
+   write "inutile.^"
+   return true
+endif
+if here has UNDER_WATER : here has ON_WATER
+   write "Sous l'eau ?^"
+   return true
+endif
+if player has SITTING
+   write "Vous devez vous levez auparavant.^"
+   return true
+endif
+write "Considérez que c'est fait.^"
+}
+
+grammar say yes >yes
+grammar yes   	>yes
+grammar okay  	>yes
+grammar yeah  	>yes
+
+
+{+yes
+write "Hmmm ?^"
+set time = false
+}
+
+grammar say no	>no
+grammar nah 	>no
+grammar no		>no
+grammar no way	>no
+
+{+no
+write "Hmmm ?^"
+set time = false
+}
+
+grammar say yes to *present 	>say_yes
+grammar yes to *present  		>say_yes
+grammar say okay to *present 	>say_yes
+grammar say yeah to *present 	>say_yes
+grammar *present comma yes		>say_yes
+grammar *present comma okay		>say_yes
+grammar *present comma yeah		>say_yes
+grammar *present comma okay		>say_yes
+
+{+say_yes
+if +can_talk<noun1 = true
+   return true
+endif
+override
+write  noun1{The} " ne semble" noun1{nt}
+write " pas prêter attention.^"
+}
+
+grammar say no to *present	>say_no
+grammar nah to *present 	>say_no
+grammar no to *present		>say_no
+grammar no way to *present	>say_no
+grammar *present comma no	>say_no
+
+{+say_no
+if +can_talk<noun1 = true
+   return true
+endif
+override
+write  noun1{The} " ne semble" noun1{nt}
+write " pas prêter attention.^"
+}
+
+grammar say *anywhere >say_object
+
+{+say_object
+if here has UNDER_WATER
+   write "Talking under water isn't very easy.^"
+   set time = false
+   return true
+endif
+override
+write "You say, ~" noun1{the} ".~^"
+}
+
+grammar say *anywhere to *present	>say_object_to
+
+{+say_object_to
+execute "+can_talk<noun2"
+override
+write "You say, ~" noun1{the} "~ to " noun2{the} ".^"
+}
+
+grammar why   >why
+grammar why?  >why
+
+{+why
+write "Because.^"
+set time = false
+}
+
+grammar blow *held at *present   >blow_at
+grammar blow *held to *present   >blow_at
+
+{+blow_at
+if +important<noun2 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+write "You can't blow " noun1{the} " at " noun2{the} .^
+set time = false
+}
+
+grammar point *held at *present	>point_at
+grammar aim *held at *present	>point_at
+
+{+point_at
+if +important<noun2 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+if noun2 has ANIMATE
+   write noun2{The} " looks at you quizzically.^"
+   return true
+endif
+write "You point " noun1{the} " at " noun2{the} ".^"
+}
+
+grammar throw *held in *here	>throw_at
+grammar hurl *held in *here		>throw_at
+grammar pitch *held in *here	>throw_at
+grammar cast *held in *here		>throw_at
+grammar throw *held on *here	>throw_at
+grammar hurl *held on *here		>throw_at
+grammar pitch *held on *here	>throw_at
+grammar cast *held on *here		>throw_at
+grammar throw *held at *here	>throw_at
+grammar throw *held to *here	>throw_at
+grammar cast *held to *here		>throw_at
+grammar cast *held at *here		>throw_at
+grammar pitch *held to *here	>throw_at
+grammar pitch *held at *here	>throw_at
+grammar lob *held to *here		>throw_at
+grammar lob *held at *here		>throw_at
+grammar hurl *held to *here		>throw_at
+grammar hurl *held at *here		>throw_at
+
+grammar jeter *held vers *here		>throw_at
+grammar jeter *held on *here		>throw_at
+
+grammar lancer *held vers *here		>throw_at
+grammar lancer *held on *here		>throw_at
+
+
+{+throw_at
+if +important<noun2 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if noun2 has LOCATION
+   write noun1{The} " comes to rest nearby.^"
+   move noun1 to here
+   return
+endif
+if noun2 is *held
+   write "Il est difficile de lancer quelque chose vers " noun2{the} " tandis que vous êtes en train de "
+   write "porter " noun2{obj} ".^"
+   set time = false
+   return
+endif
+if noun2(parent) hasnt LOCATION
+   write "You can't throw " noun1{the} " at " noun2{the} " while "
+   if noun2 has PLURAL
+      write "they are"
+   else
+      write "it is"
+   endif
+   write " in something else.^"
+   set time = false
+   return true
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+if noun2 has ANIMATE
+   write "Je ne pense pas que " noun2{the} " apprécierait que vous jetiez "
+   #TODO plural
+   write noun1{the} " "
+   if noun2 has FEMALE
+      write "vers elle.^"
+   else
+      write "vers lui.^"
+   endif
+   set time = false
+   return true
+endif
+if noun1(mass) => 20
+   write  noun1{The}
+   if noun1 has PLURAL
+      if noun1 has FEMALE
+      write " sont un peu trop lourdes pour être lancées ainsi.^"
+   else
+      write " sont un peu trop lourds pour être lancés ainsi.^"
+   endif
+   else
+    if noun1 hasnt PLURAL
+      if noun1 has FEMALE
+      write " est un peu trop lourde pour être lancée ainsi.^"
+    else
+      write " est un peu trop lourd pour être lancé ainsi.^"
+        endif
+    endif
+endif
+   set time = false
+   return true
+endif
+if here has UNDER_WATER
+   write "Throwing things underwater is never as easy as you might "
+   write "think.^"
+   set time = false
+   return true
+endif
+if here has ON_WATER
+   write "Vous lancez " noun1{the} " vers " noun2{the} " qui "
+   if noun1 has PLURAL
+      write "rebondissent"
+   else
+      write "rebondit"
+   endif
+   write " atterissant sur l'eau où "
+   if noun1 has PLURAL
+      write "coulent"
+   else
+      write "coule"
+   endif
+   write " rapidement " noun1{s} ", disparaissant de la vue.^"
+   move noun1 to limbo
+   return true
+endif
+write  noun1{The} " rebondit" " sur " noun2{the} " et atterit"
+write " sur le sol.^"
+move noun1 to here
+}
+
+grammar remove **held       >remove
+grammar take off **held     >remove
+grammar doff **held         >remove
+
+grammar retirer **held         >remove
+grammar enlever **held         >remove
+
+{+remove
+ifall noun1(parent) has CONTAINER : noun1 isnt *held
+   proxy "take " noun1{names}
+   return
+endif
+if noun1 hasnt WORN : noun1 isnt *held
+   write "Vous ne portez pas " noun1{the} .^
+   set time = false
+   return true
+endif
+if noun1(mass) > player(quantity)
+   write "You are carrying too much to remove " noun1{the} .^
+   set time = false
+   return true
+endif
+override
+set player(quantity) - noun1(mass)
+ensure noun1 hasnt WORN
+write "Vous retirez " noun1{the} .^
+}
+
+grammar wear **held		>wear
+grammar put on **held	>wear
+grammar put **held on	>wear
+grammar don **held		>wear
+
+grammar mettre **held		>wear
+# TODO clash de verbes
+
+
+
+
+{+wear
+if +not_held<noun1 = true
+   return
+endif
+if noun1 hasnt WEARABLE
+   write "Vous ne pouvez porter " noun1{the} .^
+   set time = false
+   return true
+endif
+if noun1 has WORN
+   write "Vous portez déjà " noun1{the} .^
+   set time = false
+   return true
+endif
+override
+set player(quantity) + noun1(mass)
+ensure noun1 has WORN
+write "Vous mettez " noun1{the} ".^"
+}
+
+grammar talk		>talk_only
+grammar talk to		>talk_only
+grammar talk with	>talk_only
+
+grammar parler	>talk_only
+grammar parler avec >talk_only
+
+
+{+talk_only
+if +get_animate != 0
+   proxy "talk to " candidate{names}
+   return
+endif
+write "Avec qui voulez-vous parler ?^"
+setstring question "parler à "
+set time = false
+}
+
+grammar talk *present		>talk_to
+grammar talk to *present	>talk_to
+grammar talk with *present	>talk_to
+
+grammar parler with *present	>talk_to
+grammar parler to *present	>talk_to
+grammar parler à *present	>talk_to
+grammar parler a *present	>talk_to
+grammar parler au *present	>talk_to
+grammar parler aux *present	>talk_to
+grammar parler *present	>talk_to
+
+#TODO à corriger dans french.library ?
+#constant DONT "ne"
+#constant DOESNT "ne"
+
+{+talk_to
+if +can_talk<noun1 = true
+   return true
+endif
+override
+if noun1 has PLURAL
+	write  noun1{The} " ne semblent pas très intéressé" noun1{es} " par la "
+else
+	write  noun1{The} " ne semble pas très intéressé" noun1{es} " par la "
+endif
+write "conversation.^"
+}
+
+grammar consume *present	>eat
+grammar eat *present		>eat
+
+grammar manger *present		>eat
+
+{+eat
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+write "Vous ne pouvez manger " noun1{the} .^
+set time = false
+}
+
+grammar eat	>eat_only
+
+grammar manger	>eat_only
+
+{+eat_only
+write "Que voulez-vous manger ?^"
+setstring question "manger "
+set time = false
+}
+
+grammar drink from *present   >drink_from
+grammar sip from *present     >drink_from
+
+grammar boire depuis *present     >drink_from
+grammar boire dans *present     >drink_from
+
+{+drink_from
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +contains_liquid?<noun1 = true
+   proxy "drink " CHILD{names}
+   set time = false
+   return true
+endif
+write "Il n'y a rien à boire dans " noun1{the} .^
+set time = false
+}
+
+grammar drink *present        >drink
+grammar sip *present          >drink
+
+grammar boire *present          >drink
+
+{+drink
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 hasnt LIQUID
+   write "Vous ne pouvez boire " noun1{the} .^
+   set time = false
+   return true
+endif
+override
+write "Vous buvez " noun1{the} .^
+move noun1 to limbo
+}
+
+grammar drink	>drink_only
+
+{+drink_only
+write "Que voulez-vous boire ?^"
+setstring question "drink "
+set time = false
+}
+
+grammar flick **present >flick
+grammar flip **present >flick
+
+# chiquenaude, intraduisible ?
+
+{+flick
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 has LIQUID
+   write "A wet hand is your only reward.^"
+   return true
+endif
+override
+write "Flicking " noun1{the} " achieves nothing more than causing a sharp "
+write "pain in your index finger.^"
+}
+
+grammar press **present        >press
+grammar poke **present         >press
+
+grammar presser **present         >press
+
+{+press
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 has LIQUID
+   write "Vous ne gagnez que de mouiller votre main à faire cela.^"
+   return true
+endif
+override
+write "Presser " noun1{the} " n'a pas d'effet visible.^"
+}
+
+grammar light *present with *held     >light_with
+grammar burn *present with *held      >light_with
+grammar ignite *present with *held    >light_with
+grammar set fire to *present with *held >light_with
+
+grammar bruler *present with *held >light_with
+grammar faire *present with *held >light_with
+#TODO? grammar allumer *present with *held >light_with
+
+{+light_with
+if +not_held<noun2 = true
+   return
+endif
+if here has UNDER_WATER
+   write "I don't think you are going to be lighting anything under "
+   write "water.^"
+   set time = false
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 hasnt FLAMMABLE
+   write  noun1{The} " " noun1{is} " not at all flammable.^"
+   set time = false
+   return true
+endif
+if noun2 hasnt IGNITABLE
+   write "I don't see how you can light " noun1{the} " using " noun2 .^
+   set time = false
+   return true
+endif
+if noun1(quantity) = 0
+   write  noun1{The} " has run out.^"
+   return true
+endif
+if noun1 has BURNING
+	write  noun1{The} " " noun1{is} " déjà allumé" noun1{es} ".^"
+	set time = false
+	return true
+endif
+override
+write "Vous allumez " noun1{the} " en utilisant " noun2 .^
+ensure noun1 has BURNING
+ensure noun1 has LUMINOUS
+}
+
+grammar set *present to $integer	>set_to_integer
+grammar turn *present to $integer	>set_to_integer
+
+{+set_to_integer
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "You can't set " noun1{the} " to anything.^"
+set time = false
+}
+
+grammar set *present to $integer with *held >set_to_integer_with
+grammar turn *present to $integer with *held >set_to_integer_with
+
+{+set_to_integer_with
+if +important<noun1 = true
+   return true
+endif
+if +not_held<noun2 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "You can't set " noun1{the} " with " noun2{the} "^"
+}
+
+grammar burn *present         >light
+grammar light *present        >light
+grammar ignite *present       >light
+grammar set fire to *present  >light
+
+grammar bruler *present  >light
+grammar faire bruler *present  >light
+
+grammar allumer *present  >light
+#TODO conflit probable avec allumer machine
+
+{+light
+if here has UNDER_WATER
+   write "I don't think you are going to be lighting anything under "
+   write "water.^"
+   set time = false
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 has IGNITABLE
+   override
+   write "Vous produisez une brève flamme.^"
+   return true
+endif
+if noun1 hasnt FLAMMABLE
+   write  noun1{The} " n'" noun1{is} " pas inflammable. (Si vous souhaitez allumer / éteindre un appareil, veuillez utiliser les verbes « démarrer / arrêter »)^"
+   #TODO PLURAL
+   set time = false
+   return true
+endif
+if noun1 has BURNING
+   write  noun1{The} " " noun1{is} " déjà allumé" noun1{es} ".^"
+   set time = false
+   return true
+endif
+write "Avec quoi vouliez-vous allumer " noun1{the} " ?^"
+setstring question "light " noun1{names} " with "
+set time = false
+}
+
+grammar extinguish *present   >extinguish
+grammar put out *present      >extinguish
+
+grammar éteindre *present      >extinguish
+grammar eteindre *present      >extinguish
+
+{+extinguish
+if noun1 hasnt BURNING
+   write  noun1{The} " " noun1{is} " pas allumé" noun1{es} ". (Si vous souhaitez allumer / éteindre un appareil, veuillez utiliser les verbes « démarrer / arrêter »)^"
+   set time = false
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Vous éteignez " noun1{the} .^
+ensure noun1 hasnt BURNING
+ensure noun1 hasnt LUMINOUS
+}
+
+{+sitting
+if player has SITTING
+   proxy "stand up"
+   write "^"
+endif
+if player has SITTING
+   write "Vous ne pouvez vous déplacer tant que vous êtes assis !^"
+   set time = false
+   return true
+endif
+return false
+}
+
+integer from_location 0
+
+{+travel
+set compass = arg[0]
+if compass < 0 : compass > 11
+   write "ERREUR : Impossible d'aller dans cette direction: " compass ".^"
+   return
+endif
+set destination = here(compass)
+ifexecute "+movement"
+   # THE MOVE HAS BEEN STOPPED, JUST RETURN
+   set time = false
+   return
+endif
+ifexecute "here.movement"
+   # THE MOVE HAS BEEN STOPPED, JUST RETURN
+   set time = false
+   return
+endif
+if destination = 0
+   write "Vous ne pouvez pas aller dans cette direction.^"
+   set time = false 
+else
+   set from_location = here
+   set player(parent) = destination
+   execute "+display_location"
+   set time = true
+endif
+}
+
+grammar swim >swim_only
+
+grammar nager >swim_only
+
+{+swim_only
+if here has UNDER_WATER : here has ON_WATER
+   write "Vous devez indiquer dans quelle direction vous souhaitez nager.^"
+   set time = false
+   return
+endif
+write "Vous ne pouvez nager ici.^"
+set time = false
+}
+
+grammar swim west >swim_west
+
+{+swim_west
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<west"
+   return true
+endif
+write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
+set time = false
+}
+
+grammar west      >west
+grammar go west   >west
+grammar walk west >west
+
+grammar ouest >west
+grammar aller à l'ouest >west
+grammar marcher vers ouest >west
+grammar marcher vers l'ouest >west
+
+{+west
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<west"
+}
+
+grammar swim east >swim_east
+
+{+swim_east
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<east"
+   return true
+endif
+write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
+#I don't see how you can swim when you are not in water
+set time = false
+}
+
+grammar east      >east
+grammar go east   >east
+grammar walk east >east
+
+grammar est >east
+grammar aller à l'est >east
+grammar aller vers est >east
+grammar marcher vers est >east
+
+{+east
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<east"
+}
+
+grammar swim south >swim_south
+
+{+swim_south
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<south"
+   return true
+endif
+write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
+set time = false
+}
+
+grammar south      >south
+grammar go south   >south
+grammar walk south >south
+
+grammar sud 			>south
+grammar aller au sud 	>south
+grammar aller sud 	>south
+#TODO MARCHE PAS
+grammar aller sud 		>south
+grammar marcher vers sud 	>south
+
+
+{+south
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<south"
+}
+
+grammar swim southeast >swim_southeast
+
+{+swim_southeast
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<southeast"
+   return true
+endif
+write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
+set time = false
+}
+
+grammar southeast      >southeast
+grammar go southeast   >southeast
+grammar walk southeast >southeast
+
+grammar se >southeast
+
+
+{+southeast
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<southeast"
+}
+
+grammar swim southwest >swim_southwest
+
+{+swim_southwest
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<southwest"
+   return true
+endif
+write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau."
+set time = false
+}
+
+grammar southwest      >southwest
+grammar go southwest   >southwest
+grammar walk southwest >southwest
+
+{+southwest
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<southwest"
+}
+
+grammar swim north >swim_north
+
+{+swim_north
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<north"
+   return true
+endif
+write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
+set time = false
+}
+
+grammar north         >north
+grammar go north      >north
+grammar walk north    >north
+
+grammar nord    >north
+grammar aller au nord    >north
+# TODO : AU = filtré
+grammar aller nord    >north
+grammar marcher vers nord    >north
+
+{+north
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<north"
+}
+
+grammar swim northeast >swim_northeast
+
+{+swim_northeast
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<northeast"
+   return true
+endif
+write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
+set time = false
+}
+
+grammar northeast             >northeast
+grammar go northeast          >northeast
+grammar walk northeast        >northeast
+
+{+northeast
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<northeast"
+}
+
+grammar swim northwest >swim_northwest
+
+{+swim_northwest
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<northwest"
+   return true
+endif
+write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
+set time = false
+}
+
+grammar northwest             >northwest
+grammar go northwest          >northwest
+grammar walk northwest        >northwest
+
+{+northwest
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<northwest"
+}
+
+grammar climb *here			>climb_up
+grammar climb up *here		>climb_up
+grammar walk up *here		>climb_up
+grammar go up *here			>climb_up
+
+grammar escalader *here			>climb_up
+grammar monter on *here			>climb_up
+grammar grimper on *here			>climb_up
+
+
+
+{+climb_up
+if noun1 is *held
+   write "Il est difficile d'escalader " noun{2}{the} " tant que vous portez quelque chose."
+   write ".^"
+# Is is hard to climb up ... while you are ... holding it
+   set time = false
+   return
+endif
+override
+write "Vous ne pouvez pas escalader " noun1{the} .^
+# You can not climb up
+set time = false
+}
+
+grammar climb down *here      >climb_down
+grammar walk down *here       >climb_down
+grammar go down *here         >climb_down
+
+grammar descendre de *here         >climb_down
+
+{+climb_down
+if noun1 is *held
+   write "C'est difficile de descendre de " noun{2}{the} " alors que vous le "
+   write "portez.^"
+   set time = false
+   return
+endif
+override
+write "Vous ne pouvez descendre de " noun1{the} .^
+set time = false
+}
+
+grammar enter *present		>enter
+grammar go through *present	>enter
+grammar go in *present		>enter
+grammar climb on *present	>enter
+grammar climb in *present	>enter
+grammar get in *present		>enter
+grammar jump in *present	>enter
+grammar get on *present		>enter
+
+grammar entrer in *present		>enter
+grammar entrer *present		>enter
+grammar entrer in *present		>enter
+grammar monter in *present		>enter
+grammar grimper in *present		>enter
+
+grammar entrer 		>in
+
+{+enter
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+write "Vous ne pouvez entrer dans " noun1{the} .^
+set time = false
+}
+
+integer NEARBY
+
+grammar follow *anywhere	>follow
+
+grammar suivre *anywhere	>follow
+
+{+follow
+if noun1 is *present
+   write noun1{The} " est ici !^"
+   set time = false
+   return
+endif
+
+set INDEX = -1
+
+# LOOP THROUGH ALL THE EXITS OF THE CURRENT LOCATION
+set COUNTER = 0
+repeat
+   if here(COUNTER) = noun1(parent)
+      set INDEX = COUNTER
+   endif
+   set COUNTER + 1
+until COUNTER = 12
+
+if INDEX != -1
+   execute "+go_direction<INDEX"
+else
+   write "Vous ne savez pas dans quelle direction aller.^"
+   set time = false
+endif
+}
+
+grammar go back		>go_back
+grammar back		>go_back
+grammar return		>go_back
+
+grammar revenir		>go_back
+grammar retourner		>go_back
+
+{+go_back
+if from_location != 0
+   proxy "go to " from_location{names}
+   return true
+endif
+write "Vous devez aller quelque part auparavant !^"
+set time = false
+}
+
+grammar move to *location	>go_to
+grammar walk to *location	>go_to
+grammar go to *location		>go_to
+grammar go *location		>go_to
+
+grammar aller vers *location		>go_to
+grammar aller au *location		>go_to
+# TODO : rajouter des formes et verbes pertinents
+
+
+{+go_to
+if noun1 = here
+   write "Vous êtes déjà là !^"
+   set time = false
+   return
+endif
+dir_to INDEX here noun1
+if INDEX = -1
+   write "Vous n'êtes pas certain de la direction à prendre.^"
+   set time = false
+   return
+endif
+write "] "
+style input
+write dir_command[INDEX] ^
+style normal
+execute "+go_direction<INDEX"
+}
+
+{+go_direction
+if arg[0] = north
+   proxy "go north"
+   return true
+endif
+if arg[0] = northeast
+   proxy "go northeast"
+   return true
+endif
+if arg[0] = east
+   proxy "go east"
+   return true
+endif
+if arg[0] = southeast
+   proxy "go southeast"
+   return true
+endif
+if arg[0] = south
+   proxy "go south"
+   return true
+endif
+if arg[0] = southwest
+   proxy "go southwest"
+   return true
+endif
+if arg[0] = west
+   proxy "go west"
+   return true
+endif
+if arg[0] = northwest
+   proxy "go northwest"
+   return true
+endif
+if arg[0] = up
+   proxy "go up"
+   return true
+endif
+if arg[0] = down
+   proxy "go down"
+   return true
+endif
+if arg[0] = in
+   proxy "go in"
+   return true
+endif
+if arg[0] = out
+   proxy "go out"
+   return true
+endif
+}
+
+grammar swim in >swim_in
+
+{+swim_in
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<in"
+   return true
+endif
+write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
+set time = false
+}
+
+grammar go in		>in
+grammar get in		>in
+grammar climb in	>in
+grammar in			>in
+grammar enter		>in
+grammar walk in		>in
+
+{+in
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<in"
+}
+
+grammar swim out >swim_out
+
+{+swim_out
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<out"
+   return true
+endif
+write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
+set time = false
+}
+
+grammar get out		>out
+grammar out			>out
+grammar exit		>out
+grammar leave		>out
+grammar climb out	>out
+grammar walk out	>out
+grammar go out		>out
+
+grammar sortir		>out
+
+{+out
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<out"
+}
+
+grammar surface >swim_up
+grammar swim up >swim_up
+
+{+swim_up
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<up"
+   return true
+endif
+write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
+set time = false
+}
+
+grammar up            >up
+grammar climb         >up
+grammar climb up      >up
+grammar jump up       >up
+grammar go up         >up
+grammar walk up       >up
+
+grammar monter       >up
+grammar haut       >up
+
+{+up
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<up"
+}
+
+grammar swim down     >swim_down
+grammar dive down     >swim_down
+grammar dive          >swim_down
+
+grammar plonger          >swim_down
+
+{+swim_down
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<down"
+   return true
+endif
+write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
+set time = false
+}
+
+grammar down          >down
+grammar climb down    >down
+grammar jump down     >down
+grammar go down       >down
+grammar walk down     >down
+
+grammar descendre     >down
+grammar bas     >down
+
+{+down
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<down"
+}
+
+grammar look around	>look_around
+grammar look		>look_around
+grammar ls			>look_around
+grammar watch		>look_around
+
+grammar regarder		>look_around
+
+
+{+look_around
+ensure here hasnt VISITED
+execute "+display_location"
+set time = false
+}
+
+{+display_location
+ifexecute "+before_look"
+  return
+endif
+ifexecute "here.before_look"
+  return
+endif
+if here has DARKNESS
+   execute "+no_light"
+   return
+endif
+call "+title"
+if display_mode = true
+   ensure here hasnt VISITED
+endif
+ifexecute "here.look"
+   # THERE IS A LOCATION SPECIFIC LOOK FUNCTION,
+   # NO NEED TO PERFORM THE DEFAULT ACTION
+else
+   execute "+look"
+endif
+ensure here has KNOWN
+ensure here has VISITED
+ensure here has MAPPED
+execute "+object_descriptions"
+call "here.after_look"
+call "+after_look"
+}
+
+{+look
+write "Vous pouvez voir "
+set INDEX = 0
+loop
+   ifall here grandof noun3 : player !grandof noun3 : noun3 hasnt LOCATION
+      set INDEX + 1
+   endif
+endloop
+if INDEX = 0
+   write "rien de spécial.^"
+   return true
+endif
+loop
+   ifall here grandof noun3 : player !grandof noun3 : noun3 hasnt LOCATION
+      set INDEX - 1
+      write noun3{list}
+      execute "+object_info<noun3"
+      execute "+list_structure"
+      if INDEX = 0
+         write "^"
+         return true
+      endif
+   endif
+endloop
+}
+
+{+object_descriptions
+select here
+   ifall noun3(mass) < scenery : noun3 hasnt LOCATION
+      write ^ noun3{long}
+   endif
+endselect
+}
+
+{+no_light
+write "Il fait trop sombre pour voir.^"
+}
+
+grammar look under *present		>look_under
+grammar search under *present	>look_under
+
+grammar regarder sous *present	>look_under
+grammar fouiller sous *present	>look_under
+
+{+look_under
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1(mass) >= heavy : noun1 has LOCATION
+   write "Vous ne pouvez voir sous " noun1{the} .^
+   set time = false
+   return true
+endif
+write "Il n'y a rien de spécial sous " noun1{the} .^
+}
+
+grammar look behind *present	>look_behind
+grammar search behind *present	>look_behind
+
+grammar fouiller derrière *present	>look_behind
+grammar fouiller derriere *present	>look_behind
+
+{+look_behind
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1(mass) >= heavy : noun1 has LOCATION
+   write "Vous ne pouvez voir derrière " noun1{the} .^
+   set time = false
+   return true
+endif
+write "Il n'y a rien de spécial derrière " noun1{the} .^
+}
+
+grammar look through *present >look_through
+grammar look out *present     >look_through
+
+grammar regarder à travers *present     >look_through
+grammar regarder travers *present     >look_through
+
+{+look_through
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+write "Vous ne pouvez regarder à travers " noun1{the} .^
+set time = false
+}
+
+grammar look through *held at *present        >look_through_at
+
+{+look_through_at
+proxy "look at " noun2{names} " through " noun1{names}
+}
+
+grammar look at *present through *held        >look_at_through
+grammar look at *present with *held           >look_at_through
+
+{+look_at_through
+if +important<noun1 = true
+   return true
+endif
+if +not_held<noun2 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if noun1 = noun2
+   write "Vous ne pouvez regarder " noun1{the} " à travers "
+   if noun1 has PLURAL
+      write "eux.^"
+   else
+      write "lui.^"
+   set time = false
+   return true
+endif
+override
+write "Vous ne pouvez regarder " noun1{the} "  à travers " noun2{the} .^
+set time = false
+}
+
+grammar wait				>wait
+grammar z					>wait
+grammar attendre			>wait
+
+{+wait
+write "Le temps passe...^"
+}
+
+grammar listen        >listen
+
+grammar écouter        >listen
+grammar ecouter        >listen
+
+{+listen
+override
+write "Vous n'entendez rien de particulier.^"
+}
+
+grammar listen to *present    >listen_to
+grammar listen at *present    >listen_to
+
+grammar écouter at *present    >listen_to
+grammar écouter  *present    >listen_to
+grammar ecouter  *present    >listen_to
+
+{+listen_to
+write "Vous n'entendez rien de particulier.^"
+}
+
+grammar use *present          >use
+grammar work *present         >use
+grammar operate *present      >use
+
+grammar utiliser *present      >use
+
+{+use
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 has ANIMATE
+   write "De quelle manière "
+   write "comptiez-vous ~utiliser~ " noun1{the} " ?^"
+   set time = false
+   return true
+endif
+write "Veuillez être un peu plus précis sur "
+write "la manière dont vous voulez utiliser " noun1{the} ".^"
+}
+
+grammar rotate *present		>turn
+grammar turn *present		>turn
+grammar twist *present		>turn
+grammar twiddle *present	>turn
+grammar spin *present		>turn
+
+grammar tourner *present		>tourner
+grammar tourner *present		>turn
+
+
+{+turn
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+write "Vous ne pouvez tourner " noun1{the} .^
+set time = false
+}
+
+{+tourner
+	proxy "turn " noun1
+}
+
+grammar rotate *present clockwise	>turn_clockwise
+grammar turn *present clockwise		>turn_clockwise
+grammar twist *present clockwise 	>turn_clockwise
+grammar twiddle *present clockwise	>turn_clockwise
+grammar spin *present clockwise		>turn_clockwise
+
+grammar tourner *present in le sens horaire		>turn_clockwise
+#marche pas, trop compliqué sans doute
+
+{+turn_clockwise
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+write "Vous ne pouvez tourner " noun1{the} " dans le sens horaire.^"
+set time = false
+}
+
+grammar rotate *present anticlockwise	>turn_anticlockwise
+grammar turn *present anticlockwise		>turn_anticlockwise
+grammar twist *present anticlockwise 	>turn_anticlockwise
+grammar twiddle *present anticlockwise	>turn_anticlockwise
+grammar spin *present anticlockwise		>turn_anticlockwise
+
+grammar tourner *present in le sens anti-horaire		>turn_anticlockwise
+#marche pas, trop compliqué sans doute
+
+{+turn_anticlockwise
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+write "Vous ne pouvez tourner " noun1{the} " dans le sens anti-horaire.^"
+set time = false
+}
+
+grammar engage *present		>turn_on
+grammar turn on *present	>turn_on
+grammar turn *present on	>turn_on
+grammar switch on *present	>turn_on
+grammar switch *present on	>turn_on
+grammar start *present		>turn_on
+
+grammar démarrer *present		>turn_on
+grammar demarrer *present		>turn_on
+
+{+turn_on
+if +reach<noun1 = true
+   return true
+endif
+override
+if noun1 has ON
+   write  noun1{The} " " noun1{is} " déjà démarré.^"
+else
+   write "Vous ne pouvez démarrer " noun1{the} ".^"
+endif
+set time = false
+}
+
+grammar disengage *present	>turn_on
+grammar turn off *present	>turn_off
+grammar turn *present off	>turn_off
+grammar shut down *present	>turn_off
+grammar power down *present	>turn_off
+grammar shut off *present	>turn_off
+grammar power off *present	>turn_off
+grammar switch off *present	>turn_off
+grammar switch *present off	>turn_off
+grammar stop *present		>turn_off
+
+grammar arrêter *present		>turn_off
+
+{+turn_off
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Vous ne pouvez arrêter " noun1{the} ".^"
+set time = false
+}
+
+grammar pour *present         >pour
+
+{+pour
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 hasnt LIQUID
+   write "Vous ne pouvez verser " noun1{the} .^
+   set time = false
+   return true
+endif
+set noun3 = noun1(parent)
+if noun3 = false : noun3(parent) <> player
+   write "Vous n'avez pas " noun1{the} .^
+   set time = false
+   return true
+endif
+if +closed<noun3 = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Vous versez " noun1{the} " par terre.^"
+move noun1 to limbo
+}
+
+grammar type $string on *present >type_on
+grammar key $string on *present >type_on
+grammar key $string in *present >type_on
+
+{+type_on
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Vous ne pouvez écrire sur " noun1{the} ".^"
+set time = false
+}
+
+grammar list objects >list_objs
+
+{+list_objs
+select noun3(mass) > 0 
+   write noun3{The} 
+next
+}
+
+grammar tip *present on *present      >pour_on
+grammar tip *present down *present    >pour_on
+grammar tip *present in *present      >pour_on
+grammar tip *present over *present    >pour_on
+grammar pour *present down *present   >pour_on
+grammar pour *present on *present     >pour_on
+grammar pour *present in *present     >pour_on
+grammar pour *present over *present   >pour_on
+
+{+pour_on
+if +important<noun1 = true
+   return true
+endif
+if +important<noun2 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 hasnt LIQUID
+   write "Vous ne pouvez verser " noun1{the} .^
+   set time = false
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+set noun3 = noun1(parent)
+if noun3 = false : noun3(parent) <> player
+   write "Vous n'avez pas " noun1{the} .^
+   set time = false
+   return true
+endif
+if +closed<noun3 = true
+   return true
+endif
+if +closed<noun2 = true
+   return true
+endif
+if +reach<noun2 = true
+   return true
+endif
+override
+if +contains_liquid?<noun2 = true
+   write noun2{The} " already contain" noun2{s} " " CHILD{the} ". If you "
+   write "were to also add " noun1{the} " they would mix together.^"
+   set time = false
+   return true
+endif
+ifall noun2 has CONTAINER : noun2 hasnt CLOSED
+   override
+   write "Vous versez " noun1{the} " dans " noun2{the} .^
+   move noun1 to noun2
+   return true
+endif
+ifall noun2(parent) hasnt LOCATION : noun2(parent) has CONTAINER
+   set noun3 = noun2(parent)
+   write noun1{The} " run" noun1{s} " off " noun2{the} " and goes into "
+   write noun3{the} ".^"
+   move noun1 to noun3
+   return true
+endif
+write noun1{The} " runs off " noun2{the} " and goes all over the "
+write "ground.^"
+move noun1 to limbo
+}
+
+grammar blankjacl >blankjacl
+
+{+blankjacl
+write "Je vous demande pardon ?^"
+#A fiendishly clever move
+set time = false
+}
+
+grammar instructions	>instructions
+grammar help		>instructions
+
+grammar aide	>instructions
+
+{+instructions
+style note
+if interpreter = GLK 
+	write "^À traduire à l'occasion... en attendant, vous pouvez aller voir http://ifiction.free.fr^^"
+else
+	write "^À traduire à l'occasion... en attendant, vous pouvez aller voir <a href=~http://ifiction.free.fr/index.php?id=aide~>http://ifiction.free.fr/index.php?id=aide</a>^^"
+endif
+style normal
+write "^/.../^"
+set time = false
+}
+
+;                                                    SPEAKING TO OTHER OBJECTS
+; ----------------------------------------------------------------------------
+; Grammar statements beginning with an object must be defined last in the game
+; to avoid confusion with verbs that may also be objects such as "drink drink"
+
+grammar *present comma press *present		>tell_to_press
+grammar *present comma push *present		>tell_to_press
+
+{+tell_to_press
+if +can_talk<noun1 = true
+   return true
+endif
+write "~You press it,~ " noun1{the} " replies.^"
+}
+
+grammar *present comma give me *anywhere		>ask_for
+grammar *present comma give *anywhere to myself	>ask_for
+grammar *present comma give *anywhere to me		>ask_for
+
+grammar *present comma donne moi *anywhere 	>ask_for
+grammar *present comma donnez moi *anywhere 	>ask_for
+
+#Marche pas :
+#grammar demander *anywhere au *present  	>ask_for
+#grammar demander *anywhere a *present  	>ask_for
+#grammar demander *anywhere à *present  	>ask_for
+
+grammar *present comma tell me about *anywhere			>ask_about
+grammar *present comma tell me all about *anywhere		>ask_about
+grammar *present comma what do you know about *anwhere	>ask_about
+
+grammar questionner *present on *anywhere  	>ask_about
+grammar questionner *present a propos *anywhere  	>ask_about
+grammar questionner *present à propos *anywhere  	>ask_about
+grammar questionner *present au sujet of *anywhere  	>ask_about
+
+grammar parler à *present of *anywhere  	>ask_about
+grammar parler a *present of *anywhere  	>ask_about
+grammar parler avec *present of *anywhere  	>ask_about
+
+grammar *present comma parle moi *anywhere  	>ask_about 
+# <!> filtre sur "de, du...", aussi ne pas le rajouter
+
+synonym interroger	questionner 
+
+grammar *present comma who are you		>who?
+grammar *present comma what is your name	>who?
+grammar *present comma what is your name?	>who?
+
+grammar *present comma qui es-tu ?	>who?
+grammar *present comma qui êtes-vous ?	>who?
+
+{+who?
+if +can_talk<noun1 = true
+   return true
+endif
+proxy "ask " noun1{names} " about " noun1{names}
+}
+
+grammar *present comma sorry		>apologise
+grammar *present comma im sorry	>apologise
+grammar *present comma i am sorry	>apologise
+grammar apologise to *present	>apologise
+
+grammar s'excuser auprès *present	>apologise
+grammar m'excuser auprès *present	>apologise
+
+{+apologise
+if +can_talk<noun1 = true
+   return true
+endif
+write  noun1{the} " assure qu'il n'est pas nécessaire de s'"
+write "excuser.^"
+}
+
+grammar *present comma thanks		>thank
+grammar *present comma thank you	>thank
+grammar thank *present		>thank
+
+grammar remercier *present		>thank
+
+{+thank
+if +can_talk<noun1 = true
+   return true
+endif
+write "~De rien,~ répond "  noun1{the} ".^"
+}
+
+grammar hi *present					>greet
+grammar hello *present				>greet
+grammar greet *present				>greet
+grammar *present comma hello		>greet
+grammar *present comma hello sailor	>greet
+grammar *present comma hi there		>greet
+grammar *present comma dr			>greet
+grammar *present comma doctor		>greet
+grammar *present comma hi			>greet
+
+{+greet
+if +can_talk<noun1 = true
+   return true
+endif
+override
+write  noun1{The}
+if noun1 has PLURAL
+   write " acquiescent.^"
+else
+   write " acquiesce.^"
+}
+ 
+grammar *present comma *anywhere	>object_object
+
+{+object_object
+if +can_talk<noun1 = true
+   return true
+endif
+override
+write "Vous n'obtenez pas de réponse.^"
+}
+
+string question			"none"
+
+grammar *present	>noun_only
+grammar *anywhere	>noun_only
+
+{+noun_only
+ifstring question != "none"
+   addstring question noun1{names} 
+   proxy question
+   return
+else
+   if noun1 has LOCATION
+      write "] "
+      style input
+      write "aller vers " noun1{the} ^
+      style normal
+      proxy "go to " noun1{names}
+      return
+   endif
+   if noun1 isnt *present
+      write "Vous ne pouvez voir " noun1{the} " ici.^"
+      set time = false
+      return
+   endif
+   ifall noun1 has ANIMATE : noun1 hasnt DEAD
+      write "] "
+      style input
+      write "parler à " noun1{the} ^
+      style normal
+      proxy "talk to" noun1{names}
+      return
+   endif
+   ifall noun1(mass) < heavy noun1 : hasnt OUT_OF_REACH : noun1 isnt *held
+      write "] "
+      style input
+      write "prendre " noun1{the} ^
+      style normal
+      proxy "take " noun1{names}
+      return
+   endif
+   write "] "
+   style input
+   write "examiner " noun1{the} ^
+   style normal
+   proxy "examine " noun1{names}
+   return
+endif
+write "Il n'y a pas de verbe dans cette phrase.^"
+set time = false
+}
+
+{+system_eachturn
+setstring question "none"
+}
+
+integer candidate
+
+{+get_animate
+set INDEX = 0
+set candidate = 0
+select *present
+  ifall noun3 has ANIMATE noun3 != player
+     set candidate = noun3
+     set INDEX + 1
+  endif
+endselect
+if INDEX = 1
+   return candidate
+else
+   return 0
+endif
+}
+
+{+get_inanimate
+set INDEX = 0
+set candidate = 0
+select *present noun3
+  ifall noun3 hasnt ANIMATE : noun3 is *present : noun3(mass) != scenery
+     set candidate = noun3
+     set INDEX + 1
+  endif
+endselect
+if INDEX = 1
+   return candidate
+else
+   return 0
+endif
+}
+
+{+get_openable
+set INDEX = 0
+set candidate = 0
+select *present noun3
+  ifall noun3 has CLOSABLE
+     set candidate = noun3
+     set INDEX + 1
+  endif
+endselect
+if INDEX = 1
+   return candidate
+endif
+if INDEX = 0
+   return 0
+else
+   # THERE ARE MORE THAN ONE, SEE IF IT CAN BE REDUCED BY OPEN LOOKING
+   # FOR CLOSED OBJECTS
+   set INDEX = 0
+   set candidate = 0
+   select *present noun3
+     ifall noun3 has CLOSABLE : noun3 has CLOSED
+        set candidate = noun3
+        set INDEX + 1
+     endif
+   endselect
+   if INDEX = 1
+      return candidate
+   else
+      return 0
+   endif
+endif
+}
+
+{+get_closable
+set INDEX = 0
+set candidate = 0
+select *present noun3
+  ifall noun3 has CLOSABLE
+     set candidate = noun3
+     set INDEX + 1
+  endif
+endselect
+if INDEX = 1
+   return candidate
+endif
+if INDEX = 0
+   return 0
+else
+   # THERE ARE MORE THAN ONE, SEE IF IT CAN BE REDUCED BY OPEN LOOKING
+   # FOR CLOSED OBJECTS
+   set INDEX = 0
+   set candidate = 0
+   select *present noun3
+     ifall noun3 has CLOSABLE : noun3 hasnt CLOSED
+        set candidate = noun3
+        set INDEX + 1
+     endif
+   endselect
+   if INDEX = 1
+      return candidate
+   else
+      return 0
+   endif
+endif
+}
+
+{+get_takeable
+set INDEX = 0
+set candidate = 0
+select *present noun3
+  ifall noun3(mass) < heavy : noun3 isnt *held : noun3 hasnt LOCATION
+     set candidate = noun3
+     set INDEX + 1
+  endif
+endselect
+if INDEX = 1
+   return candidate
+else
+   return 0
+endif
+}
+
+{+get_dropable
+set INDEX = 0
+set candidate = 0
+select *held noun3
+  if noun3(mass) < heavy
+     set candidate = noun3
+     set INDEX + 1
+  endif
+endselect
+if INDEX = 1
+   return candidate
+else
+   return 0
+endif
+}
+
+{+game_over
+write "^"
+execute "+score"
+select player
+   set noun3(parent) = limbo
+endselect
+set player(parent) = epilogue
+write "^"
+execute "+look_around"
+}
+
+location epilogue : epilogue
+  short       name "Épilogue"
+
+{look
+if interpreter = GLK
+   write "Le jeu est terminé. Veuillez taper "
+   style input
+   write "annuler"
+   style normal
+   write ", "
+   style input
+   write "recommencer"
+   style normal
+   write " ou "
+   style input
+   write "restore"
+   style normal
+   write " suivi par un nom de fichier, ou "
+   style input
+   write "quitter"
+   style normal
+   write ".^"
+else
+   write "Le jeu est terminé. Veuillez taper <b>annuler (undo)</b>, <b>recommencer (restart)</b> ou <b>restore</b> "
+   write "suivi par un nom de fichier.^"
+endif
+}
+
+{+update_top_screen
+cursor 1 0
+style note
+write game_title "^"
+style normal
+write "------------------------------^"
+write "                              ^"
+cursor 3 0
+write "Score :" score "% Tours : " total_moves "^^"
+write "                              ^"
+style subheader
+cursor 5 0
+write here{The} "^^"
+style normal
+}
+

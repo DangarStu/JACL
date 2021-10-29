@@ -1,0 +1,358 @@
+#!../bin/cgijacl
+
+# -----------------------------------------------------------------------------
+
+constant status_window 0
+constant game_title		"JACL Task Manager"
+constant game_author	"Stuart Allen"
+constant game_release    1
+constant game_build      1
+constant ifid			"JACL-002"
+
+# -----------------------------------------------------------------------------
+
+integer temp
+integer INDEX
+integer editing
+integer now
+integer gmt
+integer errors
+
+integer last_task			0
+integer last_project		0
+
+constant VIEW           	1
+constant CREATE         	2
+constant SEARCH         	3
+constant EDIT           	4
+
+constant tab_names "Tasks" "List" "Add Task" "Search" "Edit"
+
+string id_data
+string description_data
+string description_error
+string dependency_data
+string dependency_error
+string startdate_data
+string startdate_error
+string duedate_data
+string duedate_error
+string status_data
+string status_error
+string completeddate_data
+string completeddate_error
+string search_data
+string search_error
+string project_data
+string project_error
+
+parameter id			id_data
+parameter description	description_data
+parameter project		project_data
+parameter dependency	dependency_data
+parameter startdate		startdate_data
+parameter duedate		duedate_data
+parameter status		status_data
+parameter completeddate	completeddate_data
+parameter search		search_data
+
+{+links_div
+write "JACL Task Manager"
+}
+
+{+intro
+set player = you
+
+# GET THE LAST TASK ID
+set last_task = 0
+iterate $user_id
+   set last_task = field[0]
+enditerate
+
+execute "+before"
+execute "+after"
+}
+
+grammar blankjacl >blankjacl
+
+{+blankjacl
+}
+
+grammar delete $integer >delete
+
+{+delete
+update $user_id
+   if field[0] != $integer
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
+   endif
+endupdate
+write "Task " $integer " deleted.^^"
+}
+
+grammar edit $integer >edit
+
+{+edit
+set editing = true
+execute "+skip_to_task<$integer"
+execute "+edit_form"
+}
+
+{+skip_to_task
+iterate $user_id
+   if field[0] = $integer
+      return
+   endif
+enditerate
+}
+
+{+edit_form
+write "<form>"
+
+execute "+text<Description<description<60<field[1]"
+execute "+text<Project<project<30<field[2]"
+execute "+text<Dependency<dependency<30<field[3]"
+execute "+text<Start date<startdate<30<field[4]"
+execute "+text<Due date<duedate<30<field[5]"
+execute "+text_submit<Status<status<30<field[6]"
+
+write "<input type=~hidden~ name=~command~ value=~update " field[0] "~/>"
+hidden
+write "</form>
+}
+
+grammar update $integer >update
+
+{+update
+update $user_id
+   if field[0] = $integer
+      insert field[0] description_data project_data dependency_data startdate_data duedate_data status_data completeddate_data
+   else
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
+   endif
+endupdate
+write "Task " $integer " updated.^^"
+set editing = true
+}
+
+{+before
+ifstring id_data = ""
+   setstring id_data "NULL"
+endif
+ifstring description_data = ""
+   setstring description_data "NULL"
+endif
+ifstring project_data = ""
+   setstring project_data "NULL"
+endif
+ifstring dependency_data = ""
+   setstring dependency_data "NULL"
+endif
+ifstring startdate_data = ""
+   setstring startdate_data "NULL"
+endif
+ifstring duedate_data = ""
+   setstring duedate_data "NULL"
+endif
+ifstring status_data = ""
+   setstring status_data "NULL"
+endif
+ifstring completeddate_data = ""
+   setstring completeddate_data "NULL"
+endif
+if WEBAPP_mode = SEARCH
+   execute "+display_search"
+endif
+if WEBAPP_mode = VIEW
+   execute "+display_quickadd"
+endif
+return false
+}
+
+{+after
+if WEBAPP_mode = CREATE
+   execute "+create_form"
+endif
+if WEBAPP_mode = VIEW
+   execute "+display_tasks"
+endif
+ifall WEBAPP_mode = EDIT : editing = false
+   write "To edit a task, select it from the <b>List</b> or "
+   write "<b>Search</b> tabs by clicking the <b>Edit</b> link "
+   write "beside the task you wish to edit.^"
+endif
+set editing = false
+
+# CLEAR THE PARAMETERS
+setstring id_data				"NULL"
+setstring description_data		"NULL"
+setstring project_data			"NULL"
+setstring dependency_data		"NULL"
+setstring startdate_data		"NULL"
+setstring duedate_data			"NULL"
+setstring status_data			"NULL"
+setstring completeddate_data	"NULL"
+setstring search_data			""
+}
+
+{+display_search
+write "<form>"
+execute "+text_submit<Search<search<60<search_data"
+write "<input type=~hidden~ name=~command~ value=~search~/>"
+hidden
+write "</form>"
+write "<hr>"
+}
+
+{+display_quickadd
+write "<form>"
+execute "+text_submit<Quick add<description<60"
+write "<input type=~hidden~ name=~command~ value=~quickadd~/>"
+hidden
+write "</form>"
+write "<hr>"
+}
+
+{+create_form
+write "<form>"
+
+execute "+text<Description<description<60<field[1]"
+execute "+text<Project<project<30<field[2]"
+execute "+text<Dependency<dependency<30<field[3]"
+execute "+text<Start date<startdate<30<field[4]"
+execute "+text_submit<Due date<duedate<30<field[5]"
+
+write "<input type=~hidden~ name=~command~ value=~add~/>"
+hidden
+write "</form>
+}
+
+grammar add >add_task
+
+{+add_task
+set last_task + 1
+append $user_id last_task description_data project_data dependency_data startdate_data duedate_data "Open" "Not Completed"
+if WEBAPP_mode = CREATE
+   write "Task ~" description_data "~ added.^^"
+endif
+}
+
+integer matches
+
+string action
+
+grammar quickadd >quickadd
+
+{+quickadd
+set WEBAPP_mode = VIEW
+setstring project_data		"DEFAULT"
+setstring dependency_data	"NULL"
+set gmt = unixtime
+set now = +adjusted_time<gmt
+setstring startdate_data    now{integer_date}	
+setstring duedate_data		"NULL"
+execute "+add_task"
+}
+
+grammar search >search
+
+{+search
+set WEBAPP_mode = SEARCH
+set matches = 0
+write "<table width=~100%~ class=~customer~>"
+write "<tr>"
+write "<th>ID</th>"
+write "<th>Description</th>"
+write "<th>Project</th>"
+write "<th>Start date</th>"
+write "<th>Due date</th>"
+write "<th>Status</th>"
+write "<th>ACTION</th>"
+write "</tr>"
+
+iterate $user_id
+   ifstring field[1] contains search_data : field[2] contains search_data : field[3] contains search_data : field[4] contains search_data : field[5] contains search_data : field[6] contains search_data
+      write "<tr>"
+      write "<td>" field[0] "</td>"
+      write "<td>" field[1] "</td>"
+      write "<td>" field[2] "</td>"
+      write "<td>" field[4] "</td>"
+      write "<td>" field[5] "</td>"
+      write "<td>" field[6] "</td>"
+      write "<td>"
+      setstring action "delete " field[0]
+      hyperlinkNE "Delete" action
+      write "<br>"
+      setstring action "edit " field[0] "&mode=" EDIT
+      hyperlinkNE "Edit" action
+      write "</td>"
+      write "</tr>"
+      set matches + 1 
+   endif
+enditerate
+write "</table>"
+
+if matches = 0
+   write "^No matching tasks found.^"
+endif
+if matches = 1
+   write "^1 matching task found.^"
+endif
+if matches > 1
+   write "^" matches " matching tasks found.^"
+endif
+}
+
+{+display_tasks
+write "<table width=~100%~ class=~customer~>"
+write "<tr>"
+write "<th>ID</th>"
+write "<th>Description</th>"
+write "<th>Project</th>"
+write "<th>Start date</th>"
+write "<th>Due date</th>"
+write "<th>Status</th>"
+write "<th>ACTION</th>"
+write "</tr>"
+iterate $user_id
+   write "<tr>"
+   write "<td>" field[0] "</td>"
+   write "<td>" field[1] "</td>"
+   write "<td>" field[2] "</td>"
+   write "<td>" field[4] "</td>"
+   ifstring field[5] = "NULL"
+      write "<td>None</td>"
+   else
+      write "<td>" field[5] "</td>"
+   endif
+   write "<td>" field[6] "</td>"
+   write "<td>"
+   setstring action "delete " field[0]
+   hyperlinkNE "Delete" action
+   write "<br>"
+   setstring action "edit " field[0] "&mode=" EDIT
+   hyperlinkNE "Edit" action
+   write "</td>"
+   write "</tr>"
+enditerate
+write "</table>"
+}
+
+constant status_values "Open" "Completed" "Cancelled"
+
+location boardroom
+
+object you
+
+constant title_image        "none"
+constant footer_image       "none"
+constant header_colour      "#000000"
+constant header_height      87
+constant linkbar_colour     "#c0b098"
+constant maintext_colour    "#dddddd"
+constant tab_colour         "#60594e"
+
+#include "forms.library"
+#include "time.library"
+#include "validation.library"
+#include "webapp.library"
+#include "webapp.css"

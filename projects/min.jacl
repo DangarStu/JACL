@@ -1,0 +1,19 @@
+#!../bin/jacl
+
+string teststring "fred"
+
+{+intro
+print:
+  This is a test.^
+.
+write function_name ^
+write teststring ^
+terminate
+}
+
+location cave
+object fred
+player
+
+#include "verbs.library"
+#include "utils.library"

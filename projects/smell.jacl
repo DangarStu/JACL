@@ -1,0 +1,100 @@
+#!../bin/jacl
+
+constant game_title		"Smell Restrictions"
+constant game_author	"Stuart Allen"
+constant game_version	1
+
+
+location street : street
+   has		OUTDOORS
+   short	the "street"
+   down		sewer
+
+{look
+write "You are in the street. The sewer is below you.^"
+}
+
+object flowers : flowers
+   has		PLURAL
+   short	some "flowers"
+   long		"There are some flowers here.^"
+   mass		2
+
+{smell
+if here = sewer
+   write "The disgusting reek of the sewage overwhelms your nose. "
+   write "You can't smell anything else.^"
+   return true
+endif
+write "They smell wonderful.^"
+}
+
+object spacesuit : spacesuit space suit 
+   has		WEARABLE
+   short	a "spacesuit"
+   long		"A spacesuit rests nearby.^"
+   mass		5
+
+location sewer : sewer
+   short	the "sewer"
+   up		street
+
+{look
+write "You are in the sewer. The street is above you.^"
+}
+
+object sewage : sewage
+   short	some "sewage"
+   long		"Sewage flows through here.^"
+   mass		heavy
+ 
+{smell
+write "It reeks.^"
+}
+
+{+before_smell
+if noun1 = spacesuit : noun1 = kryten
+   write "You smell nothing unsual about " noun1{the} ".^"
+   return true
+endif
+if spacesuit has WORN
+   write "You can't smell anything while wearing the spacesuit.^"
+   return true
+endif
+return false   
+}
+
+{+intro
+write game_title " by " game_author ^^
+look
+}
+
+object kryten: myself self me
+ has		ANIMATE
+ short		name "yourself"
+ quantity	42
+ parent		street
+ player
+
+{examine
+write "As beautiful as ever.^"
+execute "+inventory"
+}
+
+{take
+write "...seriously?"
+set time = false
+}
+
+{+no_light
+write "It is too dark to see.^"
+set time = false
+}
+
+{+title
+if player has SITTING
+   write "(sitting)^"
+endif
+}
+
+#include "verbs.library"

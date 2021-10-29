@@ -1,0 +1,1616 @@
+#!../bin/jacl
+
+constant game_version 1
+constant game_title "BAD MOON RISING"
+constant game_author "Davy Stedham."
+constant portinfo "JACL port by Rob."
+integer curword 0
+constant SOAHC 1
+constant ELLIRG 2
+constant ANANSI 3
+
+#monsters
+object corpse : corpse
+ short	a "corpse"
+ skill		5
+ stamina	8
+ damage		3
+
+object spiderlings : spiderlings
+short the "spiderlings"
+skill 7
+stamina 5
+damage 2
+
+object mummified_imp:mummified imp
+short a "mummified imp"
+skill 7
+stamina 5
+damage 2
+
+object vladimir:vladimir chance
+short name "Vladimir Chance"
+skill 9
+stamina 15
+damage 2
+
+object imps:imp horde
+short the "imp horde"
+skill 5
+stamina 8
+damage 2
+
+#Objects
+object helmet:helmet
+short a "copper helmet"
+
+object sword:sword
+short a "sword"
+
+object shield:shield
+short a "shield"
+
+object machete:machete
+short a "machete"
+parent kryten
+
+object dagger:dagger
+short a "dagger"
+parent kryten
+
+{+intro
+clear
+style note
+write game_title ^
+style normal
+write "by " game_author ^
+write "Release " game_version ^
+write portinfo ^
+write "----------^"
+print
+ Sighing, you lean forward, let your hair hang in front of your eyes,  and glower at Jakob through the dangling red tangles.^
+"How, exactly, have the plans changed?"^
+"Cleef sold the plans to Billy Stamen," mumbles Jakob through a chicken leg.^
+ You wince.^
+"Stamen?"^
+"Yeah, but it's fine. I've had a word with Billy, and he needs some more hands. He's cutting us in."^
+"How big a cut?"^
+"A tenth part between us."^
+You put your head in your hands, then set your jaw and make up your mind.^
+"No. Not a chance. We're taking this one, Cleef told us we could have those plans. We need that money to clear the debt, to get the kitty growing. We're taking this one back, Jak."^
+"Well, it's almost dark," says Jakob, shrugging and wiping gravy about his face with the back of his hand, "Billy's going to be here soon. You got a plan, let me know."^
+ "Dunno yet. Just follow me, and keep ready. You got your bow?"^
+Jakob flips his old, greasy pistol crossbow over his shoulder, and places it on the table.^
+ "Okay, load it and keep it out of sight."^
+ "Done," he says, winding the bow and dropping it a little gingerly onto his lap.^
+ "And?"^
+ "I'm thinking! Just keep quiet and..."^
+ "Billy!" cries Jakob, smiling a little too broadly.^
+ "Hey, Billy," you say, not looking up.^
+ "Jakob. Martine," says Stamen. He stands by your table for a moment or two, flanked by a pair of half-bright looking thugs, before pulling out a chair and sitting down. His hired help keep on their feet, standing either side of him.^
+  "So, looks like we're all going to be working together. Happy day, eh?"^
+ You pull one of your throwing knives - a long, heavy blade with a nicely balanced handle - from your belt and start flipping it into the air, letting it thud down point first in the scabby table. Stamen sighs and looks unimpressed, but Jakob tenses a little. Idiot. You kick at his shins and he makes an unconvincing effort at looking innocent.^
+ "Cleef told me and Jak that we could have this one, Billy."^
+ "I know. But I paid him my tithe last month. He isn't a charity, as he loves to remind us."^
+ You send the blade into the air again.^
+ "We really need this money, Billy."^
+ The knife smacks into the table, an inch or two from your hand. You pull it out and send it flying back up again.^
+"Yah, Jakob said. That's why I cut you in. I don't like to see you go without..."^
+ "We don't need any handouts, Billy."^
+.
+print
+ "Oh, it looks like it," Stamen says, grinning nastily, "You're getting fat, Martine. What's the matter? You used to be beautiful."^
+ You pull the knife out of the splintered wood and flip it up...^
+ "I still am, Billy," you tell him, grinning right back.^ ...and it smacks down into the back of his hand, nailing it to the table.^
+Howling, Billy goes to grab the dagger and pull it out with his other hand, but you're faster, and rest the flat of your palm against the smooth, heavy pommel. Snarling, he tries to grab your wrist, but you just push the blade forward a little, making the dagger scrape against one of his bones. He doesn't like that at all, and decides to keep still.^
+ You haven't taken your eyes off of Billy's, and you haven't been attacked by his thugs either. That means Jakob's got the idea, and is hopefully waving his bow between the two of them, keeping them safely at bay. You put your trust in him, and keep your attentions on Stamen.^
+ "All right. You're going to give me the plans, then I'm going to pull this out of you and me and Jakob're going to walk away. You're not going to move until we're out of the door, and we're never going to mention this again. You're going to go off and lick your wounds, and forget all about his, right Billy?"^
+ You twist the knife a little.^
+ "Right!" he squawks.^
+ "The map and the plans. Get them out."^
+ He scrabbles through his coat with his free hand, then throw them onto the table. You scoop them up then, watching him carefully, wrench the dagger free and back away from the table. Billy jams his hand under his armpit and hisses at you, but doesn't move.^
+ "Thank you very much, Billy. Jak, let's go."^^
+*^^
+Out in the torch lit street, walking quickly, your cloak and Jakob's great-coat flying out behind you like wings. Jakob isn't happy...^
+"We've messed it here..."^
+ "Shut up."^
+ "Billy's never gonna let this lie..."^
+ "We can handle Stamen."^
+ "Aw, c'mon, Marts! You reckon you can 'handle' getting sapped on the back of the head an' having your throat slit? 'Cause that's how Billy does business! If you were wanting to do the rip and run, we should've killed him."^
+ "Be calm."^
+ "What!?"^
+ "I do the thinking, so let me do the worrying. I'll work something out."^
+Jakob sighs.^
+ "You're a pretty girl, Marts... but I don't want to die for you...."^
+ The pair of you slip round a corner, and vanish into the shadows of an alley. Feeling a little safer, you slow your pace slightly.^
+ "Fuck the pretty, fuck the girl. Am I the brains or aren't I?"^
+ Jakob sighs.^
+ "You're the brains...."^
+ "Then let me handle the worry. Right....We going to need anything we haven't got?"^
+ "I've got the jemmy and the rope..."^
+ "Then c'mon."^^
+ *^^
+It's started to rain by the time you get to the graveyard - mild still, just now, but the sky's dark with clouds - a promise of heavier rains later. The plot you want is in the overgrown south-east corner, a place thick with vines, bushes and vermin, but you find what you're after soon enough - ^^
+.
+style bold
+write "VLADIMIR CHANCE^"
+write "109 - 168^"
+write "HE STANDS ALONE^^"
+style normal
+print:
+"He stands alone?" asks Jakob, after staring at the inscription for some time.^
+ You shrug, running your hands over the huge granite coffer that lies at the foot of the grave-marker -  a stout stone podium, on top of which lies a carving of a tall, stern faced man made of some rough looking, dappled grey rock.^
+ "They always say something like that. All big and cryptic and clever. Never `He Was Rich, All right, But He Died Anyway'. We're never going to lift this with the jemmy - what's the map say about opening it? Cleef said getting in would be easy..."^
+ Jakob squints at the map for a while, then shrugs and hands it to you - reading the grave-stone took him more than a minute. You study it for a while, then crouch in front of the epitaph. The grave markers unusual - a fat stone block, rather than your normal upright slab, carved face set slightly lower than the rest. You lay both hands over the words, and shove. The whole front-plate slides some six inches into the plinth, revealing a hollow with a rusted lever in it. You look up at Jakob, grinning.^
+ "Well?" he says, grinning back, "Give it a tug."^
+You do and, with an unhealthy groan and a squall of gears, the top of the coffin slowly flips open, letting out a blast or damp, fetid air.^
+ "Right," you say "tie the rope to the marker, and then make yourself comfy. You're keeping guard here while I go down."^
+ "All right."^
+ "Keep your bow ready - Stamen might try something."^
+ "Nah, you were right," he says, knotting the rope into a noose and feeding it into the hole, "Billy's chickenshit. He'll let it slide. So, uh... who was this Vladimir Chance guy, anyways?"^
+ "Don't know. Don't care. Look, he was some rich guy who died and got buried in a big old crypt with a magic sword and shield. And now, ten years later, we get them for Cleef and he pays us five-hundred shinies to get said sword and shield back out of the big old crypt.. That's all that matters, right?"^
+ "S'pose..."^
+ "All right, then," you say, lighting your lamp and gripping its strap between your teeth, "Wish me luck..."^
+ Jakob flops into the mud, pulls a flask from his coat and leans back against the coffin.^
+ "Ah, like you need it..."^
+You flip your legs over the edge, and climb down into the darkness....^
+.
+write "- - - - -^"
+execute +GetInitialStats
+write "- - - - -^"
+look
+}
+
+
+location section1:1
+short name 1
+
+{look
+print
+You are standing in the centre of a circular room with a high domed ceiling. The brick work is a very low standard - the pointing is terrible - and five years of seeping damp has made the tomb dank and unpleasant. You're standing in a couple of inches of freezing, filthy water. You've been in better places.
+There is a doorway to the North,  blocked by an iron grille, and two corridors leading off to the East and West.  So, what first?^
+.
+}
+
+{choices
+write ^
+execute +clear_options
+execute "+add_option<1<Investigate the North door, with the iron grille."
+
+if section49 hasnt MAPPED
+execute "+add_option<2<Go East."
+endif
+
+if section27 hasnt MAPPED
+execute "+add_option<3<Go West."
+endif
+
+}
+
+
+{1
+move player to section12
+look
+}
+
+{2
+move player to section49
+look
+}
+
+{3
+move player to section27
+look
+}
+
+
+location section2:2
+short name 2
+
+{look
+print
+You quickly discover that no amount of squirming and grunting is going to give your shoulder the ability to pass straight through solid iron. You wrench your head back out of the bars and turn your attention back to the lions heads.^
+.
+}
+
+{choices
+write ^
+execute +clear_options
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section20
+look
+}
+
+
+location section3:3
+short name 3
+
+{look
+print
+As soon as you take one step towards it, the cadaver jerks into life, and staggers uncertainly across the room. You pull out your machete and ready yourself, thinking carefully - a few clean chops at it's legs'll send it crashing to the floor, where you'll be able to finish it off easily...^^
+.
+style note
+write "[The zombie's hammer is big enough to cause three points of damage with each hit.]^
+style normal
+set CombatBonus[0] = DoubleBonus
+set VictoryPage = section46
+set InCombat = true
+move player to combat
+move corpse to combat
+look
+}
+
+
+location section4 : 4
+short name 4
+has CantChoose
+
+{look
+print
+You pull your machete from your belt, bounce it in your hand a few times, then slam it down into the middle of the sack-thing. It splits from end to end, disgorging a seething tide of fat, twisted, puss white spiderlings. You swear and jump back as the nasty, half formed little things jump and skutter towards you, squealing like hurt kittens. One tries crawling up your leggings - you kick it off and stamp on it, but then another hops onto your shoulder and gets tangled in your hair. You slap at it and it bursts, sending a spray of hot shmeq down the back of your neck, and here's another caught up in the laces on the front of your jerkin and another wrapping its hot soft legs around your fingers and sheer blind panics not far away now...^
+.
+set InCombat = true
+move spiderlings to combat
+move player to combat
+set VictoryPage = spiderlingsVictory
+set FailedPage = spiderlingsFail
+set turnslimit = 3
+look
+}
+
+
+location spiderlingsVictory
+short name 35
+
+{look
+print
+The remaining spiderlings slink off into the shadows, or else are too unformed to be a nuisance. Breathing heavily and still shaking, you back away from the empty sack and stumble over to the portcullis.^
+.
+}
+
+{choices
+write ^
+execute +clear_options
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section35
+look
+}
+
+
+location spiderlingsFail
+short name 14
+
+{look
+print
+Your panic grips you completely.^
+.
+execute +ResetCombat
+}
+
+{choices
+write ^
+execute +clear_options
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section14
+look
+}
+
+
+location section5 : 5
+short name 5
+has CantChoose
+
+{look
+print
+Your first blow smashes a hole into the imps scrawny chest, showering you with clammy dirt and sending it flying back across the room. Hopping back onto its feet, it grabs hold of the lid of another crypt-box and begins to push at it, it's ragged little feet scrabbling for purchase against the flooded floor...  This doesn't look cheery.
+You pull one of your throwing daggers from your belt, and take careful aim.^
+.
+set VictoryPage = section34
+set FailedPage = section9
+execute +TestYourLuck
+}
+
+
+location section6:6
+short name 6
+
+{look
+print
+  All right. If the left head was boobyrigged, then the right head's got the lever. Obvious. You stride confidently up to the lions head and ram your hand down its throat... and the jaws slam shut, just like before, this time on your unprotected right arm. Howling, you drag your arm out and stagger backwards, stumbling on an unknown something below the water, and splashing down onto your backside. Nice going, Marts - stuck by the same pin twice... 
+After a little gentle prodding, and a bolt or two of excruciating pain, you decide that you've either got a chipped bone or a fracture. Not a bad one, hopefully, but enough to keep your arm out of commission - at least, as far as wielding your machete goes - for a little while. You remove your buckler from your left arm, and strap it over your right, as a make-shift splint. Looks like you're going to be fighting southpaw for a little while...^
+.
+execute +DecreaseStamina<4
+execute +DecreaseSkill<1
+write "What would you like to do now?^"
+}
+
+{choices
+write ^
+execute +clear_options
+execute "+add_option<1<Check the heads more closely."
+execute "+add_option<2<Keep clear of the treacherous devices and try to squeeze through the portcullis."
+}
+
+{1
+move player to section20
+look
+}
+
+{2
+move player to section39
+look
+}
+
+location section7:7
+short name 7
+
+{look
+print
+The right hand wheel spins round smoothly, and a pointed iron pole slides out of the wall, gashing your shoulder badly. Cursing and spitting, you dance back away from the wheels.^
+.
+execute +DecreaseStamina<4
+print
+Still, you suppose you've been lucky - if you were of average height, the spike might have pierced a lung.^
+What now?^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Try the left hand wheel."
+execute "+add_option<2<Try the central wheel."
+execute "+add_option<3<Try another passageway."
+}
+
+{1
+move player to section32
+look
+}
+
+{2
+move player to section40
+look
+}
+
+{3
+move player to section1
+look
+}
+
+
+location section8:8
+short name 8
+
+{look
+print
+You run into a room in which sword wielding zombies are strung from the ceiling by their heels. Thankfully, there's no time to take in the finer details. You crouch low and dart between them.^
+.
+set player(dice1) = +rnd<6
+set player(dice1) / 2
+execute +DecreaseStamina<player(dice1)
+}
+
+{choices
+execute +clear_options
+write ^
+execute +add_option<1<"Continue."
+}
+
+{1
+move player to section21
+look
+}
+
+
+location section9:9
+short name 9
+
+{look
+print
+The dagger misses the imp by a wasps breadth, and splashes into the water as the little fiend drags the lid from the crypt-box, freeing one of its brothers. The two imps then set to work on another two boxes... you can see where this is leading, and run quickly through the chamber and down the north passage.^
+.
+execute +drop_eq<dagger
+set curword = SOAHC
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section44
+look
+}
+
+
+location section10:10
+short name 10
+
+{look
+print
+Picking, on a whim, the left head, you slowly put your arm into its cold stone maw, and fumble around inside, wary of the head biting, searching for a catch or a switch or...^
+The heavy head of the lion suddenly drops, biting down hard on your forearm. With a grunt and a curse, you snatch your arm back out of it's mouth. Fortunately, you were using your left arm, and your metal bracer protected you from any serious damage.^
+.
+execute +DecreaseStamina<1
+write "Will you now^"
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Check out the right head."
+execute "+add_option<2<Investigate the left head further."
+execute "+add_option<3<Try to squeeze through the portcullis."
+}
+
+{1
+move player to section6
+look
+}
+
+{2
+move player to section20
+look
+}
+
+{3
+move player to section39
+look
+}
+
+location section11:11
+short name 11
+
+{look
+print
+You smash against the far wall of the pit and plunge into the foul, stinking water. You crash awkwardly against the bottom - your legs twist under you and your machete slices across your calf.^
+.
+execute +DecreaseStamina<3
+print
+Behind you, you hear Vladimir moan from the edge of the pit, and, in a surge of adrenaline, you scramble up the wall and race off down the passageway.
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section33
+look
+}
+
+
+location section12:12
+short name 12
+
+{look
+print
+The thick iron grille looks far too heavy for you to think of moving, and the bars are too close together for even you to squeeze through. You turn your attention instead to three metal wheels which are set into the stonework on the right hand side of the doorway. Some kind of gear-and-pulley locking system, you suppose. Which wheel do you want to try first?^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<The left hand wheel."
+execute "+add_option<2<The central wheel."
+execute "+add_option<3<The right hand wheel."
+}
+
+{1
+move player to section32
+look
+}
+
+{2
+move player to section40
+look
+}
+
+{3
+move player to section7
+look
+}
+
+location section13:13
+short name 13
+
+{look
+print
+Picking a box at random, you place a shoulder against the edge of the lid and heave. It slides off the box and splashes into the thick, dirty water. You lean forward to see what's inside - and a tiny, mummified humanoid launches itself out of the box and grabs hold of you. Wrapping its spindly little legs around you, it scratches and bites at your neck and face. You're smart enough not to try attacking it with your machete - you open your hands and begin to hit it open palmed.^
+.
+set CombatBonus[0] = FirstHitBonus
+set VictoryPage = section5
+move player to combat
+move mummified_imp to combat
+set InCombat = true
+look
+}
+
+
+location section14:14
+short name 14
+
+{look
+print
+The little bastards are all over you, in your hair, under your jerkin and oh shit shit shit there's one down your shirt, one down your shirt, there's one inside of your fucking shirt... You run screaming around the chamber, beating wildly at your self and bouncing off the walls until you stumble and crash down into the water.^
+.
+execute +DecreaseStamina<3
+print
+  You thrash around, rolling over and over, until, sobbing, you begin to get your grip back. Slowly, you drag yourself back onto your feet, and, breathing hard, stumble over to the portcullis. You can feel something hot and lumpy running down between your breasts. When you get out, you're not mentioning this to anyone, not Jakob, not to no-one. You're going to forget all about it. It never happened...^
+.
+set curword = ANANSI
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section35
+look
+}
+
+
+location section15:15
+short name 15
+
+{look
+print
+You unstrap the shield from your back, and hold it nervously between your hands.^
+"Whatever you say, Billy..." you tell him, letting your voice shake a little, "It's yours. Just don't hurt us, all right?"^
+Billy throws back his head and laughs...^
+"Of course, Martine whatever you say..."^ ...and the heavy, metal shield you sent flying across the graveyard like a discos smashes into Billy-Boys teeth with the force of a hammer blow.^
+Jakob's body thinks faster than his brain - his face is still slack and vacant, but he's dropping to his knees and slamming an elbow into the gut of the bearded guy. The guy crumples, Jak draws his sword and...^
+ Billy's other henchman's gaping open mouthed at his screaming boss, and turns round just in time to meet your machete head on...^
+Wrenching the blade free, you round on the howling Billy-Boy, but he's not too keen on head on confrontation, it seems. He leaps past you, kicks you into the mud and races off to freedom... only that blow from the shield must have messed up his head a little, because he runs straight into the stone coffer, pivots forward and vanishes from sight with a squeal...^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section25
+look
+}
+
+
+location section16:16
+short name 16
+
+{look
+print
+After only a few feet, the corridor opens out into a small, square room. It's low and flooded and fit to collapse, but you're expecting that by now. There's something a little odd here, though. Tilting your lamp to get a better view, you see that there's several dozen small, square stone boxes lining the walls of this chamber. Each is capped by a stone slab, which looks like it could be lifted fairly easily...^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Open the boxes."
+execute "+add_option<2<Leave through the only other exit, a door in the north wall."
+}
+
+{1
+move player to section13
+look
+}
+
+{2
+move player to section44
+look
+}
+
+
+location section17:17
+short name 17
+
+{look
+print
+Well, then. It's off white, fibrous, about three feet long and slightly tapered, like a cigar. The whole length of it is writhing in a nasty, lumpy way, like a sack full of kittens. Whatever it is, it doesn't seem aware of you.^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Attack it."
+execute "+add_option<2<Leave it where it is and head over to the doors."
+}
+
+{1
+move player to section4
+look
+}
+
+{2
+move player to section35
+look
+}
+
+
+location section18:18
+short name 18
+
+{look
+print
+The wheel turns a half circle, then locks into place. Cautiously, you turn the remaining wheel, and the portcullis rises jerkily up into the stonework, before sticking halfway. Shrugging, you let go of the wheel, slip underneath the grille, and hop up a short flight of stairs into a new room...^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section30
+look
+}
+
+
+location section19:19
+short name 19
+
+{look
+print
+Please choose '1' to continue.^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+if curword = SOAHC
+move player to section52
+look
+else
+move player to section21
+look
+endif
+}
+
+
+location section20:20
+short name 20
+
+{look
+print
+Jamming the lions jaws open with your machete, you shine your lamp into its nasty, craggy mouth. It seems as if the tongue is a pressure plate, triggering the biting action - but just behind that is a short, sturdy lever. You pull it - wincing as you do so - and hear a few distant grinding noises.  You try the same trick with the other head, and the portcullis rattles up into the masonry with a crunch of gears. Grinning, you slip through the door before the grilles have time to disappear into the ceiling.^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section29
+look
+}
+
+
+location section21:21
+short name 21
+
+{look
+print
+You race through the chamber, and stagger on towards the lion-head room.^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+if curword = ELLIRG
+move player to section24
+look
+else
+move player to section38
+look
+}
+
+
+location section22:22
+short name 22
+
+{look
+print
+The wheel turns stiffly at first, then springs loose with a series of clicks. A blunt iron pole creaks out of the wall and retracts again, just missing your head. That's very clever. What now?^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Try the left hand wheel."
+execute "+add_option<2<Try the middle wheel."
+execute "+add_option<3<Try the right hand wheel."
+execute "+add_option<4<Try something else."
+}
+
+{1
+move player to section32
+look
+}
+
+{2
+move player to section40
+look
+}
+
+{3
+move player to section7
+look
+}
+
+{4
+move player to section1
+look
+}
+
+
+location section23:23
+short name 23
+
+{look
+print
+You pull back your hair and squeeze the helmet over it, waiting for a tingle or flash of magic, but.. nothing. But why would an ordinary helmet be in a crypt? You shrug. It's damp down here, after all, and for all you know, magic might well be soluble...^
+.
+execute +take_eq<helmet
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section1
+look
+}
+
+
+location section24:24
+short name 24
+
+{look
+print
+You come pounding down the corridor, and crash right into the portcullis. You drop to your knees and try to squirm through a gap, but the shield strapped to your back is too wide to let you through. Behind you, you're sure you can hear the relentless footsteps of Vladimir...^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<If you're willing to discard the shield, you'll be able to fit through the grille."
+execute "+add_option<2<If you aren't prepared to ditch the shield, you have no choice but to make a stand against Vladimir."
+}
+
+{1
+execute +drop_eq<shield
+move player to section38
+look
+}
+
+{2
+move player to section50
+look
+}
+
+
+location section25:25
+short name 25
+has CantChoose
+
+{look
+print
+The rain lashes down harder than ever as you hoist yourself up onto the edge of the stone coffer, and sever the rope with a single machete blow, sending it slithering down into the darkness like a big dead snake. Peering down into the crypt, you see that Billy's somehow managed to save or re-light his torch, and is waving it around with his left arm. His right arm doesn't look like it'd be much good for waving anything, and from the way he's crouched up, he's popped quite a few ribs, too.^
+Jakob rests a hand on the rusted metal lever that controls the coffer lid, and raises an eyebrow at you. You hold up a hand, signalling him to wait, and take a last look down at Billy. He's not going to be lonely down there for long, you see - a new friends lurching up behind him, eyes all happy and purple, arms outstretched for a nice warm hug. Billy hasn't seen him, yet - he's too busy screaming up at you.^
+"Martine, you little fucking whore! I'll fucking well wring your bastard neck! And you, Jakob! You know what you are?"^
+You turn round and give Jak the nod. You know that Billy's only joking, but ol' Jak, he's the sensitive type.^
+"You're nothing but a dirty son of a..."^
+The stone lid crashes down, obscuring Billy's last words. You press your ear against the slab, and fancy you can hear Billy and his new playmate getting aquatinted. Then Jakob lays a hand on your shoulder, and you look across at him and return his grin.^
+"You okay?"^
+"Guess I'll do. You?"^
+"Yeah..."^
+The two of you walk through the rain, out of the grave yard and into the dawn...^
+.
+write "---[You have won.]---^"
+endgame
+}
+
+
+location section26:26
+short name 26
+
+{look
+print
+After a short while the corridor opens out into a square room, with a tall vaulted ceiling. Around a half-dozen iron hooks are set into the ceiling, and dangling from them on heavy, rusty chains are decaying corpses, strung up by their feet. Each grips a sword in each hand. As you're about to enter the room, they begin to thrash around wildly, slashing randomly at the air around them.  You whistle softly, impressed. A potent trap - the zombies are held high enough to make them a difficult target, while still allowing them to rain blows down upon anyone who walked beneath them...anyone of normal height, that is. With your short stature, you're pretty sure you can creep beneath them fairly safely...^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Try to creep beneath them."
+execute "+add_option<2<Return to the T-junction and try the other corridor."
+}
+
+{1
+move player to section48
+look
+}
+
+{2
+move player to section16
+look
+}
+
+
+location section27:27
+short name 27
+
+{look
+print
+You wander down a half flooded corridor and arrive in a water-logged, crumbling chamber. A couple of sodden wooden chests stand against one wall. Standing motionless in the middle of the room is a human figure - but only just. Even from here, it's stench makes you gag - it smells worse than Jakob. It's a zombie, a caddy, a dead-boy, more bone than flesh, more rotted away than still here. Over one of its shoulders it carries a long, heavy hammer, hefted and ready, but it makes no move towards you. However, you've got a feeling that if you get any closer to those chests...^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Investigate the chests, and risk disturbing the zombie."
+execute "+add_option<2<Return to the entry vault."
+}
+
+{1
+move player to section3
+look
+}
+
+{2
+move player to section1
+look
+}
+
+
+
+location section28:28
+short name 28
+
+{look
+print
+Not with out some difficulty, you wrench the sword out from it's moorings and hold it in front of you like a lance. Vladimir's having trouble near his coffin - it looks like he's got his foot caught in something under the water. Whooping, you race forward with the sword held aloft in front of you, and run Ol' Vlad clean through, screaming with rage.^
+ Vladimir looks down at the handle of the sword jutting from his belly. He blinks. He growls and then starts to stagger towards you...^
+You decide that discretion is the greater part of staying alive, and race off down the corridor.^
+.
+execute +drop_eq<sword
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section45
+look
+}
+
+
+location section29:29
+short name 29
+
+{look
+print
+The corridor is low ceilinged, waterlogged and slightly decayed. Same old, same old. You try to forget that you're deep underground in a rotting, decayed tomb, and think about the money, and about never having to have to do anything like this ever again.. Splashing along for a short way, you end up at a t-junction.^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Head east."
+execute "+add_option<2<Head west."
+}
+
+{1
+move player to section26
+look
+}
+
+{2
+move player to section16
+look
+}
+
+
+location section30:30
+short name 30
+
+{look
+print
+You are in a long, low room which is in much better repair than the previous chambers - the bricks are more even, and the floor, while still lost beneath a layer of filthy water, moves around less beneath your feet. As you flash your lamp around to get a better look at the place, you notice a couple of torches strapped to the walls, and, after a short struggle, manage to get it lit. At the northern end of the room is another grid-style portcullis, flanked by two stone lion's heads with gaping maws. Glued to a wall near the door you entered through is a white, fibrous sack which seems to be undulating softly. You've gazed upon more pleasant things...^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Head straight down the room and check out the portcullis."
+execute "+add_option<2<Get a closer look at the writhing sack."
+}
+
+{1
+move player to section35
+look
+}
+
+{2
+move player to section17
+look
+}
+
+
+location section31:31
+short name 31
+
+{look
+print
+You bounce off the far lip of the pit and plunge down about three meters - far enough to do yourself damage, if the pit had been empty as designed, but not so harmful when it's full of brackish water.^
+.
+execute +DecreaseStamina<2
+print
+You surface, gasping, and dog-paddle your way back to the northern side. It's easy enough to find finger holes in the half-collapsed masonry, and you've soon pulled yourself back up to the passageway.^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section41
+look
+}
+
+
+location section32:32
+short name 32
+
+{look
+print
+The wheel spins round bonlessly. There's a few distressing creaks from somewhere inside the wall, and a gout of powdered rust jets briefly from a small round hole. Vaguely, you wonder what was meant to have happened. What now?^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Try the middle wheel."
+execute "+add_option<2<Try the right hand wheel."
+execute "+add_option<3<Try one of the other passageways."
+}
+
+{1
+move player to section40
+look
+}
+
+{2
+move player to section7
+look
+}
+
+{3
+move player to section1
+look
+}
+
+
+location section33:33
+short name 33
+
+{look
+print
+Your feet smack down onto the waterlogged flags on the far side of the pit, and you turn to make sure Vladimir's not getting over. You watch as he walks calmly over the edge of the pit, and drops into the darkness. You wait... and then hear a quiet splashing like, well, someone walking slowly-yet-unstoppably  through waist deep water. Turning, you charge on down the corridor, splashing to a halt at the cross roads. Quickly, now^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Head left."
+execute "+add_option<2<Head right."
+}
+
+{1
+move player to section8
+look
+}
+
+{2
+move player to section19
+look
+}
+
+
+location section34:34
+short name 34
+
+{look
+print
+The imps head explodes in a shower of dust as your dagger strikes home. It's little body splashes down into the water, the ragged bandages quickly turning black with damp...Cautiously, you peer into the open crypt-box. Inside are a small gold brooch of unremarkable design, and a small pile of what appear to be teeth.^
+You decide against opening any more boxes, and exit through the north door.^
+.
+move dagger to limbo
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section44
+look
+}
+
+
+location section35:35
+short name 35
+
+{look
+print
+The two open mouthed lions seem identical. Peering into their maws, but it's difficult to see much inside either of them. The portcullis itself seems to have wider set bars than the last one - you think you could squeeze through the gaps, with a little luck.^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Check out the lions heads."
+execute "+add_option<2<Try to squeeze through the portcullis."
+}
+
+{1
+move player to section10
+look
+}
+
+{2
+move player to section39
+look
+}
+
+
+location section36:36
+short name 36
+
+{look
+print
+The freak staggers back, collapsing against his own coffin, and you've got a second to think. You've opened several gaping wounds in Vladimir's body, but each time you do, the wound just blazes with that headaching purple light and closes up again. This isn't right. There's something... fey about all this. Maybe that sword he was buried with... Keep your enemies closest, and all that...^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Try using Vladimir's own sword against him."
+execute "+add_option<2<It seems more sensible to cut and run."
+}
+
+{1
+move player to section28
+look
+}
+
+{2
+move player to section45
+look
+}
+
+
+location section37:37
+short name 37
+
+{look
+print
+You land clumsily, and tumble to the floor. Still, you made it. You pick yourself up and walk on down the passageway.^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section41
+look
+}
+
+
+location section38:38
+short name 38
+
+{look
+print
+You splash across the lion room, on into the big round entry chamber, and dive at the dangling rope. Water and muck and gods alone know what else rain off of you as you pull yourself toward safety. You whip your head from side to side as you scramble up the rope, trying to get your filthy, matted hair out of your eyes.^
+"Jak! Pullit! Gemme up, man!" you yell, scrambling up the twisted shank of hemp, "Worn out my welcome down here, I can fuckin' tell you..."^
+You burst out into the torch lit cemetery - and find yourself surrounded. Billy Stamen and his two thugees are standing around the coffin, wearing the smug, superior faces of men who know they've won. Jakob, standing to one side with a crossbow pointed at his head, grins an apologetic - but drunk and pathetic - grin, and shrugs. Oh, Jakob, you idiot, you lousy, worthless, drunken...^
+"Well, well, Martine," says Billy, "Seems you were wrong. You don't look at all beautiful to me right now..."^
+You drag yourself out of the grave and stand on the lip of the stone coffin.^
+"All right, Billy. What's it going to be then, ey?"^
+"The sword. The shield. You throw them over to me, you little slut."^
+You lower your head slightly, and smile.^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+if shield(parent) = player
+move player to section15
+look
+else
+move player to section67
+look
+endif
+}
+
+
+location section39:39
+short name 39
+has CantChoose
+
+{look
+print
+You slip your head and arm through the bars and begin squirming. This is going to be tight...^
+.
+set VictoryPage = section42
+set FailedPage = section2
+execute +TestYourLuck
+}
+
+
+location section40:40
+short name 40
+
+{look
+print
+The middle wheel turns stiffly, then locks into place with a click. Do you now - ^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Turn the left wheel."
+execute "+add_option<2<Turn the right wheel."
+}
+
+{1
+move player to section22
+look
+}
+
+{2
+move player to section18
+look
+}
+
+
+location section41:41
+short name 41
+
+{look
+print
+You step into yet another flooded chamber, and breathe a sigh of relief. Finally. From the rotted burial goods to the decayed flags to the needlessly elaborate marble coffin, everything about this room screams "Rich Boy's Burial Chamber". And - blessed be - the lid of the coffins already slightly open. You jam your machete into  the gap and wrench it to one side, and with a little pushing and shoving, manage to move the lid far enough over for you to see inside. A pale, bloated body lies in there, though remarkably intact considering the conditions. On his chest lie a gilded sword and shield. You reach in carefully - your time in the tomb has taught you that ol' Mister Chance was fond of trickery - and pick up the sword and shield. Vladimir doesn't move a rotted muscle. You strap the shield across your back and slide the sword between it and the leather of your cloak - not ideal, but the best way you can come up with for a four-foot person to carry a five-foot sword.  With your treasures stowed away safely, you turn to leave the chamber - and hear a soft, mucoid groan coming from the coffin. Closing your eyes, you ask -^
+"You're behind me, aren't you?"^
+.
+execute +take_eq<shield
+execute +take_eq<sword
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Run."
+execute "+add_option<2<Fight."
+}
+
+{1
+move player to section45
+look
+}
+
+{2
+move player to section47
+look
+}
+
+
+location section42:42
+short name 42
+
+{look
+print
+After much grunting and twisting, you manage to drag your body through the grille. In doing so, however, you gather some minor scrapes and bruises.^
+.
+execute +DecreaseStamina<1
+set curword = ELLIRG
+write "You take a second to catch your breath, then set off down the corridor.^"
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section29
+look
+}
+
+
+location section44:44
+short name 44
+has CantChoose
+
+{look
+print
+The tunnel you're walking down joins another, which you follow northwards. Before long, you come across a pit in the floor of the corridor, the rank water that covers the tomb trickling slowly into its depths. It's about two meters wide, a fair jump, but nothing impossible... You lie down and hold your lamp over the edge of the chasm, but the wan light it casts isn't enough to let you see deep it is.  Well, only one thing for it. You back up, then charge forward, running at top speed, leaping just as you come to the edge of the pit...^
+.
+set VictoryPage = section37
+set FailedPage = section31
+execute +TestYourSkill
+}
+
+
+location section45:45
+short name 45
+has CantChoose
+
+{look
+print
+"Fuck it!"^
+You don't even waste time thinking - your feet are sending up splashes and propelling you back along the corridor before Vladimir has even got time to groan. You don't slow down when you come back to the pit - you just speed up and leap.^
+.
+
+set modifier = 2
+set VictoryPage = section33
+set FailedPage = section11
+execute +TestYourSkill
+}
+
+
+location section46:46
+short name 46
+
+{look
+print
+The rotted corpse splashes to the floor, and begins to dissolve in the rank water.^
+You briefly consider taking the zombies hammer, but it's much too long for you to wield effectively, and there's no way you're searching its "corpse". The wooden chests are badly rotted - trying to open them results in the lids tearing off in your hands, and though one of them seems to have been trapped, originally, the needle-on-a-spring is too rusted to be of any danger. The left chest is filled with nothing but a stinking mulch - fabrics or clothes, once, you guess. The other contains a copper helmet, gone green with the damp.^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Try it on."
+execute "+add_option<2<Leave it here and return to the main chamber."
+}
+
+{1
+move player to section23
+look
+}
+
+{2
+write "You return to the main chamber...^"
+move player to section1
+look
+}
+
+
+location section47:47
+short name 47
+
+{look
+print
+"Fucking come on, then!"^
+You turn on your heel and face  Vladimir's cadaver. He's not a zombie, you can see that straight away. The flesh's puffy and bluish-white, but not all rotted out, and the eyes are glowing purple, which is unusual by any standards. He opens his mouth and hisses at you, his mouth full of the same violet fire, trying to look all undead and fearful. You're not in the mood for it. You're angry, soaking wet, filthy, bruised, battered and very very tired. Double crosses are stressful. Tombs are not pleasant. Repeatedly falling into dirty, ice cold water is not fun. This has not been a nice night. You whip out your machete and charge towards Vladimir, screaming.^
+.
+set InCombat = true
+move vladimir to combat
+move player to combat
+set FailedPage = section36
+set turnslimit = 3
+look
+}
+
+
+location section48:48
+short name 48
+
+{look
+print
+Crouching low, you race across the chamber as the zombies go wild above you, thrashing and screaming and hitting each other. A blade zips by in front of your face - you jump back and dodge to the right. There's a splash to your left - a sword hitting the water point first.^
+"Clever boys..." you mutter.^
+They've realised they can't reach you with the swords in their hands, so they're going to try some of the old ranged combat. Pretty smart, for a zombie.. You hunker down as low as you can and race towards the north door, swords raining down about you.^
+.
+#This is a quite nasty situation,
+#the character can lose stamina plus skill points too
+
+set temp = 0
+
+while temp <= 3
+set player(dice1) = +rnd<6
+execute this.CheckRoll<player(dice1)
+set temp + 1
+endwhile
+}
+
+{CheckRoll
+ifall arg[0] >= 1 : arg[0] <= 4
+write "A flying blade bruises you.^"
+execute +DecreaseStamina<1
+else
+if arg[0] = 5
+write "A flying blade hits you.^"
+execute +DecreaseStamina<2
+endif
+if arg[0] = 6
+write "A flying blade injures you seriously.^"
+set player(dice1) = +rnd<6
+execute +DecreaseStamina<player(dice1)
+execute +DecreaseSkill<1
+endif
+endif
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section44
+look
+}
+
+
+location section49:49
+short name 49
+
+{look
+print
+The passage-way rapidly degenerates, before ending at a cave in. You return to the main chamber.^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section1
+look
+}
+
+
+location section50:50
+short name 50
+has CantChoose
+
+{look
+print
+Vladimir is full of some strange, unnatural force that you can't even comprehend. He cannot be destroyed. But, to your credit, you stand tall, and fight him for as long as there is blood in your body.^
+.
+set vladimir(skill) = 10
+set InCombat = true
+move player to combat
+move vladimir to combat
+look
+}
+
+
+location section52:52
+short name 52
+
+{look
+print
+You stumble around the corner, and charge headlong into the stone-box-room - to be met by a good two-dozen of the dirty little mummy-imps, standing silent and ready. Splashing to a halt, you're on the verge of turning back and trying the other route, when you hear or imagine Vlad's footsteps behind you, and charge forward towards the imps, swinging your blade wildly and yelling the very best oaths that your father taught you. They scratch and claw and grab at you wildly as you try to push your way through them, doing their best to weigh you down and drag you into the mire...^
+.
+set player(dice1) = +rnd<6
+set player(dice1) + 2
+write "The imps are very brittle, but there's a lot of them, and you don't have much time.^"
+style note
+write "[You have " player(dice1) " turns until Vladimir arrives.]^"
+style normal
+set turnslimit = player(dice1)
+set VictoryPage = ImpsVictory
+set FailedPage = ImpsFail
+set InCombat = true
+move imps to combat
+move player to combat
+look
+}
+
+
+location ImpsVictory:impsvictory
+short name 52
+
+{look
+print
+The survivors scatter, and you take up the race to the exit once more.^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section21
+look
+}
+
+
+location ImpsFail:impsfail
+short name 52
+has CantChoose
+
+{look
+execute +ResetCombat
+move player to section58
+look
+}
+
+
+location section58:58
+short name 58
+has CantChoose
+
+{look
+print
+With close on a half dozen imps hanging off you, you collapse heavily against one of the stone boxes, and drop your blade into the water. Swearing, you plunge your hand into the mire to search for it. From behind you comes a familiar groan, a pair of cold, wet hands wrap around your neck and - gods bless - it's over almost before you have a chance to scream.^
+.
+execute +game_over
+}
+
+
+location section62:62
+short name 62
+
+{look
+print
+You grab hold of the rope and wrap your legs tight around it. It jerks hard but holds, leaving you dangling a foot or so beneath the lip of the coffin. You creep back up the line, and pause just beneath the edge, gripping your machete by the blunt edge of the blade, the heavy handle pointing upwards. You listen to the yells and cursing, then hear footsteps come splashing over. Fighting to hold in crazy laughter, you watch until Billy-Boy's face pops over the side of the coffin, and slam the butt of your machete into the end of his nose, and scramble up over the side as he backs off howling.^
+You yell at Jak, but without cause. Jakob's body thinks faster than his brain - his face is still slack and vacant, but he's dropping to his knees and slamming an elbow into the gut of the bearded guy. Jak draws his sword and...^
+ Billy's other henchman's gaping open mouthed at his screaming boss, and turns round just in time to meet your machete head on...^
+Wrenching the blade free, you round on Billy-Boy, but he's not too keen on head on confrontation, it seems. He leaps past you, kicks you into the mud and races off to freedom... only that blow on the snout must have messed up his head a little, because he runs straight into the stone coffer, pivots forward and vanishes from sight with a squeal..^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section25
+look
+}
+
+
+location section67:67
+short name 67
+has CantChoose
+
+{look
+print
+This is going to be risky. It's stupid and it's dangerous, but it's all you can think of, so it's going to damn well work.^
+“Come get them, Billy,” you say, sweetly, taking a backwards step off the edge of the coffin and dropping into the deep black maw of the crypt.^
+.
+set VictoryPage = section62
+set FailedPage = section70
+execute +TestYourSkill
+}
+
+
+location section70:70
+short name 70
+
+
+{look
+print
+You grab hold of the rope and wrap your legs tight around it. You slide a good few feet down it, the rough hemp sizzling against your palms.
+.
+execute +DecreaseStamina<2
+print
+The rope jerks hard but holds, leaving you dangling about eight beneath the lip of the coffin. You creep back up the line, and pause just beneath the edge, gripping your machete by the blunt edge of the blade, the heavy handle pointing upwards. You listen to the yells and cursing, then hear footsteps come splashing over. Fighting to hold in crazy laughter, you watch until Billy-Boy's face pops over the side of the coffin, slam the butt of your machete into the end of his nose, and scramble up over the side as he backs off howling.^
+You yell at Jak, but without cause. Jakob's body thinks faster than his brain - his face is still slack and vacant, but he's dropping to his knees and slamming an elbow into the gut of the bearded guy. Jak draws his sword and...^
+ Billy's other henchman's gaping open mouthed at his screaming boss, and turns round just in time to catch your machete with the bridge of his nose...^
+Wrenching the blade free, you round on Billy-Boy, but he's not too keen on head on confrontation, it seems. He leaps past you, kicks you into the mud and races off to freedom... only that knock on the hooter must have messed up his head a little, because he runs straight into the stone coffer, pivots forward and vanishes from sight with a squeal..^
+.
+}
+
+{choices
+execute +clear_options
+write ^
+execute "+add_option<1<Continue."
+}
+
+{1
+move player to section25
+look
+}
+
+
+object kryten: kryten
+ has		ANIMATE
+ short		name "yourself"
+ long		"Odly, you see yourself standing here."
+ capacity	42
+ parent 	section1
+ damage		2
+ player
+
+constant title_image "none"
+constant footer_image "none"
+constant header_colour "#42596d"
+constant linkbar_colour "#6a7a87"
+constant maintext_colour "#dddddd"
+
+#include "ff.library"

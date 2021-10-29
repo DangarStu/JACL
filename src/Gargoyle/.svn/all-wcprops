@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/svn/!svn/ver/157/trunk/src/Gargoyle
+END
+License.txt
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/2/trunk/src/Gargoyle/License.txt
+END
+glkstart.h
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/!svn/ver/2/trunk/src/Gargoyle/glkstart.h
+END
+glk.h
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/!svn/ver/153/trunk/src/Gargoyle/glk.h
+END
+gi_dispa.h
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/!svn/ver/3/trunk/src/Gargoyle/gi_dispa.h
+END
+gi_blorb.h
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/!svn/ver/3/trunk/src/Gargoyle/gi_blorb.h
+END
+garglk_main.c
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/2/trunk/src/Gargoyle/garglk_main.c
+END
+garglk.h
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/!svn/ver/153/trunk/src/Gargoyle/garglk.h
+END
+libgarglk.so
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/14/trunk/src/Gargoyle/libgarglk.so
+END

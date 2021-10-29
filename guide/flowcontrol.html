@@ -1,0 +1,456 @@
+<html>
+<head>
+	<title>The JACL Author's Guide</title>
+	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<link rel=stylesheet type="text/css" href="styles.css">
+</head>
+<body>
+
+<h1><a class="title" name="flowcontrol0">Flow Control</a></h1>
+
+<h2><a class="section" name="flowcontrol1">The IF, IFALL and ENDIF Commands</a></h2>
+
+<P>An <b>if</b> command tests whether an expression is true or false for the purpose of selectively executing code. If the expression is true, execution will continue from the next line. If the expression is false, execution will continue from the line after the matching <b>endif</b> or <b>else</b> command. If no <b>endif</b> command is found by the end of the function, the function will terminate normally with an implicit <b>return true</b>. An <b>if</b> command must be of the format:
+
+<pre>
+<b>if</b> <i>LeftValue test RightValue</i> [<i>LeftValue Test RightValue</i>]...
+</pre>
+
+<P>In an <b>if</b> command, each set of three parameters (two values and a test), is called an expression. Each expression is evaluated to equal either true or false. If more than one expression is supplied, the entire statement is considered be true if any one of the expressions is true &mdash; a logical <b>OR</b>. The <b>ifall</b> command has the same format as an <b>if</b> command except the entire statement is only considered to be true if all of the expressions are true &mdash; a logical <b>AND</b>.
+
+<P>The following table lists the possible tests that can be used with an <b>if</b> or <b>ifall</b> command when the left and right values are both either an integer, an integer constant, an object or the word <b>random</b>. For more information on constants and <b>random</b> see the chapter on <a href="internals.html">Internals</a>.
+
+<table class="infowarn">
+<tr><td><img src="info.png" alt="Information"></td>
+<td>Each object defined is assigned a unique number when the game is loaded. In a <B>set</B>, <B>if</B> or <b>ifall</b> command, an object's label is substituted for this number. Objects are numbered in the order they appear in the game file starting at one.</td>
+</tr></table>
+
+<center>
+<table width=80%>
+<TR><th>Test</th>
+<th>Description</th>
+</TR>
+<TR><td><B>=</B> or <b>==</b></TD>
+<td>This tests if the left value is equal to the right value.</TD>
+</TR>
+<TR><td><B>&gt;</B></TD>
+<td>This tests if the left value is greater than the right value.</TD>
+</TR>
+<TR><td>
+<B>&lt;</B></TD>
+<td>This tests if the left value is less than the right value.</TD>
+</TR>
+<TR><td><B>&gt;=</b> or <b>=&gt;</B></TD>
+<td>This tests if the left value is equal to or greater than the right value.</TD>
+</TR>
+<TR><td><B>&lt;=</b> or <b>=&lt;</B></TD>
+<td>This tests if the left value is equal to or less than the right value.</TD>
+</TR>
+<TR><td><B>!=</b> or <b>&lt;&gt;</B></TD>
+<td>This tests if the left value is not equal to the right value.</TD>
+</tr></table>
+</center>
+
+<P>The following are the possible tests that can be used with an <B>if</B> command when the left and right values are both set to an object:  
+
+<center>
+<table width=80%>
+<TR>
+<th>Test</th>
+<th>Description</th>
+</TR><TR>
+<td><B>grandof</B></TD>
+<td>This tests if the left object is the grand parent of the right object.</TD>
+</TR><TR>
+<td><B>!grandof</B></TD>
+<td>This tests if the left object is not the grand parent of the right object.</TD>
+</tr></table>
+</center>
+
+<P>When an object is placed inside another object, which is then placed inside yet another object, the last object is said to be the grand parent of the first. This is the case no matter how many intermediate objects there are.
+
+<P>The following are the possible tests that can be used with an <B>if</B> command when the left value is a location and the right value is an object:</p>
+
+<center>
+<table width=80%>
+<TR>
+<th>Test</th>
+<th>Description</th>
+</TR><TR>
+<td><B>locationof</B></TD>
+<td>This tests if the left value is the location of the right object.</TD>
+</TR><TR>
+<td><B>!locationof</B></TD>
+<td>This tests if the left value is not the location of the right object.</TD>
+</tr></table>
+</center>
+
+<p>The difference between <b>grandof</b> and <b>locationof</b> is that, for example, if a key is put on a keyring, which is put in a box, which is put into a bag, and the bag is in a room called "beach", '<b>locationof key</b>' would refer to the beach, but '<b>grandof key</b>' would refer to the bag.</p>
+
+<P>The following are the possible tests that can be used with an <B>if</B> command when the left value is an object and the right value is an attribute. For more information see the chapter on <a href="attributes.html">Attributes</a>.
+
+<center>
+<table width=80%>
+<tr>
+<th>Test</th>
+<th>Description</th>
+</TR><TR>
+<td><b>has</b></td>
+<td>This tests if the object has the specified attribute set</TD>
+</TR><TR>
+<td><B>hasnt</B></TD>
+<td>This tests if the object hasn't the specified attribute set</TD>
+</tr></table>
+</center>
+
+<P>The following are the possible tests that can be used with an <B>if</B> command when the left value is an object and the right value is one of the words <B>*here</B>, <B>*held</B>, <B>*present </B>or <B>*anywhere</B>. These words have the same meanings when used in an <b>if</b> statement as in a <B>grammar</B> statement. For more information see the section on <a href="definitions.html#definitions11">Grammar Statements</a>.
+
+<center>
+<table width=80%>
+<TR>
+<th>Test</th>
+<th>Description</th>
+</TR><TR>
+<td><B>is</B></TD>
+<td>This tests if the object is in the specified scope.</TD>
+</TR><TR>
+<td><B>isnt</B></TD>
+<td>This tests if the object isnt in the specified scope.</TD>
+</tr></table>
+</center>
+
+<P>To help clarify, here are some examples of the various types of <b>if</b> commands:
+
+<pre>
+if beach locationof bucket
+if sand grandof bucket
+if TOTAL_MOVES &gt;= 42
+if glove has WORN
+if guard isnt *present : id_card has WORN
+if noun1 = sword : noun1 = knife
+if sword(parent) = field
+</pre>
+
+<P>It is possible to nest <B>if</B> statements. Nesting involves placing a second <B>if</B> command before the matching <B>endif</B> command of a first. The end result of this is that the code between the second <B>if</B> command and its matching <B>endif</B> command will only be executed if both statements are true &mdash; a logical <b>AND</b>.
+
+<h2><a class="section" name="flowcontrol2">The IFSTRING Command</a></h2>
+
+<p>An <b>ifstring</b> command is used to compare two strings of text. If the string of text is to contain any spaces, it must be enclosed in double quotes. An <b>ifstring</b> command must use the following format:
+
+<pre>
+<b>ifstring text</b> <i>test String</i> [<b>text</b> <i>Test String</i>]...
+</pre>
+
+<p>Below is a list of the possible tests:
+
+<center>
+<table width=80%>
+<tr>
+<th width=40%>Test</th>
+<th>Description</th>
+</tr>
+<tr>
+<td><b>==</b> or <b>=</b></td>
+<td>This tests if the first string equals the second string</TD>
+</tr><tr>
+<td><b>!=</b> or <b>&lt;&gt;</b></td>
+<td>This tests if the first string doesn't equal the second string</td>
+</tr><tr>
+<td><b>contains</b></td>
+<td>This tests if the first string contains the second string</td>
+</tr><tr>
+<td><b>!contains</b></td>
+<td>This tests if the first string doesn't contain the second string</td>
+</tr>
+<tr>
+<td><b>==C</b> or <b>=C</b></td>
+<td>This tests if the first string equals the second string including case</TD>
+</tr><tr>
+<td><b>!=C</b> or <b>&lt;&gt;C</b></td>
+<td>This tests if the first string doesn't equal the second string including case</td>
+</tr><tr>
+<td><b>containsC</b></td>
+<td>This tests if the first string contains the second string including case</td>
+</tr><tr>
+<td><b>!containsC</b></td>
+<td>This tests if the first string doesn't contain the second string including case</td>
+</tr>
+</table>
+</center>
+
+<p>Below are some examples of the <b>ifstring</b> command being used.
+
+<pre>
+ifstring string_arg[0] contains "help"
+ifstring command[0] == "take"
+</pre>
+
+<h2><a class="section" name="flowcontrol3">The IFEXECUTE Command</a></h2>
+
+<p>The <b>ifexecute</b> command works in a similar manner to the <b>call</b> command (see the chapter on <a href="functions.html">Functions</a> of more information.) If the function specified after the <b>ifexecute</b> command exists and does not return <b>false</b>, executing will continue from the line after the <b>ifexecute</b> command. If the function being called does not exist or returns <b>false</b> executing will continue from after the matching <b>endif</b> or <b>else</b> command. 
+
+<p>This command is normally only used by library code to test if the game author has provided some specific associated function and to perform some sort of default action if not. For example:
+
+<pre>
+ifexecute "here.look"
+   # ASSOCIATED FUNCTION PROVIDED, DO NOTHING
+else
+   # NO ASSOCIATED FUNCTION, PERFORM DEFAULT
+   execute "+look"
+endif
+</pre>
+
+<p>If the <b>ifexecute</b> command is true, in other words, a <b>look</b> function associated with the player's current location exists and does not return <b>false</b>, the block of code below it will be executed. As the associated <b>look</b> function has already performed any required action, this block contains only a comment. If this function did not exist or returned <b>false</b> the function <b>+look</b> would be executed.
+
+<h2><a class="section" name="flowcontrol4">The ELSE Command</a></h2>
+
+<p>The code following an <b>else</b> command is executed only if the matching <b>if</b> command was false. If the matching <b>if</b> command was true, execution will continue from the line after the matching <B>endif</B> command. For example:
+
+<pre>
+if mulder has DEAD
+   write "Clamminess on your lips.^"
+else
+   write "He looks quite surprised to say the least.^"
+endif
+</pre>
+
+<P>Nested <B>if</B> commands may also make use of the <B>else</B> command. This is demonstrated in the following section of code taken from the <B>+take_all</B> function: 
+
+<pre>
+loop
+   if noun3 childof noun1 
+      if noun3(mass) &lt; heavy
+         if noun3 hasnt LIQUID
+            if noun3(mass) &lt;= player(info)
+               if TURN_WORKED = true
+                  set TOTAL_MOVES + 1
+                  execute "+eachturn"
+               endif
+               execute "+take_routine"
+               set INDEX + 1
+            else
+               write "You are carrying too much to take "
+               write noun3{the} .^
+               set INDEX + 1
+            endif
+         else
+            write noun3{The} " run" noun3{s} " through "
+            write "your fingers.^"
+            set INDEX + 1
+         endif
+      endif
+   endif
+endloop
+</pre>
+
+<p>In the above code, the block of code after the first <b>else</b> command is executed if the matching <b>if</b> command above it:
+
+<pre>
+if noun3(mass) &lt;= player(info)
+</pre>
+
+<p>is false. This line of code will not get executed, however, if the line:
+
+<pre>
+if noun3 hasnt LIQUID
+</pre>
+
+<p>is false as execution will have already jumped to after the second <b>else</b> command.
+
+<h2><a class="section" name="flowcontrol5">The LOOP and ENDLOOP Commands</a></h2>
+
+<p>The <B>loop</B> command is used to iterate through all the objects (and locations) defined in the game. The <b>loop</b> command takes a single argument being the integer variable to use as a pointer to the current object during iteration. If a <b>loop</b> command is executed with no parameters, <B>noun3</B> is used as the default variable. When the <b>loop</b> command is executed, iteration starts with the variable being set to 1 (the first object or location in the game file). When the matching <B>endloop</B> command is executed the variable is incremented to point to the next object or location and execution continues from the first line after the original <B>loop</B> command. The loop will end when the <b>endloop</b> command is executed with the iteration variable already pointing to the last object or location. When the loop ends, execution continues from the first line after the <b>endloop</b> command. For example, the following code will output the short description of each object and location as a list:
+
+<pre>
+{+print_objects
+loop 
+   write noun3{List} ^
+endloop
+}
+</pre>
+
+<p>As another example, this function will output all the children of the object passed as an argument to it, using the variable <b>POINTER</b> as the iteration variable:
+
+<pre>
+integer POINTER
+
+{+print_children
+write "Children of " arg[0]{the} ":^"
+loop POINTER
+  if POINTER(parent) = arg[0]
+     write "  " POINTER{the} ^
+  endif
+endloop
+}
+</pre>
+
+<p>It is not legal to nest loops unless the inner loop is within a function that is called from within the outer loop. To return out of a loop early you can either return from the currently executing function or set the iteration variable to point to the last object or location manually. For example, to return out of a loop after the fifth object, use the constant <b>objects</b> like this:
+
+<pre>
+loop
+ write noun3{The} ^
+ if noun3 = 5
+    # SET THE CONTAINER noun3 TO POINT TO THE
+    # LAST OBJECT OR LOCATION SO THAT THE
+    # LOOP WILL STOP ITERATING
+    set noun3 = objects
+ endif
+endloop
+</pre>
+
+<p>The index of the last object or location (which is also the number of object and locations in the game) is stored in the constant <b>objects</b>.
+
+<h2><a class="section" name="flowcontrol6">The SELECT and ENDSELECT Commands</a></h2>
+
+<p>The <b>select</b> command is similar to the <b>loop</b> command except that it only iterates over a subset of game's objects. This subset is defined by passing a parameter to the <b>select</b> command. This parameter can be one of the following three things:
+
+<ol>
+	<li>an object that all the selected objects must be a direct child of
+	<li>an attribute that all the selected objects must have, or
+	<li>a scope that all the selected objects must be in
+</ol>
+
+<p>It is possible to prefix any of the above three criterion with a shriek (<b>!</b>) to indicate that the objects to be selected should <i>not</i> meet the specified criterion. 
+
+<p>Although the <b>loop</b> command can be used to produce any list of objects that the <b>select</b> command can, the <b>select</b> command is significantly faster as the bulk of the filtering is done by compiled code. Even if the selected objects are filtered with further <b>if</b> statements as in a regular loop, the number of objects returned by the <b>select</b> command is usually a significantly smaller number than the total number of objects in the game, so the remaining processing is relatively quick. Below is an example of the loop above using the <b>select</b> command:
+
+<pre>
+integer POINTER
+
+{+print_children
+write "Children of " arg[0]{the} ":^"
+select arg[0] POINTER
+  write "  " POINTER{the} ^
+endselect
+}
+</pre>
+
+<p>If the desired set of objects cannot be expressed with a single criterion, further <b>if</b> statements are placed within the loop such as this code from <b>verbs.library</b>:
+
+<pre>
+{+contains_liquid?
+# CHECK IF THE SPECIFIED OBJECT CONTAINS ANY LIQUIDS
+select LIQUID CHILD
+   if CHILD(parent) = arg[0]
+      return true
+   endif
+endselect
+return false
+}
+</pre>
+
+<p>Like the <b>loop</b> command, if a container is not specified (<b>CHILD</b> in the example above), <b>noun3</b> is used by default.
+
+<table class="infowarn"><tr>
+<td><img src="warning.png" alt="Warning"></td>
+<td>
+Becareful not to use the default iteration container <b>noun3</b> more than once when using nested <b>select</b> loops. As it is a global variable the loops will intefere with each other if it is shared. 
+<td>
+</td></tr></table>
+
+The following scopes can be used with the <b>select</b> command:
+
+<center>
+<table width=60%>
+<tr><th>Scope</th>
+<th>Description</th>
+</tr><tr>
+<td><b>*held</b></td><td>All objects held by the player.</td>
+</tr><tr>
+<td><b>*here</b></td><td>All objects in the current location.</td>
+</tr><tr>
+<td><b>*present</b></td><td>All objects either in the current location or currently held.</td>
+</tr><tr>
+<td><b>*anywhere</b></td><td>All objects in the game (use <b>loop</b> command instead).</td>
+</tr></table></center>
+
+<table class="infowarn">
+<tr><td><img src="info.png" alt="Information"></td>
+<td>As only a single parameter can be used with a <b>select</b> command it is more efficient to use the criterion that selects the smallest set of the object when <b>if</b> statements are required to filter the list further. For example, if you wanted a list of all the objects that are being carried by the player that don't have a <b>mass</b> of <b>scenery</b>, the it would be more efficient to use the <b>select</b> command to find the objects that are children of the player and then <b>if</b> statements to check their mass. This is because there will generally be fewer objects in the game that are currently being carried by the player than objects with a <b>mass</b> that isn't set to <b>scenery</b>. If the <b>select</b> command has been used to find all the objects that aren't scenery, the <b>if</b> statement to check if each object is also carried by the player would need to be executed many more times.
+</td></tr></table>
+<h2><a class="section" name="flowcontrol7">The REPEAT and UNTIL Commands</a></h2>
+
+<P>A <B>repeat</B>... <B>until</B> loop allows you to repeat a section of code until a specified condition is true. The expression or expressions to be tested should follow the <B>until</B> statement, using the same syntax as an <B>if </B>statement. 
+
+<P>The following is an example of a <B>repeat</B>... <B>until</B> loop:
+
+<pre>
+set INDEX = 10
+repeat
+  write "DON'T PANIC! "
+  set INDEX - 1
+until INDEX = 0
+</pre>
+
+<table class="infowarn"><tr>
+<td><img src="warning.png" alt="Warning"></td>
+<td>
+<B>loop</B>...<B>endloop</B> loops and <B>repeat</B>...<B>until</B> loops cannot be nested within a single function. It is legal, however, to place a second loop within a function that is called from within the first loop. For example:
+
+<pre>
+{+print_objects
+set INDEX = 10
+loop noun3
+  write noun3{the} ^
+  execute "+print_children"
+endloop
+}
+
+{+print_children
+loop noun4
+  if noun3 grandof noun4
+     write "   " noun4{the} ^
+  endif
+endloop
+}
+</pre>
+
+<p>Note that it is legal, however, to nest a <b>repeat</b> loop inside an object <b>loop</b> or vice versa.
+
+</td>
+</tr></table>
+
+<h2><a class="section" name="flowcontrol8">The WHILE and ENDWHILE Commands</a></h2>
+
+<p>As a <b>repeat</b> loop will always happen at least once, if there is any chance that a loop should happen zero times, a <b>while</b> loop must be used. A <b>while</b> loop performs its test first, then executes the code following the expression if it evaluates to <b>true</b>. On reaching an <b>endwhile</b> command it will return to the matching <b>while</b> command and re-evaluate the expression. When the expression eventually evaluates to <b>false</b>, execution will continue from the line after the <b>endwhile</b> command. For example, the following function will output the value of the passed arguments:
+
+<pre>
+{+arg_values
+set INDEX = 0
+while INDEX != @arg
+  write "Argument" INDEX " = " arg[INDEX] ".^"
+  set INDEX + 1
+endwhile
+}
+</pre>
+
+<h2><a class="section" name="flowcontrol9">The RETURN Command</a></h2>
+
+<P><b>return</B> or <B>return true</B><br>
+The command <B>return</B> will stop execution of the current function and return to the next line after the corresponding <B>execute</B> command in the calling function. If the function containing the <b>return</b> command  was called internally by the JACL interpreter, processing will continue, eventually returning to the command prompt for the player's next move.
+
+<p><b>return false</b><br> 
+The command <B>return false</B> will stop execution of the current function just like a <b>return</b> command. When it returns, the JACL interpreter will behave as though the function it returned from did not exist, and was therefore not executed at all. This will, in the case of calls originating from <B>grammar</B> statements, cause the default action to occur.
+
+<P>The following is a demonstration of the use of <B>return false</B>:
+
+<pre>
+object bond: james bond
+
+{ask_about_bomb
+if bomb(parent) = limbo
+   return false ;The function +ask_about will now be
+               ; executed as though this function did
+               ; not exist.
+endif
+write "~I'm glad you asked...~^"
+}
+</pre>
+
+<p>This is a common technique in JACL games. Once the player has typed a command that refers to an object, the interpreter will attempt to execute the appropriate function that is associated with that object. For example, if the player was to type <b>ask bond about the bomb</b>, the interpreter would attempt to execute the function <b>ask_about_bomb</b> that is associated with the object <b>bond</b> (the function above). If this function does not exist, the function <b>+ask_about</b> will be called instead. When a <b>return false</b> command executed, the interpreter will behave as though the local function containing the <b>return false</b> does not exist. In essence, this allows a function to override the default result of a verb under some conditions and accept it under others.
+
+<!-- END OF BODY -->
+<p><a href="index.html">Back to Contents</b>
+</BODY>
+</HTML>

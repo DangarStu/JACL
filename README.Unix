@@ -1,0 +1,15 @@
+JACL Adventure Creation Language v4.0
+
+For a quick-start look at some of the games included with this distribution,
+change into the 'bin' directory and type, for example: 
+'./garjacl ../projects/grail.jacl'
+
+To use the multimedia-capable JACL interpreter 'garjacl', you will need to
+copy the file 'src/Gargoyle/libgarlk.so' to '/usr/lib'. Depending on
+you currently installed libraries, others libraries to support multimedia 
+may be needed.  For instructions and installation information see the 
+appropriate chapter in the Author's Guide (guide/installation.html).
+
+For console use, use the command:
+
+'./jacl ../projects/grail.jacl'

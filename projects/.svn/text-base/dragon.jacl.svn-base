@@ -1,0 +1,2096 @@
+#!../bin/jacl
+#ifid:JACL-003
+#                                                               THE DOWN DRAGON 
+# -----------------------------------------------------------------------------
+# Copyright (C) Stuart Allen 1998-2008. All rights reserved.
+#
+# -----------------------------------------------------------------------------
+
+constant game_title     "The Down Dragon"           
+constant game_author    "Stuart Allen"
+constant game_release    1
+constant game_build      1
+constant ifid           "JACL-003"
+
+# CONSTANTS FOR RESOURCES IN BLORB FILE
+constant image_dragon 1
+
+# -----------------------------------------------------------------------------
+
+attribute UP_POSITION CUSTOM2 CUSTOM3
+
+location tavern: tavern 
+ short			the "Rusty Sword Tavern"    
+ south          square
+ out            square
+
+{movement
+if destination != nowhere
+   write "You squint as you step back out into the light.^^"
+   return false
+endif
+write "The only way out of here is south, through the front doors.^"
+set time = false
+return
+}
+
+{look
+if here has VISITED
+   return
+endif
+print:
+   You can barely make out the back wall of this seedy bar through a
+   thick haze of smoke. Your nausea has begun to subside now that
+   you've acclimatised to the stench of stale beer\
+.
+if dragon hasnt DEAD
+   print:
+      , but the sorrowful wailing of a dragon sitting at the bar
+      continues to grate\
+   .
+endif
+write ". "
+print:
+   A grubby-looking man sits in the corner of the room with a group of 
+   unemployed fantasy extras while a barmaid who is making no attempt to
+   hide how much she hates her job is walking through the crowd.
+.
+endif
+#print:
+#  Running along the east wall of the tavern is a wooden bar.^^
+#.
+execute +details<bar
+write ^
+}
+
+{eachturn
+if @ = 2
+   if dragon hasnt DEAD
+      write "^The dragon indulges in a fit of pitiful crying then chugs "
+      write "down another pint.^"
+   endif
+endif
+if @ = 3
+   print:
+      ^The grubby-looking man ducks down beneath his table, tears a
+      small triangle out of a coaster then wedges it onto his nose.
+      Sitting up straight again, he yells out at the top of his
+      voice, ~Okay! Who threw that?!~^
+   .
+endif
+if @ = 4
+   if dragon hasnt DEAD
+      write "^Dragon cries!^"
+   endif
+endif
+if @ = 5
+   print:
+      ^~I've got a joke for you,~ the grubby-looing man says as he leans
+      forward across the table. ~These three guys walk into a bar\
+  .
+  write ": "
+  print:
+      an Inform programmer, a TADS programmer and a JACL programmer.
+      As they sit down at a table, the Inform programmer says, 'I bet you
+      a Midori and Lemonade that I can write a port of Rippled Flesh
+      faster than either of you.'^^
+      ~'Your on!' the other two reply after a short pause.
+      Ready to do battle, they all sit down, pull out their
+      notebook PCs and switch them on.~^
+   .
+endif
+if @ = 6
+   print:
+      ^~Well, who won?~ a man across the table asks.^^
+      ~No one,~ the grubby man replies. ~You see it turned out to be a
+      biker bar and all three of them got bashed for being geeks
+      before their PCs had even finished booting!~^
+   .
+endif
+if @ = 7 
+   print:
+      ^~Damned fools,~ the barmaid mumbles as she continues to clear
+      away a stack of empty glasses. ~Everyone knows bikers use Hugo.~^
+   .
+endif
+if @ = 8
+   if dragon hasnt DEAD
+      write "^Dragon cries!^"
+   endif
+endif
+if @ = 9
+   print:
+      ^A grubby-looking man sitting near the back of the room
+      grabs a bottle of red wine from the
+      barmaid's tray then slaps her on the arse as she turns to leave.
+      With practiced ease, he screws a bottle opener into the cork
+      then pushes down on the levers to open the bottle.^
+   .
+endif
+if @ = 10
+   print:
+      ^~Hey! Check it out!~ the grubby-looking man yells to the
+      women at his table as he holds the bottle opener vertically
+      against his chest. With a sleazy grin, he presses the handle
+      for the screw up and down repeatedly causing the tips of the
+      levers to describe small arcs across the region of his nipples.
+      ~Settle down sweet jugs,~ he shouts to a woman who wasn't even
+      paying him the slightest bit of attention. ~It's your turn
+      next.~^
+   .
+endif
+if @ = 11
+   write "^The grubby-looking man takes a swig of wine from the bottle "
+   write "then proceeds to pour everyone a glass, starting with himself.^"
+endif
+}
+
+object bowl: wooden bowl
+ has            CONTAINER
+ short          a "wooden bowl"
+ long           "There is a wooden bowl here.^"
+ mass           5
+ capacity       2
+ parent			bar
+
+{take
+if bowl(parent) != alcove : lever has UP_POSITION
+   return false
+endif
+if brass_rod(parent) = right_hole : brass_rod(parent) = left_hole
+   if copper_rod(parent) = right_hole : copper_rod(parent) = left_hole
+      write "The rods prevent you from being able to take the bowl out of "
+      write "the alcove.^"
+      return
+   endif
+endif
+if brass_rod(parent) = right_hole : brass_rod(parent) = left_hole
+   write "The brass cylindrical weight prevents you from being able "
+   write "to take the bowl out of the alcove.^"
+   return
+endif
+if copper_rod(parent) = right_hole : copper_rod(parent) = left_hole
+   write "The copper cylindrical weight prevents you from being able "
+   write "to take the bowl out of the alcove.^"
+   return
+endif
+return false
+}
+
+object grapes: bunch of grapes
+   short		a "bunch of grapes"
+   has			PLURAL
+   long			"There is a bunch of grapes here.^"
+   mass			5
+   parent		bowl
+
+grammar juice *present		>break
+grammar squash *present		>break
+grammar squeeze *present	>break
+grammar mash *present		>break
+
+{peel
+if @give_to_grubby_man_grapes = 0
+   write "You've got better things to be doing than peeling grapes.^"
+else
+   write "Have you no self respect?^"
+endif
+}
+
+{give_to_grubby_man
+print:
+   ~You've got plenty of time on your hands, peel them for me first.~^
+.
+}
+
+{break
+if grapes(parent) != bowl
+   print:
+      If you mash the grapes out of the bowl the juice will run everywhere.^
+   .
+   set time = false
+   return
+endif
+if bowl(parent) = alcove
+   if brass_rod(parent) = right_hole : brass_rod(parent) = left_hole : copper_rod(parent) = right_hole : copper_rod(parent) = left_hole
+      if lever hasnt UP_POSITION
+         write "You push the lever up then "
+         ensure lever has UP_POSITION
+      else
+         write "You "
+      endif
+   else
+      write "You "
+   endif
+   write "reach into the alcove and mash the grapes until they are "
+   write "nothing more than juice.^"
+else
+   write "You mash the grapes until they are nothing more than juice.^"
+endif
+move juice to bowl
+move grapes to limbo
+}
+
+{eat
+if @ > 3
+   print:
+      Okay, that's it. You obviously aren't responsible enough to look
+      after the grapes. I'm afraid I'm going to have to confiscate
+      them until you are responsible enough to look after them in an
+      appropriate manner. You want the grapes? WELL YOU CAN'T HANDLE THE 
+      GRAPES!^
+   .
+   move grapes to limbo
+   return
+endif   
+if @ = 3
+   write "What is your problem! LEAVE THE SMEGGING GRAPES ALONE!^"
+   return
+endif
+if @ = 2
+   write "No! How much more obvious do I have to make it: IF YOU EAT THE "
+   write "GRAPES YOU CAN'T WIN THE GAME. There, I said it.^"
+   return
+endif
+print:
+   But what if they are of some other use? If I let you eat them, you
+   might be getting your life into an unsolvable state, and then who
+   would you blame? Me. That's right, me.
+   I can see the newsgroup messages now: ~STUART BREAKS RULE #1 OF
+   PLAYER'S BILL OF RIGHTS~. Is that what you want? Is that what you
+   want me to become? Some sort of IF outcast? A loner on the
+   outskirts of IF acceptance? Okay, I know, I know... Anyway, go
+   find something else to do and stop trying to eat the grapes.^
+.
+}
+
+{examine
+print:
+   The grapes look very juicy.^
+.
+}
+
+object juice: grape juice
+ has            LIQUID
+ mass           5
+ parent         limbo
+
+{drink
+if trail(north) = antechamber
+   write "You chug down the grape juice to reward yourself for "
+   write "a puzzle well solved.^"
+   move juice to limbo
+else
+   write "No.^"
+   set time = false
+endif
+}
+
+object drink: drink beer ale lager
+ short      a "drink"
+
+{order
+write "You don't have a single yorkquid to your name.^"
+set time = false
+}
+
+grammar chat up *present	>talk_to
+grammar flirt with *present	>talk_to
+
+object barmaid: busty barmaid maid
+ short  a "barmaid"
+ has            ANIMATE FEMALE
+
+{attack_with_sword
+if @ = 1
+   print:
+      You leap forward swinging the sword only to be hit fair and
+      square on the nose by a well-thrown beer mug. Once you can see
+      clearly again you notice the barmaid standing in front of you
+      waving her finger and telling you to settle down.^
+   .
+   return
+endif
+write "Not after last time.^"
+}
+
+{examine
+write "The barmaid looks about as bored as humanly possible.^"
+}
+
+{ask_for_drink
+write "You don't have a yorkquid to your name.^"
+}
+
+{talk_to
+if @ != 1
+   write "I think you've had enough rejection for one day.^"
+   set time = false
+   return
+endif
+print:
+   Your brief attempt to chat up the barmaid comes to and end when
+   she asks what you do for a living. A fantasy IF actor with a job?
+   Yeah, right...^
+.
+}
+
+{kiss
+if @ = 1
+   print:
+      Without even looking the barmaid slaps you hard on the face the instant
+      you get within arm's length.^
+   .
+   return
+endif
+if @ = 2
+   print
+      This time you approach from a different side to give your other cheek
+      a rest.^
+   .
+   return
+endif
+print:
+   You have run out of cheeks.^
+.
+}
+
+{feel
+print:
+   A sharp slap on your hand sends a clear message.^
+.
+}
+
+{take
+print:
+   The last thing this barmaid is projecting is ~take me.~^
+.
+set time = false
+}
+
+{wink_at
+if @ = 1
+   print:
+      The barmaid scrunches her forehead and squints back at you. You smile at
+      first but then start to think that maybe she's taking the piss.^
+   .
+   return
+endif
+print:
+   Don't put us through that again. Go give it shot on your own once the game
+   is over maybe.^
+.
+}
+
+object grubby_man: grubby looking grubby-looking man grubby
+ has            ANIMATE
+ short          a "grubby-looking man"
+
+{examine
+print:
+   The grubby-looking man has an oily, red face, garnished with a thin
+   butt-fluff moustache. His grin, with its vaguely curled upper lip;
+   his eyes, rolling intermittently into the back of his lolling head;
+   and his rambling speech, punctuated with bursts of articulate
+   obscenities, all strike you as an omens of his imminent lapse into 
+   unconsciousness.^
+.
+}
+
+{attack_with_sword
+write "You attempt to walk over to the grubby-looking man but a repelled "
+write "by an invisible barrier. You dismiss any thoughts of the man having "
+write "Jedi powers when you realise that is it just his breath.^"
+}
+
+{talk_to
+if @ != 1
+   print:
+      ~Go on, get out of here! We don't need you and your false hope.~^
+   .
+   return
+endif
+print:
+   ~Look at you,~ the grubby-looking man spits as he stares you up and down.
+   ~You still think you are going to get another fantasy role one day, don't
+   you? Well forget it, it's over! They don't need us now with their new-age
+   romantic comedies. Are you going to sit at home spending your spare time
+   practicing being able to respond to a full-sentence parser. Baahhhrrrghhh!~
+   The exertion of this little speech seems to have given the grubby-looking
+   man the head spins, although he quickly recovers.^
+.
+}
+
+{ask_about_dragon
+if dragon has DEAD
+   print:
+      ~Don't worry about, he's used to getting killed in almost every game he
+      does.~^
+   .
+else
+   print:
+      ~He's probably worse off than any of us. Ever tried getting a role
+      in a sci-fi thriller as a dragon?~^
+   .
+endif
+}
+
+{kiss 
+write "ERROR 469: COMMAND TOO DISGUSTING - PLEASE DON'T CONTACT YOUR "
+write "SYSTEM ADMINISTRATOR^"
+}
+
+object extras : group of extras
+   short		the "extras"
+   has			PLURAL
+
+{examine
+print:
+  The extras are all on a path to self destruction. Unwilling or unable to 
+  make the leap from playing trolls, goblins and ogres to multi-dimensional
+  characters with multi-syllabic responses they sit here each day, drinking
+  themselves into oblivion.^
+.
+}
+
+{talk_to
+print:
+   ~Huh?~ the extras respond in slack-jawed response to your attempt to 
+   communicate.^
+.
+}
+
+object bar: bar counter
+ has            SURFACE
+ short          a "bar"
+ quantity       50
+
+{look_behind
+if sword hasnt TOUCHED
+   print:
+      There is a rusty sword hanging on the wall behind the bar.^
+   .
+   return
+endif
+print:
+   You a find a patch floor similar to the floor on this side of the bar.^
+.
+}
+
+object stool : bar counter stool
+   short		a "bar stool"
+   has			NOT_IMPORTANT
+
+{take
+if dragon has DEAD
+   return false
+else
+   print:
+      The dragon is sitting on the stool.^
+   .
+endif
+}
+
+object dragon: bleary-eyed dragon
+ has            ANIMATE
+ short          the "dragon"
+ long			"Patrons walk around a dragon lying dead on the floor.^"
+
+{examine
+if dragon has DEAD
+   write "The dragon is lying belly-up on the floor, quite dead.^^"
+   write "~Lucky bastard,~ you think.^"
+   return
+endif
+write "The dragon looks very down -- almost suicidal.^"
+}
+
+{attack_with_sword_override
+write "The dragon is far to drunk to defend himself.^^"
+write "~Oh the pain! the pain!~ he moans as he keels over backwards, "
+write "falling off his bar stool.^"
+ensure dragon has DEAD
+points 15
+set dragon(status) = 5
+set dragon(mass) = heavy
+}
+
+{talk_to_override
+write "~No job!~ the dragon blubbers, bursting into tears.^"
+}
+
+{hug
+print:
+   Your attempts to comfort the dragon appear unsuccessful.^
+.
+}
+
+{kiss
+write "Now you don't want "
+style bold
+write "another"
+style normal
+write " burnt tongue, do you?^"
+set time = false
+}
+
+object sword: rusty old broad sword
+ short      a "sword"
+ long       function
+ mass       10
+
+{long
+if sword hasnt TOUCHED 
+   write "Hanging on the wall behind the bar is a rusty old broad sword.^"
+else
+   write "A rusty old broad sword rests on the ground.^"
+}
+
+{give_to_dragon
+write "You would give a weapon to a dragon that is feeling suicidal? "
+write "For all you know he might kill himself before you get the chance. "
+write "Where's the fun in that?^"
+}
+
+{take_override
+if sword hasnt TOUCHED
+   write "A cloud of dust fills the air as you take the sword from its "
+   write "rack.^"
+   ensure sword has TOUCHED
+else
+   write "You take the sword.^"
+endif
+move sword to player
+}
+
+{examine
+write "The sword is rusty and chipped.^"
+}
+
+location square: square
+ short			the "square"
+ north          tavern
+ in             tavern
+ west           town
+
+{movement
+if destination = nowhere
+   print:
+      The only way from here is either back into the tavern or down the road
+      to the west.^
+   .
+   set time = false
+   return true
+endif
+return false
+}
+      
+{look
+if here has VISITED
+   return
+endif
+write "The hustle and bustle of city life at its worst. People rush "
+write "everywhere around this square leaving trails of turbulence behind "
+write "themselves in the foul polluted air. Some rush north to the bar, "
+write "some west to the village. Others just circle the square getting "
+write "nowhere and not enjoying the journey.^"
+}
+
+object people : people villagers
+ short		some "people"
+ has		NOT_IMPORTANT PLURAL
+
+location town: town
+ short			the "town"
+ east           square
+ south          club
+ west           road
+ north          studio
+
+{look
+if here has VISITED
+   return
+endif
+print:
+   The town centre is a bit on the quiet side. There are two buildings of 
+   note here: an austere office to the north and a ritzy-looking nightclub 
+   to the south. The road continues west.^
+.
+}
+
+object sign: sign
+   short		a "sign"
+   long		"There is a sign hanging above the doorway of the building to the north.^"
+   mass		heavy
+
+{read : examine
+write "IF Studios^^"
+write "Now coding the cyber-psycho-techno-thriller QUARKAZOID VII^"
+}
+
+location club: club
+ short			the "club"
+ north          town
+
+{look
+if here has VISITED
+   return
+endif
+print:
+   A world of glitz and glamour far removed from the town outside exists
+   within this crowded club.^
+.
+}
+
+{eachturn
+if outfit hasnt WORN
+   write "^~Sorry buddy -- no cloaks, no feathered hats and definitely no "
+   write "codpieces,~ a burly bouncer yells as he pushes you back out "
+   write "the door.^^"
+   move player to town
+   look
+   return
+endif
+if sword(parent) = player
+   write "^As you walk through the door, the bouncer places a huge "
+   write "palm against your chest to stop you.^^"
+   write "~I'll take that, sunshine,~ he says as he takes the sword "
+   write "from you. "
+   move sword to bouncer
+   if cloak(parent) = player
+      print:
+         ~Hey, and what's this?~ the bouncer asks grabbing the cloak from your
+	     arms. ~This isn't a dress-up party with a come-as-your-favourite-loser
+	     theme you know.~
+      .
+	  move cloak to bouncer
+   endif
+   write ^
+else
+   if cloak(parent) = player
+      print:
+         ~Hey, what's this?~ the bouncer asks grabbing the cloak from your
+	     arms. ~This isn't a dress-up party with a come as your favourite loser
+	     theme you know.~^
+      .
+      move cloak to bouncer
+   endif
+endif
+if club hasnt SCORED
+   points 20
+   ensure club has SCORED
+endif
+}
+
+object thief : fat satiated man thief seae chiffon
+   has			ANIMATE
+   short		name "Seae Chiffon"
+   long			"Seae Chiffon is sitting in the corner of the room.^"
+   mass			heavy
+
+{examine
+print:
+   A fat, satiated gentleman, Seae Chiffon is dressed in a new
+   Armarni suit.
+   You first met him many years ago back in the early days when he played a 
+   supporting role as a scrawny thief in a game you starred in. 
+   Three sci-fi thrillers and one comedy-romance later he
+   appears to have done quite well for himself.^
+.
+}
+
+{ask_about_studio : tell_about_script : ask_about_script : ask_for_job : ask_about_job
+if script(parent) = limbo
+   write "I think you might have already blown any chance of getting "
+   write "a job out of Seae.^"
+   return
+endif
+if script has SCORED
+   write "Don't worry, you've already got the part. Traitor.^"
+else
+   write "~Oh, you want in? No Problem, baby,~ the fat, "
+   write "satiated gentleman says. "
+   write "~I'll call the studio in the morning and tell Alfonzo he's out.~^"
+   if script hasnt SCORED
+      ensure script has SCORED
+   endif
+endif
+}
+
+{talk_to
+write "~Move with the times, baby,~ he advises cheerily.^^"
+write "~Fat bastard,~ you think grumpily.^"
+}
+
+{tell_about_big_chair
+if @sit_on_big_chair != 0
+   print:
+      ~I feel I need to tell you that I farted in your chair.~^^
+      Seae just looks at you, lost for words.^
+   .
+else
+   print:
+      ~I just wanted to say that I thought about sitting in your chair,~
+	  you confess to Seae.^^
+	  ~You're a wild man,~ Seae replies blandly.^
+   .
+endif
+}
+
+object job : support lead job role part in quarkazoid vii 7 seven 
+ short		a "part in Quarkazoid VII"
+ parent		thief
+
+object bouncer : burly bouncer man guard heavy big
+ has		ANIMATE POSSESSIVE
+ short		the "bouncer"
+ long		"There is a burly bouncer standing by the door.^"
+ mass		heavy
+
+{examine
+write "The bouncer is standing with his arms crossed and blank "
+write "expression on his face.^"
+}
+
+{talk
+write "Silence.^"
+}
+
+{attack
+write "It's been nice knowing you.^"
+execute "+game_over"
+}
+
+{ask_for_sword
+print:
+   ~What sword? I don't remember taking any sword from you.~^
+.
+}
+
+{ask_for_cloak
+print:
+   ~I had it burned.~^
+.
+}
+
+location studio : studio if studios
+   short		name "IF Studios"		
+   south		town
+   out			town
+   west			office
+   in			office
+
+{look
+if here has VISITED
+   return
+endif
+print:
+   It has been a while since you've been inside IF Studios. The last
+   game you did, a racy little number where the hero (a dashing
+   knight in shining armour) decides to slay the maiden and pork the
+   dragon, was a bit of a box-office flop. Auditions are currently on,
+   however, for a more avant-garde endeavour. It is about a butterfly
+   that is born with only one wing, yet learns to live on, bolstered
+   by the love of a small orphan boy that keeps it in a jar.
+   There is a narrow doorway to the west.^
+.
+}
+
+{movement
+if destination = nowhere
+   write "The only exits are south, back onto the street, and west, "
+   write "through the narrow doorway.^"
+   set time = false
+   return
+endif
+return false
+}
+
+object script: audition script
+   short		an "audition script"
+   long			"An audition script rests on the ground.^"
+   mass			1
+
+{read : examine
+if here = club
+   if script has SCORED
+      write "Don't worry, you've already got the part. Traitor.^"
+   else
+      write "You run through some of the commands in the script in an attempt "
+      write "to impress Seae.^^"
+      proxy "ask seae about script"
+   endif
+   return
+endif
+write "The script reads:^^"
+if gui_mode != MOBILE
+set linebreaks = false
+   style pre
+   write "BOY:             GENTLY CARESS JAR WHILE GAZING LOVINGLY^"
+   write "                 THROUGH THE GLASS^"
+   write "BUTTERFLY:       WAIT^"
+   write "BOY:             SAY TO BUTTERFLY, ~OH, HOW YOUR WILL TO^"
+   write "                 SURVIVE INSPIRES ME SO~^"
+   write "BUTTERFLY:       WINK^"
+   write "BOY:             LIFT THE JAR UP TOWARDS THE SUN, ALLOWING^"
+   write "                 THE GOLDEN RAYS OF LIGHT TO ILLUMINATE THE^"
+   write "                 BUTTERFLY'S ONE REMAINING WING^"
+   write "BUTTERFLY:       PREEN^"
+   write "BOY:             WIPE THE TEAR FROM MY EYE AND TOUCH THE^"
+   write "                 GLASS GENTLY WITH MY MOISTENED FINGER^"
+   write "BUTTERFLY:       STARE^"
+   write "BOY:             GENTLY PLACE THE JAR UPON THE VELVET^"
+   write "                 PILLOW PRESSING AND TWISTING IT UNTIL IT^"
+   write "                 IS SEATED SECURELY^^"
+   style normal
+   set linebreaks = true
+else
+   write "BOY: GENTLY CARESS JAR WHILE GAZING LOVINGLY THROUGH THE GLASS^"
+   write "BUTTERFLY: WAIT^"
+   write "BOY: SAY TO BUTTERFLY, ~OH, HOW YOUR WILL TO SURVIVE INSPIRES ME SO~^"
+   write "BUTTERFLY: WINK^"
+   write "BOY: LIFT THE JAR UP TOWARDS THE SUN, ALLOWING THE GOLDEN RAYS OF "
+   write "LIGHT TO ILLUMINATE THE BUTTERFLY'S ONE REMAINING WING^"
+   write "BUTTERFLY: PREEN^"
+   write "BOY: WIPE THE TEAR FROM MY EYE AND TOUCH THE GLASS GENTLY WITH MY "
+   write "MOISTENED FINGER^"
+   write "BUTTERFLY: STARE^"
+   write "BOY: GENTLY PLACE THE JAR UPON THE VELVET PILLOW PRESSING AND "
+   write "TWISTING IT UNTIL IT IS SEATED SECURELY^^"
+endif
+write "You feel you would have a good chance at getting the role of the "
+write "butterfly if you were able to wink.^"
+}
+
+{show_to_thief
+proxy "ask chiffon about script"
+}
+
+{break : insert_in_thief : eat
+ifall here = club 
+   write "You clearly express to the fat, satiated gentleman how you feel "
+   write "about the new genre of IF.^"
+   points 15
+   move script to limbo
+   return
+endif
+break false
+}
+
+location office: seae's office
+  short			name "Seae's Office"
+  east          studio
+  out			studio
+
+{look
+if here has VISITED
+   return
+endif
+print:
+   Eccentric and oddly pompous -- this office is unmistakably Seae
+   Chiffon's, the boss here at IF Studios.
+   Fortunately for you, however, he is not around at the moment so you
+   are free to take a seat in his plush leather chair. The last time
+   you were in this office you were sitting on the small chair opposite,
+   sweating profusely. The takings from your last game hadn't been good
+   and you were being told why in no uncertain terms.
+   86% of all critics used the term ~has been~ somewhere in their
+   review; 13% called you a ~never was~. One final write-up had been
+   quite kind, but the fact that its author coincidentally shared your
+   surname was unfortunate to say the least.
+   The only other piece of furniture is a large grandfather clock\
+.
+if clock(status) = true
+   print:
+      , its ominous tick giving Seae the psychological edge in any 
+      negotiations he conducts here
+   .
+endif
+write ".^"
+}
+
+{listen
+if clock(status) = true
+   write "You can hear the sound of the grandfather clock ticking loudly.^"
+else
+   write "You can hear an ominous silence that tells you that you better "
+   write "not be around when Mr Chiffon returns.^"
+endif
+}
+
+object big_chair : big leather chair seat
+  short         a "big leather chair"
+
+{examine
+print:
+   The leather chair is large and well padded with a high back and high arms
+   giving it the air of a throne.^
+.
+}
+
+{sit_on : use
+if @ = 1
+   print:
+      You slowly sink into the big leather chair as if it was a nice hot bath,
+      then smile to yourself as you blow a few bubbles. A sound out in the 
+      foyer turns your smile into a look of terror as you leap out of the 
+      chair, but it was just the wind blowing the sign about.^
+   .
+   return
+endif
+print:
+   Once was enough.^
+.
+}
+
+object small_chair : small rickety chair
+  short         a "small rickety chair"
+
+{examine
+print:
+   The rickety chair is made from timber and appears to have had the legs
+   cut down to make any occupant sit just that little bit lower.^
+.
+}
+
+{sit_on : use
+if @sit_on_big_chair = 0
+   print:
+      Seae isn't in, you don't have to sit in the rickety chair this time.^
+   .
+   return
+else
+   print:
+      You sit briefly on the rickety chair, somehow re-affirming your place
+      in the world.^
+   .
+endif
+}
+
+object clock : grandfather clock door
+  has           CONTAINER CLOSABLE CLOSED
+  short         a "grandfather clock"
+  status        true
+  quantity      40
+
+{examine
+write "The grandfather clock is made from finely-crafted wood and stands "
+write "about six feet tall. "
+if clock has CLOSED
+   write "A tall door, which is currently closed, stretches from the "
+   write "clock face down to the solid base.^"
+   return
+endif
+write "Through the clock's open door you can see a "
+if clock(status) = true
+   write "swinging"
+else
+   write "still"
+endif
+write " pendulum, hanging from the mechanism behind the clock's face. "
+write "Behind top of this pendulum a fine chain loops over a cog. The "
+write "chain is made from flat, oval-shaped links and has a small hook "
+write "at each end. "
+execute "+weights"
+}
+
+object pendulum : pendulum
+  short			a "pendulum"
+  has			NOT_IMPORTANT
+  parent		clock
+
+object chain : fine chain
+  short         a "fine chain"
+  parent        clock
+  mass          2
+
+{examine
+write "The chain loops over a cog that has a tight-fitting guard "
+write "surrounding its top half. It is made from flat, "
+write "oval-shaped links and has a small hook at each end. "
+execute "+weights"
+}
+
+{+weights
+if brass_rod(status) = true
+   if copper_rod(status) = true
+      write "There is a brass weight hanging from one hook and copper "
+      write "weight hanging from the other."
+endall
+if brass_rod(status) = true
+   if copper_rod(status) = false
+      write "A brass weight attached to one of the hooks rests in the "
+      write "bottom of the clock while the other hook dangles "
+      write "high up near the cog."
+endall
+if brass_rod(status) = false
+   if copper_rod(status) = true
+      write "A copper weight attached to one of the hooks rests in the "
+      write "bottom of the clock while the other hook dangles high up near "
+      write "the cog."
+endall
+write ^
+}
+
+{take
+write "The chain loops over a cog that has a tight-fitting guard "
+write "surrounding its top half. "
+if brass_rod(parent) = chain
+   if copper_rod(parent) = chain
+      write "With a large weight attached to each end of the chain it is "
+      write "impossible to remove it.^"
+      set time = false
+      return
+endall
+write "Although the hooks on each end of the chain are small, they are "
+write "still too large to fit through the guard.^"
+set time = false
+}
+
+object brass_rod: brass cylinder rod weight loop
+  short         a "cylindrical brass weight"
+  plural		rods weights cylinders
+  parent        clock
+  status        1
+  mass          4
+
+{take_override
+if copper_rod(status) = true
+   if brass_rod(status) = true
+      write "Supporting the copper weight, you carefully unhook the brass "
+      write "one. Without anything to balance it, you slowly lower the "
+      write "copper weight to rest in the bottom of the clock.^"
+      move brass_rod to player
+      set brass_rod(status) = false
+      ensure brass_rod has TOUCHED
+      set clock(status) = false
+      return
+endall
+if brass_rod(status) = true
+   write "You take the brass weight, unhooking it from the chain.^"
+   move brass_rod to player
+   set brass_rod(status) = false
+   ensure brass_rod has TOUCHED
+   set clock(status) = false
+   return
+endif  
+return false      
+}
+
+{examine
+print:
+   The weight is cylindrical in shape, about one inch in diameter and
+   about eight inches long. It is made from highly-polished brass and has
+   a very small loop at one end and the word ~NEGATIVE~ engraved in 
+   the other.^
+.
+}
+
+{insert_in_left_hole : insert_in_right_hole
+if copper_rod(parent) = noun2
+   if lever has UP_POSITION
+      write  noun2{The} " is already filled with the "
+      write "cylindrical copper weight.^"
+   else
+      write  noun2{The} " already has the cylindrical copper weight "
+      write "protruding out from it.^"
+   endif
+else
+   if lever has UP_POSITION
+      write "You slide " noun1{the} " almost entirely into "
+      write noun2{the} " where it clicks into place.^"
+   else
+      write "You slide " noun1{the} " about an inch up into " noun2{the}
+      write " where it clicks into place, its lower end dangling three inches "
+      write "above the bottom of the alcove.^"
+   endif
+   set noun1(parent) = noun2
+endif
+}
+
+object copper_rod: copper cylinder rod weight loop
+  short         a "cylindrical copper weight"
+  plural		rods weights cylinders
+  parent        clock
+  status        true
+  mass          4
+
+{take_override
+if copper_rod(status) = true
+   if brass_rod(status) = true
+      write "Supporting the brass weight, you carefully unhook the copper "
+      write "one. Without anything to balance it, you slowly lower the "
+      write "brass weight to rest in the bottom of the clock.^"
+      move copper_rod to player
+      ensure copper_rod has TOUCHED
+      set copper_rod(status) = false
+      set clock(status) = false
+      return
+endall
+if copper_rod(status) = true
+   write "You take the copper weight, unhooking it from the chain.^"
+   move copper_rod to player
+   ensure copper_rod has TOUCHED
+   set copper_rod(status) = false
+   set clock(status) = false
+   return
+endif  
+return false      
+}
+
+{examine
+print:
+   The weight is cylindrical in shape, about one inch in diameter and
+   about eight inches long. It is made from copper and has
+   a very small loop at one end and the word ~POSITIVE~ engraved in 
+   the other.^
+.
+}
+
+{insert_in_left_hole : insert_in_right_hole
+if brass_rod(parent) = noun2
+   if lever has UP_POSITION
+      write  noun2{The} " is already filled with the "
+      write "cylindrical brass weight.^"
+   else
+      write  noun2{The} " already has the cylindrical brass weight "
+      write "protruding out from it.^"
+   endif
+else
+   if lever has UP_POSITION
+      write "You slide " noun1{the} " almost entirely into "
+      write noun2{the} " where it clicks into place.^"
+   else
+      write "You slide " noun1{the} " about an inch up into " noun2{the}
+      write " where it clicks into place, its lower end dangling three inches "
+      write "above the bottom of the alcove.^"
+   endif
+   set noun1(parent) = noun2
+endif
+}
+
+{clean
+write "I don't mean to be impolite, but it really doesn't look much better.^"
+}
+
+location road: road
+ east           town
+ out            pasture
+
+{movement
+if compass = west
+   print:
+      You contemplate walking out into the desert like a sick dog looking for
+      somewhere quiet to die. You take one step, then another. You pause and
+      look over your shoulder, tears welling in your eyes as you think back 
+      on a life-time of unfulfilled promise. ~Not today...~ you think as you 
+      turn back. ~Things to see, people to do.~^
+   .
+   return
+endif
+return false
+}
+
+{look
+if here has VISITED
+   return
+endif
+print:
+   Long, rocky and tedious. It frightens you how much this road reminds
+   you of your career. To the east, at its start, lies the bustling
+   excitement of the town centre. To the west, at its end, lies a
+   desert.^
+.
+}
+
+object road_sign: crooked road sign
+ short      a "crooked road sign"
+ long      "A crooked road sign stands nearby.^"
+ mass           heavy
+
+{examine : read
+write "The sign reads:^^"
+write "  EAST TO LIFE^"
+write "  WEST TO DEATH^"
+write "  OUT TO PASTURE^"
+}
+
+location pasture: pasture
+ in          road
+ north	     trail
+
+{look
+if here has VISITED
+   return
+endif
+print:
+   A comfortable feeling of relief comes over you in this pasture, away
+   from the cut-throat pace of the town. You've always hated the way
+   people judge you there, but for some reason you always seem to
+   return. To the north, through a thick clump of bushes, a trail
+   beckons.^
+.
+}
+
+{wait
+write "It is with pleasure that you spend some quiet time in these "
+write "relaxing surroundings.^"
+}
+
+object bushes : thick clump of bushes
+  short		a "thick clump of bushes"
+
+{examine
+write "They are a pretty ordinary clump of bushes.^"
+}
+
+location trail : trail
+   south		pasture
+   north		nowhere
+   in			nowhere
+
+{look
+if here has VISITED
+   return
+endif
+write "The north end of this trail ends at a rocky cliff-face. "
+write "There is a small alcove set into the cliff-face just beside a "
+if stone_door has CLOSED
+   write "large set of closed double doors. "
+else
+   write "large open doorway. "
+endif
+print:
+   Next to the alcove is a long-handled lever while above it, looking 
+   remarkably out of place, is the red domed cover of an electric light.^ 
+.
+}
+
+{movement
+if compass = north
+   if destination = nowhere
+      write "The large double doors are closed.^"
+      return
+   endif
+endif
+return false
+}
+
+object cliff : rocky cliff face cliff-face
+  short			a "rocky cliff-face"
+
+{examine
+write "There is a small alcove set into the cliff-face just beside a "
+if stone_door has CLOSED
+   write "large set of closed double doors. "
+else
+   write "large open doorway. "
+endif
+print:
+   Next to the alcove is a long-handled lever while above it, looking 
+   remarkably out of place, is the red domed cover of an electric light.^ 
+.
+}
+
+object light : red domed cover electric light
+  short			a "red light"
+
+{examine
+if stone_door has CLOSED
+   write "The red light is currently off.^"
+else
+   write "The red light is currently on.^"
+endif
+}
+
+object stone_door : large double stone door doors
+  has           CLOSED PLURAL CLOSABLE
+  short         a "large double doors"
+
+{examine
+if stone_door has CLOSED
+   write "The large double doors are closed.^"
+else
+   write "The large double doors are open.^"
+endif
+}
+
+{open_override
+write "You see no obvious way to open the large double doors.^"
+}
+
+{close_override
+write "You see no obvious way to close the large double doors.^"
+}
+
+object alcove : small alcove
+  has           CONTAINER
+  quantity      5
+  short         an "alcove"
+
+{examine
+write "The alcove is ten cubic centimetres in size. In the roof of the "
+write "alcove are two small holes. "
+execute "+contents<alcove"
+write " "
+if lever has UP_POSITION 
+   if brass_rod(parent) = right_hole
+      if copper_rod(parent) = left_hole
+         write "There is a brass cylindrical weight protruding about "
+         write "an inch from the right hole and a "
+         write "copper one from the left.^"
+         return
+      endif
+   endif
+   if brass_rod(parent) = left_hole
+      if copper_rod(parent) = right_hole
+         write "There is a copper cylindrical weight protruding about "
+         write "an inch from the right hole and a "
+         write "brass one from the left.^"
+         return
+      endif
+   endif
+   if copper_rod(parent) = right_hole
+      if brass_rod(parent) != left_hole
+         write "There is a copper cylindrical weight protruding about "
+         write "an inch from the right hole.^"
+         return
+      endif
+   endif
+   if copper_rod(parent) = left_hole
+      if brass_rod(parent) != right_hole
+         write "There is a copper cylindrical weight protruding about "
+         write "an inch from the left hole.^"
+         return
+      endif
+   endif
+   if brass_rod(parent) = right_hole
+      if brass_rod(parent) != left_hole
+         write "There is a brass cylindrical weight protruding about "
+         write "an inch from the right hole.^"
+         return
+      endif
+   endif
+   if brass_rod(parent) = left_hole
+      if brass_rod(parent) != right_hole
+         write "There is a brass cylindrical weight protruding about "
+         write "an inch from the left hole.^"
+         return
+      endif
+   endif
+else
+   if brass_rod(parent) = right_hole
+      if copper_rod(parent) = left_hole
+         write "There is a brass cylindrical weight protruding "
+         write "from the right hole and a copper one from the left. "
+         if bowl(parent) = alcove
+            write "The weights reach down into the wooden bowl.^"
+         else
+            write "The weights reach down to about three inches from the "
+            write "bottom of the alcove.^"
+         endif
+         return
+      endif
+   endif
+   if brass_rod(parent) = left_hole
+      if copper_rod(parent) = right_hole
+         write "There is a copper cylindrical weight protruding "
+         write "from the right hole and a brass one from the left. "
+         if bowl(parent) = alcove
+            write "The weights reach down into the wooden bowl.^"
+         else
+            write "The weights reach down to about three inches from the "
+            write "bottom of the alcove.^"
+         endif
+         return
+      endif
+   endif
+   if copper_rod(parent) = right_hole
+      if brass_rod(parent) != left_hole
+         write "There is a copper cylindrical weight protruding "
+         write "the right hole. "
+         if bowl(parent) = alcove
+            write "The weight reaches down into the wooden bowl.^"
+         else
+            write "The weight reaches down to about three inches from the "
+            write "bottom of the alcove.^"
+         endif
+         return
+      endif
+   endif
+   if copper_rod(parent) = left_hole
+      if brass_rod(parent) != right_hole
+         write "There is a copper cylindrical weight protruding "
+         write "from the left hole. "
+         if bowl(parent) = alcove
+            write "The weight reaches down into the wooden bowl.^"
+         else
+            write "The weight reaches down to about three inches from the "
+            write "bottom of the alcove.^"
+         endif
+         return
+      endif
+   endif
+   if brass_rod(parent) = right_hole
+      if brass_rod(parent) != left_hole
+         write "There is a brass cylindrical weight protruding "
+         write "from the right hole. "
+         if bowl(parent) = alcove
+            write "The weight reaches down into the wooden bowl.^"
+         else
+            write "The weight reaches down to about three inches from the "
+            write "bottom of the alcove.^"
+         endif
+         return
+      endif
+   endif
+   if brass_rod(parent) = left_hole
+      if brass_rod(parent) != right_hole
+         write "There is a brass cylindrical weight protruding "
+         write "from the left hole. "
+         if bowl(parent) = alcove
+            write "The weight reaches down into the wooden bowl.^"
+         else
+            write "The weight reaches down to about three inches from the "
+            write "bottom of the alcove.^"
+         endif
+         return
+      endif
+   endif
+endif
+write ^
+}
+
+{enter
+write "The alcove is only about a foot square.^"
+}
+
+object left_hole : left hole
+  has			CONTAINER
+  long			"There is a left hole here.^"
+  short			a "left hole"
+  plural		holes 
+  quantity		0
+  
+{examine
+if lever has UP_POSITION
+   # The rods is retracted.
+   if brass_rod(parent) = left_hole : copper_rod(parent) = left_hole
+      if brass_rod(parent) = left_hole
+         write "The brass rod is almost completely within the left hole, "
+         write "only about an inch is left protruding.^"
+      else
+         write "The copper rod is almost completely within the left hole, "
+         write "only about an inch is left protruding.^"
+      endif
+   else
+      write "The left hole is about one inch in diameter"
+      write " and about seven inches deep.^"
+   endif
+   return
+else
+   # The rods are protruding.
+   if brass_rod(parent) = left_hole : copper_rod(parent) = left_hole
+      if brass_rod(parent) = left_hole
+         write "The brass rod is protruding from the left hole by "
+         write "about seven inches, almost to the bottom of the alcove.^"
+      else
+         write "The copper rod is protruding from the left hole by "
+         write "about seven inches, almost to the bottom of the alcove.^"
+      endif
+   else
+      write "The left hole is about one inch in diameter"
+      write " and about one inch deep.^"
+   endif
+   return
+endif
+}
+
+object right_hole : right hole
+  has			CONTAINER
+  long			"There is a right hole here.^"
+  short			the "right hole"
+  plural		holes 
+  quantity		0
+
+{examine
+if lever has UP_POSITION
+   # The rods is retracted.
+   if brass_rod(parent) = right_hole : copper_rod(parent) = right_hole
+      if brass_rod(parent) = right_hole
+         write "The brass rod is almost completely within the right hole, "
+         write "only about an inch is right protruding.^"
+      else
+         write "The copper rod is almost completely within the right hole, "
+         write "only about an inch is right protruding.^"
+      endif
+   else
+      write "The right hole is about one inch in diameter"
+      write " and about seven inches deep.^"
+   endif
+   return
+else
+   # The rods are protruding.
+   if brass_rod(parent) = right_hole : copper_rod(parent) = right_hole
+      if brass_rod(parent) = right_hole
+         write "The brass rod is protruding from the right hole by "
+         write "about seven inches, almost to the bottom of the alcove.^"
+      else
+         write "The copper rod is protruding from the right hole by "
+         write "about seven inches, almost to the bottom of the alcove.^"
+      endif
+   else
+      write "The right hole is about one inch in diameter"
+      write " and about one inch deep.^"
+   endif
+   return
+endif
+}
+
+object lever : long-handled lever
+  has		UP_POSITION
+  long		"There is a lever here."
+  short		a "lever"
+
+{examine
+write "The lever is current in the "
+if lever has UP_POSITION
+   write "up position.^"
+else
+   write "down position.^"
+endif
+}
+
+{move
+if lever has UP_POSITION
+   write "The lever is already in the up position.^"
+   return
+endif
+ensure lever has UP_POSITION
+if brass_rod(parent) = right_hole : brass_rod(parent) = left_hole
+   if copper_rod(parent) = right_hole : copper_rod(parent) = left_hole
+      write "As you push the lever the two cylindrical weights retract "
+      write "back into the holes in the roof of the alcove.^"
+      return
+   endif
+endif
+if brass_rod(parent) = right_hole
+   write "As you push the lever the cylindrical brass weight "
+   write "retracts back up into the roof of the alcove.^"
+   return
+endif
+if brass_rod(parent) = left_hole
+   write "As you push the lever the cylindrical brass weight "
+   write "retracts back up into the roof of the alcove.^"
+   return
+endif
+if copper_rod(parent) = right_hole
+   write "As you push the lever the cylindrical copper weight "
+   write "retracts back up into the roof of the alcove.^"
+   return
+endif
+if copper_rod(parent) = left_hole
+   write "As you push the lever the cylindrical copper weight "
+   write "retracts back up into the roof of the alcove.^"
+   return
+endif
+write "You push the lever into the up position.^"
+}
+
+{pull
+if lever hasnt UP_POSITION
+   write "The lever is already in the down position.^"
+   return
+endif
+loop
+   if noun3(parent) = alcove
+      if noun3 != bowl
+         if noun3(mass) > 4
+            return +rods
+         endif
+      endif
+   endif
+endloop
+ensure lever hasnt UP_POSITION
+if bowl(parent) = alcove
+   if brass_rod(parent) = right_hole : brass_rod(parent) = left_hole
+      if copper_rod(parent) = right_hole : copper_rod(parent) = left_hole
+         write "As you pull the lever the two cylindrical weights emerge "
+         write "from the holes in the roof of the alcove and lower into "
+         write "the bowl"
+         if juice(parent) = bowl
+            write ". Moments later the ground begins to shake in a rather "
+            write "cliched fashion and the large double doors open.^"
+            points 25
+            ensure stone_door hasnt CLOSED
+            set trail(north) = antechamber
+            set trail(in) = antechamber
+         endif
+         if grapes(parent) = bowl
+            write " pushing the grapes aside."
+         endif
+         write "^"
+         return
+      endif
+   endif
+   if brass_rod(parent) = right_hole
+      write "As you pull the lever the cylindrical brass weight "
+      write "emerges from the right hole in the roof of the alcove and lowers "
+      write "into the bowl.^"
+      return
+   endif
+   if brass_rod(parent) = left_hole
+      write "As you pull the lever the cylindrical brass weight "
+      write "emerges from the left hole in the roof of the alcove and lowers "
+      write "into the bowl.^"
+      return
+   endif
+   if copper_rod(parent) = right_hole
+      write "As you pull the lever the cylindrical copper weight "
+      write "emerges from the right hole in the roof of the alcove and lowers "
+      write "into the bowl.^"
+      return
+   endif
+   if copper_rod(parent) = left_hole
+      write "As you pull the lever the cylindrical copper weight "
+      write "emerges from the left hole in the roof of the alcove and lowers "
+      write "into the bowl.^"
+      return
+   endif
+   write "You pull the lever into the down position.^"
+else ; the bowl is not in the alcove
+   if brass_rod(parent) = right_hole : brass_rod(parent) = left_hole
+      if copper_rod(parent) = right_hole : copper_rod(parent) = left_hole
+         write "As you pull the lever the two cylindrical weights emerge "
+         write "from the holes in the roof of the alcove and lower to "
+         write "within three inches of the base of the alcove.^"
+         return
+      endif
+   endif
+   if brass_rod(parent) = right_hole
+      write "As you pull the lever the cylindrical brass weight "
+      write "emerges from the right hole in the roof of the alcove and lowers "
+      write "to within three inches of the base of the alcove.^"
+      return
+   endif
+   if brass_rod(parent) = left_hole
+      write "As you pull the lever the cylindrical brass weight "
+      write "emerges from the left hole in the roof of the alcove and lowers "
+      write "to within three inches of the base of the alcove.^"
+      return
+   endif
+   if copper_rod(parent) = right_hole
+      write "As you pull the lever the cylindrical copper weight "
+      write "emerges from the right hole in the roof of the alcove and lowers "
+      write "to within three inches of the base of the alcove.^"
+      return
+   endif
+   if copper_rod(parent) = left_hole
+      write "As you pull the lever the cylindrical copper weight "
+      write "emerges from the left hole in the roof of the alcove and lowers "
+      write "to within three inches of the base of the alcove.^"
+      return
+   endif
+   write "You pull the lever into the down position.^"
+endif
+}
+
+location antechamber : antechamber long dark passage
+   short		the "long dark passage"
+   south		trail
+   out			trail
+   north		show_room
+
+{look
+if here has VISITED
+   return
+endif
+write "You are in a long dark passage that runs north-south. At the "
+write "northern end you can see a bright light.^"
+}
+
+{movement
+if destination = false
+   write "The passage runs north-south.^"
+   return
+endif
+return false
+}
+
+location show_room : show_room
+   short		the "show room"
+   south		antechamber
+
+{look
+if here has VISITED
+   return
+endif
+write "There are many spotlights attached to the domed ceiling "
+write "of this room, all focused on a clothes rack in the very "
+write "middle of the floor. "
+execute "+details<rack"
+write "^"
+}
+
+object outfit : sparkling sequin outfit
+  has           WEARABLE
+  short         a "sparkling sequin outfit"
+  long			"There is a sparkling sequin outfit here.^"
+  mass			10
+  parent		rack
+
+{wear_override
+if cloak has WORN
+   write "You can't put the outfit on over your cloak.^"
+   return
+endif
+write "You slip into the sparkling sequin outfit. Groovy.^"
+ensure outfit has WORN
+}
+
+{remove_override
+if here != club
+   return false
+endif
+print:
+   The room goes completely silent. No, wait, somebody
+   has just broken the ice with a wolf whistle. What's left of the ice
+   has now been completely shattered by the ensuing
+   laughter. But wait! One fair maiden is not laughing. No, in fact she
+   stares with much admiration in her eyes.^^
+   ~I love a man who's not afraid to show his true colours,~ she
+   whispers into your ear. ~Take me you big, butch fantasy-IF actor.~^^
+   One year later...^^
+   You are in the pasture just outside of town. A simple hut
+   stands in the centre, built with your own hands. Mary sits in the sun
+   beside the hut playing with your new-born triplets, each one clad in a
+   codpiece nappy.^^
+.
+points 25
+execute "+game_over"
+}
+
+object rack : rack
+ has		SURFACE
+ short		the "rack"
+ capacity	20 
+ 
+object spotlights : spotlights lights
+   has			OUT_OF_REACH PLURAL
+   short		the "spotlights"
+
+object kryten: myself self me
+   has			ANIMATE
+   short		name "yourself"
+   quantity		98
+   parent		tavern
+   player
+
+{attack
+if kryten has UP_POSITION
+   write "I now pronounce you a genuine has-been.^"
+   execute "+game_over"
+endif
+write "Kill yourself, hey? Probably a good idea. After all, it's better to "
+write "burn out than to fade away...^"
+ensure kryten has UP_POSITION
+}
+
+{examine
+execute "+inventory"
+}
+
+{take
+write "Seriously?^"
+set time = false
+}
+
+object boots: leather boots
+   has			WEARABLE WORN PLURAL
+   short		"a pair of" "leather boots"
+   long			"Your boots are here.^"
+   mass			5
+   parent		kryten
+
+
+object codpiece: leather codpiece
+   has			WEARABLE WORN
+   short		a "leather codpiece"
+   mass			4
+   parent		kryten
+
+{remove
+print:
+   Ever since your career as a fantasy adventurer has been on the slide
+   you have considered doing some AIF but you've always worried
+   that one day your mother would play it.^
+.
+}
+
+{examine
+write "It looks a lot better since you stuffed those old rags in it.^"
+}
+
+object cloak: long cloak
+   has			WEARABLE WORN
+   short		a "long cloak"
+   long			"Your cloak is lying on the ground here.^"
+   mass			8
+   parent		kryten
+
+{examine
+print:
+  You ~borrowed~ it from wardrobe during your last job. At the time
+  you thought it would be good for your image, but now you're not so
+  sure.^
+.
+}
+
+{wear
+if outfit has WORN
+   write "It would be such a shame to cover such a fine outfit with "
+   write "the cloak.^"
+   return
+endif
+return false
+}
+
+{+eachturn
+if dragon(status) <> 0
+   set dragon(status) - 1
+   if dragon(status) = 0
+      write "^Oh, and in case you're wandering why "
+      write "you got points for killing a poor "
+      write "defenceless dragon for no established reason, don't be "
+      write "so naive. You ALWAYS get points for killing the dragon! "
+      write "And anyway, it's not like a dragon has any productive "
+      write "role to play in modern IF.^"
+   endif
+endif
+}
+
+{+about
+style note
+write game_title ^
+style normal
+write "Copyright (c) 2008 " game_author "^"
+write "Release " game_release " / build " game_build
+write " / JACL verb.library version " library_version
+write "^^The game is dedicated to David Cornelson. How did I miss your "
+write "DragonComp?^"
+set time = false
+}
+
+grammar wink at *present >wink_at
+
+{wink_at
+if noun1 hasnt ANIMATE
+   write "You practice winking (without success) at " noun1{the} .^
+   return true
+endif
+}
+
+grammar wink >wink
+
+{+wink
+set INDEX = @
+set INDEX % 3
+if INDEX = 0
+   print:
+      I agree that practice makes perfect, but trust me, you aren't going to
+      master this particular skill in any great hurry.^
+   .
+   return
+endif
+print:
+   Try as you might, your muscled brow lowers en masse resulting in a
+   dense, slow-motion blink.^
+.
+}
+
+grammar blink >blink
+
+{+blink
+print:
+   Your muscled brow lowers on mass resulting in a dense, slow-motion 
+   blink that, to you, feels completely different from your winks.^
+.
+}
+
+grammar preen >preen
+
+{+preen
+if here = club
+   if script has SCORED
+      write "Don't worry, you've already got the part. Traitor.^"
+   else
+      print:
+         You flick your long golden hair back behind your shoulders.
+         Impressed by your skills Seae's eyes light up,
+      .
+      proxy "ask seae about script"
+   endif
+   return
+endif
+print:
+   You flick your long golden hair back behind your shoulders.^
+.
+}
+
+grammar stare >stare
+
+{+stare
+if here = club
+   if script has SCORED
+      write "Don't worry, you've already got the part. Traitor.^"
+   else
+      print:
+         That one your have mastered. Sometimes when you do it, people even 
+         mistake it for thinking. Impressed by your skills Seae's eyes 
+         light up,
+      .
+      proxy "ask seae about script"
+   endif
+   return
+endif
+print:
+   That one your have mastered. Sometimes when you do it, people even mistake
+   it for thinking.^
+.
+}
+
+grammar stare at *present >examine
+
+{+intro
+clear
+if interpreter = GLK
+   image image_dragon
+endif
+write "^^WARNING: "
+write "This game contains coarse language, sexual references, "
+write "adult themes, low-level violence, extremely poor-taste 'humour', "
+write "in-jokes, self-reference and a dragon.^"
+if interpreter = GLK 
+   if graphics_supported = false
+      style header
+      write "^^T H E   D O W N    D R A G O N^^"
+      style normal
+   else
+      write "^^"
+   endif
+endif
+write "Copyright (c) 2008 " game_author ".^"
+write "Release " game_release " / build " game_build
+write " / JACL verb.library version " library_version ".^^"
+write "As a fantasy adventurer, the only commands you've used in a while have "
+write "been WAIT, DOWN and OUT. But look on the bright side, at least "
+write "you're not the only one...^^"
+set player = kryten 
+set player(parent) = tavern
+more
+clear
+execute "+look_around"
+}
+ 
+{+rods
+if copper_rod(parent) = left_hole : copper_rod(parent) = right_hole
+   if brass_rod(parent) = left_hole : brass_rod(parent) = right_hole
+      write "As you try to pull the lever, the rods being to protrude "
+      write "only to hit " noun3{the} ", preventing you from pulling the "
+      write "lever any further.^"
+      return
+   endif
+endif
+if copper_rod(parent) = left_hole : copper_rod(parent) = right_hole
+   write "As you try to pull the lever, the copper rod begins to protrude "
+   write "only to hit " noun3{the} ", preventing you from pulling the "
+   write "lever any further.^"
+   return
+endif
+if brass_rod(parent) = left_hole : brass_rod(parent) = right_hole
+   write "As you try to pull the lever, the brass rod begins to protrude "
+   write "only to hit " noun3{the} ", preventing you from pulling the "
+   write "lever any further.^"
+   return
+endif
+return false
+}
+
+{+before_insert_in
+if noun2 = left_hole : noun2 = right_hole
+   loop
+      if noun3(parent) = alcove
+         if noun3(mass) > 4
+            write "With " noun3{the} " in the way, you are unable to put "
+            write noun1{the} " in " noun2{the} .^
+            return
+         endif
+      endif
+   endloop
+endif
+if noun2 = alcove
+   if noun1(mass) > 4
+      if lever hasnt UP_POSITION
+         if copper_rod(parent) = left_hole : copper_rod(parent) = right_hole
+            if brass_rod(parent) = left_hole : brass_rod(parent) = right_hole
+               write "The weights are in the way.^"
+               return
+            endif
+         endif
+         if copper_rod(parent) = left_hole : copper_rod(parent) = right_hole
+            write "The copper weight is in the way.^"
+            return
+         endif
+         if brass_rod(parent) = left_hole : brass_rod(parent) = right_hole
+            write "The brass weight is in the way.^"
+            return
+         endif
+      endif  
+   endif
+endif
+return false
+}
+
+{+title
+style subheader
+write here{The} ^
+style normal
+if player has SITTING
+   write "(sitting)^"
+endif
+}
+
+{+wait
+write "With practiced ease you do nothing for a while...^"
+}
+
+{+down
+write "You can't sink any lower.^"
+set time = false
+}
+
+{+default_give_to
+if noun2 = barmaid
+   write "~What would I want that for?~ the barmaid snaps at you.^"
+   return
+endif
+return false
+}
+
+{+bootstrap
+if interpreter = CGI
+   setstring command_prompt "Type your command: "
+endif
+}
+
+# CONSTANTS FOR THE WEB INTERFACE LIBRARY
+constant title_image "/images/dragon.png"
+constant footer_image "none"
+constant header_colour "#42596d"
+constant linkbar_colour "#3f3527"
+constant maintext_colour "#dddddd"
+
+#debug "debug.library"
+#include "webinterface.library"
+#include "webinterface.css"
+#include "verbs.library"

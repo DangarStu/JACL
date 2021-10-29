@@ -1,0 +1,32 @@
+#!../bin/jacl
+
+constant game_version	1
+constant game_title		"My Game"
+constant game_author 	"myself"
+
+{+intro
+clear
+style note
+write GAME_TITLE ^
+style normal
+write "by " GAME_AUTHOR ^
+write "Release " GAME_VERSION ^
+write "----------^"
+
+write "- - - - -^"
+execute +GetInitialStats
+write "- - - - -^"
+look
+}
+
+object kryten: kryten
+ has		ANIMATE
+ short		name "yourself"
+ long		"Odly, you see yourself standing here."
+ capacity	42
+ parent 	#PUT THE LABEL OF THE STARTING LOCATION HERE
+ damage		2
+ player
+
+
+#include "ff.library"

@@ -1,0 +1,158 @@
+<html>
+<head>
+	<title>The JACL Author's Guide</title>
+	<meta name="description" content="Documention for the JACL Adventure Creation Language.">
+	<meta name="keywords" content="JACL,programming,programmers,guide,manual,documention,instructions">
+	<link rel=stylesheet type="text/css" href="styles.css">
+</head>
+<body>
+
+<h1><a class="title" name="set0">Changing Data</a></h1>
+
+<p>It is often desireable to change the value of data that is defined when the game is first loaded. This is achieved using the <b>set</b> command for integers, objects and locations (see Typecasting below), and the <b>setstring</b> command for text.
+
+<h2><a class="section" name="set1">The SET Command</a></h2>
+
+<P>Any <B>set</B> command must be of the following format:
+
+<pre>
+<B>set</B> <I>container operator value</I> [ <i>operator value</i>...]
+</pre>
+
+<P>The <B>set</B> command enables you to modify the current value of the specified container. A container is either an object element (see the chapter <a href="definitions.html">Definitions in Detail</a> for more information), a variable or an item pointer such as <B>noun1</B> or <B>here</B>. The <i>value</i> can be an integer, integer constant or any other container whose value you wish to copy.
+
+<P>The following is a list of operators that can be used with the <B>set</B> command:
+
+<center>
+<table width=80%>
+<TR>
+<th>Operator</th>
+<th>Description</th>
+</TR>
+<TR><td><B>=</B></TD>
+<td>
+Set the value of the specified container to the specified value.</TD>
+</TR>
+<TR><td><B>+</B></TD>
+<td>Add the specified value to the current value of the specified container.</TD>
+</TR>
+<TR><td>
+<B>-</B></TD>
+<td>Subtract the specified value from the current value of the specified container.</TD>
+</TR>
+<TR><td>
+<B>/</B></TD>
+<td>Divide the current value of the specified container by the specified value.</TD>
+</TR>
+<TR><td><B>*</B></TD>
+<td>Multiply the current value of the specified container by the specified value.</TD>
+</TR>
+<TR><td><B>%</B></TD>
+<td>The modulo operator calculates the remainder value of the specified container when divided by the specified value.</TD>
+</TR>
+</TABLE>
+</center>
+
+The following example demonstrates how to add 7 and 8 then divide the result by 5:
+
+<pre>
+integer TEMP
+
+{+maths
+set TEMP = 7 + 8 / 5
+}
+</pre>
+
+<p>This line of code can be read as a container to apply the operations to followed by groups of two parameters: an operator and a value. In this case the three operations are:
+
+<ol>
+	<li>make TEMP equal to 7
+	<li>add 8 to TEMP
+	<li>divided TEMP by 5
+</ol>
+
+<table class="infowarn">
+<TR><td>
+<img src="warning.png" alt="Warning"></TD>
+<td>Although all JACL commands require whitespace between each parameter, it is especially easy to forget the space between the container and the operator or the operator and the value. It is, of course, valid to have a command such as:
+
+<pre>
+set BANK_BALANCE = -42
+</pre>
+</td>
+</tr></table>
+
+<table class="infowarn">
+<TR><td>
+<img src="info.png" alt="Information"></TD>
+<td><p>The <b>set</b> command also has the ability to use the current value of a string as the name of the container or value being referred to. For example, if an integer variable called <b>counter</b> was defined, its value could be set to 1 using the following code: 
+
+<pre>
+integer counter 0
+
+{+modify
+setstring indirection "counter"
+set indirection = 1 
+}
+</pre>
+<p>This technique can be particularly useful when the need arises to pass a reference to an array as a function argument.
+</td>
+</tr></table>
+
+<h2><a class="section" name="set2">Type Casting</a></h2>
+
+<P>The JACL language allows the definition of complex types such as objects and locations at load time, but once the game is running, the only types that can be modified are integers and strings. When objects and locations are created they are assigned an integer value. The first object or location defined is given the number one, the remainder are numbered sequentially in the order they appear in the source file. For the purposes of numbering there is no distinction between objects and locations. Because of this, it is possible to use an integer variable wherever an object label is expected. For example:
+
+<pre>
+integer VARIABLE
+
+{+code
+set VARIABLE = small_frog
+set noun4 = VARIABLE
+set noun4 + 1 ; NOTE: noun4 will now equal the item defined
+              ; directly after small_frog in the game file.
+set lantern(status) = noun1(parent)
+set max_rand = objects
+set sword(parent) = random
+}
+</pre>
+
+<p>This code sets an integer variable to the index of the object <b>small_frog</b>. It then sets the internal object pointer (another integer variable) <b>noun4</b> to that value. This pointer is then incremented to point to the object or location that is definied directly after the <b>small_frog</b>. After that, the current parent of the object pointed to by <b>noun1</b> is stored in the <b>status</b> element of the object <b>lantern</b>. Finally, <b>max_rand</b> is set to the constant <b>objects</b> (the number of objects and locations in the game), and the parent of the object <b>sword</b> is randomly set to one of the object or locations from in the game.
+
+<p>As you can see, all these variables, object elements, object labels, object pointers and constants simply resolve into integers and can be used interchangeably.
+
+<table class="infowarn">
+<tr>
+<td><img src="warning.png" alt="Warning"></td>
+<td>The only real potential danger in the above examples it that of setting one of the object pointers to a value less than one, or greater than the internal number of the last object. The index of the last object or location (which is also the number of object and locations in the game) is stored in the constant <b>objects</b>.</td>
+</tr></table>
+
+<h2><a class="section" name="set3">The SETSTRING and ADDSTRING Commands</a></h2>
+
+<p>The <b>setstring</b> command is in many ways similar to the <b>write</b> command. Where a <b>write</b> command can take a list of parameters and will output the result to the screen, the <b>setstring</b> command can take an identical list of parameters and store the result in a <b>string</b>. The first parameter of a <b>setstring</b> command is a <b>string</b> to store the resulting output in. All other parameters constitute the text to be stored. Any previous contents in a string are overwritten by a <b>setstring</b> command. Below is an example of the <b>setstring</b> command in action:
+
+<pre>
+string buffer "empty"
+
+{+some_function
+setstring buffer "You are currently in " here{the} " on turn " total_moves ".^"
+}
+</pre>
+
+<p>The <b>addstring</b> command works in a similar way except it does not erase the current contents of the string being written to. 
+
+<h2><a class="section" name="set4">The PADSTRING Command</a></h2>
+
+<p>The <b>padstring</b> command takes three parameters. The label of the string to fill, the text to fill the string with and an integer specifying the number of times to copy the text into the string. This command primarily exists to assist with presentation within the status window. For example, to print a blank line in the status window, the text that will by copied is a single space in quotes (&quot; &quot;) and it will be copied <b>status_width</b> times. The code below demonstrates creating a string called <b>status_text</b> that contains enough spaces to fill a line in the status window: 
+
+<pre>
+string status_text
+
+{+update_status_window
+padstring status_text " " status_width
+}
+</pre>
+
+<!-- END OF BODY -->
+<p><a href="index.html">Back to Contents</b>
+</body></html>

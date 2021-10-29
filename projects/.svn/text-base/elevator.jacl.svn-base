@@ -1,0 +1,463 @@
+#!../bin/jacl
+
+constant game_title		"Elevator and stairs"
+constant game_author	"Stuart Allen"
+constant game_version	2
+
+attribute	OUTSIDE_LIFT
+
+integer FLOOR_MAPPING ground_floor first_floor second_floor
+
+{+intro
+write ^^ game_title " by " game_author ^^
+look
+}
+
+{+eachturn
+execute "+lift_action"
+}
+
+location ground_floor : ground floor
+ short		the "ground floor"
+ has		OUTSIDE_LIFT
+ up			first_floor
+
+{look
+write "You are on the ground floor. The "
+if here(north) != nowhere
+   write "open "
+else
+   write "closed "
+endif
+write "door door to an elevator is to the north and a set of stairs lead up. "
+write "Beside the door is a call button.^"
+}
+
+{movement
+return +door_warning
+return false
+}
+
+object stairs : stairs
+ mass		scenery
+
+{examine
+if here = ground_floor
+   write "The stairs go up.^"
+endif
+if here = first_floor
+   write "The go stairs up and down.^"
+endif
+if here = second_floor
+   write "The go stairs down.^"
+endif
+}
+
+{take
+if here = first_floor
+   write "Do you want to take the stairs up, or take the stairs down?^"
+endif
+if here = ground_floor
+   proxy "up"
+endif
+if here = second_floor
+   proxy "down"
+endif
+}
+
+{take_up
+proxy "up"
+}
+
+{take_down
+proxy "down"
+}
+
+grammar take *here up >take_up
+
+{+take_up
+write "You can't take " noun1{the} " up.^"
+}
+
+grammar take *here down >take_down
+
+{+take_down
+write "You can't take " noun1{the} " down.^"
+}
+
+object callbuttong: call button
+ short		a "call button"
+ floor		0
+
+{examine : *examine_callbutton1 : *examine_callbutton2
+write "Pushing this button summons the elevator to this floor. It's "
+write "currently "
+if self has ON
+   write "lit.^"
+   return
+endif
+write "dark.^"
+}
+
+{press : *press_callbutton1 : *press_callbutton2
+if lift_obj(moving_to) != arrived
+   write "The button lights as you press it, only to go off again when you "
+   write "release it.^"
+   return
+endif
+if lift_obj(floor) = self(floor)
+   if here(north) = nowhere
+      write "A crisp-sounding bell rings briefly and the doors "
+      write "to the lift slide open.^"
+      execute "+lift_open"
+      return
+   endif
+   write "The button lights as you press it, only to go off again when you "
+   write "release it.^"
+   return
+endall
+set lift_obj(moving_to) = self(floor)
+ensure self has ON
+write "The button lights up as you press it.^"
+}
+
+location lift : lift
+ short		the "elevator"
+
+{look
+write "You are inside the elevator. The door to the south is "
+if here(south) != nowhere
+   write "open, "
+else
+   write "closed, "
+endif
+write "and there is the usual panel of buttons beside it.^"
+}
+
+{movement
+if compass = south : compass = out
+   if destination = nowhere
+      write "The lift doors are currently closed.^"
+      return
+endall
+if destination = false
+   write "The only way out of the lift is to the west.^"
+   return
+endif
+return false
+}
+ 
+object cbutton: east eastern close door button control 1
+ short		a "close doors button"
+
+{press : move
+if lift_obj(turns_till_doors_close) = 0
+   write "The doors are already closed.^"
+   set time = false
+   return
+endif
+write "The lift doors slide closed.^"
+execute "+lift_close"
+}
+
+object obutton: east eastern open door button control 1
+ short		an "open doors button"
+
+{press : move
+if lift_obj(turns_till_doors_close) > 0
+   write "The doors are already open.^"
+   set time = false
+   return
+endif
+if lift_obj(moving_to) != arrived
+   write "The lift doors refuse to open while the lift is in motion.^"
+   return
+endif
+write "The lift doors slide open.^"
+execute "+lift_open"
+}
+
+object gbutton: ground floor button g
+ short		a "ground floor button"
+ floor		0
+
+{press : move
+execute +floorbuttonpress<self
+}
+
+object 1button: first floor button 1
+ short		a "first floor button"
+ floor		1
+
+{press : move
+execute +floorbuttonpress<self
+}
+
+object 2button: second floor button 2
+ short		a "second floor button"
+ floor		2
+
+{press : move
+execute +floorbuttonpress<self
+}
+
+object panel : panel of buttons
+ short		a "panel of buttons"
+
+{examine
+write "The panel consists of five buttons labelled ground, one, two, "
+write "open and close. "
+if gbutton has ON
+   write "The button for the ground floor is currently lit."
+endif
+if 1button has ON
+   write "The button for the first floor is currently lit."
+endif
+if 2button has ON
+   write "The button for the second floor is currently lit."
+endif
+write ^
+execute examine_display
+}
+
+string led_display	G 1 2
+
+object display : led display
+ short		an "LED display"
+
+{examine
+write "Above the panel is an LED display with a large red '"
+write led_display[lift_obj(floor)] "'.^"
+}
+
+# Elements of lift object:
+constant floor						5
+constant moving_to					6
+	constant arrived				42; POSSIBLE VALUE OF moving_to
+constant turns_till_doors_close 	7
+constant delta						8
+
+object lift_obj: lift door doors
+ short		name "east lift"
+ moving_to	arrived
+
+{examine
+if lift_obj(turns_till_doors_close) > 0;
+   write "The lift doors are open.^"
+else
+   write "The lift doors are closed.^"
+endif
+}
+
+{enter
+if here = lift
+   write "You are already in the lift.^"
+   set time = false
+   return
+endif
+proxy "east"
+}
+
+{open
+if lift_obj(turns_till_doors_close) > 0;
+   write "The lift doors are already open.^"
+   return
+endif
+if here = lift
+   write "(by pressing the open doors button)^"
+   proxy "press open doors button"
+   return
+endif
+write "(by pressing the call button)^"
+proxy "press call button"
+}
+
+{close
+if lift_obj(turns_till_doors_close) = 0;
+   write "The lift doors are already closed.^"
+   return
+endif
+if here = lift
+   write "(by pressing the close doors button)^"
+   proxy "press close doors button"
+   return
+endif
+write "There is no way to close the lift doors from the outside.^"
+}
+
+location first_floor : first floor
+ short		the "first floor"
+ has		OUTSIDE_LIFT
+ down		ground_floor
+ up			second_floor
+
+{look
+write "You are on the first floor. The "
+if here(north) != nowhere
+   write "open "
+else
+   write "closed "
+endif
+write "door door to an elevator is to the north and a set of stairs lead up "
+write "and down from here. "
+write "Beside the door is a call button.^"
+}
+
+{movement
+return +door_warning
+return false
+}
+
+object callbutton1: call button
+ short		a "call button"
+ floor		1
+
+location second_floor : second floor
+ short		the "second floor"
+ has		OUTSIDE_LIFT
+ down		first_floor
+
+{look
+write "You are on the second floor. The "
+if here(north) != nowhere
+   write "open "
+else
+   write "closed "
+endif
+write "door door to an elevator is to the north and a set of stairs lead "
+write "down. Beside the door is a call button.^"
+}
+
+{movement
+return +door_warning
+return false
+}
+
+object callbutton2: call button
+ short		a "call button"
+ floor		2
+
+{+lift_close
+set lift_obj(turns_till_doors_close) = 0
+set noun3 = FLOOR_MAPPING[lift_obj(floor)]
+set lift(south) = nowhere
+set lift(out) = nowhere
+set lift(south) = nowhere
+set lift(out) = nowhere
+set noun3(in) = nowhere
+set noun3(north) = nowhere
+}
+
+{+lift_open
+set lift_obj(turns_till_doors_close) = 3;
+set noun3 = FLOOR_MAPPING[lift_obj(floor)]
+set lift(south) = noun3
+set lift(out) = noun3
+set noun3(in) = lift
+set noun3(north) = lift
+}
+
+{+lift_action
+if here = lift
+   move lift_obj to here
+endif
+if here has OUTSIDE_LIFT
+   move stairs to here
+   move lift_obj to here
+endif
+if lift_obj(turns_till_doors_close) > 0
+   # THE LIFT DOORS ARE OPEN...
+   set lift_obj(turns_till_doors_close) - 1
+   if lift_obj(turns_till_doors_close) = 0
+      if here = lift : here = FLOOR_MAPPING[lift_obj(floor)]
+         write "^The lift doors slide closed.^"
+       endif
+      execute "+lift_close"
+   endif
+   return # THE LIFT CAN'T DO ANYTHING ELSE UNTIL THE DOORS HAVE CLOSED
+endif
+if lift_obj(moving_to) != arrived
+   if lift_obj(moving_to) != lift_obj(floor)
+      # THE LIFT IS STILL ON ITS WAY TO SOMEWHERE
+      set lift_obj(delta) = lift_obj(moving_to)
+      set lift_obj(delta) - lift_obj(floor)
+      if lift_obj(delta) < 0 
+         set lift_obj(floor) - 1
+      else
+         set lift_obj(floor) + 1
+      endif
+      if here = lift
+         write "^The lift vibrates as it slowly "
+         if lift_obj(delta) < 0
+            write "descends.^"
+         else
+            write "ascends.^"
+         endif
+      endif
+      return
+   endif
+   set lift_obj(moving_to) = arrived
+   if here = FLOOR_MAPPING[lift_obj(floor)]
+      write "^A crisp-sounding bell rings briefly and the doors "
+      write "to the lift slide open.^"
+   endif
+   if here = lift
+      write "^Having arrived at the selected floor, the lift "
+      write "gently comes to a halt and the doors open.^" 
+   endif
+   execute "+lift_open"
+   execute "+disable_callbuttons"
+endif
+}
+
+{+floorbuttonpress
+if arg[0] has ON
+   write "" arg[0]{The} " has already been pressed.^"
+   set time = false
+   return
+endif
+if lift_obj(floor) = arg[0](floor)
+   if lift_obj(turns_till_doors_close) > 0
+      write "The lift is already at " FLOOR_MAPPING[arg(floor)]{the} ".^"
+      set time = false
+      return
+   endif
+   write "A crisp-sounding bell rings briefly and the doors "
+   write "to the lift slide open.^"
+   execute "+lift_open"
+   ensure arg[0] hasnt ON
+   return
+endif   
+write "" arg[0]{The} " lights up as you press it.^"
+execute "+disable_callbuttons"
+ensure arg[0] has ON
+set lift_obj(moving_to) = arg[0](floor)
+}
+
+{+disable_callbuttons
+ensure gbutton hasnt ON
+ensure 1button hasnt ON
+ensure 2button hasnt ON
+ensure callbuttong hasnt ON
+ensure callbutton1 hasnt ON
+ensure callbutton2 hasnt ON
+}
+
+{+door_warning
+if compass = north : compass = in
+   if destination = false
+       write "The lift doors are closed.^"
+       return
+   endif
+endif
+return false
+}
+
+object kryten: myself self me
+ has		ANIMATE
+ short		name "yourself"
+ quantity	50
+ parent		ground_floor
+ player
+
+#include "verbs.library"

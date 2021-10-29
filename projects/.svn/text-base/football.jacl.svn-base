@@ -1,0 +1,109 @@
+#!../bin/cgijacl
+
+# -----------------------------------------------------------------------------
+
+constant status_window 0
+constant game_title		"Football Manager"
+constant game_author	"Stuart Allen"
+constant game_release    1
+constant game_build      1
+constant ifid			"JACL-002"
+
+# -----------------------------------------------------------------------------
+
+integer temp
+integer INDEX
+integer last_id			0
+integer editing
+
+constant FORMATION		1
+constant SQUAD			2
+constant TABLE			3
+constant FIXTURES		4
+
+string tab_names "Contacts" "Formation" "Squad" "League table" "Fixtures"
+
+{+links_div
+write "Football Manager"
+}
+
+{+intro
+execute "+display_formation"
+}
+
+{+after
+if WEBAPP_mode = FORMATION
+   execute "+display_formation"
+endif
+if WEBAPP_mode = SQUAD
+   execute "+display_squad"
+endif
+}
+
+integer left_pos	100
+integer bottom_pos	100
+
+{+display_formation
+write "<div class=~pitch~>"
+write "<img src=~/images/Pitch.png~>^"
+execute "+display_player<155<100<Allen"
+execute "+display_player<355<100<Farrell"
+execute "+display_player<115<200<Edwards"
+execute "+display_player<255<200<Harrison"
+execute "+display_player<405<200<Alonso"
+execute "+display_player<75<300<Taoube"
+execute "+display_player<195<300<Berghold"
+execute "+display_player<315<300<Yu"
+execute "+display_player<435<300<Ferranti"
+execute "+display_player<255<400<Nguyen"
+write "</div>"
+}
+
+{+display_player
+write "<div style=~text-align: center; position: absolute; bottom: "
+write arg[1] "px; left: " arg[0] "px;~>"
+write "<a href=~" $url "?user_id=" $user_id "&command=delete~>"
+write "<img src=~/images/Player.png~ class=~player~>"
+write "</a>"
+write "<p class=~player_name~>" string_arg[2] "</p>"
+write "</div>"
+}
+
+{+local_styles
+print:
+	div.pitch {
+		position: relative;
+		width: 600px;
+		height: 538px; }^
+    img.player {
+        border: none;
+        border-width: 0px;
+        margin-right: 0px;
+        margin-bottom: 0px;
+        margin-left: 0px;
+        margin-top: 0px; }^
+	p.player_name {
+		color: black;
+		position: relative;
+		top: -21px;
+        border-width: 0px;
+		padding: 0px 0px 0px 0px;
+        margin: 0px 0px 0px 0px; }^
+.
+}
+
+location boardroom
+
+object you
+  player
+
+constant title_image "none"
+constant footer_image "none"
+constant header_colour "#000000"
+constant linkbar_colour "#c0b098"
+constant maintext_colour "#dddddd"
+
+#include "forms.library"
+#include "webapp.library"
+#include "webapp.css"
+

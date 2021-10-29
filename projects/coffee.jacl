@@ -1,0 +1,191 @@
+#!../bin/jacl
+
+constant game_title		"Coffee disambiguation"
+constant game_author	"I.F. Author"
+constant game_version	2
+
+location kitchen : test kitchen
+   short		the "test kitchen"
+   south		living_room
+
+{look
+print:
+   This test kitchen is very clean. It's so clean, it hardly has
+   anything in it. The living room is to the south.^
+.
+}
+
+object mug : world's best example coder coffee mug
+   short		the "coffee mug"
+   long			"There is a coffee mug here."
+   mass			4
+   capacity		5
+   has			CONTAINER
+
+{examine
+print:
+   The mug has the phrase 'WORLD'S BEST EXAMPLE CODER' prominently on
+   the outside. The inside of the mug is
+.
+if cup_full(parent) = mug
+   write "full of coffee.^"
+else
+   write "empty.^"
+endif
+}
+
+object coffee_urn : big large round heavy coffee urn
+   short		the "coffee urn"
+   long			"Sitting on the bench is a large coffee urn."
+   mass			heavy
+   capacity		10
+   has			CONTAINER
+
+{examine
+print:
+   The urn is large, round, and heavy. It has to be large to hold the
+   endless supply of coffee inside it. Perhaps you'd like to pour some
+   into a mug?^
+.
+}
+
+{pour 
+if mug is *present
+   if cup_full(parent) = mug
+      write "But the mug is full!^"
+      set time = false
+   else
+      write "Using the urn, you fill the mug with hot coffee.^"
+      move cup_full to mug
+   endif
+else
+   write "But you don't have a mug!^"
+endif
+}
+
+{pour_on_mug
+if cup_full(parent) = mug
+   write "But the mug is full!^"
+   set time = false
+else
+   write "Using the urn, you fill the mug with hot coffee.^"
+   move cup_full to mug
+endif
+}
+
+{take_all_from
+write "You can't empty the urn.^"
+set time = false
+}
+
+object coffee_supply : endless supply dark of coffee
+   short		the "endless supply of coffee"
+   parent		coffee_urn
+   mass			5
+   has			LIQUID
+
+{examine
+write "Hello, tall, dark, and endless.^"
+} 
+
+{pour
+proxy "pour urn"
+}
+
+{pour_on_mug
+proxy "pour urn into mug"
+}
+
+{smell
+write "Hello, tall, dark, and endless.^"
+}
+
+{drink
+write "How rude! Use a mug!^"
+set time = false
+}
+
+object cup_full : cup full of coffee
+   short		a "cup full of coffee"
+   mass			4
+   has			LIQUID
+   parent		limbo
+
+{examine
+write "The coffee in the mug looks quite drinkable.^"
+}
+
+{smell
+write "Smells good. A cupful of good.^"
+}
+
+{drink : taste
+write "You drink the mug of coffee. Aaah. The satisfaction.^"
+move cup_full to limbo
+}
+
+location living_room : living room
+   short		the "living room"
+   north		kitchen
+
+{look
+print:
+   This pleasant living room is ever-so-lightly furnished with a
+   coffee table. A kitchen can be found to the north.^
+.
+}
+
+object coffee_table : modern square glass top coffee table
+   short		the "coffee table"
+   mass			scenery
+   has			SURFACE
+   capacity		20
+
+{examine
+print:
+   The coffee table is a modern piece of furniture with metal legs
+   and a square glass top.^
+.
+execute +details<noun1
+write ^
+}
+
+{sit_on : jump_on
+write "The spec says you're not allowed.^"
+set time = false
+}
+
+{+intro
+write ^^ game_title " by " game_author ^^
+look
+}
+
+object kryten: myself self me
+ has		ANIMATE
+ short		name "yourself"
+ quantity	42
+ parent		living_room
+ player
+
+{examine
+write "As beautiful as ever.^"
+execute "+inventory"
+}
+
+{take
+write "...seriously?"
+set time = false
+}
+
+{+no_light
+write "It is too dark to see.^"
+set time = false
+}
+
+{+title
+if player has SITTING
+   write "(sitting)^"
+endif
+}
+
+#include "verbs.library"

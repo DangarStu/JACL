@@ -1,0 +1,1477 @@
+#!/usr/bin/jacl
+
+constant     game_version    1
+constant    game_title        "Le camion frigorifique"
+constant    game_author        "Barnabé Froleneau"
+constant    ifid            "JACL-000"
+
+# CONSTANTS FOR RESOURCES IN BLORB FILE
+constant image_camion_frigo 1
+constant music_camion_frigo01 2
+constant music_camion_frigo02 3
+constant music_camion_frigo03 4
+
+integer AUDIO_CHANNEL02 2
+
+
+integer PLAYER_REPONSE 2
+integer LUCIEN_TIME_TALKED_TO 0
+integer LUCIEN_EXALTED 0
+
+
+synonym soluce solution
+ 
+
+#### NEW DEFINITIONS #######
+
+attribute INVISIBLE
+
+attribute SPOTTED
+
+attribute TOT
+attribute MATIN
+attribute MIDI
+attribute APRESMIDI
+attribute SOIR
+attribute NUIT
+
+attribute BOUTIQUE
+attribute NOTICED
+
+attribute ENTERED
+
+grammar mute >stop_sound
+
+{+stop_sound
+stop
+}
+ 
+grammar volume >volume
+grammar volume - >volume
+
+{+volume
+# decrease volume
+volume 40
+}
+
+grammar volume + >volume_inc
+
+{+volume_inc
+# inc volume
+volume 80
+}
+
+
+
+{+instructions
+write "Ceci est une fiction interactive. Vous pouvez y jouer en tapant vos instructions en fonction de ce qui se déroule à l'écran. ^^Si nécessaire, vous trouverez plus d'informations sur http://ifiction.free.fr ^^Durant les conversations, il est possible d'utiliser la forme « Parler à Untel », et parfois « Questionner Untel sur Truc ».^^Pour arrêter la musique, vous pouvez taper la commande « musique off » (ou juste « mute » pour arrêter le son en cours sans couper le reste).^Pour obtenir des informations sur le jeu (auteur, licence...), veuillez taper « à propos ».^^Pour obtenir une aide en fonction du contexte, la commande est « astuces ».^^ "
+#TODO
+}
+
+{+object_descriptions
+loop
+   ifall noun3(parent) = here : noun3(mass) < scenery : noun3 hasnt LOCATION : noun3 hasnt INVISIBLE
+      write ^ noun3{long}
+   endif
+endloop
+}
+
+attribute TALKED_TO
+attribute SALUTED
+attribute LISTENED
+attribute BREAKED
+
+string camion_location "quai"
+
+
+grammar show *present to *present        >show_to
+
+grammar montrer *present to *present    >show_to
+grammar montrer *present au *present    >show_to
+grammar montrer *present à *present    >show_to
+grammar montrer *present a *present    >show_to
+
+
+# TODO? m approcher 
+
+grammar  m approcher    >approche
+
+{+approche
+if here = magasin1 
+    write "Je me rapproche de l'avant de la boutique.^^"
+    execute "+east"
+else
+if here = arriereboutique
+    write "Je me rapproche du fond de l'arrière-boutique.^^"
+    execute "+south"
+else
+    write "M'approcher de quoi ?^"
+endif 
+}
+
+
+{+show_to
+override
+write noun2{The} " " noun2{doesnt} " semble pas très impressionné" noun2{es}
+write " par " 
+write noun1{the} .^
+}
+
+grammar chanter         >sing_only
+
+{+sing_only
+write "Vous chantez un petit air populaire qui vous passe par la tête.^"
+write "C'est une chanson qui parle de " player{chanson}"^"
+}
+
+grammar démonter *present    >break
+grammar demonter *present    >break
+
+
+integer ALEATOIRE
+integer ALEAT2
+
+{+macro_chanson
+set max_rand = 5
+set ALEATOIRE = random
+if ALEATOIRE = 1
+   setstring return_value "l'histoire d'une jeune femme qui part acheter du pain et s'enfuie avec un autre homme."
+endif
+if ALEATOIRE = 2
+   setstring return_value "la vie et de ses soucis."
+endif
+if ALEATOIRE = 3
+   setstring return_value "vacances à la plage avec un petit chien espiègle."
+endif
+if ALEATOIRE = 4
+   setstring return_value "tout et de rien."
+endif
+if ALEATOIRE = 5
+   # setstring return_value "l'amour que porte le chanteur à une petite vendeuse " player{vendeuse}
+   setstring return_value "l'amour que porte le chanteur à une petite vendeuse " 
+    set max_rand = 4
+    set ALEAT2 = random
+    if ALEAT2 = 1
+       addstring return_value "de soda."
+    endif
+    if ALEAT2 = 2
+       addstring return_value "de glaces."
+    endif
+    if ALEAT2 = 3
+       addstring return_value "de baumes pour le corps."
+    endif
+    if ALEAT2 = 4
+       addstring return_value "de poupées en chiffon."
+    endif
+endif
+}
+
+
+# not used
+{+macro_vendeuse
+set max_rand = 4
+set ALEAT2 = random
+if ALEAT2 = 1
+   setstring return_value "de soda"
+endif
+if ALEAT2 = 2
+   setstring return_value "de glaces"
+endif
+if ALEAT2 = 3
+   setstring return_value "de baumes pour le corps."
+endif
+if ALEAT2 = 4
+   setstring return_value "de poupées en chiffon."
+endif
+}
+
+
+#### Hints #####
+
+{+hint_nonum
+if frisoni hasnt TALKED_TO
+ write "Il est nécessaire de parler à Madame Frisoni pour connaître ce qu'elle attend de vous en ce moment, en effet vous êtes son employé...^"
+ more "..."
+endif
+ifall lucien(parent) = camion : LUCIEN_EXALTED < 2
+ write "Vous vous rendrez rapidement compte que votre collègue Lucien a tendance à s'énerver assez facilement, selon ce qu'on lui dit. Mais vous pouvez également éviter ce risque et finir plus rapidement cette livraison.^"
+ more "..."
+endall
+write "Il n'y a pas d'autres astuces pour le moment...^"
+}
+
+#### GAME ######
+
+
+grammar a propos >about
+grammar à propos >about
+
+grammar auteur >author
+grammar licence >about
+
+{+author
+  proxy "about"
+}
+
+{+about
+write "Ce jeu a été écrit en 2011-2012, en utilisant le système JACL.^^"
+style bold
+write game_title
+style normal
+write "^^Histoire, code et musique^^"
+write "par " game_author
+write "^^" 
+write "Publié sous licence CC-BY-SA^^"
+write "^Special thanks to " 
+write "Stuart Allen, for making JACL available.^"
+write " ^"
+write "Cover art machine: Jake Hildebrand. The Telecalculograph Mk II^"
+write "Camion frigo cover: http://mariohistoire.unblog.fr/2009/07/21/livreur-de-creme-glacee/^"
+
+
+set time = false
+}
+
+{+intro
+clear
+           style italic
+           write "^Elle vous cherche encore. « Lucien ! François ! » De sa voix stridente, elle vous appelle. Pas question de la faire attendre. « Lucien ! François ! »"
+           more "^^" 
+clear
+           style normal
+           style bold
+        write "^"game_author "^"
+        write "présente ^"
+           if interpreter = GLK 
+        if graphics_supported = false
+              style bold
+                  write ^ game_title
+                  style normal
+                 # write " par " game_author "^^"
+        else
+            volume 80
+            volume 50 AUDIO_CHANNEL02
+            image image_camion_frigo center
+            sound music_camion_frigo01
+            style bold
+        #          write ^ game_title
+        #          style normal
+        #         # write " par " game_author "^^"
+          endif
+        endif
+        if interpreter = CGI
+            write ^ game_title
+          endif
+           write "^^"
+           style normal
+           more ""
+clear
+if interpreter = GLK 
+if sound_supported = true
+  #timer 500
+  volume 80
+  volume 75
+  volume 70
+  volume 60
+  volume 55
+  volume 50
+  volume 45
+  volume 40
+  style italic
+  more "(tapez « aide » durant le jeu pour obtenir des instructions...)"
+  style normal
+  clear
+  volume 35
+  volume 30
+  volume 25
+  volume 20
+  volume 15
+  volume 10
+  volume 5
+  volume 0
+  stop
+  volume 80
+  endif
+endif
+
+move sophiejeanne to limbo
+set CONCLUSION = 0
+if here hasnt OUTDOORS
+endall
+move ground to here
+look
+else
+move route to here
+endall
+}
+
+{+timer
+
+}
+
+#TODO : x route , x dehors
+
+string demod_article = "Un"
+
+{+eachturn
+set kryten(mass) = 100
+if here has BOUTIQUE
+    move marchandises to here
+else
+    move marchandises to limbo
+endif
+## demodulateur 
+set max_rand = 5
+set ALEATOIRE = random
+if ALEATOIRE = 1
+    if demodulateur(parent) = here
+      if demodulateur has NOTICED
+    setstring demod_article "Le"
+    else
+    setstring demod_article "Un"
+      endif
+      write "^" demod_article " démodulateur émet un léger bourdonnement sonore et une petite lumière bleue.^"
+      if sound_supported = true
+    sound music_camion_frigo03 AUDIO_CHANNEL02
+      endif
+    endif
+endif
+## dans camion
+ifall player(parent) = camion : camion hasnt ENTERED 
+  write "Vous êtes dans le camion.^" 
+  ensure camion has ENTERED 
+  endif
+if LUCIEN_EXALTED > 3
+ set max_rand = 5
+ set ALEATOIRE = random
+ifall ALEATOIRE = 1 : CONCLUSION = 0
+ write "Lucien marmonne des choses incompréhensibles.^"
+    endall
+endif
+}
+
+{+look
+if lucien(parent) = camion
+  if camion_location = "quai"
+    # TODO
+    write "Le camion est toujours à quai, attendant que vous soyez prêt, comme s'il avait un vie propre.^"
+  endif
+  if camion_location = "foret"
+      write "Le camion traverse une forêt, ou du moins une zone boisée sur plusieurs lieues.^"
+  endif
+  if camion_location = "campagne"
+    write "Le paysage est monotone, c'est la morne campagne.^"
+  endif
+  if camion_location = "clairiere"
+    write "La forêt est si dense que vous n'y voyez plus grand chose. Les phares éclairent bientôt l'entrée d'une clairière sinistre.^"
+  endif
+  if camion_location = "cottage"
+    write "Un petit cottage propret se trouve au bout du chemin.^"
+  endif  
+}
+
+{+examine_out
+  execute "+look"
+}
+
+
+grammar xyzzy>xyzzy
+
+{+xyzzy
+  write "Un gros jukebox chromé apparaît.^^"
+  if sound_supported = true
+    set max_rand = 2
+    set ALEATOIRE = random
+    if ALEATOIRE = 1
+      sound music_camion_frigo01
+    else
+      sound music_camion_frigo02
+    endif
+  endif
+  more "Une musique entêtante envahit l'atmosphère...^"
+  stop
+  write "... puis disparaît aussi vite qu'elle est apparue, en même temps que le jukebox, avant même que vous ayez pu lire le titre de la mélodie.^"
+}
+
+grammar regarder out      >look_out
+grammar examiner out      >look_out
+grammar x out      >look_out
+
+{+look_out
+if player(parent) = camion
+    proxy "look"
+  else
+    proxy "look"
+   endif
+}
+
+
+{+out 
+if player(parent) = camion
+ if camion_location = "quai"
+  write "Vous sortez du camion.^"
+  move player to camion_location
+  move lucien to camion_location
+  move camionnette to camion_location
+ else
+    if camion_location = "foret"
+    write "Vous sautez du camion en train de ralentir pour passer un virage, et tombez sur une surface meuble qui amortit la chute.^"
+    set CONCLUSION = 1
+    move player to camion_location
+    write "Le choc est violent, mais vous pouvez vous relever au bout d'un moment...^"
+    points 10
+    return 
+    endif
+    if camion_location = "campagne"
+      write "Inexplicablement, vous sautez du camion en marche, alors qu'il roulait à pleine vitesse. Le choc est fatal.^"
+        execute "+game_over"  
+    endif
+    if camion_location = "clairiere"
+      write "Vous sortez du camion, un peu étonné, et surtout pas très rassuré.^"
+      move player to camion_location
+      write "Au moment où vous posez le pied à terre, vous sentez une douleur dans la nuque. Et puis plus rien. Vous ne saurez jamais ce qui s'est passé ensuite...^"
+      execute "+game_over"  
+      # TODO : enrichir avec plus de possibilités...
+      return
+    endif
+    if camion_location = "cottage"
+      write "Vous sortez du camion.^"
+      move player to camion_location
+      move camionnette to camion_location
+      move lucien to camion_location
+      move demodulateur to camion_location
+      ensure demodulateur has OUT_OF_REACH
+      write "Lucien saute également hors de la cabine, l'air tout ragaillardi.^« Bon, vieux, viens me filer un coup de main, qu'on en finisse rapidement. »^"
+      return
+    endif
+  else 
+  execute "+travel<out"
+  endif
+ endif
+endif
+}
+
+{+jump
+if player(parent) = camion
+  execute "+out"
+  else 
+    write "Considérez que c'est fait et on n'en parle plus.^"
+endif
+}
+
+{+movement
+if player(parent) = camion
+ ifall destination = out
+    return false
+ else
+  write "Ce n'est pas vous qui conduisez.^"
+  return false
+# todo : juste return ?
+ endall
+endif
+ifall destination != nowhere : 
+     if CONCLUSION == 1
+       return false
+     else
+    move lucien to destination
+     endif
+endif
+return false
+}
+
+
+
+
+
+object sophiejeanne: sophie-jeanne sophie jeanne
+ has          ANIMATE POSSESSIVE FEMALE 
+ short        name "Sophie-Jeanne"  
+ long       write "Sophie-Jeanne" 
+ mass       heavy 
+ quantity     20 
+
+
+object kryten: kryten myself self me moi moi-même moi-meme joueur souliers terreux 
+ has        ANIMATE
+ short      name "moi"
+ capacity      42
+ mass       scenery
+ parent          magasin1
+ player  
+
+{examine
+write "Vous êtes comme d'habitude : habillé comme un commis, avec de gros souliers limite terreux et des habits trop grands pour vous. Une blouse terne vient compléter le tableau.^^"
+execute "+inventory"
+}
+
+{take
+write "... vraiment ?^"
+set time = false
+}
+
+
+{+no_light
+write "Il fait trop sombre pour voir.^"
+set time = false
+}
+
+{+title
+style subheader
+write here{The} ^
+style normal
+if player has SITTING
+   write "(sitting)^"
+endif
+}
+
+
+
+
+object blouse: blouse grise terne graisse
+ has        WEARABLE FEMALE WORN CONTAINER
+ short       une "blouse"
+ long       function
+ definite      la
+ parent       kryten
+ mass       2
+
+{long
+    proxy "examine blouse"
+}
+
+   
+{examine
+   write: "Une blouse grise, maculée de graisse, avec une unique poche.^"
+}
+
+
+
+
+object poche: petite poche mauve 
+ has        FEMALE CONTAINER 
+ short       une "poche" 
+ long       "Une poche." 
+ definite      la 
+ parent      blouse 
+ mass       2 
+ 
+
+
+object bonnet: petit bonnet rouge
+ has        WEARABLE
+ short      un "bonnet"
+ long       long
+ definite      le
+ parent       poche
+ mass       1
+
+{long
+    proxy "examine bonnet"
+}
+
+
+{examine
+    write: "Ce bonnet a pour unique fonction de vous tenir chaud entre le début de l'automne et la fin de l'hiver.^"
+}
+ 
+
+{give_to_lucien
+    set LUCIEN_EXALTED - 1
+    write "« Tiens, merci bien, ça va me tenir chaud. »^"
+    return false
+}
+
+
+
+
+
+
+ 
+## Grand Magasin ##
+
+location magasin1: grand magasin fond
+  short     name "Le Grand Magasin"
+  has         BOUTIQUE
+  east        magasin2
+  south        arriereboutique
+
+{look
+if here hasnt VISITED
+    write "Un grand magasin, comme ça se fait encore de nos jours, idéalement situé dans la principale artère commerçante de Port-Londhrin. L'avant de la boutique se trouve à l'est, ainsi que votre patronne, Mme Frisoni. L'arrière-boutique est au sud.^"
+    move frisoni to here
+    ensure frisoni has OUT_OF_REACH
+else
+    write "Le grand magasin où vous travaillez. L'avant de la boutique se trouve à l'est et l'arrière-boutique au sud.^"
+    move frisoni to here
+    ensure frisoni has OUT_OF_REACH
+endif
+}
+
+
+{movement
+ifall compass == south : frisoni hasnt TALKED_TO
+    write "Madame Frisoni vous interpelle : « Hep les p'tits gars, j'en ai pas encore fini avec vous ! »^"
+    return # TODO : return (sans false) pour activer
+ else
+   return false
+endall
+}
+
+
+object lucien: lucien homme garcon garçon collègue collegue ami lui lui-même lui-meme 
+ has            ANIMATE POSSESSIVE
+ long        function
+ short       name "Lucien"
+ mass       heavy 
+ quantity      20
+ 
+#TODO : il faut utiliser 2 versions : avec accents et sans
+
+{long
+if magasin2 hasnt VISITED
+   write "Lucien est là.^"
+else
+    write "Lucien n'est pas loin de vous.^"
+endif
+}
+
+{talk_to
+ifall lucien(parent) = camion : demodulateur(parent) = camion
+  if camion_location = "quai"
+    if interpreter = GLK 
+      if graphics_supported = false
+      else
+    sound music_camion_frigo02
+    endif
+      endif
+   write "« On est enfin prêts à partir...^- Bon ben on y va ? Tu sais où c'est au fait ? ^- Oui, dans un petit cottage dans la ville d'à côté, Peuthrin sur Vroc. ^- Jamais entendu parler. J'espère que tu connais bien la route ! ^ - Ça roule ! » et il démarre.^^ Le camion sort du dépôt, et oblique vers le nord. Le temps est assez bleu aujourd'hui, pour le peu que les grattes-ciels laissent passer. Après quelques lieues en ville, le véhicule atteint les boulevards, et le paysage change du tout au tout : ici s'étend une myriade de petits pavillons, tous semblables, mais avec une petite touche personnelle pour chacun qui permet de les différencier. Puis vous sortez enfin de la civilisation, pour passer par les plaines désertiques. Enfin, il reste sans doute encore des animaux qui habitent là.^"
+   setstring camion_location "campagne"
+   set LUCIEN_TIME_TALKED_TO + 1
+   return true
+   endif
+  if LUCIEN_TIME_TALKED_TO = 1
+    write "« Nous voilà partis. Tu le sens bien ce voyage ?»^"
+    set LUCIEN_TIME_TALKED_TO + 1
+    getyesorno PLAYER_REPONSE
+      if PLAYER_REPONSE = 1
+    write "« Superbe, on va bien s'amuser tu vas voir ! »^"
+    set LUCIEN_EXALTED + 1
+      else 
+    write "« Mon pauvre ami, toujours à ruminer les côtés négatifs de la vie... Bon, c'est vrai ce n'est pas un vrai voyage. Il y a combien de lieues jusqu'à notre destination déjà ? Attends voir... Un peu plus de vingt-quatre... On va essayer de te divertir un peu alors ! »^"
+    set LUCIEN_EXALTED - 1
+      endif
+      set kryten(mass) = 99
+      # TODO : or 100 ??
+      # otherwise getyesorno PLAYER_REPONSE => mass = 1
+    return true
+   endif
+  if LUCIEN_TIME_TALKED_TO = 2
+    write "« Je ne sais pas si je t'ai raconté ce qui m'est arrivé la semaine dernière. En fait Sophie-Jeanne a décidé de m'énerver jusqu'au bout, en revenant chercher des livres qui lui appartenaient, selon elle. Pourtant, c'était des ouvrages dédicacés à mon nom par de grands auteurs comme Armand Oubly et Frédéric Jeanne. Elle me tape sur le système, vraiment ! »^"
+    set LUCIEN_TIME_TALKED_TO + 1
+    return true
+    endif
+  if LUCIEN_TIME_TALKED_TO = 3
+    write "« Je vais me concentrer sur la route maintenant, je vois que l'on entre en forêt, il pourrait y avoir des animaux... »^"
+    setstring camion_location "foret"
+    set LUCIEN_TIME_TALKED_TO + 1
+    return true
+    endif
+  if LUCIEN_TIME_TALKED_TO = 4
+    write "« Hmm... »^"
+    set LUCIEN_TIME_TALKED_TO + 1
+    return true
+    endif
+  if LUCIEN_TIME_TALKED_TO = 5
+    write "« Ça y est, on est enfin sortis de cette fichue forêt ! »^"
+    setstring camion_location "campagne"
+    set LUCIEN_TIME_TALKED_TO + 1
+    return true
+    endif
+  if LUCIEN_TIME_TALKED_TO = 6
+    write "« On arrive... »^"
+    set LUCIEN_TIME_TALKED_TO + 1
+    if LUCIEN_EXALTED > 4
+      setstring camion_location "clairiere"
+      write "Bercé par le moteur, vous vous étiez un peu assoupi, et en regardant par la fenêtre, vous vous rendez rapidement compte que cela ne ressemble pas du tout à la destination prévue... Lucien vous a amené dans une sombre forêt, à des lieues de toute civilisation. À quoi cela rime ?^^« Allez, on descend ! », ordonne Lucien d'une voix d'outre-tombe.^"
+     else
+       setstring camion_location "cottage"
+       write "Bercé par le moteur, vous vous étiez un peu assoupi, et en regardant par la fenêtre, vous voyez que vous êtes dans un petit village pittoresque. Un chemin mène maintenant à un cottage accueillant, entouré de haies et de taillis...^"
+    endif
+    return true
+    endif
+  if LUCIEN_TIME_TALKED_TO > 6
+    write "« Hmm... »^"
+    set LUCIEN_TIME_TALKED_TO + 1
+    return true
+    endif
+else
+if lucien(parent) = camion
+    write "« On ne va pas partir sans notre marchandise. », se plaint Lucien.^"
+    return true
+else
+  if magasin2 hasnt VISITED
+    write "« Bon ben on y va ? »^"
+    return true
+  else
+      if frisoni hasnt TALKED_TO
+          write "« La patronne nous a appelé je crois... »^"
+          return true
+      else 
+      if lucien hasnt TALKED_TO
+          write "« La vie pourrait être plus facile, c'est vrai. »^"
+          ensure lucien has TALKED_TO
+          return true
+      else
+          write "« Bon, arrête de radoter, vieux ! »^"
+          return true
+      endif
+      endif
+  endif
+endif
+}
+
+#TODO : parler quand lucien est ici
+
+
+{+talk_only
+if lucien(parent) = camion
+    write "Veuillez écrire ici la phrase complète.^"
+else
+    write "À qui voulez-vous parler ? Veuillez formuler ici la phrase complète.^"
+endif
+}
+
+{ask_about_frisoni
+if frisoni(parent) = here
+  write "« Mme Frisoni est vraiment bonne avec nous, tu sais. »^"
+  else
+  write "« Quelle vieille folle... Que veux-tu que je te dise de plus que tu ne saches déjà ? »^"
+ endif
+}
+
+{ask_about_kryten
+if lucien(parent) = camion
+  write "« Je suis sûr que la vieille a le béguin pour toi.^ ...^^ Fais pas cette tête ! Je plaisante ! »^"
+  else
+  write "« Ça fait combien de temps déjà qu'on travaille ensemble ? »^"
+ endif
+}
+
+
+{ask_about_lucien
+if frisoni(parent) = here
+    write "« Les murs ont des oreilles ici... »^"
+  else
+    write "« Tu veux vraiment apprendre à mieux me connaître, gars ? »^"
+  getyesorno PLAYER_REPONSE
+      if PLAYER_REPONSE = 1
+    write "« Je ne suis pas vraiment du genre à me dévoiler comme ça, et raconter n'importe quoi sur ma vie privée ! »^"
+    set LUCIEN_EXALTED - 1
+      else 
+    write "« Merci, c'est sympa de ne pas s'intéresser à moi ! »^"
+    set LUCIEN_EXALTED + 1
+      endif
+ endif
+}
+
+{ask_about_route
+if LUCIEN_EXALTED > 2
+  write "« Mais arrête avec ça !! Je connais très bien cette route, ne remets pas en cause ma conduite à tout bout de champs ! » ^Il semble gagné par une folie inexplicable en hurlant ces paroles.^"
+ set LUCIEN_EXALTED + 1
+ else
+   write "« Je connais la route. »^"
+   set LUCIEN_EXALTED + 1
+endif
+}
+
+{ask_about_magasin2
+  write "« Tu n'étais pas encore capable de boire de la bière que je travaillais déjà dans cette boîte ! »^"
+ set LUCIEN_EXALTED - 1
+}
+
+{ask_about_sophiejeanne
+  write "« Mais pourquoi me parles-tu maintenant de cette folle ? Tu sais très bien que j'essaye d'oublier jusqu'à son existence, ce n'est pas la peine de me harceler avec ces mauvais souvenirs ! » ^Il semble gagné par une folie montante en proférant ces paroles d'une voix démentielle.^"
+ set LUCIEN_EXALTED + 1
+}
+
+{ask_about_demodulateur
+     write "« Il est vraiment trop lourd ce truc. »^"
+}
+
+
+{ask_about_camionnette
+  write "« T'inquiète pas, je l'ai déjà conduite. »^"
+}
+
+
+
+{examine
+    write "Il est habillé exactement comme vous, peut-être juste un peu plus soigné, et encore...^"
+ifall LUCIEN_EXALTED > 2 : LUCIEN_EXALTED < 4
+    write "Lucien semble un peu surexcité, en tout cas il ne semble pas dans un état tout à fait normal.^"
+endall
+ifall LUCIEN_EXALTED > 3 : LUCIEN_EXALTED < 5
+    write "Vous ne l'avez jamais vu dans un tel état d'exaltation, il semble en transe, et vous redoutez qu'il ne fasse quelque chose de complètement irrationnel.^"
+endall
+if LUCIEN_EXALTED > 4 
+    write "Vous redoutez qu'il ne fasse quelque chose de complètement irrationnel. Comme essayer de vous tuer par exemple.^"
+endif
+}
+
+{kiss
+    write "Ce n'est plus dans les mœurs de l'époque.^"
+}
+
+
+{salute_at
+if self hasnt SALUTED
+    write "Vous saluez Lucien, qui vous rend votre salut.^"
+    ensure lucien has SALUTED
+    else
+        write "« Ok, ok, salut, on ne va pas y passer la journée ! » dit-il en souriant.^"
+endif
+}
+
+{attack
+ifall LUCIEN_EXALTED > 3 : LUCIEN_EXALTED < 5
+    write "Si la violence n'est pas une solution, c'est peut-être que vous n'avez pas frappé assez fort...^"
+endall
+if LUCIEN_EXALTED > 4
+    write "Il vous rend vos coups, plus fort que vous.^"
+    execute "+game_over" 
+else
+      write "Vous ne feriez pas cela à un ami...^"
+endif  
+}
+
+
+{help_other
+  if camion_location = "cottage"
+      write "Vous peinez un peu à descendre l'appareil du camion, puis vous le glisser sur l'allée pour l'installer enfin chez la cliente. Une fois le bon de livraison signé, vous ne vous faites pas prier pour remonter dans le camion et vaquer à d'autres occupations.^"
+  points 20
+  write "Le trajet du retour est calme. Une fois rentré, vous laissez Lucien rentrer le camion, et vous rentrez chez vous pour le déjeuner. Que nous réservera cet après-midi ? Ces missions ne sont pas passionnantes, mais au moins on ne risque pas grand chose dans ce travail !^"
+  execute "+game_over" 
+    return 
+  else
+    write "« Merci de vouloir m'aider. »^"
+  endif
+  
+}
+
+### Salle principale ###
+
+
+location magasin2: grand magasin
+  short     name "Le Grand Magasin"
+  has         BOUTIQUE
+  west         magasin1
+  north     devantmagasin
+  out        devantmagasin
+
+{look
+if here hasnt VISITED
+   print:
+      Le grand magasin est toujours impressionnant, même pour vous qui y travaillez depuis maintenant quatre ans. Des confiseries composent toute la devanture qui se trouve à hauteur d'enfant, et plus haut, en arrière, ont été épinglés divers outils pour les bricoleurs. Quelques ustensiles ménagers et de rares bijoux rappellent que le magasin est également le royaume des dames. Le fond de la boutique se trouve à l'ouest et la sortie est au nord.^
+   .
+   move frisoni to here
+   ensure frisoni hasnt OUT_OF_REACH
+else
+   print:
+      Le grand magasin où vous travaillez. Le fond de la boutique se trouve à l'ouest et la sortie au nord.^
+    .
+    move frisoni to here
+    ensure frisoni hasnt OUT_OF_REACH
+endif
+}
+
+# TODO : bug "sortir" ne fonctionne pas
+
+object frisoni: femme dame madame patronne harpie frisoni habits costume jupe velour dentelles
+ has        ANIMATE FEMALE POSSESSIVE
+ long        function
+ short       name "Madame Frisoni"
+ mass       heavy 
+ quantity      20
+
+
+{long
+    if self has OUT_OF_REACH
+    write "Madame Frisoni semble impatiente.^"
+    else
+       write "Madame Frisoni est là.^"
+}
+
+{talk_to
+if self has OUT_OF_REACH
+    write "Il vaudrait mieux s'approcher un peu, Madame Frisoni, qui a toute autorité sur vous, n'aimerait pas qu'on l'interpelle depuis l'autre bout du magasin.^"
+    else
+    if self hasnt TALKED_TO
+            write "« Vous arrivez enfin les gars ? Voilà votre mission de ce matin : J'ai une cliente qui devait recevoir un démodulateur de rechange pour son four à plasma. On est déjà en retard et c'est une bonne cliente pour notre magasin, alors il va s'agir de ne pas traîner ! Si vous la décevez, vous me décevrez également ! »^"
+            write "^Lucien demande alors quel véhicule on doit prendre.^"
+            write "^« Il ne reste plus que le camion frigorifique, c'est le seul assez grand pour cet appareil. »^"
+            points 10
+            ensure self has TALKED_TO
+        else
+            write "Elle vous coupe la parole sans arrêt pour évoquer les détails à ne pas oublier. Et quand vous avez des questions précises, elle vous conjure de trouver en vous-même les ressources pour y répondre.^"
+    endif
+    endif
+}
+
+{examine
+if self has OUT_OF_REACH
+    write "Une dame assez forte. Elle se trouve à l'entrée du magasin.^"
+    else
+       write "Une dame assez forte, avec de long cheveux roux coiffés en chignons. Ses habits sont assez recherchés, quoique un peu vulgaire, avec de la dentelle et du velour bleu marine composant son costume et sa jupe.^"
+}
+
+{kiss
+if self has OUT_OF_REACH
+        write "L'idée d'embrasser cette harpie vous terrifie rien que de l'évoquer. Heureusement pour le moment elle est encore loin.^"
+    else
+    write "L'idée d'embrasser cette harpie vous terrifie rien que de l'évoquer.^"
+    points -5
+}
+
+
+{salute_at
+if self has OUT_OF_REACH    
+    write "Elle est un peu plus loin, vers l'est.^"
+    else
+    if self hasnt SALUTED
+        write "Vous saluez Madame Frisoni.^"
+        ensure self has SALUTED
+        else
+        write "« Oui oui, au revoir et à bientôt, ne traînez pas !^"
+    endif
+    endif
+}
+
+
+object marchandises: produits marchandises cartons carton caisses caisse confiseries bijoux outils ustensiles ménager bonbons devanture
+ has        FEMALE PLURAL 
+ short        des "marchandises"
+ long      "Diverses marchandises remplissent cette pièce.^"
+ definite      les
+ mass      25
+ 
+{show_to_lucien
+  write "« Hé oui, un jour ou l'autre il faudra que l'on livre une de ces cochonneries... »^"
+}
+
+{take
+      execute "+no_marchandises"
+}
+
+{open
+      execute "+no_marchandises"
+}
+
+{search
+      execute "+no_marchandises"
+}
+
+{+no_marchandises
+  write "Si vous vous faites prendre à fouiller ces marchandises, on risque de vous accuser de vol.^"
+}
+
+# Arrière boutique
+
+location arriereboutique: arriere boutique remise depot entrepot entrepôt
+  short       name "L'arrière-boutique"
+  has         BOUTIQUE
+  north      magasin1 
+  south      quai
+
+{look
+if here hasnt VISITED
+    write "L'arrière-boutique fait également office d'entrepôt pour toutes les marchandises. Elle s'ouvre au nord vers le magasin, tandis qu'au bout du dépôt, au sud, se trouve le quai de chargement et déchargement.^"
+else
+    write "L'arrière-boutique s'ouvre au nord vers le magasin, et au sud se trouve le quai.^"
+endif
+}
+
+
+object demodulateur: appareil demodulateur démodulateur de rechange machine demod bourdonnement grésillement lumière lumiere bleue bleu
+ short      un "démodulateur"
+ long         function
+ parent       arriereboutique
+ definite      le
+ mass         75
+
+{long:
+    proxy "examine demodulateur"
+}    
+
+{examine
+    if demodulateur has NOTICED
+      setstring demod_article "Le démodulateur"
+    else
+      setstring demod_article "Un démodulateur qui se trouve ici"
+    endif
+    write demod_article " grésille un peu.^"
+    ensure self has NOTICED
+}
+
+{listen_to
+    write "L'appareil fait un petit bruit de friture, mais on vous a assuré qu'il fonctionnait bien.^"
+    ensure self has NOTICED
+    ensure self has LISTENED
+if sound_supported = true
+  sound music_camion_frigo03 AUDIO_CHANNEL02
+endif
+}
+
+{show_to_lucien
+if demodulateur(parent) = camion
+  write "« Cet appareil est très bien là où il est actuellement ! »^"
+  return
+else
+      write "« Bon, il va falloir le transporter maintenant..."
+      if self has LISTENED
+    write " Au niveau du bruit, t'inquiète pas, c'est increvable ces machins-là !"
+      endif
+      write " »^"
+    ensure self has NOTICED
+endif
+}
+
+{move : pull : turn : take
+if camion_location = "cottage"
+  proxy "help lucien"
+  endif
+if demodulateur(parent) = camion
+  write "Cet appareil est très bien là où il est actuellement !^"
+  return
+endif
+if planche(parent) = here : planche(parent) = player
+  if planche has BREAKED
+      write "Lucien regarde la planche à roulette et vous signale qu'elle aurait été plus utile si vous ne l'aviez pas démontée.^"
+      points -10
+      return
+   else
+      write "Lucien regarde la planche à roulette et vous félicite pour votre trouvaille.^"
+      write "« Il ne reste plus qu'à glisser le démodulateur sur la planche pour le faire rouler jusqu'à la camionnette. Ce n'est pas une affaire facile, mais ce n'est pas si compliqué en fin de compte. »^
+      write "^"
+      write "Au bout d'un moment, vous vous retrouvez près du camion chargé.^"
+      points 30
+      move player to quai
+      move lucien to quai
+      move demodulateur to camion
+   endif
+else      
+    write "C'est un peu lourd pour vous si vous souhaitez manipuler seul ce démodulateur.^"
+    write "« Il faudrait qu'on trouve le chariot pour le déplacer jusqu'au camion. », vous annonce Lucien.^"
+    set time = false
+    ensure self has NOTICED
+    return 
+endif
+# marche pas si trop lourd
+}
+
+
+# bug avec push car = à move (push n'existe pas. Or c'est dans l'exemple... TODO) bugreport)
+
+
+# Le quai
+
+location quai: quai embarquement dechargement déchargement
+  short       name "Le quai de déchargement"
+  north        arriereboutique
+  
+  
+object camionnette: camion frigo frigorifique fourgonette camionnette vehicule véhicule couleurs chatoyantes
+  has CONTAINER CLOSABLE CLOSED SURFACE
+  capacity    400
+    mass        heavy
+   definite    le
+ short        un "camion frigorifique"
+ long        function
+ 
+{long
+if here = quai
+  write "Le seul véhicule qui reste ce matin est la camionnette.^"
+  else
+    if here = camion
+      write "Vous êtes dans la cabine.^"
+    else
+    write "La camionnette se trouve là.^"
+    endif
+  endif
+}
+
+{examine
+  write "Ce camion est un des plus vieux du magasin. Normalement plus personne ne l'utilise, mais il sert aux dépannages. Avec ses couleurs chatoyantes, on ne va pas passer inaperçus, c'est sûr ! C'est d'ailleurs dans l'objectif avoué de l'enseigne « Frisoni & fils - Mercerie, Droguerie et Quincaille » de se faire remarquer dans toutes les chaumières. Les lettres rouges et oranges sont néanmoins presque complètement effacées maintenant.^"
+}
+
+{read
+  write "« Fr soni & fils - Merc rie, Dr  uerie et Quinc  lle. Les    duits   mme dans l  r clame ! »^"
+}
+
+{turn_on : turn_off : use
+if demodulateur(parent) = camion
+  write "« Ok, montons dans ce camion alors. Tout ce dont on a besoin ce matin est chargé. »^"
+  execute "+enter_camion"
+ else
+  write "« On ne va pas partir sans notre marchandise. », se plaint Lucien.^"
+  return   
+}
+
+{show_to_lucien
+  write "« Il n'est pas prévu pour ça, mais il ne reste que celui-là pour aujourd'hui, quelle poisse, c'est pénible à charger, pénible à décharger, ça se conduit mal, bref ce n'est pas notre jour de chance. »^"
+}
+
+{enter
+if camion_location = "cottage"
+  write "« On ne remonte pas dans la cabine tant que la cliente n'est pas livrée, voyons ! »^"
+  return 
+  endif
+if camion_location = "clairiere"
+  write "Lucien pourrait se réveiller d'un moment à un autre, cela ne serait pas très sérieux de rentrer de nouveau dans la cabine.^"
+  return 
+  endif
+if camionnette hasnt ENTERED
+  move player to camion
+  move lucien to camion
+  move camionnette to camion
+  write "Lucien prend place sur le siège en velour du conducteur, tandis que vous prenez celui du passager.^"
+else
+   write "Vous êtes déjà dans le camion^."
+}
+
+
+object lettres: lettres lettre rouges oranges rouge orange 
+ has        FEMALE PLURAL 
+ short        des "lettres"
+ long        "Des lettres pimpantes formant le logo de Frisoni & fils.^"
+ definite      les
+ parent      quai
+ mass        scenery
+
+{read
+  write "« Fr soni & fils - Merc rie, Dr  uerie et Quinc  lle. Les    duits   mme dans l  r clame ! »^"
+}
+
+object radio: radio tsf poste
+ has            FEMALE
+ short      une "radio"
+ long        "Une vieille radio équipe la cabine de ce camion.^"  
+ definite       la
+ parent       camion
+ mass          scenery
+
+{turn_on : turn_off : use : listen
+  write "La radio diffuse une chanson qui parle de " player{chanson}"^"
+}
+
+
+# FAKE object 
+
+location camion: quai embarquement dechargement déchargement cabine volant sièges sieges siege vitre pare-brise
+  short       name "Le camion"
+ 
+
+  
+# Devant le magasin
+
+location devantmagasin: devant le grand magasin dehors out pancarte enseigne tele televiseur téléviseur télévision rue television tv enfants velocycles vélocycles piétons pietons navettes dalles granit
+  short       name "Devant le Grand Magasin"
+  south        magasin2 
+  in        magasin2
+
+{look
+if here hasnt VISITED
+    write "C'est vrai que ce magasin a de la classe : une grande devanture fraîchement repeinte en ocre crème et rouge bordeau, avec en lettre d'or l'enseigne « Frisoni & fils - Mercerie, Droguerie et Quincaille. Les produits comme dans la réclame ! ». Un téléviseur encadré de cuivre diffuse des publi-informations à caractères médicaux ou culinaires.^Le quartier également respire la joie de vivre et la sérénité. Des enfants jouent sur les trottoirs recouverts de dalles de granit. Seuls des vélocycles et des piétons circulent dans cette artère passante. Quelques navettes planent au loin, sans un bruit, avec juste des volutes de vapeur sur leurs sillages, rapidement dispersées.^"
+else
+    write "La devanture du magasin s'intègrent parfaitement avec le cachet sans histoire de ce quartier. Une enseigne claironne « Frisoni & fils - Mercerie, Droguerie et Quincaille. Les produits comme dans la réclame ! »^"
+endif
+}
+
+{movement
+if compass == south : compass == in
+  if CONCLUSION == 0
+    return false
+   else
+    if LUCIEN_EXALTED > 3
+      write "Vous poussez la porte. Votre patronne s'étonne de vous voir arriver seul. Vous lui expliquez ce qui s'est passé, et elle vous confirme qu'elle s'inquiétait elle-aussi pour la santé mentale de Lucien. Elle vous fait asseoir dans le grand fauteuil à son bureau, pendant qu'elle va prévenir la police. Elle revient quelques minutes plus tard, et vous propose quelques gâteaux pour vous remettre de vos émotions.^^Finalement, vous n'avez pas passé une si mauvaise journée que cela, même si c'est la plus étrange que vous ayez eu dans votre petite vie tranquille !^"
+      points 15
+      execute "+game_over" 
+      return true
+    else
+      write "Vous poussez la porte. Votre patronne s'étonne de vous voir arriver seul. Vous lui expliquez ce qui s'est passé, mais vous n'êtes pas très convaincant : pourquoi avoir quitté votre travail comme cela, sans bonne raison ?^^On vous fait rentrer chez vous, mais vous avez des doutes sur votre avenir dans l'entreprise Frisoni & Fils.^"
+      points -20
+      execute "+game_over"
+    endif
+ endif
+else
+   write "Madame Frisoni fait de grands mouvements pour vous signifier de revenir au travail.^"
+   return
+endif
+return false
+}
+
+
+object bille: bille, balle, boule, billes, balles, boules
+  has         FEMALE
+  mass         1
+  definite     la
+  parent    limbo
+  short        une "bille en métal"
+  long        "Une bille en métal brille sur le sol.^"
+ 
+{throw_at_camion 
+if camion has BREAKED
+  write "Vous vous êtes déjà acharné sur la vitre.^"
+  else
+ if camion_location = "clairiere"
+    write "Vous lancez la bille vers le pare-brise, ce qui le casse et détourne l'attention de Lucien. Heureusement le camion est déjà arrêté, ce qui évite l'accident, mais vous n'êtes pas long à profiter de la situation et à assomer l'homme qui devenait par trop menaçant.^"
+    move bille to here
+    set CONCLUSION = 1
+    ensure camion has BREAKED
+    move lucien to limbo
+    move player to clairiere
+    # move camion to clairiere
+    move camionnette to clairiere
+    points 20
+    write "Vous ressortez du camion.^"
+  else
+    if camion_location = "quai"
+    write "Vous lancez la bille vers le pare-brise ce qui le casse directement. Lucien va chercher Madame Frisoni, et vous êtes renvoyé immédiatement. C'est si dommage de perdre son travail sur un coup de tête !^"
+    ensure camion has BREAKED
+    points -10
+    execute "+game_over" 
+      else    
+    write "Vous lancez la bille vers la vitre et la cassez un peu bêtement. Lucien vous regarde d'un air interloqué. « Mais pourquoi as-tu fait ça ? Tu n'es pas bien dans ta tête... Au retour, je dirai évidemment que c'est de ta faute ! »^"
+    move bille to here
+    ensure camion has BREAKED
+    points -5
+      endif
+   endif
+ endif
+}
+
+{throw_at_lucien
+ifall lucien(parent) = camion : LUCIEN_EXALTED > 3
+ if camion_location = "clairiere"
+    write "Vous lancez la bille vers Lucien, mais ça ne lui fait pas grand chose, sauf de l'énerver un peu plus. La bille roule sur le plancher.^"
+    move bille to here
+  else
+    write "Vous lancez la bille sous les pédales de Lucien, qui perd le contrôle du véhicule.^Après une brève embardée et une sortie de route spectaculaire, le camion atterrit dans un fossé boueux. Choqué, vous préférez vous éloigner du véhicule avant qu'il n'explose, ou que son conducteur vous pourchasse...^"
+    points 20
+    ensure camion has BREAKED
+    set CONCLUSION = 1
+    move player to retour
+    #TODO faire plus de possibilités...
+  endif
+else
+  write "Vous décidez finalement que cela ne sera pas très utile dans le contexte actuel, et vous vous ravisez au dernier moment.^"
+  endall
+}
+
+object bague: cercle, cerceau, bague, arceau, rondelle
+  has         FEMALE
+  mass         1
+  definite     la
+  parent    limbo
+  short        une "bague en métal"
+  long        "Une bague en métal se trouve par terre.^"
+  
+{examine 
+  write "C'est une grosse bague en acier qui retenait les billes du roulement de la planche à roulettes.^"
+}
+
+object planche: planche roulettes roulette roues roue roulement
+  has        SURFACE
+  capacity      12
+  mass       4
+   definite    la
+   parent    devantmagasin
+ short        une "planche a roulettes"
+ long        function
+ 
+ {long
+ if planche(parent) = devantmagasin
+   write "Une planche à roulette en bois est posée contre la devanture du magasin.^"
+else
+    write "Une planche à roulette.^"
+endif
+}
+
+{examine
+ if self(parent) = devantmagasin
+  write "Un garnement a sans doute oublié sa planche à roulettes ici.^" 
+else
+  write "Une planche à roulette, avec quatre petites roues montées sur roulement.^"
+  endif
+}
+
+
+{break
+if planche has BREAKED
+    write "La planche est déjà démontée.^"
+  else
+    write "En tirant sur les roulettes, celles-ci se démontent, le roulement à billes saute, laissant tomber sur le sol quelques composants le constituant.^"
+    points 25
+    move bague to here
+    move bille to here
+    ensure planche has BREAKED
+ endif
+}
+
+{open : pull
+  proxy "break planche"
+}
+
+string dir_fall "avant"
+
+{climb_up
+set max_rand = 2
+set ALEATOIRE = random
+if ALEATOIRE = 1
+    setstring dir_fall "avant"
+    else
+    setstring dir_fall "arrière"
+endif
+if planche has BREAKED
+  write "La planche n'est plus en état de fonctionner pour son usage habituel.^"
+  else
+  write "Ce n'est sans doute plus de votre âge. Aussitôt le pied posé sur la planche, celle-ci est propulsée en " dir_fall " et vous tombez à la renverse.^"
+  write "Aïe !^"
+    return
+ endif
+}
+
+
+# La campagne
+
+location campagne: campagne dehors
+  short       name "La campagne."
+  east        arriereboutique
+  
+{look
+write "Vous êtes en rase campagne. Quelques usines parsèment deci delà la route, en bordure des champs ou des bosquets."
+}
+  
+
+# La foret
+
+location foret: foret
+  short       name "Dans la forêt"
+  east        retour
+
+{look
+write "La forêt recouvre encore une partie du territoire, mais souvent il s'agit de quelques points de verdure clairsemée, qui donne l'impression que l'homme s'intéresse encore à la nature. Pourtant dans les faits, l'homme de ce siècle est entièrement tourné vers les sciences et le social. La ville et ses mystères modernes se trouvent vers l'est.^"
+}
+  
+  
+# La clairière
+
+location clairiere: clairiere
+  short       name "Dans la clairière"
+  east        retour
+
+{look
+write "C'est vraiment une clairière sinistre. Vous pouvez la quitter en allant vers l'est.^"
+#TODO 
+}
+
+# TODO sophiejeanne dans clairière ?
+
+
+# Le cottage
+
+location cottage: cottage
+  short       name "Près du cottage"
+  east        retour
+
+{look
+write "Un fort beau cottage, à l'image des autres que l'on peut trouver dans ce village, embellit le paysage de sa présence rassurante.^"
+# TODO more desc.
+}
+  
+  
+#  TODO : autres routes
+
+# La route
+
+
+object route: route chemin voie 
+ has               SURFACE FEMALE
+ short          une "route"
+ definite       la
+
+
+# Le retour
+
+location retour: retour    
+  short         name "Retour en ville"
+  west        foret
+
+integer CONCLUSION
+
+{look
+  write "Vous marchez quelques heures dans la campagne avant d'arriver aux portes de la ville. La brise qui se lève est un peu fraîche, mais ce n'est pas désagréable, même en cette saison un peu froide. Votre marche vous réchauffe et vous endurcit un peu.^^Vous arrivez enfin dans la rue où siège « Frisoni & Fils ». Vous regardez encore une fois la devanture du magasin, ne sachant pas trop quoi dire à Madame Frisoni, cette histoire paraissant si invraisemblable.^"
+  move player to devantmagasin
+}
+
+  
+## Moteur du jeu ##
+
+    
+
+object ground: ground sol carrelage
+ has            SURFACE NO_TAB
+ short          un "sol"
+ definite        le
+
+integer status_window 3
+integer OFFSET
+
+string status_text
+
+{+update_status_window 
+style reverse
+padstring status_text " " status_width
+write status_text
+cursor 0 1
+write status_text
+cursor 0 2
+write status_text
+cursor 1 1
+write here{The}
+setstring status_text "Score : " score " Moves: " total_moves
+set OFFSET = status_width
+length INDEX status_text
+set OFFSET - INDEX
+set OFFSET - 1
+cursor OFFSET 1
+write status_text
+style normal
+}
+
+
+{+bootstrap
+if interpreter = CGI
+   setstring command_prompt "Tapez votre commande > "
+endif
+}
+
+
+constant title_image "/images/camion_frigo.png"
+constant footer_image "none"
+constant header_colour "#777"
+constant linkbar_colour "#999"
+constant maintext_colour "#dedede"
+
+
+#debug "debug.library"
+#include "french_webinterface.library"
+#include "webinterface.css"
+#include "npc.library"
+#include "utils.library"
+#include "french_verbs.library"
+
+
+# TODO : voir pour ^ à la fin de la description "long" en fct des objets
+
+
+

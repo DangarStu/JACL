@@ -1,0 +1,2 @@
+LINKLIBS =
+GLKLIB = -lcheapglk

@@ -1,0 +1,879 @@
+#!../bin/jacl
+
+constant 	game_version	1
+constant	game_title		"Dungeon 80"
+constant	game_author		"Stuart Allen"
+constant	ifid			"JACL-009"
+
+constant	MAX_DEPTH		7
+
+constant	dun_north		1
+constant	dun_south		2
+constant	dun_east		3
+constant	dun_west		4
+
+# The 2D array for storing the map
+integer_array map_array 36
+integer_array map_array_offsets 2
+integer map_array_dimensions 6 6
+
+integer next_location loc1
+integer previous_location loc1
+
+# These arrays store the number of exits from each location
+# and the last location created.
+# These are needed for building due to the current lack 
+# of local variables in JACL
+integer_array exit_count 50
+
+integer_array location_stack 40
+integer location_stack_index
+
+{+intro
+style bold
+write "^^" game_title 
+style normal
+write " by " game_author "^^"
+
+execute "+new_map"
+write "^^"
+execute "+look_around"
+}
+
+location test
+
+{+plan_view
+# NORTH WALL
+if here = false 
+   write wall_image wall_image wall_image wall_image wall_image 
+else
+   if here(north) = nowhere
+      write wall_image wall_image wall_image wall_image wall_image 
+   else
+      if here(gate_dir) = dun_north
+         write wall_image wall_image 
+         execute here(gate_obj).image
+         write wall_image wall_image 
+      else
+         write wall_image wall_image blank_image wall_image wall_image 
+      endif
+   endif
+endif
+# NORTH OF MIDDLE
+write "^"
+if here = false 
+   write wall_image wall_image wall_image wall_image wall_image 
+else
+   write wall_image blank_image blank_image blank_image wall_image 
+endif
+# MIDDLE WALL
+write "^"
+if here = false 
+   write wall_image wall_image wall_image wall_image wall_image 
+else
+   if here(west) = nowhere
+      write wall_image
+   else
+      if here(gate_dir) = dun_west
+         execute here(gate_obj).image
+      else
+         write blank_image
+      endif
+   endif
+   write blank_image
+   execute "+display_key"
+   write blank_image
+   if here(east) = nowhere
+      write wall_image
+   else
+      if here(gate_dir) = dun_east
+         execute here(gate_obj).image
+      else
+         write blank_image
+      endif
+   endif
+endif
+# SOUTH OF MIDDLE
+write "^"
+if here = false 
+   write wall_image wall_image wall_image wall_image wall_image 
+else
+   write wall_image blank_image blank_image blank_image wall_image 
+endif
+# SOUTH WALL
+write "^"
+if here = false 
+   write wall_image wall_image wall_image wall_image wall_image 
+else
+   if here(south) = nowhere
+      write wall_image wall_image wall_image wall_image wall_image 
+   else
+      if here(gate_dir) = dun_south
+         write wall_image wall_image 
+         execute here(gate_obj).image
+         write wall_image wall_image 
+      else
+         write wall_image wall_image blank_image wall_image wall_image 
+      endif
+   endif
+ endif
+write "^"
+}
+
+{+display_key
+if blue_key(parent) = here
+   execute blue_key.image
+   return
+endif
+if green_key(parent) = here
+   execute green_key.image
+   return
+endif
+if red_key(parent) = here
+   execute red_key.image
+   return
+endif
+write blank_image
+}
+
+integer BUILD_DEPTH
+integer KEY_DEPTH
+integer DOOR_DEPTH
+
+integer deep_rooms
+
+{+new_map
+#Reset all the object's locations
+set blue_gate(parent) = nowhere
+set green_gate(parent) = nowhere
+set red_gate(parent) = nowhere
+
+# Clear the number of MAX_DEPTH room in map.
+set deep_rooms = 0
+
+# Initialise the 2D array using utils helper functions.
+execute "+init_array<map_array" 
+
+# Start with location 1.
+set here = loc1
+
+# Put this location in the middle of the bottom row (or preferred place).
+execute "+set_array<map_array<loc1<2<3"	
+set loc1(x) = 2
+set loc1(y) = 3
+
+execute "+build_map"
+}
+
+{+build_map
+#write "----------------- building " here{the} " ----------------------------^"
+# Code to make the map (think tree) a bit bushier
+set BUILD_DEPTH + 1
+
+if BUILD_DEPTH = 1
+   set exit_count[here] = 4		; Force the starting location to have four exits
+else
+   if BUILD_DEPTH = MAX_DEPTH
+      set deep_rooms + 1
+      set exit_count[here] = 0		; When the maximum tree depth is reached make 
+									; all locations dead ends
+   else
+      if BUILD_DEPTH = KEY_DEPTH
+         execute "+add_key"
+      endif
+      set max_rand = 4 			; Maximum number of new exits from any room is 0-3.
+								; 0 new exits means that the only exit is the way
+								; the player came in, so this location is a dead end
+      set INDEX = random -1
+      set exit_count[here] = INDEX
+   endif
+endif
+
+while exit_count[here] > 0
+   #write "DEBUG: " exit_count[here] " exits to go^"
+
+   # Pick a direction for this exit
+   set INDEX = +pick_direction
+   if INDEX = fail
+      # Give up on finding any more exists from this location.
+      #write "DEBUG: failed to find available direction from " here{the} "^"
+      set exit_count[here] = 0
+      break					
+   endif
+
+   if here(gate_dir) = nowhere
+      if BUILD_DEPTH = DOOR_DEPTH
+         execute "+add_gate"
+      endif
+   endif
+   set next_location + 1				; Get the next unused location
+   set new_location = next_location		; Set the new location to this one
+
+   # Store the current location on the stack so we can return to it.
+   execute "+push_stack<location_stack<here"
+
+   #write "DEBUG: setting exit " temp " for location " here{the} " to " new_location{the} ".^"
+   set here(INDEX) = new_location		; Link the current location to the new one using the 
+										; direction picked by +pick_direction
+
+   # Store this new location in the map grid (a 2D array) 
+   # and also store the locations coordinates in the location object
+   execute "+set_array<map_array<new_location<new_x<new_y"	
+   set new_location(x) = new_x
+   set new_location(y) = new_y
+
+   # Create the reciprocal connection - from the new location back to the current
+   if INDEX = north
+      set new_location(south) = here
+   endif
+   if INDEX = south
+      set new_location(north) = here
+   endif
+   if INDEX = east
+      set new_location(west) = here
+   endif
+   if INDEX = west
+      set new_location(east) = here
+   endif
+
+   # Move to the new location
+   set here = new_location
+   #write "DEBUG: here now equals " here ^
+
+   # Move on to build the tree from this new location
+   execute "+build_map"
+
+   #write "DEBUG: " exit_count[here] " remaining exits for " here{the} "^"
+   set exit_count[here] - 1
+endwhile
+
+#write "DEBUG: all exits done for " here{the} ^
+set BUILD_DEPTH - 1
+if location_stack_index != 0
+   set here = +pop_stack<location_stack
+   #write "DEBUG: *** moving back to " here{the} " index number "  location_stack_index " ***^"
+endif
+}
+
+{+add_key
+if blue_key(parent) = nowhere
+   set blue_key(parent) = here
+   return
+endif
+if green_key(parent) = nowhere
+   set green_key(parent) = here
+   return
+endif
+if red_key(parent) = nowhere
+   set red_key(parent) = here
+   return
+endif
+}
+
+constant gate_obj 12
+constant gate_dir 13
+
+{+add_gate
+if blue_gate(parent) = nowhere
+   set here(gate_dir) = INDEX
+   set here(gate_dir) + 1
+   set blue_gate(parent) = here
+   set here(gate_obj) = blue_gate
+   return
+endif
+if green_gate(parent) = nowhere
+   set here(gate_dir) = INDEX
+   set here(gate_dir) + 1
+   set green_gate(parent) = here
+   set here(gate_obj) = green_gate
+   return
+endif
+if red_gate(parent) = nowhere
+   set here(gate_dir) = INDEX
+   set here(gate_dir) + 1
+   set red_gate(parent) = here
+   set here(gate_obj) = red_gate
+   return
+endif
+}
+
+constant fail 100
+integer temp
+integer ncounter 
+integer new_location
+
+{+pick_direction
+set ncounter = 0
+set max_rand = 4
+set temp = random - 1
+repeat
+   set temp = random - 1
+   #write "DEBUG: picked direction " temp "^"
+   if here(temp) = nowhere 
+      # This exit hasn't been used yet, so far so good.
+      if +check_bounds<temp = true
+         #write "DEBUG: bounds check passed^"
+         return temp
+      endif 
+      #write "DEBUG: bounds check failed^"
+   else
+      #write "DEBUG: direction chosen for " here{the} " already set to " here(temp){the} "^"
+   endif
+   set ncounter + 1
+until ncounter = 10
+return fail
+}
+
+integer new_x
+integer new_y
+
+{+check_bounds
+#write "DEBUG: currently at " here(x) ", " here(y) "^"
+if arg[0] = north
+   if here(y) = 0
+      #write "DEBUG: north is off grid^"
+      return false ; Off the grid.
+   endif
+   set new_y = here(y) - 1	; One square up.
+   set new_x = here(x)
+   if +get_array<map_array<new_x<new_y = 0
+      ; The square above is empty so everything is okay for a 
+      ; north exit from this location.
+      return true
+   endif
+endif
+if arg[0] = south
+   if here(y) = 5
+      #write "DEBUG: south is off grid^"
+      return false ; Off the grid.
+   endif
+   set new_y = here(y) + 1	; One square down.
+   set new_x = here(x)
+   if +get_array<map_array<new_x<new_y = 0
+      ; The square above is empty so everything is okay for a 
+      ; south exit from this location.
+      return true
+   endif
+endif
+if arg[0] = east
+   if here(x) = 5
+      #write "DEBUG: east is off grid^"
+      return false ; Off the grid.
+   endif
+   set new_x = here(x) + 1	; One square right.
+   set new_y = here(y)
+   if +get_array<map_array<new_x<new_y = 0
+      ; The square above is empty so everything is okay for a 
+      ; east exit from this location.
+      return true
+   endif
+endif
+if arg[0] = west
+   if here(x) = 0
+      #write "DEBUG: west is off grid^"
+      return false ; Off the grid.
+   endif
+   set new_x = here(x) - 1	; One square down.
+   set new_y = here(y)
+   if +get_array<map_array<new_x<new_y = 0
+      ; The square above is empty so everything is okay for a 
+      ; west exit from this location.
+      return true
+   endif
+endif
+#write "DEBUG: square " new_x ", " new_y " not empty^"
+return false
+}
+
+object kryten: myself self me
+ has		ANIMATE
+ short		name "yourself"
+ capacity	42
+ parent		loc1
+ player
+
+{examine
+write "As beautiful as ever.^"
+execute "+inventory"
+}
+
+{take
+write "...seriously?^"
+set time = false
+}
+
+
+{+no_light
+write "It is too dark to see.^"
+set time = false
+}
+
+{+title
+style subheader
+write here{The} ^
+style normal
+if player has SITTING
+   write "(sitting)^"
+endif
+}
+
+integer status_window 3
+integer OFFSET
+
+string status_text
+
+{+update_status_window 
+style reverse
+padstring status_text " " status_width
+write status_text
+cursor 0 1
+write status_text
+cursor 0 2
+write status_text
+cursor 1 1
+write here{The}
+setstring status_text "Score: " score " Moves: " total_moves
+set OFFSET = status_width
+length INDEX status_text
+set OFFSET - INDEX
+set OFFSET - 1
+cursor OFFSET 1
+write status_text
+style normal
+}
+
+object blue_gate : blue gate
+  short		the "blue gate"
+
+{image
+write "<image src=~/images/tiles/blue_gate.png~>"
+}
+  
+object green_gate : green gate
+  short		the "green gate"
+  
+{image
+write "<image src=~/images/tiles/green_gate.png~>"
+}
+  
+object red_gate : red gate
+  short		the "red gate"
+  
+{image
+write "<image src=~/images/tiles/red_gate.png~>"
+}
+  
+object blue_key : blue key
+  short		the "blue key"
+  parent	nowhere
+  mass		5
+
+{image
+write "<image src=~/images/tiles/blue_key.png~>"
+}
+  
+object green_key : green key
+  short		the "green key"
+  parent	nowhere
+  mass		5
+  
+{image
+write "<image src=~/images/tiles/green_key.png~>"
+}
+  
+object red_key : red key
+  short		the "red key"
+  parent	nowhere
+  mass		5
+  
+{image
+write "<image src=~/images/tiles/red_key.png~>"
+}
+  
+location start_of_list
+
+# The locations, a bit ugly...
+
+location loc1 : one
+  short		name "Location one"
+
+location loc2 : two
+  short		name "Location two"
+
+location loc3 : three
+  short		name "Location three"
+
+location loc4 : four
+  short		name "Location four"
+
+location loc5 : five
+  short		name "Location five"
+
+location loc6 : six
+  short		name "Location six"
+
+location loc7 : seven
+  short		name "Location seven"
+
+location loc8 : eight
+  short		name "Location eight"
+
+location loc9 : nine
+  short		name "Location nine"
+
+location loc10 : ten
+  short		name "Location ten"
+
+location loc11 : eleven
+  short		name "Location eleven"
+
+location loc12 : tweleve
+  short		name "Location twelve"
+
+location loc13 : thirteen
+  short		name "Location thirteen"
+
+location loc14 : fourteen
+  short		name "Location fourteen"
+
+location loc15: fifteen
+  short		name "Location fifteen"
+
+location loc16 : sixteen
+  short		name "Location sixteen"
+
+location loc17 : seventeen
+  short		name "Location seventeen"
+
+location loc18 : eighteen
+  short		name "Location eighteen"
+
+location loc19 : nineteen
+  short		name "Location nineteen"
+
+location loc20 : twenty
+  short		name "Location twenty"
+
+location loc21 : twenty one
+  short		name "Location twenty one"
+
+location loc22 : twenty two
+  short		name "Location twenty two"
+
+location loc23 : twenty three
+  short		name "Location twenty three"
+
+location loc24 : twenty four
+  short		name "Location twenty four"
+
+location loc25 : twenty five
+  short		name "Location twenty five"
+
+location loc26 : twenty six
+  short		name "Location twenty six"
+
+location loc27 : twenty seven
+  short		name "Location twenty seven"
+
+location loc28 : twenty eight
+  short		name "Location twenty eight"
+
+location loc29 : twenty nine
+  short		name "Location twenty nine"
+
+location loc30 : thirty
+  short		name "Location thirty"
+
+location loc31 : thirty one
+  short		name "Location thirty one"
+
+location loc32 : thirty two
+  short		name "Location thirty two"
+
+location loc33 : thirty three
+  short		name "Location thirty three"
+
+location loc34 : thirty four
+  short		name "Location thirty four"
+
+location loc35 : thirty five
+  short		name "Location thirty five"
+
+location loc36 : thirty six
+  short		name "Location thirty six"
+
+location end_of_list
+
+integer xaxis 
+integer yaxis
+integer current_location
+
+grammar map numbered >map_numbered
+
+{+map_numbered
+style preformatted
+set yaxis = 0
+repeat
+   execute "+display_row"
+   set yaxis + 1
+until yaxis = 6
+style normal
+}
+
+integer location_number
+{+display_row
+set xaxis = 0
+repeat
+   set current_location = +get_array<map_array<xaxis<yaxis
+   set location_number = current_location - start_of_list	; Set status to the number of this location.
+   if current_location = false 
+      write "####"
+   else
+      if current_location(north) = nowhere
+         write "####"
+      else
+         write "#  #"
+      endif
+   endif
+   set xaxis + 1
+until xaxis = 6
+write "^"
+
+set xaxis = 0
+repeat
+   set current_location = +get_array<map_array<xaxis<yaxis
+   set location_number = current_location - start_of_list	; Set status to the number of this location.
+   if current_location = false 
+      write "####"
+   else
+      if current_location(west) = nowhere
+         write "#" location_number
+      else
+         write " " location_number
+      endif
+      if current_location(east) = nowhere
+         if location_number < 10
+            write " #"
+         else 
+            write "#"
+         endif
+      else
+         if location_number < 10
+            write "  "
+         else 
+            write " "
+         endif
+      endif
+   endif
+   set xaxis + 1
+until xaxis = 6
+write "^"
+
+set xaxis = 0
+repeat
+   set current_location = +get_array<map_array<xaxis<yaxis
+   set location_number = current_location - start_of_list	; Set status to the number of this location.
+   if current_location = false 
+      write "####"
+   else
+      if current_location(south) = nowhere
+         write "####"
+      else
+         write "#  #"
+      endif
+   endif
+   set xaxis + 1
+until xaxis = 6
+write "^"
+}
+
+grammar map big >map_big
+
+{+map_big
+set yaxis = 0
+repeat
+   execute "+display_big_row"
+   set yaxis + 1
+until yaxis = 6
+}
+
+{+display_big_row
+set xaxis = 0
+repeat
+   set current_location = +get_array<map_array<xaxis<yaxis
+   if current_location = false 
+      write wall_image wall_image wall_image wall_image wall_image 
+   else
+      if current_location(north) = nowhere
+         write wall_image wall_image wall_image wall_image wall_image 
+      else
+         write wall_image wall_image blank_image wall_image wall_image 
+      endif
+   endif
+   set xaxis + 1
+until xaxis = 6
+write "^"
+
+set xaxis = 0
+repeat
+   set current_location = +get_array<map_array<xaxis<yaxis
+   if current_location = false 
+      write wall_image wall_image wall_image wall_image wall_image 
+   else
+      write wall_image blank_image blank_image blank_image wall_image 
+   endif
+   set xaxis + 1
+until xaxis = 6
+write "^"
+
+set xaxis = 0
+repeat
+   set current_location = +get_array<map_array<xaxis<yaxis
+   if current_location = false 
+      write wall_image wall_image wall_image wall_image wall_image 
+   else
+      if current_location(west) = nowhere
+         write wall_image
+      else
+         write blank_image
+      endif
+      if current_location(east) = nowhere
+         write blank_image blank_image blank_image wall_image
+      else
+         write blank_image blank_image blank_image blank_image
+      endif
+   endif
+   set xaxis + 1
+until xaxis = 6
+write "^"
+
+set xaxis = 0
+repeat
+   set current_location = +get_array<map_array<xaxis<yaxis
+   if current_location = false 
+      write wall_image wall_image wall_image wall_image wall_image 
+   else
+      write wall_image blank_image blank_image blank_image wall_image 
+   endif
+   set xaxis + 1
+until xaxis = 6
+write "^"
+
+set xaxis = 0
+repeat
+   set current_location = +get_array<map_array<xaxis<yaxis
+   if current_location = false 
+      write wall_image wall_image wall_image wall_image wall_image 
+   else
+      if current_location(south) = nowhere
+         write wall_image wall_image wall_image wall_image wall_image 
+      else
+         write wall_image wall_image blank_image wall_image wall_image 
+      endif
+   endif
+   set xaxis + 1
+until xaxis = 6
+write "^"
+}
+
+grammar map >map
+
+constant wall_image "<image src=~/images/tiles/wall.png~>"
+constant blank_image "<image src=~/images/tiles/blank.png~>"
+
+{+map
+set linebreaks = false
+style preformatted
+set yaxis = 0
+repeat
+   execute "+simple_row"
+   set yaxis + 1
+until yaxis = 6
+style normal
+set linebreaks = true
+}
+
+{+simple_row
+# TOP ROW OF LOCATIONS
+set xaxis = 0
+repeat
+   set current_location = +get_array<map_array<xaxis<yaxis
+   if current_location = false 
+      write "###"
+   else
+      if current_location(north) = nowhere
+         write "###"
+      else
+         write "# #"
+      endif
+   endif
+   set xaxis + 1
+until xaxis = 6
+write "^"
+
+# MIDDLE ROW OF LOCATIONS
+set xaxis = 0
+repeat
+   set current_location = +get_array<map_array<xaxis<yaxis
+   if current_location = false 
+      write "###"
+   else
+      if current_location(west) = nowhere
+         write "# "
+      else
+         write "  "
+      endif
+      if current_location(east) = nowhere
+         write "#"
+      else
+         write " "
+      endif
+   endif
+   set xaxis + 1
+until xaxis = 6
+write "^"
+
+# BOTTOM ROW OF LOCATIONS
+set xaxis = 0
+repeat
+   set current_location = +get_array<map_array<xaxis<yaxis
+   if current_location = false 
+      write "###"
+   else
+      if current_location(south) = nowhere
+         write "###"
+      else
+         write "# #"
+      endif
+   endif
+   set xaxis + 1
+until xaxis = 6
+write "^"
+}
+
+grammar jinfo >info
+
+{+info
+write "Deep rooms: " deep_rooms ^
+}
+
+{+bootstrap
+if interpreter = CGI
+   setstring command_prompt "Type your command: "
+endif
+set gui_mode = true
+set DOOR_DEPTH = MAX_DEPTH - 1
+set KEY_DEPTH = MAX_DEPTH - 3
+}
+
+constant title_image "/images/dungeon80.png"
+constant footer_image "none"
+constant header_colour "#8b6249"
+constant linkbar_colour "#333333"
+constant maintext_colour "#dddddd"
+
+#include "tileinterface.library"
+#include "tileinterface.css"
+#include "verbs.library"
+#include "debug.library"
+#include "utils.library"

@@ -1,0 +1,314 @@
+<html
+<head>
+	<title>The JACL Author's Guide</title>
+	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<link rel=stylesheet type="text/css" href="styles.css">
+	<meta HTTP-EQUIV=~Content-Type~ CONTENT=~text/html; charset=UTF-8~>
+</head>
+<body>
+
+<h1><a class="title" name="screendisplay0">Screen Display</a></h1>
+
+<p>Interactive fiction is primarily a text-based medium and this chapter discusses all the features of JACL that relate to the output of text. Depending on the Glk library used, JACL interpreters may also provide the ability to add graphics and sound to your games. The use of these features is covered in the following chapter, <a href="multimedia.html">Glk and Multimedia</a>.
+
+<h2><a class="section" name="screendisplay1">The WRITE Command</a></h2>
+
+<P>The <B>write</B> command is the most flexible method of outputting text. It takes one or more parameters, each separated by a whitespace, and prints the result to the screen. A parameter can either be plain text, a string or integer variable, a string or integer constant or an object macro.
+
+<P>For example, the following command:
+
+<pre>
+write Hello, world!
+</pre>
+
+<P>contains two separate parameters, the string <B>Hello</B> and the string <B>world!</B> (the comma after <b>hello</b> is considered to be white space.) When executed it will produce the following output:
+
+<pre>
+Helloworld!
+</pre>
+
+<P>This is obviously not the desired result. The correct way to print this familiar greeting is:
+
+<pre>
+write "Hello, world!"
+</pre>
+
+<P>The reason for this demonstration of how <U>not</U> to print text is that it demonstrates how the <B>write</B> command operates. Each of the parameters supplied to the <b>write</b> command is printed directly after the one before it. In the second example a single parameter containing both a space and comma is printed.
+
+<table class="infowarn">
+<tr>
+<td><img src="warning.png" alt="Warning"></td>
+<td>As with all other JACL commands, any single parameter that contains spaces must be enclosed in quotes. Failing to do this is a common cause of error.</td>
+</tr></table>
+
+<!-- NEW PAGE -->
+<h3><a class="section" name="screendisplay2">Special Characters</a></h3>
+
+<P>When printing text, the <B>write</B> command recognises the following special characters:
+
+<center>
+<table width=80%>
+<tr>
+<th>Character</th>
+<th>Output</th>
+</tr><tr>
+<td><b>^</b></td>
+<td>A caret will be translated into a newline.</td>
+</tr><tr>
+<td><b>~</b></td>
+<td>A tilde will be translated into a double quote.</td>
+</tr></table>
+</center>
+
+<p>To print the first two special characters (<b>^</b> and <b>~</b>) literally, the words <b>caret</b> and <b>tilde</b> should be used as parameters of a <b>write</b> command. 
+
+<P>Below is an example of the use of the above special characters:
+
+<pre>
+write "~Hello,~ said the boy.^"
+write "~Hello,~ said the girl in reply.^"
+</pre>
+
+<P>Each of these <B>write</B> commands prints a single parameter enclosed in quotes and together will display:
+
+<pre>
+"Hello," said the boy.
+
+"Hello," said the girl in reply.
+</pre>
+
+<h3><a class="section" name="screendisplay3">Printing the Value of Variables</a></h3>
+
+<P>If the value of a variable is to be printed, as opposed to verbatim text, the name of the variable must be entered as a separate parameter that is not enclosed in double quotes. For example, consider the following line from the <B>+score</B> function of the standard library, a <b>write</b> command with five parameters:
+
+<pre>
+write "Your score is " score "% in " total_moves " moves.^"
+</pre>
+
+<P>The output of this five parameter command will vary depending on the current value of the two variables being printed. Typed as the very first command of the game it would display:
+
+<pre>
+Your score is 0% in 0 moves.
+</pre>
+
+<h3><a class="section" name="screendisplay4">Printing the Value of Item Elements</a></h3>
+
+<P>The current value of object and location elements may also be printed using a <B>write</B> command. This is done by enclosing the name of the element in brackets directly after the object or location label. For example:
+
+<pre>
+write "The dial is set to " dial(status) "Mhz.^"
+</pre>
+
+<P>The elements of each object and location are stored in a sixteen element array (0-15). A number between 0 and 15 can be used between the brackets as an index to the object element rather than it's name. For a mapping of default element names to index numbers, see the chapter <a href="definitions.html">Definitions in Detail</a>. Constants can also be defined as a way of renaming any given element to a name that more clearly indicates its purpose. For example:
+
+<pre>
+constant fuel_left	2
+
+{+show_status
+set submarine(fuel_left) = 42
+write "FUEL: " submarine(fuel_left) ^
+}
+</pre>
+
+<p>This code defines <b>fuel_left</b> as the constant 2, then sets the second element of the object <b>submarine</b> to equal 42. Finally, it uses a <b>write</b> statement to output the current value of <b>submarine(2)</b> by using the constant <b>fuel_left</b> to improve the readability of the code. This results in the following output:
+
+<pre>
+FUEL: 42
+</pre>
+
+<h3><a class="section" name="screendisplay5">Printing the Names and Descriptions of Objects</a></h3>
+
+<P>As you can see in the file <B>verbs.library</B>, it is a common need to print the short description of the object or objects that the player referred to in his or her last move. This is done using the integer variables <b>noun1</b> and <b>noun2</b>. When used as parameters of a <B>write</B> command, these variables may be followed by either a <b>{the}</b> or a <b>{list}</b> macro to display the object's short description. Given the following object:
+
+<pre>
+object wooden_box : small wooden box
+  has          CONTAINER CLOSED CLOSABLE
+  short        a "small wooden box"
+</pre>
+
+<p>if the player refers to this box as the first object in their command, then the <b>write</b> command:
+
+<pre>
+write noun1{list}
+</pre>
+
+<P>would display, "a small wooden box", while
+
+<pre>
+write noun1{the}
+</pre>
+
+<P>would display, "the small wooden box".
+
+<P>If you require the output to be capitalised when using these macros, use <B>{The}</B> or <b>{List}</b> instead. For example, with <B>noun1</B> still set to the box object:
+
+<pre>
+write noun1{The} " is no good to eat.^"
+</pre>
+
+<P>will display, &quot;The small wooden box is no good to eat.&quot;
+
+<h3><a class="section" name="screendisplay6">Sentences Referring to Varying Objects</a></h3>
+
+<P>There are several other macros that may be used with the <B>write</B> command to assist in constructing sentences that refer to different objects at different times. They are designed to simplify the process of displaying the correct text for objects based on whether they have the attributes <B>PLURAL</B>, <b>ANIMATE</b> or <b>FEMALE</b>. They are:
+
+<center>
+<table width=80%>
+<tr>
+	<th width=40%>Macro</Th>
+	<th>Output</Th>
+</tr>
+<tr>
+	<td><i>object_label</i><b>{long}</b></td>
+	<td>Prints the objects <b>long</b> description.</td>
+</tr>
+<tr>
+	<td><i>object_label</i><b>{that}</b></td>
+	<td>Prints either the word <b>them</b> if the object has the attribute <b>PLURAL</b>, <b>him</b> if the object has the attribute <b>ANIMATE</b>, <b>her</b> if the object has the attributes <b>ANIMATE</B> and <b>FEMALE</b>, or the word <B>that</B> if the object doesn't have any of these attributes.</td>
+</tr>
+<tr>
+	<td><i>object_label</i><b>{it}</b></td>
+	<td>Prints either the word <b>they</b> if the object has the attribute <b>PLURAL</b>, <b>he</b> if the object has the attribute <b>ANIMATE</b>, <b>she</b> if the object has the attributes <b>ANIMATE</B> and <b>FEMALE</b>, or the word <B>it</B> if the object doesn't have any of these attributes.</td>
+</tr>
+<tr>
+	<td><i>object_label</i><b>{does}</b></td>
+	<td>Prints the word <b>do</b> if the object has the attribute <b>PLURAL</B>, or the word <B>does</B> if the object doesn't have the attribute <B>PLURAL</B>.</td>
+</tr>
+<tr>
+	<td><i>object_label</I><B>{doesnt}</B></TD>
+	<td>Prints the word <B>don't</B> if the object has the attribute <B>PLURAL,</B> or the word <B>doesn't</B> if the object doesn't have the attribute <B>PLURAL</B>.</TD>
+</tr>
+<tr>
+	<td><i>object_label</I><B>{is}</B></TD>
+	<td>Prints the word <B>are</B> if the object has the attribute <B>PLURAL</B>, or the word <B>is</B> if the object doesn't have the attribute <B>PLURAL</B>.</TD>
+</tr>
+<tr>
+	<td><i>object_label</I><B>{isnt}</B></TD>
+	<td>Prints the word <B>aren't</B> if the object has the attribute <B>PLURAL</B>, or the word <B>isn't</B> if the object doesn't have the attribute <B>PLURAL</B>.</TD>
+</tr>
+<tr>
+	<td><i>object_label</I><B>{s}</B></TD>
+	<td>Prints the letter <B>s</B> if the object hasn't got the attribute <B>PLURAL</B>, or nothing if the object does have the attribute <B>PLURAL</B>.</TD>
+</tr>
+<tr>
+<td><i>object_label</I><B>{sub}</B></TD>
+<td>Prints the word <b>you</b> if the object is the current player, <b>he</b> if the object has the attribute <b>ANIMATE</b>, <b>she</b> if the object has both the <b>ANIMATE</b> and the <b>FEMALE</b> attribute, <b>it</b> if the object has neither the <b>ANIMATE</b> nor the <b>FEMALE</b> attribute or the word <b>they</b> if the object being refered to has the attribute <b>PLURAL</b>.</td>
+</tr><tr>
+<td><i>object_label</I><B>{obj}</B></TD>
+<td>Prints the word <b>yourself</b> if the object is the current player, <b>him</b> if the object has the attribute <b>ANIMATE</b>, <b>her</b> if the object has both the <b>ANIMATE</b> and the <b>FEMALE</b> attribute, <b>it</b> if the object has neither the <b>ANIMATE</b> nor the <b>FEMALE</b> attribute or the word <b>them</b> if the object being refered to has the attribute <b>PLURAL</b>.</td>
+</table>
+</center>
+
+<h3><a class="section" name="screendisplay7">Custom Macros</a></h3>
+
+<p>It is also possible to define your own custom macros by creating a function with the name <b>+macro_</b> followed by the name of the macro. This is primarily of use when writing a JACL game or library using a language other than English. The object the macro is being applied to will be passed to the function as an argument. The output of the macro is specified by setting the value of the string variable <b>return_value</b>. For example:
+
+<pre>
+{some_function
+write noun1{The} " " noun1{is} " verrouillé" noun1{es} ".^"
+}
+
+{+macro_es
+if arg[0] has FEMALE
+   if arg[0] has PLURAL
+      setstring return_value "es"
+   else
+      setstring return_value "e"
+   endif
+else
+   if arg[0] has PLURAL
+      setstring return_value "s"
+   else
+      setstring return_value ""
+   endif
+endif
+}
+</pre>
+
+<p>As you can see, the macro is used using the name <b>{es}</b> while the function is defined using the full name of <b>+macro_es</b>. The text to be returned by the macro is placed in the string variable <b>return_value</b> which is created internally by the interpreter.
+
+<h3><a class="section" name="screendisplay8">Printing the Value of Strings</a></h3>
+
+<P>If the value of a string is to be printed, as opposed to verbatim text, the name of the string variable or string constant must be entered as a separate parameter that is not enclosed in quotes. For example:
+
+<pre>
+constant game_title  "Tutorial Game"
+constant game_author "I. F. Author" 
+
+{+intro
+write "Welcome to " game_title " by " game_author ".^"
+}
+</pre>
+
+<P>The output of the <b>+intro</b> function will be:
+
+<pre>
+Welcome to Tutorial Game by I. F. Author.
+</pre>
+
+<h2><a class="section" name="screendisplay9">The PRINT Command</a></h2>
+
+<P>The <B>print</B> command is the primary way to output plain text. Unlike the <b>write</b> command, the values of variables, macros or string constants cannot be displayed. In fact the only thing that can be displayed by a <b>print</b> command is plain literal text. A <b>print</b> command has no parameters. On executing a <b>print</b> command the interpreter will begin printing all the text from the following line onwards until it encounters a line with a period (<b>.</b>) as the first non-whitespace character.  The lines of text will be displayed verbatim with the following considerations:
+
+<ol>
+	<li>if a line does not end with a caret (<b>^</b>), an implicit space will be printed after the line and the following line of text will continue straight after it, following the usual word wrapping rules;
+
+	<li>if a line ends with a backslash (<b>\</b>) or a caret (<b>^</b>), no implicit space will be added to the line; 
+	
+	<li>a vertical bar will be translated into a space to allow formatting such as paragraph indenting to be done.
+</ol>
+
+<p style="page-break-before: always">Below is an example of the <b>print</b> command in action (note that the colon after the word <b>print</b> is optional whitespace):
+
+<pre>
+{+intro
+clear
+print:
+   This text will be printed to the screen and
+   word wrapped in the appropriate places.
+   The backslash at the end of this line will prev\
+   ent an implicit space being printed as will
+   the caret at the end of this line.^
+   ||These two vertical bars will allow this line
+   to be indented two spaces.^
+.
+}
+
+</pre>
+<h2><a class="section" name="screendisplay10">The LOOK Command</a></h2>
+
+<P>The <b>look</b> command will print the long description of the current location and any visible objects that are in the current location. A <b>look</b> command is executed implicitly by the JACL interpreter whenever a description of the player's current location is required. This is at times such as when then player moves into a location for the first time or restores a saved game.
+
+<table class="infowarn">
+<tr>
+<td><img src="info.png" alt="Information"></td>
+<td>If the player has set the game to verbose mode (<b>DISPLAY_MODE</b> = 1), locations will not be given the attribute <b>VISITED</b>.</td>
+</tr></table>
+
+<p>The very first thing the <B>look</B> command will do is remove the attribute <b>VISITED</b> from the current location. It will then execute the global function <B>+before_look</B>. If this function exists, and returns <b>true</b>, nothing more is done. If it does not exist, or returns <b>false</b>, the function <b>+title</b> will be executed. This function is an opportunity to print extra information that is potentially relevant to all locations. For example, the <b>+title</b> function in <b>frame.jacl</b> tests if the player is currently sitting down and displays the text "(sitting)". It is also common to add the following line to the top of <b>+title</b> to give each location description a title:
+
+<pre>
+write here{The} ^
+</pre>
+
+<p> Next the <B>look</B> function associated with the current location is executed. After this has finished, the interpreter will display the text supplied by the <B>long</B> property for each object that is in the current location and doesn't have a <B>mass</B> of <B>scenery</B>.
+
+<p>If the <b>long</b> property of an object is set to <b>function</b>, that function will be executed. This is useful for descriptions that are either too long to fit in a single line of code or change during the course of the game. If the <b>long</b> property is not set to <b>function</b>, the property text is displayed verbatim. 
+
+<P>The final step in the process is that the global function <B>+after_look </B>is executed.
+
+<P>It is a convention to have a <B>look</B> command at the end of the <B>+intro </B>function so the player can see where they are and what objects are nearby when the game begins.
+
+<h2><a class="section" name="screendisplay11">The MORE Command</a></h2>
+
+<p>The <b>more</b> command will print a message and then wait for the player to press a key before continuing. The message to print is passed as the only parameter of a <b>more</b> command. If no message is provided, the message <b>[MORE]</b> is used as a default. Below is an example of using the <b>more</b> command with a custom message:
+
+<pre>
+<b>more</b> &quot;Hit any key to continue&quot;
+</pre>
+
+<!-- END OF BODY -->
+<p><a href="index.html">Back to Contents</b>
+</BODY>
+</HTML>

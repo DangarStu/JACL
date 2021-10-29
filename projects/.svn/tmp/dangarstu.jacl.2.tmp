@@ -1,0 +1,171 @@
+#!../bin/cgijacl
+#!/usr/local/jacl/bin/fcgijacl
+# -----------------------------------------------------------------------------
+
+constant status_window	0
+constant game_title		"DangarStu"
+constant game_author	"Stuart Allen"
+constant game_release    1
+constant game_build      1
+constant ifid			"JACL-002"
+
+# -----------------------------------------------------------------------------
+
+integer temp
+integer INDEX
+integer last_id			0
+integer editing
+integer errors
+
+constant SONGS			1
+constant NEWS			2
+constant LYRICS			3
+constant ABOUT			4
+
+string tab_names "DangarStu" "Songs" "News" "Lyrics" "About"
+
+{+links_div
+write "@DangarStu"
+}
+
+{+intro
+print:
+   <div class="fb-like" data-href="http://jacl.animats.net/fastcgi-bin/dangarstu.jacl" data-send="true" data-width
+="450" data-show-faces="false"></div><br>
+.
+execute "+display_songs"
+}
+                                                                                                
+{+before
+print:
+   <div class="fb-like" data-href="http://jacl.animats.net/fastcgi-bin/dangarstu.jacl" data-send="true" data-width
+="450" data-show-faces="false"></div><br>
+.
+if WEBAPP_mode = SONGS
+   execute "+display_songs"
+endif
+if WEBAPP_mode = LYRICS
+   execute "+display_lyrics"
+endif
+if WEBAPP_mode = NEWS
+   execute "+display_news"
+endif
+if WEBAPP_mode = ABOUT
+   execute "+display_about"
+endif
+return false
+} 
+
+{+display_about
+image "/images/AtMic.png" left "[Stuart at Australia Day gig]"
+print:
+  <p>For a long time now I have enjoyed writing and recording songs. 
+  In the past I have recorded more guitar-based versions of my songs but 
+  have recently discovered that using Ableton Live I am able to get something 
+  closer to that sound I have always heard in my head. I am currently a solo
+  artist although I do enjoy collaborating with others when our tastes overlap 
+  and skill sets don't. My songs, like everyone's, are affected by my 
+  influences which range from U2 to The Mighty Boosh. My interest in loop-based 
+  music was originally inspired by seeing Mr Percival perform live. I guess you 
+  could describe my music as a combination of Synthpop or Electropop with a 
+  touch of Folktronica.</p>
+.
+image "/images/cc.logo.png" left "[CC Logo]"
+image "/images/by-nc-sa.png" right "[CC BY-NC-SA]"
+print:
+  <p>All of my music is released under the Creative Commons license, 
+  “Attribution-NonCommercial-ShareAlike”. Catchy, hey? This means that you can download 
+  my songs, not just stream them, and you are free to share them with your friends as 
+  long as you give me credit for having made them. You can also make new versions so 
+  long as you release those remixes under the same license. You can’t, however, use these 
+  songs for any commercial purpose under this license.</p>
+  <p>If you do wish to use one of my songs for a commercial purpose, or even just say hello,
+  you can contact me by email at stuartallen1972@gmail.com.</p>
+  <hr>
+.
+}
+
+{+display_news
+print:
+<div style="float: left; width: 260px;">
+<script charset="utf-8" src="http://widgets.twimg.com/j/2/widget.js"></script>
+<script>
+new TWTR.Widget({
+  version: 2,
+  type: 'profile',
+  rpp: 6,
+  interval: 30000,
+  width: 250,
+  height: 500,
+  theme: {
+    shell: {
+      background: '#333333',
+      color: '#ffffff' },
+    tweets: {
+      background: '#000000',
+      color: '#ffffff',
+      links: '#f5e63f' } },
+  features: {
+    scrollbar: false,
+    loop: false,
+    live: false,
+    behavior: 'all' } }).render().setUser('DangarStu').start();
+</script>
+</div>
+<div>
+<h2>New site</h2>
+<h3>18 July 2012</h3>
+<p>Welcome to my new website! For a while I've been planning to create a space where I can bring all
+the bits and pieces relating to my music together in one place. Where possible I've tried not to
+reinvent the wheel so all the songs still live on SoundCloud and any brief news will still come through
+Twitter. Over the next few months I'm going to try to improve Facebook integration, but for now it's just
+the plain old <b>Like</b> button. I hope you enjoy the site enough to use it! ;) </p>
+<hr>
+</div>
+.
+}
+
+{+display_lyrics
+image "/images/Tapes.jpeg" right "[Blank Tapes]"
+write "<p><table><tr>"
+write "<td>The Glass Slipper</td>"
+write "<td><a href=~/cgi-bin/webchord.pl?chordpro=TheGlassSlipper.pro~ target=~_blank~>Lyrics and chords</a></td>"
+write "<td><a href=~/downloads/chordpro/TheGlassSlipper.pro~>Download Chordpro file</a></td>"
+write "</tr><tr>"
+write "<td>Stars</td>"
+write "<td><a href=~/cgi-bin/webchord.pl?chordpro=Stars.pro~ target=~_blank~>Lyrics and chords</a></td>"
+write "<td><a href=~/downloads/chordpro/Stars.pro~>Download Chordpro file</a></td>"
+write "</tr><tr>"
+write "<td>Immortaility</td>"
+write "<td><a href=~/cgi-bin/webchord.pl?chordpro=Immortality.pro~ target=~_blank~>Lyrics and chords</a></td>"
+write "<td><a href=~/downloads/chordpro/Immortality.pro~>Download Chordpro file</a></td>"
+write "</tr></table>
+}
+
+{+display_songs
+print:
+   <iframe width="100%" height="450" scrolling="no" frameborder="no" src="http://w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Fplaylists%2F995985&show_artwork=true"></iframe>
+   <a href='http://soundcloud.com/dangarstu/follow' style='text-align: left; display: block; margin: 0 auto 4px auto; width: 246px; height: 27px; font-size: 11px; padding: 36px 0 0 104px; background: transparent url(http://a1.sndcdn.com/images/badges/fmonsc/horizontal/white.png?a9a4a49) top left no-repeat; color: #ffffff; text-decoration: none; font-family: "Lucida Grande", Helvetica, Arial, sans-serif; line-height: 1.3em; outline: 0;' class='soundcloud-badge'><span style="display: block; width: 230px; white-space: nowrap; height: 20px; margin: 0 0 0 0; overflow: hidden; -o-text-overflow: ellipsis; text-overflow: ellipsis;">http://soundcloud.com/dangarstu</span></a>
+.
+}
+
+constant title_values "Mr" "Mrs" "Ms" "Miss" "Dr"
+
+location studio
+
+object you
+  player
+
+constant title_image		"/images/BandPage.jpg"
+constant footer_image		"none"
+constant header_colour		"#000000"
+constant header_height		200
+#constant linkbar_colour		"#c0b098"
+constant linkbar_colour		"#000000"
+constant maintext_colour	"#dddddd"
+constant tab_colour		"#60594e"
+
+#include "forms.library"
+#include "webapp.library"
+#include "webapp.css"
+#include "validation.library"

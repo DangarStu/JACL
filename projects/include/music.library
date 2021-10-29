@@ -1,0 +1,960 @@
+# MUSIC.library
+
+integer       MUSIC_temp
+integer       MUSIC_mode            SCALE
+
+# ADDING CHORDS TO A SONG WILL ADD THE NOTES OF THAT CHORD TO THIS ARRAY
+# INDIVIDUAL NOTES CAN ALSO BE ADDED TO THE SONG MANUALLY
+# SET OF NOTES CONTAINED IN THE SCALE, WOULD NORMALLY NOT EXCEED 7
+integer_array MUSIC_scale			28
+integer       MUSIC_scale_index
+
+integer_array MUSIC_song			28
+integer       MUSIC_song_index
+
+integer       MUSIC_scale_key		UNKNOWN
+integer       MUSIC_scale_type		UNKNOWN
+
+# THIS IS AN ARRAY OF THE KEYS THE SONG COULD POSSIBLY BE IN.
+# A SONG WITH NO NOTES COULD BE IN ANY KEY SO THAT IS THE INITIAL STATE
+integer       MUSIC_keys        	0 1 2 3 4 5 6 7 8 9 10 11
+integer       MUSIC_keys_index  	12
+
+# THESE ARE THE NOTES OF THE CHORD TO BE ANALYSED
+integer_array MUSIC_key_chord       4
+integer       MUSIC_key_chord_index
+
+# THESE ARE THE NOTES OF THE CHORD TO BE ANALYSED
+integer_array MUSIC_chord       	28
+integer       MUSIC_chord_index
+
+# THESE ARE THE INTERVALS OF THE CHORD TO BE ANALYSED
+integer_array MUSIC_intervals      	28
+integer       MUSIC_intervals_index
+
+integer_array MUSIC_chord_bass		7
+integer       MUSIC_chord_bass_index
+
+integer_array MUSIC_chord_roots		7
+integer       MUSIC_chord_roots_index
+
+integer_array MUSIC_chord_types		7
+integer       MUSIC_chord_types_index
+
+integer_array MUSIC_chord_add		5
+integer       MUSIC_chord_add_index	
+
+integer_array MUSIC_notes       	13
+integer       MUSIC_notes_index
+
+integer_array MUSIC_array			26
+integer       MUSIC_array_index
+integer       MUSIC_array_offset
+
+integer       MUSIC_counter
+integer       MUSIC_index
+integer       MUSIC_note
+
+constant interval_names "Root" "Minor second" "Major second" "Minor third" "Major third"
+constant interval_names "Perfect fourth" "Diminished fifth" "Perfect fifth" "Augmented fifth"
+constant interval_names "Major sixth" "Minor seventh" Major seventh" "Octave"
+constant interval_names "Minor ninth" "Major ninth" "Minor tenth" "Major tenth" "Perfect eleventh"
+constant interval_names "Diminished twelfth" "Perfect twelfth"
+constant interval_names "Minor thirteenth" "Major thirteenth" "Minor fourteenth" "Major fourteenth"
+
+# AN ARRAY OF THE NOTE NAMES
+constant note_names "A" "A#" "B" "C" "C#" "D" "D#" "E" "F" "F#" "G" "G#"
+constant note_names "A" "Bb" "B" "C" "Db" "D" "Eb" "E" "F" "Gb" "G" "Ab"
+
+constant SHARP           1
+constant NATURAL         0
+constant FLAT           -1
+
+# THESE ARE THE OFFSETS INTO THE note_names ARRAY. IF FLATS ARE TO BE USED
+# THEN START AT 12 and ADD THE NOTE
+constant SHARPS          0
+constant NATURALS        0
+constant FLATS           12
+
+# INFORMATION USED FOR NAMING THE KEY AND THE NOTES WITHIN IT. 
+# IN THE KEY OF 'A' (0) ALL NON-NATURAL NOTES ARE NOTATED AS SHARPS
+integer note_naming SHARPS FLATS SHARPS NATURALS FLATS SHARPS
+integer note_naming FLATS SHARPS FLATS SHARPS SHARPS FLATS
+
+# OBJECT TYPES
+
+constant CHORD           1
+constant SCALE           2
+constant NOTE            3
+
+{+bootstrap
+set MUSIC_chord_type_count = @chord_intervals / 7
+}
+
+# ARRAY OF INTERVALS
+
+integer MUSIC_chord_type_count 0
+
+constant MAJOR           0
+integer chord_intervals  0 4 7 -1 -1 -1 -1
+string chord_names       "Major"
+string chord_short_names ""
+integer chord_position   0
+
+constant MINOR           1
+integer chord_intervals  0 3 7 -1 -1 -1 -1
+string chord_names       "Minor"
+string chord_short_names "m"
+integer chord_position   0
+
+constant AUGMENTED       2
+integer chord_intervals  0 4 8 -1 -1 -1 -1
+string chord_names       "Aug"
+string chord_short_names "aug"
+integer chord_position   0
+
+constant DIMINISHED      3
+integer chord_intervals  0 3 6 -1 -1 -1 -1
+string chord_names       "Dim"
+string chord_short_names "dim"
+integer chord_position   0
+
+constant MAJOR6TH        4
+integer chord_intervals  0 4 7 9  -1 -1 -1
+string chord_names       "Major6th"
+string chord_short_names "Maj6"       
+integer chord_position   0
+
+constant 7TH             5
+integer chord_intervals  0 4 7 10 -1 -1 -1
+string chord_names       "7th"
+string chord_short_names "7"
+integer chord_position   0
+
+constant MAJOR7TH        6
+integer chord_intervals  0 4 7 11 -1 -1 -1
+string chord_names       "Major7th"
+string chord_short_names "Maj7"
+integer chord_position   0
+
+constant MINOR7TH        7
+integer chord_intervals  0 3 7 10 -1 -1 -1
+string chord_names       "Minor7th"
+string chord_short_names "m7"
+integer chord_position   0
+
+constant MAJOR9TH        8
+integer chord_intervals  0 4 7 11 15 -1 -1
+string chord_names       "Major9th"
+string chord_short_names "Maj9"
+integer chord_position   0
+
+constant MAJOR1STINV     9
+integer chord_intervals  0 5 9 -1 -1 -1 -1
+string chord_names       "Major"
+string chord_short_names ""
+integer chord_position   1
+
+constant MAJOR2STINV     9
+integer chord_intervals  0 3 8 -1 -1 -1 -1
+string chord_names       "Major"
+string chord_short_names ""
+integer chord_position   2
+
+constant ADD4            10 
+integer chord_intervals  0 4 5 7 -1 -1 -1
+string chord_names       "add4"
+string chord_short_names "add4"       
+integer chord_position   0
+
+constant UNKNOWN        -1
+
+# CHORD ATTRIBUTES
+constant rootnote        9
+constant chordtype       10
+
+# TWO OCTAVES OF INTERVALS FOR THE MAJOR SCALE
+integer major_intervals  0 2 4 5 7 9 11 12 14 16 17 19 21 23
+
+# -----------------------------------------------------------------------------
+# ALL SCALE TYPES ARE NOW DETERMINED RELATIVE TO THE ABOVE MAJOR SCALE
+# -----------------------------------------------------------------------------
+
+# --- MAJOR SCALE
+# INFORMATION USED FOR NAMING THE KEY AND THE NOTES WITHIN IT. 
+# FIRST INDEX IS 'A'. 
+# IN THE KEY OF 'A' ALL NON-NATURAL NOTES ARE NOTATED AS SHARPS
+integer note_naming SHARPS FLATS SHARPS NATURALS FLATS SHARPS
+integer note_naming FLATS SHARPS FLATS SHARPS SHARPS FLATS
+
+# THE OFFSETS RELATIVE TO THE BASELINE OF major_intervals
+integer scale_offsets NATURAL NATURAL NATURAL NATURAL NATURAL NATURAL NATURAL
+integer scale_offsets NATURAL NATURAL NATURAL NATURAL NATURAL NATURAL NATURAL
+
+# --- MINOR SCALE
+# INFORMATION USED FOR NAMING THE KEY AND THE NOTES WITHIN IT
+# FIRST INDEX IS 'A'. 
+# IN THE KEY OF 'A Minor' ALL NOTES ARE NATURAL
+integer note_naming NATURALS FLATS SHARPS FLATS SHARPS FLATS 
+integer note_naming SHARPS SHARPS FLATS SHARPS FLATS SHARPS
+
+# THE OFFSETS RELATIVE TO THE BASELINE OF major_intervals
+integer scale_offsets NATURAL NATURAL FLAT NATURAL NATURAL FLAT FLAT
+integer scale_offsets NATURAL NATURAL FLAT NATURAL NATURAL FLAT FLAT
+
+integer MUSIC_macro
+
+{+macro_chord_obj
+set MUSIC_macro = arg[0](rootnote)
+if MUSIC_scale_key != UNKNOWN
+   set MUSIC_macro + note_naming[MUSIC_scale_key]
+else
+   set MUSIC_temp = MUSIC_keys[0]
+   set MUSIC_macro + note_naming[MUSIC_temp]
+endif
+setstring return_value note_names[MUSIC_macro]
+}
+
+{+macro_chordtype
+set MUSIC_macro = arg[0]
+setstring return_value chord_names[MUSIC_macro]
+}
+
+integer MUSIC_macro2
+
+{+macro_chord
+set MUSIC_macro = arg[0]
+set MUSIC_macro2 = MUSIC_macro(rootnote)
+if MUSIC_scale_key != UNKNOWN
+   set MUSIC_macro2 + note_naming[MUSIC_scale_key]
+else 
+   set MUSIC_macro2 + note_naming[MUSIC_macro2]
+endif
+setstring return_value note_names[MUSIC_macro2] " " chord_names[MUSIC_macro(chordtype)]
+}
+
+{+macro_note_obj
+set MUSIC_macro = arg[0](rootnote)
+if MUSIC_scale_key != UNKNOWN
+   set MUSIC_macro + note_naming[MUSIC_scale_key]
+else
+   set MUSIC_temp = MUSIC_keys[0]
+   set MUSIC_macro + note_naming[MUSIC_temp]
+endif
+setstring return_value note_names[MUSIC_macro]
+}
+
+{+macro_key
+set MUSIC_macro = arg[0] % 12
+set MUSIC_temp = MUSIC_macro
+set MUSIC_macro + note_naming[MUSIC_temp]
+setstring return_value note_names[MUSIC_macro]
+}
+
+{+macro_note
+set MUSIC_macro = arg[0] % 12
+if MUSIC_scale_key != UNKNOWN
+   set MUSIC_macro + note_naming[MUSIC_scale_key]
+else
+   set MUSIC_temp = MUSIC_keys[0]
+   set MUSIC_macro + note_naming[MUSIC_temp]
+endif
+setstring return_value note_names[MUSIC_macro]
+}
+
+{+macro_scale
+set MUSIC_macro = arg[0]
+setstring return_value chord_names[MUSIC_macro]
+}
+
+# THIS FUNCTION LOOKS AT THE NOTES IN MUSIC_scale AND 
+# DETERMINES WHICH KEYS THE SONG COULD BE IN.
+
+{+determine_key
+# CLEAR THE POSSIBLE KEYS SET
+set MUSIC_keys_index = 0
+
+# LOOPING THROUGH ALL OF THE KEYS (ROOT NOTES)
+set MUSIC_counter = 0
+repeat
+   #write "DEBUG: Checking " MUSIC_counter{note} ".^"
+   # NOW LOOP THROUGH ALL THE NOTES OF THE SONG
+   if "+loop_through_scale<MUSIC_counter" = true
+      # THE SONG COULD BE IN THIS KEY, ADD IT TO THE POSSIBLE KEYS SET
+      execute "+add_to_set<MUSIC_keys<MUSIC_counter"
+   endif
+   set MUSIC_counter + 1
+until MUSIC_counter = 12
+if MUSIC_keys_index = 1
+   set MUSIC_scale_key = MUSIC_keys[0]
+endif
+}
+
+integer MUSIC_loop
+
+# LOOP THROUGH ALL THE NOTES OF THE SONG AND SEE IF THEy ARE IN THE CURRENT KEY
+
+{+loop_through_scale
+# arg[0] = root note of key
+set MUSIC_loop = 0
+while MUSIC_loop < MUSIC_scale_index
+   if "+is_in_key<arg[0]<MAJOR<MUSIC_scale[MUSIC_loop]" = false
+      # THIS NOTE IS NOT IN THE SCALE MUSIC_counter AND THEREFORE NOT IN THAT KEY 
+      return false
+   endif
+   set MUSIC_loop + 1
+endwhile
+# THERE WERE NO NOTES FROM THE SONG THAT WERE NOT IN THE CURRENT KEY
+return true
+}
+
+# IS THE SUPPLIED NOTE IN THE SUPPLIED KEY?
+{+is_in_key
+# arg[0] = root note of key
+# arg[1] = scale type
+# arg[2] = song note
+
+#write "^key = " arg[0]{note} "^"
+#write "scale = " string_arg[1] "^"
+#write "note = " arg[2]{note} "^"
+
+#write "^"
+
+# JUMP TO THE RIGHT SCALE TYPE (TWO OCTAVES PER SCALE)
+set MUSIC_array_offset = arg[1] * 14
+
+# LOOP THROUGH ALL THE NOTES IN THAT SCALE AND SEE IF THE SONG NOTE IS IN IT
+set MUSIC_index = 0
+repeat
+   set MUSIC_temp = arg[0] + major_intervals[MUSIC_index] + scale_offsets[MUSIC_array_offset]
+   set MUSIC_temp % 12
+   if MUSIC_temp = arg[2]
+      # THE SONG NOTE IS IN THIS SCALE
+      #write "DEBUG: " arg[2]{note} " is in " arg[0]{note} ".^"
+      return true
+   endif
+   set MUSIC_index + 1
+   set MUSIC_array_offset + 1
+   # ONLY LOOP THROUGH ONE OCTAVE FOR THE PURPOSE OF DETERMINING THE KEY
+until MUSIC_index = 7
+#write "^DEBUG: " arg[2]{note} " is not in " arg[0]{note} ".^"
+return false
+}
+
+# THIS FUNCTION LOOKS AT THE NOTES IN MUSIC_chord AND DETERMINES WHICH CHORDS 
+# THE SPECIFIED NOTES COULD BE
+
+integer MUSIC_type
+integer MUSIC_pos
+
+{+determine_chord
+# CLEAR THE POSSIBLE CHORD SET
+set MUSIC_chord_roots_index = 0
+set MUSIC_chord_bass_index = 0
+set MUSIC_chord_types_index = 0
+set MUSIC_chord_add_index = 0
+
+# REDUCE THE INTERVALS TO BE ZERO-BASED
+execute "+reduce_intervals<MUSIC_chord"
+
+# COMPARE MUSIC_intervals TO THE chords_intervals TO GET A PLAIN ENGLISH NAME
+set MUSIC_type = "+determine_chord_type"
+
+if MUSIC_type != UNKNOWN
+   set MUSIC_pos = chord_position[MUSIC_type]
+   # THE BELOW CODE NEEDS CHANGING, CAN'T USE SET AS THE SAME VALUE
+   # MAY BE ADDED MORE THAN ONCE, NEED TO USE PLAIN ARRAYS
+   if MUSIC_pos != 0
+      # THE BASS NOTE IS NOT THE ROOT OF THE CHORD, STORE IT FOR DISPLAYING THE CHORD NAME
+      execute "+add_to_set<MUSIC_chord_bass<MUSIC_chord[0]"
+   else
+      execute "+add_to_set<MUSIC_chord_bass<-1"
+   endif  
+   execute "+add_to_set<MUSIC_chord_roots<MUSIC_chord[MUSIC_pos]"
+   execute "+add_to_set<MUSIC_chord_types<MUSIC_type"
+endif
+}
+
+{+display_chord
+if interpreter = CGI
+   write "<div class=~keys~>"
+   write MUSIC_chord_roots[0]{note} " " MUSIC_chord_types[0]{chordtype}
+   write "<div class=~display~>"
+   write "(" MUSIC_chord[0]{note} " " MUSIC_chord[1]{note} " " MUSIC_chord[2]{note} ")"
+   write "</div>"
+   write "</div>"
+else
+   write MUSIC_chord_roots[0]{note} " " MUSIC_chord_types[1]{chordtype} "^"
+   write "(" MUSIC_chord[0]{note} " " MUSIC_chord[1]{note} " " MUSIC_chord[2]{note} ")"
+endif
+}
+
+
+{+test_chord_type
+# JUMP TO THE RIGHT SCALE TYPE (TWO OCTAVES PER SCALE)
+set MUSIC_array_offset = arg[1] * 14
+
+# LOOP THROUGH ALL THE NOTES IN THE CHORD AND SEE IF THE CHORD NOTE IS IN IT
+set MUSIC_index = 0
+repeat
+   set MUSIC_temp = arg[0] + major_intervals[MUSIC_index] + scale_offsets[MUSIC_array_offset]
+   set MUSIC_temp % 12
+   #write MUSIC_temp{note} " "
+   if MUSIC_temp = arg[2]
+      # THE SONG NOTE IS IN THIS SCALE
+      #write "DEBUG: " arg[2]{note} " is in " arg[0]{note} ".^"
+      return true
+   endif
+   set MUSIC_index + 1
+   set MUSIC_array_offset + 1
+   # ONLY LOOP THROUGH ONE OCTAVE FOR THE PURPOSE OF DETERMINING THE KEY
+until MUSIC_index = 7
+#write "^"
+#write "DEBUG: " arg[2]{note} " is not in " arg[0]{note} ".^"
+return false
+}
+
+{+display_chord_obj
+# arg[0] = chord object
+execute +display_chord<arg[0](rootnote)<arg[0](chordtype)
+}
+
+{+display_chord
+# arg[0] = root note
+# arg[1] = chord type
+
+# JUMP TO THE START OF THE RIGHT TYPE OF CHORD
+set MUSIC_array_offset = 7 * arg[1]
+
+# LOOP OVER THE NOTES OF THE CHORD
+set MUSIC_note = chord_intervals[MUSIC_array_offset]
+while MUSIC_note != -1
+    set MUSIC_note + arg[0]
+    write MUSIC_note{note}
+    set MUSIC_array_offset + 1
+    # SELECT THE NOTES FROM THE MAJOR SCALE
+    set MUSIC_note = chord_intervals[MUSIC_array_offset]
+    if MUSIC_note != -1 
+       write " "
+    endif
+endwhile
+}
+
+{+add_chord_obj
+# arg[0] = chord object
+
+execute +add_chord<arg[0](rootnote)<arg[0](chordtype)
+}
+
+integer MUSIC_rootnote
+integer MUSIC_one
+integer MUSIC_three
+integer MUSIC_five
+
+# THIS FUNCTION DISPLAYS ALL THE CHORDS IN A KEY
+# TODO - NEED TO GET THIS FUNCTION TO USE THE SET MUSIC_intervals INSTEAD OF MUSIC_chord
+# THIS WAY THE GENERAL SYSTEM IS:
+# MUSIC_chord = notes
+# MUSIC_intervals = intervals
+# chord_intervals[] = reference chords
+# THIS MEANS THE BELOW FUNCTION COULD JUST ADD THE NOTES FROM THE SCALE TO MUSIC_key_chord
+# AND UTILISE THE FUNCTION +extract_intervals
+
+{+display_chords
+# arg[0] = root note
+# arg[1] = scale type
+set MUSIC_rootnote = arg[0]
+
+# CREATE AN ARRAY OF INTERVALS FOR THE SELECTED SCALE
+set MUSIC_array_offset = arg[1] * 14
+
+set MUSIC_index = 0
+repeat
+   set MUSIC_array[MUSIC_index] = major_intervals[MUSIC_index] + scale_offsets[MUSIC_array_offset]
+   set MUSIC_index + 1
+   set MUSIC_array_offset + 1
+until MUSIC_index = 14
+
+# LOOP THROUGH THE SEVEN NOTES OF THE KEY
+set MUSIC_index = 0
+repeat
+   # CLEAR THE CHORD SET
+   set MUSIC_key_chord_index = 0
+
+   # GET THE INTERVAL OF '1' FOR THE CURRENT ROOT NOTE
+   set MUSIC_temp = MUSIC_index
+   execute "+add_to_set<MUSIC_key_chord<MUSIC_array[MUSIC_temp]"
+
+   # STORE THE ROOT NOTE OF THIS CHORD
+   set MUSIC_note = MUSIC_rootnote + MUSIC_array[MUSIC_temp]
+
+   # NOW GET THE INTERVAL OF '3' FOR THE CURRENT ROOT NOTE
+   set MUSIC_temp + 2
+   execute "+add_to_set<MUSIC_key_chord<MUSIC_array[MUSIC_temp]"
+   
+   # NOW GET THE INTERVAL OF '5' FOR THE CURRENT ROOT NOTE
+   set MUSIC_temp + 2
+   execute "+add_to_set<MUSIC_key_chord<MUSIC_array[MUSIC_temp]"
+
+   # TERMINATE THE SET
+   execute +add_to_set<MUSIC_key_chord<-1
+
+   # REDUCE THE INTERVALS TO BE ZERO-BASED
+   execute "+reduce_intervals<MUSIC_key_chord"
+
+   # COMPARE MUSIC_chord TO THE chords_intervals TO GET A PLAIN ENGLISH NAME
+   set MUSIC_temp = +determine_chord_type
+
+   # TURN THE STORED INTERVALS INTO ACTUAL NOTES
+   set MUSIC_one = MUSIC_rootnote + MUSIC_key_chord[0]
+   set MUSIC_three = MUSIC_rootnote + MUSIC_key_chord[1]
+   set MUSIC_five = MUSIC_rootnote + MUSIC_key_chord[2]
+
+   if interpreter = CGI
+      write "<div class=~keys~>"
+         write MUSIC_note{note} " " MUSIC_temp{chordtype}
+         write "<div class=~display~>"
+         write "(" MUSIC_one{note} " " MUSIC_three{note} " " MUSIC_five{note} ")"
+         write "</div>"
+      write "</div>"
+   else
+      write MUSIC_note{note} " " MUSIC_temp{chordtype}
+      write " (" MUSIC_one{note} " " MUSIC_three{note} " " MUSIC_five{note} ")^"
+   endif
+
+   set MUSIC_note + 1
+   set MUSIC_index + 1
+until MUSIC_index = 7
+}
+
+integer MUSIC_length
+integer MUSIC_base
+integer MUSIC_loop
+string  MUSIC_array_name
+string  MUSIC_string
+
+{+reduce_intervals
+# string_arg[0] = array to be reduced into MUSIC_intervals
+set MUSIC_intervals_index = 0
+
+setstring MUSIC_string string_arg[0] "_index"
+set MUSIC_length = MUSIC_string
+
+set MUSIC_loop = 0
+while MUSIC_loop < MUSIC_length
+   setstring MUSIC_array_name string_arg[0] "[" MUSIC_loop "]"
+   set MUSIC_temp = MUSIC_array_name
+   if MUSIC_temp = -1
+      execute "+add_to_set<MUSIC_intervals<-1"
+      return
+   endif
+   if MUSIC_loop = 0
+      # STORE THE FIRST INTERVAL SO IT CAN BE REMOVED FROM ALL
+      set MUSIC_base = MUSIC_temp
+   endif
+   set MUSIC_temp - MUSIC_base
+   execute "+add_to_set<MUSIC_intervals<MUSIC_temp"
+   set MUSIC_loop + 1
+endwhile
+execute "+add_to_set<MUSIC_intervals<-1"
+}
+
+# THIS FUNCTION DETERMINES THE TYPE OF CHORD A SET OF NOTES MAKES
+
+integer MUSIC_chord_type
+
+{+determine_chord_type
+# START WITH THE FIRST TYPE
+set MUSIC_chord_type = MAJOR
+
+repeat
+   if +compare_intervals = true
+      return MUSIC_chord_type
+   endif   
+
+   # THIS CHORD TYPE WASN'T A MATCH, MOVE ON TO THE NEXT
+   set MUSIC_chord_type + 1
+until MUSIC_chord_type = MUSIC_chord_type_count
+
+# THE CURRENT INTERVALS IN MUSIC_intervals DO NOT MATCH ANY KNOWN CHORD
+return UNKNOWN
+}
+
+integer MUSIC_looper
+
+{+compare_intervals
+# COMPARING ALL ELEMENTS IN MUSIC_intervals[]
+# WITH                      chord_intervals[MUSIC_array_offset]
+set MUSIC_looper = 0
+set MUSIC_array_offset = 7 * MUSIC_chord_type
+while MUSIC_looper != 7
+   if chord_intervals[MUSIC_array_offset] != MUSIC_intervals[MUSIC_looper]
+      return false
+   endif
+   ifall chord_intervals[MUSIC_array_offset] = -1 : MUSIC_intervals[MUSIC_looper] = -1
+      return true
+   endif
+   set MUSIC_array_offset + 1
+   set MUSIC_looper + 1  
+endwhile
+return false
+}
+
+integer MUSIC_toggle
+
+{+toggle_note
+if MUSIC_mode = SCALE
+   if "+is_in_set<MUSIC_song<arg[0]" = false
+      execute "+add_note<arg[0]"
+   else
+      execute "+delete_note<arg[0]"
+   endif
+else
+   if "+is_in_set<MUSIC_chord<arg[0]" = false
+      execute "+add_note<arg[0]"
+   else
+      execute "+delete_note<arg[0]"
+   endif
+endif
+}
+
+# ADD THE NOTE TO THE SONG OR CHORD
+
+{+add_note
+if MUSIC_mode = SCALE
+   execute "+add_to_set<MUSIC_song<arg[0]"
+   set MUSIC_temp = arg[0] % 12
+   execute "+add_to_set<MUSIC_scale<MUSIC_temp"
+   execute "+determine_key"
+else
+   execute "+add_to_set<MUSIC_chord<arg[0]"
+   execute "+sort_set<MUSIC_chord"
+   execute "+determine_chord"
+endif
+}
+
+# DELTE THE NOTE FROM THE SONG OR CHORD
+
+{+delete_note
+if MUSIC_mode = SCALE
+   execute "+delete_from_set<MUSIC_song<arg[0]"
+   set MUSIC_temp = arg[0] % 12
+   execute "+delete_from_set<MUSIC_scale<MUSIC_temp"
+   execute "+determine_key"
+else
+   execute "+delete_from_set<MUSIC_chord<arg[0]"
+   execute "+sort_set<MUSIC_chord"
+   execute "+determine_chord"
+endif
+}
+
+{+add_note_obj
+execute +add_note<arg[0](rootnote)
+}
+
+# THIS FUNCTION ADDS A SPECIFIED CHORD TO THE CURRENT SONG
+# arg[0] = root note
+# arg[1] = chord type
+
+{+add_chord
+# JUMP TO THE START OF THE RIGHT TYPE OF CHORD
+set MUSIC_array_offset = 7 * arg[1]
+
+# LOOP OVER THE NOTES OF THE CHORD
+set MUSIC_note = chord_intervals[MUSIC_array_offset]
+while MUSIC_note != -1
+    # ADD THE INTERVAL TO THE ROOT NOTE
+    set MUSIC_note + arg[0]
+    # DROP THE NOTE TO THE BASE OCTAVE
+    set MUSIC_note % 12
+    # ADD THE CHORDS NOTES TO THE SONG SET
+    execute +add_to_set<MUSIC_scale<MUSIC_note
+    set MUSIC_array_offset + 1
+    # SELECT THE NOTES FROM THE MAJOR SCALE
+    set MUSIC_note = chord_intervals[MUSIC_array_offset]
+endwhile
+execute "+determine_key"
+}
+
+{+name_chord
+# arg[0] = root note
+# arg[1] = chord type
+}
+
+{+display_song
+set MUSIC_index = 0
+while MUSIC_index < MUSIC_scale_index
+  write MUSIC_scale[MUSIC_index]{note} " "
+  set MUSIC_index + 1
+endwhile
+}
+
+{+display_scale
+# arg[0] = root note
+# arg[1] = scale type
+
+set MUSIC_array_offset = 14 * arg[1]
+
+write "The scale of " arg[0]{note} " contains: "
+# LOOP OVER THE SEVEN NOTES OF THE SCALE
+set MUSIC_index = 0
+repeat
+    # START WITH THE INTERVAL FOR THE MAJOR SCALE
+    set MUSIC_temp = major_intervals[MUSIC_index]
+    # ADJUST FOR THE TYPE OF SCALE REQUESTED
+    set MUSIC_temp + scale_offsets[MUSIC_array_offset]
+    # ADD THE INTERVAL TO THE ROOT NOTE
+    set MUSIC_note = arg[0] + MUSIC_temp
+    # VOILA!
+    write MUSIC_note{note} " "
+    # MOVE ON TO THE NEXT NOTE IN THE SCALE
+    set MUSIC_array_offset + 1
+    set MUSIC_index + 1
+until MUSIC_index = 7
+write "^"
+}
+
+# THIS FUNCTION ACCEPTS A SET OF NOTES AND DETERMINES WHICH CHORD THEY FORM
+{+which_chord
+}
+
+# -----------------------------------------------------------------------------
+# OBJECTS FOR ALL THE NOTES
+# -----------------------------------------------------------------------------
+
+object a : "a" note
+  class			NOTE
+  rootnote		0
+
+object as : "a#" "bb" note
+  class			NOTE
+  rootnote		1
+
+object b : "b" note
+  class			NOTE
+  rootnote		2
+
+object c : "c" note
+  class			NOTE
+  rootnote		3
+
+object cs : "c#" "db" note
+  class			NOTE
+  rootnote		4
+
+object d : "d" note
+  class			NOTE
+  rootnote		5
+
+object ds : "d#" "eb" note
+  class			NOTE
+  rootnote		6
+
+object e : "e" note
+  class			NOTE
+  rootnote		7
+
+object f : "f" note
+  class			NOTE
+  rootnote		8
+
+object fs : "f#" "gb" note
+  class			NOTE
+  rootnote		9
+
+object g : "g" note
+  class			NOTE
+  rootnote		10
+
+object gs : "g#" "ab" note
+  class			NOTE
+  rootnote		11
+
+# -----------------------------------------------------------------------------
+# OBJECTS FOR ALL THE CHORDS
+# -----------------------------------------------------------------------------
+
+object amajor : a major amaj amajor
+  class           CHORD
+  rootnote        0
+  chordtype       MAJOR
+
+object asmajor : "a#" "bb" major "bbmaj" "a#maj" "bbmajor" "a#major"
+  class           CHORD
+  rootnote        1
+  chordtype       MAJOR
+
+object bmajor : b major bmaj amajor
+  class           CHORD
+  rootnote        2
+  chordtype       MAJOR
+
+object cmajor : c major cmaj amajor
+  class           CHORD
+  rootnote        3
+  chordtype       MAJOR
+
+object csmajor : "c#" "db" major "dbmaj" "c#maj" "dbmajor" "c#major"
+  class           CHORD
+  rootnote        4
+  chordtype       MAJOR
+
+object dmajor : "d" major "dmaj" "dmajor"
+  class           CHORD
+  rootnote        5
+  chordtype       MAJOR
+
+object dsmajor : "d#" "eb" major "d#maj" "ebmaj" "d#major" "ebmajor"
+  class           CHORD
+  rootnote        6
+  chordtype       MAJOR
+
+object emajor : "e" major "emaj" "emajor"
+  class           CHORD
+  rootnote        7
+  chordtype       MAJOR
+
+object fmajor : "f" major "fmaj" "fmajor"
+  class           CHORD
+  rootnote        8
+  chordtype       MAJOR
+
+object fsmajor : "f#" "gb" major "f#maj" "gbmaj" "f#major" "gbmajor"
+  class           CHORD
+  rootnote        9
+  chordtype       MAJOR
+
+object gmajor : "g" major "gmaj" "gmajor"
+  class           CHORD
+  rootnote        10
+  chordtype       MAJOR
+
+object gsmajor : "g#" "ab" major "g#maj" "abmaj" "g#major" "abmajor"
+  class           CHORD
+  rootnote        11
+  chordtype       MAJOR
+
+# --- MINOR CHORDS
+
+object aminor : a minor amin aminor
+  class           CHORD
+  rootnote        0
+  chordtype       MINOR
+
+object asminor : "a#" "bb" minor "bbmin" "a#min" "bbminor" "a#minor"
+  class           CHORD
+  rootnote        1
+  chordtype       MINOR
+
+object bminor : b minor bmin aminor
+  class           CHORD
+  rootnote        2
+  chordtype       MINOR
+
+object cminor : c minor cmin aminor
+  class           CHORD
+  rootnote        3
+  chordtype       MINOR
+
+object csminor : "c#" "db" minor "dbmin" "c#min" "dbminor" "c#minor"
+  class           CHORD
+  rootnote        4
+  chordtype       MINOR
+
+object dminor : "d" minor "dmin" "dminor"
+  class           CHORD
+  rootnote        5
+  chordtype       MINOR
+
+object dsminor : "d#" "eb" minor "d#min" "ebmin" "d#minor" "ebminor"
+  class           CHORD
+  rootnote        6
+  chordtype       MINOR
+
+object eminor : "e" minor "emin" "eminor"
+  class           CHORD
+  rootnote        7
+  chordtype       MINOR
+
+object fminor : "f" minor "fmin" "fminor"
+  class           CHORD
+  rootnote        8
+  chordtype       MINOR
+
+object fsminor : "f#" "gb" minor "f#min" "gbmin" "f#minor" "gbminor"
+  class           CHORD
+  rootnote        9
+  chordtype       MINOR
+
+object gminor : "g" minor "gmin" "gminor"
+  class           CHORD
+  rootnote        10
+  chordtype       MINOR
+
+object gsminor : "g#" "ab" minor "g#min" "abmin" "g#minor" "abminor"
+  class           CHORD
+  rootnote        11
+  chordtype       MINOR
+
+# --- DIMINISHED CHORDS
+
+object adiminished : a diminished adim adiminished
+  class           CHORD
+  rootnote        0
+  chordtype       DIMINISHED
+
+object asdiminished : "a#" "bb" diminished "bbdim" "a#dim" "bbdiminished" "a#diminished"
+  class           CHORD
+  rootnote        1
+  chordtype       DIMINISHED
+
+object bdiminished : b diminished bdim adiminished
+  class           CHORD
+  rootnote        2
+  chordtype       DIMINISHED
+
+object cdiminished : c diminished cdim adiminished
+  class           CHORD
+  rootnote        3
+  chordtype       DIMINISHED
+
+object csdiminished : "c#" "db" diminished "dbdim" "c#dim" "dbdiminished" "c#diminished"
+  class           CHORD
+  rootnote        4
+  chordtype       DIMINISHED
+
+object ddiminished : "d" diminished "ddim" "ddiminished"
+  class           CHORD
+  rootnote        5
+  chordtype       DIMINISHED
+
+object dsdiminished : "d#" "eb" diminished "d#dim" "ebdim" "d#diminished" "ebdiminished"
+  class           CHORD
+  rootnote        6
+  chordtype       DIMINISHED
+
+object ediminished : "e" diminished "edim" "ediminished"
+  class           CHORD
+  rootnote        7
+  chordtype       DIMINISHED
+
+object fdiminished : "f" diminished "fdim" "fdiminished"
+  class           CHORD
+  rootnote        8
+  chordtype       DIMINISHED
+
+object fsdiminished : "f#" "gb" diminished "f#dim" "gbdim" "f#diminished" "gbdiminished"
+  class           CHORD
+  rootnote        9
+  chordtype       DIMINISHED
+
+object gdiminished : "g" diminished "gdim" "gdiminished"
+  class           CHORD
+  rootnote        10
+  chordtype       DIMINISHED
+
+object gsdiminished : "g#" "ab" diminished "g#dim" "abdim" "g#diminished" "abdiminished"
+  class           CHORD
+  rootnote        11
+  chordtype       DIMINISHED
+
