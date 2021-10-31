@@ -570,7 +570,7 @@ listen_again:
 			setenv("SERVER_PROTOCOL", "HTTP/1.0", 1);
 			setenv("REQUEST_METHOD", "GET", 1);
 			setenv("SCRIPT_NAME", "", 1);
-			//setenv("REMOTE_USER", getenv("REMOTE_USER"), 1);
+			//setenv("REMOTE_USER", "", 1);
 
 			setenv("CONTENT_TYPE", "", 1);
 			setenv("CONTENT_LENGTH", "", 1);

@@ -46,3 +46,4 @@ install: all
 
 clean:
 	rm -f *.o
+	rm -f cgihtml-1.69/*.o
