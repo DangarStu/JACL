@@ -162,7 +162,6 @@ read_gamefile()
 	create_integer ("multi_prefix", 0);
 	create_integer ("notify", 1);
 	create_integer ("debug", 0);
-	create_integer ("remote_user", 0);
 	create_integer ("linebreaks", 1);
 
 	/* STORE THIS SO THE SECOND PASS KNOWS WHERE TO START 
@@ -174,6 +173,7 @@ read_gamefile()
 	create_cinteger ("graphics_supported", 0);
 	create_cinteger ("sound_supported", 0);
 	create_cinteger ("timer_supported", 0);
+	create_cinteger ("remote_user", 0);
     create_cinteger ("GLK", 0);
     create_cinteger ("CGI", 1);
     create_cinteger ("NDS", 2);

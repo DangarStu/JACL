@@ -372,14 +372,15 @@ main(argc, argv)
 
 		read_cgi_input(&entries);
 
-		if (cgi_val(entries, "user_id") != NULL || (prefer_remote_user == TRUE && REMOTE_USER != NULL && strcmp("", REMOTE_USER))) {
-			// IF THIS IS TRUE THERE IS ALREADY A USABLE USER ID OF SOME FORM
-
+		if (cgi_val(entries, "user_id") != NULL) {
+			// A user_id HAS BEEN PASSED TO THIS REQUEST
 			if (prefer_remote_user == TRUE && REMOTE_USER != NULL && strcmp("", REMOTE_USER)) {
 			    /* PREFER REMOTE_USER FOR POTENTIAL SECURE SITES. */
 				strcpy (user_id, REMOTE_USER);
 				REMOTE_USER_USED->value = TRUE;
 			} else {
+				// THERE IS NO REMOTE_USER OR prefer_remote_user IS SET TO FALSE
+				// SO USE THE PASSED user_id
 				strcpy(user_id, cgi_val(entries, "user_id"));
 				REMOTE_USER_USED->value = FALSE;
 			}
@@ -393,9 +394,15 @@ main(argc, argv)
 			} else {
 				returning_player = FALSE;
 			}
+		} else if (REMOTE_USER != NULL && strcmp("", REMOTE_USER)) {
+			// REMOTE_USER IS SET AND user_id IS NULL SO USE REMOTE_USER
+			strcpy (user_id, REMOTE_USER);
+			REMOTE_USER_USED->value = TRUE;
 
+			//sprintf(error_buffer, "REMOTE_USER_USED: %d\n", REMOTE_USER_USED->value);
+			//log_message(error_buffer, PLUS_STDERR);
 		} else {
-			/* GENERATE UNIQUE USER ID FOR SESSION MANAGEMENT*/
+			// REMOTE_USER ISN'T SET AND user_id IS BLANK SO CREATE A NEW user_id
 			sprintf(user_id, "%d-%d",
 					(1 + (int) ((float) 58408 * rand() / (RAND_MAX + 1.0))),
 					(1 + (int) ((float) 256 * rand() / (RAND_MAX + 1.0))));
