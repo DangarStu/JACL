@@ -378,29 +378,19 @@ main(argc, argv)
 			    /* PREFER REMOTE_USER FOR POTENTIAL SECURE SITES. */
 				strcpy (user_id, REMOTE_USER);
 				REMOTE_USER_USED->value = TRUE;
+				returning_player = TRUE;
 			} else {
 				// THERE IS NO REMOTE_USER OR prefer_remote_user IS SET TO FALSE
 				// SO USE THE PASSED user_id
 				strcpy(user_id, cgi_val(entries, "user_id"));
 				REMOTE_USER_USED->value = FALSE;
-			}
-
-			sprintf(temp_buffer, "%s%s-%s.auto", temp_directory, prefix, user_id);
-
-			/* AS HTTP IS STATELESS, RELOAD THE PLAYER'S GAME IN PROGRESS
-			 * BEFORE PROCESSING EACH COMMAND */
-			if (restore_game(temp_buffer, FALSE)) {
 				returning_player = TRUE;
-			} else {
-				returning_player = FALSE;
 			}
 		} else if (REMOTE_USER != NULL && strcmp("", REMOTE_USER)) {
 			// REMOTE_USER IS SET AND user_id IS NULL SO USE REMOTE_USER
 			strcpy (user_id, REMOTE_USER);
 			REMOTE_USER_USED->value = TRUE;
-
-			//sprintf(error_buffer, "REMOTE_USER_USED: %d\n", REMOTE_USER_USED->value);
-			//log_message(error_buffer, PLUS_STDERR);
+			returning_player = TRUE;
 		} else {
 			// REMOTE_USER ISN'T SET AND user_id IS BLANK SO CREATE A NEW user_id
 			sprintf(user_id, "%d-%d",
@@ -413,7 +403,21 @@ main(argc, argv)
 
 		}
 
+		if (returning_player == TRUE) {
+			sprintf(temp_buffer, "%s%s-%s.auto", temp_directory, prefix, user_id);
+
+			/* AS HTTP IS STATELESS, RELOAD THE PLAYER'S GAME IN PROGRESS
+			 * BEFORE PROCESSING EACH COMMAND */
+			if (restore_game(temp_buffer, FALSE)) {
+				returning_player = TRUE;
+			} else {
+				returning_player = FALSE;
+			}
+		}
+
 		if (returning_player == FALSE) {
+			// THIS TRANSACTION IS EITHER NOT ASSOCIATED WITH A REMOTE_USER OR user_id
+			// OR THE LOADING OF THE ASSOCIATED SAVED GAME FAILED
 			/* TRY TO RESTART THE GAME BY RESTORING THE saved_start */
 			if (restore_game(saved_start, FALSE) == FALSE) {
 				/* THIS HAS FAILED, USED THE LESS EFFICIENT restart_game
