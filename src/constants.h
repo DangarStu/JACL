@@ -53,9 +53,9 @@
 #define TOUCHED         8388608
 #define SCORED          16777216
 #define SITTING         33554432
-#define NPC				67108864
+#define NPC             67108864
 #define DONE            134217728
-#define GAS	            268435456
+#define GAS	         268435456
 #define NO_TAB          536870912
 #define NOT_IMPORTANT   1073741824
 
@@ -102,6 +102,7 @@
 #define MULTI_PREFIX			integer_resolve("multi_prefix")
 #define NOTIFY					integer_resolve("notify")
 #define DEBUG					integer_resolve("debug")
+#define REMOTE_USER_USED			integer_resolve("remote_user")
 
 /* SYSTEM INTEGER CONSTANTS */
 

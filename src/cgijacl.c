@@ -372,15 +372,16 @@ main(argc, argv)
 
 		read_cgi_input(&entries);
 
-		if (cgi_val(entries, "user_id") != NULL 
-			|| (prefer_remote_user == TRUE && REMOTE_USER != NULL && strcmp("", REMOTE_USER))) {
+		if (cgi_val(entries, "user_id") != NULL || (prefer_remote_user == TRUE && REMOTE_USER != NULL && strcmp("", REMOTE_USER))) {
 			// IF THIS IS TRUE THERE IS ALREADY A USABLE USER ID OF SOME FORM
 
 			if (prefer_remote_user == TRUE && REMOTE_USER != NULL && strcmp("", REMOTE_USER)) {
 			    /* PREFER REMOTE_USER FOR POTENTIAL SECURE SITES. */
 				strcpy (user_id, REMOTE_USER);
+				REMOTE_USER_USED->value = TRUE;
 			} else {
 				strcpy(user_id, cgi_val(entries, "user_id"));
+				REMOTE_USER_USED->value = FALSE;
 			}
 
 			sprintf(temp_buffer, "%s%s-%s.auto", temp_directory, prefix, user_id);
@@ -401,6 +402,7 @@ main(argc, argv)
 
 			// THIS IS THE FIRST COMMAND OF A NEW GAME
 			returning_player = FALSE;
+			REMOTE_USER_USED->value = FALSE;
 
 		}
 
