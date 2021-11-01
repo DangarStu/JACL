@@ -80,8 +80,11 @@ if @tab_names > 1
 	      write "<div class=~selectedtab~>" tab_names[WEBAPP_index] "</div>"
 	   else
 	      write "<div class=~tab~>"
-	      write "<a class=~tablink~ href=~" $url "?user_id=" $user_id 
-	      write "&command=change mode " WEBAPP_index "&mode=" WEBAPP_index "~>" tab_names[WEBAPP_index] "</a>"
+	      write "<a class=~tablink~ href=~" $url "?"
+		 if remote_user = false
+		    write "user_id=" $user_id "&"
+		 endif
+	      write "command=change mode " WEBAPP_index "&mode=" WEBAPP_index "~>" tab_names[WEBAPP_index] "</a>"
 	      write "</div>
 	  endif
       set WEBAPP_index + 1
