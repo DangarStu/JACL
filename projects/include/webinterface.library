@@ -34,7 +34,7 @@ write "<title>" game_title "</title>"
 execute "+styles"
 print:
    <script src="/include/jquery-3.6.0.min.js"></script>
-   <script language=~JavaScript~>^
+   <script language="JavaScript">^
    <!--^
    function KeyPressed() {^
       if ($("#JACLCommandPrompt").val() == "") { main.scrollTop = main.scrollHeight; } }^

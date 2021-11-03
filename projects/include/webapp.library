@@ -37,26 +37,27 @@ else
 endif
 print:
    <script language=~JavaScript~>^
-   <!--^
-      function ajaxCommand(command, user_id) { ^
-      var xhReq = createXMLHttpRequest();^
-      if(xhReq == null) { return true; }^
-      xhReq.open("GET",
+      function ajaxRequest(event) {^
 .
-write "~" $url
- print:
-    ?user_id="+user_id+"&command="+command+"&ajax=true", false);^
-    xhReq.send(null);^
-    return (xhReq.responseText); }^
-
-    function createXMLHttpRequest() {^
-    try { return new XMLHttpRequest(); } catch(e) {}^
-    try { return new ActiveXObject("Msxml2.XMLHTTP"); } catch (e) {}^
-    alert("XMLHttpRequest not supported");^
-    return null; }^
+         write "var url_string = ~" $url
+         if remote_user = false
+            write "?user_id=" $user_id
+         endif
+         write ""&ajax=true&command=~ + "
+         write "event.data.command;^"
+         write "$.ajax({^url: url_string,^"
+print:
+             success: function (data) { 
+			if (event.data.replace == true) {
+				$(event.data.element).append(data);
+			} else {	
+				$(event.data.element).append(data);
+			}
+		  }
+         });^
+      }^
+   </script>^
 .
-write "-->"
-write "</script>^"
 call "+local_header"
 print:  
    </head><body>^
@@ -80,8 +81,11 @@ if @tab_names > 1
 	      write "<div class=~selectedtab~>" tab_names[WEBAPP_index] "</div>"
 	   else
 	      write "<div class=~tab~>"
-	      write "<a class=~tablink~ href=~" $url "?user_id=" $user_id 
-	      write "&command=change mode " WEBAPP_index "&mode=" WEBAPP_index "~>" tab_names[WEBAPP_index] "</a>"
+	      write "<a class=~tablink~ href=~" $url "?"
+		 if remote_user = false
+		    write "user_id=" $user_id "&"
+		 endif
+	      write "command=change mode " WEBAPP_index "&mode=" WEBAPP_index "~>" tab_names[WEBAPP_index] "</a>"
 	      write "</div>
 	  endif
       set WEBAPP_index + 1

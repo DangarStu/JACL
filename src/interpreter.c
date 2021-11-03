@@ -418,7 +418,7 @@ execute(funcname)
 
 	if (encrypted) jacl_decrypt(text_buffer);
 
-	while (text_buffer[0] != 125 && !interrupted) {
+	while (text_buffer[0] != '}' && !interrupted) {
 		encapsulate();
 		if (word[0] == NULL);
 		else if (!strcmp(word[0], "endwhile")) {
@@ -474,7 +474,7 @@ execute(funcname)
 			}
 		} else if (!strcmp(word[0], "print") && current_level != execution_level) {
 			// SKIP THIS BLOCK OF PLAIN TEXT UNTIL IT FINDS A 
-			// LINE THAT STARTS WITH A '.' OR A '}'
+			// LINE THAT STARTS WITH A '.'
 #ifdef GLK
 			glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
 #else
@@ -484,11 +484,6 @@ execute(funcname)
 			if (encrypted) jacl_decrypt(text_buffer);
 
 			while (text_buffer[0] != '.') {
-				if (text_buffer[0] == '}') {
-					// HIT THE END OF THE FUNCTION, JUST BAIL OUT
-					return (exit_function(TRUE));
-				}
-
 				// GET THE NEXT LINE
 #ifdef GLK
 				glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
@@ -1703,7 +1698,7 @@ execute(funcname)
 				int non_space = FALSE;
 
 				// DISPLAYS A BLOCK OF PLAIN TEXT UNTIL IT FINDS A 
-				// LINE THAT STARTS WITH A '.' OR A '}'
+				// LINE THAT STARTS WITH A '.'
 #ifdef GLK
 				glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
 #else
@@ -1712,7 +1707,7 @@ execute(funcname)
 
 				if (encrypted) jacl_decrypt(text_buffer);
 
-				while (text_buffer[0] != '.' && text_buffer[0] != '}') {
+				while (text_buffer[0] != '.') {
 					index = 0;
 					non_space = FALSE;
 
@@ -1723,12 +1718,15 @@ execute(funcname)
 							 * ALLOW INDENTING OF NEW PARAGRAPHS ETC */
 							text_buffer[index] = ' ';
 						} else if (text_buffer[index] == '\r') {
+							// GOT TO THE END OF THE LINE, STRIP THE \r AND BREAK
 							text_buffer[index] = 0;
 							break;
 						} else if (text_buffer[index] == '\n') {
+							// GOT TO THE END OF THE LINE, STRIP THE \n AND BREAK
 							text_buffer[index] = 0;
 							break;
 						} else if (text_buffer[index] != ' ' && text_buffer[index] != '\t') {
+							// THE FIRST CHARACTER THAT IS NOT A SPACE OR A TAB HAS BEEN REACHED
 							non_space = TRUE;
 						}
 

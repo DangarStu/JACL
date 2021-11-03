@@ -102,13 +102,13 @@
 #define MULTI_PREFIX			integer_resolve("multi_prefix")
 #define NOTIFY					integer_resolve("notify")
 #define DEBUG					integer_resolve("debug")
-#define REMOTE_USER_USED			integer_resolve("remote_user")
 
 /* SYSTEM INTEGER CONSTANTS */
 
 #define SOUND_SUPPORTED			cinteger_resolve("sound_supported")
 #define GRAPHICS_SUPPORTED		cinteger_resolve("graphics_supported")
 #define TIMER_SUPPORTED			cinteger_resolve("timer_supported")
+#define REMOTE_USER_USED			cinteger_resolve("remote_user")
 
 /* ABBREVIATIONS */
 

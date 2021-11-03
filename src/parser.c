@@ -848,10 +848,7 @@ add_all(scope_word, noun_number)
 	struct word_type	*scope_word;
 	int					noun_number;
 {
-	int index, counter;
-
-	//printf("--- trying to add all\n");
-	counter = 0;
+	int index;
 
 	for (index = 1; index <= objects; index++) {
 		if ((object[index]->MASS < HEAVY) &&

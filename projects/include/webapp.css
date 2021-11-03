@@ -4,25 +4,6 @@ integer WEBAPP_total
 print:
    <style>
      <!--
-     div.tumblr_title {
-		 font-family: Verdana, Arial, Sanserif;
-		 color: #333333; font-size: 18pt;
-		 font-weight: bold; }^
-     li.tumblr_post {
-		background-color: #cccccc;
-		border-width: 2px;
-        border-style: solid;
-        border-color: #eeeeee;
-		padding: 10px 10px 10px 10px;
-        margin-left: 0px;
-        margin-bottom: 10px; }^
-     ol.tumblr_posts {
-		margin-left: 0px;
-        padding-left: 0px;
-        list-style-type: none; 
-		text-indent: 0px;
-        list-style-position: outside;
-        list-style-image: none; }^
      body {
 		height: 100%; 
 		max-height: 100%;
