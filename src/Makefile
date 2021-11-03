@@ -9,7 +9,7 @@ bjorb : bjorb.c
 	$(CC) $(CFLAGS) -o bjorb bjorb.c
 
 jacl : libglkterm.a jacl.c jacl.h glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c types.h libcsv.c csv.h 
-	$(CC) $(CFLAGS) -DGLK -o jacl jacl.c glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c libcsv.c csv.h -Iglkterm -Lglkterm -lglkterm -lm -lncurses;
+	$(CC) $(CFLAGS) -DGLK jacl.c glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c libcsv.c csv.h -Iglkterm -Lglkterm -lglkterm -lm -lncurses;
 
 jaclw : libglktermw.a jacl.c jacl.h glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c types.h libcsv.c csv.h
 	$(CC) $(CFLAGS) -DGLK -o jacl jacl.c glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c libcsv.c csv.h -Iglktermw -Lglktermw -lglktermw -lm -lncursesw;

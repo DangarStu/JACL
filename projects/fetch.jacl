@@ -1,16 +1,27 @@
 #!/usr/local/jacl/bin/cgijacl
 
-string teststring "fred"
-
 {+header
+set linebreaks = false
 print:
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">^
 	<html><head>^
-	<title>Test of Ajax fetch</title>
+	<title>Test of Ajax fetch</title>^
 	<meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">^
-	<script src="/include/jquery-3.6.0.min.js"></script>
-	</head>
-	<body>	
+	<script src="/include/jquery-3.6.0.min.js"></script>^
+	<script language="JavaScript">^
+		function fetchResponse(event) {^
+.
+			write "var url_string = ~" $url "?user_id=" $user_id "&ajax=true&~ + "
+			write "event.data.arg1;^"
+			write "$.ajax({^url: url_string,^"
+print:
+				
+           		success: function (data) { $('#screen').append(data); }^
+			});^
+		}^
+	</script>^
+	</head>^
+	<body>^
 		<div id="screen">
 .
 }
@@ -18,38 +29,35 @@ print:
 {+footer
 print:
 		</div>
-	<button id="option1"><img src="/images/tiles/green_chest.png"></button>
+	<button id="option1"><img src="/images/tiles/green_chest.png"></button>^
+	<button id="option2"><img src="/images/tiles/red_chest.png"></button>^
 	<script language="JavaScript">^
-		$('#option1').click(function() {
-.
-				write "$.ajax({^url: ~" $url "?user_id=" $user_id "&command=isalive&ajax=true~,^"
-print:
-           			success: function (data) { $('#screen').append(data); }
-				});^
-			}^
-		);^
-	</script>
+		$('#option1').click( { arg1: "command=greenchest" }, fetchResponse );^
+		$('#option2').click( { arg1: "command=redchest" }, fetchResponse );^
+	</script>^
 	</body>
 </html>
 .
 }
 
-grammar isalive >isalive
+grammar greenchest >greenchest
 
-{+isalive
-write "Yes, the server is alive!^"
+{+greenchest
+write "You clicked on the green chest.<br>"
+}
+
+grammar redchest >redchest
+
+{+redchest
+write "You clicked on the red chest.<br>"
 }
 
 {+intro
-set linebreaks = false
 print:
-  Test of jQuery.ajax.
+<p>Test of jQuery.ajax.</p>
 .
 }
 
 location cave
 object fred
 player
-
-#include "verbs.library"
-#include "utils.library"

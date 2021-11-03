@@ -4,10 +4,15 @@ constant game_title		"Parser Lab"
 constant game_author	"Stuart Allen"
 constant game_version	1
 
+integer testint
+
 {+intro
 style bold
 style note
 write "^^" game_title " by " game_author "^^"
+if remote_user = GOOBER
+   write "This is a " GOOBER "^"
+endif
 style normal
 print:
    This program is simply an object-rich environment for testing the JACL 

@@ -12,6 +12,7 @@
 /* INDICATES THAT THE CURRENT '.j2' FILE BEING WORKED 
  * WITH IS ENCRYPTED */
 int					encrypted = FALSE;
+int					in_print = FALSE;
 
 extern char			text_buffer[];
 extern char         	temp_buffer[];
@@ -722,6 +723,7 @@ read_gamefile()
 		encapsulate();
 		if (word[0] == NULL);
 		else if (text_buffer[0] == '{') {
+			in_print = FALSE;
 			word[wp]++;			/* MOVE THE START OF THE FIRST WORD ONLY
 								 * TO PAST THE '{'. */
 			if (word[wp][0] == 0) {
@@ -815,8 +817,16 @@ read_gamefile()
 					line++;
 				}
 				if (encrypted) jacl_decrypt(text_buffer);
-				if (text_buffer[0] == '}')
+				encapsulate();
+				if (word[0] != NULL && !strcmp(word[0], "print")) {
+					// NOW INSIDE A PRINT BLOCK, SKIP UNTIL '.' IS REACHED
+					in_print = TRUE;
+				} else if (text_buffer[0] == '.') {
+					// NOW BACK OUT OF THE PRINT BLOCK AGAIN
+					in_print = FALSE;
+				} else if (in_print == FALSE && text_buffer[0] == '}') {
 					break;
+				}
 			}
 		} else if (!strcmp(word[0], "string_array")) {
 		} else if (!strcmp(word[0], "integer_array")) {

@@ -1,4 +1,5 @@
-/include/jquery-1.7.min.js application/javascript include/jquery-1.7.min.js
+/include/jquery-3.6.0.min.js application/javascript include/jquery-3.6.0.min.js
+/images/favicon.ico image/x-icon images/favicon.ico
 /images/unholygrail.png image/png images/unholygrail.png
 /images/buttons/look.png image/png images/buttons/look.png
 /images/buttons/use.png image/png images/buttons/use.png

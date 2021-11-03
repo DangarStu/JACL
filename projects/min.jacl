@@ -4,7 +4,13 @@ string teststring "fred"
 
 {+intro
 print:
+{
   This is a test.^
+}
+did that open brace print okay?
+{ }
+did that close brace print okay?
+}
 .
 write function_name ^
 write teststring ^

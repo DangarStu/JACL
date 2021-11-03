@@ -411,6 +411,8 @@ main(argc, argv)
 			if (restore_game(temp_buffer, FALSE)) {
 				returning_player = TRUE;
 			} else {
+				sprintf(error_buffer, "Unable to restore saved file for program \"%s\" and returning user \"%s\"", prefix, user_id);
+				log_error(error_buffer, PLUS_STDOUT);
 				returning_player = FALSE;
 			}
 		}
