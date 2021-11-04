@@ -49,7 +49,7 @@ print:
 print:
              success: function (data) { 
 			if (event.data.replace == true) {
-				$(event.data.element).append(data);
+				$(event.data.element).html(data);
 			} else {	
 				$(event.data.element).append(data);
 			}
