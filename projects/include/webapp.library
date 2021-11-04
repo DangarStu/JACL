@@ -37,7 +37,13 @@ else
 endif
 print:
    <script language=~JavaScript~>^
-      function ajaxRequest(event) {^
+	var isMobile = false;
+
+	if (window.matchMedia("(max-width: 767px)").matches) {
+		isMobile = true;
+	}
+
+     function ajaxRequest(event) {^
 .
          write "var url_string = ~" $url
          if remote_user = false
