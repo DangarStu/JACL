@@ -98,8 +98,6 @@ set linebreaks = true
 }
 
 {+footer
-set linebreaks = false
 write "</div>"
 write "</body></html>^"
-set linebreaks = true
 }

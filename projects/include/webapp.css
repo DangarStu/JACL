@@ -3,7 +3,6 @@ integer WEBAPP_total
 {+styles
 print:
    <style>
-     <!--
      body {
 		height: 100%; 
 		max-height: 100%;
@@ -117,8 +116,8 @@ print:
 .
 write " background-color: " maintext_colour "; }^"
 print:
-	p {	font-family: Verdana, Arial, Sanserif;
-		color: #333333; font-size: 12pt}^
+	#p {	font-family: Verdana, Arial, Sanserif;
+	#	color: #333333; font-size: 12pt}^
 	b.light {	font-family: Verdana, Arial, Sanserif;
 		color: #c0b098; font-size: 12pt}^
 	a.tablink {	font-family: Verdana, Arial, Sanserif;
@@ -222,7 +221,6 @@ print:
 .
 call "+local_styles"
 print:
-     -->
    </style>
 .
 }
