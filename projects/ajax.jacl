@@ -11,12 +11,16 @@ print:
 	<script language="JavaScript">^
 		function fetchResponse(event) {^
 .
-			write "var url_string = ~" $url "?user_id=" $user_id "&ajax=true&~ + "
-			write "event.data.arg1;^"
+			write "var url_string = ~" $url 
+			if remote_user = false
+			   write "?user_id=" $user_id 
+			endif
+			write ""&ajax=true&command=~ + "
+			write "event.data.command;^"
 			write "$.ajax({^url: url_string,^"
 print:
 				
-           		success: function (data) { $('#screen').append(data); }^
+           		success: function (data) { $(event.data.element).append(data); }^
 			});^
 		}^
 	</script>^
@@ -32,8 +36,8 @@ print:
 	<button id="option1"><img src="/images/tiles/green_chest.png"></button>^
 	<button id="option2"><img src="/images/tiles/red_chest.png"></button>^
 	<script language="JavaScript">^
-		$('#option1').click( { arg1: "command=greenchest" }, fetchResponse );^
-		$('#option2').click( { arg1: "command=redchest" }, fetchResponse );^
+		$('#option1').click( { command: "greenchest", element: "#screen" }, fetchResponse );^
+		$('#option2').click( { command: "redchest", element: "#screen" }, fetchResponse );^
 	</script>^
 	</body>
 </html>
