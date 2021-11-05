@@ -3,21 +3,15 @@ integer WEBAPP_total
 {+styles
 print:
    <style>
-     body {
-		height: 100%; 
+	html { height: 100%;}^
+	body {
+		top: 0px;
+		bottom: 0px;
 		max-height: 100%;
-		overflow: hidden;
-		padding: 0;
-		top: 0;
-		left: 0;
-		right: 0; 
-		border: 0;
-		background-color: black; }
+		height: 100%;
+		margin: 0px; }^
+
      #header {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
 		display: block;
 .
 write "		height: " header_height "px;"
@@ -40,22 +34,16 @@ print:
 		background-color: #40392e; }^
 
       div.mode {
-		display: inline;
-
-          position: absolute; 
-		left: 0px;
-.
-write "	top: " header_height "px;"
-print:
-		right: 0px;
-          height: 30px;
-          overflow: automatic;
+		display: flex;
+          justify-content: flex-start;
+          align-items: flex-start;
 .
 write "	background-color: " tab_colour "; }^"
 print:
       div.tab {
+		display: table-cell; 
+		vertical-align: middle;
           margin: 0px;
-          padding: 3px;
           border-top: none;
           border-bottom: none;
           border-left: none;
@@ -64,7 +52,7 @@ print:
           border-color: black;
 		text-align: center;
           float: left; 
-          height: 30px;
+          height: 23px;
 .
 write "   width: " tab_width "px;"
 print:
@@ -88,10 +76,9 @@ print:
           border-width: 1px;
           border-color: black;
           margin: 0px;
-          padding: 3px;
 		text-align: center;
           float: left; 
-          height: 30px;
+          height: 23px;
 .
 write "   width: " tab_width "px;"
 print:
@@ -101,6 +88,7 @@ print:
 write "   background-color: " maintext_colour "; }^"
 print:
       #main {
+		height: 100%;
      	font-family: Verdana, Arial, Sanserif;
           display: block;
 		color: #333333;
@@ -108,20 +96,14 @@ print:
 		padding-bottom: 20px;
 		padding-left: 20px;
 		padding-right: 20px;
-		position: absolute;
-		left: 0px;
+		overflow: auto;	
 .
 if @tab_names = 1
-   write "top: " header_height "px;"
+   #write "top: " header_height "px;"
 else
    set WEBAPP_total = header_height + 30
-   write "top: " WEBAPP_total "px;"
+   #write "top: " WEBAPP_total "px;"
 endif
-print:
-		right: 0px;
-		overflow: auto;
-		bottom: 0px;
-.
 write "   background-color: " maintext_colour "; }^"
 print:
 	b.light {	font-family: Verdana, Arial, Sanserif;
@@ -181,18 +163,10 @@ print:
 		margin-left: 0px; }^
 
 	div.links { 		
+		position: relative;
+		top: -23px;
+		height: 23px;
 		opacity: 0.7;
-		position: absolute;
-.
-set WEBAPP_total = header_height - 31
-write "   top: " WEBAPP_total "px;"
-print:
-		right: 0px;
-		left: 0px;
-		height: 31px;
-		font-family: Verdana, Arial, Sanserif;
-		font-color: black;
-		padding-top: 4px;
 		padding-right: 10px;
 		text-align: right;
 .
@@ -207,6 +181,8 @@ print:
 		float: left; }^
 
 	img.titleimage {
+		margin: 0px;
+		padding: 0px;
 .
 write "	height: " header_height "px; }^"
 print:
