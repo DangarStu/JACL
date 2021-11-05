@@ -2,10 +2,16 @@
 
 string current_image "none"
 
+parameter "mode" WEBAPP_mode
 integer WEBAPP_mode 1
+
 integer WEBAPP_index
 
-parameter "mode" WEBAPP_mode
+parameter "device" WEBAPP_device
+integer WEBAPP_device	1
+constant WEBAPP_desktop	1
+constant WEBAPP_mobile	2
+
 
 grammar change mode $integer >change_mode
 
@@ -13,7 +19,11 @@ grammar change mode $integer >change_mode
 set WEBAPP_mode = $integer
 }
 
-grammar standard >standard
+grammar change device $integer >change_device
+
+{+change_device
+set WEBAPP_device = $integer
+}
 
 {+header
 set linebreaks = false
@@ -83,23 +93,23 @@ call "+links_div"
 write "</div>^"
 write "</div>^"
 if @tab_names > 1
-	write "<div class=~mode~>^"
-    set WEBAPP_index = 1 
-    while WEBAPP_index < @tab_names 
-  	   if WEBAPP_mode = WEBAPP_index
-	      write "<div class=~selectedtab~>" tab_names[WEBAPP_index] "</div>"
-	   else
-	      write "<div class=~tab~>"
-	      write "<a class=~tablink~ href=~" $url "?"
-		 if remote_user = false
-		    write "user_id=" $user_id "&"
-		 endif
-	      write "command=change mode " WEBAPP_index "&mode=" WEBAPP_index "~>" tab_names[WEBAPP_index] "</a>"
-	      write "</div>
-	  endif
-      set WEBAPP_index + 1
-    endwhile
-	write "</div>"
+   write "<div class=~mode~>^"
+   set WEBAPP_index = 1 
+   while WEBAPP_index < @tab_names 
+     if WEBAPP_mode = WEBAPP_index
+        write "<div class=~selectedtab~>" tab_names[WEBAPP_index] "</div>"
+     else
+        write "<div class=~tab~>"
+        write "<a class=~tablink~ href=~" $url "?"
+        if remote_user = false
+	      write "user_id=" $user_id "&"
+        endif
+	   write "command=change mode " WEBAPP_index "&mode=" WEBAPP_index "~>" tab_names[WEBAPP_index] "</a>"
+	   write "</div>
+     endif
+     set WEBAPP_index + 1
+   endwhile
+   write "</div>"
 endif
 write "<div id=~main~>^"
 set linebreaks = true

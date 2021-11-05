@@ -34,67 +34,75 @@ print:
 		left: 0;
 		right: 0;
 		display: inline;
-        overflow: hidden;
+          overflow: hidden;
 		font-family: Verdana, Arial, Sanserif; 
 		height: 160px;
 		background-color: #40392e; }^
+
       div.mode {
 		display: inline;
-        position: absolute; 
+
+          position: absolute; 
 		left: 0px;
 .
-write "		top: " header_height "px;"
+write "	top: " header_height "px;"
 print:
 		right: 0px;
-        height: 30px;
-        overflow: automatic;
+          height: 30px;
+          overflow: automatic;
 .
 write "	background-color: " tab_colour "; }^"
 print:
       div.tab {
-        margin: 0px;
-        padding: 3px;
-        border-top: none;
-        border-bottom: none;
-        border-left: none;
-        border-right: solid;
-        border-width: 1px;
-        border-color: black;
+          margin: 0px;
+          padding: 3px;
+          border-top: none;
+          border-bottom: none;
+          border-left: none;
+          border-right: solid;
+          border-width: 1px;
+          border-color: black;
 		text-align: center;
-        float: left; 
-        height: 30px;
-        width: 125px;
+          float: left; 
+          height: 30px;
+.
+write "   width: " tab_width "px;"
+print:
 		font-family: Verdana, Arial, Sanserif; 
 		font-size: 12pt;
-        background-color: #777777; }^
+          background-color: #777777; }^
+
       div.error {
 		font-family: Verdana, Arial, Sanserif; 
 		font-size: 12pt;
 		float: left;
-        margin-left: 10px;
+          margin-left: 10px;
 		margin-top: 6px;
-        color: red; }^
+          color: red; }^
+
       div.selectedtab {
-        border-top: none;
-        border-bottom: none;
-        border-left: none;
-        border-right: solid;
-        border-width: 1px;
-        border-color: black;
-        margin: 0px;
-        padding: 3px;
+          border-top: none;
+          border-bottom: none;
+          border-left: none;
+          border-right: solid;
+          border-width: 1px;
+          border-color: black;
+          margin: 0px;
+          padding: 3px;
 		text-align: center;
-        float: left; 
-        height: 30px;
-        width: 125px;
-		font-family: Verdana, Arial, Sanserif; 
-        font-color: black;
+          float: left; 
+          height: 30px;
 .
-write " background-color: " maintext_colour "; }^"
+write "   width: " tab_width "px;"
+print:
+		font-family: Verdana, Arial, Sanserif; 
+          font-color: black;
+.
+write "   background-color: " maintext_colour "; }^"
 print:
       #main {
      	font-family: Verdana, Arial, Sanserif;
-        display: block;
+          display: block;
 		color: #333333;
 		padding-top: 20px;
 		padding-bottom: 20px;
@@ -104,69 +112,80 @@ print:
 		left: 0px;
 .
 if @tab_names = 1
-   write "		top: " header_height "px;"
+   write "top: " header_height "px;"
 else
    set WEBAPP_total = header_height + 30
-   write "		top: " WEBAPP_total "px;"
+   write "top: " WEBAPP_total "px;"
 endif
 print:
 		right: 0px;
 		overflow: auto;
 		bottom: 0px;
 .
-write " background-color: " maintext_colour "; }^"
+write "   background-color: " maintext_colour "; }^"
 print:
-	#p {	font-family: Verdana, Arial, Sanserif;
-	#	color: #333333; font-size: 12pt}^
 	b.light {	font-family: Verdana, Arial, Sanserif;
 		color: #c0b098; font-size: 12pt}^
+
 	a.tablink {	font-family: Verdana, Arial, Sanserif;
 		text-decoration: none;
 		color: black; 
         font-size: 12pt}^
+
 	a.control {	font-family: Verdana, Arial, Sanserif;
 		text-decoration: none;
 		color: #333333; 
         font-size: 12pt}^
+
 	a.main {	font-family: Verdana, Arial, Sanserif;
 		color: black; 
         font-size: 12pt}^
+
 	a {	font-family: Verdana, Arial, Sanserif;
 		color: #4444bb; 
         font-size: 12pt}^
-    th { background-color: #CCCCCC; 
+
+     th { background-color: #CCCCCC; 
          padding: 4px 10px 4px 10px;
          margin: 0px; 
          border: none;
          border-width: 0px; }^
-    td { border-bottom: solid;
+
+     td { border-bottom: solid;
          border-width: 2px; 
          border-color: #CCCCCC;
          padding: 4px 10px 4px 10px;
          margin: 0px; }^
+
 	h1 { font-family: Verdana, Arial, Sanserif;
 		 color: #c0b098; 
          font-size: 18pt}^
+
 	h1.title { margin-left: 20px; }^
+
 	h2 {	 	
 		 font-family: Verdana, Arial, Sanserif;
 		 color: #333333; font-size: 18pt;
 		 font-weight: bold; }^
+
 	h3 {	 	
 		 font-family: Verdana, Arial, Sanserif;
 		 color: #333333; font-size: 14pt; }^
+
 	input.button {
 		margin-top: 7px;
 		margin-left: 5px; }^
+
 	input.dir_button {
 		margin-top: 0px;
 		margin-left: 0px; }^
+
 	div.links { 		
 		opacity: 0.7;
 		position: absolute;
 .
 set WEBAPP_total = header_height - 31
-write "    top: " WEBAPP_total "px;"
+write "   top: " WEBAPP_total "px;"
 print:
 		right: 0px;
 		left: 0px;
@@ -177,45 +196,51 @@ print:
 		padding-right: 10px;
 		text-align: right;
 .
-write " background-color: " linkbar_colour "; }^"
+write "   background-color: " linkbar_colour "; }^"
 print:
 	img.right {
 		padding: 15px 5px 5px 5px;
 		float: right; }^
+
 	img.left {
 		padding: 15px 15px 5px 5px;
 		float: left; }^
+
 	img.titleimage {
 .
-write "		height: " header_height "px; }^"
+write "	height: " header_height "px; }^"
 print:
 	a.logo { 
-        position: absolute;
-        bottom: 15px;
-        right: 475px; 
+          position: absolute;
+          bottom: 15px;
+          right: 475px; 
 		border: none;
 		border-width: 0px;
 		margin-right: 0px;
 		margin-bottom: 0px;
 		margin-left: 0px;
 		margin-top: 0px; }^
+
 	div.row {
 		display: table-row; }^
+
 	div.label {
 		display: table-cell;
 		margin-top: 5px;
 		margin-bottom: 5px;
-        margin-right: 5px;
+          margin-right: 5px;
 		text-align: right;
-        width: 150px;
+          width: 150px;
 		float: left; }^
+
 	div.input {
 		display: table-cell;
 		margin-top: 5px;
 		margin-bottom: 5px;
-        margin-right: 5px;
+          margin-right: 5px;
 		text-align: left;
 		float: left; }^
+
 	select {
 		width: 150px; }^
 .

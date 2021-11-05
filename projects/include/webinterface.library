@@ -8,7 +8,7 @@ string current_image "none"
 
 constant STANDARD	1
 constant GUI		2
-constant MOBILE		3
+constant MOBILE	3
 
 grammar standard >standard
 
