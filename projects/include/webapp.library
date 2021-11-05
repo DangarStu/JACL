@@ -57,9 +57,9 @@ print:
 .
          write "var url_string = ~" $url "?"
          if remote_user = false
-            write "user_id=" $user_id
+            write "user_id=" $user_id "&"
          endif
-         write "&ajax=true&command=~ + "
+         write "ajax=true&command=~ + "
          write "event.data.command;^"
          write "$.ajax({^url: url_string,^"
 print:
