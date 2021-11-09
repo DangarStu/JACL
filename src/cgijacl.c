@@ -90,7 +90,7 @@ char            processed_file[256] = "\0";
 char            saved_start[256] = "\0";
 char            blorb[81] = "\0";
 
-char            game_url[256] = "\0";;
+char            game_url[256] = "\0";
 llist           entries;
 struct stat     gamestat;
 
