@@ -37,6 +37,7 @@ struct stack_type {
 	int				quoted[MAX_WORDS];
 	int				wp;
 	int				argcount;
+	int			local1, local2, local3, local4;
 	int				*loop_integer;
 	int				*select_integer;
 	int				criterion_value;
