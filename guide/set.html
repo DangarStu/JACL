@@ -153,6 +153,16 @@ padstring status_text " " status_width
 }
 </pre>
 
+<h2><a class="section" name="set5">The SPLIT Command</a></h2>
+
+<p>The <b>split</b> command accepts a string and splits it into one or more substrings which are stored in the specified string array. The number of strings the original string is split into is stored into an integer variable specified as the first parameter of the command. The second argument is the string to split, the third is the delimeter to split on and the final parameter is the array to store the results in.
+
+<p>The following command is from the <b>validation.library</b> for splitting a date into it's components.
+
+<pre>
+split VALID_count string_arg[0] "/" VALID_string
+</pre>
+
 <!-- END OF BODY -->
 <p><a href="index.html">Back to Contents</b>
 </body></html>

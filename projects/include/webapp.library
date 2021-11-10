@@ -55,12 +55,11 @@ print:
 
      function ajaxRequest(event) {^
 .
-         write "var url_string = ~" $url "?"
+         write "var url_string = ~" $url "?ajax=true&command=~ + "
+         write "event.data.command + "
          if remote_user = false
-            write "user_id=" $user_id "&"
+            write "~&user_id=" $user_id "~^"
          endif
-         write "ajax=true&command=~ + "
-         write "event.data.command;^"
          write "$.ajax({^url: url_string,^"
 print:
              success: function (data) { 
@@ -119,3 +118,12 @@ set linebreaks = true
 write "</div>"
 write "</body></html>^"
 }
+
+{+command_link
+write "<a href=~" $url "?command=" string_arg[0]
+if remote_user = false
+   write "&user_id=" $user_id
+endif
+write "~>"
+}
+

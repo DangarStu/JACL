@@ -379,7 +379,7 @@ wj_listen(void)
 	static int      server_initialized = 0;
 	static int      wj_totalconnections = 0;
 
-	char            request[WJ_MAX_REQ_SIZE], request_line[WJ_MAX_REQ_SIZE];
+	char            request[WJ_MAX_REQ_SIZE], request_line[WJ_MAX_REQ_SIZE], webjacl_cookies[WJ_MAX_REQ_SIZE];
 	int             port, sockopt;
 	static int      savefdIN, savefdOUT;
 
@@ -494,12 +494,17 @@ listen_again:
 		fflush(stdin);
 
 		while (request_len > 2) {
+
 			// LOOP THROUGH ALL THE REQUEST
 			if (strstr(request_line, "GET ") == request_line) {
 				strncpy(request, request_line, WJ_MAX_REQ_SIZE - 1);
 			}
 			if (strstr(request_line, "POST ") == request_line) {
 				strncpy(request, request_line, WJ_MAX_REQ_SIZE - 1);
+			}
+			if (strstr(request_line, "Cookie") == request_line) {
+				request_line[strlen(request_line)-2] = 0;
+				strncpy(webjacl_cookies, &request_line[8], WJ_MAX_REQ_SIZE - 1);
 			}
 
 			fgets(request_line, WJ_MAX_REQ_SIZE - 1, stdin);
@@ -509,7 +514,7 @@ listen_again:
 			} else {
 				request_len = 0;
 			}
-		    //fprintf(stderr, "LOOP: %s LENGTH: %d\n", request_line, request_len);
+
 			fflush(stdin);
 		}
 
@@ -570,6 +575,7 @@ listen_again:
 			setenv("SERVER_PROTOCOL", "HTTP/1.0", 1);
 			setenv("REQUEST_METHOD", "GET", 1);
 			setenv("SCRIPT_NAME", "", 1);
+			setenv("HTTP_COOKIE", webjacl_cookies, 1);
 			//setenv("REMOTE_USER", "", 1);
 
 			setenv("CONTENT_TYPE", "", 1);
