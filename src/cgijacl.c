@@ -375,19 +375,19 @@ main(argc, argv)
 		read_cgi_input(&entries);
 		parse_cookies(&jacl_cookies);
 
-		sprintf (error_buffer, "HTTP_COOKIE: %s", getenv("HTTP_COOKIE"));
-		log_message(error_buffer, PLUS_STDERR);
+		//sprintf (error_buffer, "HTTP_COOKIE: %s", getenv("HTTP_COOKIE"));
+		//log_message(error_buffer, PLUS_STDERR);
 
-		sprintf (error_buffer, "user_id value pulled from cookies: %s", cgi_val(jacl_cookies, "user_id"));
-		log_message(error_buffer, PLUS_STDERR);
+		//sprintf (error_buffer, "user_id value pulled from cookies: %s", cgi_val(jacl_cookies, "user_id"));
+		//log_message(error_buffer, PLUS_STDERR);
 
 		if (cgi_val(entries, "user_id") != NULL || cgi_val(jacl_cookies, "user_id") != NULL) {
 			// A user_id HAS BEEN PASSED TO THIS REQUEST VIA A PARMETER OR A COOKIE
 			if (prefer_remote_user == TRUE && REMOTE_USER != NULL && strcmp("", REMOTE_USER)) {
 			    /* PREFER REMOTE_USER FOR POTENTIAL SECURE SITES. */
 				strcpy (user_id, REMOTE_USER);
-				sprintf(error_buffer, "Using user_id %s from REMOTE_USER.", user_id);
-				log_message(error_buffer, PLUS_STDERR);
+				//sprintf(error_buffer, "Using user_id %s from REMOTE_USER.", user_id);
+				//log_message(error_buffer, PLUS_STDERR);
 				REMOTE_USER_USED->value = TRUE;
 				returning_player = TRUE;
 			} else {
@@ -396,21 +396,21 @@ main(argc, argv)
 				if (cgi_val(jacl_cookies, "user_id") != NULL) {
 					strcpy(user_id, cgi_val(jacl_cookies, "user_id"));
 					REMOTE_USER_USED->value = TRUE;
-					sprintf(error_buffer, "Using user_id %s from cookie.", user_id);
-					log_message(error_buffer, PLUS_STDERR);
+					//sprintf(error_buffer, "Using user_id %s from cookie.", user_id);
+					//log_message(error_buffer, PLUS_STDERR);
 				} else {
 					strcpy(user_id, cgi_val(entries, "user_id"));
 					REMOTE_USER_USED->value = FALSE;
-					sprintf(error_buffer, "Using user_id %s from parameter.", user_id);
-					log_message(error_buffer, PLUS_STDERR);
+					//sprintf(error_buffer, "Using user_id %s from parameter.", user_id);
+					//log_message(error_buffer, PLUS_STDERR);
 				}
 				returning_player = TRUE;
 			}
 		} else if (REMOTE_USER != NULL && strcmp("", REMOTE_USER)) {
 			// REMOTE_USER IS SET AND user_id IS NULL SO USE REMOTE_USER
 			strcpy (user_id, REMOTE_USER);
-			sprintf(error_buffer, "Using user_id %s from REMOTE_USER.", user_id);
-			log_message(error_buffer, PLUS_STDERR);
+			//sprintf(error_buffer, "Using user_id %s from REMOTE_USER.", user_id);
+			//log_message(error_buffer, PLUS_STDERR);
 			REMOTE_USER_USED->value = TRUE;
 			returning_player = TRUE;
 		} else {
@@ -422,8 +422,8 @@ main(argc, argv)
 			// THIS IS THE FIRST COMMAND OF A NEW GAME
 			returning_player = FALSE;
 
-			sprintf(error_buffer, "Created user_id %s for new user.", user_id);
-			log_message(error_buffer, PLUS_STDERR);
+			//sprintf(error_buffer, "Created user_id %s for new user.", user_id);
+			//log_message(error_buffer, PLUS_STDERR);
 
 			// SET THIS TO TRUE ASSUMING THAT COOKIES ARE ENABLED
 			REMOTE_USER_USED->value = TRUE; 
