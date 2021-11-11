@@ -12,7 +12,6 @@ integer WEBAPP_device	1
 constant WEBAPP_desktop	1
 constant WEBAPP_mobile	2
 
-
 grammar change mode $integer >change_mode
 
 {+change_mode 
@@ -32,9 +31,8 @@ print:
 <html dir="ltr" lang="en-US">
 	<head>
 		<meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-		<meta name="viewport" content="width=device-width,initial-scale=1.0">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 .
-#<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0">
 write "<title>" game_title "</title>"
 execute "+styles"
 call "+user_styles"
@@ -47,10 +45,12 @@ else
 endif
 print:
    <script language=~JavaScript~>^
-	var isMobile = false;
-
 	if (window.matchMedia("(max-width: 767px)").matches) {
-		isMobile = true;
+.
+		if WEBAPP_device != WEBAPP_mobile
+         		write "window.location.replace(~" $url "?device=2~);"
+		endif
+print:
 	}
 
      function ajaxRequest(event) {^
