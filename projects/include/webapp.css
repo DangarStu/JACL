@@ -164,9 +164,18 @@ print:
 
 	div.links { 		
 		position: relative;
+		top: -48px;
+		height: 23px;
+		opacity: 1.0;
+		padding-right: 10px;
+		text-align: right;
+		white-space: nowrap; }^
+
+	div.linkbar { 		
+		position: relative;
 		top: -26px;
 		height: 23px;
-		opacity: 0.7;
+		opacity: 0.5;
 		padding-right: 10px;
 		text-align: right;
 		white-space: nowrap;

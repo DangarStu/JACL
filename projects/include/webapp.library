@@ -84,12 +84,18 @@ print:
 ifstring title_image = "none"
   write "<h1 class=~title~>" game_title "</h1>"
 else
-  write "<img class=~titleimage~ alt=~" game_title "~ src=~" title_image "~>"
+  if WEBAPP_device = WEBAPP_desktop
+     write "<img class=~titleimage~ alt=~" game_title "~ src=~" desktop_title_image "~>"
+  else
+     write "<img class=~titleimage~ alt=~" game_title "~ src=~" mobile_title_image "~>"
+  endif
 endif
 call "+header_links"
+write "<div class=~linkbar~>
+write "</div>^"
 write "<div class=~links~>
 call "+links_div"
-write "</div>^"
+write "</div>"
 write "</div>^"
 if @tab_names > 1
    write "<div class=~mode~>^"

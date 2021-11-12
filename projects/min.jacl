@@ -2,24 +2,26 @@
 
 string teststring "fred"
 
+integer INDEX
+
 {+intro
-print:
-{
-  This is a test.^
-}
-did that open brace print okay?
-{ }
-did that close brace print okay?
-}
-.
-write function_name ^
-write teststring ^
+write "Call recursively 10 times.^"
+set INDEX = 10
+execute "+recurse"
 terminate
+}
+
+{+recurse
+set local = random
+write "INDEX: " INDEX " RANDOM: " local "^"
+set INDEX - 1
+if INDEX > 0
+   execute "+recurse"
+endif
+write "INDEX: " INDEX " RANDOM: " local "^"
 }
 
 location cave
 object fred
 player
 
-#include "verbs.library"
-#include "utils.library"
