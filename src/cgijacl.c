@@ -460,7 +460,7 @@ main(argc, argv)
 
 		// OUTPUT THE HTTP HEADER
 		puts("Content-type: text/html");
-		printf("Set-Cookie: user_id=%s; SameSite=Strict;\n", user_id);
+		printf("Set-Cookie: user_id=%s; SameSite=Strict; Max-Age=21600\n", user_id);
 		puts("Expires: -1\n");
 
 		/* RESET GLOBAL VARIABLES THAT ARE INTERNAL TO THE INTERPRETER */
