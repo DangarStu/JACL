@@ -375,6 +375,7 @@ main(argc, argv)
 		}
 #endif
 
+		user_id[0] = (char) 0; // CLEAR THE USER_ID
 		read_cgi_input(&entries);
 		parse_cookies(&jacl_cookies);
 		cookie_read_successfully = FALSE;
