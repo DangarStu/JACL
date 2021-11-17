@@ -179,6 +179,9 @@ read_gamefile()
 	create_cinteger ("sound_supported", 0);
 	create_cinteger ("timer_supported", 0);
 	create_cinteger ("remote_user", 0);
+	create_cinteger ("jacl_version", J_VERSION);
+	create_cinteger ("jacl_release", J_RELEASE);
+	create_cinteger ("jacl_build", J_BUILD);
     create_cinteger ("GLK", 0);
     create_cinteger ("CGI", 1);
     create_cinteger ("NDS", 2);

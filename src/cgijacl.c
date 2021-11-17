@@ -511,11 +511,11 @@ main(argc, argv)
 
 			/* PUT DIRECT FUNCTION CALL CHECKS HERE */
 			if (cgi_val(entries, "function") != NULL) {
-				if (!strcmp(cgi_val(entries, "function"), "+timer")) {
+				if (!strcmp(cgi_val(entries, "function"), "timer")) {
 					execute("+timer");
-				}else if (!strcmp(cgi_val(entries, "function"), "+exits")) {
+				} else if (!strcmp(cgi_val(entries, "function"), "exits")) {
 					execute("+ajax");
-				}else if (!strcmp(cgi_val(entries, "function"), "+ajax")) {
+				} else if (!strcmp(cgi_val(entries, "function"), "ajax")) {
 					execute("+ajax");
 				} else if (!strcmp(cgi_val(entries, "function"), "eachturn")) {
 					/* CALL THE GLOBAL EACHTURN FUNCTION THEN ASSOCIATED */
