@@ -86,7 +86,7 @@ FILE           *file = NULL;
 
 char            user_id[81] = "\0";
 char            prefix[81] = "\0";
-char            cookie_expiry[81] = "\0";
+char            cookie_expiry[81] = "21600";
 char            game_path[256] = "\0";
 char            game_file[256] = "\0";
 char            processed_file[256] = "\0";
@@ -250,7 +250,7 @@ main(argc, argv)
 		sprintf(error_buffer, "Using default error log \"%s\"", error_log);
 		log_message(error_buffer, PLUS_STDERR);
 	} else {
-		sprintf(error_buffer, "Using defined error log \"%s\"", error_log);
+		sprintf(error_buffer, "Using configured error log \"%s\"", error_log);
 		log_message(error_buffer, PLUS_STDERR);
 	}
 
@@ -260,7 +260,7 @@ main(argc, argv)
 		sprintf(error_buffer, "Using default access log \"%s\"", access_log);
 		log_message(error_buffer, PLUS_STDERR);
 	} else {
-		sprintf(error_buffer, "Using defined access log \"%s\"", access_log);
+		sprintf(error_buffer, "Using configured access log \"%s\"", access_log);
 		log_message(error_buffer, PLUS_STDERR);
 	}
 
@@ -270,7 +270,7 @@ main(argc, argv)
 		sprintf(error_buffer, "Using default include location \"%s\"", include_directory);
 		log_message(error_buffer, PLUS_STDERR);
 	} else {
-		sprintf(error_buffer, "Using defined include location \"%s\"", include_directory);
+		sprintf(error_buffer, "Using configured include location \"%s\"", include_directory);
 		log_message(error_buffer, PLUS_STDERR);
 	}
 
@@ -280,7 +280,7 @@ main(argc, argv)
 		sprintf(error_buffer, "Using default data location \"%s\"", data_directory);
 		log_message(error_buffer, PLUS_STDERR);
 	} else {
-		sprintf(error_buffer, "Using defined data location \"%s\"", data_directory);
+		sprintf(error_buffer, "Using configured data location \"%s\"", data_directory);
 		log_message(error_buffer, PLUS_STDERR);
 	}
 
@@ -290,9 +290,12 @@ main(argc, argv)
 		sprintf(error_buffer, "Using default temp location \"%s\"", temp_directory);
 		log_message(error_buffer, PLUS_STDERR);
 	} else {
-		sprintf(error_buffer, "Using default temp location \"%s\"", temp_directory);
+		sprintf(error_buffer, "Using configured temp location \"%s\"", temp_directory);
 		log_message(error_buffer, PLUS_STDERR);
 	}
+
+	sprintf(error_buffer, "Cookie expiry set to \"%s\"", cookie_expiry);
+	log_message(error_buffer, PLUS_STDERR);
 
 	/* PREPROCESS THE FILE AND WRITE IT OUT TO THE NEW FILE */
 	if (jpp() == FALSE) {
@@ -896,8 +899,6 @@ read_config_file()
 		} else if (!strcmp(word[0], "cookie_expiry")) {
 			if (word[1] != NULL) {
 				strncpy(cookie_expiry, word[1], 80);
-			} else {
-				strncpy(cookie_expiry, "21600", 80);
 			}
 		}
 		fgets(text_buffer, 80, file);
