@@ -65,7 +65,8 @@ char            proxy_buffer[1024];
 int				start_of_last_command;
 int				start_of_this_command;
 
-int				prefer_remote_user = TRUE;
+int			prefer_remote_user = TRUE;
+int			cookie_read_successfully;
 
 int             buffer_index = 0;
 
@@ -85,6 +86,7 @@ FILE           *file = NULL;
 
 char            user_id[81] = "\0";
 char            prefix[81] = "\0";
+char            cookie_expiry[81] = "\0";
 char            game_path[256] = "\0";
 char            game_file[256] = "\0";
 char            processed_file[256] = "\0";
@@ -310,6 +312,7 @@ main(argc, argv)
 	// INTIALISE THE CSV PARSER
 	csv_init(&parser_csv, CSV_APPEND_NULL);
   
+	// CODE THAT IS ONLY RUN ONCE WHEN THE GAME IS LOADED
 	execute ("+bootstrap");
 
 	/* SAVE THE GAME STATE RIGHT AT THE START TO RESTORE FOR
@@ -374,6 +377,7 @@ main(argc, argv)
 
 		read_cgi_input(&entries);
 		parse_cookies(&jacl_cookies);
+		cookie_read_successfully = FALSE;
 
 		//sprintf (error_buffer, "HTTP_COOKIE: %s", getenv("HTTP_COOKIE"));
 		//log_message(error_buffer, PLUS_STDERR);
@@ -396,6 +400,7 @@ main(argc, argv)
 				if (cgi_val(jacl_cookies, "user_id") != NULL) {
 					strcpy(user_id, cgi_val(jacl_cookies, "user_id"));
 					REMOTE_USER_USED->value = TRUE;
+					cookie_read_successfully = TRUE;
 					//sprintf(error_buffer, "Using user_id %s from cookie.", user_id);
 					//log_message(error_buffer, PLUS_STDERR);
 				} else {
@@ -460,7 +465,12 @@ main(argc, argv)
 
 		// OUTPUT THE HTTP HEADER
 		puts("Content-type: text/html");
-		printf("Set-Cookie: user_id=%s; SameSite=Strict; Max-Age=21600\n", user_id);
+
+		if (cookie_read_successfully == FALSE) {
+			// COOKIE WASN'T READ SO THIS IS EITHER THE FIRST TRANSACTION
+			// OR COOKIES AREN'T SUPPORTED BY THE USER'S CLIENT
+			printf("Set-Cookie: user_id=%s; SameSite=Strict; Max-Age=%s\n", user_id, cookie_expiry);
+		}
 		puts("Expires: -1\n");
 
 		/* RESET GLOBAL VARIABLES THAT ARE INTERNAL TO THE INTERPRETER */
@@ -881,6 +891,12 @@ read_config_file()
 				strncpy(access_log, word[1], 80);
 				if (access_log[strlen(access_log) - 1] == '/')
 					strcat(access_log, "access.log");
+			}
+		} else if (!strcmp(word[0], "cookie_expiry")) {
+			if (word[1] != NULL) {
+				strncpy(cookie_expiry, word[1], 80);
+			} else {
+				strncpy(cookie_expiry, "21600", 80);
 			}
 		}
 		fgets(text_buffer, 80, file);
