@@ -447,7 +447,7 @@ main(argc, argv)
 				returning_player = TRUE;
 			} else {
 				sprintf(error_buffer, "Unable to restore saved file for program \"%s\" and returning user \"%s\"", prefix, user_id);
-				log_error(error_buffer, PLUS_STDOUT);
+				log_error(error_buffer, LOG_ONLY);
 				returning_player = FALSE;
 			}
 		}
