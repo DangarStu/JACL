@@ -54,6 +54,7 @@ char            access_log[81] = "\0";
 
 
 char            function_name[81];
+char            rpc_function_name[81];
 char            override[81];
 
 char            temp_buffer[1024];
@@ -378,7 +379,9 @@ main(argc, argv)
 		}
 #endif
 
-		user_id[0] = (char) 0; // CLEAR THE USER_ID
+		user_id[0] = (char) 0; 			// CLEAR THE USER_ID
+		rpc_function_name[0] = (char) 0;	// CLEAR THE RPC FUNCTION NAME
+
 		read_cgi_input(&entries);
 		parse_cookies(&jacl_cookies);
 		cookie_read_successfully = FALSE;
@@ -504,25 +507,32 @@ main(argc, argv)
 
 		if (returning_player 
 			|| (cgi_val(entries, "command") != NULL)
-			|| (cgi_val(entries, "function") != NULL)) {
+			|| (cgi_val(entries, "rpc") != NULL)) {
 			/* THIS MOVE IS A CONTINUATION OF A GAME THAT IS IN PROGRESS */
 			TIME->value = TRUE;
 			custom_error = FALSE;
 
 			/* PUT DIRECT FUNCTION CALL CHECKS HERE */
-			if (cgi_val(entries, "function") != NULL) {
-				if (!strcmp(cgi_val(entries, "function"), "timer")) {
+			if (cgi_val(entries, "rpc") != NULL) {
+				if (!strcmp(cgi_val(entries, "rpc"), "timer")) {
 					execute("+timer");
-				} else if (!strcmp(cgi_val(entries, "function"), "exits")) {
+				} else if (!strcmp(cgi_val(entries, "rpc"), "ajax")) {
 					execute("+ajax");
-				} else if (!strcmp(cgi_val(entries, "function"), "ajax")) {
-					execute("+ajax");
-				} else if (!strcmp(cgi_val(entries, "function"), "eachturn")) {
+				} else if (!strcmp(cgi_val(entries, "rpc"), "eachturn")) {
 					/* CALL THE GLOBAL EACHTURN FUNCTION THEN ASSOCIATED */
 					execute("+eachturn");
 					strcpy(function_name, "eachturn_");
 					strcat(function_name, object[HERE]->label);
 					execute(function_name);
+				} else {
+					// CALL +rpc, BUT SET THE NAME THE FUNCTION IS CALLED AS
+					// TO THE ONE SUPPLIED. THIS IS FOR SECURITY PURPOSES.
+					// IT PREVENTS ANY FUNCTION BEING CALLED AT WILL, BUT
+					// PROVIDES A CLEAN INTERFACE FOR THE PURPOSE OF THE CALL
+					// TO BE HANDLED INSIDE +rpc
+					strcpy(rpc_function_name, "+");
+					strncat(rpc_function_name, cgi_val(entries, "rpc"), 80);
+					execute("+rpc");
 				}
 			} else {
 				/* GET THE REQUEST PARAMETERS CONTAINING THE PLAYER'S MOVE */
