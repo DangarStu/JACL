@@ -484,7 +484,8 @@ main(argc, argv)
 		style_index = 0;
 
 		/* DISPLAY THE HEADER OF THE HTML PAGE */
-		if (cgi_val(entries, "ajax") == NULL || strcmp(cgi_val(entries, "ajax"), "true")) {
+		if (cgi_val(entries, "rpc") == NULL && 
+			(cgi_val(entries, "ajax") == NULL || strcmp(cgi_val(entries, "ajax"), "true"))) {
 			if (execute("+header") == FALSE) {
 				default_header();
 			}
@@ -514,6 +515,8 @@ main(argc, argv)
 
 			/* PUT DIRECT FUNCTION CALL CHECKS HERE */
 			if (cgi_val(entries, "rpc") != NULL) {
+				// ALL FUNCTION CALLS ARE AJAX RPC BY DEFINITION
+
 				if (!strcmp(cgi_val(entries, "rpc"), "timer")) {
 					execute("+timer");
 				} else if (!strcmp(cgi_val(entries, "rpc"), "ajax")) {
@@ -592,7 +595,8 @@ main(argc, argv)
 		}
 
 		/* DISPLAY THE FOOTER OF THE HTML PAGE */
-		if (cgi_val(entries, "ajax") == NULL || strcmp(cgi_val(entries, "ajax"), "true")) {
+		if (cgi_val(entries, "rpc") == NULL &&
+			(cgi_val(entries, "ajax") == NULL || strcmp(cgi_val(entries, "ajax"), "true"))) {
 			if (execute("+footer") == FALSE) {
 				default_footer();
 			}
