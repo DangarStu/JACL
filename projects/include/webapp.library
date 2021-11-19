@@ -53,6 +53,14 @@ print:
 print:
 	}
 
+	if (window.matchMedia("(min-width: 767px)").matches) {
+.
+		if WEBAPP_device != WEBAPP_desktop
+         		write "window.location.replace(~" $url "?device=1~);"
+		endif
+print:
+	}
+
      function ajaxRequest(event) {^
 .
          write "var url_string = ~" $url "?ajax=true&command=~ + "
