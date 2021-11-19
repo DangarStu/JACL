@@ -163,10 +163,10 @@ read_gamefile()
 	create_integer ("multi_prefix", 0);
 	create_integer ("notify", 1);
 	create_integer ("debug", 0);
-	create_integer ("local1", 0);
-	create_integer ("local2", 0);
-	create_integer ("local3", 0);
-	create_integer ("local4", 0);
+	create_integer ("local", 0);
+	create_integer ("local_x", 0);
+	create_integer ("local_y", 0);
+	create_integer ("local_a", 0);
 	create_integer ("linebreaks", 1);
 
 	/* STORE THIS SO THE SECOND PASS KNOWS WHERE TO START 

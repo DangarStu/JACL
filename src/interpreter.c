@@ -2752,10 +2752,10 @@ pop_stack()
 	}
 
 	wp = backup[stack].wp;
-	LOCAL1->value = backup[stack].local1;
-	LOCAL2->value = backup[stack].local2;
-	LOCAL3->value = backup[stack].local3;
-	LOCAL4->value = backup[stack].local4;
+	LOCAL->value = backup[stack].local;
+	LOCAL_X->value = backup[stack].local_x;
+	LOCAL_Y->value = backup[stack].local_y;
+	LOCAL_A->value = backup[stack].local_a;
 	top_of_loop = backup[stack].top_of_loop;
 	outfile = backup[stack].outfile;
 	infile = backup[stack].infile;
@@ -2803,10 +2803,10 @@ push_stack(file_pointer)
 		backup[stack].function = executing_function;
 		backup[stack].address = file_pointer;
 		backup[stack].wp = wp;
-		backup[stack].local1 = LOCAL1->value;
-		backup[stack].local2 = LOCAL2->value;
-		backup[stack].local3 = LOCAL3->value;
-		backup[stack].local4 = LOCAL4->value;
+		backup[stack].local = LOCAL->value;
+		backup[stack].local_x = LOCAL_X->value;
+		backup[stack].local_y = LOCAL_Y->value;
+		backup[stack].local_a = LOCAL_A->value;
 		backup[stack].top_of_loop = top_of_loop;
 		backup[stack].top_of_select = top_of_select;
 		backup[stack].top_of_while = top_of_while;

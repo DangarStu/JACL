@@ -102,10 +102,10 @@
 #define MULTI_PREFIX			integer_resolve("multi_prefix")
 #define NOTIFY					integer_resolve("notify")
 #define DEBUG					integer_resolve("debug")
-#define LOCAL1					integer_resolve("local1")
-#define LOCAL2					integer_resolve("local2")
-#define LOCAL3					integer_resolve("local3")
-#define LOCAL4					integer_resolve("local4")
+#define LOCAL					integer_resolve("local")
+#define LOCAL_X				integer_resolve("local_x")
+#define LOCAL_Y				integer_resolve("local_y")
+#define LOCAL_A				integer_resolve("local_a")
 
 /* SYSTEM INTEGER CONSTANTS */
 
