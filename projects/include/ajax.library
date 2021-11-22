@@ -1,0 +1,23 @@
+write "function ajaxRequest(event) {^"
+write "var url_string = ~" $url "?ajax=true&command=~ + "
+write "event.data.command"
+if remote_user = false
+	write "+ ~&user_id=" $user_id "~;^"
+else
+	write ";^"
+endif
+write "$.ajax({^url: url_string,^"
+print:
+		success: function (data) {
+			if (event.data.replace == true) {
+				$(event.data.element).html(data);
+			} else {
+				$(event.data.element).append(data);
+			}
+.
+call "+local_success"
+print:
+		}
+	});^
+}^
+.

@@ -9,20 +9,9 @@ print:
 	<meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">^
 	<script src="/include/jquery-3.6.0.min.js"></script>^
 	<script language="JavaScript">^
-		function fetchResponse(event) {^
 .
-			write "var url_string = ~" $url 
-			if remote_user = false
-			   write "?user_id=" $user_id 
-			endif
-			write ""&ajax=true&command=~ + "
-			write "event.data.command;^"
-			write "$.ajax({^url: url_string,^"
+#include "ajax.library"
 print:
-				
-           		success: function (data) { $(event.data.element).append(data); }^
-			});^
-		}^
 	</script>^
 	</head>^
 	<body>^
@@ -36,8 +25,8 @@ print:
 	<button id="option1"><img src="/images/tiles/green_chest.png"></button>^
 	<button id="option2"><img src="/images/tiles/red_chest.png"></button>^
 	<script language="JavaScript">^
-		$('#option1').click( { command: "greenchest", element: "#screen" }, fetchResponse );^
-		$('#option2').click( { command: "redchest", element: "#screen" }, fetchResponse );^
+		$('#option1').click( { async: true, command: "greenchest", element: "#screen", replace: "false" }, ajaxRequest);^
+		$('#option2').click( { async: true, command: "redchest", element: "#screen", replace: "false" }, ajaxRequest);^
 	</script>^
 	</body>
 </html>
