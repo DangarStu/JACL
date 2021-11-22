@@ -25,9 +25,9 @@ else
    write "height: 87px;"
 endif
 print:
-		font-size: 12pt;
+		font-size: 10pt;
 		color: white;
-		font-family: Verdana, Arial, Sanserif;
+		font-family: Merriweather, Verdana, Arial, Sanserif;
 .
 write " background-color: " header_colour "; }^"
 print:
@@ -37,7 +37,7 @@ print:
 		left:0;
 		right:0;
 		display:block;
-		font-family: Verdana, Arial, Sanserif; 
+		font-family: Merriweather, Verdana, Arial, Sanserif; 
 .
 if gui_mode = GUI
    write "height: 210px; "
@@ -46,7 +46,7 @@ if gui_mode = MOBILE
    write "height: 45px; "
 endif
 if gui_mode = STANDARD
-   write "height: 100px; "
+   write "height: 75px; "
 endif
 ifstring footer_image != "none"
    write "background-image: url('" footer_image "'); "
@@ -72,7 +72,7 @@ ifstring current_image != "none"
    write "  margin-right: 500px;"
 endif
 if gui_mode = STANDARD
-   write " bottom: 100px; "
+   write " bottom: 75px; "
 endif
 if gui_mode = MOBILE
    write " bottom: 45px; "
@@ -82,7 +82,7 @@ if gui_mode = GUI
 endif
 write " background-color: " maintext_colour "; }^"
 print:
-	p {	font-family: Verdana, Arial, Sanserif;
+	p {	font-family: Merriweather, Verdana, Arial, Sanserif;
 		color: black; 
 .
 if gui_mode = MOBILE
@@ -91,15 +91,15 @@ else
    write "font-size: 12pt;}^"
 endif
 print:
-	a {	font-family: Verdana, Arial, Sanserif;
-		color: white; font-size: 12pt}^
+	a {	font-family: Merriweather, Verdana, Arial, Sanserif;
+		color: white; font-size: 10pt}^
 	h1 { 		
 		padding-left: 18px;
-		font-family: Verdana, Arial, Sanserif;
+		font-family: Merriweather, Verdana, Arial, Sanserif;
 		color: black; 
 		font-size: 24pt}^
 	h2 {	
-		font-family: Georgia, Palatino, Times, Serif;
+		font-family: Merriweather, Georgia, Palatino, Times, Serif;
 		color: black; 
 		font-weight: bold;
 		margin-bottom: 2px;
@@ -120,7 +120,7 @@ print:
 		right: 0px;
 		left: 0px;
 		height: 22px;
-		font-family: Verdana, Arial, Sanserif;
+		font-family: Merriweather, Verdana, Arial, Sanserif;
 		padding-right: 10px;
 		text-align: right;
 .
@@ -152,7 +152,7 @@ print:
 		float: right;
 .
 if gui_mode = STANDARD
-   write " bottom: 100px; "
+   write " bottom: 75px; "
 endif
 if gui_mode = MOBILE
    write " bottom: 45px; "
@@ -163,14 +163,16 @@ endif
 write " background-color: " maintext_colour "; }^"
 print:
 	div.directions { 		
+		padding-top: 2px;
 		overflow: hidden;
 		opacity: 0.5;
 		right: 0px;
 		left: 0px;
 		height: 22px;
-		font-family: Verdana, Arial, Sanserif;
+		font-family: Merriweather, Verdana, Arial, Sanserif;
+		font-size: 10pt;
 		padding-right: 10px;
-		text-align: right;
+		text-align: center;
 		color: white;
 .
 write " background-color: " linkbar_colour "; }^"
@@ -191,7 +193,7 @@ print:
 		margin-left: 0px;
 		margin-top: 0px; }^
 	div.maintext {
-     	font-family: Georgia, Palatino, Times, Serif;
+     	font-family: Merriweather, Georgia, Palatino, Times, Serif;
 .
 if gui_mode = MOBILE
    print:
@@ -223,7 +225,8 @@ else
    write "font-size: 12pt;^"
 endif
 print:
-		width: 95%; }^
+		float: left;
+		width: 100%; }^
 	div.prompt_text {
 		float: left;
 		width: 20%; 
@@ -233,11 +236,11 @@ print:
 if gui_mode = STANDARD
    print:
 	    div.command_prompt {
-		float: right;
-		width: 80%;
-        text-align: center;
-        padding-top: 25px; }
-   .
+		float: left;
+		width: 95%;
+        	text-align: center;
+        	padding: 15px; }^
+.
 endif
 if gui_mode = MOBILE
    print:
@@ -250,7 +253,7 @@ endif
 print:
 	div.interface {
 		position: relative;
-		font-family: Verdana, Arial, Sanserif;
+		font-family: Merriweather, Verdana, Arial, Sanserif;
 		padding-top: 10px;
 		padding-left: 10px;
 		padding-right: 10px;

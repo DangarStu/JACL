@@ -23,8 +23,9 @@ set linebreaks = false
 print:
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"^
   "http://www.w3.org/TR/html4/loose.dtd">^
+<html><head>
+<link href="http://fonts.googleapis.com/css?family=Merriweather" rel="stylesheet" type="text/css">
 .
-write "<html><head>"
 write "<meta HTTP-EQUIV=~Content-Type~ CONTENT=~text/html; charset=UTF-8~>"
 if gui_mode = MOBILE
    write "<meta name = ~viewport~ content = ~width = device-width, initial-scale = 1.0, user-scalable = no~/>"
@@ -35,7 +36,6 @@ execute "+styles"
 print:
    <script src="/include/jquery-3.6.0.min.js"></script>
    <script language="JavaScript">^
-   <!--^
    function KeyPressed() {^
       if ($("#JACLCommandPrompt").val() == "") { main.scrollTop = main.scrollHeight; } }^
    function changeInterface() {^
@@ -91,7 +91,6 @@ print:
       return null; }^
    .
 endif
-write "-->"
 write "</script>^"
 write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
 write "</head>^"
@@ -165,9 +164,11 @@ endif
 if gui_mode = STANDARD : gui_mode = MOBILE
    if gui_mode = STANDARD
       write "<form name=~JACLGameForm~ method=~get~ onsubmit=~return userCommand();~>^"
-      write "<div class=~prompt_text~>"
-      write command_prompt
-      write "</div>^"
+		ifstring prompt_text != ""
+      		#write "<div class=~prompt_text~>"
+      		write command_prompt
+      		#write "</div>^"
+		endif
    else
       write "<form name=~JACLGameForm~ method=~get~ onsubmit=~return userCommand();~>^"
       #write "<form name=~JACLGameForm~ method=~get~>^"

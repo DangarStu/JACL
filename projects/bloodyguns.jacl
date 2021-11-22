@@ -7471,7 +7471,7 @@ object dog_tags : dog tags
    parent		kryten
    mass		1
 
-{examine
+{examine : read
 print:
    Two stainless-steel identity discs, one circular, one octagonal
    attached to a thin leather cord.
@@ -8252,16 +8252,16 @@ object ground: ground floor
 
 {+bootstrap
 if interpreter = CGI
-   setstring command_prompt "Type your command: "
+   setstring command_prompt ""
 endif
 }
 
 # CONSTANTS FOR THE WEB INTERFACE LIBRARY
 constant title_image "/images/bloodyguns.png"
 constant footer_image "none"
-constant header_colour "#5e684e"
+constant header_colour "#8e987e"
 constant linkbar_colour "#454030"
-constant maintext_colour "#ddd1c5"
+constant maintext_colour "#fdf1e5"
 
 #debug "debug.library"
 #include "webinterface.library"
