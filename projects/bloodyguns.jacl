@@ -5,41 +5,41 @@
 # Copyright (C) Stuart Allen 2008. All rights reserved.
 # -----------------------------------------------------------------------------
 
-constant 	game_release	1
-constant 	game_build		8
+constant	game_release	1
+constant	game_build		8
 constant	game_title		"The Bloody Guns"
 constant	game_author		"Stuart Allen"
-constant	ifid			"JACL-004"
+constant	ifid				"JACL-004"
 
 # -----------------------------------------------------------------------------
 # CONSTANTS FOR RESOURCES IN BLORB FILE
 # -----------------------------------------------------------------------------
 
-constant image_bloodyguns				1
-constant image_MelvilleMapInGame		2
+constant image_bloodyguns					1
+constant image_MelvilleMapInGame			2
 
-constant sound_TheBloodyGuns			3
-constant sound_AircraftBattle			4
+constant sound_TheBloodyGuns				3
+constant sound_AircraftBattle				4
 constant sound_ArtilleryNoExplosion		5
 constant sound_ArtilleryWithExplosion	6
-constant sound_CanoePaddle				7
-constant sound_Explosion				8
-constant sound_GunShot					9
+constant sound_CanoePaddle					7
+constant sound_Explosion					8
+constant sound_GunShot						9
 constant sound_MetalicClang				10
-constant sound_Alarm					11
+constant sound_Alarm							11
 constant sound_RifleCocking				12
-constant sound_FiringRifle				13
-constant sound_Flies					14
-constant sound_MorseCodeShort			15
-constant sound_Thunder					16
-constant sound_Rain						17
+constant sound_FiringRifle					13
+constant sound_Flies							14
+constant sound_MorseCodeShort				15
+constant sound_Thunder						16
+constant sound_Rain							17
 constant sound_DoorBreaking				18
 constant sound_GeneratorFalseStart		19
-constant sound_GeneratorStarting		20
+constant sound_GeneratorStarting			20
 constant sound_GeneratorRunning			21
-constant sound_RadioStatic				22
-constant sound_RopeStrain				23
-constant sound_Windlass					24
+constant sound_RadioStatic					22
+constant sound_RopeStrain					23
+constant sound_Windlass						24
 
 # -----------------------------------------------------------------------------
 # USER ATTRIBUTES
@@ -61,13 +61,13 @@ integer next_sound			0
 integer turn_count			0
 integer status_window 		0
 
-constant loop				-1
+constant loop					-1
 
 constant foreground_channel	0
 constant background_channel	1
-constant eachturn_channel	2
-constant timed_channel		3 
-constant global_channel		4 
+constant eachturn_channel		2
+constant timed_channel			3 
+constant global_channel			4 
 
 {+intro
 set player = kryten
@@ -1758,8 +1758,8 @@ else
    print:
       The shell shrieks through the air, climbing through a steep parabolic
       arc until it disappears out of view. The gun crew waits for the shell
-      to explode, but eventually it becomes obvious that it must have hit
-      the sea by now.^
+      to explode, but with the shell fuse not set it eventually becomes 
+		obvious that it must have hit the sea by now.^
    .
    return
 endif
@@ -1812,10 +1812,10 @@ set fuse(set_to) = 0
 
 constant set_to			3
 constant fired_not_set	4
-constant total_shots	5
+constant total_shots		5
 
 object fuse : fuse on shell ring rings holes felt gunpowder
-   short		the "powder fuse"
+   short			the "powder fuse"
    parent		shell
 
 {examine
