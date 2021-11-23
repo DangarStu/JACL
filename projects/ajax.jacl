@@ -1,5 +1,4 @@
 #!/usr/local/jacl/bin/cgijacl
-
 {+header
 set linebreaks = false
 print:
@@ -24,9 +23,24 @@ print:
 		</div>
 	<button id="option1"><img src="/images/tiles/green_chest.png"></button>^
 	<button id="option2"><img src="/images/tiles/red_chest.png"></button>^
+	<form name="command" id="commandForm">
+.
+		prompt	
+print:
+	</form>
 	<script language="JavaScript">^
 		$('#option1').click( { async: true, command: "greenchest", element: "#screen", replace: "false" }, ajaxRequest);^
 		$('#option2').click( { async: true, command: "redchest", element: "#screen", replace: "false" }, ajaxRequest);^
+		$('#commandForm').submit ( submitForm );^
+
+		function submitForm() {
+			ajaxForm({ 
+				command: document.getElementById('JACLCommandPrompt').value,
+				replace: false,
+				element: "#screen"
+			});
+			return false;
+		}
 	</script>^
 	</body>
 </html>

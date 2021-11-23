@@ -1,3 +1,25 @@
+write "function ajaxForm(details) {^"
+write "var url_string = ~" $url "?ajax=true&command=~ + details.command + "~"
+if remote_user = false
+	write "+ ~&user_id=" $user_id "~;^"
+else
+	write ";^"
+endif
+print:
+	$.ajax({
+		url: url_string,^
+		success: function (data) {^
+			if (details.replace == true) {^
+				console.log(details);
+				$(details.element).html(data);^
+			} else {^
+				console.log(details);
+				$(details.element).append(data);^
+			}^
+		}^
+	});^
+}^
+.
 write "function ajaxRequest(event) {^"
 write "var url_string = ~" $url "?ajax=true&command=~ + "
 write "event.data.command"
@@ -7,17 +29,21 @@ else
 	write ";^"
 endif
 write "$.ajax({^url: url_string,^"
+write "		success: function (data) {^"
+ifexecute "+local_success"
+	# RESULT HANDLED BY LOCAL APPLICATION
+else
+	# DEFAULT ACTION
+	print:
+			if (event.data.replace == true) {^
+				$(event.data.element).html(data);^
+			} else {^
+				$(event.data.element).append(data);^
+			}^
+   .
+endif
 print:
-		success: function (data) {
-			if (event.data.replace == true) {
-				$(event.data.element).html(data);
-			} else {
-				$(event.data.element).append(data);
-			}
-.
-call "+local_success"
-print:
-		}
+		}^
 	});^
 }^
 .
