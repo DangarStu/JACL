@@ -9,6 +9,12 @@ print:
 	$.ajax({
 		url: url_string,^
 		success: function (data) {^
+.
+ifexecute "+local_success"
+	# RESULT HANDLED BY LOCAL APPLICATION
+else
+print:
+	# DEFAULT ACTION
 			if (details.replace == true) {^
 				console.log(details);
 				$(details.element).html(data);^
@@ -16,6 +22,9 @@ print:
 				console.log(details);
 				$(details.element).append(data);^
 			}^
+.
+endif
+print:
 		}^
 	});^
 }^

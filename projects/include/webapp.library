@@ -58,32 +58,11 @@ print:
 		if WEBAPP_device != WEBAPP_desktop
          		write "window.location.replace(~" $url "?device=1~);"
 		endif
-print:
-	}
+write "}"
 
-     function ajaxRequest(event) {^
-.
-         write "var url_string = ~" $url "?ajax=true&command=~ + "
-         write "event.data.command + "
-         if remote_user = false
-            write "~&user_id=" $user_id "~^"
-         endif
-         write "$.ajax({^url: url_string,^"
-print:
-             success: function (data) { 
-			if (event.data.replace == true) {
-				$(event.data.element).html(data);
-			} else {	
-				$(event.data.element).append(data);
-			}
-.
-			call "+local_success"
-print:
-		  }
-         });^
-      }^
-   </script>^
-.
+#include "ajax.library"
+
+write "</script>^"
 call "+local_header"
 print:  
    </head><body>^

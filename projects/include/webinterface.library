@@ -36,61 +36,19 @@ execute "+styles"
 print:
    <script src="/include/jquery-3.6.0.min.js"></script>
    <script language="JavaScript">^
+
    function KeyPressed() {^
-      if ($("#JACLCommandPrompt").val() == "") { main.scrollTop = main.scrollHeight; } }^
+      if ($("#JACLCommandPrompt").val() == "") { 
+			main.scrollTop = main.scrollHeight; 
+		} 
+	}^
+
    function changeInterface() {^
-      document.JACLInterfaceForm.submit(); }^
+      document.JACLInterfaceForm.submit(); 
+	}^
 .
 if gui_mode = STANDARD : gui_mode = MOBILE
-   print:
-      function userCommand() { ^
-      var xhReq = createXMLHttpRequest();^
-      if(xhReq == null) { return true; }^
-      var user_id = document.JACLGameForm.user_id.value;^
-      var command = document.JACLGameForm.command.value;^
-      xhReq.open("GET",
-   .
-   write "~" $url
-   print:
-      ?user_id="+user_id+"&command="+command+"&ajax=true", false);^
-      xhReq.send(null);^
-      var serverResponse = xhReq.responseText;^
-      var maintext = document.getElementById("maintext");^
-      $('#maintext').find('audio').remove();^
-      $('#maintext').find('script').remove();^
-      maintext.innerHTML += "<br><b>&gt;" + command + "</b><br>" + serverResponse;^
-      var main = document.getElementById("main");^
-      var textAdded = main.scrollHeight - main.scrollTop;
-.
-if gui_mode = MOBILE
-   print:
-      if (textAdded > 180) { main.scrollTop += 180; } 
-      else { main.scrollTop = main.scrollHeight;^ }
-   .
-else
-   print:
-      if (textAdded > $("#main").height()) { main.scrollTop += $("#main").height(); } 
-      else { main.scrollTop = main.scrollHeight;^ }
-   .
-endif
-print:   
-      document.JACLGameForm.command.value = "";^
-      var sound = $('#maintext').find('audio')[0];^
-      if (sound != null) {^
-			sound.play(); }^
-      var jaclscript = $('#maintext').find('script')[0];^
-      if (jaclscript != null) {^ 
-		eval (jaclscript.text); }^
-      $('#JACLCommandPrompt').focus();
-      return false; }^
-
-      function createXMLHttpRequest() {^
-      try { return new XMLHttpRequest(); } catch(e) {}^
-      try { return new ActiveXObject("Msxml2.XMLHTTP"); } catch (e) {}^
-      alert("XMLHttpRequest not supported");^
-      return null; }^
-   .
-endif
+#include "ajax.library"
 write "</script>^"
 write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
 write "</head>^"
@@ -161,18 +119,7 @@ if gui_mode != MOBILE
    execute "+exits"
    write "</div>"
 endif
-if gui_mode = STANDARD : gui_mode = MOBILE
-   if gui_mode = STANDARD
-      write "<form name=~JACLGameForm~ method=~get~ onsubmit=~return userCommand();~>^"
-		ifstring prompt_text != ""
-      		#write "<div class=~prompt_text~>"
-      		write command_prompt
-      		#write "</div>^"
-		endif
-   else
-      write "<form name=~JACLGameForm~ method=~get~ onsubmit=~return userCommand();~>^"
-      #write "<form name=~JACLGameForm~ method=~get~>^"
-   endif
+   write "<form id=~commandForm~ name=~JACLGameForm~ method=~get~>"
    write "<div class=~command_prompt~>^"
    prompt "KeyPressed();"
 endif
@@ -270,8 +217,67 @@ if gui_mode = GUI
    endif
    write "</div>^"
 endif   
-write "</div>"
-write "</form></div>^"
-write "</body></html>^"
+print:
+	</div>
+	</form></div>^
+	<script>
+          function submitForm() {^
+               ajaxForm({^
+                    command: document.getElementById('JACLCommandPrompt').value,^
+                    replace: false,^
+                    element: "#maintext"^
+               });^
+               return false;^
+          }^
+          $('#commandForm').submit ( submitForm );^
+	</script>^
+	</body></html>^
+.
 set linebreaks = true
 }
+
+{+local_success
+print:
+      var maintext = document.getElementById("maintext");^
+      $('#maintext').find('audio').remove();^
+      $('#maintext').find('script').remove();^
+
+      maintext.innerHTML += "<br><b>&gt;" + details.command + "</b><br>"
+	 + data;^
+
+      var main = document.getElementById("main");^
+      var textAdded = main.scrollHeight - main.scrollTop;
+.
+if gui_mode = MOBILE
+   print:
+      if (textAdded > 180) { 
+			main.scrollTop += 180;
+		} else { 
+			main.scrollTop = main.scrollHeight;^ 
+		}
+.
+else
+   print:
+      if (textAdded > $("#main").height()) { 
+			main.scrollTop += $("#main").height(); 
+		} else { 
+			main.scrollTop = main.scrollHeight;^ 
+		}
+.
+endif
+print:   
+      document.JACLGameForm.command.value = "";^
+      var sound = $('#maintext').find('audio')[0];^
+      if (sound != null) {^
+			sound.play(); 
+		}^
+      var jaclscript = $('#maintext').find('script')[0];^
+      if (jaclscript != null) {^ 
+			eval (jaclscript.text); 
+		}^
+      $('#JACLCommandPrompt').focus();
+      return false; 
+.
+endif
+}
+
