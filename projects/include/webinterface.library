@@ -119,7 +119,7 @@ if gui_mode != MOBILE
    execute "+exits"
    write "</div>"
 endif
-   write "<form id=~commandForm~ name=~JACLGameForm~ method=~get~>"
+   write "<form id=~commandForm~ name=~JACLGameForm~ method=~get~ autocomplete=~off~>"
    write "<div class=~command_prompt~>^"
    prompt "KeyPressed();"
 endif
@@ -279,5 +279,121 @@ print:
       return false; 
 .
 endif
+}
+
+{+display_chart_table
+print:
+     <script>
+          var paper = Raphael("main", 2000, 2000, null);
+.
+
+select VISITED topic
+	# LOOP THROUGH ALL THE LINKS TO OTHER TOPICS AND DRAW THE LINES
+     set INDEX = 0
+     repeat
+		if topic(INDEX) != 0
+			# GET THE COORDINATES OFFSETS FOR THE LINE DIRECTION
+			set node_x = topic(x)
+			set node_x * 100
+			set node_x + 5
+			set node_x + 30
+			set node_y = topic(y)
+			set node_y * 100
+			set node_y + 5
+			set node_y + 30
+
+			write "paper.path(~M"
+			write node_x " " node_y "L"
+
+			set destination = topic(INDEX)
+
+			set node_x = destination(x)
+			set node_x * 100
+			set node_x + 5
+			set node_x + 30
+			set node_y = destination(y)
+			set node_y * 100
+			set node_y + 5
+			set node_y + 30
+
+			write node_x " " node_y "~);^"
+		endif	
+		set INDEX + 1
+	until INDEX = 8
+endselect
+
+select VISITED topic
+	set node_x = topic(x)
+	set node_x * 100
+	set node_x + 5
+	set node_y = topic(y)
+	set node_y * 100
+	set node_y + 5
+   write "var node = paper.rect(" node_x ", " node_y ", 60, 60, 10);^"
+	if topic = here
+		write "node.attr(~fill~, ~#BDD8D6~);^"
+	else
+		ifexecute "+child_of_here<topic"
+			write "node.attr(~fill~, ~#ccc~);^"
+		else
+			write "node.attr(~fill~, ~#eee~);^"
+		endif
+	endif
+
+	# ADD THE TOPIC'S LABEL TO THE CENTRE OF THE NODE
+	set node_x + 30
+	set node_y + 30
+	write "var label = paper.text(" node_x ", " node_y ", ~" 
+	split array_count topic{The} " " label
+
+	if array_count = 0
+		write topic{The}			
+     else
+		set INDEX = 0
+		repeat
+			write label[INDEX]
+			write "\n"				
+			set INDEX + 1
+		until INDEX = array_count
+	endif
+	write "~);^"
+
+	# MAKE THE NODE'S LABEL A LINK
+	write "label.attr(~href~, ~"
+	write $url "?command=" topic{label} "&mode=1"
+	if remote_user = false
+   		write "&user_id=" $user_id
+	endif
+	write "~);^"
+
+	if topic has VIDEO
+		set node_x + 25
+		set node_y + 23
+		write "paper.text(" node_x ", " node_y ", ~v~);^"
+	endif
+	if topic has PHOTO
+		set node_x + 24
+		set node_y + 22
+		write "paper.text(" node_x ", " node_y ", ~p~);^"
+	endif
+endselect
+
+#FIND THE CENTRE OF THE CURRENT NODE
+set node_x = here(x)
+set node_x * 100
+set node_x + 35
+set node_y = here(y)
+set node_y * 100
+set node_y + 35
+
+#SCROLL THE DIV SO THE CURRENT NODE IS CENTRED
+write "var halfDivWidth = document.getElementById(~main~).offsetWidth / 2;^"
+write "var halfDivHeight = document.getElementById(~main~).offsetHeight / 2;^"
+write "halfDivHeight = halfDivHeight - 100;^"
+write "if (halfDivHeight < 0) halfDivHeight = 0;^"
+write "document.getElementById(~main~).scrollLeft=" node_x " - halfDivWidth;^"
+write "document.getElementById(~main~).scrollTop=" node_y " - halfDivHeight;^"
+
+write "</script>"
 }
 

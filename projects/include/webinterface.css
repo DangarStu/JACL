@@ -217,6 +217,10 @@ print
 .
 write " background-color: " maintext_colour "; }^"
 print:
+	#JACLCommandPrompt:focus {
+		outline-width: 0;
+	}^
+
 	#JACLCommandPrompt {
 .
 if gui_mode = MOBILE
@@ -226,6 +230,7 @@ else
 endif
 print:
 		float: left;
+		border: 1px;
 		width: 100%; }^
 	div.prompt_text {
 		float: left;
