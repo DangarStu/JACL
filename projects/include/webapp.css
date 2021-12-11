@@ -178,9 +178,9 @@ print:
 		opacity: 0.7;
 		padding-right: 10px;
 		text-align: right;
-		white-space: nowrap; }^
+		white-space: nowrap;
 .
-#write "   background-color: " linkbar_colour "; }^"
+write "   background-color: " linkbar_colour "; }^"
 print:
 	img.right {
 		padding: 15px 5px 5px 5px;
