@@ -1,4 +1,4 @@
-#!../bin/jacl
+#!/usr/local/jacl/bin/fcgijacl
 #ifid:JACL-002
 #                                                              THE UNHOLY GRAIL 
 # -----------------------------------------------------------------------------
