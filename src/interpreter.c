@@ -123,7 +123,7 @@ extern int 						encrypted;
 extern int						after_from;
 extern int						last_exact;
 
-extern char					rpc_function_name[];
+extern char						rpc_function_name[];
 extern char						temp_directory[];
 extern char						data_directory[];
 char							csv_buffer[2048];
@@ -368,12 +368,16 @@ execute(funcname)
 	long			before_command = 0;
 #endif
 
+#ifdef GLK
+	strncpy (called_name, funcname, 1023);
+#else
 	if (!strcmp(funcname, "+rpc")) {
 		strncpy (called_name, rpc_function_name, 80);
 	} else {	
 		strncpy (called_name, funcname, 1023);
 	}
 
+#endif
 	/* GET THE FUNCTION OBJECT BY THE FUNCTION NAME */
 	resolved_function = function_resolve(called_name);
 
