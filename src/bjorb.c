@@ -10,9 +10,9 @@
 
 #define BUF_SIZE 4096
 
-char *ShortProgramName (char *string);
+static char *ShortProgramName (char *string);
 
-void *
+static void *
 my_realloc (void *buf, size_t size)
 {
   buf = realloc (buf, size);
@@ -24,7 +24,7 @@ my_realloc (void *buf, size_t size)
   return buf;
 }
 
-void *
+static void *
 my_malloc (int size)
 {
   void *buf = malloc (size);
@@ -46,9 +46,9 @@ my_malloc (int size)
 // Maximum number of chunks we'll allow
 #define MAX_BLORB 1024
 // The program name.  DJGPP munges this, so we rebuild it here
-char *MyName;
+static char *MyName;
 // The current line in the blc control file
-int Line = 0;
+static int Line = 0;
 
 /*
  * The blorb chunk types. In addition to the chunk data, it holds the
@@ -63,7 +63,7 @@ struct Chunk
   char *Data;
 };
 
-void
+static void
 write_int (FILE * f, unsigned int v)
 // Write_int writes an integer to a file in blorb format 
 {
@@ -76,7 +76,7 @@ write_int (FILE * f, unsigned int v)
   fwrite (&v1, 1, 1, f);
 }
 
-void
+static void
 str_long (char *f, unsigned int v)
 /*
  * str_long writes a long to a string, in a format suitable to later
@@ -92,7 +92,7 @@ str_long (char *f, unsigned int v)
   f[3] = v1;
 }
 
-void
+static void
 str_short (char *f, unsigned int v)
 /*
  * str_long writes a long to a string, in a format suitable to later
@@ -105,7 +105,7 @@ str_short (char *f, unsigned int v)
   f[1] = v1;
 }
 
-void
+static void
 write_id (FILE * f, unsigned char *s)
 /*
  * write_id writes a string to a file as a blorb ID string (4 bytes, space
@@ -121,7 +121,7 @@ write_id (FILE * f, unsigned char *s)
     fwrite (&sp, 1, 1, f);
 }
 
-void
+static void
 str_id (char *f, unsigned char *s)
 // str_id writes a blorb identifier to a string
 {
@@ -134,9 +134,9 @@ str_id (char *f, unsigned char *s)
     f[i] = sp;
 }
 
-short int headerPrinted = 0;
+static short int headerPrinted = 0;
 
-struct Chunk *
+static struct Chunk *
 ReadChunk (FILE * f)
 // ReadChunk reads one entry from a blc control file and loads a chunk
 // from it
@@ -245,15 +245,15 @@ ReadChunk (FILE * f)
 }
 
 // Array of all chunks
-struct Chunk *Blorb[MAX_BLORB];
+static struct Chunk *Blorb[MAX_BLORB];
 // Number of chunks in this file
-int Chunks = 1;
+static int Chunks = 1;
 // Number of chunks we need to index
-int IndexEntries = 0;
+static int IndexEntries = 0;
 // Offsets of index entries
-unsigned long int *Index;
+static unsigned long int *Index;
 
-void
+static void
 BuildIndex (FILE * f)
 // BuildIndex builds the index chunk for a blorb file, loading all other
 // chunks
@@ -301,7 +301,7 @@ BuildIndex (FILE * f)
       }
 }
 
-void
+static void
 Write_Chunk (FILE * Out, struct Chunk *C)
 // Write_Chunk writes one chunk to a file
 {
@@ -321,7 +321,7 @@ Write_Chunk (FILE * Out, struct Chunk *C)
     fwrite (&z, 1, 1, Out);
 }
 
-void
+static void
 WriteBlorb (FILE * F, FILE * Out)
 // WriteBlorb generates a blorb from a BLC file
 {
