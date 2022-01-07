@@ -172,6 +172,8 @@ struct word_type *grammar_table = NULL;
 struct synonym_type *synonym_table = NULL;
 struct filter_type *filter_table = NULL;
 
+static void version_info(void);
+
 void
 glk_main(void)
 {

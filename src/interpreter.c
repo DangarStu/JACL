@@ -249,6 +249,8 @@ char							called_name[1024];
 char							scope_criterion[24];
 char							*output;
 
+static int exit_function(int return_code);
+
 void
 terminate(code)
 	 int             code;
@@ -284,8 +286,8 @@ terminate(code)
 #endif
 }
 
-void
-build_proxy()
+static void
+build_proxy(void)
 {
 	int             index;
 
@@ -306,7 +308,7 @@ build_proxy()
 	//printf("--- proxy buffer = \"%s\"\n", proxy_buffer);
 }
 
-void 
+static void 
 cb1 (void *s, size_t i, void *not_used) {
 	struct string_type *resolved_cstring;
 
@@ -333,7 +335,7 @@ cb1 (void *s, size_t i, void *not_used) {
 
 }
 
-void 
+static void 
 cb2 (int c, void *not_used) {
 	// THE END OF THE RECORD HAS BEEN REACHED, EXPORT THE NUMBER OF FIELDS READ
 	struct cinteger_type *resolved_cinteger;
@@ -344,8 +346,7 @@ cb2 (int c, void *not_used) {
 }
 
 int
-execute(funcname)
-	 char           *funcname;
+execute(char *funcname)
 {
 	int             index;
 	int             counter;
@@ -879,7 +880,7 @@ execute(funcname)
 					criterion_type = CRI_USER_ATTRIBUTE;
 				} else {
 					// USE VALUE OF AS A CATCH ALL IF IT IS NOT AN ATTRIBUTE OR SCOPE
-					criterion_value = value_of(argument_buffer);
+					criterion_value = value_of(argument_buffer, 0);
 
 					if (value_resolved) {
 						criterion_type = CRI_PARENT;
@@ -925,7 +926,7 @@ execute(funcname)
 					sprintf(error_buffer, NO_LOOP, executing_function->name);
 					log_error(error_buffer, PLUS_STDOUT);
 				} else {
-					if (select_next(select_integer, criterion_type, criterion_value, scope_criterion)) {
+					if (select_next()) {
 #ifdef GLK
 						glk_stream_set_position(game_stream, top_of_select, seekmode_Start);
 #else
@@ -943,7 +944,7 @@ execute(funcname)
 			} else if (!strcmp(word[0], "cursor")) {
 				if (word[2] == NULL) {
 					/* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
-					noproprun(0);
+					noproprun();
 					return(exit_function (TRUE));
 				} else {
 					if (current_window == statuswin) {
@@ -1088,7 +1089,7 @@ execute(funcname)
 			} else if (!strcmp(word[0], "askstring") || !strcmp(word[0], "getstring")) {
 				if (word[1] == NULL) {
 					/* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
-					noproprun(0);
+					noproprun();
 					return (exit_function(TRUE));
 				} else {
 					/* GET A POINTER TO THE STRING BEING MODIFIED */
@@ -1209,7 +1210,7 @@ execute(funcname)
 			} else if (!strcmp(word[0], "cursor")) {
 				if (word[2] == NULL) {
 					/* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
-					noproprun(0);
+					noproprun();
 					return(exit_function (TRUE));
 				} else {
 					printf("\x1b[%d;%dH", (int) value_of(word[1], TRUE), (int) value_of(word[2], TRUE));
@@ -1222,7 +1223,7 @@ execute(funcname)
 			} else if (!strcmp(word[0], "askstring") || !strcmp(word[0], "getstring")) {
 				if (word[1] == NULL) {
 					/* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
-					noproprun(0);
+					noproprun();
 					return (exit_function(TRUE));
 				} else {
 					/* GET A POINTER TO THE STRING BEING MODIFIED */
@@ -1537,7 +1538,7 @@ execute(funcname)
 			} else if (!strcmp(word[0], "image")) {
 				if (word[1] == NULL) {
 					/* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
-					noproprun(0);
+					noproprun();
 					return (exit_function(TRUE));
 				} else {
 					if (word[2] == NULL) {
@@ -1551,7 +1552,7 @@ execute(funcname)
 			} else if (!strcmp(word[0], "sound")) {
 				if (word[2] == NULL) {
 					/* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
-					noproprun(0);
+					noproprun();
 					return (exit_function(TRUE));
 				} else {
 					write_text("<audio autoplay=~autoplay~>");
@@ -1796,7 +1797,7 @@ execute(funcname)
 			} else if (!strcmp(word[0], "length")) {
 				if (word[2] == NULL) {
 					/* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
-					noproprun(0);
+					noproprun();
 					return(exit_function (TRUE));
 				} else {
 					if ((container = container_resolve(word[1])) == NULL) {
@@ -1872,7 +1873,7 @@ execute(funcname)
 
 				if (word[4] == NULL) {
 					/* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
-					noproprun(0);
+					noproprun();
 					return (exit_function(TRUE));
 				} else {
 					split_container = container_resolve(var_text_of_word(1));
@@ -1924,7 +1925,7 @@ execute(funcname)
 
 				if (word[2] == NULL) {
 					/* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
-					noproprun(0);
+					noproprun();
 					return (exit_function(TRUE));
 				} else {
 					/* GET A POINTER TO THE STRING BEING MODIFIED */
@@ -1956,7 +1957,7 @@ execute(funcname)
 	
 				if (word[3] == NULL) {
 					/* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
-					noproprun(0);
+					noproprun();
 					return (exit_function(TRUE));
 				} else {
 					/* GET A POINTER TO THE STRING BEING MODIFIED */
@@ -2328,7 +2329,7 @@ execute(funcname)
 				current_level++;
 				if (word[3] == NULL) {
 					/* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
-					noproprun(0);
+					noproprun();
 					return (exit_function(TRUE));
 				} else if (and_strcondition()) {
 					execution_level++;
@@ -2338,7 +2339,7 @@ execute(funcname)
 				current_level++;
 				if (word[3] == NULL) {
 					/* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
-					noproprun(0);
+					noproprun();
 					return (exit_function(TRUE));
 				} else if (strcondition()) {
 					execution_level++;
@@ -2347,7 +2348,7 @@ execute(funcname)
 				current_level++;
 				if (word[1] == NULL) {
 					/* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
-					noproprun(0);
+					noproprun();
 					return (exit_function(TRUE));
 				} else {
 					/* RESOLVE ALL THE TEXT AND STORE IT IN A TEMPORARY BUFFER*/
@@ -2365,7 +2366,7 @@ execute(funcname)
 				current_level++;
 				if (word[3] == NULL) {
 					/* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
-					noproprun(0);
+					noproprun();
 					return (exit_function(TRUE));
 				} else if (condition()) {
 					execution_level++;
@@ -2374,7 +2375,7 @@ execute(funcname)
 				current_level++;
 				if (word[3] == NULL) {
 					/* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
-					noproprun(0);
+					noproprun();
 					return (exit_function(TRUE));
 				} else if (and_condition()) {
 					execution_level++;
@@ -3073,13 +3074,13 @@ logic_test(first)
 			unkobjrun(first);
 			return (FALSE);
 		} else
-			return (scope(index, word[first + 2]));
+			return (scope(index, word[first + 2], FALSE));
 	} else if (!strcmp(word[first + 1], "isnt")) {
 		if (index < 1 || index > objects) {
 			unkobjrun(first);
 			return (FALSE);
 		} else
-			return (!scope(index, word[first + 2]));
+			return (!scope(index, word[first + 2], FALSE));
 	} else if (!strcmp(word[first + 1], "has"))
 		if (index < 1 || index > objects) {
 			unkobjrun(first);
@@ -3555,7 +3556,7 @@ select_next()
 				}
 				break;
 			case CRI_SCOPE:
-				if (scope(*select_integer, scope_criterion)) {
+				if (scope(*select_integer, scope_criterion, FALSE)) {
 					if (!criterion_negate) {
 						return TRUE;
 					}

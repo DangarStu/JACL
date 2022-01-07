@@ -159,6 +159,8 @@ PrintConsole topScreen;
 PrintConsole bottomScreen;
 //Keyboard	kbd;
 
+static void version_info(void);
+
 int
 main(argc, argv)
 	 int             argc;

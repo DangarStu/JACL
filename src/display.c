@@ -34,7 +34,7 @@ check_light(where)
 	else {
 		for (index = 1; index <= objects; index++) {
 			if ((object[index]->attributes & LUMINOUS)
-				&& scope(index, "*present"))
+				&& scope(index, "*present", FALSE))
 				return (TRUE);
 		}
 	}

@@ -77,6 +77,8 @@ extern int    			        noun[];
 
 int								value_resolved;
 
+static int legal_label_check(const char *word, int line, int type);
+
 void
 read_gamefile()
 {
@@ -480,7 +482,7 @@ read_gamefile()
 							if (legal_label_check(word[1], line, CINT_TYPE)) {	
 								errors++;
 							} else {
-								create_cinteger(word[1], value_of(word[index]), FALSE);
+								create_cinteger(word[1], value_of(word[index], 0));
 								if (!value_resolved) {
 									unkvalerr(line, index);
 									errors++;
@@ -1134,10 +1136,7 @@ build_grammar_table(pointer)
 }
 
 int
-legal_label_check(word, line, type)
-	char 		*word;
-	int			line;
-	int			type;
+legal_label_check(const char *word, int line, int type)
 {
 	struct integer_type *integer_pointer = integer_table;
 	struct cinteger_type *cinteger_pointer = cinteger_table;
@@ -1468,9 +1467,7 @@ set_defaults()
 }
 
 void
-create_cinteger (name, value)
-  char *name;
-  int	value;
+create_cinteger (const char *name, int value)
 {
 	struct cinteger_type *new_cinteger = NULL;
 
@@ -1493,9 +1490,7 @@ create_cinteger (name, value)
 }
 
 void
-create_integer (name, value)
-  char *name;
-  int	value;
+create_integer (const char *name, int value)
 {
 	struct integer_type *new_integer = NULL;
 
@@ -1521,9 +1516,7 @@ create_integer (name, value)
 }
 
 void
-create_string (name, value)
-  char *name;
-  char *value;
+create_string (const char *name, const char *value)
 {
 	struct string_type *new_string = NULL;
 
@@ -1558,9 +1551,7 @@ create_string (name, value)
 }
 
 void
-create_cstring (name, value)
-  char *name;
-  char *value;
+create_cstring (const char *name, const char *value)
 {
 	struct string_type *new_string = NULL;
 

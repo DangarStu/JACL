@@ -28,9 +28,13 @@ extern int						parent;
 
 extern int    			        noun[];
 
+static void write_integer(FILE *file, int x);
+static void write_long(FILE *file, long x);
+static int  read_integer(FILE *file);
+static long read_long(FILE *file);
+
 int
-save_game(filename)
-     char           *filename;
+save_game(const char *filename)
 {
 	struct integer_type *current_integer = integer_table;
     struct function_type *current_function = function_table;
@@ -97,9 +101,7 @@ save_game(filename)
 }
 
 int
-restore_game(filename, warn)
-     char           *filename;
-     int            warn;
+restore_game(const char *filename, int warn)
 {
 	struct integer_type *current_integer = integer_table;
     struct function_type *current_function = function_table;
