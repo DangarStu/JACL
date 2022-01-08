@@ -33,6 +33,11 @@ extern int						parent;
 
 extern int    			        noun[];
 
+static void write_integer(strid_t stream, int x);
+static void write_long(strid_t stream, long x);
+static int  read_integer(strid_t stream);
+static long read_long(strid_t stream);
+
 int
 save_game(saveref)
 	 frefid_t           saveref;

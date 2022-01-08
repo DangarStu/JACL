@@ -142,8 +142,7 @@ unkattrun(wordno)
 }
 
 void
-unkdirrun(wordno)
-	 int             wordno;
+unkdirrun(int wordno)
 {
 	sprintf(error_buffer, UNDEFINED_DIRECTION_RUN,
 			executing_function->name, word[wordno]);
@@ -151,15 +150,14 @@ unkdirrun(wordno)
 }
 
 void
-badparun()
+badparun(void)
 {
 	sprintf(error_buffer, BAD_PARENT, executing_function->name);
 	log_error(error_buffer, PLUS_STDOUT);
 }
 
 void
-badplrrun(value)
-	int			value;
+badplrrun(int value)
 {
 	sprintf(error_buffer, BAD_PLAYER, executing_function->name, value);
 	log_error(error_buffer, PLUS_STDOUT);

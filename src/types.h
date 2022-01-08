@@ -3,6 +3,9 @@
  * according to GNU GPL, see file COPYING for details.
  */
 
+#ifndef __JACL_TYPES_H__
+#define __JACL_TYPES_H__
+
 #include "constants.h"
 
 // THIS STRUCTURE CONTAINS ALL THE INFORMATION THAT NEEDS TO BE 
@@ -166,4 +169,6 @@ struct parameter_type {
 	int             high;
 	struct parameter_type *next_parameter;
 };
+#endif
+
 #endif

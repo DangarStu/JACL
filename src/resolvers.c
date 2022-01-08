@@ -66,8 +66,7 @@ char 						macro_function[84];
 int							value_has_been_resolved;
 
 int            *
-container_resolve(container_name)
-	 char           *container_name;
+container_resolve(const char *container_name)
 {
 	container_name = arg_text_of(container_name);
 
@@ -94,9 +93,8 @@ container_resolve(container_name)
 		return ((int *) NULL);
 }
 
-char		   *
-var_text_of_word(wordnumber)
-	int			wordnumber;
+const char		   *
+var_text_of_word(int wordnumber)
 {
     char *value;
 
@@ -218,9 +216,8 @@ text_of(string)
 	}
 }
 
-char           *
-arg_text_of(string)
-	 char           *string;
+const char           *
+arg_text_of(const char *string)
 {
 	struct string_type *resolved_string;
 	struct string_type *resolved_cstring;
@@ -243,8 +240,7 @@ arg_text_of(string)
 }
 
 int
-validate(string)
-	 char            *string;
+validate(const char *string)
 {
 	int             index,
 	                count;
@@ -269,9 +265,7 @@ validate(string)
 }
 
 long
-value_of(value, run_time)
-	 char*           value;
-     int			 run_time;
+value_of(const char *value, int run_time)
 {
 	long            compare;
 
@@ -358,8 +352,7 @@ value_of(value, run_time)
 }
 
 struct integer_type *
-integer_resolve(name)
-	 char            *name;
+integer_resolve(const char *name)
 {
 	int             index,
 					iterator,
@@ -422,9 +415,7 @@ integer_resolve(name)
 }
 
 struct integer_type *
-integer_resolve_indexed(name, index)
-	char           *name;
-	int				index;
+integer_resolve_indexed(char *name, int index)
 {
 	struct integer_type *pointer = integer_table;
 
@@ -451,8 +442,7 @@ integer_resolve_indexed(name, index)
 }
 
 struct cinteger_type *
-cinteger_resolve(name)
-	 char            *name;
+cinteger_resolve(const char *name)
 {
 	int             index,
 					iterator,
@@ -515,9 +505,7 @@ cinteger_resolve(name)
 }
 
 struct cinteger_type *
-cinteger_resolve_indexed(name, index)
-	char           *name;
-	int				index;
+cinteger_resolve_indexed(const char *name, int index)
 {
 	struct cinteger_type *pointer = cinteger_table;
 
@@ -544,8 +532,7 @@ cinteger_resolve_indexed(name, index)
 }
 
 struct string_type *
-string_resolve(name)
-	 char            *name;
+string_resolve(const char *name)
 {
 	int             index,
 					iterator,
@@ -628,8 +615,7 @@ string_resolve_indexed(name, index)
 }
 
 struct string_type *
-cstring_resolve(name)
-	 char            *name;
+cstring_resolve(const char *name)
 {
 	int             index,
 					iterator,
@@ -807,8 +793,7 @@ expand_function(name)
 }
 
 char *
-macro_resolve(testString)
-	 char           *testString;
+macro_resolve(const char *testString)
 {
 	int             index,
 	                counter;
@@ -883,35 +868,35 @@ macro_resolve(testString)
 			badptrrun(expression, index);
 			return (NULL);
 		} else {
-			return (it_output(index, FALSE));
+			return (it_output(index));
 		}
 	} else if (!strcmp(&expression[delimiter], "doesnt")) {
 		if (index < 1 || index > objects) {
 			badptrrun(expression, index);
 			return (NULL);
 		} else {
-			return (doesnt_output(index, FALSE));
+			return (doesnt_output(index));
 		}
 	} else if (!strcmp(&expression[delimiter], "does")) {
 		if (index < 1 || index > objects) {
 			badptrrun(expression, index);
 			return (NULL);
 		} else {
-			return (does_output(index, FALSE));
+			return (does_output(index));
 		}
 	} else if (!strcmp(&expression[delimiter], "isnt")) {
 		if (index < 1 || index > objects) {
 			badptrrun(expression, index);
 			return (NULL);
 		} else {
-			return (isnt_output(index, FALSE));
+			return (isnt_output(index));
 		}
 	} else if (!strcmp(&expression[delimiter], "is")) {
 		if (index < 1 || index > objects) {
 			badptrrun(expression, index);
 			return (NULL);
 		} else {
-			return (is_output(index, FALSE));
+			return (is_output(index));
 		}
 	} else if (!strcmp(&expression[delimiter], "the")) {
 		if (index < 1 || index > objects) {
@@ -986,35 +971,35 @@ macro_resolve(testString)
 			badptrrun(expression, index);
 			return (NULL);
 		} else {
-			return (it_output(index, TRUE));
+			return (it_output(index));
 		}
 	} else if (!strcmp(&expression[delimiter], "Doesnt")) {
 		if (index < 1 || index > objects) {
 			badptrrun(expression, index);
 			return (NULL);
 		} else {
-			return (doesnt_output(index, TRUE));
+			return (doesnt_output(index));
 		}
 	} else if (!strcmp(&expression[delimiter], "Does")) {
 		if (index < 1 || index > objects) {
 			badptrrun(expression, index);
 			return (NULL);
 		} else {
-			return (does_output(index, TRUE));
+			return (does_output(index));
 		}
 	} else if (!strcmp(&expression[delimiter], "Isnt")) {
 		if (index < 1 || index > objects) {
 			badptrrun(expression, index);
 			return (NULL);
 		} else {
-			return (isnt_output(index, TRUE));
+			return (isnt_output(index));
 		}
 	} else if (!strcmp(&expression[delimiter], "Is")) {
 		if (index < 1 || index > objects) {
 			badptrrun(expression, index);
 			return (NULL);
 		} else {
-			return (is_output(index, TRUE));
+			return (is_output(index));
 		}
 	} else if (!strcmp(&expression[delimiter], "The")) {
 		if (index < 1 || index > objects) {
@@ -1058,8 +1043,7 @@ count_resolve(testString)
 }
 
 int
-array_length_resolve(testString)
-	 char            *testString;
+array_length_resolve(char *testString)
 {
 	int             counter = 0;
 	char            *array_name = &testString[1];
@@ -1134,8 +1118,7 @@ array_length_resolve(testString)
 }
 
 int
-object_element_resolve(testString)
-	 char            *testString;
+object_element_resolve(const char *testString)
 {
 	int             index,
 					iterator,

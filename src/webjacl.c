@@ -66,6 +66,8 @@ struct media {
 
 struct media    mediadb;
 
+static void version_info(void);
+
 
 /*
  * int wj_setup( int argc, char **argv ) This function must be called once at

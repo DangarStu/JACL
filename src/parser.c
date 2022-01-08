@@ -91,6 +91,8 @@ extern struct function_type		*executing_function;
 extern struct object_type		*object[];
 extern struct variable_type		*variable[];
 
+static int find_parent(int index);
+
 void
 parser()
 {
@@ -1540,7 +1542,7 @@ noun_resolve(scope_word, finding_from, noun_number)
 
 			if (finding_from) {
 				if (strcmp(scope_word->word, "*anywhere") && strcmp(scope_word->word, "**anywhere")) {
-					if (scope(index, "*present") == FALSE) {
+					if (scope(index, "*present", TRUE) == FALSE) {
 						matches--;
 						confidence[index] = FALSE;
 						continue;
