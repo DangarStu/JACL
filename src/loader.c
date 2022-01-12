@@ -33,6 +33,10 @@ static struct integer_type *last_system_integer = NULL;
 int								value_resolved;
 
 static int legal_label_check(const char *word, int line, int type);
+static void create_language_constants(void);
+static void set_defaults(void);
+static void build_grammar_table(struct word_type *pointer);
+static void free_from(struct word_type *x);
 
 void
 read_gamefile()
@@ -264,10 +268,11 @@ read_gamefile()
 	if (encrypted) jacl_decrypt(text_buffer);
 
 #ifdef GLK
-	while (result) {
+	while (result)
 #else
-    while (!feof(file)) {
+    while (!feof(file))
 #endif
+	{
 		encapsulate();
 		if (word[0] == NULL);
 		else if (text_buffer[0] == '{') {
@@ -680,10 +685,11 @@ read_gamefile()
 	if (encrypted) jacl_decrypt(text_buffer);
 
 #ifdef GLK
-	while (result) {
+	while (result)
 #else
-    while (!feof(file)) {
+    while (!feof(file))
 #endif
+	{
 		encapsulate();
 		if (word[0] == NULL);
 		else if (text_buffer[0] == '{') {
@@ -1049,8 +1055,7 @@ read_gamefile()
 }
 
 void
-build_grammar_table(pointer)
-	 struct word_type *pointer;
+build_grammar_table(struct word_type *pointer)
 {
 	do {
 		if (!strcmp(word[wp], pointer->word)) {

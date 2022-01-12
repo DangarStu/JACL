@@ -10,6 +10,9 @@
 #include "prototypes.h"
 #include <string.h>
 
+
+static int jacl_whitespace(int character);
+
 void
 eachturn()
 {
@@ -53,8 +56,7 @@ get_here()
 }
 
 char *
-strip_return (string)
-	char *string;
+strip_return (char *string)
 {
 	/* STRIP ANY TRAILING RETURN OR NEWLINE OFF THE END OF A STRING */
 	int index;
@@ -69,7 +71,7 @@ strip_return (string)
 		}
 	}
 
-	return (char *) string;
+	return string;
 }
 
 int

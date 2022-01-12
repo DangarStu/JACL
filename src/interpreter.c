@@ -62,6 +62,10 @@ char *strcasestr(const char *s, const char *find)
 }
 #endif
 
+#ifdef __NDS__
+extern void jflush(void);
+#endif
+
 #define MAX_TRY 10 
 
 static struct flock	read_lck;
@@ -72,13 +76,13 @@ static int			write_fd;
 static char *url_encode(const char *str);
 static char to_hex(char code);
 
-char *location_attributes[] = {
+static const char * const location_attributes[] = {
  "VISITED ", "DARK ", "ON_WATER ", "UNDER_WATER ", "WITHOUT_AIR ", "OUTDOORS ",
  "MID_AIR ", "TIGHT_ROPE ", "POLLUTED ", "SOLVED ", "MID_WATER ", "DARKNESS ",
  "MAPPED ", "KNOWN ",
  NULL };
 
-char *object_attributes[] = {
+static const char * const object_attributes[] = {
  "CLOSED ", "LOCKED ", "DEAD ", "IGNITABLE ", "WORN ", "CONCEALING ",
  "LUMINOUS ", "WEARABLE ", "CLOSABLE ", "LOCKABLE ", "ANIMATE ", "LIQUID ",
  "CONTAINER ", "SURFACE ", "PLURAL ", "FLAMMABLE ", "BURNING ", "LOCATION ",
@@ -86,12 +90,12 @@ char *object_attributes[] = {
  "SCORED ", "SITTING ", "NPC ", "DONE ", "GAS ", "NO_TAB ",
  "NOT_IMPORTANT ", NULL };
 
-char *object_elements[] = {
+static const char * const object_elements[] = {
  "parent", "capacity", "mass", "bearing", "velocity", "next", "previous",
  "child", "index", "status", "state", "counter", "points", "class", "x", "y", 
  NULL };
 
-char *location_elements[] = {
+static const char * const location_elements[] = {
  "north", "south", "east", "west", "northeast", "northwest", "southeast",
  "southwest", "up", "down", "in", "out", "points", "class", "x", "y", 
  NULL };
@@ -123,12 +127,8 @@ struct cinteger_type *previous_cinteger = NULL;
 
 unsigned int					bit_mask;
 extern int 						encrypted;
-extern int						after_from;
-extern int						last_exact;
 
 extern char						rpc_function_name[];
-extern char						temp_directory[];
-extern char						data_directory[];
 char							csv_buffer[2048];
 
 int								resolved_attribute;
@@ -150,16 +150,6 @@ int								interrupted = FALSE;
 char 							string_buffer[2048];
 char							argument_buffer[1024];
 #ifdef GLK
-extern schanid_t				sound_channel[];
-extern strid_t					game_stream;
-extern winid_t					mainwin;
-extern winid_t 					statuswin;
-extern winid_t 					current_window;
-
-extern strid_t 					mainstr;
-extern strid_t 					statusstr;
-extern strid_t 					quotestr;
-extern strid_t 					inputstr;
 glsi32  						top_of_loop = 0;
 glsi32  						top_of_select = 0;
 glsi32							top_of_while = 0;
@@ -167,7 +157,6 @@ glsi32							top_of_iterate = 0;
 glsi32							top_of_update = 0;
 glsi32 							top_of_do_loop = 0;
 #else
-extern FILE                     *file;
 char  					        option_buffer[2024];
 int								style_stack[100];
 int								style_index = 0;
@@ -192,19 +181,25 @@ extern int						note_mode;
 // VALUES FROM LOADER
 extern int						value_resolved;
 
-extern FILE           			*transcript;
-extern char						margin_string[];
-
 char  					        integer_buffer[16];
 static char						called_name[1024];
 static char						scope_criterion[24];
 static const char				*output;
 
 static int exit_function(int return_code);
+static int select_next(void);
+static void new_position(double x1, double y1, double bearing, double velocity);
+static void pop_proxy(void);
+static void push_proxy(void);
+static void pop_stack(void);
+static int condition(void);
+static int and_condition(void);
+static int distance(double x1, double y1, double x2, double y2);
+static int strcondition(void);
+static void set_arguments(const char *function_call);
 
 void
-terminate(code)
-	 int             code;
+terminate(int code)
 {
 	// FREE ANY EXTRA RAM ALLOCATED BY THE CSV PARSER
 	csv_free(&parser_csv);
@@ -2386,9 +2381,7 @@ exit_function(return_code)
 }
 
 char *
-object_names(object_index, names_buffer)
-	 int             object_index;
-	 char			*names_buffer;
+object_names(int object_index, char *names_buffer)
 {
 	/* THIS FUNCTION CREATES A LIST OF ALL AN OBJECT'S NAMES.
 	   THE escape ARGUMENT INDICATES WHETHER A + SIGN SHOULD BE
@@ -2406,11 +2399,7 @@ object_names(object_index, names_buffer)
 }
 
 int
-distance(x1, y1, x2, y2)
-	 double          x1,
-	                 y1,
-	                 x2,
-	                 y2;
+distance(double x1, double y1, double x2, double y2)
 {
 	/* THIS FUNCTION CALCULATES THE DISTANCE BETWEEN TWO POINTS IN A 
 	   TWO-DIMENSIONAL PLANE */
@@ -2462,11 +2451,7 @@ distance(x1, y1, x2, y2)
 }
 
 void
-new_position(x1, y1, bearing, velocity)
-	 double          x1,
-	                 y1,
-	                 bearing,
-	                 velocity;
+new_position(double x1, double y1, double bearing, double velocity)
 {
 	double          delta_x,
 	                delta_y;
@@ -2563,8 +2548,7 @@ bearing(x1, y1, x2, y2)
 }
 
 void
-set_arguments(function_call)
-  char		*function_call;
+set_arguments(const char *function_call)
 {
 	/* THIS FUNCTION CREATES AN ARRAY OF JACL INTEGER CONSTANTS TO
 	   REPRESENT THE ARGUMENTS PASSED TO A JACL FUNCTION */
@@ -3218,9 +3202,7 @@ str_test(int first)
 }
 
 void
-add_cinteger(name, value)
-  char *name;
-  int   value;
+add_cinteger(const char *name, int value)
 {
 	/* THIS FUNCTION ADDS A NEW JACL CONSTANT TO THE LIST */
 
@@ -3246,8 +3228,7 @@ add_cinteger(name, value)
 }
 
 void
-clear_cinteger(name)
-  char *name;
+clear_cinteger(const char *name)
 {
     /* FREE CONSTANTS THAT HAVE SUPPLIED NAME*/
 
@@ -3310,8 +3291,7 @@ add_cstring(const char *name, const char *value)
 }
 
 void
-clear_cstring(name)
-  char *name;
+clear_cstring(const char *name)
 {
     /* FREE CONSTANTS THAT HAVE SUPPLIED NAME*/
 	if (cstring_table != NULL) {

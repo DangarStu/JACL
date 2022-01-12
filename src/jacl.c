@@ -48,17 +48,7 @@ schanid_t 			sound_channel[8] = { NULL, NULL, NULL, NULL,
 
 event_t				*cancelled_event;
 
-extern int			custom_error;
-extern int			interrupted;
-
 extern int			jpp_error;
-
-extern int			it;
-extern int			them[];
-extern int			her;
-extern int			him;
-
-extern int			oops_word;
 
 #ifdef WINGLK
 struct	string_type	*resolved_string;
@@ -74,7 +64,6 @@ char            walkthru[81] = "\0";
 
 char            function_name[81];
 
-extern char            default_function[81];
 char            override[81];
 
 char            temp_buffer[1024];
@@ -171,6 +160,9 @@ static void version_info(void);
 static void jacl_set_window(winid_t new_window);
 static void walking_thru(void);
 static void scripting(void);
+static void save_game_state(void);
+static void restore_game_state(void);
+static void word_check(void);
 #ifdef READLINE
 static char* object_generator(const char* text, int state);
 static char* verb_generator(const char* text, int state);

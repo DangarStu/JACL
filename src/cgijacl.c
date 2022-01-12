@@ -103,11 +103,11 @@ struct synonym_type *synonym_table = NULL;
 struct filter_type *filter_table = NULL;
 
 static void version_info(void);
+static void read_config_file(void);
+static void word_check(void);
 
 int
-main(argc, argv)
-	 int             argc;
-	 char           *argv[];
+main(int argc, char *argv[])
 {
 	int             index;
 	char           *last_slash;
@@ -603,7 +603,7 @@ main(argc, argv)
 void
 default_header()
 {
-	/* THIS HEADER IS DISPLAYED IS NO CUSTOM ONE IS PROVIDED */
+	/* THIS HEADER IS DISPLAYED IF NO CUSTOM ONE IS PROVIDED */
 
 	puts("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n\"http://www.w3.org/TR/html4/loose.dtd\">\n");
 	puts("<html><head>");
@@ -651,7 +651,7 @@ default_header()
 void
 default_footer()
 {
-	/* THIS FOOTER IS DISPLAYED IS NO CUSTOM ONE IS PROVIDED */
+	/* THIS FOOTER IS DISPLAYED IF NO CUSTOM ONE IS PROVIDED */
 
 	puts("</div>\n");
 	puts("</div>\n");

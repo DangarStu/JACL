@@ -257,4 +257,3 @@ look_around()
 
 	execute("+after_look");
 }
-
