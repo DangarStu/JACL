@@ -76,7 +76,6 @@ struct string_type *cstring_resolve(const char *name);
 struct string_type *cstring_resolve_indexed(const char *name, int index);
 struct cinteger_type *cinteger_resolve(const char *name);
 struct cinteger_type *cinteger_resolve_indexed(const char *name, int index);
-int attribute_test();
 char* object_names(int object_index, char *names_buffer);
 const char* arg_text_of(const char *string);
 const char* arg_text_of_word(int wordnumber);
@@ -120,9 +119,7 @@ int  restore_game(frefid_t saveref, int warn);
 int  save_game(const char *filename);
 int  restore_game(const char *filename, int warn);
 #endif
-void add_string();
 void add_cstring(const char *name, const char *value);
-void clear_string();
 void clear_cstring(const char *name);
 void add_cinteger(const char *name, int value);
 void clear_cinteger(const char *name);
