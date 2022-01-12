@@ -9,6 +9,9 @@
 #include "prototypes.h"
 #include "csv.h"
 #include "errno.h"
+#include "interpreter.h"
+#include "parser.h"
+#include "encapsulate.h"
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -61,13 +64,13 @@ char *strcasestr(const char *s, const char *find)
 
 #define MAX_TRY 10 
 
-struct flock	read_lck;
-int				read_fd;
-struct flock	write_lck;
-int				write_fd;
+static struct flock	read_lck;
+static int			read_fd;
+static struct flock	write_lck;
+static int			write_fd;
 
-char *url_encode(char *str);
-char to_hex(char code);
+static char *url_encode(const char *str);
+static char to_hex(char code);
 
 char *location_attributes[] = {
  "VISITED ", "DARK ", "ON_WATER ", "UNDER_WATER ", "WITHOUT_AIR ", "OUTDOORS ",
@@ -118,7 +121,7 @@ struct cinteger_type *new_cinteger = NULL;
 struct cinteger_type *current_cinteger = NULL;
 struct cinteger_type *previous_cinteger = NULL;
 
-long							bit_mask;
+unsigned int					bit_mask;
 extern int 						encrypted;
 extern int						after_from;
 extern int						last_exact;
@@ -186,58 +189,6 @@ extern int						subheader_mode;
 extern int						note_mode;
 #endif
 
-extern char						user_id[];
-extern char						prefix[];
-extern char						text_buffer[];
-extern char						chunk_buffer[];
-extern char						*word[];
-
-extern char						bookmark[];
-extern char						file_prompt[];
-
-/* CONTAINED IN PARSER.C */
-extern int						object_list[4][MAX_WORDS];
-extern int						list_size[];
-extern int						max_size[];
-
-/* CONTAINED IN ENCAPSULATE.C */
-extern int						quoted[];
-
-extern struct object_type		*object[];
-extern struct integer_type		*integer_table;
-extern struct integer_type		*integer[];
-extern struct cinteger_type		*cinteger_table;
-extern struct attribute_type	*attribute_table;
-extern struct string_type		*string_table;
-extern struct string_type		*cstring_table;
-extern struct function_type		*function_table;
-extern struct function_type		*executing_function;
-extern struct command_type		*completion_list;
-extern struct word_type			*grammar_table;
-extern struct synonym_type		*synonym_table;
-extern struct filter_type		*filter_table;
-
-extern char						function_name[];
-extern char						temp_buffer[];
-extern char						error_buffer[];
-extern char						proxy_buffer[];
-
-extern char						default_function[];
-extern char						override[];
-
-extern int						noun[];
-extern int						wp;
-extern int						start_of_this_command;
-extern int						start_of_last_command;
-extern int						buffer_index;
-extern int						objects;
-extern int						integers;
-extern int						player;
-extern int						oec;
-extern int						*object_element_address;
-extern int						*object_backup_address;
-extern int						walkthru_running;
-
 // VALUES FROM LOADER
 extern int						value_resolved;
 
@@ -245,9 +196,9 @@ extern FILE           			*transcript;
 extern char						margin_string[];
 
 char  					        integer_buffer[16];
-char							called_name[1024];
-char							scope_criterion[24];
-char							*output;
+static char						called_name[1024];
+static char						scope_criterion[24];
+static const char				*output;
 
 static int exit_function(int return_code);
 
@@ -346,7 +297,7 @@ cb2 (int c, void *not_used) {
 }
 
 int
-execute(char *funcname)
+execute(const char *funcname)
 {
 	int             index;
 	int             counter;
@@ -1351,7 +1302,7 @@ execute(char *funcname)
 					pop_stack();
 					return (TRUE);
 				} else {
-					index = value_of(word[1]);
+					index = value_of(word[1], 0);
 					if (word[2] != NULL) {
 						sprintf(option_buffer, "<option value=\"%d\">",
 								index);
@@ -1425,7 +1376,7 @@ execute(char *funcname)
 					pop_stack();
 					return (TRUE);
 				} else {
-					char * encoded;
+					const char * encoded;
 
 					if (!strcmp(word[0], "hyperlink")) {
 						encoded = url_encode(text_of_word(2));
@@ -2785,12 +2736,12 @@ pop_stack()
 
 }
 
-void
-push_stack(file_pointer)
 #ifdef GLK
-	 glsi32          file_pointer;
+void
+push_stack(glsi32 file_pointer)
 #else
-	 long          file_pointer;
+void
+push_stack(long file_pointer)
 #endif
 {
 	/* COPY ALL THE CURRENT SYSTEM DATA ONTO THE STACK */
@@ -3195,11 +3146,10 @@ and_strcondition()
 }
 
 int
-str_test(first)
-	 int             first;
+str_test(int first)
 {
-	char  *index;
-	char  *compare;
+	const char  *index;
+	const char  *compare;
 
 	// GET THE TWO STRING VALUES TO COMPARE
 
@@ -3333,9 +3283,7 @@ clear_cinteger(name)
 }
 
 void
-add_cstring(name, value)
-  char *name;
-  char *value;
+add_cstring(const char *name, const char *value)
 {
 	/* ADD A STRING CONSTANT WITH THE SUPPLIED NAME AND VALUE */
 
@@ -3580,15 +3528,17 @@ char to_hex(char code) {
 
 /* Returns a url-encoded version of str */
 /* IMPORTANT: be sure to free() the returned string after use */
-char *url_encode(char *str) {
-  char *pstr = str, *buf = malloc(strlen(str) * 3 + 1), *pbuf = buf;
+char *url_encode(const char *str) {
+  const char *pstr = str;
+  char *buf = malloc(strlen(str) * 3 + 1), *pbuf = buf;
   while (*pstr) {
     if (isalnum(*pstr) || *pstr == '-' || *pstr == '_' || *pstr == '.' || *pstr == '~') 
       *pbuf++ = *pstr;
     else if (*pstr == ' ') 
       *pbuf++ = '+';
-    else 
-      *pbuf++ = '%', *pbuf++ = to_hex(*pstr >> 4), *pbuf++ = to_hex(*pstr & 15);
+	else {
+	  *pbuf++ = '%'; *pbuf++ = to_hex(*pstr >> 4); *pbuf++ = to_hex(*pstr & 15);
+	}
     pstr++;
   }
   *pbuf = '\0';

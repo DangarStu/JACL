@@ -20,34 +20,15 @@
 #include "language.h"
 #include "types.h"
 #include "prototypes.h"
+#include "encapsulate.h"
 #include <string.h>
 
-extern char			text_buffer[];
-extern char			temp_buffer[];
-extern char			*word[];
-extern short int	quoted[];
-extern short int	punctuated[];
-extern int			wp;
+static int			lines_written;
 
-extern char			user_id[];
-extern char			prefix[];
-extern char			game_path[];
-extern char			game_file[];
-extern char			processed_file[];
+static FILE 	 	*outputFile = NULL;
+static FILE   	    *inputFile = NULL;
 
-extern short int	encrypted;
-
-extern char			include_directory[];
-extern char			temp_directory[];
-
-extern char			error_buffer[];
-
-int					lines_written;
-
-FILE 	 	        *outputFile = NULL;
-FILE   	    		*inputFile = NULL;
-
-char				*stripped_line;
+static char			*stripped_line;
 
 /* INDICATES THAT THE CURRENT '.j2' FILE BEING WORKED 
  * WITH BEING PREPARED FOR RELEASE (DON'T INCLUDE DEBUG LIBARIES) */

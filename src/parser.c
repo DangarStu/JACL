@@ -7,6 +7,8 @@
 #include "language.h"
 #include "types.h"
 #include "prototypes.h"
+#include "parser.h"
+#include "encapsulate.h"
 #include <string.h>
 
 #define FIRST_LIST		noun_number-2
@@ -70,26 +72,6 @@ char            				before_function[84];
 char            				after_function[84];
 char            				local_after_function[84];
 
-extern char						text_buffer[];
-extern char						function_name[];
-extern char						temp_buffer[];
-extern char						error_buffer[];
-extern char						override[];
-extern char						*word[];
-
-extern int						quoted[];
-
-extern struct object_type		*object[];
-extern int						objects;
-
-extern int						noun[];
-extern int						wp;
-extern int						player;
-
-extern struct word_type			*grammar_table;
-extern struct function_type		*executing_function;
-extern struct object_type		*object[];
-extern struct variable_type		*variable[];
 
 static int find_parent(int index);
 
@@ -612,8 +594,7 @@ exact_match(pointer)
 }
 
 int
-is_terminator(scope_word)
-	struct word_type		*scope_word;
+is_terminator(struct word_type *scope_word)
 {
 	struct word_type *terminator = scope_word->first_child;
 
@@ -1782,10 +1763,7 @@ diagnose()
 }
 
 int
-scope(index, expected, restricted)
-         int             index;
-         char           *expected;
-		 int			 restricted;
+scope(int index, const char *expected, int restricted)
 {
 	/* THIS FUNCTION DETERMINES IF THE SPECIFIED OBJECT IS IN THE SPECIFIED
 	 * SCOPE - IT RETURNS TRUE IF SO, FALSE IF NOT. */

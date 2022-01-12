@@ -7,6 +7,9 @@
 #include "language.h"
 #include "types.h"
 #include "prototypes.h"
+#include "interpreter.h"
+#include "encapsulate.h"
+#include "parser.h"
 #include <string.h>
 
 /* INDICATES THAT THE CURRENT '.j2' FILE BEING WORKED 
@@ -14,17 +17,7 @@
 int					encrypted = FALSE;
 int					in_print = FALSE;
 
-extern char			text_buffer[];
-extern char         	temp_buffer[];
-extern char			prefix[];
-extern char			error_buffer[];
-extern char			*word[];
-extern int			quoted[];
-extern int			punctuated[];
-extern int			wp;
-
 #ifdef GLK
-extern schanid_t                sound_channel[];
 #else
 #ifndef __NDS__
 extern struct parameter_type	*parameter_table;
@@ -33,47 +26,9 @@ struct parameter_type *new_parameter;
 #endif
 #endif
 
-extern struct object_type		*object[];
-extern struct integer_type		*integer_table;
-extern struct integer_type		*integer[];
-extern struct cinteger_type		*cinteger_table;
-extern struct string_type		*string_table;
-extern struct string_type		*cstring_table;
-extern struct attribute_type	*attribute_table;
-extern struct function_type		*function_table;
-extern struct function_type		*executing_function;
-extern struct command_type		*completion_list;
-extern struct word_type			*grammar_table;
-extern struct synonym_type		*synonym_table;
-extern struct filter_type		*filter_table;
-
-
-struct string_type *current_string = NULL;
-struct integer_type *current_integer = NULL;
-struct integer_type *last_system_integer = NULL;
-
-extern struct string_type *current_cstring;
-extern struct cinteger_type *current_cinteger;
-
-#ifdef GLK
-extern strid_t					game_stream;
-#else
-extern FILE                     *file;
-#endif
-
-extern int						objects;
-extern int						integers;
-extern int						functions;
-extern int						strings;
-extern int						player;
-
-extern int						it;
-extern int						them[];
-extern int						her;
-extern int						him;
-extern int						parent;
-
-extern int    			        noun[];
+static struct string_type *current_string = NULL;
+static struct integer_type *current_integer = NULL;
+static struct integer_type *last_system_integer = NULL;
 
 int								value_resolved;
 

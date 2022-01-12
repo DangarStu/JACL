@@ -8,36 +8,14 @@
 #include "language.h"
 #include "types.h"
 #include "prototypes.h"
+#include "interpreter.h"
+#include "encapsulate.h"
 #include <string.h>
-
-#ifdef GLK
-extern glui32 					status_width, status_height;
-extern winid_t 				statuswin;
-#endif
 
 #ifdef __NDS__
 extern int					screen_width;
 extern int					screen_depth;
 #endif
-
-extern struct object_type		*object[];
-extern struct integer_type		*integer_table;
-extern struct integer_type		*integer[];
-extern struct cinteger_type		*cinteger_table;
-extern struct attribute_type		*attribute_table;
-extern struct string_type		*string_table;
-extern struct string_type		*cstring_table;
-extern struct function_type		*function_table;
-extern struct function_type		*executing_function;
-extern struct command_type		*completion_list;
-extern struct word_type			*grammar_table;
-extern struct synonym_type		*synonym_table;
-extern struct filter_type		*filter_table;
-
-extern char					function_name[];
-extern char					temp_buffer[];
-extern char					error_buffer[];
-extern char					integer_buffer[16];
 
 #ifndef GLK
 #ifndef __NDS__
@@ -45,20 +23,6 @@ extern char					game_url[];
 extern char					user_id[];
 #endif
 #endif
-
-extern int					noun[];
-extern int					quoted[];
-extern int					percented[];
-extern char					*word[];
-
-extern int					resolved_attribute;
-
-extern int					objects;
-extern int					integers;
-extern int					player;
-extern int					oec;
-extern int					*object_element_address;
-extern int					*object_backup_address;
 
 extern int					value_resolved;
 
@@ -96,7 +60,7 @@ container_resolve(const char *container_name)
 const char		   *
 var_text_of_word(int wordnumber)
 {
-    char *value;
+    const char *value;
 
 	if (percented[wordnumber] == FALSE) {
 		return (word[wordnumber]);
@@ -112,11 +76,10 @@ var_text_of_word(int wordnumber)
 	}
 }
 
-char		   *
-arg_text_of_word(wordnumber)
-	int			wordnumber;
+const char		   *
+arg_text_of_word(int wordnumber)
 {
-    char *value;
+    const char *value;
 
 	if (quoted[wordnumber] == 1) {
 		return (word[wordnumber]);
@@ -132,11 +95,10 @@ arg_text_of_word(wordnumber)
 	}
 }
 
-char		   *
-text_of_word(wordnumber)
-	int			wordnumber;
+const char		   *
+text_of_word(int wordnumber)
 {
-    char *value;
+    const char *value;
 
 	if (quoted[wordnumber] == 1) {
 		return (word[wordnumber]);
@@ -152,9 +114,8 @@ text_of_word(wordnumber)
 	}
 }
 
-char           *
-text_of(string)
-	 char           *string;
+const char           *
+text_of(const char *string)
 {
 	struct integer_type *resolved_integer;
 	struct cinteger_type *resolved_cinteger;
@@ -415,7 +376,7 @@ integer_resolve(const char *name)
 }
 
 struct integer_type *
-integer_resolve_indexed(char *name, int index)
+integer_resolve_indexed(const char *name, int index)
 {
 	struct integer_type *pointer = integer_table;
 
@@ -586,9 +547,7 @@ string_resolve(const char *name)
 }
 
 struct string_type *
-string_resolve_indexed(name, index)
-	char           *name;
-	int				index;
+string_resolve_indexed(const char *name, int index)
 {
 	struct string_type *pointer = string_table;
 
@@ -669,9 +628,7 @@ cstring_resolve(const char *name)
 }
 
 struct string_type *
-cstring_resolve_indexed(name, index)
-	 char           *name;
-	int				index;
+cstring_resolve_indexed(const char *name, int index)
 {
 	struct string_type *pointer = cstring_table;
 
@@ -698,8 +655,7 @@ cstring_resolve_indexed(name, index)
 }
 
 struct function_type *
-function_resolve(name)
-	 char          *name;
+function_resolve(const char *name)
 {
 	char           *full_name;
 	char			core_name[84];
@@ -740,9 +696,8 @@ function_resolve(name)
 	return (NULL);
 }
 
-char *
-expand_function(name)
-	 char           *name;
+const char *
+expand_function(const char *name)
 {
 	/* THIS FUNCTION TAKES A SCOPE FUNCTION CALL SUCH AS noun1.function
 	 * AND REOLVE THE ACTUAL FUNCTION NAME SUCH AS function_key */
@@ -1026,8 +981,7 @@ macro_resolve(const char *testString)
 }
 
 int
-count_resolve(testString)
-	 char            *testString;
+count_resolve(const char *testString)
 {
 	struct function_type 	*resolved_function = NULL;
 
@@ -1043,10 +997,10 @@ count_resolve(testString)
 }
 
 int
-array_length_resolve(char *testString)
+array_length_resolve(const char *testString)
 {
 	int             counter = 0;
-	char            *array_name = &testString[1];
+	const char      *array_name = &testString[1];
 
 	struct integer_type *integer_pointer = integer_table;
 	struct cinteger_type *cinteger_pointer = cinteger_table;
@@ -1210,8 +1164,7 @@ object_element_resolve(const char *testString)
 }
 
 int
-object_resolve(object_string)
-	 char            object_string[];
+object_resolve(const char *object_string)
 {
 	int             index;
 
@@ -1247,10 +1200,9 @@ object_resolve(object_string)
 }
 
 long
-attribute_resolve(attribute)
-	 char           *attribute;
+attribute_resolve(const char *attribute)
 {
-	long            bit_mask;
+	unsigned int            bit_mask;
 
 	if (!strcmp(attribute, "VISITED"))
 		return (VISITED);
@@ -1354,8 +1306,7 @@ attribute_resolve(attribute)
 }
 
 long
-user_attribute_resolve(name)
-	char           *name;
+user_attribute_resolve(const char *name)
 {
 	struct attribute_type *pointer = attribute_table;
 

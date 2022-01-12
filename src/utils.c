@@ -10,25 +10,6 @@
 #include "prototypes.h"
 #include <string.h>
 
-extern char						function_name[];
-
-extern struct object_type		*object[];
-extern struct variable_type		*variable[];
-
-extern int						objects;
-extern int						player;
-
-extern char						game_file[];
-extern char						game_path[];
-extern char						prefix[];
-extern char						blorb[];
-extern char   			        bookmark[];
-extern char            			walkthru[];
-extern char						include_directory[];
-extern char            			temp_directory[];
-extern char            			data_directory[];
-extern char            			temp_buffer[];
-
 void
 eachturn()
 {
@@ -102,8 +83,7 @@ random_number()
 }
 
 void
-create_paths(full_path)
-	char		*full_path;
+create_paths(char *full_path)
 {
 	int				index;
 	char           *last_slash;
@@ -181,8 +161,7 @@ create_paths(full_path)
 }
 
 int
-jacl_whitespace(character)
-	int character;
+jacl_whitespace(int character)
 {
 	/* CHECK IF A CHARACTER IS CONSIDERED WHITE SPACE IN THE JACL LANGUAGE */
 	switch (character) {
@@ -196,8 +175,7 @@ jacl_whitespace(character)
 }
 
 char *
-stripwhite (string)
-		char *string;
+stripwhite (char *string)
 {
     int i;
 
@@ -221,8 +199,7 @@ stripwhite (string)
 }
 
 void
-jacl_encrypt(string)
-  char *string;
+jacl_encrypt(char *string)
 {
 	int index, length;
 
@@ -237,8 +214,7 @@ jacl_encrypt(string)
 }
 
 void
-jacl_decrypt(string)
-  char *string;
+jacl_decrypt(char *string)
 {
 	int index, length;
 
