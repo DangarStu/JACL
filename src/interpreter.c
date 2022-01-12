@@ -101,10 +101,10 @@ static const char * const location_elements[] = {
  NULL };
 
 struct csv_parser				parser_csv;
-char							in_name[1024];
-char							out_name[1024];
-FILE 						*infile, *outfile, *tempfile;
-int							first_column;
+static char						in_name[1024];
+static char						out_name[1024];
+static FILE 					*infile, *outfile, *tempfile;
+static int						first_column;
 
 int             				stack = 0;
 int             				proxy_stack = 0;
