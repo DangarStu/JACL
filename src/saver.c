@@ -7,26 +7,6 @@
 #include "types.h"
 #include "prototypes.h"
 
-extern struct object_type		*object[];
-extern struct integer_type		*integer_table;
-extern struct integer_type		*integer[];
-extern struct function_type		*function_table;
-extern struct string_type       *string_table;
-
-extern char 					last_command[];
-extern int						objects;
-extern int						integers;
-extern int						functions;
-extern int						strings;
-extern int						player;
-
-extern int						it;
-extern int						them[];
-extern int						her;
-extern int						him;
-extern int						parent;
-
-extern int    			        noun[];
 
 static void write_integer(FILE *file, int x);
 static void write_long(FILE *file, long x);

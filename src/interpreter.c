@@ -9,6 +9,9 @@
 #include "prototypes.h"
 #include "csv.h"
 #include "errno.h"
+#include "interpreter.h"
+#include "parser.h"
+#include "encapsulate.h"
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -59,23 +62,27 @@ char *strcasestr(const char *s, const char *find)
 }
 #endif
 
+#ifdef __NDS__
+extern void jflush(void);
+#endif
+
 #define MAX_TRY 10 
 
-struct flock	read_lck;
-int				read_fd;
-struct flock	write_lck;
-int				write_fd;
+static struct flock	read_lck;
+static int			read_fd;
+static struct flock	write_lck;
+static int			write_fd;
 
-char *url_encode(char *str);
-char to_hex(char code);
+static char *url_encode(const char *str);
+static char to_hex(char code);
 
-char *location_attributes[] = {
+static const char * const location_attributes[] = {
  "VISITED ", "DARK ", "ON_WATER ", "UNDER_WATER ", "WITHOUT_AIR ", "OUTDOORS ",
  "MID_AIR ", "TIGHT_ROPE ", "POLLUTED ", "SOLVED ", "MID_WATER ", "DARKNESS ",
  "MAPPED ", "KNOWN ",
  NULL };
 
-char *object_attributes[] = {
+static const char * const object_attributes[] = {
  "CLOSED ", "LOCKED ", "DEAD ", "IGNITABLE ", "WORN ", "CONCEALING ",
  "LUMINOUS ", "WEARABLE ", "CLOSABLE ", "LOCKABLE ", "ANIMATE ", "LIQUID ",
  "CONTAINER ", "SURFACE ", "PLURAL ", "FLAMMABLE ", "BURNING ", "LOCATION ",
@@ -83,21 +90,21 @@ char *object_attributes[] = {
  "SCORED ", "SITTING ", "NPC ", "DONE ", "GAS ", "NO_TAB ",
  "NOT_IMPORTANT ", NULL };
 
-char *object_elements[] = {
+static const char * const object_elements[] = {
  "parent", "capacity", "mass", "bearing", "velocity", "next", "previous",
  "child", "index", "status", "state", "counter", "points", "class", "x", "y", 
  NULL };
 
-char *location_elements[] = {
+static const char * const location_elements[] = {
  "north", "south", "east", "west", "northeast", "northwest", "southeast",
  "southwest", "up", "down", "in", "out", "points", "class", "x", "y", 
  NULL };
 
 struct csv_parser				parser_csv;
-char							in_name[1024];
-char							out_name[1024];
-FILE 						*infile, *outfile, *tempfile;
-int							first_column;
+static char						in_name[1024];
+static char						out_name[1024];
+static FILE 					*infile, *outfile, *tempfile;
+static int						first_column;
 
 int             				stack = 0;
 int             				proxy_stack = 0;
@@ -118,14 +125,10 @@ struct cinteger_type *new_cinteger = NULL;
 struct cinteger_type *current_cinteger = NULL;
 struct cinteger_type *previous_cinteger = NULL;
 
-long							bit_mask;
+unsigned int					bit_mask;
 extern int 						encrypted;
-extern int						after_from;
-extern int						last_exact;
 
 extern char						rpc_function_name[];
-extern char						temp_directory[];
-extern char						data_directory[];
 char							csv_buffer[2048];
 
 int								resolved_attribute;
@@ -147,16 +150,6 @@ int								interrupted = FALSE;
 char 							string_buffer[2048];
 char							argument_buffer[1024];
 #ifdef GLK
-extern schanid_t				sound_channel[];
-extern strid_t					game_stream;
-extern winid_t					mainwin;
-extern winid_t 					statuswin;
-extern winid_t 					current_window;
-
-extern strid_t 					mainstr;
-extern strid_t 					statusstr;
-extern strid_t 					quotestr;
-extern strid_t 					inputstr;
 glsi32  						top_of_loop = 0;
 glsi32  						top_of_select = 0;
 glsi32							top_of_while = 0;
@@ -164,7 +157,6 @@ glsi32							top_of_iterate = 0;
 glsi32							top_of_update = 0;
 glsi32 							top_of_do_loop = 0;
 #else
-extern FILE                     *file;
 char  					        option_buffer[2024];
 int								style_stack[100];
 int								style_index = 0;
@@ -186,74 +178,28 @@ extern int						subheader_mode;
 extern int						note_mode;
 #endif
 
-extern char						user_id[];
-extern char						prefix[];
-extern char						text_buffer[];
-extern char						chunk_buffer[];
-extern char						*word[];
-
-extern char						bookmark[];
-extern char						file_prompt[];
-
-/* CONTAINED IN PARSER.C */
-extern int						object_list[4][MAX_WORDS];
-extern int						list_size[];
-extern int						max_size[];
-
-/* CONTAINED IN ENCAPSULATE.C */
-extern int						quoted[];
-
-extern struct object_type		*object[];
-extern struct integer_type		*integer_table;
-extern struct integer_type		*integer[];
-extern struct cinteger_type		*cinteger_table;
-extern struct attribute_type	*attribute_table;
-extern struct string_type		*string_table;
-extern struct string_type		*cstring_table;
-extern struct function_type		*function_table;
-extern struct function_type		*executing_function;
-extern struct command_type		*completion_list;
-extern struct word_type			*grammar_table;
-extern struct synonym_type		*synonym_table;
-extern struct filter_type		*filter_table;
-
-extern char						function_name[];
-extern char						temp_buffer[];
-extern char						error_buffer[];
-extern char						proxy_buffer[];
-
-extern char						default_function[];
-extern char						override[];
-
-extern int						noun[];
-extern int						wp;
-extern int						start_of_this_command;
-extern int						start_of_last_command;
-extern int						buffer_index;
-extern int						objects;
-extern int						integers;
-extern int						player;
-extern int						oec;
-extern int						*object_element_address;
-extern int						*object_backup_address;
-extern int						walkthru_running;
-
 // VALUES FROM LOADER
 extern int						value_resolved;
 
-extern FILE           			*transcript;
-extern char						margin_string[];
-
 char  					        integer_buffer[16];
-char							called_name[1024];
-char							scope_criterion[24];
-char							*output;
+static char						called_name[1024];
+static char						scope_criterion[24];
+static const char				*output;
 
 static int exit_function(int return_code);
+static int select_next(void);
+static void new_position(double x1, double y1, double bearing, double velocity);
+static void pop_proxy(void);
+static void push_proxy(void);
+static void pop_stack(void);
+static int condition(void);
+static int and_condition(void);
+static int distance(double x1, double y1, double x2, double y2);
+static int strcondition(void);
+static void set_arguments(const char *function_call);
 
 void
-terminate(code)
-	 int             code;
+terminate(int code)
 {
 	// FREE ANY EXTRA RAM ALLOCATED BY THE CSV PARSER
 	csv_free(&parser_csv);
@@ -346,7 +292,7 @@ cb2 (int c, void *not_used) {
 }
 
 int
-execute(char *funcname)
+execute(const char *funcname)
 {
 	int             index;
 	int             counter;
@@ -1351,7 +1297,7 @@ execute(char *funcname)
 					pop_stack();
 					return (TRUE);
 				} else {
-					index = value_of(word[1]);
+					index = value_of(word[1], 0);
 					if (word[2] != NULL) {
 						sprintf(option_buffer, "<option value=\"%d\">",
 								index);
@@ -1425,7 +1371,7 @@ execute(char *funcname)
 					pop_stack();
 					return (TRUE);
 				} else {
-					char * encoded;
+					const char * encoded;
 
 					if (!strcmp(word[0], "hyperlink")) {
 						encoded = url_encode(text_of_word(2));
@@ -2435,9 +2381,7 @@ exit_function(return_code)
 }
 
 char *
-object_names(object_index, names_buffer)
-	 int             object_index;
-	 char			*names_buffer;
+object_names(int object_index, char *names_buffer)
 {
 	/* THIS FUNCTION CREATES A LIST OF ALL AN OBJECT'S NAMES.
 	   THE escape ARGUMENT INDICATES WHETHER A + SIGN SHOULD BE
@@ -2455,11 +2399,7 @@ object_names(object_index, names_buffer)
 }
 
 int
-distance(x1, y1, x2, y2)
-	 double          x1,
-	                 y1,
-	                 x2,
-	                 y2;
+distance(double x1, double y1, double x2, double y2)
 {
 	/* THIS FUNCTION CALCULATES THE DISTANCE BETWEEN TWO POINTS IN A 
 	   TWO-DIMENSIONAL PLANE */
@@ -2511,11 +2451,7 @@ distance(x1, y1, x2, y2)
 }
 
 void
-new_position(x1, y1, bearing, velocity)
-	 double          x1,
-	                 y1,
-	                 bearing,
-	                 velocity;
+new_position(double x1, double y1, double bearing, double velocity)
 {
 	double          delta_x,
 	                delta_y;
@@ -2612,8 +2548,7 @@ bearing(x1, y1, x2, y2)
 }
 
 void
-set_arguments(function_call)
-  char		*function_call;
+set_arguments(const char *function_call)
 {
 	/* THIS FUNCTION CREATES AN ARRAY OF JACL INTEGER CONSTANTS TO
 	   REPRESENT THE ARGUMENTS PASSED TO A JACL FUNCTION */
@@ -2785,12 +2720,12 @@ pop_stack()
 
 }
 
-void
-push_stack(file_pointer)
 #ifdef GLK
-	 glsi32          file_pointer;
+void
+push_stack(glsi32 file_pointer)
 #else
-	 long          file_pointer;
+void
+push_stack(long file_pointer)
 #endif
 {
 	/* COPY ALL THE CURRENT SYSTEM DATA ONTO THE STACK */
@@ -3195,11 +3130,10 @@ and_strcondition()
 }
 
 int
-str_test(first)
-	 int             first;
+str_test(int first)
 {
-	char  *index;
-	char  *compare;
+	const char  *index;
+	const char  *compare;
 
 	// GET THE TWO STRING VALUES TO COMPARE
 
@@ -3268,9 +3202,7 @@ str_test(first)
 }
 
 void
-add_cinteger(name, value)
-  char *name;
-  int   value;
+add_cinteger(const char *name, int value)
 {
 	/* THIS FUNCTION ADDS A NEW JACL CONSTANT TO THE LIST */
 
@@ -3296,8 +3228,7 @@ add_cinteger(name, value)
 }
 
 void
-clear_cinteger(name)
-  char *name;
+clear_cinteger(const char *name)
 {
     /* FREE CONSTANTS THAT HAVE SUPPLIED NAME*/
 
@@ -3333,9 +3264,7 @@ clear_cinteger(name)
 }
 
 void
-add_cstring(name, value)
-  char *name;
-  char *value;
+add_cstring(const char *name, const char *value)
 {
 	/* ADD A STRING CONSTANT WITH THE SUPPLIED NAME AND VALUE */
 
@@ -3362,8 +3291,7 @@ add_cstring(name, value)
 }
 
 void
-clear_cstring(name)
-  char *name;
+clear_cstring(const char *name)
 {
     /* FREE CONSTANTS THAT HAVE SUPPLIED NAME*/
 	if (cstring_table != NULL) {
@@ -3580,15 +3508,17 @@ char to_hex(char code) {
 
 /* Returns a url-encoded version of str */
 /* IMPORTANT: be sure to free() the returned string after use */
-char *url_encode(char *str) {
-  char *pstr = str, *buf = malloc(strlen(str) * 3 + 1), *pbuf = buf;
+char *url_encode(const char *str) {
+  const char *pstr = str;
+  char *buf = malloc(strlen(str) * 3 + 1), *pbuf = buf;
   while (*pstr) {
     if (isalnum(*pstr) || *pstr == '-' || *pstr == '_' || *pstr == '.' || *pstr == '~') 
       *pbuf++ = *pstr;
     else if (*pstr == ' ') 
       *pbuf++ = '+';
-    else 
-      *pbuf++ = '%', *pbuf++ = to_hex(*pstr >> 4), *pbuf++ = to_hex(*pstr & 15);
+	else {
+	  *pbuf++ = '%'; *pbuf++ = to_hex(*pstr >> 4); *pbuf++ = to_hex(*pstr & 15);
+	}
     pstr++;
   }
   *pbuf = '\0';

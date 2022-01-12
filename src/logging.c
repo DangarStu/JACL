@@ -8,9 +8,6 @@
 #include "prototypes.h"
 #include "language.h"
 
-extern char						user_id[];
-extern char						prefix[];
-
 #ifdef __NDS__
 void
 log_error(const char *message, int console)

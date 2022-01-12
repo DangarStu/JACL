@@ -24,25 +24,9 @@
 #include "types.h"
 #include "prototypes.h"
 #include "csv.h"
-
-extern struct csv_parser parser_csv;
-
-extern char			text_buffer[];
-extern char			*word[];
-extern short int	quoted[];
-extern short int	punctuated[];
-extern int			wp;
-
-extern int			custom_error;
-extern int			interrupted;
-
-extern int			it;
-extern int			them[];
-extern int			her;
-extern int			him;
-extern int			oops_word;
-
-extern int			proxy_level;
+#include "interpreter.h"
+#include "parser.h"
+#include "encapsulate.h"
 
 extern int			style_index;
 
@@ -79,9 +63,6 @@ int             oec;
 int            *object_element_address,
                *object_backup_address;
 
-long            top_of_loop;
-long            top_of_while;
-long            top_of_do_loop;
 
 FILE           *file = NULL;
 
@@ -106,7 +87,7 @@ char            current_command[1024];
 
 int             objects, integers, functions, strings;
 
-struct stack_type backup[STACK_SIZE];
+extern struct stack_type backup[STACK_SIZE];
 struct object_type *object[MAX_OBJECTS];
 struct integer_type *integer_table = NULL;
 struct cinteger_type *cinteger_table = NULL;
@@ -122,11 +103,11 @@ struct synonym_type *synonym_table = NULL;
 struct filter_type *filter_table = NULL;
 
 static void version_info(void);
+static void read_config_file(void);
+static void word_check(void);
 
 int
-main(argc, argv)
-	 int             argc;
-	 char           *argv[];
+main(int argc, char *argv[])
 {
 	int             index;
 	char           *last_slash;
@@ -622,7 +603,7 @@ main(argc, argv)
 void
 default_header()
 {
-	/* THIS HEADER IS DISPLAYED IS NO CUSTOM ONE IS PROVIDED */
+	/* THIS HEADER IS DISPLAYED IF NO CUSTOM ONE IS PROVIDED */
 
 	puts("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\n\"http://www.w3.org/TR/html4/loose.dtd\">\n");
 	puts("<html><head>");
@@ -670,7 +651,7 @@ default_header()
 void
 default_footer()
 {
-	/* THIS FOOTER IS DISPLAYED IS NO CUSTOM ONE IS PROVIDED */
+	/* THIS FOOTER IS DISPLAYED IF NO CUSTOM ONE IS PROVIDED */
 
 	puts("</div>\n");
 	puts("</div>\n");
@@ -940,8 +921,7 @@ version_info()
 }
 
 void
-write_text(tout_buffer)
-	 char            tout_buffer[];
+write_text(const char *tout_buffer)
 {
 	int             index;
 
@@ -998,8 +978,7 @@ write_text(tout_buffer)
 }
 
 int
-restore_interaction(filename)
-    char        *filename;
+restore_interaction(const char *filename)
 {
 
     if (filename == NULL) {
@@ -1017,8 +996,7 @@ restore_interaction(filename)
 }
 
 int
-save_interaction(filename)
-    char        *filename;
+save_interaction(const char *filename)
 {
 
     if (filename == NULL) {

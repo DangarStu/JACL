@@ -20,11 +20,14 @@
 #include "language.h"
 #include "types.h"
 #include "prototypes.h"
+#include "interpreter.h"
+#include "parser.h"
+#include "encapsulate.h"
 
 // EXTRA PROTOTYPES FOR DS
-void jflush();
-void output_text();
-void print_text();
+void jflush(void);
+static void output_text(const char *write_buffer, int print_newline);
+static void print_text(char *print_buffer);
 void write_right();
 void write_centred();
 void clrscrn();
@@ -41,20 +44,9 @@ char chordal_number();
 char* touch_screen();
 char* get_ds_string();
 
-extern char			text_buffer[];
-extern char			*word[];
-extern int			quoted[];
 extern int			punctuated[];
-extern int			wp;
 
-extern int			custom_error;
 extern int			bad_command;
-extern int			interrupted;
-
-extern int			it;
-extern int			them[];
-extern int			her;
-extern int			him;
 
 extern int			oops_word;
 
@@ -160,11 +152,12 @@ PrintConsole bottomScreen;
 //Keyboard	kbd;
 
 static void version_info(void);
+static void save_game_state(void);
+static void restore_game_state(void);
+static void word_check(void);
 
 int
-main(argc, argv)
-	 int             argc;
-	 char           *argv[];
+main(int argc, char *argv[])
 {
 	int             index;
 
@@ -569,8 +562,7 @@ version_info()
 }
 
 void
-write_text(tout_buffer)
-	 char            *tout_buffer;
+write_text(const char *tout_buffer)
 {
 	int             index;
 
@@ -632,9 +624,7 @@ jflush()
 }
 
 void
-output_text(write_buffer, print_newline)
-	 char           *write_buffer;
-	 int			print_newline;
+output_text(const char *write_buffer, int print_newline)
 {
 	int             index;
 	char           *pointer;
@@ -717,8 +707,7 @@ output_text(write_buffer, print_newline)
  }
 
 void 
-print_text(print_buffer) 
-	 char            *print_buffer;
+print_text(char *print_buffer)
 {
 	/* PRINT THE MARGIN IF THIS IS THE FIRST TEXT ON THIS LINE */
 	if (margin && column == 0) printf("%s", margin_string);
@@ -822,7 +811,7 @@ scroll()
 }
 
 int
-get_yes_or_no()
+get_yes_or_no(void)
 {
     char *cx;
 	char commandbuf[256];
@@ -848,8 +837,7 @@ get_yes_or_no()
 }
 
 char
-get_character(message)
-  char			*message;
+get_character(char *message)
 {
     char *cx;
 	char commandbuf[256];
@@ -896,8 +884,7 @@ get_string(char *string_buffer)
 }
 
 char *
-get_ds_string(message)
-  char			*message;
+get_ds_string(char *message)
 {
     char *cx;
 	char commandbuf[256];
@@ -932,10 +919,7 @@ clrscrn()
 }
 
 int 
-get_number(insist, low, high)
-	int		insist;
-	int		low;
-	int		high;
+get_number(int insist, int low, int high)
 {
     char *cx;
 	char commandbuf[256];
@@ -982,8 +966,7 @@ get_number(insist, low, high)
 }
 
 void
-more(message)
-	char* message;
+more(const char *message)
 {
 	int character;
 
@@ -1125,8 +1108,7 @@ restore_game_state()
 }
 
 int
-restore_interaction(filename)
-    char        *filename;
+restore_interaction(const char *filename)
 {
 
     if (filename == NULL) {
@@ -1142,8 +1124,7 @@ restore_interaction(filename)
 }
 
 int
-save_interaction(filename)
-    char        *filename;
+save_interaction(const char *filename)
 {
 
     if (filename == NULL) {

@@ -10,19 +10,11 @@
 
 int					jpp_error = FALSE;
 
-extern strid_t 		game_stream;
-extern char			game_file[];
-extern char			game_path[];
-extern char			prefix[];
-extern char			temp_buffer[];
-extern char			processed_file[];
-extern char			error_buffer[];
-
 extern short int    encrypt;
 extern short int    release;
 
 /* PROTOTYPE FOR NEEDED UTILITY FUNCTION */
-void create_paths(); 
+extern void create_paths(char*);
 
 int 
 winglk_startup_code(const char* cmdline)
