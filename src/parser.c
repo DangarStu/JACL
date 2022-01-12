@@ -633,7 +633,7 @@ build_object_list(struct word_type *scope_word, int noun_number)
 
 	int				index, counter;
 	int				resolved_object;
-	char			*except_word;
+	const char		*except_word;
 
 	//printf("--- entering build object list starting at %s with a scope_word of %s\n", word[wp], scope_word->word);
 	/* LOOK AHEAD FOR A FROM CLAUSE AND STORE from_object IF SO */
