@@ -8,7 +8,7 @@
 #ifdef GLK
 #include "glk.h"
 
-strid_t open_glk_file(glui32 usage, glui32 mode, char *filename);
+strid_t open_glk_file(glui32 usage, glui32 mode, const char *filename);
 glui32 glk_get_bin_line_stream(strid_t file_stream, char *buffer, glui32 max_length); 
 int convert_to_utf32 (unsigned char *text);
 void convert_to_utf8(glui32 *text, int len);
@@ -28,8 +28,6 @@ extern void garglk_set_config(const char *name);
 
 void default_footer(void);
 void default_header(void);
-int bearing(double x1, double y1, double x2, double y2);
-int and_strcondition(void);
 int logic_test(int first);
 int str_test(int first);
 int first_available(int list_number);
@@ -39,17 +37,12 @@ int object_element_resolve(const char *testString);
 int execute(const char *funcname);
 int object_resolve(const char *object_string);
 int random_number(void);
-void log_access(char *message);
+void log_access(const char *message);
 void log_error(const char *message, int console);
 int parent_of(int parent, int child, int restricted);
 int grand_of(int child, int objs_only);
 int check_light(int where);
 int find_route(int fromRoom, int toRoom, int known);
-int	count_resolve(const char *testString);
-void create_cstring(const char *name, const char *value);
-void create_string(const char *name, const char *value);
-void create_integer(const char *name, int value);
-void create_cinteger(const char *name, int value);
 void undoing(void);
 void create_paths(char *full_path);
 int get_key(void);

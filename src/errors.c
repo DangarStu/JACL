@@ -7,7 +7,6 @@
 #include "language.h"
 #include "types.h"
 #include "prototypes.h"
-#include "prototypes.h"
 #include "encapsulate.h"
 
 void

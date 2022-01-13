@@ -15,7 +15,7 @@
 /* INDICATES THAT THE CURRENT '.j2' FILE BEING WORKED 
  * WITH IS ENCRYPTED */
 int					encrypted = FALSE;
-int					in_print = FALSE;
+static int			in_print = FALSE;
 
 #ifdef GLK
 #else
@@ -37,6 +37,10 @@ static void create_language_constants(void);
 static void set_defaults(void);
 static void build_grammar_table(struct word_type *pointer);
 static void free_from(struct word_type *x);
+static void create_cstring(const char *name, const char *value);
+static void create_string(const char *name, const char *value);
+static void create_integer(const char *name, int value);
+static void create_cinteger(const char *name, int value);
 
 void
 read_gamefile()
