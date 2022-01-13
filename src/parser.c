@@ -601,7 +601,7 @@ exact_match(struct word_type *pointer)
 	return (NULL);
 }
 
-int
+static int
 is_terminator(struct word_type *scope_word)
 {
 	struct word_type *terminator = scope_word->first_child;
@@ -1876,10 +1876,7 @@ find_parent(int index)
 }
 
 int
-parent_of(parent, child, restricted)
-	 int             parent,
-	                 child,
-					 restricted;
+parent_of(int parent, int child, int restricted)
 {
 	/* THIS FUNCTION WILL CLIMB THE OBJECT TREE STARTING AT 'CHILD' UNTIL
 	 * 'PARENT' IS REACHED (RETURN TRUE), OR THE TOP OF THE TREE OR A CLOSED

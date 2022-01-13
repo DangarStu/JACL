@@ -46,7 +46,7 @@ glui32 				status_width, status_height;
 schanid_t 			sound_channel[8] = { NULL, NULL, NULL, NULL, 
 										 NULL, NULL, NULL, NULL };
 
-event_t				*cancelled_event;
+static event_t		*cancelled_event;
 
 extern int			jpp_error;
 
@@ -68,20 +68,20 @@ char            override[81];
 
 char            temp_buffer[1024];
 char            error_buffer[1024];
-unsigned char   chunk_buffer[4096];
+static unsigned char chunk_buffer[4096];
 #ifndef NOUNICODE
-glui32          chunk_buffer_uni[4096];
+static glui32   chunk_buffer_uni[4096];
 #endif
 char            proxy_buffer[1024];
 
-char			oops_buffer[1024];
-char			oopsed_current[1024];
+static char		oops_buffer[1024];
+static char		oopsed_current[1024];
 char            last_command[1024];
 char			*blank_command = "blankjacl\0";
-char            *current_command = (char *) NULL;
-char			command_buffer[1024];
+static const char            *current_command = (char *) NULL;
+static char		command_buffer[1024];
 #ifndef NOUNICODE
-glui32			command_buffer_uni[1024];
+static glui32	command_buffer_uni[1024];
 #endif
 char			players_command[1024];
 
@@ -106,10 +106,10 @@ static strid_t script_stream = NULL;
 int             noun[4];
 int             player = 0;
 
-int             noun3_backup;
-int             player_backup = 0;
+static int      noun3_backup;
+static int      player_backup = 0;
 
-int             variable_contents;
+static int      variable_contents;
 int             oec;
 int            *object_element_address,
 			   *object_backup_address;
@@ -1125,13 +1125,13 @@ get_character(const char *message)
 }
 
 strid_t
-open_glk_file (glui32 usage, glui32 mode, char *filename)
+open_glk_file (glui32 usage, glui32 mode, const char *filename)
 {
 
 	frefid_t	file_reference;
 	strid_t		stream_reference;
 
-   	file_reference = glk_fileref_create_by_name(usage, filename, 0);
+   	file_reference = glk_fileref_create_by_name(usage, (char *)filename, 0);
 
 	if (file_reference) {
     	stream_reference = glk_stream_open_file(file_reference, mode, 0);
@@ -1393,7 +1393,7 @@ object_generator(char* text, int state)
                    THEM TO THE COMPLETION LIST */
                 current_name = object[index]->first_name;
                 while (current_name) {
-                    add_word (current_name);
+                    add_word (current_name->name);
                     current_name = current_name->next_name;
                 }
             }

@@ -106,56 +106,56 @@ static char						out_name[1024];
 static FILE 					*infile, *outfile, *tempfile;
 static int						first_column;
 
-int             				stack = 0;
-int             				proxy_stack = 0;
+static int             			stack = 0;
+static int             			proxy_stack = 0;
 
-int             				field_no = 0;
+static int             			field_no = 0;
 
-struct stack_type				backup[STACK_SIZE];
-struct proxy_type				proxy_backup[STACK_SIZE];
+static struct stack_type		backup[STACK_SIZE];
+static struct proxy_type		proxy_backup[STACK_SIZE];
 
-struct function_type *resolved_function = NULL;
-struct string_type *resolved_string = NULL;
+static struct function_type *resolved_function = NULL;
+static struct string_type *resolved_string = NULL;
 
-struct string_type *new_string = NULL;
+static struct string_type *new_string = NULL;
 struct string_type *current_cstring = NULL;
-struct string_type *previous_cstring = NULL;
+static struct string_type *previous_cstring = NULL;
 
-struct cinteger_type *new_cinteger = NULL;
+static struct cinteger_type *new_cinteger = NULL;
 struct cinteger_type *current_cinteger = NULL;
-struct cinteger_type *previous_cinteger = NULL;
+static struct cinteger_type *previous_cinteger = NULL;
 
-unsigned int					bit_mask;
+static unsigned int				bit_mask;
 extern int 						encrypted;
 
 extern char						rpc_function_name[];
-char							csv_buffer[2048];
+static char						csv_buffer[2048];
 
 int								resolved_attribute;
 
 /* THE ITERATION VARIABLE USED FOR LOOPS */
-int								*loop_integer = NULL;
-int								*select_integer = NULL;
+static int						*loop_integer = NULL;
+static int						*select_integer = NULL;
 
-int								criterion_value = 0;
-int								criterion_type = 0;
-int								criterion_negate = FALSE;
-int             				current_level;
-int             				execution_level;
-int             				*ask_integer;
-int								new_x;
-int								new_y;
+static int						criterion_value = 0;
+static int						criterion_type = 0;
+static int						criterion_negate = FALSE;
+static int             			current_level;
+static int             			execution_level;
+static int             			*ask_integer;
+static int						new_x;
+static int						new_y;
 
 int								interrupted = FALSE;
-char 							string_buffer[2048];
-char							argument_buffer[1024];
+static char 					string_buffer[2048];
+static char						argument_buffer[1024];
 #ifdef GLK
-glsi32  						top_of_loop = 0;
-glsi32  						top_of_select = 0;
-glsi32							top_of_while = 0;
-glsi32							top_of_iterate = 0;
-glsi32							top_of_update = 0;
-glsi32 							top_of_do_loop = 0;
+static glsi32  					top_of_loop = 0;
+static glsi32  					top_of_select = 0;
+static glsi32					top_of_while = 0;
+static glsi32					top_of_iterate = 0;
+static glsi32					top_of_update = 0;
+static glsi32 					top_of_do_loop = 0;
 #else
 char  					        option_buffer[2024];
 int								style_stack[100];
@@ -194,6 +194,8 @@ static void push_proxy(void);
 static void pop_stack(void);
 static int condition(void);
 static int and_condition(void);
+static int and_strcondition(void);
+static int bearing(double x1, double y1, double x2, double y2);
 static int distance(double x1, double y1, double x2, double y2);
 static int strcondition(void);
 static void set_arguments(const char *function_call);
@@ -2357,8 +2359,7 @@ execute(const char *funcname)
 }
 
 int
-exit_function(return_code)
-	int			return_code;
+exit_function(int return_code)
 {
 	if (infile != NULL) {
 		read_lck.l_type = F_UNLCK;	// SETTING A READ LOCK
@@ -2498,11 +2499,7 @@ new_position(double x1, double y1, double bearing, double velocity)
 }
 
 int
-bearing(x1, y1, x2, y2)
-	 double          x1,
-	                 y1,
-	                 x2,
-	                 y2;
+bearing(double x1, double y1, double x2, double y2)
 {
 	int             quadrant;
 	double          delta_x,
@@ -2978,8 +2975,7 @@ and_condition()
 }
 
 int
-logic_test(first)
-	 int             first;
+logic_test(int first)
 {
 	long            index,
 	                compare;
@@ -3319,8 +3315,7 @@ clear_cstring(const char *name)
 }
 
 void
-inspect (object_num) 
-	int		object_num;
+inspect (int object_num)
 {
 	// THIS FUNCTION DISPLAYS THE STATE OF A JACL OBJECT FOR DEBUGGING
 
@@ -3409,9 +3404,7 @@ inspect (object_num)
 }
 
 int
-grand_of(child, objs_only)
-     int             child,
-                     objs_only;
+grand_of(int child, int objs_only)
 {
     /* THIS FUNCTION WILL CLIMB THE OBJECT TREE STARTING AT 'CHILD' UNTIL
      * A 'PARENT' IS REACHED */

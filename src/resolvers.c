@@ -29,6 +29,7 @@ extern int					value_resolved;
 char 						macro_function[84];
 int							value_has_been_resolved;
 
+static int count_resolve(const char *testString);
 static const char* expand_function(const char *name);
 static int array_length_resolve(const char *testString);
 static char* macro_resolve(const char *testString);
