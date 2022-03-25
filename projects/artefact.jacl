@@ -1,0 +1,174 @@
+#!../bin/jacl
+# -----------------------------------------------------------------------------
+
+constant status_window  0
+constant game_title     "JACL Artifact Database"
+constant game_author    "Stuart Allen"
+constant game_release   1
+constant game_build     1
+constant ifid           "JACL-042"
+
+# -----------------------------------------------------------------------------
+
+integer temp
+integer INDEX
+integer editing
+integer now
+integer gmt
+integer errors
+
+integer last_treasure       0
+
+string id_data              #0
+string short_desc_data      #1
+string description_data     #2
+string location_data        #3
+string datelost_data        #4
+string datefound_data       #5
+string status_data          #6
+string value_data           #7
+string latitute_data        #8
+string longitude_data       #9
+
+{+intro
+set player = you
+
+write "Reading database...^"
+
+# GET THE LAST TASK ID
+set last_treasure = 0
+iterate "default"
+   set last_treasure = field[0]
+enditerate
+
+if matches = 1
+   write "^1 record found.^"
+endif
+if matches > 1
+   write "^" matches " records found.^"
+endif
+}
+
+grammar blankjacl >blankjacl
+
+{+blankjacl
+}
+
+grammar delete $integer >delete
+
+{+delete
+update "default"
+   if field[0] != $integer
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
+   endif
+endupdate
+write "Treasure " $integer " deleted.^"
+}
+
+grammar edit $integer >edit
+
+{+edit
+set editing = true
+execute "+skip_to_treasure<$integer"
+}
+
+{+skip_to_treasure
+iterate "default"
+   if field[0] = $integer
+      return
+   endif
+enditerate
+}
+
+grammar update $integer >update
+
+{+update
+update "default"
+   if field[0] = $integer
+      insert field[0] description_data project_data dependency_data startdate_data duedate_data status_data completeddate_data
+   else
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
+   endif
+endupdate
+write "Treasure " $integer " updated.^^"
+set editing = true
+}
+
+grammar add >add_treasure
+
+{+add_treasure
+set last_treasure + 1
+append $user_id last_treasure description_data project_data dependency_data startdate_data duedate_data "Open" "Not Completed"
+if WEBAPP_mode = CREATE
+   write "Task ~" description_data "~ added.^^"
+endif
+}
+
+integer matches
+
+string action
+
+grammar quickadd >quickadd
+
+{+quickadd
+setstring description_data        "DEFAULT"
+setstring location_data    "NULL"
+set gmt = unixtime
+set now = +adjusted_time<gmt
+setstring startdate_data    now{integer_date}    
+setstring duedate_data        "NULL"
+execute "+add_treasure"
+}
+
+grammar search $string >search
+
+{+search
+set matches = 0
+
+iterate "default"
+   ifstring field[1] contains search_data : field[2] contains search_data : field[3] contains search_data : field[4] contains search_data : field[5] contains search_data : field[6] contains search_data
+      write "ID: " field[0]
+      write "Short description: " field[1]
+      set matches + 1 
+   endif
+enditerate
+
+if matches = 0
+   write "^No matching treasures found.^"
+endif
+if matches = 1
+   write "^1 matching treasure found.^"
+endif
+if matches > 1
+   write "^" matches " matching treasures found.^"
+endif
+}
+
+{+display_treasures
+iterate "default"
+   write "ID: " field[0] "^"
+   write "SHORT DESCRIPTION: " field[1] "^"
+   write "DESCRIPTION: " field[2] "^"
+   write "LOCATION: " field[3] "^"
+   write "DATE LOST: " field[4] "^"
+   write "DATE FOUND: " field[5] "^"
+   write "STATUS: " field[6] "^"
+   write "VALUE: $" field[7] "^"
+   write "LATITUDE: " field[8] "^"
+   write "LONGITUDE: " field[9] "^"
+enditerate
+}
+
+constant status_values "Missing" "Found" "Returned"
+
+location belefonte
+  short    name "JACL Treasure Database"
+
+object you
+
+{+update_status_window
+write game_title " v" game_release "." game_build
+}
+
+#include "time.library"
+#include "validation.library"
