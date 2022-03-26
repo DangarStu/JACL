@@ -12,35 +12,33 @@ constant ifid           "JACL-042"
 
 integer temp
 integer INDEX
-integer editing
 integer now
 integer gmt
-integer errors
 
-integer last_treasure       0
+integer last_artefact       0
+integer next_artefact       0
 
-string id_data              #0
-string short_desc_data      #1
-string description_data     #2
-string location_data        #3
-string datelost_data        #4
-string datefound_data       #5
-string status_data          #6
-string value_data           #7
-string latitute_data        #8
-string longitude_data       #9
+string id          
+string short_desc      ""
+string description     ""
+string location        "Australia"
+integer datelost
+integer datefound
+string foundstatus     "NOT FOUND"
 
 {+intro
 set player = you
-
+set datelost = "+adjusted_time<unixtime"
+set datefound = "+adjusted_time<unixtime"
 write "Reading database...^"
 
 # GET THE LAST TASK ID
-set last_treasure = 0
+set last_artefact = 0
 iterate "default"
-   set last_treasure = field[0]
+   set last_artefact = field[0]
 enditerate
-
+set next_artefact = last_artefact
+set next_artefact + 1
 if matches = 1
    write "^1 record found.^"
 endif
@@ -85,7 +83,7 @@ grammar update $integer >update
 {+update
 update "default"
    if field[0] = $integer
-      insert field[0] description_data project_data dependency_data startdate_data duedate_data status_data completeddate_data
+      insert field[0] short_desc description location datalost datefound foundstatus
    else
       insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
    endif
@@ -94,14 +92,59 @@ write "Treasure " $integer " updated.^^"
 set editing = true
 }
 
-grammar add >add_treasure
+grammar clear >new
+grammar new >new
 
-{+add_treasure
-set last_treasure + 1
-append $user_id last_treasure description_data project_data dependency_data startdate_data duedate_data "Open" "Not Completed"
-if WEBAPP_mode = CREATE
-   write "Task ~" description_data "~ added.^^"
-endif
+{+new
+setstring short_desc ""
+setstring description ""
+setstring location "Australia"
+set gmt = unixtime
+set now = +adjusted_time<gmt
+set datelost = now
+set datefound = now
+setstring foundstatus "NOT FOUND"
+write "Artefact #" next_artefact " cleared.^"
+}
+
+grammar short $string >short
+
+{+short
+setstring short_desc $string
+write "Short description set to ~" short_desc "~^"
+}
+
+grammar long $string >description
+grammar description $string >description
+
+{+description
+setstring description $string
+write "Description set to ~" short_desc "~^"
+}
+
+grammar add >write
+grammar commit >write
+grammar write >write
+
+{+write
+set last_artefact + 1
+insert last_artefact short_desc description location datalost datefound foundstatus
+write "Artefact ~" short_description "~ added.^^"
+}
+
+grammar cat >print
+grammar print >print
+
+{+print
+set INDEX = last_artefact
+set INDEX + 1
+write "ID: " INDEX "^"
+write "SHORT DESCRIPTION: " short_desc "^"
+write "DESCRIPTION: " description "^"
+write "LOCATION: " location "^"
+write "DATE LOST: " datelost{integer_date} "^"
+write "DATE FOUND: " datefound{integer_date} "^"
+write "STATUS: " foundstatus "^"
 }
 
 integer matches
@@ -111,12 +154,12 @@ string action
 grammar quickadd >quickadd
 
 {+quickadd
-setstring description_data        "DEFAULT"
-setstring location_data    "NULL"
+setstring description        "DEFAULT"
+setstring location    "NULL"
 set gmt = unixtime
 set now = +adjusted_time<gmt
-setstring startdate_data    now{integer_date}    
-setstring duedate_data        "NULL"
+set startdate
+setstring duedate        "NULL"
 execute "+add_treasure"
 }
 
@@ -126,9 +169,9 @@ grammar search $string >search
 set matches = 0
 
 iterate "default"
-   ifstring field[1] contains search_data : field[2] contains search_data : field[3] contains search_data : field[4] contains search_data : field[5] contains search_data : field[6] contains search_data
+   ifstring field[1] contains search : field[2] contains search : field[3] contains search : field[4] contains search : field[5] contains search : field[6] contains search
       write "ID: " field[0]
-      write "Short description: " field[1]
+      write "SHORT DESCRIPTION: " field[1]
       set matches + 1 
    endif
 enditerate
@@ -153,16 +196,11 @@ iterate "default"
    write "DATE LOST: " field[4] "^"
    write "DATE FOUND: " field[5] "^"
    write "STATUS: " field[6] "^"
-   write "VALUE: $" field[7] "^"
-   write "LATITUDE: " field[8] "^"
-   write "LONGITUDE: " field[9] "^"
 enditerate
 }
 
-constant status_values "Missing" "Found" "Returned"
-
-location belefonte
-  short    name "JACL Treasure Database"
+location renko
+  short    name "Renko"
 
 object you
 
