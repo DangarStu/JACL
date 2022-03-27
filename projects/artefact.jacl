@@ -2,10 +2,10 @@
 # -----------------------------------------------------------------------------
 
 constant status_window  0
-constant game_title     "JACL Artifact Database"
+constant game_title     "JACL Artefact Database"
 constant game_author    "Stuart Allen"
 constant game_release   1
-constant game_build     1
+constant game_build     0
 constant ifid           "JACL-042"
 
 # -----------------------------------------------------------------------------
@@ -16,20 +16,20 @@ integer now
 integer gmt
 
 integer last_artefact       0
-integer next_artefact       0
+integer current_artefact    0
+
+string temp_string
 
 string id          
 string short_desc      ""
 string description     ""
 string location        "Australia"
-integer datelost
-integer datefound
+integer datelost       0
+integer datefound      0
 string foundstatus     "NOT FOUND"
 
 {+intro
 set player = you
-set datelost = "+adjusted_time<unixtime"
-set datefound = "+adjusted_time<unixtime"
 write "Reading database...^"
 
 # GET THE LAST TASK ID
@@ -37,8 +37,8 @@ set last_artefact = 0
 iterate "default"
    set last_artefact = field[0]
 enditerate
-set next_artefact = last_artefact
-set next_artefact + 1
+set current_artefact = last_artefact
+set current_artefact + 1
 if matches = 1
    write "^1 record found.^"
 endif
@@ -104,7 +104,35 @@ set now = +adjusted_time<gmt
 set datelost = now
 set datefound = now
 setstring foundstatus "NOT FOUND"
-write "Artefact #" next_artefact " cleared.^"
+write "Artefact #" current_artefact " cleared.^"
+}
+
+grammar found $string >found
+
+{+found
+set datefound = +parse_date<$string
+write "Date found set to " datefound{integer_date} "^"
+}
+
+grammar lost $string >lost
+
+{+lost
+set datelost = +parse_date<$string
+write "Date lost set to " datefound{integer_date} "^"
+}
+
+grammar status $string >status
+
+{+status
+setstring foundstatus $string
+write "New status set.^"
+}
+
+grammar location $string >location
+
+{+location
+setstring location $string
+write "New location set.^"
 }
 
 grammar short $string >short
@@ -119,7 +147,7 @@ grammar description $string >description
 
 {+description
 setstring description $string
-write "Description set to ~" short_desc "~^"
+write "Description set to ~" description "~^"
 }
 
 grammar add >write
@@ -127,23 +155,35 @@ grammar commit >write
 grammar write >write
 
 {+write
+if current_artefact <= last_artefact
+   write "Writing will overwrite artefact " current_artefact ". Use UPDATE instead.^"
+endif
 set last_artefact + 1
-insert last_artefact short_desc description location datalost datefound foundstatus
-write "Artefact ~" short_description "~ added.^^"
+set current_artefact + 1
+append default current_artefact short_desc description location datalost datefound foundstatus
+write "Artefact ~" short_desc "~ added.^"
 }
 
 grammar cat >print
 grammar print >print
 
 {+print
-set INDEX = last_artefact
-set INDEX + 1
-write "ID: " INDEX "^"
+write "ID: " current_artefact "^"
 write "SHORT DESCRIPTION: " short_desc "^"
 write "DESCRIPTION: " description "^"
 write "LOCATION: " location "^"
-write "DATE LOST: " datelost{integer_date} "^"
-write "DATE FOUND: " datefound{integer_date} "^"
+write "DATE LOST: "
+if datelost = 0
+   write "UNKNOWN^"
+else
+   write datelost{integer_date} "^"
+endif
+write "DATE FOUND: "
+if datefound = 0
+   write "UNKNOWN^"
+else
+   write datefound{integer_date} "^"
+endif
 write "STATUS: " foundstatus "^"
 }
 
@@ -204,8 +244,44 @@ location renko
 
 object you
 
+grammar last >last
+grammar total >last
+
+{+last
+write "The total number of artefacts is " last_artefact ".^"
+}
+
+grammar select $integer >select
+grammar set $integer >select
+
+{+select
+if $integer > last_artefact
+   set current_artefact = last_artefact
+   set current_artefact + 1
+else
+   set current_artefact = $integer
+endif
+write "Artefact " current_artefact " selected.^"
+}
+
+grammar pwd >current
+grammar current >current
+grammar current artefact >current
+
+{+current
+write "The currently selected artefact is " current_artefact ".^"
+}
+
+integer offset
+
 {+update_status_window
 write game_title " v" game_release "." game_build
+setstring temp_string "CURRENT ARTEFACT: " current_artefact "/" last_artefact
+length INDEX temp_string
+set offset = status_width
+set offset - INDEX
+cursor offset 0
+write temp_string
 }
 
 #include "time.library"

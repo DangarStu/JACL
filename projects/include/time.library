@@ -11,13 +11,13 @@
 # set now = "+adjusted_time<unixtime" # ADJUSTS FOR THE CONFIGURED TIMEZONE
 # write now{full_date} "^"
 
-constant TIME_CONST_minute		60
-constant TIME_CONST_hour		3600
-constant TIME_CONST_day			86400
-constant TIME_CONST_week		604800
-constant TIME_CONST_month 		2629743
-constant TIME_CONST_year		31536000
-constant TIME_CONST_year_leap	31622400
+constant TIME_CONST_minute      60
+constant TIME_CONST_hour      3600
+constant TIME_CONST_day         86400
+constant TIME_CONST_week      604800
+constant TIME_CONST_month       2629743
+constant TIME_CONST_year      31536000
+constant TIME_CONST_year_leap   31622400
 
 # THE CYCLE OF LEAP AND NON-LEAP YEARS STARTING FROM 1970
 constant TIME_CONST_year_cycle 31536000 31536000 31622400 31536000
@@ -29,16 +29,16 @@ constant TIME_CONST_lenleap 2678400 2505600 2678400 2592000 2678400 2592000
 constant TIME_CONST_lenleap 2678400 2678400 2592000 2678400 2592000 2678400
 
 # THESE ARE THE LENGTHS OF THE MONTHS IN DAYS FOR NORMAL AND LEAP YEARS
-constant TIME_CONST_daynum		31 28 31 30 31 30 31 31 30 31 30 31
-constant TIME_CONST_daynumleap	31 29 31 30 31 30 31 31 30 31 30 31
+constant TIME_CONST_daynum      31 28 31 30 31 30 31 31 30 31 30 31
+constant TIME_CONST_daynumleap   31 29 31 30 31 30 31 31 30 31 30 31
 
 # 0 = 1700-1799
-constant TIME_century_starts 	4 2 0 6 4 2 0 6 4 2
+constant TIME_century_starts    4 2 0 6 4 2 0 6 4 2
 
-constant TIME_month_starts		0 3 3 6 1 4 6 2 5 0 3 5
-constant TIME_month_starts_leap	6 2 3 6 1 4 6 2 5 0 3 5
+constant TIME_month_starts      0 3 3 6 1 4 6 2 5 0 3 5
+constant TIME_month_starts_leap   6 2 3 6 1 4 6 2 5 0 3 5
 
-integer TIME_epoch	false
+integer TIME_epoch   false
 integer TIME_temp
 integer TIME_index
 integer TIME_day
@@ -62,7 +62,7 @@ integer TIME_now
 
 integer TIME_timezone 20
 
-string_array TIME_chunk	5
+string_array TIME_chunk   5
 
 string TIME_CONST_months "January" "February" "March" "April" "May" "June" 
 string TIME_CONST_months "July" "August" "September" "October" "November" "December"
