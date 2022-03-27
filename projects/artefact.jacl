@@ -78,18 +78,17 @@ iterate "default"
 enditerate
 }
 
-grammar update $integer >update
+grammar update >update
 
 {+update
 update "default"
-   if field[0] = $integer
-      insert field[0] short_desc description location datalost datefound foundstatus
+   if field[0] = current_artefact
+      insert field[0] short_desc description location datelost datefound foundstatus
    else
       insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
    endif
 endupdate
-write "Treasure " $integer " updated.^^"
-set editing = true
+write "Artefact " current_artefact ", ~" short_desc "~ updated.^"
 }
 
 grammar clear >new
@@ -160,7 +159,7 @@ if current_artefact <= last_artefact
 endif
 set last_artefact + 1
 set current_artefact + 1
-append default current_artefact short_desc description location datalost datefound foundstatus
+append default current_artefact short_desc description location datelost datefound foundstatus
 write "Artefact ~" short_desc "~ added.^"
 }
 
@@ -258,10 +257,22 @@ grammar set $integer >select
 if $integer > last_artefact
    set current_artefact = last_artefact
    set current_artefact + 1
+   write "Artefact set to " current_artefact ", the first new index.^"
+   return
 else
    set current_artefact = $integer
-endif
 write "Artefact " current_artefact " selected.^"
+endif
+iterate default
+   if field[0] = current_artefact
+      setstring short_desc field[1]
+      setstring description field[2]
+      setstring location field[3]
+      set datelost = field[4]
+      set datefound = field[5]
+      setstring foundstatus field[6]
+   endif
+enditerate
 }
 
 grammar pwd >current
