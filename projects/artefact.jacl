@@ -52,15 +52,21 @@ grammar blankjacl >blankjacl
 {+blankjacl
 }
 
-grammar delete $integer >delete
+grammar delete >delete
 
 {+delete
+write "This will delete artefact " current_artefact ", ~" short_desc "~. Are you sure?"
+getyesorno INDEX
+if INDEX = 0
+   write "Delete cancelled.^"
+   return
+endif
 update "default"
-   if field[0] != $integer
+   if field[0] != current_artefact
       insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
    endif
 endupdate
-write "Treasure " $integer " deleted.^"
+write "Artefact " current_artefact ", ~" short_desc "~ deleted.^"
 }
 
 grammar edit $integer >edit
@@ -158,7 +164,6 @@ if current_artefact <= last_artefact
    write "Writing will overwrite artefact " current_artefact ". Use UPDATE instead.^"
 endif
 set last_artefact + 1
-set current_artefact + 1
 append default current_artefact short_desc description location datelost datefound foundstatus
 write "Artefact ~" short_desc "~ added.^"
 }
@@ -216,17 +221,30 @@ iterate "default"
 enditerate
 
 if matches = 0
-   write "^No matching treasures found.^"
+   write "^No matching artefacts found.^"
 endif
 if matches = 1
-   write "^1 matching treasure found.^"
+   write "^1 matching artefacts found.^"
 endif
 if matches > 1
-   write "^" matches " matching treasures found.^"
+   write "^" matches " matching artefacts found.^"
 endif
 }
 
-{+display_treasures
+grammar list >list
+grammar ls >list
+
+{+list
+iterate "default"
+   write "[" field[0] "] " field[1] ": " field[6] "^"
+enditerate
+}
+
+grammar display >display
+grammar export >display
+grammar dump >display
+
+{+display
 iterate "default"
    write "ID: " field[0] "^"
    write "SHORT DESCRIPTION: " field[1] "^"
