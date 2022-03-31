@@ -50,6 +50,7 @@ endif
 grammar blankjacl >blankjacl
 
 {+blankjacl
+write "Please type a command.^"
 }
 
 grammar delete >delete
