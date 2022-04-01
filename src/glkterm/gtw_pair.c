@@ -201,7 +201,7 @@ void win_pair_redraw(window_t *win)
         if (dwin->splitwidth) {
             move(dwin->splitpos, win->bbox.left);
             for (ix=win->bbox.left; ix<win->bbox.right; ix++) {
-                addch('-');
+                addch(' ');
             }
             if (win->bbox.left-1 >= 0) {
                 mvaddch(dwin->splitpos, win->bbox.left-1, '+');

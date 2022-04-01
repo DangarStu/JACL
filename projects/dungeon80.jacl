@@ -1,4 +1,4 @@
-#!../bin/jacl
+#!../bin/cgijacl
 
 constant 	game_version	1
 constant	game_title		"Dungeon 80"

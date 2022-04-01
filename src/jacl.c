@@ -567,21 +567,20 @@ word_check()
 			TIME->value = FALSE;
 		}
 	} else if (!strcmp(word[wp], cstring_resolve("AGAIN_WORD")->value) || !strcmp(word[wp], "g")) {
-		if (TOTAL_MOVES->value == 0) {
-			write_text(cstring_resolve("NO_MOVES")->value);
-			TIME->value = FALSE;
-		} else if (last_command[0] == 0) {
-			write_text(cstring_resolve("NOT_CLEVER")->value);
-			TIME->value = FALSE;
-		} else {
-			strcpy(text_buffer, last_command);
-			current_command = last_command;
-			command_encapsulate();
-			jacl_truncate();
-			//printf("--- command started at %d\n", start_of_last_command);
-			wp = start_of_last_command;
-			word_check();
-		}
+                if (TOTAL_MOVES->value == 0) {
+                        write_text(cstring_resolve("NO_MOVES")->value);
+                        TIME->value = FALSE;
+                } else if (last_command[0] == 0) {
+                        write_text(cstring_resolve("NOT_CLEVER")->value);
+                        TIME->value = FALSE;
+                } else {
+                        strcpy(current_command, last_command);
+                        strcpy(text_buffer, last_command);
+                        command_encapsulate();
+                        jacl_truncate();
+                        wp = start_of_last_command;
+                        word_check();
+                }
 	} else if (!strcmp(word[wp], cstring_resolve("SCRIPT_WORD")->value) || !strcmp(word[wp], "transcript")) {
 		scripting();
 	} else if (!strcmp(word[wp], cstring_resolve("UNSCRIPT_WORD")->value)) {
