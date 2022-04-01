@@ -4,6 +4,6 @@
  */
 
 #define J_VERSION			4
-#define J_RELEASE			2
-#define	J_BUILD			5
-#define INTERPRETER_VERSION	424
+#define J_RELEASE			3
+#define	J_BUILD			0
+#define INTERPRETER_VERSION	430
