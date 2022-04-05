@@ -20,7 +20,7 @@ constant image_dragon 1
 attribute UP_POSITION CUSTOM2 CUSTOM3
 
 location tavern: tavern 
- short			the "Rusty Sword Tavern"    
+ short            the "Rusty Sword Tavern"    
  south          square
  out            square
 
@@ -151,7 +151,7 @@ object bowl: wooden bowl
  long           "There is a wooden bowl here.^"
  mass           5
  capacity       2
- parent			bar
+ parent         bar
 
 {take
 if bowl(parent) != alcove : lever has UP_POSITION
@@ -178,16 +178,16 @@ return false
 }
 
 object grapes: bunch of grapes
-   short		a "bunch of grapes"
-   has			PLURAL
-   long			"There is a bunch of grapes here.^"
-   mass			5
-   parent		bowl
+   short        a "bunch of grapes"
+   has            PLURAL
+   long            "There is a bunch of grapes here.^"
+   mass            5
+   parent        bowl
 
-grammar juice *present		>break
-grammar squash *present		>break
-grammar squeeze *present	>break
-grammar mash *present		>break
+grammar juice *present        >break
+grammar squash *present        >break
+grammar squeeze *present    >break
+grammar mash *present        >break
 
 {peel
 if @give_to_grubby_man_grapes = 0
@@ -286,7 +286,7 @@ else
 endif
 }
 
-object drink: drink beer ale lager
+object drink: drink beer ale lager pint
  short      a "drink"
 
 {order
@@ -294,8 +294,8 @@ write "You don't have a single yorkquid to your name.^"
 set time = false
 }
 
-grammar chat up *present	>talk_to
-grammar flirt with *present	>talk_to
+grammar chat up *present    >talk_to
+grammar flirt with *present    >talk_to
 
 object barmaid: busty barmaid maid
  short  a "barmaid"
@@ -441,8 +441,8 @@ write "SYSTEM ADMINISTRATOR^"
 }
 
 object extras : group of extras
-   short		the "extras"
-   has			PLURAL
+   short        the "extras"
+   has            PLURAL
 
 {examine
 print:
@@ -478,8 +478,8 @@ print:
 }
 
 object stool : bar counter stool
-   short		a "bar stool"
-   has			NOT_IMPORTANT
+   short        a "bar stool"
+   has            NOT_IMPORTANT
 
 {take
 if dragon has DEAD
@@ -494,7 +494,7 @@ endif
 object dragon: bleary-eyed dragon
  has            ANIMATE
  short          the "dragon"
- long			"Patrons walk around a dragon lying dead on the floor.^"
+ long            "Patrons walk around a dragon lying dead on the floor.^"
 
 {examine
 if dragon has DEAD
@@ -568,7 +568,7 @@ write "The sword is rusty and chipped.^"
 }
 
 location square: square
- short			the "square"
+ short            the "square"
  north          tavern
  in             tavern
  west           town
@@ -597,11 +597,11 @@ write "nowhere and not enjoying the journey.^"
 }
 
 object people : people villagers
- short		some "people"
- has		NOT_IMPORTANT PLURAL
+ short        some "people"
+ has        NOT_IMPORTANT PLURAL
 
 location town: town
- short			the "town"
+ short            the "town"
  east           square
  south          club
  west           road
@@ -619,9 +619,9 @@ print:
 }
 
 object sign: sign
-   short		a "sign"
-   long		"There is a sign hanging above the doorway of the building to the north.^"
-   mass		heavy
+   short        a "sign"
+   long        "There is a sign hanging above the doorway of the building to the north.^"
+   mass        heavy
 
 {read : examine
 write "IF Studios^^"
@@ -629,7 +629,7 @@ write "Now coding the cyber-psycho-techno-thriller QUARKAZOID VII^"
 }
 
 location club: club
- short			the "club"
+ short            the "club"
  north          town
 
 {look
@@ -660,18 +660,18 @@ if sword(parent) = player
    if cloak(parent) = player
       print:
          ~Hey, and what's this?~ the bouncer asks grabbing the cloak from your
-	     arms. ~This isn't a dress-up party with a come-as-your-favourite-loser
-	     theme you know.~
+         arms. ~This isn't a dress-up party with a come-as-your-favourite-loser
+         theme you know.~
       .
-	  move cloak to bouncer
+      move cloak to bouncer
    endif
    write ^
 else
    if cloak(parent) = player
       print:
          ~Hey, what's this?~ the bouncer asks grabbing the cloak from your
-	     arms. ~This isn't a dress-up party with a come as your favourite loser
-	     theme you know.~^
+         arms. ~This isn't a dress-up party with a come as your favourite loser
+         theme you know.~^
       .
       move cloak to bouncer
    endif
@@ -683,10 +683,10 @@ endif
 }
 
 object thief : fat satiated man thief seae chiffon
-   has			ANIMATE
-   short		name "Seae Chiffon"
-   long			"Seae Chiffon is sitting in the corner of the room.^"
-   mass			heavy
+   has            ANIMATE
+   short        name "Seae Chiffon"
+   long            "Seae Chiffon is sitting in the corner of the room.^"
+   mass            heavy
 
 {examine
 print:
@@ -731,21 +731,21 @@ if @sit_on_big_chair != 0
 else
    print:
       ~I just wanted to say that I thought about sitting in your chair,~
-	  you confess to Seae.^^
-	  ~You're a wild man,~ Seae replies blandly.^
+      you confess to Seae.^^
+      ~You're a wild man,~ Seae replies blandly.^
    .
 endif
 }
 
 object job : support lead job role part in quarkazoid vii 7 seven 
- short		a "part in Quarkazoid VII"
- parent		thief
+ short        a "part in Quarkazoid VII"
+ parent        thief
 
 object bouncer : burly bouncer man guard heavy big
- has		ANIMATE POSSESSIVE
- short		the "bouncer"
- long		"There is a burly bouncer standing by the door.^"
- mass		heavy
+ has        ANIMATE POSSESSIVE
+ short        the "bouncer"
+ long        "There is a burly bouncer standing by the door.^"
+ mass        heavy
 
 {examine
 write "The bouncer is standing with his arms crossed and blank "
@@ -774,11 +774,11 @@ print:
 }
 
 location studio : studio if studios
-   short		name "IF Studios"		
-   south		town
-   out			town
-   west			office
-   in			office
+   short        name "IF Studios"        
+   south        town
+   out            town
+   west            office
+   in            office
 
 {look
 if here has VISITED
@@ -807,9 +807,9 @@ return false
 }
 
 object script: audition script
-   short		an "audition script"
-   long			"An audition script rests on the ground.^"
-   mass			1
+   short        an "audition script"
+   long            "An audition script rests on the ground.^"
+   mass            1
 
 {read : examine
 if here = club
@@ -878,9 +878,9 @@ break false
 }
 
 location office: seae's office
-  short			name "Seae's Office"
+  short            name "Seae's Office"
   east          studio
-  out			studio
+  out            studio
 
 {look
 if here has VISITED
@@ -995,9 +995,9 @@ execute "+weights"
 }
 
 object pendulum : pendulum
-  short			a "pendulum"
-  has			NOT_IMPORTANT
-  parent		clock
+  short            a "pendulum"
+  has            NOT_IMPORTANT
+  parent        clock
 
 object chain : fine chain
   short         a "fine chain"
@@ -1049,7 +1049,7 @@ set time = false
 
 object brass_rod: brass cylinder rod weight loop
   short         a "cylindrical brass weight"
-  plural		rods weights cylinders
+  plural        rods weights cylinders
   parent        clock
   status        1
   mass          4
@@ -1110,7 +1110,7 @@ endif
 
 object copper_rod: copper cylinder rod weight loop
   short         a "cylindrical copper weight"
-  plural		rods weights cylinders
+  plural        rods weights cylinders
   parent        clock
   status        true
   mass          4
@@ -1217,7 +1217,7 @@ write "  OUT TO PASTURE^"
 
 location pasture: pasture
  in          road
- north	     trail
+ north         trail
 
 {look
 if here has VISITED
@@ -1238,16 +1238,16 @@ write "relaxing surroundings.^"
 }
 
 object bushes : thick clump of bushes
-  short		a "thick clump of bushes"
+  short        a "thick clump of bushes"
 
 {examine
 write "They are a pretty ordinary clump of bushes.^"
 }
 
 location trail : trail
-   south		pasture
-   north		nowhere
-   in			nowhere
+   south        pasture
+   north        nowhere
+   in            nowhere
 
 {look
 if here has VISITED
@@ -1277,7 +1277,7 @@ return false
 }
 
 object cliff : rocky cliff face cliff-face
-  short			a "rocky cliff-face"
+  short            a "rocky cliff-face"
 
 {examine
 write "There is a small alcove set into the cliff-face just beside a "
@@ -1293,7 +1293,7 @@ print:
 }
 
 object light : red domed cover electric light
-  short			a "red light"
+  short            a "red light"
 
 {examine
 if stone_door has CLOSED
@@ -1466,11 +1466,11 @@ write "The alcove is only about a foot square.^"
 }
 
 object left_hole : left hole
-  has			CONTAINER
-  long			"There is a left hole here.^"
-  short			a "left hole"
-  plural		holes 
-  quantity		0
+  has            CONTAINER
+  long            "There is a left hole here.^"
+  short            a "left hole"
+  plural        holes 
+  quantity        0
   
 {examine
 if lever has UP_POSITION
@@ -1507,11 +1507,11 @@ endif
 }
 
 object right_hole : right hole
-  has			CONTAINER
-  long			"There is a right hole here.^"
-  short			the "right hole"
-  plural		holes 
-  quantity		0
+  has            CONTAINER
+  long            "There is a right hole here.^"
+  short            the "right hole"
+  plural        holes 
+  quantity        0
 
 {examine
 if lever has UP_POSITION
@@ -1548,9 +1548,9 @@ endif
 }
 
 object lever : long-handled lever
-  has		UP_POSITION
-  long		"There is a lever here."
-  short		a "lever"
+  has        UP_POSITION
+  long        "There is a lever here."
+  short        a "lever"
 
 {examine
 write "The lever is current in the "
@@ -1696,10 +1696,10 @@ endif
 }
 
 location antechamber : antechamber long dark passage
-   short		the "long dark passage"
-   south		trail
-   out			trail
-   north		show_room
+   short        the "long dark passage"
+   south        trail
+   out            trail
+   north        show_room
 
 {look
 if here has VISITED
@@ -1718,8 +1718,8 @@ return false
 }
 
 location show_room : show_room
-   short		the "show room"
-   south		antechamber
+   short        the "show room"
+   south        antechamber
 
 {look
 if here has VISITED
@@ -1735,9 +1735,9 @@ write "^"
 object outfit : sparkling sequin outfit
   has           WEARABLE
   short         a "sparkling sequin outfit"
-  long			"There is a sparkling sequin outfit here.^"
-  mass			10
-  parent		rack
+  long            "There is a sparkling sequin outfit here.^"
+  mass            10
+  parent        rack
 
 {wear_override
 if cloak has WORN
@@ -1771,19 +1771,19 @@ execute "+game_over"
 }
 
 object rack : rack
- has		SURFACE
- short		the "rack"
- capacity	20 
+   has        SURFACE
+   short      the "rack"
+   capacity   20 
  
 object spotlights : spotlights lights
-   has			OUT_OF_REACH PLURAL
-   short		the "spotlights"
+   has            OUT_OF_REACH PLURAL
+   short        the "spotlights"
 
 object kryten: myself self me
-   has			ANIMATE
-   short		name "yourself"
-   quantity		98
-   parent		tavern
+   has          ANIMATE
+   short        name "yourself"
+   quantity     98
+   parent       tavern
    player
 
 {attack
@@ -1806,18 +1806,18 @@ set time = false
 }
 
 object boots: leather boots
-   has			WEARABLE WORN PLURAL
-   short		"a pair of" "leather boots"
-   long			"Your boots are here.^"
-   mass			5
-   parent		kryten
+   has            WEARABLE WORN PLURAL
+   short        "a pair of" "leather boots"
+   long            "Your boots are here.^"
+   mass            5
+   parent        kryten
 
 
 object codpiece: leather codpiece
-   has			WEARABLE WORN
-   short		a "leather codpiece"
-   mass			4
-   parent		kryten
+   has            WEARABLE WORN
+   short        a "leather codpiece"
+   mass            4
+   parent        kryten
 
 {remove
 print:
@@ -1832,11 +1832,11 @@ write "It looks a lot better since you stuffed those old rags in it.^"
 }
 
 object cloak: long cloak
-   has			WEARABLE WORN
-   short		a "long cloak"
-   long			"Your cloak is lying on the ground here.^"
-   mass			8
-   parent		kryten
+   has          WEARABLE WORN
+   short        a "long cloak"
+   long         "Your cloak is lying on the ground here.^"
+   mass         8
+   parent       kryten
 
 {examine
 print:

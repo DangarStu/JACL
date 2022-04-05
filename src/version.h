@@ -3,7 +3,7 @@
  * according to GNU GPL, see file COPYING for details.
  */
 
-#define J_VERSION			4
-#define J_RELEASE			3
-#define	J_BUILD			0
-#define INTERPRETER_VERSION	430
+#define J_VERSION            4
+#define J_RELEASE            4
+#define J_BUILD              0
+#define INTERPRETER_VERSION  440

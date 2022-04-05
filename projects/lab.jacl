@@ -1,4 +1,4 @@
-#!../bin/jacl
+#!/usr/local/jacl/bin/jacl
 
 constant game_title		"Parser Lab"
 constant game_author	"Stuart Allen"
@@ -26,6 +26,7 @@ if here hasnt OUTDOORS
 endall
 move ground to here
 execute "+look_around"
+output "outboard-ten_restoration_tips.html"
 }
 
 location lab : parser lab
