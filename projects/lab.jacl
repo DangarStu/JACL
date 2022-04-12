@@ -15,8 +15,8 @@ if remote_user = GOOBER
 endif
 style normal
 print:
-   This program is simply an object-rich environment for testing the JACL 
-   parser.^^
+   This program is: simply an object-rich environment for testing the JACL 
+   parser.:^^
 .
 if here hasnt OUTDOORS
    move north_wall to here
