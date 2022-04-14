@@ -71,10 +71,16 @@ print:
 ifstring title_image = "none"
   write "<h1 class=~title~>" game_title "</h1>"
 else
+  ifstring title_link != "" : title_link = "title_link"
+     execute "+command_link<title_link"
+  endif
   if WEBAPP_device = WEBAPP_desktop
      write "<img class=~titleimage~ alt=~" game_title "~ src=~" desktop_title_image "~>"
   else
      write "<img class=~titleimage~ alt=~" game_title "~ src=~" mobile_title_image "~>"
+  endif
+  ifstring title_link != ""
+     write "</a>
   endif
 endif
 call "+header_links"
