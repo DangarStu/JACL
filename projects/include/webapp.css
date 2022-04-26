@@ -36,7 +36,10 @@ print:
       div.mode {
         display: flex;
         justify-content: flex-start;
-          align-items: flex-start;
+        align-items: flex-start;
+        padding-left: 0px;
+        padding-right: 0px;
+
 .
 write "    background-color: " tab_colour "; }^"
 print:

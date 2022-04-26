@@ -36,8 +36,9 @@ print:
 write "<title>" game_title "</title>"
 execute "+styles"
 call "+user_styles"
-write "<script src=~/include/jquery-3.6.0.min.js~></script>"
-
+print:
+   <script src=~/include/jquery-3.6.0.min.js~></script>
+.
 ifstring favicon_image = "none"
 	write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
 else
@@ -103,13 +104,24 @@ if @tab_names > 1
    endwhile
    write "</div>"
 endif
+print:
+   <script>
+      $(".mode div").on("click",function(e) {
+         if (e.target.firstChild.href) {
+            window.location.href = e.target.firstChild.href;
+         }
+      });
+   </script>
+.
 write "<div id=~main~>^"
 set linebreaks = true
 }
 
 {+footer
-write "</div>"
-write "</body></html>^"
+print:
+   </div>
+   </body></html>^
+.
 }
 
 {+command_link
