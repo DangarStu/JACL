@@ -11,20 +11,14 @@ print:
 		left: 0;
 		right: 0; 
 		border: 0;
-		background-color: black; }
+		background-color: black; }^
      #header {
 		position: absolute;
 		top:0;
 		left:0;
 		right:0;
 		display:block;
-.
-if gui_mode = MOBILE
-   write "height: 57px;"
-else
-   write "height: 87px;"
-endif
-print:
+                height: 87px;
 		font-size: 10pt;
 		color: white;
 		font-family: Merriweather, Verdana, Arial, Sanserif;
@@ -38,16 +32,8 @@ print:
 		right:0;
 		display:block;
 		font-family: Merriweather, Verdana, Arial, Sanserif; 
+                height: 75px;
 .
-if gui_mode = GUI
-   write "height: 210px; "
-endif
-if gui_mode = MOBILE
-   write "height: 45px; "
-endif
-if gui_mode = STANDARD
-   write "height: 75px; "
-endif
 ifstring footer_image != "none"
    write "background-image: url('" footer_image "'); "
    write "background-repeat: repeat; "
@@ -58,58 +44,36 @@ print:
       #main {
 		position:absolute;
 		left:0px;
-.
-if gui_mode = MOBILE
-   write "top: 57px;^"
-else
-   write "top: 87px;^"
-endif
-print:
+                top: 87px;
 		right:0px;
 		overflow:auto;
 .
 ifstring current_image != "none"
    write "  margin-right: 500px;"
 endif
-if gui_mode = STANDARD
-   write " bottom: 75px; "
-endif
-if gui_mode = MOBILE
-   write " bottom: 45px; "
-endif
-if gui_mode = GUI
-   write " bottom: 210px; "
-endif
+write " bottom: 75px; "
 write " background-color: " maintext_colour "; }^"
 print:
 	p {	font-family: Merriweather, Verdana, Arial, Sanserif;
-		color: black; 
-.
-if gui_mode = MOBILE
-   write "font-size: 12pt;}^"
-else
-   write "font-size: 12pt;}^"
-endif
-print:
+                font-size: 12pt;}^
 	a {	font-family: Merriweather, Verdana, Arial, Sanserif;
-		color: white; font-size: 10pt}^
+		color: white; 
+                font-size: 10pt; }^
+	b {	font-family: Merriweather, Verdana, Arial, Sanserif;
+		color: black;
+                font-weight: 900; 
+                font-size: 12pt;}^
 	h1 { 		
 		padding-left: 18px;
 		font-family: Merriweather, Verdana, Arial, Sanserif;
 		color: black; 
-		font-size: 24pt}^
+		font-size: 24pt; }^
 	h2 {	
 		font-family: Merriweather, Georgia, Palatino, Times, Serif;
 		color: black; 
 		font-weight: bold;
 		margin-bottom: 2px;
-.
-if gui_mode = MOBILE
-   write "font-size: 12pt}^"
-else
-   write "font-size: 12pt}^"
-endif
-print:
+                font-size: 12pt; }^
 	input.dir_button {
 		margin-top: 0px;
 		margin-left: 0px; }^
@@ -133,33 +97,19 @@ print:
 		padding: 2px;
 		border-style: solid;
 		border-width: 2px;
-		border-color: black; }
+		border-color: black; }^
 	img.inline { 
 		width: 40%;
 		float: right;
-		margin: 10px 0px 10px 20px; }
+		margin: 10px 0px 10px 20px; }^
 	div.picture {
 		position: absolute;
 		right: 0;
-.
-if gui_mode = MOBILE
-   write "top: 57px; "
-else
-   write "top: 87px; "
-endif
-print:
+                top: 87px;
 		width: 500px;
 		float: right;
+                bottom: 75px;
 .
-if gui_mode = STANDARD
-   write " bottom: 75px; "
-endif
-if gui_mode = MOBILE
-   write " bottom: 45px; "
-endif
-if gui_mode = GUI
-   write " bottom: 210px; "
-endif
 write " background-color: " maintext_colour "; }^"
 print:
 	div.directions { 		
@@ -177,58 +127,23 @@ print:
 .
 write " background-color: " linkbar_colour "; }^"
 print:
-	img.titleimage {
-.
-if gui_mode = MOBILE
-   write "height: 57px; }^"
-else
-   write "height: 87px; }^"
-endif
-print:
-	img.compass { 
-		border: none;
-		border-width: 0px;
-		margin-right: 0px;
-		margin-bottom: 0px;
-		margin-left: 0px;
-		margin-top: 0px; }^
+	img.titleimage { height: 87px; }^
 	div.maintext {
-     	font-family: Merriweather, Georgia, Palatino, Times, Serif;
-.
-if gui_mode = MOBILE
-   print:
-		padding-top: 10px;
-		padding-bottom: 10px;
-		padding-left: 10px;
-		padding-right: 10px;
-		font-size: 12pt;
-   .
-else
-   print:
+     	        font-family: Merriweather, Georgia, Palatino, Times, Serif;
+                color: #444;
 		padding-top: 30px;
 		padding-bottom: 30px;
 		padding-left: 50px;
 		padding-right: 50px;
 		font-size: 12pt;
-   .
-endif
-print
 		overflow: auto;
 .
 write " background-color: " maintext_colour "; }^"
 print:
 	#JACLCommandPrompt:focus {
-		outline-width: 0;
-	}^
-
+		outline-width: 0; }^
 	#JACLCommandPrompt {
-.
-if gui_mode = MOBILE
-   write "font-size: 12pt;^"
-else
-   write "font-size: 12pt;^"
-endif
-print:
+                font-size: 12pt;
 		float: left;
 		border: 1px;
 		width: 100%; }^
@@ -236,26 +151,12 @@ print:
 		float: left;
 		width: 20%; 
 		padding-top: 25px;
-		text-align: right;^ }
-.
-if gui_mode = STANDARD
-   print:
-	    div.command_prompt {
+		text-align: right; }^
+	div.command_prompt {
 		float: left;
 		width: 95%;
         	text-align: center;
         	padding: 15px; }^
-.
-endif
-if gui_mode = MOBILE
-   print:
-        div.command_prompt {
-		width: 100%;
-        text-align: center;
-        padding-top: 5px; }
-   .
-endif
-print:
 	div.interface {
 		position: relative;
 		font-family: Merriweather, Verdana, Arial, Sanserif;
@@ -264,22 +165,6 @@ print:
 		padding-right: 10px;
 		padding-bottom: 10px;			
 		float: left; }^
-	div.compass {
-.
-write " background-color: " maintext_colour ";"
-print:
-		border-style: solid;
-		border-width: 2px;
-		border-color: black;
-		margin-left: 0px;
-		margin-right: 0px;
-		margin-top: 0px;
-		margin-bottom: 0px;
-		padding-left: 0px;
-		padding-right: 0px;
-		padding-top: 0px;
-		padding-bottom: 0px;
-		float: right;}^
 	select {
 		width: 200px; }^
      -->

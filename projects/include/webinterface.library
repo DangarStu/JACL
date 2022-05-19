@@ -1,22 +1,6 @@
 # STANDARD HEADERS AND FOOTERS FOR WEB-BASED INTERACTIVE FICTION
 
-parameter interface gui_mode
-
-integer gui_mode STANDARD
-
 string current_image "none"
-
-constant STANDARD	1
-constant GUI		2
-constant MOBILE	3
-
-grammar standard >standard
-
-{+standard
-set gui_mode = STANDARD
-set time = false
-write "Interface set to standard mode.^"
-}
 
 {+header
 set linebreaks = false
@@ -25,12 +9,8 @@ print:
   "http://www.w3.org/TR/html4/loose.dtd">^
 <html><head>
 <link href="http://fonts.googleapis.com/css?family=Merriweather" rel="stylesheet" type="text/css">
+<meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
 .
-write "<meta HTTP-EQUIV=~Content-Type~ CONTENT=~text/html; charset=UTF-8~>"
-if gui_mode = MOBILE
-   write "<meta name = ~viewport~ content = ~width = device-width, initial-scale = 1.0, user-scalable = no~/>"
-   write "<meta name=~apple-mobile-web-app-capable~ content=~yes~/>"
-endif
 write "<title>" game_title "</title>"
 execute "+styles"
 print:
@@ -39,15 +19,14 @@ print:
 
    function KeyPressed() {^
       if ($("#JACLCommandPrompt").val() == "") { 
-			main.scrollTop = main.scrollHeight; 
-		} 
-	}^
+         main.scrollTop = main.scrollHeight; 
+      } 
+   }^
 
    function changeInterface() {^
       document.JACLInterfaceForm.submit(); 
-	}^
+   }^
 .
-if gui_mode = STANDARD : gui_mode = MOBILE
 #include "ajax.library"
 write "</script>^"
 write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
@@ -59,43 +38,17 @@ ifstring title_image = "none"
 else
   write "<img class=~titleimage~ alt=~" game_title "~ src=~" title_image "~>"
 endif
-if gui_mode != MOBILE
-   write "<form name=~JACLInterfaceForm~ method=get>^"
-   write "<div class=~links~>
-   write "| "
-   write "Interface: "
-   write "Standard<input type=~radio~ name=~interface~ value=~1~"
-   if gui_mode = STANDARD
-      write " checked onclick=~return changeInterface();~>"
-   else 
-      write " onclick=~return changeInterface();~>"
-   endif
-   write " GUI<input type=~radio~ name=~interface~ value=~2~"
-   if gui_mode = GUI
-      write " checked onclick=~return changeInterface();~>"
-   else 
-      write " onclick=~return changeInterface();~>"
-   endif
-   write " Mobile<input type=~radio~ name=~interface~ value=~3~"
-   if gui_mode = MOBILE
-      write " checked onclick=~return changeInterface();~>"
-   else 
-      write " onclick=~return changeInterface();~>"
-   endif
-   hidden
-   write "<input type=~hidden~ name=~command~ value=~look~>"
-   write " | "
-   hyperlink "Instructions" "instructions" "header"
-   write " | "
-   hyperlink "About" "about" "header"
-   write " | "
-   hyperlink "Restart" "restart" "header"
-   write " | "
-   hyperlink "Hint" "hint" "header"
-   write " |"
-   write "</div>^"
-   write "</form>^"
-endif
+write "<div class=~links~>
+write " | "
+hyperlink "Instructions" "instructions" "header"
+write " | "
+hyperlink "About" "about" "header"
+write " | "
+hyperlink "Restart" "restart" "header"
+write " | "
+hyperlink "Hint" "hint" "header"
+write " |"
+write "</div>^"
 write "</div>^"
 write "<div id=~main~>^"
 write "<div id=~maintext~ class=~maintext~>^"
@@ -106,121 +59,22 @@ set linebreaks = true
 set linebreaks = false
 write "</div>"
 write "</div>"
-if gui_mode != MOBILE
    ifstring current_image != "none"
       write "<div class=~picture~>"
       write "<img class=~main~ src=~" current_image "~>"
       write "</div>"
    endif
-endif
 write "<div id=~footer~>^"
-if gui_mode != MOBILE
-   write "<div class=~directions~>"
-   execute "+exits"
-   write "</div>"
-endif
-   write "<form id=~commandForm~ name=~JACLGameForm~ method=~get~ autocomplete=~off~>"
-   write "<div class=~command_prompt~>^"
-   prompt "KeyPressed();"
-endif
-if gui_mode = GUI
-   write "<form name=~JACLGameForm~ method=get>^"
-   write "<div class=~interface~>^"
-   button "Look"
-   button "Take"
-   button "Drop"
-   write "<br>"
-   button "Use"
-   button "Open"
-   button "Close"
-   write "<br>"
-   button "Talk to"
-   button "Wear"
-   button "Remove"
-   write "<br>"
-   button "Touch"
-   button "Wait"
-   button "Give"
-   write "<br>"
-   button "Break"
-   button "Consume"
-   button "Enter"
-   write "</div>"
-   write "<div class=~interface~>^"
-   write "<b>You can see:</b><br>^"
-   write "<select name=~noun~ size=8>"
-   loop
-      ifall here grandof noun3 : player !grandof noun3 : noun3 hasnt LOCATION
-         option noun3
-      else
-         if noun3 = player
-            option noun3
-         endif
-      endif
-   endloop
-   write "</select>"
-   write "</div>"
-   write "<div class=~interface~>^"
-   write "<b>You are carrying:</b><br>^"
-   write "<select name=~noun~ size=8>"
-   loop
-      ifall player grandof noun3 : noun3 != player
-         option noun3
-      endif
-   endloop
-   write "</select>"
-   hidden
-   write "</div>"
-   write "<div class=~compass~>"
-   ifall here(northwest) != nowhere : here(northwest) != NO_GO
-      hyperlink "<img class=~compass~ src=~/images/compass/northwest_blue.png~>" "nw"
-   else
-      write "<img src=~/images/compass/northwest.png~>"
-   endif
-   ifall here(north) != nowhere : here(north) != NO_GO
-      hyperlink "<img class=~compass~ src=~/images/compass/north_blue.png~>" "n"
-   else
-      write "<img src=~/images/compass/north.png~>"
-   endif
-   ifall here(northeast) != nowhere : here(northeast) != NO_GO
-      hyperlink "<img class=~compass~ src=~/images/compass/northeast_blue.png~>" "ne"
-   else
-      write "<img src=~/images/compass/northeast.png~>"
-   endif
-   write "<br>"
-   ifall here(west) != nowhere : here(west) != NO_GO
-      hyperlink "<img class=~compass~ src=~/images/compass/west_blue.png~>" "w"
-   else
-      write "<img src=~/images/compass/west.png~>"
-   endif
-   write "<img src=~/images/compass/centre.png~>"
-   ifall here(east) != nowhere : here(east) != NO_GO
-      hyperlink "<img class=~compass~ src=~/images/compass/east_blue.png~>" "east"
-   else
-      write "<img src=~/images/compass/east.png~>"
-   endif
-   write "<br>"
-   ifall here(southwest) != nowhere : here(southwest) != NO_GO
-      hyperlink "<img class=~compass~ src=~/images/compass/southwest_blue.png~>" "sw"
-   else
-      write "<img src=~/images/compass/southwest.png~>"
-   endif
-   ifall here(south) != nowhere : here(south) != NO_GO
-      hyperlink "<img class=~compass~ src=~/images/compass/south_blue.png~>" "s"
-   else
-      write "<img src=~/images/compass/south.png~>"
-   endif
-   ifall here(southeast) != nowhere : here(southeast) != NO_GO
-      hyperlink "<img class=~compass~ src=~/images/compass/southeast_blue.png~>" "se"
-   else
-      write "<img src=~/images/compass/southeast.png~>"
-   endif
-   write "</div>^"
-endif   
+write "<div class=~directions~>"
+execute "+exits"
+write "</div>"
+write "<form id=~commandForm~ name=~JACLGameForm~ method=~get~ autocomplete=~off~>"
+write "<div class=~command_prompt~>^"
+prompt "KeyPressed();"
 print:
-	</div>
-	</form></div>^
-	<script>
+   </div>
+   </form></div>^
+   <script>
           function submitForm() {^
                ajaxForm({^
                     command: document.getElementById('JACLCommandPrompt').value,^
@@ -230,8 +84,8 @@ print:
                return false;^
           }^
           $('#commandForm').submit ( submitForm );^
-	</script>^
-	</body></html>^
+   </script>^
+   </body></html>^
 .
 set linebreaks = true
 }
@@ -243,42 +97,27 @@ print:
       $('#maintext').find('script').remove();^
 
       maintext.innerHTML += "<br><b>&gt;" + details.command + "</b><br>"
-	 + data;^
+    + data;^
 
       var main = document.getElementById("main");^
       var textAdded = main.scrollHeight - main.scrollTop;
-.
-if gui_mode = MOBILE
-   print:
-      if (textAdded > 180) { 
-			main.scrollTop += 180;
-		} else { 
-			main.scrollTop = main.scrollHeight;^ 
-		}
-.
-else
-   print:
       if (textAdded > $("#main").height()) { 
-			main.scrollTop += $("#main").height(); 
-		} else { 
-			main.scrollTop = main.scrollHeight;^ 
-		}
-.
-endif
-print:   
+         main.scrollTop += $("#main").height(); 
+      } else { 
+         main.scrollTop = main.scrollHeight;^ 
+      }
       document.JACLGameForm.command.value = "";^
       var sound = $('#maintext').find('audio')[0];^
       if (sound != null) {^
-			sound.play(); 
-		}^
+         sound.play(); 
+      }^
       var jaclscript = $('#maintext').find('script')[0];^
       if (jaclscript != null) {^ 
-			eval (jaclscript.text); 
-		}^
+         eval (jaclscript.text); 
+      }^
       $('#JACLCommandPrompt').focus();
       return false; 
 .
-endif
 }
 
 {+display_chart_table
@@ -288,94 +127,94 @@ print:
 .
 
 select VISITED topic
-	# LOOP THROUGH ALL THE LINKS TO OTHER TOPICS AND DRAW THE LINES
+   # LOOP THROUGH ALL THE LINKS TO OTHER TOPICS AND DRAW THE LINES
      set INDEX = 0
      repeat
-		if topic(INDEX) != 0
-			# GET THE COORDINATES OFFSETS FOR THE LINE DIRECTION
-			set node_x = topic(x)
-			set node_x * 100
-			set node_x + 5
-			set node_x + 30
-			set node_y = topic(y)
-			set node_y * 100
-			set node_y + 5
-			set node_y + 30
+      if topic(INDEX) != 0
+         # GET THE COORDINATES OFFSETS FOR THE LINE DIRECTION
+         set node_x = topic(x)
+         set node_x * 100
+         set node_x + 5
+         set node_x + 30
+         set node_y = topic(y)
+         set node_y * 100
+         set node_y + 5
+         set node_y + 30
 
-			write "paper.path(~M"
-			write node_x " " node_y "L"
+         write "paper.path(~M"
+         write node_x " " node_y "L"
 
-			set destination = topic(INDEX)
+         set destination = topic(INDEX)
 
-			set node_x = destination(x)
-			set node_x * 100
-			set node_x + 5
-			set node_x + 30
-			set node_y = destination(y)
-			set node_y * 100
-			set node_y + 5
-			set node_y + 30
+         set node_x = destination(x)
+         set node_x * 100
+         set node_x + 5
+         set node_x + 30
+         set node_y = destination(y)
+         set node_y * 100
+         set node_y + 5
+         set node_y + 30
 
-			write node_x " " node_y "~);^"
-		endif	
-		set INDEX + 1
-	until INDEX = 8
+         write node_x " " node_y "~);^"
+      endif   
+      set INDEX + 1
+   until INDEX = 8
 endselect
 
 select VISITED topic
-	set node_x = topic(x)
-	set node_x * 100
-	set node_x + 5
-	set node_y = topic(y)
-	set node_y * 100
-	set node_y + 5
+   set node_x = topic(x)
+   set node_x * 100
+   set node_x + 5
+   set node_y = topic(y)
+   set node_y * 100
+   set node_y + 5
    write "var node = paper.rect(" node_x ", " node_y ", 60, 60, 10);^"
-	if topic = here
-		write "node.attr(~fill~, ~#BDD8D6~);^"
-	else
-		ifexecute "+child_of_here<topic"
-			write "node.attr(~fill~, ~#ccc~);^"
-		else
-			write "node.attr(~fill~, ~#eee~);^"
-		endif
-	endif
+   if topic = here
+      write "node.attr(~fill~, ~#BDD8D6~);^"
+   else
+      ifexecute "+child_of_here<topic"
+         write "node.attr(~fill~, ~#ccc~);^"
+      else
+         write "node.attr(~fill~, ~#eee~);^"
+      endif
+   endif
 
-	# ADD THE TOPIC'S LABEL TO THE CENTRE OF THE NODE
-	set node_x + 30
-	set node_y + 30
-	write "var label = paper.text(" node_x ", " node_y ", ~" 
-	split array_count topic{The} " " label
+   # ADD THE TOPIC'S LABEL TO THE CENTRE OF THE NODE
+   set node_x + 30
+   set node_y + 30
+   write "var label = paper.text(" node_x ", " node_y ", ~" 
+   split array_count topic{The} " " label
 
-	if array_count = 0
-		write topic{The}			
+   if array_count = 0
+      write topic{The}         
      else
-		set INDEX = 0
-		repeat
-			write label[INDEX]
-			write "\n"				
-			set INDEX + 1
-		until INDEX = array_count
-	endif
-	write "~);^"
+      set INDEX = 0
+      repeat
+         write label[INDEX]
+         write "\n"            
+         set INDEX + 1
+      until INDEX = array_count
+   endif
+   write "~);^"
 
-	# MAKE THE NODE'S LABEL A LINK
-	write "label.attr(~href~, ~"
-	write $url "?command=" topic{label} "&mode=1"
-	if remote_user = false
-   		write "&user_id=" $user_id
-	endif
-	write "~);^"
+   # MAKE THE NODE'S LABEL A LINK
+   write "label.attr(~href~, ~"
+   write $url "?command=" topic{label} "&mode=1"
+   if remote_user = false
+         write "&user_id=" $user_id
+   endif
+   write "~);^"
 
-	if topic has VIDEO
-		set node_x + 25
-		set node_y + 23
-		write "paper.text(" node_x ", " node_y ", ~v~);^"
-	endif
-	if topic has PHOTO
-		set node_x + 24
-		set node_y + 22
-		write "paper.text(" node_x ", " node_y ", ~p~);^"
-	endif
+   if topic has VIDEO
+      set node_x + 25
+      set node_y + 23
+      write "paper.text(" node_x ", " node_y ", ~v~);^"
+   endif
+   if topic has PHOTO
+      set node_x + 24
+      set node_y + 22
+      write "paper.text(" node_x ", " node_y ", ~p~);^"
+   endif
 endselect
 
 #FIND THE CENTRE OF THE CURRENT NODE
@@ -396,4 +235,3 @@ write "document.getElementById(~main~).scrollTop=" node_y " - halfDivHeight;^"
 
 write "</script>"
 }
-
