@@ -17,15 +17,6 @@ glui32 parse_utf8(unsigned char *buf, glui32 buflen, glui32 *out, glui32 outlen)
 void update_parameters(void);
 #endif
 
-#ifdef GARGLK
-extern char* garglk_fileref_get_name(frefid_t fref);
-
-extern void garglk_set_program_name(const char *name);
-extern void garglk_set_program_info(const char *info);
-extern void garglk_set_story_name(const char *name);
-extern void garglk_set_config(const char *name);
-#endif
-
 void default_footer(void);
 void default_header(void);
 int logic_test(int first);
