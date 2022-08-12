@@ -35,6 +35,10 @@
 #include "parser.h"
 #include "encapsulate.h"
 
+#ifdef GARGLK
+#include <glkstart.h>
+#endif
+
 #ifndef GARGLK
 #include "glkterm/gi_blorb.h"
 #include "glkterm/glk.h"
@@ -136,7 +140,7 @@ strid_t inputstr = NULL;
 
 char            user_id[] = "local";
 char            prefix[81] = "\0";
-char            blorb[81] = "\0";
+char            blorb[256] = "\0";
 char            game_path[256] = "\0";
 char            game_file[256] = "\0";
 char            processed_file[256] = "\0";
@@ -225,7 +229,15 @@ glk_main(void)
 
 	/* OPEN THE BLORB FILE IF ONE EXISTS */
 #ifndef WINGLK
+#ifdef GARGLK
+	// Per the Glk spec, Gargoyle appends ".glkdata" to files opened via the
+	// "normal" Glk routines (e.g. glk_fileref_create_by_name). JACL assumes
+	// that it can open arbitrary files, and for that,
+	// glkunix_stream_open_pathname is required.
+	blorb_stream = glkunix_stream_open_pathname(blorb, 0, 0);
+#else
 	blorb_file = glk_fileref_create_by_name(fileusage_BinaryMode, blorb, 0);
+#endif
 #else
 	strcpy(temp_buffer, game_path);
 	strcat(temp_buffer, blorb);
@@ -233,8 +245,13 @@ glk_main(void)
 	blorb_file = winglk_fileref_create_by_name(fileusage_BinaryMode, blorb, 0, 0);
 #endif
 
+	// glkunix_stream_open_pathname does all this already.
+#ifndef GARGLK
 	if (blorb_file != NULL && glk_fileref_does_file_exist(blorb_file)) {
 		blorb_stream = glk_stream_open_file(blorb_file, filemode_Read, 0);
+#else
+        {
+#endif
 
 		if (blorb_stream != NULL) {
 			/* IF THE FILE EXISTS, SET THE RESOURCE MAP */
