@@ -35,10 +35,13 @@
 #include "parser.h"
 #include "encapsulate.h"
 
+#ifdef GARGLK
+#include <glkstart.h>
+#endif
+
 #ifndef GARGLK
 #include "glkterm/gi_blorb.h"
 #include "glkterm/glk.h"
-#include "Gargoyle/garglk.h"
 #endif
 
 glui32 				status_width, status_height;
@@ -137,7 +140,7 @@ strid_t inputstr = NULL;
 
 char            user_id[] = "local";
 char            prefix[81] = "\0";
-char            blorb[81] = "\0";
+char            blorb[256] = "\0";
 char            game_path[256] = "\0";
 char            game_file[256] = "\0";
 char            processed_file[256] = "\0";
@@ -168,6 +171,11 @@ static char* object_generator(const char* text, int state);
 static char* verb_generator(const char* text, int state);
 static void add_word(const char * word);
 #endif
+
+static void jacl_strict_warning(const char *msg)
+{
+	fprintf(stderr, "JACL error: %s\n", msg);
+}
 
 void
 glk_main(void)
@@ -221,7 +229,15 @@ glk_main(void)
 
 	/* OPEN THE BLORB FILE IF ONE EXISTS */
 #ifndef WINGLK
+#ifdef GARGLK
+	// Per the Glk spec, Gargoyle appends ".glkdata" to files opened via the
+	// "normal" Glk routines (e.g. glk_fileref_create_by_name). JACL assumes
+	// that it can open arbitrary files, and for that,
+	// glkunix_stream_open_pathname is required.
+	blorb_stream = glkunix_stream_open_pathname(blorb, 0, 0);
+#else
 	blorb_file = glk_fileref_create_by_name(fileusage_BinaryMode, blorb, 0);
+#endif
 #else
 	strcpy(temp_buffer, game_path);
 	strcat(temp_buffer, blorb);
@@ -229,8 +245,13 @@ glk_main(void)
 	blorb_file = winglk_fileref_create_by_name(fileusage_BinaryMode, blorb, 0, 0);
 #endif
 
+	// glkunix_stream_open_pathname does all this already.
+#ifndef GARGLK
 	if (blorb_file != NULL && glk_fileref_does_file_exist(blorb_file)) {
 		blorb_stream = glk_stream_open_file(blorb_file, filemode_Read, 0);
+#else
+        {
+#endif
 
 		if (blorb_stream != NULL) {
 			/* IF THE FILE EXISTS, SET THE RESOURCE MAP */
@@ -1541,7 +1562,7 @@ convert_to_utf32 (unsigned char *text)
 	    return 0;
 	}
 
-	text_len = strlen(text);
+	text_len = strlen((char *)text);
 
 	if (!text_len) {
 	    return 0;
@@ -1575,12 +1596,12 @@ parse_utf8(unsigned char *buf, glui32 buflen,
 
         if ((val0 & 0xe0) == 0xc0) {
             if (pos+1 > buflen) {
-                gli_strict_warning("incomplete two-byte character");
+                jacl_strict_warning("incomplete two-byte character");
                 break;
             }
             val1 = buf[pos++];
             if ((val1 & 0xc0) != 0x80) {
-                gli_strict_warning("malformed two-byte character");
+                jacl_strict_warning("malformed two-byte character");
                 break;
             }
             res = (val0 & 0x1f) << 6;
@@ -1591,17 +1612,17 @@ parse_utf8(unsigned char *buf, glui32 buflen,
 
         if ((val0 & 0xf0) == 0xe0) {
             if (pos+2 > buflen) {
-                gli_strict_warning("incomplete three-byte character");
+                jacl_strict_warning("incomplete three-byte character");
                 break;
             }
             val1 = buf[pos++];
             val2 = buf[pos++];
             if ((val1 & 0xc0) != 0x80) {
-                gli_strict_warning("malformed three-byte character");
+                jacl_strict_warning("malformed three-byte character");
                 break;
             }
             if ((val2 & 0xc0) != 0x80) {
-                gli_strict_warning("malformed three-byte character");
+                jacl_strict_warning("malformed three-byte character");
                 break;
             }
             res = (((val0 & 0xf)<<12)  & 0x0000f000);
@@ -1613,26 +1634,26 @@ parse_utf8(unsigned char *buf, glui32 buflen,
 
         if ((val0 & 0xf0) == 0xf0) {
             if ((val0 & 0xf8) != 0xf0) {
-                gli_strict_warning("malformed four-byte character");
+                jacl_strict_warning("malformed four-byte character");
                 break;        
             }
             if (pos+3 > buflen) {
-                gli_strict_warning("incomplete four-byte character");
+                jacl_strict_warning("incomplete four-byte character");
                 break;
             }
             val1 = buf[pos++];
             val2 = buf[pos++];
             val3 = buf[pos++];
             if ((val1 & 0xc0) != 0x80) {
-                gli_strict_warning("malformed four-byte character");
+                jacl_strict_warning("malformed four-byte character");
                 break;
             }
             if ((val2 & 0xc0) != 0x80) {
-                gli_strict_warning("malformed four-byte character");
+                jacl_strict_warning("malformed four-byte character");
                 break;
             }
             if ((val3 & 0xc0) != 0x80) {
-                gli_strict_warning("malformed four-byte character");
+                jacl_strict_warning("malformed four-byte character");
                 break;
             }
             res = (((val0 & 0x7)<<18)   & 0x1c0000);
@@ -1643,7 +1664,7 @@ parse_utf8(unsigned char *buf, glui32 buflen,
             continue;
         }
 
-        gli_strict_warning("malformed character");
+        jacl_strict_warning("malformed character");
     }
 
     return outpos;
