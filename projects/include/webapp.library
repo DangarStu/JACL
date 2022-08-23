@@ -36,9 +36,8 @@ print:
 write "<title>" game_title "</title>"
 execute "+styles"
 call "+user_styles"
-print:
-   <script src=~/include/jquery-3.6.0.min.js~></script>
-.
+write "<script src=~/include/jquery-3.6.0.min.js~></script>"
+
 ifstring favicon_image = "none"
 	write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
 else
@@ -68,23 +67,19 @@ call "+local_header"
 print:  
    </head><body>^
    <div id="header">
+   <div id="headerimages">
 .
 ifstring title_image = "none"
   write "<h1 class=~title~>" game_title "</h1>"
 else
-  ifstring title_link != "" : title_link = "title_link"
-     execute "+command_link<title_link"
-  endif
   if WEBAPP_device = WEBAPP_desktop
      write "<img class=~titleimage~ alt=~" game_title "~ src=~" desktop_title_image "~>"
   else
      write "<img class=~titleimage~ alt=~" game_title "~ src=~" mobile_title_image "~>"
   endif
-  ifstring title_link != ""
-     write "</a>
-  endif
 endif
 call "+header_links"
+write "</div>"
 write "<div class=~linkbar~>
 write "</div>^"
 write "<div class=~links~>
@@ -110,24 +105,13 @@ if @tab_names > 1
    endwhile
    write "</div>"
 endif
-print:
-   <script>
-      $(".mode div").on("click",function(e) {
-         if (e.target.firstChild.href) {
-            window.location.href = e.target.firstChild.href;
-         }
-      });
-   </script>
-.
 write "<div id=~main~>^"
 set linebreaks = true
 }
 
 {+footer
-print:
-   </div>
-   </body></html>^
-.
+write "</div>"
+write "</body></html>^"
 }
 
 {+command_link
