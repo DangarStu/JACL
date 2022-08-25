@@ -13,6 +13,8 @@ print:
 .
 if WEBAPP_device = WEBAPP_desktop
    write "min-width: 960px; }^"
+else
+   write "}^"
 endif
 print:
    #header {
