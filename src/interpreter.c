@@ -15,6 +15,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <strings.h>
 
 #ifdef WIN32
 struct flock {
