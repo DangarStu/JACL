@@ -447,6 +447,7 @@ main(int argc, char *argv[])
                  * FUNCTION INSTEAD */
                 restart_game();
             }
+
         }
 
         /* COPY THE VALUE OF ANY DEFINED PARAMETERS FROM THE HTTP 
@@ -492,6 +493,12 @@ main(int argc, char *argv[])
         } else {
 
             /* THIS MOVE IS A CONTINUATION OF A GAME THAT IS IN PROGRESS */
+
+            if (returning_player == FALSE) {
+                // SETUP THE GAME STATE IF THERE IS A COMMAND 
+                // BUT IT IS NOT A RETURNING PLAYER
+                execute("+setup");
+            }
 
             TIME->value = TRUE;
             custom_error = FALSE;
