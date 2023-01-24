@@ -13,6 +13,7 @@
 #include "parser.h"
 #include "encapsulate.h"
 #include <string.h>
+#include <strings.h>
 #include <unistd.h>
 #include <fcntl.h>
 
