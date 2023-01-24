@@ -16,7 +16,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 struct flock {
     short l_type;
     short l_whence;
@@ -39,7 +39,7 @@ struct flock {
 #define F_UNLCK  2
 
 int fcntl(int __fd, int __cmd, ...) { return 0; }
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 #ifndef strcasestr
 char *strcasestr(const char *s, const char *find)

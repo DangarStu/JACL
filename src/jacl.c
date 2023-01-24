@@ -18,7 +18,7 @@
 
 #include "csv.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef GARGLK
 #include <windows.h>
 #include "glkterm/glk.h"
