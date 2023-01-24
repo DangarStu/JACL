@@ -147,7 +147,7 @@ main(int argc, char *argv[])
 
     strcpy(temp_buffer, argv[1]);
 
-#ifdef WIN32
+#ifdef _WIN32
     /* THIS CODE CONVERTS ALL FORWARD SLASHES TO BACK SLASHES AND IS
      * REQUIRED WHEN COMPILING FOR MS WINDOWS USING VISUAL C++ */
 
