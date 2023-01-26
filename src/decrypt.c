@@ -3,13 +3,11 @@
  * according to GNU GPL, see file COPYING for details.
  */
 
-
 #include "jacl.h"
 #include "language.h"
 #include "types.h"
 #include "prototypes.h"
 #include <string.h>
-
 
 static int jacl_whitespace(int character);
 
