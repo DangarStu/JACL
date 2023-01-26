@@ -595,7 +595,8 @@ read_gamefile()
                         create_integer (word[1], default_value);
                     }
                 }
-            } else if (!strcmp(word[0], "integer")) {
+            } else if (!strcmp(word[0], "integer") 
+		    || !strcmp(word[0], "variable")) {
                 if (word[1] == NULL) {
                     noproperr(line);
                     errors++;
