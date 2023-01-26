@@ -1,0 +1,6985 @@
+
+constant 	game_release	1
+constant 	game_build		6
+constant	game_title		"The Bloody Guns"
+constant	game_author		"Stuart Allen"
+constant	ifid			"JACL-004"
+
+# -----------------------------------------------------------------------------
+# CONSTANTS FOR RESOURCES IN BLORB FILE
+
+constant IMAGE_bloodyguns				1
+constant IMAGE_MelvilleMapInGame		2
+
+constant SOUND_TheBloodyGuns			3
+constant SOUND_AircraftBattle			4
+constant SOUND_ArtilleryNoExplosion		5
+constant SOUND_ArtilleryWithExplosion	6
+constant SOUND_CanoePaddle				7
+constant SOUND_Explosion				8
+constant SOUND_GunShot					9
+constant SOUND_MetalicClang				10
+constant SOUND_Alarm					11
+constant SOUND_RifleCocking				12
+constant SOUND_FiringRifle				13
+
+# -----------------------------------------------------------------------------
+
+grammar inspect **anywhere >inspect
+
+{+inspect
+inspect noun1
+}
+
+# -----------------------------------------------------------------------------
+
+
+integer_array fader			4
+
+integer next_sound			0
+integer turn_count			0
+integer status_window 		0
+
+constant foreground_channel	0
+constant background_channel	1
+constant eachturn_channel	2
+constant timed_channel		3
+
+{+intro
+volume 15 background_channel
+sound SOUND_TheBloodyGuns background_channel
+clear
+image IMAGE_bloodyguns
+if graphics_supported = false
+style header
+write ^ game_title
+style normal
+set status_window = 1
+endif
+updatestatus
+write "^Copyright (c) 2008 " game_author "^"
+write "Release " game_release " / build " game_build
+write " / JACL verb.library version " library_version "^^"
+print
+This game is a work of fiction. No character in this story is based
+upon the life of any real person, living or dead.^^
+
+This game would not exist in its present form if not for the generous
+assistance of Jack Mullholland. Mr Mullholland served as an anti-aircraft
+gunner in Darwin during World War II and I am extremely grateful to him
+for taking the time to share his personal experiences and answer my
+endless questions.^^
+
+Type 'menu' for further information about playing this game.^^
+.
+more "Hit any key to begin"
+set status_window = 1
+set script_stage = during_raid
+updatestatus
+clear
+style bold
+write "DARWIN, AUSTRALIA^
+write "SUNDAY 22 MARCH 1942^^"
+style normal
+move ground to here
+
+print
+The sun has almost risen above the tops of the gum trees at the
+far side of the field and it will soon be too hot to play cricket.
+From your position in the outfield you watch as
+Jenkins begins his loping stride towards the crease to deliver the
+final ball of the over.
+The other fielders, dressed only in khaki shorts, boots and wide brimmed
+hats stand stationary in the oppressive humidity.
+For a moment you think you can hear the faint throbbing drone of
+approaching aircraft, but then nothing. You tilt your head slightly,
+straining to hear then jump at the frantic clanging of the improvised
+air raid bell.^^
+~Man the bloody guns!~ Sergeant Thompson yells as he drops his
+bat and lets Jenkins' ball run wide.^^
+The players sprint from the field to the anti-aircraft gun mounted
+behind you at the western edge of the site as the sound of aircraft
+returns louder than before.^^
+The worn leather cricket ball rolls to a stop near your feet.^
+.
+}
+
+grammar menu >menu
+
+{+menu
+set MENU_MODE = MENU_EXECUTE
+set MENU_MODAL = false
+execute "+menu_prompt<+build_menu"
+write "Menu exited.^"
+set time = false
+}
+
+{+build_menu
+write "MAIN MENU:^^"
+execute "+menu_clear_options"
+execute "+menu_add_option<About<+about"
+execute "+menu_add_option<Instructions<+instructions"
+execute "+menu_add_option<Restore saved game<+restore_action"
+execute "+menu_add_option<Save game in progress<+save_action"
+execute "+menu_add_option<Exit menu<+exit_menu"
+}
+
+{+restore_action
+restoregame
+set MENU_IN_LOOP = false
+}
+
+{+save_action
+savegame
+set MENU_IN_LOOP = false
+}
+
+{+exit_menu
+set MENU_IN_LOOP = false
+}
+
+{+about
+style note
+write game_title ^
+style normal
+write "Copyright (c) 2008 " game_author "^"
+write "Release " game_release " / build " game_build
+write " / JACL verb.library version " library_version "^^"
+print
+I would like to thanks the following people for their beta testing: Kevin
+Wearne, George Oliver, Christopher Conley and Christopher Armstrong. You
+all did an excellent job in noticing bugs I never would have.^^
+
+I would also like to thank Paul O'Brian for the encouraging words he wrote
+in a review over ten years ago that gave me the motivation to try again.^
+.
+set time = false
+}
+
+integer	script_stage	intro
+
+constant intro			0
+constant during_raid	1
+constant tally_ho		2
+constant player_paged	4
+constant after_raid		12
+
+location outfield : darwin cricket oval outfield
+has			OUTDOORS KNOWN
+short		name "Darwin Oval (outfield)"
+in			pitch
+east			pitch
+west			assembly_area
+southeast	south_of_oval
+south		south_of_oval
+
+{look
+if here has VISITED
+return
+endif
+print
+You are standing in the outfield on the western side of Darwin Oval.
+The pitch can be seen in the centre of the oval while to the southeast
+lies a cliff edge over which the harbour can be seen. Further to the
+west the barrels of the four anti-aircraft guns can be seen above
+their surrounding revetments.^
+.
+}
+
+{eachturn
+if total_moves = 1
+write ^
+execute "+jenkins_ushers"
+return
+endif
+}
+
+{movement
+ifall script_stage = during_raid : destination != assembly_area
+set total_moves + 1
+execute "+jenkins_ushers"
+set time = false
+return
+endif
+return false
+}
+
+{+jenkins_ushers
+print
+Jenkins runs past you and grabs your arm, pulling you towards
+the anti-aircraft gun. ~Come on you daft bugger, we've got a war to
+fight!~^^
+.
+move player to assembly_area
+move gunners to assembly_area
+look
+execute "eachturn_assembly_area"
+}
+
+object gunners : soldiers gunners players
+has			PLURAL
+short		the "gunners"
+mass			scenery
+
+{examine
+print
+The gunners are mostly young men in their early twenties.^
+.
+}
+
+{follow
+if script_stage = during_raid
+if here = gun_emplacement
+write "You are right where you need to be.^"
+set time = false
+return
+else
+proxy "go to gun emplacement"
+return
+endif
+endif
+return false
+}
+
+object cricket_ball : cricket ball
+short		a "cricket ball"
+long			"There is a cricket ball resting at your feet.^"
+mass			3
+
+{examine
+write "The red-brown leather of the cricket ball is well worn with age.^"
+}
+
+{attack_with_iron_bar
+write "You bat the cricket ball a short distance away with " noun2{the} .^
+move cricket_ball to here
+}
+
+{throw_at_cylinder
+print
+The cricket ball hits the cylinder with a dull clang.^
+.
+move cricket_ball to here
+}
+
+{insert_in_setting_tool
+execute "set_to_integer_cricket_ball"
+}
+
+{set_to_integer
+if setting_tool isnt *held : script_stage > during_raid
+return false
+endif
+print
+You fumble crudely, stabbing at the cricket ball with the setting tool. Your
+senses dulled by an ever-increasing cloud of panic and confusion, you are
+unable to comprehend why nothing is happening.^^
+.
+execute "+red_card"
+}
+
+object jenkins : soldier gunner jenkins
+has			ANIMATE
+short		name "Gunner Jenkins"
+long			function
+mass			heavy
+parent		outfield
+
+{long
+if here = gun_emplacement
+if script_stage < after_raid
+write "Gunner Jenkins is standing on the gun by the breach.^"
+else
+write "Gunner Jenkins is here helping to clean the gun.^"
+endif
+else
+write "Gunner Jenkins is here, heading towards the gun emplacement.^"
+endif
+}
+
+{examine
+print
+Tall and thin, Jenkins is the camp's larrikin. His use of humour as a
+protective barrier has prevented you, or perhaps anyone else, from becoming
+particularly close to him.^
+.
+}
+
+{talk_to
+print
+You and Jenkins have never had much to say to each other.^
+.
+}
+
+{attack : attack_with_bar : kick
+print
+Tired of his larrikin behaviour, you lash out at Jenkins. You manage to
+land two good blows before being knocked to the ground by a low jab to
+the stomach.
+.
+execute "+fight"
+}
+
+{attack_with_rifle
+proxy "shoot " noun1{names} " with rifle"
+}
+
+{shoot_with_rifle_override
+volume 100 foreground_channel
+sound SOUND_FiringRifle foreground_channel
+print
+You raise your rifle, take aim and fire. The slug enters Jenkins's shoulder
+and sends him staggering backwards.
+Instinctively Sergeant Thompson rushes towards
+you and tackles you to the ground.
+.
+execute "+fight"
+}
+
+object thompson : soldier sergeant thompson
+has			ANIMATE
+short		name "Sergeant Thompson"
+long			function
+mass			heavy
+parent		outfield
+
+{long
+if here = gun_emplacement
+if script_stage < after_raid
+write "Sergeant Thompson is standing on the gun.^"
+else
+write "Sergeant Thompson is here overseeing the cleaning of the gun.^"
+endif
+else
+write "Sergeant Thompson is looking up, scanning the sky.^"
+endif
+}
+
+{examine
+print
+Sergeant Thompson has a heavy brow and muscular face, his dark brown eyes
+constantly surveying the performance of his men.^
+.
+}
+
+{talk_to
+if @+taken_off != 0
+print
+Sergeant Thompson scowls at you, still bitter about your performance
+under pressure.^
+.
+endif
+set MENU_MODE = MENU_PROXY
+execute "+menu_clear_options"
+if @+mission_briefing != 0
+execute "+menu_add_option<Tell Sergeant Thompson about mission<tell thompson about mission"
+endif
+execute "+menu_add_option<Ask Sergeant Thompson about anti-aircraft gun<ask thompson about anti-aircraft gun"
+execute "+menu_add_option<Ask Sergeant Thompson about cylinder<ask thompson about cylinder"
+}
+
+{ask_about_the_gun
+print
+~This gun was installed over two years ago now. It only saw its first
+action last month though, and it proved itself again today,~ Sergeant
+Thompson replies with obvious pride.^
+.
+}
+
+{tell_about_melville_obj : tell_about_mission
+if @+mission != 0
+print
+~Lieutenant Roberts told me they have been unable to contact the
+observation post on Melville Island. He needs me to head out there
+straight away and investigate what happening so I won't be back for
+a day or two.~^^
+Sergeant Thompson nods.^
+.
+endif
+print
+You really don't know much about the observation post at Melville.^
+.
+}
+
+{ask_about_cylinder
+if @attack_with_iron_bar_cylinder = 0
+print
+~What else can I tell you? You know it is our only real alarm system.~^
+.
+else
+print
+~You should already know that you don't go sounding it as though there
+is a raid when you haven't really seen anything.~^"
+.
+endif
+}
+
+{attack : attack_with_bar : kick
+print
+In a wave of unrestrained fury you lash out at Sergeant Thompson.
+The adrenaline-fuelled scuffle results in you being knocked to the ground.
+.
+execute "+fight"
+}
+
+{attack_with_rifle
+proxy "shoot " noun1{names} " with rifle"
+}
+
+{shoot_with_rifle_override
+volume 100 foreground_channel
+sound SOUND_FiringRifle foreground_channel
+print
+You raise your rifle, take aim and fire. Smith's hand slapping down against
+the top of the barrel as you do this sends the slug deep into a sandbag
+beside Sergeant Thompson. Instinctively Sergeant Thompson rushes towards
+you and tackles you to the ground.
+.
+execute "+fight"
+}
+
+location pitch : darwin cricket oval pitch
+has			OUTDOORS KNOWN
+short		name "Darwin Oval (on the pitch)"
+west			outfield
+south		south_of_oval
+
+{look
+if here has VISITED
+return
+endif
+print
+You are standing on the cricket pitch in the centre of the oval.
+The cricket pitch is badly damaged at end of a long wet season.^
+.
+}
+
+{movement
+if destination = nowhere
+print
+From here you can either head west towards the main camp or south
+towards the harbour.^
+.
+return true
+endif
+return false
+}
+
+constant NO_GO 22000
+
+location assembly_area: assembly area
+has			OUTDOORS KNOWN
+short		the "assembly area"
+east			outfield
+southeast	gun_emplacement
+north		outside_command_post
+south		hut
+northwest	NO_GO
+northeast	NO_GO
+southwest	NO_GO
+
+{look
+if here has VISITED
+return
+endif
+print
+This flat, bare-earth area connects the four anti-aircraft guns. To the
+southeast a gap in the tall earth banks that surround gun number three
+allows entry to your station. To the south, between guns three and four,
+is a low hut that serves as primitive sleeping and eating quarters
+for you and the rest of your crew. To the north, a path through the tall dry
+grass between guns one and two leads to the Command Post while the oval lies
+to the east. Beside you a
+crude timber frame suspends an old oxygen cylinder just above a shallow
+pit in the ground.^
+.
+}
+
+{eachturn
+if total_moves = 1
+print
+^Soldiers run past you towards the four gun emplacements as bombs
+begin to fall on ships in the harbour.^
+.
+move gunners to assembly_area
+set fader[background_channel] = 1
+timer 500
+endif
+if total_moves = 2
+write ^
+execute "+helmet_on"
+endif
+}
+
+{movement
+if script_stage = during_raid
+execute "+helmet_on"
+set total_moves + 1
+set time = false
+return true
+else
+if destination = NO_GO
+print
+There is no need to enter the other crew's gun emplacements.^
+.
+return true
+endif
+endif
+return false
+}
+
+{+helmet_on
+if hat has WORN
+print
+Someone grabs your hat from behind and replaces it roughly with
+an ill-fitting helmet
+.
+else
+print
+From behind you, someone places an ill-fitting helmet on your head
+.
+endif
+print
+as you are barrelled through the entrance to gun number three.^^
+.
+move player to gun_emplacement
+move hat to limbo
+move helmet to player
+look
+print
+Crew members scramble to their stations around the tall anti-aircraft
+gun mounted here; the drone of the approaching single-engine Japanese
+~Val~ dive bombers sharpens to a distinctive strum.^^
+Your heart pounds as the routine of countless drills races through
+your mind: get a shell from Smith, set the fuse on it to the appropriate
+time for the height of the aircraft then pass it to Jenkins for loading.^^
+You wait nervously for Smith as he disappears into the armoury to fetch
+a shell.^
+.
+move gunners to gun_emplacement
+move jenkins to gun_emplacement
+move thompson to gun_emplacement
+}
+
+object iron_bar : iron bar
+short		an "iron bar"
+long			function
+mass			5
+
+{long
+if iron_bar hasnt TOUCHED
+print
+An iron bar used to strike the cylinder in order to raise the alarm is
+resting on the ground by the frame.^
+.
+else
+write "An iron bar rests on the ground here.^"
+endif
+}
+
+{throw_at_cylinder
+print
+The iron bar hits the cylinder with a sharp clang.^
+.
+}
+
+{examine
+print
+The iron bar is about one foot long and covered in rust.^
+.
+}
+
+{clean
+print
+You've got more important things to be doing.^
+.
+set time = false
+}
+
+object chain : chain
+has			NOT_IMPORTANT
+short		a "chain"
+
+object frame : crude wooden frame
+short		a "crude wooden frame"
+
+{examine
+print
+The timber frame is made from old scraps of hardwood.^
+.
+}
+
+object cylinder : old oxygen cylinder
+short		an "old oxygen cylinder"
+
+{examine
+print
+The base of the oxygen cylinder has been cut off to make a crude
+alarm bell. It is suspended from the wooden frame by a short length of
+chain welded to its valve.^
+.
+}
+
+{look_in
+print
+The cylinder is completely empty.^
+.
+}
+
+{play
+if iron_bar is *held
+proxy "ring cylinder with iron bar"
+return
+endif
+print
+The cylinder makes a dull ring as you slap it with your hand.^
+.
+}
+
+{attack_with_iron_bar : play_with_iron_bar
+volume 100 foreground_channel
+sound SOUND_Alarm foreground_channel
+print
+As the loud ringing echoes around the camp confused voices can be heard in
+the gun emplacements. Up-turned faces scan the sky, for any sign of a
+second wave of attacking bombers.^^
+Within seconds Sergeant Witheridge runs down from the north and stands
+before you. ~What have you seen, Davis?~^^
+~Well, nothing,~ you reply feebly. ~I just, I...~^^
+Sergeant Witheridge grabs the iron bar from you. ~What's wrong with you
+Davis?~^
+.
+move witheridge to assembly_area
+move iron_bar to witheridge
+# FAKE TIME PASSING SO EACHTURN DOESN'T RUN
+set time = false
+set total_moves + 1
+}
+
+{shoot_with_rifle_override
+volume 100 foreground_channel
+sound SOUND_FiringRifle	foreground_channel
+write "You take aim and fire a shot at the cylinder.^"
+set next_sound = SOUND_MetalicClang
+set rifle(status) - 1
+}
+
+object banks : tall earth banks bank
+short		the "tall earth banks"
+has			PLURAL
+
+{climb
+print
+There is a perfectly serviceable entrance to the southeast.^
+.
+endif
+}
+
+{examine
+print
+The banks are designed to deflect the shockwaves of
+an exploding bomb over the gun crew inside the emplacement.
+.
+}
+
+location gun_emplacement : vickers 3.7 anti-aircraft bloody guns gun emplacement
+has			OUTDOORS KNOWN
+short		the "gun emplacement"
+northwest	assembly_area
+out			assembly_area
+in			armoury
+south		armoury
+
+{look
+if here has VISITED
+return
+endif
+if @ = 1
+return
+endif
+print
+The floor of the gun emplacement is a circular concrete pad almost ten
+metres in diameter. Sandbag revetments, back filled with earth on
+the outside, form the perimeter of the pit. The 3.7 inch Vickers
+anti-aircraft gun stands bolted to the concrete, its barrel
+protruding through fragments of camouflage netting suspended high
+above your head. The only exit from the emplacement is a gap in the
+revetments to the northwest, while a small room set into the south wall
+serves as an armoury.^
+.
+}
+
+{after_look
+if script_stage = after_raid
+print
+^The other members of your crew are busily cleaning the anti-aircraft
+gun after its first action in some time. Oily rags are wrapped around
+long-handled brushes then pushed up the length of the barrel from the
+loading tray.^
+.
+endif
+}
+
+{movement
+if compass = up
+proxy "climb on gun"
+return
+endif
+if destination = nowhere
+print
+From here you can either go south into the armoury or northwest to
+the assembly area.^
+.
+return
+endif
+if script_stage > during_raid
+return false
+endif
+if compass = south : compass = in
+if shell(parent) = smith
+if setting_tool(parent) = armoury
+print
+As you head for the armoury Smith emerges and forces
+a shell for the anti-aircraft gun and the fuse setting tool
+into your hands. ~You just stay at your post Davis, I
+can do my job.~^
+.
+move setting_tool to player
+ensure smith has FIRST
+else
+print
+As you head for the armoury Smith emerges and forces a new
+shell into your hands. ~You just stay at your post Davis, I
+can do my job.~^
+.
+endif
+move smith to gun_emplacement
+move shell to player
+return
+endif
+ifall second_shell(parent) = smith : smith has DONE
+print
+You try to push your way past Smith who drops the shell he is
+carrying and grabs you, pinning your arms to your side. ~What are
+you doing, Davis?~ he yells in your ear, confusion and concern in
+his voice. Fumbling desperately he relieves you of the fuse setting
+tool and recovers the shell from the ground as another bomb explodes
+nearby.^^
+.
+execute "+red_card"
+return
+endif
+ifall second_shell(parent) = smith : smith hasnt DONE
+print
+~Where are you going, Davis?~ Smith shouts over the deafening
+explosions as he steps in your path. ~I've already got another
+shell for you!~^
+.
+ensure smith has DONE
+return
+endif
+print
+~Just wait here, Davis, I'll fetch the shells for you.^
+.
+ensure smith has DONE
+return
+endif
+if compass = northwest : compass = out
+print
+You walk away from your station. For what reason only you know,
+but you just can't stay. You hear Sergeant Thompson's voice
+screaming at you from over your shoulder, but faintly as a
+whisper. The world now somehow silenced in your mind, even the
+exploding bombs muted and distant.^^
+You arive at the assembly area and sit. Your mind slowly focuses on the
+sensation of a hand on your shoulder and you look up to see Sergeant
+Thompson's face, red with frustration and rage. ~Come on lad,~ he says
+with a contrasting tone of compassion.^^
+.
+execute "+taken_off"
+return true
+endif
+return false
+}
+
+integer TURNS_WAITING 0
+
+{eachturn
+ifall script_stage > during_raid
+return
+endif
+if random > 80
+execute "+bomb_explodes"
+endif
+ifall smith(parent) = armoury : smith has FIRST
+write "^Smith returns from the armoury with another shell and "
+move smith to gun_emplacement
+if shell(parent) = limbo
+write "hands it to you.^"
+move shell to player
+else
+write "stands beside you.^"
+set TURNS_WAITING = 1
+endif
+endif
+ifall smith(parent) = armoury : smith hasnt FIRST
+print
+^Smith stumbles then regains his footing as he emerges from the
+armoury at speed carrying a shell for the anti-aircraft gun and
+your fuse setting tool. In two more strides he crosses the
+emplacement and hands them both to you.^
+.
+move setting_tool to player
+move shell to player
+move smith to gun_emplacement
+ensure smith has FIRST
+return
+endif
+if smith(parent) = gun_emplacement
+if second_shell(parent) != smith
+write "^Smith ducks back into the armoury.^"
+move smith to armoury
+move second_shell to smith
+else
+if shell(parent) = limbo
+write "^Smith hands you a new shell.^"
+move second_shell to limbo
+move shell to player
+endif
+endif
+endif
+}
+
+{+bomb_explodes
+set INDEX = @
+set INDEX % 3
+if INDEX = 0
+print
+^A nearby blast sends dust and debris over the revetments into the
+gun emplacement.^
+.
+endif
+if INDEX = 1
+print
+^Shockwaves and dissonance as a bomb explodes nearby.^
+.
+endif
+if INDEX = 2
+print
+^Another bomb falls too close for comfort just beyond the camp
+perimeter.^
+.
+endif
+}
+
+object armoury_obj : armoury
+short		the "armoury"
+
+{examine : look_in
+print
+The armoury is simply an alcove in the revetments filled with
+crates of anti-aircraft shells.^
+.
+}
+
+{enter
+proxy "go south"
+}
+
+object harbour : ship ships darwin harbour
+short		the "ships in Darwin Harbour"
+has			PLURAL OUT_OF_REACH
+
+{examine
+print
+The SS Zealandia, the ship you arrived from Sydney on; the MV Neptuna and
+SS British Motorist all lie sunk in the Harbour from the earlier raids.
+A small fleet of operational transport ships lie at anchor near the remains
+of the wharf.^
+.
+}
+
+object aircraft : aircraft airplanes planes kittyhawks fighters val dive bombers
+short		the "aircraft"
+has			PLURAL OUT_OF_REACH
+
+{+default_look_up : *examine_aircraft
+if here hasnt OUTDOORS
+write "You just see the ceiling.^"
+return
+endif
+if script_stage = during_raid
+print
+You see the Japanese ~Val~ bombers approaching Darwin Harbour from the
+northeast at between fifteen and twenty thousand feet. Depending on
+air pressure, humidity and wind speed, experience tells you that you
+will need a fuse setting somewhere between four and five seconds.^
+.
+return true
+endif
+ifall script_stage > tally_ho : script_stage < after_raid
+print
+The American P40 Kittyhawk fighters circle the ~Val~ dive bombers out
+over the waters of Darwin Harbour. Short bursts of machine gun fire
+cut through the mixture of discordant engines.^
+.
+return true
+endif
+write "Just blue sky.^"
+}
+
+{shoot_with_rifle_override
+volume 100 foreground_channel
+sound SOUND_FiringRifle	foreground_channel
+write "Predictably, you miss.^"
+set rifle(status) - 1
+if here = gun_emplacement
+if @ = 1
+print;
+^~You get'em, Davis,~ Jenkins says with a laugh. ~I don't know why we
+need the Yanks with Davis here fighting the Japs single handed.~^
+.
+endif
+endif
+if here = command_post
+if @ = 1
+print;
+^~Don't waste your amunition, Davis,~ Lieutenant Roberts says.^
+.
+endif
+endif
+}
+
+{+fight
+print
+You push yourself up with your arms only to be kicked to the ground again by
+a heavy boot.
+From out of view, arms reach beneath your own and drag you unceremoniously
+towards the command post.^^
+You sit bruised and dejected on the ground as the duty guard watches over
+you. Lieutenant Roberts arrives and begins to discuss with Sergeant
+Witheridge exactly how you will be spending the rest of the war.^^
+.
+execute "+game_over"
+}
+
+{+game_over
+style note
+write "The game is over.^^"
+style normal
+execute "+full_score"
+endgame
+}
+
+{+full_score
+if score = 0
+return
+endif
+write "You have earned:^"
+if the_gun has SCORED
+write "   10% for shooting down the ~Val~ dive bomber.^"
+endif
+}
+
+{+red_card
+print
+Sergeant Thompson jumps down from his station, grabs you and spins you
+around to face the gap in the revetments. ~You picked a fine time to fall
+to pieces, Davis,~ he growls as he marches you out to the assembly
+area. ~Montgomery you act as relieving firer, Smith you fetch and
+set.~^^
+.
+execute "+taken_off"
+}
+
+{+taken_off
+print
+Shocked and confused, you walk with Sergeant Thompson towards the command
+post.^^
+.
+move thompson to outside_command_post
+move kryten to outside_command_post
+look
+print
+^~Wait here,~ Thompson says as he heads into the command post.^^
+.
+if script_stage = during_raid
+print
+You watch as Sergeant Thompson shouts into Lieutenant Robert's ear
+over the sound of the firing anti-aircraft guns.
+.
+else
+print
+You watch silently as Sergeant Thompson and Lieutenant Roberts talk.
+.
+endif
+print
+A brief nod from Lieutenant Roberts and Sergeant Thompson returns to where
+you are standing. ~Don't move from here. Lieutenant Roberts will deal with
+you when this raid is over.~ With that, Sergeant Thompson heads back to his
+gun crew.^^
+.
+move thompson to gun_emplacement
+if script_stage = during_raid
+print
+From the loud hailer in the command post comes the call of ~Tally-ho~ --
+American P40 Kittyhawk fighters have engaged the remaining bombers and
+all gun crews are to cease fire.^^
+.
+set script_stage = tally_ho
+volume 25 timed_channel
+sound SOUND_AircraftBattle timed_channel
+endif
+print
+Sergeant Witheridge, the Gun Position Officer's Assistant, emerges from
+the command post and signals with obvious contempt for you to follow him
+back inside.^^
+.
+move kryten to command_post
+look
+print
+^~We aren't all cut out for the stresses of combat Davis, I can accept
+that,~ Lieutenant Roberts says as he walks towards you. ~Drills with wooden
+shells against an imaginary enemy just don't prepare a man for the reality
+of the fight.~^^
+You are relieved that he seems more angry with the system than you.^^
+~I can't risk putting you back at your post. You know we are short staffed
+since the army pulled inland, though, so I've got another task for you. We
+set up an observation post on Melville Island soon after the first raids
+in February to make sure we had more warning next time and today that
+system has let me down, too.~^^
+Lieutenant Roberts pauses to allow you to absorb your share of his
+disappointment.^
+.
+}
+
+{+mission_briefing
+print
+~We haven't been able to raise Melville on the radio since, so I need you
+to head out there and find out what is going on. They may have been bombed
+themselves or they may just be having radio trouble. Either way I need you
+to find out and report back to me so I've sent someone to ask Miki
+to take you out to the island.
+.
+ifall rifle is *held : kit_bag is *held
+print
+I see you've already got your gear so just head down to the beach south
+of the oval and he'll meet you there.~^
+.
+return
+endif
+if rifle is *held : kit_bag is *held
+write "Go grab the rest of "
+else
+write "Go grab "
+endif
+print
+your gear then head down to the beach south of the oval. Miki will
+meet you there.~^
+.
+}
+
+object the_gun : vickers 3.7 anti-aircraft gun
+short		an "anti-aircraft gun"
+
+{examine
+print
+The long barrel of the gun protrudes high above the tops of the revetments,
+a monument to human defiance and desperation. Shells are placed into the
+loading tray near the rear of the gun while two metal wheels at the front
+are used to adjust the gun's altitude and azimuth. The gun is firmly
+bolted to the concrete floor of the emplacement.^
+.
+if script_stage = during_raid
+print
+^Jenkins is standing up on the gun's mount near the loading tray, ready
+to receive shells from you while Sergeant Thompson is standing beside
+him, his hand resting eagerly on the firing lever. Two more gunners are
+stationed by the guidance wheels.^
+.
+endif
+}
+
+{enter : climb_up
+if script_stage = during_raid
+print
+A stern glare from Sergeant Thompson sends you back to your assigned
+post at ground level.^
+.
+return
+endif
+if script_stage = tally_ho
+print
+Your view of the air battle above would be no better from atop the
+anti-aircraft gun.^
+.
+return
+endif
+if script_stage = after_raid
+print
+The other members of your crew are too busy cleaning the gun to have
+you go climbing all over it.^
+.
+return
+endif
+}
+
+{fire : shoot : use
+print
+You just need to set the fuse on the shells and pass them to Jenkins, then
+Sergeant Thompson will fire the gun.^
+.
+}
+
+object wheels : metal wheel wheels
+has			PLURAL
+short		the "metal wheels"
+
+{examine
+print
+The two metal guidance wheels are attached to the front of the
+anti-aircraft gun. Beside each wheel is a pair of dials. The first
+shows positioning information send from the command post, the second
+shows the current position of the gun. During operation the gunners
+stationed at the wheels keep the two dials aligned.^
+.
+}
+
+{turn : use
+print
+The metal guidance wheels are operated by gunners four and five. Your role
+is to set the fuse on the shells before passing them to Jenkins for
+loading.^
+.
+}
+
+object firing_lever : firing lever
+short		a "firing lever"
+has			OUT_OF_REACH
+
+{examine
+print
+Just a bare metal handle. Sergeant Thompson pulls the firing lever once
+Jenkins has finished loading the shell.^
+.
+}
+
+object revetments : revetment revetments sandbag sandbags
+short		the "sandbag revetments"
+
+{examine
+print
+The sandbag revetments are approximately five feet tall.^
+.
+}
+
+{climb
+print
+The camouflage netting blocks the tops of the revetments.^
+.
+}
+
+object netting : fragments of camouflage netting
+short		some "fragments of camouflage netting"
+has			PLURAL OUT_OF_REACH
+
+{examine
+print
+The fragments of camouflage netting stretch across the top of the
+revetments leaving the minimum gap required to aim and fire the gun.^
+.
+}
+
+object helmet : steel helmet
+short		a "steel helmet"
+long			"There is a wide-brimmed steel helmet on the ground.^"
+has			WEARABLE WORN CONTAINER
+parent		limbo
+mass			5
+capacity		5
+
+{examine
+print
+The helmet is made from steel with a hessian cover to prevent reflections.
+Attached to the inside the helmet is a cruciform rubber skull pad and an
+elasticated web chinstrap.^
+.
+}
+
+#{wear
+#print
+#   The water pours through your hair and down your back. You sigh at
+#   the thought of how refreshing that would have been if the water in
+#   this place wasn't as damned hot as the air.^
+#.
+#}
+
+object chinstrap : elasticated web chinstrap
+short		a "chinstrap"
+has			NOT_IMPORTANT
+parent		helmet
+
+object skullpad : cruciform rubber skull pad
+short        a "skull pad"
+has			NOT_IMPORTANT
+parent       helmet
+
+location armoury : armoury
+short		the "armoury"
+has			KNOWN
+out			gun_emplacement
+north		gun_emplacement
+
+{look
+if here has VISITED
+return
+endif
+print
+Dim, humid and filled with dust. Crates of neatly stacked shells
+line the sand-bag walls.^
+.
+}
+
+object crates : crates stacked shells
+short		the "crates of neatly stacked shells"
+has			PLURAL
+
+{take
+print
+You don't need to take the shells.^
+.
+}
+
+{examine
+print
+The timber crates are stacked floor to ceiling, each containing a dozen
+anti-aircraft shells.^
+.
+}
+
+object setting_tool : fuse setting tool short wooden handle steel ring setter
+short		a "setting tool"
+long			"A setting tool rests nearby.^"
+mass			4
+
+{examine
+print
+The fuse setting tool is simply a steel ring attached to a short wooden
+handle. The steel ring has two small protrusions
+that lock into the setting ring of a shell when the tool is placed
+over the nose of the shell. Once in position, the tool is then
+rotated to set the fuse to the desired duration.^
+.
+}
+
+grammar set *present >set
+
+{+set_to_integer
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write "You can't set " noun1{the} " to anything.^"
+set time = false
+}
+
+grammar put **held over *present	>insert_on
+grammar insert **held over *present	>insert_on
+
+{insert_on_shell : insert_in_shell : insert_in_fuse : insert_on_fuse : use
+print
+To set the fuse you need to specify a length of time to set it to.
+For example, to set the fuse to three and a half seconds, simply type ~\
+.
+style input
+write "set the fuse to 35"
+style normal
+write "~.^"
+}
+
+{insert_on_cricket_ball
+execute "set_to_integer_cricket_ball"
+}
+
+attribute TALKED_TO
+
+object smith : soldier gunner smith
+has			ANIMATE
+short		name "Gunner Smith"
+long			function
+mass			heavy
+
+{long
+if script_stage = after_raid
+write "Smith is here helping to clean the gun.^"
+return
+endif
+if second_shell(parent) = smith
+write "Smith is standing beside you holding an anti-aircraft shell.^"
+else
+write "Smith is standing beside you.^"
+endif
+}
+
+{examine
+print
+Only seventeen years of age, Smith is the youngest gunner based here
+and also your closest friend.^
+.
+}
+
+{talk_to
+if @+mission_briefing = 0
+print
+You and Smith take a moment to reassure each other that you are
+indeed still alive.^
+.
+else
+if smith hasnt TALKED_TO
+print
+~I've got to head out to Melville,~ you tell Smith. ~Roberts says they
+can't contact the guys out there and he wants me to find out what is
+going on.~^^
+~Is anyone going with you?~ Smith asks. hopeful of the chance to join
+you.^^
+~Miki is taking me out there, but Roberts says he can't spare any more
+of the crew.^
+.
+ensure smith has TALKED_TO
+else
+print
+You take the opportunity to say a few last words to Smith before you
+leave.^
+.
+endif
+endif
+}
+
+{ask_for_second_shell
+print
+Smith shakes his head. ~You can only fire one at a time! I'll hold this
+one while you set the other one and get it fired.~^
+.
+}
+
+{attack : attack_with_bar : kick
+print
+Driven by a sudden need to lash out at someone, you target Smith as
+an innocent friend. You manage to land two good blows before being
+knocked to the ground from behind.
+.
+execute "+fight"
+}
+
+{attack_with_rifle
+proxy "shoot " noun1{names} " with rifle"
+}
+
+{shoot_with_rifle_override
+volume 100 foreground_channel
+sound SOUND_FiringRifle foreground_channel
+print
+You raise your rifle, take aim and fire. The slug enters Smith's shoulder
+and sends him staggering backwards.
+Instinctively Sergeant Thompson rushes towards
+you and tackles you to the ground.
+.
+execute "+fight"
+}
+
+object second_shell : smith's brass anti-aircraft shell
+short		name "Smith's anti-aircraft shell"
+long			"On the ground there is a brass anti-aircraft shell^"
+mass			10
+parent		limbo
+
+object shell_casing : hot brass anti-aircraft shell casing
+short		a "hot shell casing"
+has			NOT_IMPORTANT
+parent		limbo
+
+object shell : brass anti-aircraft shell
+short		a "brass anti-aircraft shell"
+long			"On the ground there is a brass anti-aircraft shell^"
+mass			10
+parent		smith
+
+{examine
+print
+The shell is about one foot long and made from brass. Around the
+nose cone of the shell is a series of rings that form a complex
+powder fuse.^
+.
+}
+
+{set_to_integer : set_to_integer_with_setting_tool
+execute "set_to_integer_fuse"
+}
+
+{give_to_smith : throw_at_smith
+write "~Don't give it back to me"
+if fuse(timer) = 0
+write ", set the fuse then give it to Jenkins for loading.~^"
+else
+write ", Jenkins does the loading!~^"
+endif
+}
+
+{give_to_thompson : throw_at_thompson
+write "~What are you doing, Davis! "
+if fuse(timer) = 0
+write "Set the fuse then give "
+else
+write "You give "
+endif
+write " the shell to Jenkins for loading,~ Sergeant Thompson bellows.^"
+}
+
+{give_to_jenkins : give_to_gunners : throw_at_jenkins
+if fuse(timer) = 0
+if shell(fired_not_set) = 2
+print
+~Davis!~ Sergeant Thompson bellows as you go to pass the shell
+to Jenkins. ~I was watching you that time and that shell is
+still disarmed, no wonder they aren't going off!~
+.
+set shell(fired_not_set) + 1
+return
+endif
+if shell(fired_not_set) = 3
+print
+~What did I just say to you!~^^
+.
+execute "+red_card"
+return
+endif
+set shell(fired_not_set) + 1
+endif
+if shell(total_shots) = 0
+print
+You heave the shell up to Jenkins who places it into the loading tray
+then rams it home into the chamber. Without pause, Sergeant Thompson
+pulls the firing lever and the gun responds with a deafening crack.
+The barrel recoils, slowed by the oil-filled dampers, and the hot
+shell casing is ejected onto the ground along with a plume of acrid
+smoke.^^
+.
+move shell_casing to gun_emplacement
+endif
+if shell(total_shots) = 1
+print
+You pass the shell up to Jenkins who loads it into the gun. Sergeant
+Thompson pulls the firing lever and the gun responds with a deafening
+crack. The barrel recoils, and the hot shell casing is ejected along
+with another plume of hot smoke that fills the humid air of the gun
+emplacement.^^
+.
+endif
+if shell(total_shots) > 1
+print
+Jenkins takes the shell from you then loads it for Sergeant Thompson
+to fire.^^
+.
+endif
+execute +did_it_hit?
+set fuse(timer) = 0
+move shell to limbo
+}
+
+{+did_it_hit?
+set shell(total_shots) + 1
+if fuse(timer) != 0
+volume 100 foreground_channel
+sound SOUND_ArtilleryWithExplosion foreground_channel
+if shell(total_shots) = 1
+print
+The shell shrieks through the air, climbing through a steep
+parabolic arc towards the closest of the approaching ~Val~
+dive bombers.
+.
+endif
+print
+As the fuse expires the shell detonates into a cloud of white smoke
+.
+else
+volume 100 foreground_channel
+sound SOUND_ArtilleryNoExplosion foreground_channel
+print
+The shell shrieks through the air, climbing through a steep parabolic
+arc until it disappears out of view. The gun crew waits for the shell
+to explode, but eventually it becomes obvious that it must have hit
+the sea by now.^
+.
+return
+endif
+if fuse(timer) = 42
+print
+that envelopes the aircraft. After what seems like minutes, the dive
+bomber emerges from the cloud in an ever tightening spiral. You watch
+with mixed emotions as the fuselage plunges into the warm waters of
+the Timor Sea.^^
+The rest of the gun crew erupts into a loud cheer as you scan the
+skies for any sign of parachutes.^^
+From the loud hailer in the command post comes the call of ~Tally-ho~ --
+American P40 Kittyhawk fighters have engaged the bombers and all
+gun crews are to cease fire.^
+.
+set script_stage = tally_ho
+move smith to gun_emplacement
+move second_shell to limbo
+ensure the_gun has SCORED
+points 10
+else
+if fuse(timer) < 32
+write "significantly below"
+endif
+ifall fuse(timer) > 31 : fuse(timer) < 38
+write "well below"
+endif
+ifall fuse(timer) > 37 : fuse(timer) < 40
+write "below"
+endif
+ifall fuse(timer) > 39 : fuse(timer) < 42
+write "just below"
+endif
+ifall fuse(timer) > 42 : fuse(timer) < 44
+write "just above"
+endif
+ifall fuse(timer) > 43 : fuse(timer) < 46
+write "above"
+endif
+ifall fuse(timer) > 45 : fuse(timer) < 52
+write "well above"
+endif
+if fuse(timer) > 51
+write "significantly above"
+endif
+write " the aircraft.^"
+endif
+set fuse(timer) = 0
+}
+
+constant timer			3
+constant fired_not_set	4
+constant total_shots	5
+
+object fuse : fuse on shell ring rings holes felt gunpowder
+short		the "powder fuse"
+parent		shell
+
+{examine
+if @ = 1
+style note
+print
+~There are two types of fuse on shells, mechanical fuses and powder
+fuses. Powder fuses don't store very well in the tropics - we
+had powder fuses.~
+.
+style normal
+write " -- Jack Mullholand^^"
+endif
+print
+The fuse is composed of a series of three rings, each filled with gunpowder
+and separated by felt.
+The lugs on the fuse setting tool are designed to engage with small
+holes in the top ring in order to rotate it to the required time. Markings
+around the fuse ring indicate the time in tenths of a second, starting at
+20 and finishing at 100. The fuse on this shell is currently set to
+.
+if fuse(timer) = 0
+write "the disarmed position.^"
+else
+write fuse(timer) ".^"
+endif
+}
+
+{set_to_integer : set_to_integer_with_setting_tool
+if setting_tool isnt *held
+write "You will need the setting tool to set the fuse on the shell.^"
+return
+endif
+if $integer < 20 : $integer > 100
+print
+The fuse can only be set to a number between 20 and 100, being the
+amount of time in tenths of a second until the shell explodes after
+being fired.^
+.
+return
+endif
+write "You slide the setting tool down over the nose of the shell until its "
+write "lugs engage with the holes in the fuse ring. Rotating the tool "
+write "you set the fuse to " $integer " tenths of a second.^"
+set fuse(timer) = $integer
+if fuse hasnt FIRST
+print
+^~Right'oh Davis, pass the shell up to me now,~ Jenkins calls down from
+his post at the loading tray.^
+.
+endif
+ensure fuse has FIRST
+}
+
+{set : *set_shell : use
+print
+To set the fuse you need to specify a length of time to set it to.
+For example, to set the fuse to three and a half seconds, simply type ~\
+.
+style input
+write "set the fuse to 35"
+style normal
+write "~.^"
+}
+
+location outside_command_post : outside command post
+has			OUTDOORS KNOWN
+short		name "outside the command post"
+north		command_post
+in			command_post
+south		assembly_area
+
+{enter
+proxy "in"
+}
+
+{look
+if here has VISITED
+return
+endif
+print
+Tall dry grass surrounds the low sand-bag walls of the command post. A
+well-worn track through the grass leads south to the assembly area.^
+.
+}
+
+location command_post : command post
+has			OUTDOORS KNOWN
+short		the "command post"
+south		outside_command_post
+out			outside_command_post
+
+{look
+if here has VISITED
+return
+endif
+print
+The command post is nothing more than a roofless area formed by low
+sand-bag walls. Of prominence here is the Kerrison Predictor, an
+electro-mechanical computer atop a timber tripod that sends positioning
+information to four guns.^
+.
+}
+
+{after_look
+ifall @ = 1 : @+taken_off = 0
+set turn_count = total_moves
+set turn_count - turn_paged_at
+print
+^~Davis,~ Lieutenant Roberts says as you enter.
+.
+if turn_count < 5
+print
+~Thank you for getting here so quickly.
+.
+endif
+ifall turn_count > 4 : turn_count < 16
+print
+~Thank you for coming.
+.
+endif
+if turn_count > 15
+print
+~I thought you'd never get here.
+.
+endif
+print
+Soon after the first raids in February we set up an observation post on
+Melville Island to provide an early warning of aircraft approaching
+from the north. As you have just seen for yourself, we didn't get that
+warning.^
+.
+endif
+}
+
+{movement
+if destination = nowhere
+write "South is the only way out from here.^"
+return true
+endif
+if @+map_given = 0
+execute "+map_given"
+endif
+return false
+}
+
+{eachturn
+if @+mission_briefing = 0
+write ^
+execute "+mission_briefing"
+endif
+}
+
+{+map_given
+print
+~Before you go Davis, there's one last thing,~ Lieutenant Roberts says as
+he wipes the sweat from his brow.
+~In order to prevent enemy boats from landing in Snake Bay where the
+observation post is, the Navy laid a series of concrete mooring blocks,
+each twenty feet across.~^^
+Lieutenant Roberts reaches into the top pocket of his shirt and hands you
+a folded piece of paper.^^
+~This map shows the precise location of these blocks. They're too deep to
+affect Miki's canoe, but there is a motor launch based on Melville and if
+you need to bring that back you'll need to know where they are.
+The tidal flow is restricted in Snake Bay and with a six foot draft
+the launch draws too much to clear them, even on a high tide.~^^
+~Thank you, sir,~ you reply at attention.^^
+~Oh, and Davis, be careful. I've got a bad feeling about this one but with
+the rest of the army having pulled further inland I just can't spare any
+more men to go with you.~^^
+~I will, sir.~^^
+You exchange salutes with Lieutenant Roberts.^^
+.
+move map to player
+}
+
+object map : map of snake bay paper
+short	a "map of Snake Bay"
+long		"The map of Snake Bay is on the ground.^"
+mass		2
+parent   roberts
+
+{examine
+print
+The map shows Snake Bay at Melville Island and the mooring blocks laid by
+the Navy as an obstruction to enemy vessels. The radio tower for the
+observation post is located on the eastern headland of the Bay's entrance,
+reaching 76 metres above mean high water springs. Bearings
+from the radio tower are marked on the map to aid with navigation. Most of
+the shoreline of the north side of Melville Island is steep rocky cliffs.
+The wharf at the beach inside the bay is the only suitable landing site.^^
+.
+image IMAGE_MelvilleMapInGame
+style note
+print
+NOTE: A full-sized version of this map is include with The Bloody Guns for
+the purpose of navigation during the game. If you are unable to use this map
+type
+.
+style input
+write "read map"
+style note
+write " for a text description of a path through the bay.^"
+style normal
+}
+
+{read
+style note
+print
+NOTE: Reading this map provides different information to examining it.^^
+.
+style normal
+print
+You approach Snake Bay heading east. Continue east until you see the radio
+tower at a bearing of 120 degrees then turn to starboard until heading on
+a course of 200 degrees. Once the radio tower is at a bearing of 20 degrees,
+turn to port travelling on a course of 100 degrees. When the tower is at a
+bearing of 330 degrees, turn hard to starboard until heading on a course of
+250 degrees. This will take you to the wharf.^
+.
+}
+
+{give_to_roberts : give_to_witheridge
+print
+~You're going to need the map, not me.~^
+.
+}
+
+{give_to_miki : show_to_miki
+print
+~It's okay balanda, I go to Snake Bay plenty times. I know the way.~^
+.
+}
+
+object predictor : kerrison predictor
+short		the "Kerrison Predictor"
+
+{examine
+print
+The Kerrison Predictor is an electro-mechanical computer atop a timber
+tripod. It is used to calculate the position of approaching high-level
+bombers when all four guns are fired as a salvo. It is operated by
+highly-trained staff in the command post with gunners at each of the
+emplacements turning the positioning wheels to keep the guns aligned with
+the indicated angle.^
+.
+}
+
+object roberts : lieutenant roberts
+short		name "Lieutenant Roberts"
+long			"Lieutenant Roberts is standing by the Kerrison Predictor.^"
+has			ANIMATE
+mass			heavy
+
+{examine
+print
+Lieutenant Roberts is tall and slightly built with short grey hair. For a
+career military man you have always found him surprisingly sensitive and
+introspective.^
+.
+}
+
+{attack : attack_with_bar : kick
+print
+You barely manage to land one blow on Lieutenant Roberts before Sergeant
+Witheridge has his side arm pointed at your head. Soldiers restrain you as
+Lieutenant Robert's stares at you with outrage and disbelief.^^
+Freedom of action is not a luxury you enjoy until long after the war is
+over.^
+.
+execute "+game_over"
+}
+
+{attack_with_rifle
+proxy "shoot " noun1{names} " with rifle"
+}
+
+{shoot_with_rifle_override
+volume 100 foreground_channel
+sound SOUND_FiringRifle foreground_channel
+print
+You raise your rifle and fire, shattering Lieutenant Robert's skull.
+An odd silence fills the room for the few seconds before his fate
+becomes your own.^^
+.
+execute "+game_over"
+}
+
+{talk_to
+set MENU_MODE = MENU_PROXY
+execute "+menu_clear_options"
+execute "+menu_add_option<Ask Lieutenant Roberts about Melville Island<ask roberts about melville"
+execute "+menu_add_option<Ask Lieutenant Roberts about Miki <ask roberts about miki"
+if @+map_given != 0
+execute "+menu_add_option<Ask Lieutenant Roberts about the canoe<ask roberts about canoe"
+execute "+menu_add_option<Ask Lieutenant Roberts about the map<ask roberts about map"
+endif
+}
+
+{ask_about_melville_obj
+print
+~Is there anything else you can tell me about Melville, sir?~^^
+~The observation post is setup inside an old house at Snake Bay.
+I've got three men stationed up there: Johnson, Holt and Coyle. They are
+all good men, and although the post has only be operational for a few
+weeks, everything seemed to be running smoothly until now.~^
+.
+}
+
+{ask_about_miki
+print
+~What do you think of Miki, Sir?~^^
+~He's a good lad, very loyal. I don't mind if he stays with you on
+Melville but don't forget he isn't involved in any official capacity, he's
+only volunteered to get you there and back.~^
+.
+}
+
+{ask_about_canoe
+print
+~A canoe, sir?~^^
+~You'll be fine, Davis. Miki makes the trip out there all the time.~^
+.
+}
+
+{ask_about_map
+print
+~Just keep it safe. I don't want it falling into enemy hands.~^
+.
+}
+
+object witheridge : sergeant witheridge
+short		name "Sergeant Witheridge"
+long			function
+has			ANIMATE
+mass			heavy
+
+{examine
+print
+Sergeant Witheridge has the look of a man under constant stress.^
+.
+}
+
+{long
+if here = command_post
+write "Sergeant Witheridge waits patiently by Lieutenant Roberts.^"
+else
+write "Sergeant Witheridge is standing here.^"
+endif
+}
+
+{ask_for_bar_override
+if @ = 1
+print
+~I think I'll hang on to it for now.~
+.
+return
+endif
+if @ = 1
+print
+~Don't push your luck, Davis.~^
+.
+return
+endif
+print
+Sergeant Witheridge ignores you.^
+.
+}
+
+{attack : attack_with_bar : kick
+if here != command_post
+print
+You barely manage to land one blow before Sergeant Witheridge knocks
+you to the ground.
+.
+execute "+fight"
+else
+print
+You barely manage to land one blow before
+Lieutenant Roberts has his side arm pointed at your head. Soldiers
+restrain you as Lieutenant Robert's stares at you with outrage and
+disbelief.^^
+Freedom of action is not a luxury you enjoy until long after the war is
+over.^
+.
+endif
+execute "+game_over"
+}
+
+{attack_with_rifle
+proxy "shoot " noun1{names} " with rifle"
+}
+
+{shoot_with_rifle_override
+volume 100 foreground_channel
+sound SOUND_FiringRifle foreground_channel
+if here = command_post
+print
+You raise your rifle and fire, shattering Sergeant Witheridge's skull.
+An odd silence fills the room for the few seconds before his fate
+becomes your own.^
+.
+else
+print
+You raise your rifle and fire, shattering Sergeant Witheridge's skull.
+Voices can be heard in the distance then footsteps in every direction.
+You wheel around in a panic as many soldiers take aim and return your
+fire.^
+.
+endif
+execute "+game_over"
+}
+
+location hut : hut sleeping quarters
+short		the "hut"
+has			KNOWN
+north		assembly_area
+out			assembly_area
+
+{look
+if here has VISITED
+return
+endif
+print
+Mosquito netting lines the inside of this hut that serves as your sleeping
+and eating quarters. Five-foot high sandbag walls force you to stoop
+below the baking-hot corrugated iron roof. There are ten bunks against the
+far wall, one for each of the members of your crew.^
+.
+}
+
+{movement
+if destination = nowhere
+print
+The only way out from here is back north.^
+.
+return
+endif
+return false
+}
+
+object bunk : my bunk
+short			name "your bunk"
+
+{look_under
+if kit_bag hasnt TOUCHED
+write "Your kit bag is under your bunk.^"
+return
+endif
+write "You don't find anything special.^"
+}
+
+{lie_on : enter
+print
+You would never risk being caught napping on duty.^
+.
+}
+
+object other_bunks: other bunk bunks
+short			the "other bunks"
+has			PLURAL NOT_IMPORTANT
+
+object mosquito_netting : mosquito netting
+short		the "mosquito netting"
+
+{examine
+print
+The mosquito netting protects you from the swarms of insects that inhabit
+the area at this time of year.^
+.
+}
+
+{break : shoot_with_rifle : attack_with_rifle
+print
+Putting holes in the mosquito netting won't win you any favours with
+anyone.^
+.
+}
+
+object kit_bag : kit bag gear
+short		name "your kit bag"
+long			function
+has			CONTAINER CLOSABLE CLOSED
+mass			10
+capacity		10
+
+{long
+if kit_bag hasnt TOUCHED
+print
+Your kit bag is under your bunk.^
+.
+else
+print
+Your kit bag is resting nearby.^
+.
+endif
+}
+
+object shirt : khaki shirt
+short		your "khaki shirt"
+long			"Your khaki shirt is lying on the ground.^"
+has			WEARABLE
+parent		kit_bag
+mass			4
+
+{examine
+print
+Your plain, army issue shirt hasn't had much use in the oppressive heat
+and humidity of far-north Australia.^
+.
+}
+
+grammar shoot *present with *held >shoot_with
+
+{+shoot_with
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+ifall noun1 has ANIMATE : noun1 has DEAD
+write  noun1{The} " " noun1{is} " already dead.^"
+set time = false
+return true
+endif
+if noun2 != rifle
+write "You are can't shoot anything with " noun2{the} .^
+set time = false
+return true
+endif
+if rifle(status) = 0
+write "There are no rounds remaining in the rifle.^"
+return
+endif
+override
+write "There is no need to shoot " noun1{the} .^
+set time = false
+}
+
+grammar fire *present	>fire
+
+{+fire
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+override
+write "You can't fire " noun1{the} ".^"
+set time = false
+}
+
+grammar shoot *present >shoot
+
+{+shoot
+if rifle isnt *held
+write "You are not carrying your rifle.^"
+set time = false
+return true
+endif
+if noun1 = rifle
+proxy "fire rifle"
+return
+endif
+proxy "shoot " noun1{names} " with rifle"
+}
+
+object rifle : lee enfield rifle gun
+short		name "your rifle"
+long			function
+status		10
+mass			20
+
+{long
+if rifle hasnt TOUCHED
+print
+Your rifle is leaning against the wall beside your bunk.^
+.
+else
+print
+Your rifle is resting nearby.^
+.
+endif
+}
+
+{examine
+print
+You were issued this Lee Enfield rifle during induction training back in
+Sydney over a year ago. It is a bolt-action, magazine-fed
+repeating rifle with an English walnut stock.
+.
+if rifle(status) = 0
+write "The magazine is now empty.^"
+else
+write "The magazine currently has " rifle(status) " rounds remaining.^"
+endif
+}
+
+{fire
+if rifle isnt *held
+write "You will need to be holding the rifle to fire it.^"
+set time = false
+return
+endif
+if rifle(status) = 0
+write "There are no rounds remaining in the rifle.^"
+return
+endif
+volume 100 foreground_channel
+sound SOUND_FiringRifle	foreground_channel
+if here has OUTDOORS
+write "You fire the rifle into the air.^"
+else
+write "You fire the rifle into the ceiling.^"
+endif
+set rifle(status) - 1
+if here = command_post
+print
+^Lieutenant Roberts glares at you.^
+.
+endif
+if here = gun_emplacement
+print
+^Sergeant Thompsons looks at you then shakes his head.^
+.
+endif
+}
+
+{+empty
+if rifle(status) = 0
+write "There are no rounds remaining in the rifle.^"
+return
+endif
+print
+It is best to keep your rifle loaded.^
+.
+}
+
+location south_of_oval : south of oval
+short		the "south of the oval"
+has			OUTDOORS KNOWN
+north		pitch
+in			pitch
+northwest	outfield
+south		beach
+down			beach
+
+{look
+if here has VISITED
+return
+endif
+print
+Weathered coastal scrub covers the ground between the oval to north and the
+hill side to the south. A narrow but well-worn trail works its way down to
+the beach below.^
+.
+}
+
+{movement
+if destination = nowhere
+print
+From here you can either go north to the cricket pitch, northwest
+towards to the camp or down to the beach.^
+.
+return
+endif
+return false
+}
+
+location beach : beach
+short		the "beach"
+has			OUTDOORS KNOWN
+north		south_of_oval
+up			south_of_oval
+
+{look
+if here has VISITED
+return
+endif
+print
+Deep trenches dug above the high tide line scar the beach where sand has
+been excavated for bagging. A steep path leads north from here through the
+mangroves back up to the oval.^
+.
+}
+
+{movement
+if compass = in
+proxy "enter canoe"
+return true
+endif
+return false
+}
+
+{eachturn
+ifall @+mission_briefing != 0 : canoe(parent) = limbo
+print
+^As you look out to sea you spot Miki, one of the local Aboriginal men,
+paddling around the point in his dugout canoe. Each powerful stroke of
+his paddle ends with a barely perceptible twist of the blade to keep
+his course. As he runs the canoe up onto the beach he places his
+paddle flat across the gunwhales and a broad smile comes to his face.^^
+~Come on balanda, army man saying we going to Melville,~ Miki
+shouts as he waves you to enter the canoe.^
+.
+move canoe to here
+move miki to here
+endif
+}
+
+object trenches : deep trenches scar scars
+short		the "trenches"
+has			PLURAL CONTAINER
+capacity		50
+
+{examine
+print
+The trenches are the product of many back-breaking months of filling sand
+bags.^
+.
+}
+
+{enter
+print
+There is no need to go climbing into the trenches.^
+.
+}
+
+object mangroves : mangrove mangroves tree trees
+short		the "mangroves"
+has			PLURAL
+
+{examine
+print
+The thick leaves of the mangroves shade the path up to the oval.^
+.
+}
+
+object sand : sand
+short		the "sand"
+has			NOT_IMPORTANT
+
+object sea_water : ocean sea water
+short		the "sea water"
+has			NOT_IMPORTANT
+
+{enter
+print
+You don't have to swim, Miki will take you in the canoe.^
+.
+}
+
+object miki : miki aboriginal man
+short		name "Miki"
+has			ANIMATE
+long			function
+mass			heavy
+parent		limbo
+
+{long
+if script_stage = after_raid
+print
+Miki is here sitting in his canoe, waiting for you to get in.^
+.
+return
+endif
+write "Miki is standing beside you.^"
+}
+
+{examine
+print
+Miki is one of the local Aboriginal men. Dressed only in a pair of plain
+shorts, his dark brown skin shines in the baking sun.^
+.
+}
+
+{talk_to
+set MENU_MODE = MENU_PROXY
+execute "+menu_clear_options"
+execute "+menu_add_option<Ask Miki about his canoe<ask miki about canoe"
+execute "+menu_add_option<Ask Miki about Melville Island<ask miki about melville island"
+}
+
+{ask_about_melville_obj
+print
+~Will it take us long to get out to Melville Island?~ you ask Miki.^^
+~We'll go quickly. I go to fish at Melville many times. Currents
+running strong between here and there. Miki find the currents that
+take us there fast.~^
+.
+}
+
+{ask_about_canoe
+print
+~Did you make the canoe, Miki?" you ask with interest.^^
+~I helped. Many people from my tribe working on this canoe, but they've
+gone bush now so Miki keep it.~^
+.
+}
+
+{shoot_with_rifle
+write "You could always just type "
+style input
+write "quit"
+style normal
+write " and save me the effort of explaining the error of your ways.^"
+}
+
+object miki_paddle : paddle miki's mikis
+short		name "Miki's paddle"
+mass			5
+parent		miki
+
+{examine
+print
+The paddle is carved from a single piece of wood with an intricate pattern
+engraved into the blade.^
+.
+}
+
+object canoe : dugout canoe
+short		a "dugout canoe"
+parent		limbo
+
+{examine
+print
+The dugout canoe is made from the hollowed-out trunk of a paperbark tree.
+The hull is over twenty feet long, strong and stable.^
+.
+}
+
+{enter : move
+volume 100 foreground_channel
+sound SOUND_CanoePaddle foreground_channel -1
+print
+You place your hands on the bow of the canoe and push it back into
+deeper water. Once you are wading up to your knees you jump in and Miki
+hands you a paddle.^^
+~You sitting up the front, balanda. Just keep paddling and I'll get us
+where we're going.~
+Levering his paddle against the side of the canoe he spins
+the bow out to sea and the two of you head towards Melville Island.^
+.
+write ^
+more "To be continued..."
+clear
+image IMAGE_bloodyguns
+write ^
+execute "+game_over"
+}
+
+grammar f			>north
+grammar forward		>north
+grammar go forward	>north
+
+grammar a			>south
+grammar aftward		>south
+grammar go aftward	>south
+grammar aft			>south
+grammar go aft		>south
+
+object boat : boat timber motor launch
+short		a "timber motor launch"
+
+location afterdeck : afterdeck deck decking
+short		the "afterdeck"
+has			OUTDOORS
+north		wheelhouse
+in			wheelhouse
+
+{look
+if here has VISITED
+return
+endif
+print
+The afterdeck of the timber motor launch is all but filled with a tall
+engine cover. Space between it and the gunwhales allows passage forward
+into the wheelhouse.
+.
+if boat(status) != underway
+print
+A line from the wharf is fastened to a worn samson post that protrudes
+up through the gunwhale.
+.
+else
+print
+A worn samson post protrudes up through the gunwhale.
+.
+.
+print
+Beside the post is a circular fuel cap.^
+.
+}
+
+location forepeak : forepeak
+short		the "forepeak"
+south		wheelhouse
+up			nowhere
+
+{look
+if here has VISITED
+return
+endif
+print
+Curved beams supporting the deckhead cause you to crouch low in this
+cramped compartment.
+.
+}
+
+object jerrycan : steel jerry can jerrycan
+short			a "steel jerrycan"
+long			function
+has			CONTAINER CLOSABLE CLOSED
+mass			15
+capacity		10
+
+{long
+if jerrycan hasnt TOUCHED
+print
+A steel jerrycan stands beside the generator.^
+.
+else
+There is a jerrycan here.^
+endif
+}
+
+{examine
+print
+The four gallon jerrycan is a copy of a new German design.
+The word ~DIESEL~ is painted onto the side of the can.
+.
+execute "+details<jerrycan"
+write "^"
+}
+
+object diesel : diesel fuel oil
+short			some "diesel"
+has			LIQUID
+mass			10
+parent		jerrycan
+
+location wheelhouse : wheelhouse
+short		the "wheelhouse"
+north		forepeak
+in			forepeak
+south		afterdeck
+out			afterdeck
+
+{look
+if here has VISITED
+return
+endif
+print
+The wheelhouse is relatively spacious compared to the cramped afterdeck. The
+controls for driving the boat are on the starboard side and consist of the
+helm, gear lever and throttle lever. Two buttons beside the helm are
+labelled start and stop. On the opposite side of the helm a opening in the
+bulkhead leads into the forepeak.
+The back of the wheel house is open to the afterdeck.
+.
+}
+
+grammar turn *present port			>turn_anticlockwise
+grammar turn *present to port		>turn_anticlockwise
+grammar turn *present to left		>turn_anticlockwise
+grammar turn *present left			>turn_anticlockwise
+
+grammar turn *present starboard		>turn_clockwise
+grammar turn *present to starboard	>turn_clockwise
+grammar turn *present right			>turn_clockwise
+grammar turn *present to right		>turn_clockwise
+
+object helm : helm wheel
+short		the "helm"
+
+{turn
+print
+You must specify whether you wish to turn the helm to port or starboard.
+.
+}
+
+object throttle : throttle lever
+short		the "throttle lever"
+
+object start_button: start button
+short		the "start button"
+
+object stop_button: stop button
+short		the "stop button"
+
+location foredeck : foredeck deck decking
+short		the "foredeck"
+down			nowhere
+
+{look
+if here has VISITED
+return
+endif
+print
+Teak decking fills this space from bowsprit to wheelhouse. Just forward of
+the wheelhouse is
+.
+if forward_hatch has open
+write "an open hatch leading down to the forepeak. "
+else
+write "a closed hatch in the deck. "
+endif
+if boat(status) != underway
+print
+A line from the wharf is fastened to a large brass cleat which is in turn
+bolted to the gunwhale.^
+.
+else
+print
+A large brass cleat is bolted to the gunwhale.^
+.
+.
+}
+
+{examine : *examine_afterdeck
+print
+The teak decking has been caulked with oakum then paid with tar to seal
+it against the rough seas of cyclone season.^
+.
+}
+
+object forward_hatch : square hatch
+short		a "forward hatch"
+has			CLOSABLE CLOSED
+
+{open_override
+print
+You swing the hatch open allowing access down into the forepeak.^
+.
+set foredeck(down) = forepeak
+set foredeck(in) = forepeak
+}
+
+{close_override
+print
+You swing the hatch closed again.^
+.
+set foredeck(down) = nowhere
+set foredeck(in) = nowhere
+}
+
+attribute PRIMED
+
+object engine : diesel engine motor
+short		the "diesel motor"
+
+{examine
+print
+The diesel motor sits up through the deck, the sump and driveshaft down
+low out of reach. You can see the fuel line coming up the side of the
+motor to the priming pump lever, then on through a fuel filter to the
+injector pump. There is an air bleed plug on the side of the injector
+pump that is currently
+.
+if bleed_plug has CLOSED
+write "closed.^"
+else
+write "open.^"
+endif
+}
+
+object fuel_filter : fuel filter
+short		the "fuel filter"
+
+{examine
+print
+The fuel filter is a combined particle filter and water separator.
+.
+write "Looking through the glass casing of the filter you can see "
+if engine has PRIMED
+write "that it is filled with diesel.^"
+else
+write "only air.^"
+endif
+}
+
+object primer_lever : priming pump lever
+short		the "priming pump lever"
+
+object bleed_plug : air bleed plug
+short		the "air bleed plug"
+has			CLOSABLE CLOSED
+
+object kryten: myself self me davis
+short		name "yourself"
+has			ANIMATE
+quantity		42
+parent		outfield
+player
+
+{examine
+execute "+inventory"
+}
+
+{take
+write "...seriously?"
+set time = false
+}
+
+{attack : shoot_with_rifle : kick : shoot
+write "With government rebates, therapy isn't as expensive as it seems.^"
+}
+
+object hat : wide brimmed hat
+short		the "wide brimmed hat"
+has			WORN WEARABLE
+mass			5
+parent		player
+
+object dog_tags : dog tags
+short		your "dog tags"
+long			"You dog tags are here.^"
+has			WORN WEARABLE PLURAL
+parent		kryten
+mass			1
+
+{examine
+print
+Two stainless steel identity discs, one circular, one octagonal
+attached to a thin leather cord.
+~NX45345 C.E. DAVIS A J~ is stamped into the metal on both discs.^
+.
+}
+
+# -----------------------------------------------------------------------------
+# BEFORE FUNCTIONS
+# -----------------------------------------------------------------------------
+
+{+before_tell_about
+if script_stage = during_raid
+write "Now isn't a good time to start a conversation.^"
+return
+endif
+return false
+}
+
+{+before_ask_about
+ifall script_stage = during_raid : noun2 != setting_tool : noun2 != shell
+write "Now isn't a good time to start a conversation.^"
+return
+endif
+return false
+}
+
+{+before_talk_to
+if script_stage = during_raid
+write "Now isn't a good time to start a conversation.^"
+return
+endif
+return false
+}
+
+# -----------------------------------------------------------------------------
+# DEFAULT FUNCTIONS
+# -----------------------------------------------------------------------------
+
+{+default_throw_at
+if noun2 = aircraft
+write "You throw " noun1{the} " at the aircraft. Unfortunately it falls "
+write "back to the ground about fourteen thousand feet short of its "
+write "target.^"
+move noun1 to here
+return true
+endif
+return false
+}
+
+{+default_listen
+if script_stage = during_raid
+print
+You hear the sound of the approaching aircraft and exploding bombs.^
+.
+return
+endif
+if script_stage = tally_ho
+print
+You hear the sound of aircraft above.^
+.
+return
+endif
+return false
+}
+
+{+default_give_to
+if noun2 = jenkins
+if noun1 != shell
+write "~What are you playing at Davis!~ Jenkins yells as he tosses "
+write noun1{the} " to the ground.^"
+move noun1 to gun_emplacement
+return
+endif
+endif
+return false
+}
+
+# -----------------------------------------------------------------------------
+# GRAMMAR SYNONYMS
+# -----------------------------------------------------------------------------
+
+grammar man *location		>go_to
+grammar report to *location	>go_to
+
+# -----------------------------------------------------------------------------
+# GLOBAL FUNCTIONS
+# -----------------------------------------------------------------------------
+
+integer turn_paged_at
+
+{+sound_finished
+if script_stage => tally_ho
+if arg[0] = SOUND_ArtilleryWithExplosion
+volume 25 timed_channel
+sound SOUND_AircraftBattle timed_channel
+endif
+endif
+if next_sound != false
+sound next_sound timed_channel
+set next_sound = false
+endif
+}
+
+integer timer_count 0
+
+{+timer
+set timer_count + 1
+set INDEX = 0
+while INDEX < @fader
+if fader[INDEX] != 0
+set COUNTER = volume[INDEX]
+set COUNTER - fader[INDEX]
+volume COUNTER INDEX
+if COUNTER < 1
+set fader[INDEX] = 0
+stop INDEX
+endif
+endif
+set INDEX + 1
+endwhile
+if timer_count < 6
+return
+endif
+set timer_count = 0
+if script_stage = during_raid
+if random > 65
+volume random timed_channel
+sound SOUND_Explosion timed_channel
+endif
+return
+endif
+}
+
+{+eachturn
+if witheridge(parent) != command_post
+if witheridge(parent) = here
+write ^
+endif
+execute "+push_object<witheridge<north"
+endif
+ifall script_stage < after_raid : here has OUTDOORS
+move aircraft to here
+else
+move aircraft to limbo
+endif
+if here has OUTDOORS
+move harbour to here
+else
+move harbour to limbo
+endif
+ifall script_stage > during_raid : script_stage < after_raid
+set script_stage + 1
+ifall script_stage = player_paged : @+mission_briefing = 0
+print
+^~Gunner Davis report to the command post,~ announces the loud hailer\
+.
+if here = gun_emplacement
+print
+|to a chorus of jeers from the other gunners. ~Trouble again, eh,
+Davis?~ Jenkins calls with much delight
+.
+endif
+write .^
+set turn_paged_at = total_moves
+endif
+if script_stage = after_raid
+move aircraft to limbo
+move smith to gun_emplacement
+set smith(mass) = scenery
+set jenkins(mass) = scenery
+endif
+endif
+if here hasnt OUTDOORS
+set north_wall(parent) = here
+set south_wall(parent) = here
+set east_wall(parent) = here
+set west_wall(parent) = here
+else
+set sky_obj(parent) = here
+endif
+set ground(parent) = here
+}
+
+{+no_light
+write "It is too dark to see.^"
+set time = false
+}
+
+{+title
+style subheader
+write here{The} ^
+style normal
+if player has SITTING
+write "(sitting)^"
+endif
+}
+
+string status_text
+
+{+update_status_window
+execute "+reverse_window"
+style reverse
+if script_stage = intro
+execute "+print_centred<The Bloody Guns<0"
+return
+endif
+cursor 1 0
+write here{The}
+setstring status_text "Score: " score " Moves: " total_moves
+execute "+print_right<status_text<0"
+style normal
+}
+
+object mission : mission assignment
+short		the "mission"
+parent		limbo
+
+object melville_obj : melville island observation post outpost snake bay
+short		name "Melville Island"
+parent		limbo
+
+object sky_obj : sky skies
+short		the "sky"
+has			OUT_OF_REACH NO_TAB
+
+{examine
+proxy "look up"
+}
+
+object north_wall: north north wall
+short		the "north wall"
+has			NO_TAB
+plural		walls
+
+object south_wall: south southern wall
+short		the "south wall"
+has			NO_TAB
+plural		walls
+
+object east_wall: east eastern wall
+short		the "east wall"
+has			NO_TAB
+plural		walls
+
+object west_wall: west western wall
+short		the "west wall"
+has			NO_TAB
+plural		walls
+
+object ground: ground floor
+short		the "ground"
+has			SURFACE NO_TAB
+
+# MENU library
+
+integer MENU_RESPONSE
+integer MENU_IN_LOOP
+
+integer	     MENU_COUNT			0
+string_array MENU_OPTIONS		10
+
+
+integer MENU_MODAL
+# CAN BE SET TO TRUE OR FALSE
+
+integer  MENU_MODE 				MENU_PROXY
+# CAN BE SET TO ONE OF
+constant MENU_PROXY				0
+constant MENU_EXECUTE			1
+
+# SET TO TRUE TO DISPLAY THE COMMAND WHILE IN PROXY MODE
+integer MENU_DISPLAY_COMMAND	true
+
+grammar $integer >menu_number
+
+{+menu_number
+# THIS FUNCTION IS CALLED WHEN THE PLAYER TYPES AN IN-GAME COMMAND THAT
+# CONTAINS ONLY AN INTEGER
+if MENU_COUNT = 0
+write "There is no menu currently active.^
+set time = false
+return
+endif
+if $integer < 1 : $integer > MENU_COUNT
+if MENU_COUNT = 1
+write "The only available choice is 1.^"
+return
+else
+write "Please choose a number between 1 and " MENU_COUNT .^
+return
+endif
+endif
+if MENU_MODE = MENU_EXECUTE
+execute MENU_OPTIONS[$integer]
+else
+if MENU_DISPLAY_COMMAND = true
+write "] "
+style input
+write MENU_OPTIONS[$integer] ^
+style normal
+endif
+proxy MENU_OPTIONS[$integer]
+endif
+}
+
+{+menu_clear_options
+# THE FUNCTION CLEARS ALL THE CURRENT OPTIONS FROM THE MENU
+set MENU_COUNT = 0
+}
+
+{+menu_add_option
+# THIS FUNCTION ADDS A NEW OPTION TO THE MENU
+# IT ACCEPTS: <Text to print<Response to selection
+if MENU_COUNT = 10
+# NO MORE ROOM
+return false
+endif
+set MENU_COUNT + 1
+write MENU_COUNT ". " string_arg[0] ^
+setstring MENU_OPTIONS[MENU_COUNT] string_arg[1]
+}
+
+{+menu_prompt
+# THIS FUNCTION CALLS THE PASSED FUNCTION TO POPULATE THE MENU
+# THEN PROMPTS FOR A CHOICE
+# IF MENU_MODAL IS SET TO TRUE, THE MENU WILL CONTINUOUSLY LOOP
+# ASKING THE PLAYER FOR THEIR NEXT SELECTION UNTIL THE LOOP
+# IS TERMINATED BY SETTING MENU_IN_LOOP TO FALSE
+if @arg = 0
+write "You must supply a call-back function to +menu_prompt.^"
+return
+endif
+if @arg = 1
+set MENU_IN_LOOP = true
+else
+set MENU_IN_LOOP = arg[1]
+endif
+
+repeat
+execute "+menu_clear_options"
+write ^
+execute string_arg[0]
+asknumber MENU_RESPONSE 1 MENU_COUNT
+if MENU_MODAL = false
+if MENU_RESPONSE = -1 : MENU_RESPONSE = 0
+return
+endif
+endif
+if MENU_RESPONSE < 1 : MENU_RESPONSE > MENU_COUNT
+write "Please choose a number between 1 and " MENU_COUNT .^
+else
+if MENU_MODE = MENU_EXECUTE
+execute MENU_OPTIONS[MENU_RESPONSE]
+else
+if MENU_DISPLAY_COMMAND = true
+write "] "
+style input
+write MENU_OPTIONS[MENU_RESPONSE] ^
+style normal
+endif
+proxy MENU_OPTIONS[MENU_RESPONSE]
+endif
+endif
+until MENU_IN_LOOP = false
+}
+
+# UTILS.library
+
+integer UTILS_temp
+string UTILS_text
+
+{+print_right
+set UTILS_temp = status_width
+length INDEX string_arg[0]
+set UTILS_temp - INDEX
+set UTILS_temp - 1
+cursor UTILS_temp arg[1]
+write string_arg[0]
+}
+
+{+print_centred
+set UTILS_temp = status_width
+length INDEX string_arg[0]
+set UTILS_temp - INDEX
+set UTILS_temp / 2
+cursor UTILS_temp arg[1]
+write string_arg[0]
+}
+
+{+reverse_window
+style reverse
+padstring UTILS_text " " status_width
+set UTILS_temp = 0
+while UTILS_temp < status_height
+cursor 0 UTILS_temp
+write UTILS_text
+set UTILS_temp + 1
+endwhile
+style normal
+}
+
+string LCNumber zero one two three four five six seven eight nine ten
+string UCNumber Zero One Two Three Four Five Six Seven Eight Nine Ten
+
+{+number_upper
+if arg[0] < 0 : arg[0] > 10
+write arg[0]
+else
+write UCNumber[arg[0]]
+endif
+}
+
+{+number_lower
+if arg[0] < 0 : arg[0] > 10
+write arg[0]
+else
+write LCNumber[arg[0]]
+endif
+}
+
+# ARGS: <object<direction
+
+{+push_object
+if player(parent) = arg[0](parent)
+if here hasnt DARKNESS
+write arg[0]{The}
+execute +to_direction<arg[1]
+else
+write "You hear the footsteps nearby.^"
+endif
+endif
+set UTILS_temp = arg[0](parent)
+set UTILS_temp = UTILS_temp(arg[1])
+if UTILS_temp < 1 : UTILS_temp > objects
+return false
+endif
+set arg[0](parent) = UTILS_temp
+if player(parent) = arg[0](parent)
+if here hasnt DARKNESS
+write  arg[0]{The}
+execute +from_direction<arg[1]
+else
+write "You hear the footsteps nearby.^"
+endif
+endif
+}
+
+{+to_direction
+if arg[0] = north
+write " heads off to the north.^"
+return true
+endif
+if arg[0] = northeast
+write " heads off to the northeast.^"
+return true
+endif
+if arg[0] = east
+write " heads off to the east.^"
+return true
+endif
+if arg[0] = southeast
+write " heads off to the southeast.^"
+return true
+endif
+if arg[0] = south
+write " heads off to the south.^"
+return true
+endif
+if arg[0] = southwest
+write " heads off to the southwest.^"
+return true
+endif
+if arg[0] = west
+write " heads off to the west.^"
+return true
+endif
+if arg[0] = northwest
+write " heads off to the northwest.^"
+return true
+endif
+if arg[0] = UP
+write " heads up from here.^"
+return true
+endif
+if arg[0] = DOWN
+write " heads down from here.^"
+endif
+}
+
+{+from_direction
+if arg[0] = north
+write " enters from the south.^"
+return true
+endif
+if arg[0] = northeast
+write " enters from the southwest.^"
+return true
+endif
+if arg[0] = east
+write " enters from the west.^"
+return true
+endif
+if arg[0] = southeast
+write " enters from the northwest.^"
+return true
+endif
+if arg[0] = south
+write " enters from the north.^"
+return true
+endif
+if arg[0] = southwest
+write " enters from the northeast.^"
+return true
+endif
+if arg[0] = west
+write " enters from the east.^"
+return true
+endif
+if arg[0] = northwest
+write " enters from the southeast.^"
+return true
+endif
+if arg[0] = UP
+write " enters from below.^"
+return true
+endif
+if arg[0] = DOWN
+write "enters from above.^"
+endif
+}
+
+# --- JACL INCLUDE FILE: verbs.library
+# Copyright (c) Stuart Allen 1990-2008.
+
+constant	library_version		21
+
+filter the
+filter a
+
+integer COUNTER
+integer INDEX
+integer TEMP
+integer RETURN_VALUE
+integer OXYGEN_LEFT
+integer direction
+
+synonym onto            on
+synonym into            in
+synonym inside          in
+synonym using           with
+synonym gentleman       man
+
+synonym one				1
+synonym two				2
+synonym three			3
+synonym four			4
+synonym five			5
+synonym six				6
+synonym seven			7
+synonym eight			8
+synonym nine			9
+synonym ten				10
+synonym eleven			11
+synonym twelve			12
+synonym thirteen		13
+synonym fourteen		14
+synonym fifteen			15
+synonym sixteen			16
+synonym seventeen		17
+synonym eighteen		18
+synonym nineteen		19
+synonym twenty			20
+
+synonym taje            take
+synonym taek            take
+synonym all             everything
+synonym speak           talk
+synonym depress         press
+synonym w               west
+synonym e               east
+synonym s               south
+synonym se              southeast
+synonym sw              southwest
+synonym n               north
+synonym ne              northeast
+synonym nw              northwest
+synonym u               up
+synonym d               down
+synonym l               look
+synonym beneath         under
+
+{+object_descriptions
+loop
+ifall noun3(parent) = here : noun3(mass) < scenery : noun3 hasnt LOCATION
+write ^ noun3{long}
+endif
+endloop
+}
+
+integer_array available_exits 12 0
+string dir_command north south east west northeast northwest
+string dir_command southeast southwest up down in out
+
+grammar stepto *location >stepto
+
+{+stepto
+stepto INDEX here noun1
+write "GO: " dir_command[INDEX] ^
+}
+
+grammar about >about
+
+{+about
+style note
+write game_title
+style normal
+write "Copyright (c) " game_author "^"
+write "Release " game_release " / build " game_build
+write " / JACL verb.library version " library_version "^^"
+}
+
+grammar exits >exits
+
+{+exits
+# CLEAR ALL THE PREVIOUS AND AVAILABLE EXITS
+set COUNTER = 0
+repeat
+set available_exits[COUNTER] = 0
+set COUNTER + 1
+until COUNTER = 12
+
+# LOOP THROUGH ALL THE EXITS OF THE CURRENT LOCATION
+set COUNTER = 0
+set INDEX = 0
+repeat
+ifall here(COUNTER) != nowhere : +in_list<here(COUNTER) = false
+set available_exits[COUNTER] = here(COUNTER)
+set INDEX + 1
+endif
+set COUNTER + 1
+until COUNTER = 12
+
+write "You can go "
+if INDEX = 0
+write "nowhere!^"
+return true
+endif
+
+set COUNTER = 0
+repeat
+if available_exits[COUNTER] != nowhere
+write dir_command[COUNTER]
+set INDEX - 1
+execute +or_structure
+endif
+set COUNTER + 1
+until COUNTER = 12
+write .^
+set time = false
+}
+
+{+in_list
+set TEMP = 0
+repeat
+if available_exits[TEMP] = arg[0]
+return true
+endif
+set TEMP + 1
+until TEMP = 12
+return false
+}
+
+{+list_here
+write ""
+
+set INDEX = 0
+loop
+if noun3 is *here
+set INDEX + 1
+endif
+endloop
+
+if INDEX = 0
+write "Nothing special"
+else
+loop
+if noun3 is *here
+option noun3
+endif
+endloop
+endif
+
+write ""
+}
+
+{+list_held
+write ""
+
+set INDEX = 0
+loop
+ifall noun3(parent) = player : noun3(mass) != scenery
+set INDEX + 1
+endif
+endloop
+
+if INDEX = 0
+write "Nothing at all"
+else
+loop
+ifall noun3(parent) = player : noun3(mass) != scenery
+option noun3
+endif
+endloop
+endif
+write ""
+}
+
+{+darkness
+if here has DARKNESS
+execute "+no_light"
+return true
+endif
+return false
+}
+
+{+can_talk
+if here has UNDER_WATER
+write "Talking under water isn't very easy.^"
+set time = false
+return true
+endif
+if arg[0] = player
+write "It's the first sign of madness you know...^"
+return true
+endif
+if arg[0] hasnt ANIMATE
+write "I don't think talking to " arg[0]{the} " is going to help "
+write "somehow.^"
+set time = false
+return true
+endif
+if arg[0] has DEAD
+write  arg[0]{The} " " arg[0]{is} " a bit too dead to respond.^"
+set time = false
+return true
+endif
+return false
+}
+
+{+important
+if arg[0] has NOT_IMPORTANT
+write  arg[0]{The} " " arg[0]{is} " not important, you don't need to "
+write "worry about " arg[0]{it} ".^"
+set time = false
+return true
+endif
+return false
+}
+
+{+reach
+if arg[0] has OUT_OF_REACH
+write  arg[0]{The} " " arg[0]{is} " out of reach.^"
+set time = false
+return true
+endif
+return false
+}
+
+# Open an object if possible in order to perform typed command.
+{+closed
+if arg[0] hasnt CLOSED
+return false
+endif
+proxy "open " arg[0]{names}
+if arg[0] has CLOSED
+return true
+endif
+return false
+}
+
+# Stop wearing an object if possible in order to perform typed command.
+{+worn
+if arg[0] hasnt WORN
+return false
+endif
+proxy "remove " arg[0]{names}
+if arg[0] has WORN
+return true
+endif
+return false
+}
+
+location limbo : limbo
+
+grammar shake *held   >shake
+grammar wave *held    >shake
+
+{+shake
+write "Consider it done.^"
+}
+
+integer XYZZY	false
+
+grammar say *anywhere >say_object
+
+{+say_object
+if here has UNDER_WATER
+write "Talking under water isn't very easy.^"
+set time = false
+return true
+endif
+override
+set INDEX = 0
+loop
+ifall noun3 has ANIMATE : noun3 is *present : noun3 != player
+set INDEX + 1
+endif
+endloop
+if INDEX = 0
+write "Your words fall on deaf ears.^"
+else
+write "You get no response.^"
+endif
+}
+
+grammar say xyzzy >xyzzy
+grammar xyzzy     >xyzzy
+
+{+xyzzy
+if XYZZY = true
+write "~Go away. Leave us alone.~^"
+return true
+endif
+write "~That's the password, open the door.~^^"
+write "~Are you sure? I don't recognise the voice.~^^"
+write "~Don't argue, just open the door!~^^"
+write "A previously-invisible door swings open. Beyond the door you "
+write "see what you can only imagine to be God's workshop.^^"
+write "write ~Shit! I told you it wasn't him!" caret "~;^"
+write "set bouncer_1(panic) + 5;^"
+write "write ~Quick! Shut the door." caret "~;^"
+write "set poo(parent) = bouncer_2s_trousers;^"
+write "ensure magic_door has CLOSED;^"
+write "^The door shuts and disappears again. Something tells you it "
+write "is going to be one of those days...^"
+set XYZZY = true
+set time = false
+}
+
+grammar verbose >verbose
+
+{+verbose
+if display_mode = 1
+write "Display mode already set to verbose.^"
+return true
+endif
+write "Display mode set to verbose.^^"
+set display_mode = 1
+look
+}
+
+grammar brief >brief
+
+{+brief
+if display_mode = 0
+write "Display mode already set to brief.^"
+return true
+endif
+write "Display mode set to brief.^"
+set display_mode = 0
+}
+
+grammar help *present           >help_other
+
+{+help_other
+write "How did you intend to help " noun1{the} ?^
+}
+
+grammar hint *present >hint
+
+{+hint
+write "There is no specific hint available for " noun1{the} .^
+set time = false
+}
+
+grammar hint          >first_hint
+grammar hint 1	      >first_hint
+
+{+first_hint
+write "There is no hint available specific to this location.^"
+set time = false
+}
+
+grammar hint 2      >second_hint
+
+{+second_hint
+write "There is no second hint available for this location.^"
+set time = false
+}
+
+grammar hint 3    >third_hint
+
+{+third_hint
+write "There is no third hint available for this location.^"
+set time = false
+}
+
+grammar hint 4     >fourth_hint
+
+{+fourth_hint
+write "There is a maximum of three hints for each location.^"
+set time = false
+}
+
+grammar help games >help_games
+
+{+help_games
+write "`GAMES' REFERS TO MODELS, SIMULATIONS AND GAMES WHICH HAVE TACTICAL "
+write "AND STRATEGIC APPLICATIONS.^"
+}
+
+grammar hug *present     >hug
+grammar comfort *present >hug
+grammar cuddle *present  >hug
+grammar console *present >hug
+
+{+hug
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+if noun1 hasnt ANIMATE
+write "Odd.^"
+return true
+endif
+write "I'm sure " noun1{the} " feel" noun1{s} " a whole lot better now.^"
+}
+
+grammar kiss *present >kiss
+
+{+kiss
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write "Hmmmmmm...^"
+}
+
+grammar pick *present with *held >pick_with
+
+{+pick_with
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write "You can't pick " noun1{the} " with " noun2{the} .^
+}
+
+grammar rub *present    >rub
+grammar pat *present    >rub
+
+{+rub
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write "I'm sure " noun1{the} " " noun1{is} " feeling a lot better now.^"
+}
+
+grammar rub *held on *present         >rub_on
+
+{+rub_on
+if +important<noun2 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+override
+proxy "rub " noun2{names} " with " noun1{names}
+}
+
+grammar rub *present with *held    >rub_with
+
+{+rub_with
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write "They both just get a little warmer.^"
+}
+
+grammar lick *present  >lick
+grammar taste *present >lick
+
+{+lick
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write "Yeuucck!^"
+}
+
+grammar pull *present >pull
+grammar tug *present  >pull
+
+{+pull
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write "You can't pull " noun1{the} .^
+}
+
+grammar cut *present  >cut
+grammar chop *present >cut
+grammar stab *present >cut
+
+{+cut
+write "What did you want to cut " noun1{the} " with?^"
+set time = false
+}
+
+grammar cut *present with *held       >cut_with
+grammar chop *present with *held      >cut_with
+grammar stab *present with *held      >cut_with
+
+{+cut_with
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+if noun1 has ANIMATE
+proxy "attack " noun1{names} " with " noun2{names}
+return true
+endif
+write "Vandal!^"
+set time = false
+}
+
+grammar break *present          >break
+grammar smash *present          >break
+grammar crush *present          >break
+grammar destroy *present        >break
+grammar wreck *present          >break
+grammar crack *present          >break
+grammar tear *present           >break
+grammar tear up *present        >break
+grammar tear *present up        >break
+
+{+break
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write "Don't be so destructive.^"
+set time = false
+}
+
+grammar clean *present        >clean
+grammar wash *present         >clean
+grammar wipe *present         >clean
+grammar scrub *present        >clean
+grammar polish *present       >clean
+
+{+clean
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+if noun1 has LIQUID
+write "How do you clean a liquid?^"
+set time = false
+return true
+endif
+override
+write "That's very thoughtful of you.^"
+}
+
+grammar clean *present with *held     >clean_with
+grammar wipe *present with *held      >clean_with
+grammar scrub *present with *held     >clean_with
+grammar brush *present with *held     >clean_with
+
+{+clean_with
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+if noun1 has LIQUID
+write "How do you clean a liquid?^"
+set time = false
+return true
+endif
+override
+write "You can't clean " noun1{the} " with " noun2{the} .^
+set time = false
+}
+
+grammar yell at *present      >yell_at
+grammar scream at *present    >yell_at
+
+{+yell_at
+write "Oooo, scary...^"
+}
+
+grammar pay *present       >pay
+
+{+pay
+write "You can't pay " noun1{the} .^
+}
+
+grammar order *anywhere       >order
+grammar buy *anywhere         >order
+
+{+order
+write "Your order appears to have fallen on deaf ears.^"
+}
+
+grammar knock on *present     >knock_on
+grammar tap on *present       >knock_on
+grammar tap *present          >knock_on
+
+{+knock_on
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+if noun1 has ANIMATE
+proxy "attack " noun1{names}
+endif
+endif
+if noun1 has LIQUID
+write "A wet hand is your only reward.^"
+return true
+endif
+write "You gently tap on " noun1{the}.^"
+}
+
+grammar smoke *present >smoke
+
+{+smoke
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write "You can't smoke " noun1{the} .^
+set time = false
+}
+
+grammar play *present	>play
+grammar sound *present	>play
+grammar ring *present	>play
+
+{+play
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write "You can't play " noun1{the} .^
+set time = false
+}
+
+grammar play *present with *held	>play_with
+grammar sound *present with *held	>play_with
+grammar ring *present with *held	>play_with
+
+{+play_with
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write "You can't play " noun1{the} " with " noun1{the} .^
+set time = false
+}
+
+grammar pump *present >pump
+
+{+pump
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write "You can't pump " noun1{the} .^
+set time = false
+}
+
+grammar unload *here    >empty
+grammar empty *here     >empty
+
+{+empty
+proxy "take all from " noun1{names}
+}
+
+grammar extract **here with *held      >take_with
+grammar get **here with *held          >take_with
+grammar take **here with *held         >take_with
+grammar hold **here with *held         >take_with
+grammar remove **present with *held    >take_with
+grammar empty **present with *held     >take_with
+
+{+take_with
+proxy "fill " noun2{names} " with " noun1{names}
+}
+
+grammar fill *held from *present      >fill_from
+
+{+fill_from
+if +important<noun2 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +liquid?<noun2 == false
+write  noun2{The} " " noun2{doesnt} "contain a liquid to fill " noun1{the}
+write " with.^"
+set time = false
+return true
+endif
+proxy "fill " noun1{names} " with " CHILD{names}
+}
+
+grammar fill *held with *present >fill_with
+
+{+fill_with
+if +important<noun2 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun2 = true
+return true
+endif
+if noun2 hasnt LIQUID
+if +liquid?<noun2 = true
+set noun2 = CHILD
+else
+write "You can only fill " noun1{the} " with a liquid.^"
+return true
+endif
+endif
+if noun1 hasnt CONTAINER
+write  noun1{The} " " noun1{isnt} " a container and therefore can't be "
+write "filled.^"
+return true
+endif
+if noun1 has CLOSED
+write "You can't fill " noun1{the} " while "
+if noun1 has PLURAL
+write "they are"
+else
+write "it is"
+endif
+write " closed.^"
+set time = false
+return true
+endif
+if +liquid?<noun1 = true
+write  noun1{The} " already contains " CHILD{the} ". If you were to also "
+write "add " noun2{the} " they would mix together.^"
+set time = false
+return true
+endif
+if noun1(quantity) < noun2(mass)
+write  noun1{The} " " noun1{isnt} " large enough to hold "
+write noun2{the} .^
+set time = false
+return true
+endif
+override
+write "You fill " noun1{the} " with " noun2{the} .^
+move noun2 to noun1
+}
+
+{+liquid?
+loop CHILD
+ifall CHILD(parent) = arg[0] : CHILD has LIQUID
+return true
+endif
+endloop
+return false
+}
+
+grammar fill *held >fill
+
+{+fill
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+override
+write "What did you want to fill " noun1{the} " with?^"
+set time = false
+}
+
+grammar stand         >stand
+grammar stand up      >stand
+grammar get up        >stand
+
+{+stand
+if player has SITTING
+write "Using your arms to push yourself up, you stand.^"
+ensure player hasnt SITTING
+return true
+endif
+write "You are already standing.^"
+}
+
+grammar sleep         >sleep
+
+{+sleep
+write "There will be plenty of time for that later...^"
+set time = false
+}
+
+grammar lie on *present       >lie_on
+grammar lie down on *present  >lie_on
+grammar sleep on *present     >lie_on
+grammar sleep in *present     >lie_on
+
+{+lie_on
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write  noun1{The} " " noun1{doesnt} " look like the ideal place to take a "
+write "nap.^"
+}
+
+grammar sit			>sit
+grammar sit down	>sit
+grammar squat		>sit
+grammar squat down	>sit
+
+{+sit
+set time = false
+if player has SITTING
+write "You are already sitting.^"
+return true
+endif
+if here has UNDER_WATER
+write "While underwater?^"
+return true
+endif
+if here has ON_WATER
+write "While in water?^"
+return true
+endif
+write "You plonk yourself down for a moment's rest.^"
+ensure player has SITTING
+}
+
+grammar sit *here	  >sit_on
+grammar sit on *here  >sit_on
+grammar sit in *here  >sit_on
+
+{+sit_on
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write  noun1{The} " " noun1{doesnt} " look very comfortable.^"
+}
+
+grammar kick *present           >kick
+
+{+kick
+if +worn<noun1 = true
+return true
+endif
+override
+if noun1 has ANIMATE
+proxy "attack " noun1{names}
+return
+endif
+if noun1(mass) = scenery
+if noun1 grandof player
+write "That act of contortion is beyond you.^"
+set time = false
+return
+else
+proxy "attack " noun1{names}
+return
+endif
+endif
+write "You kick " noun1{the} " a short distance away.^"
+move noun1 to here
+}
+
+grammar throw *held	>throw
+grammar lob *held	>throw
+grammar hurl *held	>throw
+grammar pitch *held	>throw
+grammar cast *held	>throw
+
+{+throw
+if +move_scenery<noun1 = true
+return true
+endif
+if +worn<noun1 = true
+return true
+endif
+override
+if here has MID_WATER : here has ON_WATER
+write "You throw " noun1{the} " which rapidly sink" noun1{s} " out of "
+write "view.^"
+move noun1 to limbo
+return true
+endif
+write "You throw " noun1{the} " a short distance away.^"
+move noun1 to here
+}
+
+grammar drop **held		>drop
+grammar put **held down	>drop
+grammar put down **held	>drop
+
+{+drop
+if +move_scenery<noun1 = true
+return true
+endif
+if +worn<noun1 = true
+return true
+endif
+override
+if here has MID_WATER : here has ON_WATER
+write "You drop " noun1{the} " which rapidly sink" noun1{s} " out of "
+write "view.^"
+move noun1 to limbo
+return true
+endif
+write "You drop " noun1{the} .^
+move noun1 to here
+}
+
+grammar take **here		>take
+grammar hold **here		>take
+grammar pick up **here	>take
+grammar pick **here up	>take
+grammar get **here		>take
+
+{+take
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+if player has SITTING
+write "You will have to stand up first.^"
+set time = false
+return true
+endif
+if +move_scenery<noun1 = true
+return true
+endif
+if noun1(mass) > player(quantity)
+write "You are carrying too much to take " noun1{the} .^
+set time = false
+return true
+endif
+if noun1 has LIQUID
+write  noun1{The} " run" noun1{s} " through your fingers.^"
+return true
+endif
+override
+write "You take " noun1{the} .^
+move noun1 to player
+ensure noun1 has TOUCHED
+}
+
+{+move_scenery
+if arg[0] has LOCATION
+write "That would be an impressive feat of strength.^"
+set time = false
+return true
+endif
+if arg[0](mass) => heavy
+set noun3 = noun1(parent)
+set INDEX = noun3
+if noun3 has LOCATION
+write  noun1{The} " " noun1{is} " immoveable.^"
+return true
+else
+write  noun1{The} " " noun1{is} " attached to " noun3{the} .^
+endif
+set time = false
+return true
+endif
+return false
+}
+
+grammar insert **held on *present	>insert_on
+grammar put **held on *present		>insert_on
+grammar place **held on *present	>insert_on
+
+{+insert_on
+if +important<noun2 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun2 = true
+return true
+endif
+if noun2 = noun1
+write "Put " noun1{the} " on "
+if noun1 has PLURAL
+write "themselves?"
+else
+write "itself?"
+endif
+write " I don't think so.^"
+set time = false
+return true
+endif
+if noun2(parent) = noun1
+write "I'm afraid that's just not possible.^"
+set time = false
+return true
+endif
+if +move_scenery<noun1 = true
+return true
+endif
+if noun2 hasnt SURFACE
+write "There isn't a flat surface on " noun2{the} .^
+set time = false
+return true
+endif
+if noun2(quantity) < noun1(mass)
+write "There is not enough room on " noun2{the} " for " noun1{the} .^
+set time = false
+return true
+endif
+if +worn<noun1 = true
+return true
+endif
+override
+write "You put " noun1{the} " on " noun2{the} .^
+move noun1 to noun2
+}
+
+grammar insert **held in *present	>insert_in
+grammar put **held in *present		>insert_in
+grammar place **held in *present	>insert_in
+
+{+insert_in
+if +important<noun2 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun2 = true
+return true
+endif
+if +move_scenery<noun1 = true
+return true
+endif
+if noun2 = noun1
+write "Put " noun1{the} " in "
+if noun1 has PLURAL
+write "themselves?"
+else
+write "itself?"
+endif
+write " I don't think so.^"
+set time = false
+return true
+endif
+if noun2(parent) = noun1
+write "I'm afraid that's just not possible.^"
+set time = false
+return true
+endif
+if noun2 = player
+write "I would ask how you intend to do that, but something tells me I "
+write "don't want to know.^"
+set time = false
+return true
+endif
+if noun2 hasnt CONTAINER
+write  noun2{The} " " noun2{isnt} " designed to receive "
+write noun1{the} .^
+set time = false
+return true
+endif
+if +closed<noun2 = true
+return true
+endif
+if noun2(quantity) < noun1(mass)
+write "There is not enough room in " noun2{the} " for " noun1{the} .^
+set time = false
+return true
+endif
+if +worn<noun1 = true
+return true
+endif
+override
+write "You put " noun1{the} " in " noun2{the} .^
+move noun1 to noun2
+}
+
+{+encumbered
+if INDEX = 0
+write "You are not carrying anything.^"
+set time = false
+endif
+}
+
+grammar ask *present for *anywhere			>pre_ask_for
+grammar tell *present to give me *anywhere	>pre_ask_for
+
+{+pre_ask_for
+proxy "sysask " noun1{names} " for " noun2{names} " from " noun1{names}
+}
+
+grammar sysask *present for *anywhere			>ask_for
+
+{+ask_for
+if +can_talk<noun1 = true
+return true
+endif
+if noun1 !grandof noun2
+write  noun1{The} " " noun1{doesnt} " seem to have " noun2{the} .^
+set time = false
+return true
+endif
+if noun2(mass) > player(quantity)
+write "With your current load you would be unable to accept"
+write noun2{the} .^
+set time = false
+return true
+endif
+override
+if noun1 has POSSESSIVE
+write  noun1{The} " refuses to give you " noun2{the} .^
+return true
+endif
+move noun2 to player
+if noun2 has WORN
+write  noun1{The} " remove" noun1{s} " " noun2{the} " then hand" noun1{s}
+if noun2 has PLURAL
+write " them"
+else
+write " it"
+endif
+write " to you.^"
+ensure noun2 hasnt WORN
+return true
+endif
+write  noun1{The} " hands you " noun2{the} .^
+}
+
+grammar tell *present about *anywhere         >tell_about
+grammar talk to *present about *anywhere      >tell_about
+grammar talk with *present about *anywhere      >tell_about
+
+{+tell_about
+if +can_talk<noun1 = true
+return true
+endif
+override
+write  noun1{The} " seem" noun1{s} " fascinated by your story about "
+write noun2{the} .^
+}
+
+grammar ask *present about *anywhere  >ask_about
+
+{+ask_about
+if +can_talk<noun1 = true
+return true
+endif
+override
+if noun2 = noun1
+write noun1(The}
+if noun1 has PLURAL
+write " are too shy to say much.^"
+else
+write " is too shy to say much.^"
+endif
+return true
+endif
+write noun1{The} " " noun1{doesnt} " have anything to say about " noun2{the}
+write ".^"
+}
+
+grammar offer *held to *present			>give_to
+grammar give *held to *present			>give_to
+grammar give *held over to *present		>give_to
+grammar pass *held to *present			>give_to
+grammar pass *held up to *present		>give_to
+grammar pass *held down to *present		>give_to
+grammar pass *held over to *present		>give_to
+grammar hand *held to *present			>give_to
+grammar hand *held up to *present		>give_to
+grammar hand *held down to *present		>give_to
+grammar hand *held over to *present		>give_to
+grammar heave *held to *present			>give_to
+grammar heave *held up to *present		>give_to
+grammar heave *held over to *present	>give_to
+grammar lower *held down to *present	>give_to
+
+{+give_to
+if noun2 hasnt ANIMATE
+write "You can't give " noun1{the} " to " noun2 .^
+set time = false
+return true
+endif
+if noun2 = player
+write "I think it might be time to take a break and get a cup of "
+write "tea.^"
+return true
+endif
+if +reach<noun2 = true
+return true
+endif
+if +move_scenery<noun1 = true
+return true
+endif
+if +worn<noun1 = true
+return true
+endif
+override
+move noun1 to noun2
+write "You give " noun1{the} " to " noun2{the} .^
+}
+
+grammar move *present >move
+grammar push *present >move
+
+{+move
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+if player has SITTING
+write "You will have to stand up first.^"
+set time = false
+return true
+endif
+if +move_scenery<noun1 = true
+return true
+endif
+if noun1 has LIQUID
+write  noun1{The} " run" noun1{s} " through your fingers.^"
+return true
+endif
+if noun1(parent) = player
+override
+write "You juggle " noun1{the} " in your hands.^"
+return true
+endif
+if +worn<noun1 = true
+return true
+endif
+override
+write "You move " noun1{the} " a short distance to one side.^"
+ensure noun1 has TOUCHED
+}
+
+grammar read *present >read
+
+{+read
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+write "There is nothing on " noun1{the} " to read.^"
+}
+
+grammar look down >look_down
+
+{+look_down
+if +darkness = true
+return true
+endif
+if here has TIGHT_ROPE : here has MID_AIR
+write "You see the ground far below.^"
+return true
+endif
+if here has ON_WATER
+write "You can't see beyond the surface of the water.^"
+return true
+endif
+write "You take a moment to admire your investigating feet.^"
+}
+
+grammar look up >look_up
+
+{+look_up
+if +darkness = true
+return true
+endif
+override
+if here hasnt OUTDOORS
+write "You see nothing special.^"
+else
+write "You see just sky.^"
+endif
+}
+
+grammar look up *anywhere in *present         >look_up_in
+grammar look for *anywhere in *present        >look_up_in
+
+{+look_up_in
+if +important<noun1 = true
+return true
+endif
+if +important<noun2 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+write "You don't find any reference to " noun1{the} " in " noun2{the} .^
+}
+
+grammar consult *present about *anywhere      >consult
+grammar consult *present re *anywhere         >consult
+grammar consult *present on *anywhere         >consult
+
+{+consult
+proxy "look up " noun2{names} " in " noun1{names}
+}
+
+grammar feel *present  >feel
+grammar touch *present >feel
+
+{+feel
+if +reach<noun1 = true
+return true
+endif
+if noun1 has ANIMATE
+write "I'm not so sure that would be polite.^"
+return true
+endif
+write "Feels just like " noun1{list} .^
+}
+
+grammar smell *present        >smell
+grammar sniff *present        >smell
+
+{+smell
+if noun1 has ANIMATE
+write "I'm not so sure that would be polite.^"
+return true
+endif
+write "Smells an awful lot like " noun1{list} .^
+}
+
+grammar taste *present >taste
+grammar lick *present  >taste
+
+{+taste
+if +reach<noun1 = true
+return true
+endif
+if noun1 has ANIMATE
+write "You are one sick puppy.^"
+return true
+endif
+write "Tastes just like you would expect " noun1{list} " to taste.^"
+}
+
+grammar look in *present      >look_in
+
+{+look_in
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if noun1 hasnt CONTAINER
+write "There is nothing in " noun1{the} .^
+return true
+endif
+if noun1 has CLOSED
+write  noun1{The} " " noun1{is} " currently closed.^"
+return true
+endif
+set INDEX = 0
+loop
+if noun3(parent) = noun1
+set INDEX + 1
+endif
+endloop
+if INDEX = 0
+write "There is nothing in " noun1{the} .^
+return true
+endif
+execute +details<noun1
+write "^"
+}
+
+grammar look *present         >examine
+grammar look at *present      >examine
+grammar look on *present      >examine
+grammar examine *present      >examine
+grammar x *present            >examine
+grammar search *present       >examine
+grammar watch *present        >examine
+
+{+examine
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+override
+if noun1 has LOCATION
+proxy "look"
+return
+endif
+ifall noun1 hasnt CLOSABLE : noun1 hasnt CONTAINER : noun1 hasnt SURFACE
+write "There is nothing special about " noun1{the} .^
+return true
+endif
+if noun1 has CLOSABLE
+execute +details<noun1
+write "^"
+return true
+endif
+set INDEX = 0
+loop
+ifall noun3(parent) = noun1 : noun3(mass) != scenery
+set INDEX + 1
+endif
+endloop
+if INDEX = 0
+write "There is nothing special about " noun1{the} .^
+return true
+endif
+execute +details<noun1
+write "^"
+}
+
+{+details
+if arg[0] has CLOSABLE
+if arg[0] hasnt CLOSED
+write  noun1{The} " " arg[0]{is} " open"
+else
+write  noun1{The} " " arg[0]{is} " closed."
+return true
+endif
+endif
+if arg[0] has CONTAINER : arg[0] has SURFACE
+execute +contents<arg[0]
+endif
+}
+
+{+contents
+set INDEX = 0
+loop
+ifall noun3(parent) = arg[0] : noun3(mass) != scenery
+set INDEX + 1
+endif
+endloop
+if INDEX = 0 : arg[0] has CONCEALING
+ifall arg[0] has CONTAINER : arg[0] has CLOSABLE
+write "."
+endif
+return true
+endif
+execute "+list_items<arg[0]"
+}
+
+{+list_items
+if INDEX = 0 : arg[0] has CONCEALING
+return true
+endif
+if arg[0] has ANIMATE
+write arg[0]{The} " " arg[0]{is} " carrying "
+endif
+if arg[0] has SURFACE
+write "On " arg[0]{the} " is "
+endif
+if arg[0] has CONTAINER
+if arg[0] has CLOSABLE
+write " and contains "
+else
+write arg[0]{The} " contains "
+endif
+endif
+loop
+ifall noun3(parent) = arg[0] : noun3(mass) != scenery
+set INDEX - 1
+write noun3{list}
+execute +object_info
+execute +list_structure
+if INDEX = 0
+write "."
+return true
+endif
+endif
+endloop
+}
+
+{+spaced_contents
+set INDEX = 0
+loop
+ifall noun3(parent) = arg[0] : noun3(mass) != scenery
+set INDEX + 1
+endif
+endloop
+if INDEX = 0
+return true
+endall
+write "^"
+execute "+list_items<arg[0]"
+write ^
+}
+
+integer CHILD
+
+{+first_child
+loop CHILD
+if CHILD(parent) = arg[0]
+return true
+endall
+endloop
+return false
+}
+
+{+children?
+set INDEX = false
+loop
+if noun3(parent) = arg[0]
+set INDEX = true
+return true
+endif
+endloop
+}
+
+grammar inv   >list_inventory
+grammar list  >list_inventory
+
+{+list_inventory
+set INDEX = 0
+loop
+ifall noun3(parent) = player : noun3(mass) != scenery
+set INDEX + 1
+endif
+endloop
+if INDEX = 0
+write "You are empty-handed.^"
+return true
+endif
+write "You are carrying:^"
+loop
+ifall noun3(parent) = player : noun3(mass) != scenery
+write "  " noun3{list}
+execute +object_info
+write "^"
+if noun3 has CONTAINER : noun3 has SURFACE
+if noun3 hasnt CLOSED
+execute +object_children<noun3
+endif
+endif
+endif
+endloop
+set time = false
+}
+
+{+object_children
+loop
+ifall noun3(parent) = arg[0] : noun3(mass) != scenery
+write "    " noun3{list}
+execute +object_info
+write "^"
+endif
+endloop
+set noun3 = arg[0]
+}
+
+grammar inventory     >inventory
+grammar i             >inventory
+
+{+inventory
+set INDEX = 0
+loop
+ifall noun3(parent) = player : noun3(mass) != scenery
+set INDEX + 1
+endif
+endloop
+if INDEX = 0
+write "You are empty handed.^"
+return true
+endif
+write "You are carrying "
+loop
+ifall noun3(parent) = player : noun3(mass) != scenery
+set INDEX - 1
+write noun3{list}
+execute +object_info
+execute +list_structure
+if INDEX = 0
+write .^
+return true
+endif
+endif
+endloop
+set time = false
+}
+
+{+or_structure
+if INDEX > 1
+write ", "
+endif
+if INDEX = 1
+write " or "
+}
+
+{+list_structure
+if INDEX > 1
+write ", "
+endif
+if INDEX = 1
+write " and "
+}
+
+{+object_info
+if noun3 has WORN
+write " (being worn)"
+endif
+if noun3 has LUMINOUS
+write " (providing light)"
+endif
+if noun3 has ON
+write " (on)"
+endif
+ifall noun3 has CLOSABLE : noun3 hasnt CLOSED
+write " (open)"
+endif
+}
+
+grammar sorry >sorry
+
+{+sorry
+write "That's quite all right.^"
+}
+
+grammar thanks        >thankyou
+grammar thank you     >thankyou
+
+{+thankyou
+write "You're welcome.^"
+}
+
+grammar score >score_command
+grammar points >score_command
+
+{+score_command
+execute "+score"
+}
+
+{+score
+set time = false
+if total_moves = 1
+write "Your score is " score "% in 1 move.^"
+else
+write "Your score is " score "% in " total_moves " moves.^"
+endif
+}
+
+grammar open *present >open
+
+{+open
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+if noun1 has LOCKED
+write  noun1{The} " " noun1{is} " locked.^"
+set time = false
+return true
+endif
+if noun1 hasnt CLOSABLE
+write "You can't open " noun1{the} .^
+set time = false
+return true
+endif
+if noun1 hasnt CLOSED
+write  noun1{The} " " noun1{is} " already open.^"
+set time = false
+return true
+endif
+override
+ensure noun1 hasnt CLOSED
+if noun1 has CONTAINER
+execute +revealing
+return true
+endif
+write "You open " noun1{the} .^
+}
+
+{+revealing
+set INDEX = 0
+loop
+if noun3(parent) = noun1
+set INDEX + 1
+endif
+endloop
+write "You open " noun1{the}
+if INDEX = 0
+write ", which " noun1{is} " empty.^"
+return true
+endif
+write " revealing "
+loop
+if noun3(parent) = noun1
+set INDEX - 1
+write noun3{list}
+execute +object_info
+execute +list_structure
+if INDEX = 0
+write .^
+return true
+endif
+endif
+endloop
+}
+
+grammar close *present        >close
+grammar shut *present         >close
+
+{+close
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+if noun1 hasnt CLOSABLE
+write "You can't close " noun1{the} .^
+set time = false
+return true
+endif
+if noun1 has CLOSED
+write  noun1{The} " " noun1{is} " already closed.^"
+set time = false
+return true
+endif
+override
+write "You close " noun1{the} .^
+ensure noun1 has CLOSED
+}
+
+grammar lock *present >lock
+
+{+lock
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+ifall noun1 has LOCKABLE : noun1 has LOCKED
+write  noun1{The} " " noun1{is} " already locked.^"
+return true
+endif
+ifall noun1 has CLOSABLE : noun1 hasnt CLOSED
+write "You can't lock " noun1{the} " while "
+if noun1 has PLURAL
+write "they are"
+else
+write "it is"
+endif
+write " open.^"
+set time = false
+return true
+endif
+if noun1 hasnt LOCKABLE
+write "You can't lock " noun1{the} .^
+return true
+endif
+override
+write "What did you want to lock " noun1{the} " with?^"
+}
+
+grammar lock *present with *held >lock_with
+
+{+lock_with
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if noun1 hasnt LOCKABLE
+write "You can't lock " noun1{the} .^
+set time = false
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+if noun1 has LOCKED
+write  noun1{The} " " noun1{is} " already locked.^"
+return true
+endif
+ifall noun1 has CLOSABLE : noun1 hasnt CLOSED
+write "You can't lock " noun1{the} " while "
+if noun1 has PLURAL
+write "they are"
+else
+write "it is"
+endif
+write " open.^"
+set time = false
+return true
+endif
+override
+write "You can't lock " noun1{the} " with " noun2{the} .^
+set time = false
+}
+
+grammar unlock *present >unlock
+
+{+unlock
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if noun1 hasnt LOCKABLE
+write "You can't unlock " noun1{the} .^
+set time = false
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+if noun1 hasnt LOCKED
+write  noun1{The} " " noun1{is} " already unlocked.^"
+set time = false
+return true
+endif
+override
+write "What did you want to unlock " noun1{the} " with?^"
+}
+
+grammar unlock *present with *held    >unlock_with
+grammar open *present with *held      >unlock_with
+
+{+unlock_with
+if noun1 hasnt LOCKABLE
+write "You can't unlock " noun1{the} .^
+set time = false
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+if noun1 hasnt LOCKED
+write  noun1{The} " " noun1{is} " already unlocked.^"
+return true
+endif
+override
+write "You can't unlock " noun1{the} " with " noun2{the} .^
+set time = false
+}
+
+grammar show *held to *present        >show_to
+
+{+show_to
+if +important<noun2 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if noun1 = noun2
+write "You can't show " noun1{the} " to "
+if noun1 has PLURAL
+write "themselves."
+else
+write "itself.^"
+endif
+set time = false
+return true
+endif
+override
+write  noun2{The} " " noun2{doesnt} " seem overly impressed by "
+write noun1{the} .^
+}
+
+grammar untie *present        >untie
+grammar free *present         >untie
+grammar undo *present         >untie
+
+{+untie
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+write  noun1{The} " " noun1{is} " not tied to anything.^"
+set time = false
+}
+
+grammar tie *held     >tie
+grammar attach *held  >tie
+
+{+tie
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+write "What do you want to tie " noun1{the} " to?^"
+set time to false
+}
+
+grammar tie *held to *present         >tie_to
+grammar fix *held to *present         >tie_to
+grammar attach *held to *present      >tie_to
+
+{+tie_to
+if +important<noun2 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun2 = true
+return true
+endif
+override
+write "You can't tie " noun1{the} " to " noun2{the} .^
+set time = false
+}
+
+grammar attack *present       >attack
+grammar hit *present          >attack
+grammar fight *present        >attack
+grammar kill *present         >attack
+grammar murder *present       >attack
+grammar punch *present        >attack
+
+{+attack
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+ifall noun1 has ANIMATE : noun1 has DEAD
+write  noun1{The} " " noun1{is} " already dead.^"
+set time = false
+return true
+endif
+override
+write "Attacking " noun1{the} " with your hands would have little "
+write "effect.^"
+set time = false
+}
+
+grammar attack *present with *held    >attack_with
+grammar hit *present with *held       >attack_with
+grammar fight *present with *held     >attack_with
+grammar kill *present with *held      >attack_with
+grammar murder *present with *held    >attack_with
+grammar stab *present with *held      >attack_with
+grammar poke *present with *held      >attack_with
+
+{+attack_with
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+if noun2 has LIQUID
+write  noun2{The} " run" noun2{s} " through your fingers.^"
+return true
+endif
+ifall noun1 has ANIMATE : noun1 has DEAD
+write  noun1{The} " " noun1{is} " already dead.^"
+set time = false
+return true
+endif
+if +worn<noun1 = true
+return true
+endif
+override
+write "Attacking " noun1{the} " with " noun2{the} " would have little "
+write "effect.^"
+set time = false
+}
+
+grammar wave  >wave
+
+{+wave
+write "You wave your arms around a bit.^"
+}
+
+grammar wave to *present      >wave_to
+
+{+wave_to
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if noun1 hasnt ANIMATE
+write "Not surprisingly, you get no response.^"
+return true
+endif
+write  noun1{The} " barely raises an eye brow.^"
+}
+
+grammar salute 	>salute
+
+{+salute
+print
+You fire off one of your snappiest saltues.^
+.
+}
+
+grammar salute *present		>salute_at
+grammar salute at *present	>salute_at
+grammar salute to *present	>salute_at
+
+{+salute_at
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if noun1 hasnt ANIMATE
+write "Not surprisingly, you get no response.^"
+return true
+endif
+override
+write "You salute " noun1{the} ".^"
+}
+
+grammar jump on to *here >jump_on
+grammar jump on *here    >jump_on
+grammar hop on *here     >jump_on
+grammar stand on *here   >jump_on
+
+{+jump_on
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+set time = false
+if noun1 hasnt SURFACE
+write "You can't jump on " noun1{the} .^
+return true
+endif
+write "This would achieve little.^"
+}
+
+grammar jump over *here       >jump_over
+
+{+jump_over
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+write "You can't jump over " noun1{the} .^
+set time = false
+}
+
+grammar jump             >jump
+
+{+jump
+if here has MID_AIR
+write "Not likely."
+return true
+endif
+if here has TIGHT_ROPE
+write "Something tells me that might be a bit too dangerous, not to "
+write "mention totally unnecessary.^"
+return true
+endif
+if here has UNDER_WATER : here has ON_WATER
+write "While underwater?^"
+return true
+endif
+if player has SITTING
+write "You would have to get up first.^"
+return true
+endif
+write "Consider it done.^"
+}
+
+grammar say yes >yes
+grammar yes   	>yes
+grammar okay  	>yes
+grammar yeah  	>yes
+
+{+yes
+write "That was a rhetorical question.^"
+set time = false
+}
+
+grammar say no	>no
+grammar nah 	>no
+grammar no		>no
+grammar no way	>no
+
+{+no
+write "That was a rhetorical question.^"
+set time = false
+}
+
+grammar say yes to *present 	>say_yes
+grammar yes to *present  		>say_yes
+grammar say okay to *present 	>say_yes
+grammar say yeah to *present 	>say_yes
+grammar *present comma yes		>say_yes
+grammar *present comma okay		>say_yes
+grammar *present comma yeah		>say_yes
+grammar *present comma okay		>say_yes
+
+{+say_yes
+if +can_talk<noun1 = true
+return true
+endif
+override
+write  noun1{The} " appear" noun1{s} " to pay no attention.^"
+}
+
+grammar say no to *present	>say_no
+grammar nah to *present 	>say_no
+grammar no to *present		>say_no
+grammar no way to *present	>say_no
+grammar *present comma no	>say_no
+
+{+say_no
+if +can_talk<noun1 = true
+return true
+endif
+override
+write  noun1{The} " appear" noun1{s} " to pay no attention.^"
+}
+
+grammar why   >why
+grammar why?  >why
+
+{+why
+write "Because.^"
+set time = false
+}
+
+grammar blow *held at *here   >blow_at
+grammar blow *held to *here   >blow_at
+
+{+blow_at
+if +important<noun2 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+write "You can't blow " noun1{the} " at " noun2{the} .^
+set time = false
+}
+
+grammar point *held at *here	>point_at
+grammar aim *held at *here		>point_at
+
+{+point_at
+if +important<noun2 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +move_scenery<noun1 = true
+return true
+endif
+if +worn<noun1 = true
+return true
+endif
+override
+if noun2 has ANIMATE
+write noun2{The} " looks at you quizzically.^"
+return true
+endif
+write "You point " noun1{the} " at " noun2{the} ".^"
+}
+
+grammar throw *held in *here	>throw_at
+grammar hurl *held in *here		>throw_at
+grammar pitch *held in *here	>throw_at
+grammar cast *held in *here		>throw_at
+grammar throw *held on *here	>throw_at
+grammar hurl *held on *here		>throw_at
+grammar pitch *held on *here	>throw_at
+grammar cast *held on *here		>throw_at
+grammar throw *held at *here	>throw_at
+grammar throw *held to *here	>throw_at
+grammar cast *held to *here		>throw_at
+grammar cast *held at *here		>throw_at
+grammar pitch *held to *here	>throw_at
+grammar pitch *held at *here	>throw_at
+grammar lob *held to *here		>throw_at
+grammar lob *held at *here		>throw_at
+grammar hurl *held to *here		>throw_at
+grammar hurl *held at *here		>throw_at
+
+{+throw_at
+if +important<noun2 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if noun2(parent) hasnt LOCATION
+write "You can't throw " noun1{the} " at " noun2{the} " while "
+if noun2 has PLURAL
+write "they are"
+else
+write "it is"
+endif
+write " in something else.^"
+set time = false
+return true
+endif
+if +move_scenery<noun1 = true
+return true
+endif
+if +worn<noun1 = true
+return true
+endif
+override
+if noun2 has ANIMATE
+write "I don't think " noun2{the} " would really appreciate you throwing "
+write noun1{the} " at "
+if noun2 has FEMALE
+write "her.^"
+else
+write "him.^"
+endif
+set time = false
+return true
+endif
+if noun1(mass) => 20
+write  noun1{The}
+if noun1 has PLURAL
+write " are "
+else
+write " is "
+endif
+write "a bit too heavy to go throwing around.^"
+set time = false
+return true
+endif
+if here has UNDER_WATER
+write "Throwing things underwater is never as easy as you might "
+write "think.^"
+set time = false
+return true
+endif
+if here has ON_WATER
+write "You throw " noun1{the} " at " noun2{the} " which "
+if noun1 has PLURAL
+write "they bounce"
+else
+write "it bounces"
+endif
+write " off, landing in the water where "
+if noun1 has PLURAL
+write "they"
+else
+write "it"
+endif
+write " rapidly sink" noun1{s} ", disappearing from sight.^"
+move noun1 to limbo
+return true
+endif
+write  noun1{The} " bounce" noun1{s} " off " noun2{the} " and land" noun1{s}
+write " on the ground.^"
+move noun1 to here
+}
+
+grammar remove **present       >remove
+grammar take off **present     >remove
+grammar doff **present         >remove
+
+{+remove
+ifall noun1 hasnt WORN : noun1(parent) = player
+write "You are not wearing " noun1{the} .^
+set time = false
+return true
+endif
+if noun1 hasnt WORN
+proxy "take " noun1{names}
+return true
+endif
+if noun1(mass) > player(quantity)
+write "You are carrying too much to remove " noun1{the} .^
+set time = false
+return true
+endif
+override
+set player(quantity) - noun1(mass)
+ensure noun1 hasnt WORN
+write "You remove " noun1{the} .^
+}
+
+grammar wear **held    >wear
+grammar put on **held  >wear
+grammar put **held on  >wear
+grammar don **held     >wear
+
+{+wear
+if noun1 hasnt WEARABLE
+write "You can't wear " noun1{the} .^
+set time = false
+return true
+endif
+if noun1 has WORN
+write "You are already wearing " noun1{the} .^
+set time = false
+return true
+endif
+override
+set player(quantity) + noun1(mass)
+ensure noun1 has WORN
+write "You put " noun1{the} " on.^"
+}
+
+grammar talk to *present >talk_to
+grammar talk with *present >talk_to
+
+{+talk_to
+if +can_talk<noun1 = true
+return true
+endif
+override
+write  noun1{The} " " noun1{doesnt} " appear very interested in a "
+write "conversation.^"
+}
+
+grammar eat *present          >eat
+
+{+eat
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+write "You can't eat " noun1{the} .^
+set time = false
+}
+
+grammar drink from *present   >drink_from
+grammar sip from *present     >drink_from
+
+{+drink_from
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +liquid?<noun1 = true
+proxy "drink " CHILD{names}
+set time = false
+return true
+endif
+write "There is nothing to drink in " noun1{the} .^
+set time = false
+}
+
+grammar drink *present        >drink
+grammar sip *present          >drink
+
+{+drink
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+if noun1 hasnt LIQUID
+write "You can't drink " noun1{the} .^
+set time = false
+return true
+endif
+override
+write "You drink " noun1{the} .^
+move noun1 to limbo
+}
+
+grammar flick *present >flick
+
+{+flick
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+if noun1 has LIQUID
+write "A wet hand is your only reward.^"
+return true
+endif
+override
+write "Flicking " noun1{the} " achieves nothing more than causing a sharp "
+write "pain in your index finger.^"
+}
+
+grammar press **present        >press
+grammar poke **present         >press
+
+{+press
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+if noun1 has LIQUID
+write "A wet hand is your only reward.^"
+return true
+endif
+override
+write "Pressing " noun1{the} " has no discernible effect.^"
+}
+
+grammar light *present with *held     >light_with
+grammar burn *present with *held      >light_with
+grammar ignite *present with *held    >light_with
+grammar set fire to *present with *held >light_with
+
+{+light_with
+if here has UNDER_WATER
+write "I don't think you are going to be lighting anything under "
+write "water.^"
+set time = false
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+if noun1 hasnt FLAMMABLE
+write  noun1{The} " " noun1{is} " not at all flammable.^"
+set time = false
+return true
+endif
+if noun2 hasnt IGNITABLE
+write "I don't see how you can light " noun1{the} " using " noun2 .^
+set time = false
+return true
+endif
+if noun1(quantity) = 0
+write  noun1{The} " has run out.^"
+return true
+endif
+if noun1 has BURNING
+write  noun1{The} " " noun1{is} " already lit.^"
+set time = false
+return true
+endif
+override
+write "You light " noun1{the} " using " noun2 .^
+ensure noun1 has BURNING
+ensure noun1 has LUMINOUS
+}
+
+grammar set *present to $integer	>set_to_integer
+grammar turn *present to $integer	>set_to_integer
+
+{+set_to_integer
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write "You can't set " noun1{the} " to anything.^"
+set time = false
+}
+
+grammar set *present to $integer with *held >set_to_integer_with
+grammar turn *present to $integer with *held >set_to_integer_with
+
+{+set_to_integer_with
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write "You can't set " noun1{the} " with " noun2{the} "^"
+}
+
+grammar burn *present         >light
+grammar light *present        >light
+grammar ignite *present       >light
+grammar set fire to *present  >light
+
+{+light
+if here has UNDER_WATER
+write "I don't think you are going to be lighting anything under "
+write "water.^"
+set time = false
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+if noun1 has IGNITABLE
+override
+write "You produce a brief flame.^"
+return true
+endif
+if noun1 hasnt FLAMMABLE
+write  noun1{The} " " noun1{is} " not at all flammable.^"
+set time = false
+return true
+endif
+if noun1 has BURNING
+write  noun1{The} " " noun1{is} " already alight.^"
+set time = false
+return true
+endif
+write "What did you intent to light " noun1{the} " with?^"
+set time = false
+}
+
+grammar extinguish *present   >extinguish
+grammar put out *present      >extinguish
+grammar put *present out      >extinguish
+
+{+extinguish
+if noun1 hasnt BURNING
+write  noun1{The} " " noun1{is} " not lit.^"
+set time = false
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write "You put out " noun1{the} .^
+ensure noun1 hasnt BURNING
+ensure noun1 hasnt LUMINOUS
+}
+
+grammar swim west >swim_west
+
+{+swim_west
+if here has UNDER_WATER
+travel west
+return true
+endif
+if here has ON_WATER
+travel west
+return true
+endif
+write "I don't see how you can swim when you are not in water.^"
+set time = false
+}
+
+grammar west      >west
+grammar go west   >west
+grammar walk west >west
+
+{+west
+if +sitting = true
+return true
+endif
+override
+travel west
+}
+
+grammar swim east >swim_east
+
+{+swim_east
+if here has UNDER_WATER : here has ON_WATER
+travel east
+return true
+endif
+write "I don't see how you can swim when you are not in water.^"
+set time = false
+}
+
+grammar east      >east
+grammar go east   >east
+grammar walk east >east
+
+{+east
+if +sitting = true
+return true
+endif
+override
+travel east
+}
+
+grammar swim south >swim_south
+
+{+swim_south
+if here has UNDER_WATER : here has ON_WATER
+travel south
+return true
+endif
+write "I don't see how you can swim when you are not in water.^"
+set time = false
+}
+
+grammar south      >south
+grammar go south   >south
+grammar walk south >south
+
+{+south
+if +sitting = true
+return true
+endif
+override
+travel south
+}
+
+grammar swim southeast >swim_southeast
+
+{+swim_southeast
+if here has UNDER_WATER : here has ON_WATER
+travel southeast
+return true
+endif
+write "I don't see how you can swim when you are not in water.^"
+set time = false
+}
+
+grammar southeast      >southeast
+grammar go southeast   >southeast
+grammar walk southeast >southeast
+
+{+southeast
+if +sitting = true
+return true
+endif
+override
+travel southeast
+}
+
+grammar swim southwest >swim_southwest
+
+{+swim_southwest
+if here has UNDER_WATER : here has ON_WATER
+travel southwest
+return true
+endif
+write "I don't see how you can swim when you are not in water.^"
+set time = false
+}
+
+grammar southwest      >southwest
+grammar go southwest   >southwest
+grammar walk southwest >southwest
+
+{+southwest
+if +sitting = true
+return true
+endif
+override
+travel southwest
+}
+
+grammar swim north >swim_north
+
+{+swim_north
+if here has UNDER_WATER : here has ON_WATER
+travel north
+return true
+endif
+write "I don't see how you can swim when you are not in water.^"
+set time = false
+}
+
+grammar north         >north
+grammar go north      >north
+grammar walk north    >north
+
+{+north
+if +sitting = true
+return true
+endif
+override
+travel north
+}
+
+grammar swim northeast >swim_northeast
+
+{+swim_northeast
+if here has UNDER_WATER : here has ON_WATER
+travel northeast
+return true
+endif
+write "I don't see how you can swim when you are not in water.^"
+set time = false
+}
+
+grammar northeast             >northeast
+grammar go northeast          >northeast
+grammar walk northeast        >northeast
+
+{+northeast
+if +sitting = true
+return true
+endif
+override
+travel northeast
+}
+
+grammar swim northwest >swim_northwest
+
+{+swim_northwest
+if here has UNDER_WATER : here has ON_WATER
+travel northwest
+return true
+endif
+write "I don't see how you can swim when you are not in water.^"
+set time = false
+}
+
+grammar northwest             >northwest
+grammar go northwest          >northwest
+grammar walk northwest        >northwest
+
+{+northwest
+if +sitting = true
+return true
+endif
+override
+travel northwest
+}
+
+grammar climb *here			>climb_up
+grammar climb up *here		>climb_up
+grammar walk up *here		>climb_up
+grammar go up *here			>climb_up
+
+{+climb_up
+write "You can not climb up " noun1{the} .^
+set time = false
+}
+
+grammar climb down *here      >climb_down
+grammar walk down *here       >climb_down
+grammar go down *here         >climb_down
+
+{+climb_down
+write "You can not climb down " noun1{the} .^
+set time = false
+}
+
+grammar enter *present		>enter
+grammar go through *present	>enter
+grammar go in *present		>enter
+grammar climb on *present	>enter
+grammar climb in *present	>enter
+grammar get in *present		>enter
+grammar jump in *present	>enter
+grammar get on *present		>enter
+
+{+enter
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+write "You can't enter " noun1{the} .^
+set time = false
+}
+
+integer NEARBY
+
+grammar follow *anywhere	>follow
+
+{+follow
+if noun1 is *here
+write noun1{The} " is right here!^"
+set time = false
+return
+endif
+
+set INDEX = -1
+
+# LOOP THROUGH ALL THE EXITS OF THE CURRENT LOCATION
+set COUNTER = 0
+repeat
+if here(COUNTER) = noun1(parent)
+set INDEX = COUNTER
+endif
+set COUNTER + 1
+until COUNTER = 12
+
+if INDEX != -1
+execute "+go_direction<INDEX"
+else
+write "You aren't sure which way to go.^"
+set time = false
+endif
+}
+
+grammar walk to *location	>go_to
+grammar go to *location		>go_to
+grammar go *location		>go_to
+
+{+go_to
+if noun1 = here
+write "You are already there!^"
+set time = false
+return
+endif
+dir_to INDEX here noun1
+if INDEX = -1
+write "You aren't sure which way to go.^"
+set time = false
+return
+endif
+write "] "
+style input
+write dir_command[INDEX] ^
+style normal
+execute "+go_direction<INDEX"
+}
+
+{+go_direction
+if arg[0] = north
+proxy "go north"
+return true
+endif
+if arg[0] = northeast
+proxy "go northeast"
+return true
+endif
+if arg[0] = east
+proxy "go east"
+return true
+endif
+if arg[0] = southeast
+proxy "go southeast"
+return true
+endif
+if arg[0] = south
+proxy "go south"
+return true
+endif
+if arg[0] = southwest
+proxy "go southwest"
+return true
+endif
+if arg[0] = west
+proxy "go west"
+return true
+endif
+if arg[0] = northwest
+proxy "go northwest"
+return true
+endif
+if arg[0] = up
+proxy "go up"
+return true
+endif
+if arg[0] = down
+proxy "go down"
+return true
+endif
+if arg[0] = in
+proxy "go in"
+return true
+endif
+if arg[0] = out
+proxy "go out"
+return true
+endif
+}
+
+grammar swim in >swim_in
+
+{+swim_in
+if here has UNDER_WATER : here has ON_WATER
+travel in
+return true
+endif
+write "I don't see how you can swim when you are not in water.^"
+set time = false
+}
+
+grammar go in		>in
+grammar get in		>in
+grammar climb in	>in
+grammar in			>in
+grammar enter		>in
+grammar walk in		>in
+
+{+in
+if +sitting = true
+return true
+endif
+override
+travel in
+}
+
+grammar swim out >swim_out
+
+{+swim_out
+if here has UNDER_WATER : here has ON_WATER
+travel out
+return true
+endif
+write "I don't see how you can swim when you are not in water.^"
+set time = false
+}
+
+grammar get out		>out
+grammar out			>out
+grammar exit		>out
+grammar leave		>out
+grammar climb out	>out
+grammar walk out	>out
+grammar go out		>out
+
+{+out
+if +sitting = true
+return true
+endif
+override
+travel out
+}
+
+grammar surface >swim_up
+grammar swim up >swim_up
+
+{+swim_up
+if here has UNDER_WATER : here has ON_WATER
+travel up
+return true
+endif
+write "I don't see how you can swim when you are not in water.^"
+set time = false
+}
+
+grammar up            >up
+grammar climb         >up
+grammar climb up      >up
+grammar jump up       >up
+grammar go up         >up
+grammar walk up       >up
+
+{+up
+if +sitting = true
+return true
+endif
+override
+travel up
+}
+
+grammar swim down     >swim_down
+grammar dive down     >swim_down
+grammar dive          >swim_down
+
+{+swim_down
+if here has UNDER_WATER : here has ON_WATER
+travel down
+return true
+endif
+write "I don't see how you can swim when you are not in water.^"
+set time = false
+}
+
+grammar down          >down
+grammar climb down    >down
+grammar jump down     >down
+grammar go down       >down
+grammar walk down     >down
+
+{+down
+if +sitting = true
+return true
+endif
+override
+travel down
+}
+
+grammar look	>look_around
+grammar ls		>look_around
+grammar watch	>look_around
+
+{+look_around
+if +darkness = true
+return true
+endif
+look
+set time = false
+}
+
+grammar look under *present		>look_under
+grammar search under *present	>look_under
+
+{+look_under
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if noun1(mass) >= heavy : noun1 has LOCATION
+write "You can't see under " noun1{the} .^
+set time = false
+return true
+endif
+write "There is nothing unusual under " noun1{the} .^
+}
+
+grammar look behind *present	>look_behind
+grammar search behind *present	>look_behind
+
+{+look_behind
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if noun1(mass) >= heavy : noun1 has LOCATION
+write "You can't see behind " noun1{the} .^
+set time = false
+return true
+endif
+write "There is nothing unusual behind " noun1{the} .^
+}
+
+grammar look through *present >look_through
+grammar look out *present     >look_through
+
+{+look_through
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+write "You can't look through " noun1{the} .^
+set time = false
+}
+
+grammar look through *held at *present        >look_through_at
+
+{+look_through_at
+proxy "look at " noun2{names} " through " noun1{names}
+}
+
+grammar look at *present through *held        >look_at_through
+grammar look at *present with *held           >look_at_through
+
+{+look_at_through
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if noun1 = noun2
+write "You can't look at " noun1{the} " through "
+if noun1 has PLURAL
+write "themselves.^"
+else
+write "itself.^"
+set time = false
+return true
+endif
+override
+write "You can't look at " noun1{the} " through " noun2{the} .^
+set time = false
+}
+
+grammar wait				>wait
+grammar z					>wait
+
+{+wait
+write "Time passes...^"
+}
+
+grammar listen        >listen
+
+{+listen
+override
+write "You don't hear anything out of the ordinary.^"
+}
+
+grammar listen to *present    >listen_to
+grammar listen at *present    >listen_to
+
+{+listen_to
+write "You don't hear anything out of the ordinary.^"
+}
+
+grammar use *present          >use
+grammar work *present         >use
+grammar operate *present      >use
+
+{+use
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if noun1 has ANIMATE
+write "I acknowledge that I probably don't want to know the answer to "
+write "this question, but in what way did you want to use " noun1{the} .^
+set time = false
+return true
+endif
+write "I'm afraid you are going to have to be a bit more specific "
+write "about how you want to use " noun1{the} ".^"
+}
+
+grammar rotate *present		>turn
+grammar turn *present		>turn
+grammar twist *present		>turn
+grammar twiddle *present	>turn
+grammar spin *present		>turn
+
+{+turn
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+write "You can't turn " noun1{the} .^
+set time = false
+}
+
+grammar rotate *present clockwise	>turn_clockwise
+grammar turn *present clockwise		>turn_clockwise
+grammar twist *present clockwise 	>turn_clockwise
+grammar twiddle *present clockwise	>turn_clockwise
+grammar spin *present clockwise		>turn_clockwise
+
+{+turn_clockwise
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+write "You can't turn " noun1{the} " clockwise.^"
+set time = false
+}
+
+grammar rotate *present anticlockwise	>turn_anticlockwise
+grammar turn *present anticlockwise		>turn_anticlockwise
+grammar twist *present anticlockwise 	>turn_anticlockwise
+grammar twiddle *present anticlockwise	>turn_anticlockwise
+grammar spin *present anticlockwise		>turn_anticlockwise
+
+{+turn_anticlockwise
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+write "You can't turn " noun1{the} " anticlockwise.^"
+set time = false
+}
+
+grammar turn on *present      >turn_on
+grammar turn *present on      >turn_on
+grammar switch on *present    >turn_on
+grammar switch *present on    >turn_on
+
+{+turn_on
+if +reach<noun1 = true
+return true
+endif
+override
+if noun1 has ON
+write  noun1{The} " " noun1{is} " already on.^"
+else
+write "You can't turn " noun1{the} " on.^"
+endif
+set time = false
+}
+
+grammar turn off *present	>turn_off
+grammar turn *present off	>turn_off
+grammar shut down *present	>turn_off
+grammar power down *present	>turn_off
+grammar shut off *present	>turn_off
+grammar power off *present	>turn_off
+grammar switch off *present	>turn_off
+grammar switch *present off	>turn_off
+
+{+turn_off
+if +reach<noun1 = true
+return true
+endif
+override
+write "You can't turn " noun1{the} " off.^"
+set time = false
+}
+
+grammar pour *present         >pour
+
+{+pour
+if +important<noun1 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if noun1 hasnt LIQUID
+write "You can't pour " noun1{the} .^
+set time = false
+return true
+endif
+set noun3 = noun1(parent)
+if noun3 = false : noun3(parent) <> player
+write "You don't have " noun1{the} .^
+set time = false
+return true
+endif
+if +closed<noun3 = true
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+override
+write "You pour " noun1{the} " all over the ground.^"
+move noun1 to limbo
+}
+
+grammar list objects >list_objs
+
+{+list_objs
+select noun3(mass) > 0
+write noun3{The}
+next
+}
+
+grammar tip *present on *present      >pour_on
+grammar tip *present down *present    >pour_on
+grammar tip *present in *present      >pour_on
+grammar tip *present over *present    >pour_on
+grammar pour *present down *present   >pour_on
+grammar pour *present on *present     >pour_on
+grammar pour *present in *present     >pour_on
+grammar pour *present over *present   >pour_on
+
+{+pour_on
+if +important<noun1 = true
+return true
+endif
+if +important<noun2 = true
+return true
+endif
+if +darkness = true
+return true
+endif
+if noun1 hasnt LIQUID
+write "You can't pour " noun1{the} .^
+set time = false
+return true
+endif
+if +reach<noun1 = true
+return true
+endif
+set noun3 = noun1(parent)
+if noun3 = false : noun3(parent) <> player
+write "You do not have " noun1{the} .^
+set time = false
+return true
+endif
+if +closed<noun3 = true
+return true
+endif
+if +reach<noun2 = true
+return true
+endif
+override
+if +liquid?<noun2 = true
+write  noun2{The} " already contain" noun2{s} " " CHILD{the} ". If you "
+write "were to also add " noun1{the} " they would mix together.^"
+set time = false
+return true
+endif
+ifall noun2 has CONTAINER : noun2 hasnt CLOSED
+override
+write "You pour " noun1{the} " into " noun2{the} .^
+move noun1 to noun2
+return true
+endif
+if noun2(parent) has CONTAINER
+set noun3 = noun2(parent)
+write  noun1{The} " run" noun1{s} " off " noun2{the} " and goes into "
+write noun3{the} ".^"
+move noun1 to noun3
+return true
+endif
+write  noun1{The} " runs off " noun2{the} " and goes all over the "
+write "ground.^"
+move noun1 to limbo
+}
+
+grammar blankjacl >blankjacl
+
+{+blankjacl
+write "A fiendishly clever move.^"
+set time = false
+}
+
+grammar instructions	>instructions
+grammar help		>instructions
+
+{+instructions
+print
+Interactive fiction involves the reader in a way that static stories
+do not. Rather than reading sequentially from beginning to end, you
+control the actions of the main character by typing commands in the
+form of simple English sentences. Before setting out on your adventure
+there are a few concepts that must be explained in order for you to
+interact successfully with the virtual world created by the author.^^
+The physical space that you will be exploring is divided up into
+discrete units called locations. Locations may be travelled between
+using the following commands:^^
+.
+style preformatted
+print
+||n  for north^
+||s  for south^
+||e  for east^
+||w  for west^
+||ne for northeast^
+||nw for northwest^
+||se for southeast^
+||sw for southwest^
+||u  for up^
+||d  for down^^
+.
+style normal
+print
+The description of each location will tell you which way you can
+travel from it. Be aware however that some exits may only be
+available under certain circumstances such as while a door is open
+or a bridge lowered.^^
+Within these locations you will find many objects that you may
+manipulate. These objects may be referred to by as few
+or as many of their names as is required to uniquely identify it.
+For example, if the story informs you that ~There is a silver key
+resting here.~ Then it may be referred to as either ~silver~, ~key~ or
+~silver key~. If your reference is ambiguous, such as using ~key~
+when there is both a silver and a gold key in the current location
+then you will be prompted to be more specific.^^
+
+The next major concept of interactive fiction to understand is the
+way in which you interact with these objects within
+the locations. The main aspect of the command interface
+to come to grips with is the scale, in other words, how much can be
+achieved with a single command. As you have seen earlier, moving from
+one location to another requires a single command. Commands such as
+~find dave~ or ~go to the library~ are not valid. You must manually
+move around the available world to achieve these tasks yourself. For
+this reason, making a map as you go is highly recommended.^^
+The basic sentence structures understood by the game are:^
+.
+style preformatted
+print
+action                            eg. scream ^
+action object                     eg. take book ^
+action object preposition object  eg. unlock door with key ^^
+.
+style normal
+print
+An action does not necessarily have to be a single word. For instance,
+~examine rock through magnifying glass~, an example of the last
+syntax, may also be expressed as ~look at rock through magnifying
+glass~.^^
+To further illustrate how much can be achieved in a single turn,
+consider the following list (being just some of the valid actions):^^
+.
+style preformatted
+print
+turn    read    pull    push    eat    cut^
+lock    unlock  rub     attack  taste  drink^
+break   smell   listen  pour    move   light^
+attack  blow    throw   wear    open   close^
+take    drop    insert  remove^^
+.
+style normal
+
+print
+The words ~it,~ ~them,~ ~him~ and ~her~ may be used to indicate the
+last appropriate object referred to in one of your commands.
+The words ~itself,~ ~themselves,~ ~himself~ and ~herself~ may be used
+to refer to the subject of the current command such as, ~ask dan about
+himself~.^^
+The word ~all~ or ~everything~ may be used in place of an object
+when using one of the verbs in the bottom row of the table above.^^
+
+However, a task such as defusing a bomb would generally not be achieved by
+typing ~defuse bomb~. The following is a sample transcript to give
+you a better idea of how this task such as this might be achieved.^^
+.
+
+style preformatted
+print
+> examine bomb^
+The bomb is about a foot square and has a small panel in its upper
+surface. The panel is currently closed.^^
+> listen to bomb^
+The bomb is making an ominous ticking sound.^^
+>open panel^
+You open the panel to reveal a red wire, a green wire, a blue wire,
+a clock and some dynamite.^^
+> i^
+You are carrying a bomb manual, an insurance policy and some wire
+cutters.^^
+> read manual^
+Leafing through the book you come to the page on diffusing. Seems
+straight forward enough, just cut the blue wire then the red
+one.^^
+> cut blue wire with cutters^
+Reaching carefully in to the bomb's casing you cut the blue wire. So
+far so good.^^
+> cut red wire with cutters^
+Holding your breath you snip the red wire.^^
+> listen to bomb^
+.
+style normal
+print
+The bomb, thankfully, is now silent.^^
+As you can see, each task you wish to achieve must be broken down
+into its component actions.^^
+
+During the course of the story you may encounter other computer
+controlled characters. These characters may be interacted with using
+the following commands:^^
+.
+style preformatted
+print
+||talk to <CHARACTER>^
+||give <OBJECT> to <CHARACTER>^
+||show <OBJECT> to <CHARACTER>^
+||ask <CHARACTER> for <OBJECT>^
+||ask <CHARACTER> about <OBJECT>^
+||tell <CHARACTER> about <OBJECT>^^
+.
+style normal
+print
+There are also some special commands for interacting with the
+program rather than the world it simulates:^^
+.
+style preformatted
+print
+||Command    Action^^
+||VERBOSE    always describe locations ^
+||BRIEF      only describe new locations ^
+||RESTART    start from the beginning ^
+||SCORE      display your score and rank ^
+||LOOK       describe the current location ^
+||SAVE       save the current position ^
+||RESTORE    restore a saved position ^
+||I          horizontal list of possessions ^
+||INV        vertical list of possessions ^
+||UNDO       take back last command ^
+||AGAIN      repeat the last command ^
+||INFO       display version information ^^
+.
+style normal
+print
+NOTE: If you are looking for a clue relevant to a specific location,
+type ~hint~, ~first hint~ or ~hint one~ in that location. The first
+hint will be a subtle clue with ~hint two~ being more blatant and
+~hint three~ being exact commands to type.^^
+
+You are now ready to embark on your first adventure into the
+world of interactive fiction.
+Remember to make a map as you go and read each
+part carefully as vital clues may be hidden in the descriptions of the
+locations and objects you come across. Examining every object you can
+refer to is a good idea, as is saving your position often. Well, good
+luck, and above all have fun!^
+.
+set time = false
+}
+
+;                                                    SPEAKING TO OTHER OBJECTS
+; ----------------------------------------------------------------------------
+; Grammar statements beginning with an object must be defined last in the game
+; to avoid confusion with verbs that may also be objects such as "drink drink"
+
+grammar *present comma press *present		>tell_to_press
+grammar *present comma push *present		>tell_to_press
+
+{+tell_to_press
+if +can_talk<noun1 = true
+return true
+endif
+write "~You press it,~ " noun1{the} " replies.^"
+}
+
+grammar *present comma give me *anywhere		>ask_for
+grammar *present comma give *anywhere to myself	>ask_for
+grammar *present comma give *anywhere to me		>ask_for
+
+grammar *present comma tell me about *anywhere			>ask_about
+grammar *present comma tell me all about *anywhere		>ask_about
+grammar *present comma what do you know about *anwhere	>ask_about
+
+grammar *present comma who are you		>who?
+grammar *present comma what is your name	>who?
+grammar *present comma what is your name?	>who?
+
+{+who?
+if +can_talk<noun1 = true
+return true
+endif
+proxy "ask " noun1{names} " about " noun1{names}
+}
+
+grammar *present comma sorry		>apologise
+grammar *present comma im sorry	>apologise
+grammar *present comma i am sorry	>apologise
+grammar apologise to *present	>apologise
+
+{+apologise
+if +can_talk<noun1 = true
+return true
+endif
+write  noun1{the} " assure" noun1{s} " you that no apology is "
+write "necessary.^"
+}
+
+grammar *present comma thanks		>thank
+grammar *present comma thank you	>thank
+grammar thank *present		>thank
+
+{+thank
+if +can_talk<noun1 = true
+return true
+endif
+write "~Don't mention it,~ "  noun1{the} " replies.^"
+}
+
+grammar hi *present					>greet
+grammar hello *present				>greet
+grammar greet *present				>greet
+grammar *present comma hello		>greet
+grammar *present comma hello sailor	>greet
+grammar *present comma hi there		>greet
+grammar *present comma dr			>greet
+grammar *present comma doctor		>greet
+grammar *present comma hi			>greet
+
+{+greet
+if +can_talk<noun1 = true
+return true
+endif
+override
+write  noun1{The}
+if noun1 has PLURAL
+write " nod.^"
+else
+write " nods.^"
+}
+
+grammar say *anywhere to *present	>say_object_to
+
+{+say_object_to
+proxy "say " noun1{names} " comma to " noun2{names}
+}
+
+grammar *present comma *anywhere	>object_object
+
+{+object_object
+if +can_talk<noun1 = true
+return true
+endif
+override
+write "You get no response.^"
+}
+
+grammar *present	>noun_only
+
+{+noun_only
+write "There is no verb in that sentence.^"
+set time = false
+}
+
+{+sitting
+if player has SITTING
+proxy "stand up"
+endif
+if player has SITTING
+write "You can't move while you are sitting down!^"
+set time = false
+return true
+endif
+return false
+}
+‚
