@@ -208,7 +208,7 @@ read_gamefile()
     create_cinteger ("index", 8);
     create_cinteger ("status", 9);
     create_cinteger ("state", 10);
-    create_cinteger ("counter", 11);
+    create_cinteger ("accumulator", 11);
     create_cinteger ("points", 12);
     create_cinteger ("class", 13);
     create_cinteger ("x", 14);
