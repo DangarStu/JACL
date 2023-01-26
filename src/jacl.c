@@ -18,7 +18,7 @@
 
 #include "csv.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef GARGLK
 #include <windows.h>
 #include "glkterm/glk.h"
@@ -81,7 +81,7 @@ static char		oops_buffer[1024];
 static char		oopsed_current[1024];
 char            last_command[1024];
 char			*blank_command = "blankjacl\0";
-static const char            *current_command = (char *) NULL;
+static char            *current_command = NULL;
 static char		command_buffer[1024];
 #ifndef NOUNICODE
 static glui32	command_buffer_uni[1024];
