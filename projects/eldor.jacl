@@ -1,0 +1,6694 @@
+;                                                            THE CURSE OF ELDOR
+; -----------------------------------------------------------------------------
+; Release 3, by Stuart Allen Copyright (C) 1995, 1996.
+
+variable DIRECTION_MOVED
+variable DEATH_PROOVED
+variable POTION_DRUNK
+variable DRAGON_PEPPERED
+variable BREAD_EATEN
+variable SAILOR_LISTENED
+variable TAP_POSITION
+variable DEBRIS_EXAMINED
+variable INTOXICATION_LEVEL
+variable SUSTENANCE_LEVEL
+variable ELDOR_FIGHT
+variable BIRD_EATING
+variable MOVEMENT_TIMER
+variable NAVIGATOR
+variable PHOTO_TIMER
+
+{global_eachturn
+if grue(location) = here
+   ensure grue has CUSTOM
+endif
+if grue(location) != here
+   ensure grue hasnt CUSTOM
+endif
+set there to grue(location)
+increment MOVEMENT_TIMER
+if MOVEMENT_TIMER = 3
+   execute "global_wander"
+   set MOVEMENT_TIMER to 0
+endif
+if grue has CUSTOM
+   if grue(location) != here
+      write "The retired grue heads "
+      execute "global_to_direction"
+endif
+if grue hasnt CUSTOM
+   if grue(location) = here
+      write "The retired grue enters from "
+      execute "global_from_direction"
+endif
+increment PHOTO_TIMER
+if PHOTO_TIMER = 14
+   if grue(location) = here
+      write "The grue produces a camera from his pocket, holds it out at an "
+      write "arms length, then proceeds to take a few happy snaps with "
+      write "himself in the foreground." return
+endif
+if grue(location) = log_cabin
+   if kryten(location) = log_cabin
+      if MOVEMENT_TIMER = 2
+         write "The grue stands by the fire, taking a moment to warm his "
+         write "hands." return
+endif
+if grue(location) = ledge
+   if kryten(location) = ledge
+      if MOVEMENT_TIMER = 2
+         write "The grue stands towards the entrance of the tunnel, peers "
+         write "down its length then shrugs nervously." return
+endif
+if grue(location) = tower
+   if kryten(location) = tower
+      if MOVEMENT_TIMER = 2
+         write "The grue takes out his camera and takes a photo of the "
+         write "mystical bird." return
+endif
+if monk has CUSTOM
+   write return "Seeing you appear the monk nods at you knowingly." return
+   ensure monk hasnt CUSTOM
+endif
+decrement SUSTENANCE_LEVEL
+if SUSTENANCE_LEVEL = 30
+   write return "You are beginning to feel hungry." return
+endif
+if SUSTENANCE_LEVEL = 20
+   write return "You are now very, very hungry." return
+endif
+if SUSTENANCE_LEVEL = 10
+   write return "You are now completely famished." return
+endif
+if SUSTENANCE_LEVEL = 0
+   write return "Collapsing to the ground you lay unconscious for several "
+   write "hours before eventually dying of hunger." return
+   execute "global_death"
+endif
+if SAILOR_LISTENED > false 
+   increment SAILOR_LISTENED
+   if SAILOR_LISTENED = 10
+      set bow(north) to deck_sea
+      set stern(south) to deck_sea
+      set galley(up) to deck_sea
+      set dock(west) to nowhere
+      if kryten(location) >= dock 
+         if kryten(location) < deck_sea 
+            execute "global_setsail"
+            write return
+            write "At moments notice the order is given for the gang plank "
+            write "to be raised and the ship slowly begins to set sail. "
+            write "As it leaves the sheltered area of the docks "
+            write "it begins to rock in the moderate swell of the northern "
+            write "sea." return
+            if kryten(location) >= deck_sea
+               if kryten(location) <= nest_sea
+                  write return
+                  look
+endif
+if SAILOR_LISTENED = 30
+   set bow(north) to deck_cove
+   set stern(south) to deck_cove
+   set galley(up) to deck_cove
+   if kryten(location) >= stern 
+      if kryten(location) <= nest_sea 
+         execute "global_arrive"
+         write return "Finaly, after you long voyage at sea, the ship comes "
+         write "to a halt on the beach of a small island." return
+         points 5 
+         if kryten(location) >= deck_cove
+            if kryten(location) <= nest_cove
+               write return
+               look
+endif
+if kryten(location) >= balloon_sea 
+   if kryten(location) <= balloon_castle 
+      write "The hot air balloon is blown eastward." return return
+      if kryten(location) = balloon_castle 
+         write "Much to your distress the hot air balloon blows straight into "
+         write "the side of one of the range's highest mountains sending you "
+         write "tumbling down is rocky face." return
+         execute "global_death"
+endif
+if kryten(location) = balloon_mountains 
+   execute "global_frommountains"
+   look
+endif
+if kryten(location) = balloon_forest 
+   execute "global_fromforest"
+   look
+endif
+if kryten(location) = balloon_sea 
+   execute "global_fromsea"
+   look
+endif
+if kryten(location) = balloon_beach 
+   if TAP_POSITION = true 
+      execute "global_frombeach"
+      look
+endif
+if kryten(location) = river 
+   move falls to river
+endif
+if kryten(location) = beh_waterfall
+   move falls to beh_waterfall
+endif
+if kryten(location) = ben_waterfall
+   move falls to ben_waterfall
+endif
+if kryten(location) = waterfall
+   move falls to waterfall
+endif
+if kryten(location) = graveyard 
+   move door to graveyard 
+endif
+if kryten(location) = crypt 
+   move door to crypt 
+endif
+if kryten(location) = stern
+   move trap_door to stern
+   ensure trap_door hasnt OUT_OF_REACH
+endif
+if kryten(location) = hold
+   move trap_door to hold
+   ensure trap_door has OUT_OF_REACH
+endif
+if DRAGON_PEPPERED != false
+   increment DRAGON_PEPPERED
+   if DRAGON_PEPPERED = 2
+      if kryten(location) = lair 
+         write return
+         write "The dragon opens it's mouth wide and shuts it's eyes tight in"
+         write "preparation for a sneeze that you don't want to be present "
+         write "for." return
+endif
+if DRAGON_PEPPERED = 3
+   if kryten(location) = lair 
+      write return
+      write "The dragon's lungs inhale vast quantities of air like two "
+      write "enormous bellows as it prepares to sneeze." return
+endif
+if DRAGON_PEPPERED = 4
+   if kryten(location) = lair 
+      write return
+      write "The dragon sneezes unleashing a huge ball of flame. "
+      write "Unfortunately your front row seat of the spectacle has left you "
+      write "worse for wear, much worse..." return
+      execute "global_death"
+endif
+if DRAGON_PEPPERED = 4
+   if kryten(location) >= ledge 
+      if kryten(location) <= tunnel
+         write return
+         write "A great roar comes from the west followed by a strong " 
+         write "gust of hot air." return return
+         write quote "Bless me," quote " a surprisingly high pitched voice "
+         write "chirps from within the lair." return 
+endif
+if DRAGON_PEPPERED = 4
+   set DRAGON_PEPPERED to 0
+endif
+if kryten(location) >= stern 
+   if kryten(location) <= beach 
+      if uniform hasnt WORN 
+         execute "global_no_uniform"
+endif
+if kryten(location) >= stern 
+   if kryten(location) <= beach 
+      if crystal childof player 
+         execute "global_crystal_stolen"
+endif
+if kryten(location) >= stern 
+   if kryten(location) <= beach 
+      if knife childof player 
+         if knife has CUSTOM
+            execute "global_blood_spotted"
+endif
+if POTION_DRUNK > 0
+   increment POTION_DRUNK
+   if POTION_DRUNK = 5
+      write return
+      write "Gradually the feeling of strength you acquired from the potion "
+      write "begins to subside." return
+      set POTION_DRUNK to 0
+endif
+if INTOXICATION_LEVEL > 0
+   decrement INTOXICATION_LEVEL
+   if INTOXICATION_LEVEL = 0
+      write return "You begin to feel sober again." return
+endif
+if kryten(location) = main_street
+   if mug childof player 
+      write return
+      write "As you step out into the street the bartender comes running out "
+      write "of the tavern and takes back his mug, then returns inside." return
+      move mug to limbo
+endif
+if kryten(location) = study
+   if ELDOR_FIGHT = 0
+      write return "Looking up as you enter, a look of anger comes of Eldor's "
+      write "face. Without hesitation he thrusts a finger in your direction "
+      write "from which a bright bolt of lightening leaps "
+      if amulet has WORN 
+         write "stiking the amulet which appears to absorb it's energy. "
+         write "Trying hard to look unpreturbed, Eldor places the palms "
+         write "of his hands on his desk and stares at you expectantly." return
+endif
+if kryten(location) = study
+   if ELDOR_FIGHT = 0
+      increment ELDOR_FIGHT
+      if amulet hasnt WORN 
+         write "striking you in chest. Stunned, you stagger to you feet "
+         write "and in a state of confusion and panic step back towards "
+         write "the exit. Sweat dripping from you brow you attempt to "
+         write "scramble back down the stairs but not before a second "
+         write "bolt causes you to loose you grip and fall to your death "
+         write "on the cold stone floor of the tower below." return
+         execute "global_death"
+endif
+if BIRD_EATING != false
+   decrement BIRD_EATING
+   if BIRD_EATING = false
+      set tower(up) to nowhere
+      move fruit to limbo
+      describe bird as "An enourmous mystical bird is perched on the bottom step of the stairs."
+      if kryten(location) = tower
+         write return "Having finished the fruit, the enourmous bird goes "
+         write "back to guarding the stairs." return
+endif
+}
+
+{global_wander
+if there = junction
+   if DIRECTION_MOVED = 5
+      if NAVIGATOR = false
+         toggle NAVIGATOR
+         move grue to track_west
+         set DIRECTION_MOVED to 7
+         break
+endif
+if there = junction
+   if DIRECTION_MOVED = 5
+      if NAVIGATOR = true 
+         toggle NAVIGATOR
+         move grue to track_east
+         set DIRECTION_MOVED to 3
+         break
+endif
+if there = junction
+   if DIRECTION_MOVED = 3
+      move grue to path
+      set DIRECTION_MOVED to 5
+      break
+endif
+if there = junction
+   if DIRECTION_MOVED = 7
+      move grue to path
+      set DIRECTION_MOVED to 5
+      break
+endif
+if there = path 
+   if DIRECTION_MOVED = 5
+      move grue to forest
+      set DIRECTION_MOVED to 3
+      break
+endif
+if there = ledge
+   move grue to m_path
+   set DIRECTION_MOVED to 5
+   break
+endif
+if there = m_path
+   if DIRECTION_MOVED = 5
+      move grue to mountains
+      set DIRECTION_MOVED to 3
+      break
+endif
+if there = mountains
+   if DIRECTION_MOVED = 3
+      set DIRECTION_MOVED to 5
+      move grue to trail
+      break
+endif
+if DIRECTION_MOVED = 1
+   if there(north) != false
+      set there to there(north)
+      move grue to there
+      break
+endif
+if DIRECTION_MOVED = 2
+   if there(northeast) != false
+      set there to there(northeast)
+      move grue to there
+      break
+endif
+if DIRECTION_MOVED = 3
+   if there(east) != false
+      set there to there(east)
+      move grue to there
+      break
+endif
+if DIRECTION_MOVED = 4
+   if there(southeast) != false
+      set there to there(southeast)
+      move grue to there
+      break
+endif
+if DIRECTION_MOVED = 5
+   if there(south) != false
+      set there to there(south)
+      move grue to there
+      break
+endif
+if DIRECTION_MOVED = 6
+   if there(southwest) != false
+      set there to there(southwest)
+      move grue to there
+      break
+endif
+if DIRECTION_MOVED = 7
+   if there(west) != false
+      set there to there(west)
+      move grue to there
+      break
+endif
+if DIRECTION_MOVED = 8
+   if there(northwest) != false
+      set there to there(northwest)
+      move grue to there
+      break
+endif
+if DIRECTION_MOVED = 9
+   if there(up) != false
+      set there to there(up)
+      move grue to there
+      break
+endif
+if DIRECTION_MOVED = 10
+   if there(down) != false
+      set there to there(down)
+      move grue to there
+      break
+endif
+if DIRECTION_MOVED = 11
+   if there(in) != false
+      set there to there(in)
+      move grue to there
+      break
+endif
+if DIRECTION_MOVED = 12
+   if there(out) != false
+      set there to there(out)
+      move grue to there
+      break
+endif
+if there(north) != false
+   set there to there(north)
+   move grue to there
+   set DIRECTION_MOVED to 1
+   break
+endif
+if there(northeast) != false
+   set there to there(northeast)
+   move grue to there
+   set DIRECTION_MOVED to 2
+   break
+endif
+if there(east) != false
+   set there to there(east)
+   move grue to there
+   set DIRECTION_MOVED to 3
+   break
+endif
+if there(southeast) != false
+   set there to there(southeast)
+   move grue to there
+   set DIRECTION_MOVED to 4
+   break
+endif
+if there(south) != false
+   set there to there(south)
+   move grue to there
+   set DIRECTION_MOVED to 5
+   break
+endif
+if there(southwest) != false
+   set there to there(southwest)
+   move grue to there
+   set DIRECTION_MOVED to 6
+   break
+endif
+if there(west) != false
+   set there to there(west)
+   move grue to there
+   set DIRECTION_MOVED to 7
+   break
+endif
+if there(northwest) != false
+   set there to there(northwest)
+   move grue to there
+   set DIRECTION_MOVED to 8 
+   break
+endif
+if there(up) != false
+   set there to there(up)
+   move grue to there
+   set DIRECTION_MOVED to 9
+   break
+endif
+if there(down) != false
+   set there to there(down)
+   move grue to there
+   set DIRECTION_MOVED to 10 
+   break
+endif
+if there(in) != false
+   set there to there(in)
+   move grue to there
+   set DIRECTION_MOVED to 11 
+   break
+endif
+if there(out) != false
+   set there to there(out)
+   move grue to there
+   set DIRECTION_MOVED to 12 
+   break
+}
+
+{global_to_direction
+if DIRECTION_MOVED = 1
+   write "north." return
+   break
+endif
+if DIRECTION_MOVED = 2
+   write "northeast." return
+   break
+endif
+if DIRECTION_MOVED = 3
+   write "east." return
+   break
+endif
+if DIRECTION_MOVED = 4
+   write "southeast." return
+   break
+endif
+if DIRECTION_MOVED = 5
+   write "south." return
+   break
+endif
+if DIRECTION_MOVED = 6
+   write "southwest." return
+   break
+endif
+if DIRECTION_MOVED = 7
+   if here = mountains
+      write "west along a barely identifiable path." return
+      break
+endif
+if DIRECTION_MOVED = 7
+   write "west." return
+   break
+endif
+if DIRECTION_MOVED = 8
+   write "northwest." return
+   break
+endif
+if DIRECTION_MOVED = 9
+   write "up." return
+   break
+endif
+if DIRECTION_MOVED = 10
+   write "down." return
+   break
+endif
+if DIRECTION_MOVED = 11
+   write "inside." return
+   break
+endif
+if DIRECTION_MOVED = 12
+   write "outside." return
+}
+
+{global_from_direction
+if DIRECTION_MOVED = 1
+   write "the south." return
+   break
+endif
+if DIRECTION_MOVED = 2
+   write "the southwest." return
+   break
+endif
+if DIRECTION_MOVED = 3
+   write "the west." return
+   break
+endif
+if DIRECTION_MOVED = 4
+   write "the northwest." return
+   break
+endif
+if DIRECTION_MOVED = 5
+   write "the north." return
+   break
+endif
+if DIRECTION_MOVED = 6
+   write "the northeast." return
+   break
+endif
+if DIRECTION_MOVED = 7
+   write "the east." return
+   break
+endif
+if DIRECTION_MOVED = 8
+   write "the southeast." return
+   break
+endif
+if DIRECTION_MOVED = 9
+   write "above." return
+   break
+endif
+if DIRECTION_MOVED = 10
+   write "below." return
+   break
+endif
+if DIRECTION_MOVED = 11
+   write "outside." return
+   break
+endif
+if DIRECTION_MOVED = 12
+   write "inside." return
+}
+
+{global_arrive
+loop
+  if noun3(location) = deck_sea
+     move noun3 to deck_cove
+  endif
+endloop
+  loop 
+    if noun3(location) = nest_sea
+       move noun3 to nest_cove
+    endif
+endloop
+}
+
+{global_setsail
+loop
+  if noun3(location) = deck_docked
+     move noun3 to deck_sea
+  endif
+endloop
+  loop 
+    if noun3(location) = nest_docked
+       move noun3 to nest_sea
+    endif
+endloop
+}
+
+{global_intro
+clear
+write quote
+write "Who can save us now!" quote " the chief councillor cries as he peers "
+write "at the frightened, fire lit faces that fill the village's hall. " quote
+write "For twenty days now the black rain has fallen, slowly killing the "
+write "forest and threatening the lively hood of all those who inhabit it."
+write quote " Stepping carefully around a large stone pillar near the back "
+write "of the hall you slowly make your way to the front of the crowd. " quote
+write "Unless someone can defeat Eldor and recover the artefacts necessary "
+write "to lift the curse we will have no choice but to leave our home land "
+write "forever" quote " the councillor continues pulling his hood back from "
+write "his grim face. " quote "Who will be that someone?" quote return return
+write "Pausing for a while, the councillor pulls a leather pouch from "
+write "his pocket and holds them up for all to see, " quote "Who ever can "
+write "return Eldor's head to me along with the artefacts we need to lift "
+write "the curse shall receive these coins as their reward. It is not much, "
+write "but the best we can do. May your journey be safe and our village soon "
+write "be free to live in peace once more." quote return return return
+more
+clear
+write bold 
+centre "T H E   C U R S E   O F   E L D O R"
+write plain return
+centre "Adventure written by Stuart Allen (stuart@perf.no.itg.telecom.com.au)" 
+centre "Release 3 Copyright (C) 1995 - 1996"
+write plain return return return return
+set CURRENT_PLAYER to kryten
+set kryten(location) to hall 
+set SUSTENANCE_LEVEL to 100 
+set MAX_CARRIED      to 45
+look
+}
+
+location hall "Village Hall" 
+ west    village
+ out     village
+ no_go   "The only exit from here is west, out into the street."
+
+{look
+write "A large open fire both lights and warms the village hall. Wide stone "
+write "pillars rise tall and strong from the floor to meet the ceiling high "
+write "above your head where the sounds a young birds can be heard calling "
+write "from their nests hidden in the shadows. A polished wooden podium "
+write "stands at the far end of the hall with several rows of benches before "
+write "it. A set of large double doors stand open to the west." return 
+if kryten has SITTING
+   write "(You are sitting on the benches.)" return
+}
+
+{listen
+write "You can hear the sounds of young birds calling from their nests." return
+}
+
+object nest a plain nest
+ has OUT_OF_REACH
+ inventory "nest"
+ 
+synonym nests nest
+
+{examine
+write "The bird's nests are hidden high up in the shadows." return
+}
+
+object bench a wooden bench
+ inventory "wooden bench"
+ mass      scenery
+
+synonym benches bench
+
+{examine
+write "The wooden benches do not look particularly comfortable." return
+}
+
+{sit_on
+if kryten has SITTING
+   write "You already are sitting." return
+   break
+endif
+write "You plonk yourself down on the end of one of the benches and wriggle "
+write "around until you are still no longer comfortable." return
+ensure kryten has SITTING
+}
+
+{look_under
+write "Nothing but dust." return
+}
+
+object fire an open fire
+ inventory "open fire"
+ mass      scenery
+
+synonym hearth fire
+
+{examine
+write "The bright orange flames dance hipnotically as you stare deeper and "
+write "deeper into their heart." return
+}
+
+object pillar a tall pillar
+ inventory "tall pillar"
+ mass      scenery
+
+synonym pillars pillar
+
+{look_behind
+write "Looking behind the pillar you see nothing other than footsteps in "
+write "the dust from when you were standing there." return
+}
+
+{examine
+write "The pillars are made from large stone blocks and rise from the floor "
+write "to the ceiling almost thirty feet above your head." return
+}
+
+object pouch a leather pouch
+ inventory "leather pouch"
+ starts childof councillor
+
+{ask_for
+write quote "You know what is required from you if you wish to earn the "
+write "coins" quote " says the councillor sternly." return
+}
+
+object councillor a plain councillor
+ has       ANIMATE
+ described "The councillor is here, standing by the podium."
+ inventory "councillor"
+ mass      scenery
+
+{tell_about_eldor
+if eldor has DEAD 
+   if DEATH_PROOVED = false
+      write "You tell the councillor the tale of your valiant battle with "
+      write "Eldor resulting in his death to which he demands proof." return
+      write return quote "To begin the ceremony required to lift the curse "
+      write "while Eldor is still alive would undoubtedly lead to our " 
+      write "destruction" quote " the councillor goes on to explain. " quote
+      write "Therefore it would be irresponsible of me to allow it without "
+      write "conclusive proof of his demise." quote return
+      break
+endif
+if eldor has DEAD 
+   if DEATH_PROOVED = true
+      write "You enthusiastically recall you battle with Eldor in great "
+      write "detail." return
+      break
+endif
+write quote "So, I hear this Eldor is a pretty bad dude" quote " you inform "
+write "the councillor." return
+}
+
+{ask_for_clove_override
+write "I think I should hang onto it for now." return
+}
+
+{ask_for_staff_override
+write "I think I should hang onto it for now." return
+}
+
+{ask_for_scroll_override
+write "I think I should hang onto it for now." return
+}
+
+{examine
+write "The councillor is a well respected man throughout the whole forest. "
+write "For the most part he rules the land with little intervention, allowing "
+write "the people to live their lives with as little interference as "
+write "possible. On the other hand, however, he is also a kind man, willing "
+write "to help where ever and when ever he can." return
+}
+
+{listen_to
+write "You can not make out what the councillor is saying to the historian, "
+write "but from the grave tone of his voice, you are sure he is discussing "
+write "the curse." return
+}
+
+{attack_with_sword
+write "As you draw you sword six royal guards appear from nowhere and have "
+write "you pinned to the ground in seconds. Within a week you are tried and "
+write "found guilty for the attempted murder of the Councillor. Life from "
+write "this point onward is pretty rough until one day, at the Councillors "
+write "own command, you are hung." return return
+execute "global_death"
+}
+
+object historian a village historian 
+ has       ANIMATE
+ described "The village historian is here talking to the councillor."
+ inventory "historian"
+ mass      scenery
+
+{ask_about_eldor
+write "Eldor is an evil man. He placed the curse on our village through spite "
+write "of our peaceful existence. Basically he's just a real smeg head." return
+}
+
+{examine
+write "The historian an old man, dressed humbly in a dark brown cloak." return
+execute "global_contents"
+}
+
+{listen_to
+write "The historian is desperately trying to reassure the councillor that "
+write "Eldor will be defeated and that the curse will be lifted from the "
+write "land before it is too late." return
+}
+
+{attack_with_sword
+write "Before you have even fully drawn your sword you notice the historian "
+write "staring you straight in the eyes. You stand mesmerised by his gaze, a "
+write "strange and unfamiliar feeling of peace and harmony over comes you, "
+write "causing you to wonder why you would ever even consider hurting such a "
+write "good friend. With a knowing smile the historian returns to his "
+write "conversation with the councillor." return
+}
+
+{talk_to
+write "Politely excusing yourself to the councillor, you press the historian "
+write "for information on you quest." return return " " quote 
+write "In order to lift the curse once Eldor has been defeated, three "
+write "artefacts will be required. The first, a clove of the herb Hujara, can "
+write "be found growing wild in the northern regions of the forest. The last "
+write "two however," quote " the historian informs you, " quote "I know not "
+write "of their whereabouts. The Scroll of Summoning is said to have been "
+write "hidden by the Druids in order to 'save it from corruption', what ever "
+write "they mean by that" quote " the councillor mutters something inaudible "
+write "under his breath then continues, " quote "It has a magic far "
+write "greater that our own, and without it we will have no chance of "
+write "conjuring up the power necessary to break the curse. Finally, we will "
+write "need Adreal's staff. Last seen over a century ago, it was lost when "
+write "Adreal was knocked from his horse during the goblin invasion of 912 "
+write "and no one has seen it since. Without it our magic will have no form "
+write "and will dissipate long before we are able to channel it to our cause."
+write quote return
+if note childof historian 
+   write return "Reaching into his pocket, the historian takes out a note "
+   write "and places it one the podium for you to take then turns back to the "
+   write "councillor." return
+   move note to podium 
+endif
+}
+
+{kiss
+write "Flattered, the historian gives you a strange smile." return
+}
+
+object note a small note
+ inventory "small note"
+ described "There is a small note resting here."
+ starts childof historian 
+ mass      1
+
+{read
+execute "examine_note"
+}
+
+{examine
+write "The note is a small piece of parchment with the following scrawled "
+write "on it..." return return
+write "  A clove of Hujara." return
+write "  Adreal's staff." return
+write "  The Scroll of Summoning." return
+}
+
+object podium a polished podium
+ has       SURFACE
+ inventory "polished podium"
+ quantity  20
+ mass      scenery
+
+{clean
+write "The podium is already so clean that you can make out your reflection."
+write return
+}
+
+{examine
+write "The podium is made from fine maple and is obviously polished on a "
+write "regular basis with great pride and care." return
+execute "global_details"
+}
+
+object doors a double door
+ has       CLOSABLE LOCKABLE
+ inventory "set of double doors"
+ mass      scenery
+ 
+synonym doors door
+
+{open
+write "The double door are already open." return
+}
+
+{close
+write "The double doors are always left open as all are welcome to meet here."
+write return
+}
+
+{examine
+write "The large double doors are wide open inviting anyone to meet here."
+write return
+}
+
+location village "Village"
+ north   road
+ south   graveyard
+ east    hall
+ west    church
+
+{look
+write "You are standing in the centre of the village square. The rough cobble "
+write "stone ground rises and falls unevenly from the many years of use. The "
+write "village hall lies to the east while the church's doors stand open "
+write "to the west. Through the village centre runs a narrow north-south road "
+write "leading from the graveyard's gates in the south, deep into the forest "
+write "in the north." return
+}
+
+object cobble some cobble stone
+ inventory "cobble stones"
+
+synonym stones stone
+
+{examine
+write "Worn smooth from years of weather and use the cobble stones are now "
+write "very uneven." return
+}
+
+{take
+write "Thinking of paving your backgarden are you?" return
+}
+
+location graveyard "Graveyard"
+ north   village
+ east    nowhere
+ no_east "The door is closed." 
+
+{look
+write "This is the village graveyard. Generations of common villagers and "
+write "gallant heroes alike rest here side by side. Around the various tombs "
+write "stones a small path weaves it's way east to the front door of a large "
+write "stone crypt standing tall by the perimeter fence. The only other exit "
+write "is back north, into the village. " 
+if door hasnt CLOSED 
+   write "The heavy stone door leading into the crypt is open." return
+   break
+endif
+write "The heavy stone door leading into the crypt is firmly shut." return
+}
+
+object tomb some tomb stone
+ inventory "tomb stones"
+ mass      scenery
+
+{examine
+write "The tomb stones tell of the generations of villager's to have been "
+write "buried here since the village was first settled over five hundred "
+write "years ago." return
+}
+
+object tumblers some plain tumblers 
+ inventory "tumblers"
+ mass      scenery
+ 
+{pick_with_wire
+execute "unlock_with_wire_door"
+}
+
+{examine
+write "The tumblers are reasonably crude yet sturdy." return
+}
+
+object crypt_obj a stone crypt
+ inventory "stone crypt"
+ mass      scenery
+
+{examine
+write "The crypt is obviously that of a nobleman. It's ornately carved "
+write "gargoyles seem to stare at you as you move about the graveyard. "
+if door hasnt CLOSED 
+   write "The heavy stone door leading into the crypt is open." return
+   break
+endif
+write "The heavy stone door leading into the crypt is firmly shut." return
+}
+
+object door a stone door
+ has       CLOSABLE LOCKABLE
+ inventory "stone door"
+ mass      scenery
+ has       CLOSED LOCKED 
+
+{pick_with_wire
+execute "unlock_with_wire_door"
+}
+
+{unlock_with_wire
+write "Inserting the wire into the lock you run it along the tumblers whilst "
+write "applying pressure on the handle until it unlocks." return
+ensure door hasnt LOCKED 
+}
+
+{lock_with_wire
+write "You lock the door using the wire." return
+ensure door has LOCKED 
+}
+
+{close_override
+ensure door has CLOSED 
+ensure crypt has DARK 
+write "The door groans as you push it closed." return
+set crypt(west) to nowhere
+set graveyard(east) to nowhere
+if kryten(location) = crypt 
+   if crypt(luminance) = dark 
+      write "With the door closed, the crypt is in complete darkness." return
+endif
+}
+
+{open_override
+write "With a heave, you pull the door open." return
+ensure crypt hasnt DARK 
+ensure door hasnt CLOSED 
+set crypt(west) to graveyard
+set graveyard(east) to crypt 
+}
+
+{examine
+write "A large set of iron tumblers can be seen in the crude lock of the "
+write "heavy stone door which is currently "
+if door hasnt CLOSED 
+   write "open." return
+   break
+endif
+write "closed." return
+}
+
+{knock_on
+write "Quite predictably, there is no answer." return
+}
+
+location crypt "Crypt"
+ has     DARK 
+ west    nowhere 
+ no_west "The door to is closed." 
+
+{look
+write "You are standing in the middle of a large windowless crypt. In the "
+write "centre of the room you can make out a large sarcophagus with a square "
+write "bronze plate set in the centre of it's heavy stone lid. Brightly "
+write "coloured banners hang on the walls indicating this to the be the "
+write "final resting place of a knight of the king's army. There is a large "
+write "stone door to the west. "
+if crypt(west) = false 
+   write "The door is closed." return
+   break
+endif
+write "The door is open." return
+}
+
+object banners some plain banners
+ inventory "brightly coloured banners"
+ mass      scenery
+
+{examine
+write "The banners depict scenes from great battles throughout history." return
+}
+
+{look_behind
+write "For a moment, you thought you saw Elvis." return
+}
+
+object lid a stone lid
+ inventory "stone lid"
+
+{open
+proxy "open sarcophagus"
+}
+
+{close
+proxy "close sarcophagus"
+}
+
+{examine 
+proxy "examine sarcophagus"
+}
+
+object plate a bronze plate
+ inventory "bronze plate"
+
+{read
+execute "examine_plate"
+}
+
+{examine
+write "The plate reads as follows..." return return return
+write "                               R. I. P." return return
+write "                           THALOS 1149-1193" return return
+write "                       KNIGHT OF THE KINGS ARMY" return
+}
+
+object sarcophagus a stone sarcophagus
+ has       CONTAINER CLOSABLE CLOSED
+ inventory "stone sarcophagus"
+ quantity  25
+
+{examine
+write "The sarcophagus is made completely from stone with a square bronze "
+write "plate set in the centre of it's lid. " 
+execute "global_details"
+}
+
+location church "Church"
+ east    village
+ up      clock_tower
+ go_up   "The stairs creek as walk up them."
+
+{look
+write "This is the village church. The only exit from here, other than back "
+write "east, into the village, is a set of stairs in the corner leading up. "
+write "A tall monk in a plain brown robe stands next to a battered wooden "
+write "sign in the corner." return
+}
+
+object stairs_bot a wooden stairs
+ inventory "set of wooden stairs"
+
+synonym steps stairs
+
+{examine
+write "The stairs lead up into the church's clock tower." return
+}
+
+{climb
+proxy "u"
+}
+
+{climb_up
+proxy "u"
+}
+
+{climb_down
+write "You are already at the bottom of the stairs." return
+}
+
+object sign a wooden sign
+ inventory "wooden sign"
+
+{read
+execute "examine_sign"
+}
+
+{examine
+write "The sign reads..." return return
+write "      LIFE INSURANCE POLICIES" return
+write "           1 GOLD PIECE" return
+}
+ 
+{take
+write "Stealing from a church?" return
+}
+
+object monk a plain monk
+ has       ANIMATE
+ inventory "monk"
+
+{examine
+write "Something about the monk makes you feel uneasy but you can't quite "
+write "put your finger on it. " 
+execute "global_contents"
+}
+
+{ask_for_g_coin_override
+write quote "No way!" return
+}
+
+{ask_for_policy
+write quote "Give me a gold piece and I will," quote " the monk snaps." return
+}
+
+{attack
+write "You couldn't... could you?" return
+}
+
+{attack_with_sword
+write "You couldn't... could you?" return
+}
+
+{attack_with_knife
+write "You couldn't... could you?" return
+}
+
+{talk_to
+if policy childof monk
+   write "Pointing to the sign the monk informs you of the dangers of "
+   write "adventuring without the appropriate life insurance." return
+   break
+endif
+write "The monk seems oddly disinterested in talking to you." return
+}
+
+object policy an insurance policy
+ described "Lying on the ground is an insurance policy."
+ inventory "insurance policy"
+ starts childof monk
+
+{examine
+execute "read_policy"
+}
+
+{read
+write "This policy entitles the holder to one (1) resurrection. Upon "
+write "resurrection you will be transported to our nearest office as "
+write "soon as the excess payment of one piece of treasure has been payed "
+write "to your administrating angel." return
+}
+
+object drumstick a turkey drumstick
+ inventory "turkey drumstick"
+ initial   "There is a succulent drumstick on one of the tables."
+ described "There is a succulent drumstick here."
+ mass      5
+
+{eat
+if SUSTENANCE_LEVEL > 120
+   write "You are not hungry." return
+   break
+endif
+increment SUSTENANCE_LEVEL by 30
+move drumstick to limbo 
+write "You eat the drumstick." return
+}
+
+location clock_tower "Clock Tower"
+ down    church
+
+{look
+write "You are in the top of the Church's clock tower. Straight infront of "
+write "you an enormous cog turns slowly driven by an equally enormous set "
+write "of weights. A set of smaller cogs mesh with the main cog filling the "
+write "room with a loud grinding noise. The only exit is back down the stairs "
+write "into the church." return
+}
+
+{listen
+write "It's hard to hear anything over the loud grinding noise of the cogs."
+write return
+}
+
+object clock a plain clock
+ inventory "clock"
+
+{examine
+write "The clock is made up from a main cog, a set of smaller cogs that mesh "
+write "with it and a set of weights suspended from a strong chain." return
+}
+
+object stairs_top a wooden stairs
+ inventory "set of wooden stairs"
+
+{examine
+write "The stairs lead down into the church's main hall." return
+}
+
+{climb
+proxy "d"
+}
+
+{climb_up
+write "You are already at the top of the stairs." return
+}
+
+{climb_down
+proxy "d"
+}
+
+object weights an enourmous weights
+ inventory "enourmouns set of weights"
+
+{examine
+write "The enourmous weights are suspended from the main clock mechanism by a "
+write "strong chain." return
+}
+
+object chain a strong chain
+ inventory "strong chain"
+ mass      scenery
+
+{examine
+write "The strong chain suspends two enourmous weights from the main clock 
+write "mechanism." return
+}
+
+{climb
+write "A nice idea, but quite unneccesary." return
+}
+
+object cogs some small cogs
+ inventory "small cogs"
+ mass      scenery
+
+synonym smaller small
+
+{examine
+write "The smaller cogs mesh with the main cog to drive the hands on the face."
+write return
+}
+
+object cog the main cog
+ inventory "main cog"
+ mass      scenery
+
+{examine
+write "The main cog of the clock is almost a metre in diameter. It turns on a "
+write "crudely fashioned wooden shaft and meshed with a set of smaller cogs "
+write "filling the room with a loud grinding noise. Having seen the inner "
+write "workings of this town monument you are no longer suprised by the fact "
+write "that it never seems to show the right time." return
+}
+
+location road "Road"
+ north   bridge
+ south   village
+ east    riverbank_east
+ west    riverbank_west
+
+{look
+write "You are on a narrow dirt road leading north out of the village, into "
+write "the dark lifeless forest. To the north the road crosses a small "
+write "wooden bridge that spans a slow flowing river while to the east and "
+write "west grassy fields line it's southern bank." return
+}
+
+object grue a retired grue
+ has ANIMATE
+ inventory "retired grue"
+ described "There is a grue here wearing dark shades and a Hawaiian shirt."
+ starts    road
+ mass heavy 
+
+{kiss
+write "The grue looks at his feet and blushes." return
+}
+
+{examine
+write "Quite a site really. Loud baggy shorts that come down to his rather "
+write "knobly knees clash about as badly as possible with a gaudy Hawaiian "
+write "shirt. Peering from side to side through dark sun glasses he appears "
+write "very interested in the surroundings." return
+}
+
+{talk_to
+write "The grue turns to you smiles, muttering something in what sounds "
+write "suspiciously like Japanese." return
+}
+
+{attack_with_sword
+write "The grue pulls out a small can of Mace and sprays you in the face."
+write return
+}
+
+{attack_with_knife
+write "The grue pulls out a small can of Mace and sprays you in the face."
+write return
+}
+
+{attack
+write "The grue pulls out a small can of Mace and sprays you in the face."
+write return
+}
+
+location riverbank_east "River Bank (East)"
+ north   river
+ east    waterfall
+ west    road
+
+{look
+write "You are standing by the southern bank of a slow flowing river. Up "
+write "stream, to the east, you can hear the sound of falling water. The "
+write "ground here, although still grassy, is already beginning to show signs "
+write "of decay as black rains creep further south towards the village." return
+}
+
+object grass a plain grass
+ inventory "patch of grass"
+ mass      scenery
+
+{examine
+write "Brown and withering." return
+}
+
+location waterfall "Waterfall"
+ north   ben_waterfall
+ west    riverbank_east
+ no_up   "The cliff is far to steep and slippery for you to climb."
+ no_east "A tall steep cliff blocks any further progress east."
+
+{look
+write "You are standing on the bank of a river, just south of a tall "
+write "waterfall. The sound here is almost deafening as the water crashes "
+write "from above. A tall cliff blocks any further progress to the east."
+write return
+}
+
+object falls a plain waterfall
+ inventory "waterfall"
+ mass      scenery
+ 
+synonym curtain waterfall
+synonym falls   waterfall
+
+{examine
+write "Although a powerful torrent of water, you notice that a rocky outcrop "
+write "halfway up the cliff reduces the flow to nothing more than a thin "
+write "curtain of water near the centre." return
+}
+
+object cliff a plain cliff
+ inventory "cliff"
+ mass      scenery
+
+{examine
+write "The cliff is over one hundred feet tall and covered with a slimy green "
+write "moss." return
+}
+
+{climb
+write "Try as you might, you can not manage to get more than a few feet off "
+write "the ground without sliding back down on the slippery surface." return
+}
+
+location ben_bridge "Beneath Wooden Bridge"
+ has     ON_WATER
+ south   drain
+ east    river
+ west    ford
+
+{look
+write "You are standing in the river directly beneath a small wooden bridge. "
+write "Storm water flows into the river from a drain tunnelled into the "
+write "southern bank. The grate that once sealed the drain has long since "
+write "rusted and fallen away." return
+}
+
+object drain a plain drain
+ inventory "storm water drain"
+ mass      scenery
+
+{examine
+write "Peering into the storm water drain you can not see very far before "
+write "the pale light gives way to an eerie blackness." return
+}
+
+location river "In River"
+ has     ON_WATER
+ south   riverbank_east 
+ no_north "The river bank is too steep to the north."
+ east    ben_waterfall
+ west    ben_bridge
+
+{look
+write "You are standing about waist deep in the middle of the river, "
+write "constantly fighting the slow but strong current pulling you west "
+write "towards the bridge. To the east water falls from a high cliff forming "
+write "a furious white curtain." return
+}
+  
+location ben_waterfall "Beneath Waterfall"
+ has     ON_WATER
+ south   waterfall
+ no_north "The river bank is too steep to the north."
+ east    beh_waterfall
+ go_east "Fighting to keep your footing you force you way through the curtain of water."
+ west    river
+
+{look
+write "You are standing directly beneath a torrent of cascading water. "
+write "Visibility is less than a foot in every direction due to the white "
+write "foaming water falling all around you. You struggle to keep your "
+write "footing here." return
+}
+
+location beh_waterfall "Behind Waterfall"
+ no_go   "Back through the waterfall is the only way out from here."
+ west    ben_waterfall
+
+{look
+write "You are in a small, dry cave carved into the cliff behind the "
+write "waterfall. The sound of the waterfall is almost deafening here as it "
+write "echoes backwards and forwards against the smooth stone walls. The only "
+write "exit from here is back west into the water. "
+write "A small bare tree grows out of the floor here to within a few feet of "
+if crystal !childof depression
+   write "a circular depression in the ceiling. " return
+   break
+endif
+if crystal childof depression
+   write "a large glowing crystal fixed into a circular depression in the "
+   write "ceiling. " return
+endif
+}
+
+{listen
+write "Falling water." return
+}
+
+object pink_flower a pink flower
+  inventory "pink flower"
+  described "A large pink flower grows out of the tip of a high branch."
+  mass      2 
+  starts    limbo
+
+{take_override
+if flower hasnt CUSTOM
+   write "You pluck the flower from the end of the branch." return
+   ensure flower has CUSTOM
+   move pink_flower to player
+   break
+endif
+write "You take the pink flower." return
+move pink_flower to player
+}
+
+{rub_with_blue_flower
+if flower has CUSTOM
+   write "A pleasant fragrance is released." return
+   break
+endif
+write "No sooner have you finished than the pink flower begins to transform "
+write "into a large fruit, growing and growing until it hangs firm and ripe "
+write "on the branch." return
+move pink_flower to limbo
+move fruit to here
+}
+
+{examine
+write "The pink flower is, well, pink." return
+}
+
+object fruit a mystical fruit
+ has EDIBLE
+ inventory "piece of mystical fruit"
+ described "A ripe mystical fruit hangs from the tip of a high branch."
+ mass      10
+ starts    limbo
+
+{give_to_bird
+write "You put the fruit down in front of the bird who, with a brief "
+write "glance around the room, begins to eat enjoying itself immensely."
+write return
+move fruit to here
+set BIRD_EATING to 10
+set tower(up) to study
+describe bird as "An enourmous mystical bird is here perched infront of a large fruit."
+points 5
+}
+
+{examine
+write "Firm, yet ripe, the mystical fruit smells divine." return
+}
+
+{eat
+if SUSTENANCE_LEVEL > 120
+   write "You are not hungry." return
+   break
+endif
+write "Not bad. Not bad at all." return
+move fruit to limbo
+increment SUSTENANCE_LEVEL by 100
+}
+
+{take_override
+if BIRD_EATING != false
+   write "You get your fingers pecked. Hard." return
+   break
+endif
+if fruit has CUSTOM
+   write "You take the mystical fruit." return
+endif
+if fruit hasnt CUSTOM
+   write "With a light snap, you pick the fruit from the tree." return
+   describe fruit as "A large mystical fruit rests on the ground."
+   ensure fruit has CUSTOM
+endif
+move fruit to player
+}
+
+object tree a bare tree
+ inventory "tree"
+ mass      scenery
+
+{examine
+write "The tree is very odd indeed. It appears to grow out of the stone floor "
+write "to within a few feet of a hemispherical depression in the ceiling."
+if pink_flower(location) = here
+   if flower hasnt CUSTOM
+      write "A pink flower is glowing out from the tip of one of the higher "
+      write "branches." return
+endif
+if fruit(location) = here
+   if fruit hasnt CUSTOM
+      write "A large mystical fruit hangs ripe from one of the higher "
+      write "branches." return
+}
+
+object depression a circular depression
+ inventory "circular depression"
+ mass      scenery
+
+{examine
+write "The depression is roughly hemispherical and about the size of a small "
+write "apple." return
+}
+
+location riverbank_west "River Bank (West)"
+ north   ford
+ east    road
+ west    east_road
+
+{look
+write "You are standing on the southern bank of a river, just to the west of "
+write "the main forest road. To the north a shallow ford spans the river "
+write "while a modest path slowly widens to the west." return
+}
+
+location ford "Ford"
+ has     ON_WATER
+ south   riverbank_west
+ east    ben_bridge
+ west    clearing
+
+{look
+write "You are standing in the middle of the river in a shallow ford. A steep "
+write "bank prevents any further progress north while a bend in the river to "
+write "the south allows passage to a clearing in the west." return
+}
+
+location clearing "Clearing"
+ north   ruins
+ up      ruins
+ east    ford
+ in      pit
+ down    pit 
+
+{look
+write "This a large green clearing set deep in the western reaches of the "
+write "forest. The trees all around here droop solemnly, slowly succumbing to "
+write "the effects of Eldor's curse. A set of roughly carved steps head north "
+write "though a gap in the trees to higher ground. In the centre of the "
+write "clearing is a deep circular pit about twelve feet deep." return
+}
+
+object pit_obj a plain deep pit
+ inventory "deep pit"
+ mass      scenery
+
+{examine
+write "The pit circular and about twelve feet deep." return
+}
+
+object steps_bot a carved stairs 
+ inventory "set of carved steps"
+ mass      scenery
+
+{climb
+proxy "u"
+}
+
+{climb_up
+proxy "u"
+}
+
+{climb_down
+write "You are already at the bottom of the steps." return
+}
+
+{examine
+write "The steps, carved into a bank of mossy rock, lead up through a "
+write "gap in the trees to some ruins." return
+}
+
+location pit "Pit"
+ up nowhere
+ no_go "The wall crumbles as you attempt to climb out, making escape impossible." 
+
+{look
+write "You are standing in the bottom of a deep pit. The walls, over twelve "
+write "feet high, are made from soft earth. Looking straight up you can see "
+write "only grey sky above you." return
+}
+
+object blue_flower a blue flower
+  inventory "blue flower"
+  described "Resting on the ground here is a blue flower."
+  mass      2
+
+{rub_with_pink_flower
+write "A pleasant fragrance is released." return
+}
+
+{examine
+write "The flower, despite having been picked and left without water, appears "
+write "quite fresh and health. A fine yellow powder covers it's upper surface."
+write return
+}
+
+{lick
+write "You stand proud of your yellow tongue." return
+}
+  
+location heaven "Heaven"
+ no_go "I'm afraid walking away isn't going to help."
+
+{look
+write "You are standing on a fluffy white cloud. Several people in long white "
+write "robes are here milling about playing golden harps etc etc. Standing "
+write "behind a long marble counter is an angel who is currently reviewing "
+write "your insurance policy." return
+if angel hasnt CUSTOM
+   write return "Looking up at you the administrative angel speaks, "
+   write quote "According to your policy, you age and occupation "
+   write "excess payment is one piece of treasure. Simply give it to me "
+   write "and you will be on your way back to the land of the living in "
+   write "no time." quote return
+   ensure angel has CUSTOM
+}
+
+object counter a marble counter
+ inventory "marble counter"
+ mass      scenery
+
+{examine
+write "The marble counter stretches are far as the eye can see to you left "
+write "and right." return
+}
+
+{knock_on
+write quote "Yes?" quote " the administritive angel asks with an irritated "
+write "tone of voice. " quote "You know the sooner you give me the excess "
+write "payment the sooner you can be on your way." quote return
+}
+
+object angel an administrative angel
+  has       ANIMATE
+  inventory "administrative angel"
+  mass      scenery
+
+{examine
+write "Crumpled and badly fitting, the angel's gown compliments his attitude "
+write "towards customer service." return
+}
+
+location ruins "Ruins"
+ south   clearing
+ down    clearing
+
+{look
+write "Set amongst the trees here are the remains of an ancient temple, "
+write "destroyed long ago during the goblin invasion. Still standing in the "
+write "middle of the ruins is a dark stone altar." return
+}
+
+object steps_top a carved stairs 
+ inventory "set of carved steps"
+
+{climb
+proxy "d"
+}
+
+{climb_up
+write "You are already at the top of the steps." return
+}
+
+{climb_down
+proxy "d"
+}
+
+{examine
+write "The steps, carved into a bank of mossy rock, lead down through a "
+write "gap in the trees into a clearing." return
+}
+
+object ruins_obj an ancient temple 
+ inventory "ancient temple"
+ mass      scenery
+
+synonym ruins temple
+
+{examine
+write "A crooked column and several moss covered blocks are all that remain "
+write "of the once grand temple." return
+}
+
+object altar a stone altar
+ inventory "stone altar"
+ mass      scenery
+
+{examine
+write "The altar is made from a dark grey stone and stands about three feet "
+write "high. Set into the front of the altar is a small niche, about a foot "
+write "high, shaped like the figure of a woman." return
+}
+
+object niche a plain niche
+ inventory "niche"
+ mass      scenery
+ 
+{examine
+execute "examine_altar"
+}
+
+object scroll a crumpled scroll
+ inventory "crumpled scroll"
+ described "A crumpled scroll rests on top of the altar."
+ starts    limbo
+ mass      5
+
+{examine
+write "Strange symbols and glyphs cover the scroll. As far as you can tell "
+write "they appear to be football results, but you could be wrong..." return
+}
+
+{give_to_councillor_override
+write "The historian takes the scroll from you hands, careful not to damage "
+write "it." return
+move scroll to councillor 
+points 5
+}
+
+location bridge "Wooden Bridge"
+ no_east "A sturdy railing prevents you from falling into the river below."
+ no_west "A sturdy railing prevents you from falling into the river below."
+ north   path
+ south   road
+
+{look
+write "You are standing in the middle of a narrow wooden bridge that spans a "
+write "slow flowing river. To the north the forest road continues as far as "
+write "the eye can see while to the south it heads back into the village."
+write return
+}
+
+object railing a sturdy railing
+ inventory "sturdy railing"
+
+{examine
+write "The sturdy railing prevents you from falling into the river below."
+}
+
+location drain "Drain"
+ north   ben_bridge 
+ south   ben_village 
+
+{look
+write "You are crouched down in a narrow dank drain that runs gently uphill "
+write "to the south. The sound of rats can be heard coming from the darkness "
+write "ahead while thin trails of light filter down from above through 
+write "gratings high above your head." return
+}
+
+location ben_village "Beneath Village"
+ north   drain
+
+{look
+write "You are standing in a large cavern directly beneath the village "
+write "square. Water drips down from small openings high above your head, "
+write "forming slimy pools that cover the floor while large piles of debris "
+write "fill each corner. The only exit from here is back north into the "
+write "drain." return
+}
+
+object pools some slimy pool
+ inventory "slimy pools"
+ mass      scenery
+
+synonym pool pools
+
+{examine
+write "To put it bluntly, they stink." return
+}
+
+object wire a plain wire 
+ inventory "piece of wire"
+ described "There is a short piece of wire here."
+ mass      1
+ starts    limbo    
+
+{examine
+write "About five inches long, the wire is bent slightly at the end and "
+write "shows no sign of beginning to rust." return
+}
+
+object goblin a plain goblin
+ has       ANIMATE
+ inventory "goblin"
+ described "There is a goblin here, snarling at you from the shadows."
+
+{examine
+if goblin hasnt DEAD 
+   write "Green, mean and very, very ugly." return
+   break
+endif
+write "Green, no long very mean and very, very ugly (even with your"
+write "rather amateur attempt at cosmetic surgury)." return
+}
+
+{ask_for_staff
+write "The goblin looks at you suspiciously." return
+}
+
+{attack_with_sword
+write "With a flurry of hacks and slashes you reduce the goblin to something "
+write "that resembles a hamper rather more than a fierce monster. As the "
+write "goblin hits the ground, a tall staff rolls out from within it's "
+write "cloak." return
+describe goblin as "The hacked remains of the goblin litter the floor."
+ensure goblin has DEAD 
+ensure sword has CUSTOM
+move staff to here
+points 5
+}
+
+{attack_with_knife
+write "Unfortunately the knife doesn't even seem to penetrate the thick "
+write "green skin of the goblin. Displeased by your attack, the goblin "
+write "retaliates with a swift headbutt." return
+}
+
+{attack
+write "Beating upon the goblins forehead with your fists does little to "
+write "increase your credibility as an adventurer." return
+}
+
+object debris some plain debris
+ inventory "debris"
+ mass      scenery
+
+{examine
+increment DEBRIS_EXAMINED
+if DEBRIS_EXAMINED = 1 
+   write "A quick rummage through the scrap metal and wood reveals nothing "
+   write "of interest." return
+   break
+endif 
+if DEBRIS_EXAMINED = 2
+   write "Looking further through the debris you come across a small piece "
+   write "of wire that appears usefully strong." return
+   move wire to here
+   break
+endif
+if DEBRIS_EXAMINED > 2 
+   write "Take it easy..." return
+}
+
+  
+object staff name plain staff
+ inventory "Adreal's staff"
+ described "Adreal's staff is here."
+ starts childof goblin 
+ mass      15
+
+{examine
+write "The staff is about two foot long and feels quite light despite it's "
+write "strength." return
+}
+
+{give_to_councillor_override
+write "You can see that the councillor is deeply moved by the site of Adreal's "
+write "staff. Taking it into his arms he nods to you. " quote "You have done "
+write "well." quote return
+move staff to councillor 
+points 5
+}
+
+location path "Forest Path"
+ north   junction
+ south   bridge
+ east    forest
+
+{look
+write "The forest path cuts north through the trees towards a range of "
+write "mountains that are slowly beginning to appear, looming over the "
+write "horizon. To the east you can make out the trunk of a tree, by far the "
+write "largest you have ever seen." return
+}
+
+location forest "Forest"
+ west    path
+ up      t_house
+ no_up   "Without the bottom branch there is no way up the tree."
+ no_down "You can't go that way."
+ no_go   "The forest is too dense to allow passage."
+
+{look
+write "You are standing at the base of giant oak tree just to the east of "
+write "the forest path. Nestled high up in the tree's sturdy bows sits a "
+write "large wooden tree house. " 
+if branch hasnt CUSTOM
+   write "A low strong branch allows you to climb up into the tree house."
+   write return
+   break
+endif
+write return
+}
+
+object oak_tree a oak tree
+ inventory "oak tree"
+
+{climb
+proxy "up"
+}
+
+object branch a tree branch
+ inventory "tree branch"
+ described "Lying on the ground is a branch from an oak tree."
+ mass      scenery 
+
+{break
+if branch has CUSTOM
+   write "You can't break the branch any further." return
+   break
+endif
+write "Rocking the branch backwards and forwards with all your strength you "
+write "manage to break it away from the trunk of the tree." return
+points 5
+ensure branch has CUSTOM
+set here(up) to nowhere
+set branch(mass) to 15
+}
+
+{take_override
+if fan has CUSTOM
+   write "The force of the fan on the branch prevents you from removing "
+   write "it." return
+   break
+endif
+if branch hasnt CUSTOM
+   write "The branch is firmly attached to the tree." return
+   break
+endif
+if MAX_CARRIED < 20 
+   write "You are carrying too much to take the branch." return
+   break
+endif
+write "You take the branch." return
+move branch to player 
+}
+
+{insert_in_fan
+if branch hasnt CUSTOM 
+   write "You thrust the branch in between the fan blades only to have it "
+   write "splinter into a thousand pieces. The fan continues to turn." return
+   move branch to limbo
+   break
+endif
+write "You thrust the branch in between the fan blades causing it to stop "
+write "turning. The fan begins to hum loudly, fighting against the "
+write "obstruction." return
+points 5 
+set here(south) to alcove
+move branch to limbo
+ensure fan has CUSTOM
+}
+
+location t_house "Tree House"
+ east    platform
+ up      platform
+ down    forest
+
+{look
+write "This tree house appears to be the home of one of the few remaining "
+write "elves in the whole northern regions. Sparsely but comfortably "
+write "furnished, the tree house appears to contain nothing of particular "
+write "interest. To the east a narrow ramp heads out and up through a doorway "
+write "to a platform suspended high in a neighbouring tree." return
+}
+
+object ramp a narrow ramp
+ inventory "narrow ramp"
+
+{examine
+write "Seems safe enough." return
+}
+
+object lantern a brass lantern
+ has       FLAMMABLE 
+ inventory "brass lantern"
+ described "There is a shiny brass lantern here."
+ initial   "There is a shiny brass lantern hanging from a hook on the wall."
+ quantity  30
+ mass      10
+ 
+synonym lamp lantern
+
+{examine
+write "Made from finely crafted brass, a wire frame protects the glass bowl "
+write "which in turn protects its bright flame from the wind"
+if lantern has BURNING
+   write "." return
+   break
+endif
+write " when lit." return
+}
+
+{turn_off
+execute "global_extinguish"
+}
+
+{light_with_matches_override
+write "Tearing a match from the book, you strike it and light the lantern."
+write return
+ensure lantern has LUMINOUS
+ensure lantern has BURNING
+}
+
+location platform "Platform"
+ down    t_house
+ west    t_house
+
+{look
+write "From this platform you can see for miles in every direction - from the "
+write "great mountain range in the north, to the columns of smoke gently "
+write "rising from the village homes in the south. To the west you can make "
+write "out the sandy white beaches that line the deep blue waters of the "
+write "northern sea while to the east the forest ends in savanna stretching "
+write "as far as the eye can see."
+write return
+}
+
+object sack the hessian sack
+ has       CLOSABLE CLOSED CONTAINER
+ inventory "hessian sack"
+ described "On the floor there is a small hessian sack."
+ quantity  12 
+ mass      10
+
+object bread a fresh bread
+ has EDIBLE
+ inventory "loaf of fresh bread"
+ described "There is a fresh loaf of bread here."
+ starts childof sack
+ mass      5
+
+{eat
+if SUSTENANCE_LEVEL > 120
+   write "You are not hungry." return
+   break
+endif
+increment SUSTENANCE_LEVEL by 80 
+increment BREAD_EATEN 
+if BREAD_EATEN = 3
+   write "You eat the last of the bread." return
+   move bread to limbo
+   break
+endif
+write "You eat some of the bread." return
+}
+
+{examine
+write "The loaf of bread is still very fresh." return
+if BREAD_EATEN = 0
+   write "There is enough bread for about three meals." return
+   break
+endif
+if BREAD_EATEN = 1
+   write "There is still about two thirds of the bread left." return
+   break
+endif
+if BREAD_EATEN = 2
+write "There is only enough bread left for one last meal." return
+}
+
+location junction "Junction"
+ north   trail
+ up      trail
+ south   path
+ east    track_east
+ west    track_west
+
+{look
+write "You are standing at a cross road in the forest path. To the north the "
+write "path continues the long gentle climb towards the mountains while "
+write "smaller tracks head off to the east and west." return
+}
+
+location track_west "Track (West)"
+ east    junction
+ west    field
+
+{look
+write "You are on a track running east-west through the forest. To the west "
+write "the track opens out into a large grassy field." return
+}
+
+location field "Grassy Field"
+ east    track_west
+ west    log_cabin
+ in      log_cabin
+ go_in   "You step into the log cabin."
+
+{look
+write "This is a large grassy field that seems oddly unaffected by the curse. "
+write "Standing in the centre of the field is simple log cabin." return
+}
+
+location log_cabin "Log Cabin"
+ east    field
+ out     field
+ go_up   "You climb up the narrow ladder."
+ up      loft
+
+{look
+write "A strange sense of well being comes over you as you stand in the "
+write "cabin. A large open fire burns at one end of the room while a large "
+write "dining table fills the majority of the western half. A narrow ladder "
+write "leads up from here into the loft." return
+}
+
+object ladder_bot a narrow ladder
+ inventory "narrow ladder"
+ mass      scenery
+
+{examine
+write "The narrow ladder leads up into the loft." return
+}
+
+{climb
+proxy "u"
+}
+
+{climb_up
+proxy "u"
+}
+
+{climb_down
+write "You are already at the bottom of the ladder." return
+}
+
+object log_fire an open fire
+ inventory "open fire"
+ mass      scenery
+
+{examine
+write "The fire is a comforting sight away from the cold wet day outside."
+write return
+}
+
+object table a dining table
+ inventory "dining table"
+ mass      scenery
+
+{examine
+write "The dining table contains nothing more than a few useless odds and "
+write "ends." return
+}
+
+location loft "Loft"
+ down    log_cabin 
+
+{look
+write "This is the cabin's loft. The only furnishing here is a low bed in "
+write "the centre. A narrow ladder leads down back into the cabin." return
+}
+
+object ladder_top a narrow ladder
+ inventory "narrow ladder"
+ mass      scenery
+
+{examine
+write "The narrow ladder leads down into the cabin." return
+}
+
+{climb
+proxy "d"
+}
+
+{climb_down
+proxy "d"
+}
+
+{climb_up
+write "You are already at the top of the ladder." return
+}
+
+object low_bed a low bed
+ inventory "low bed"
+ mass      scenery
+
+{examine
+write "The bed made from a simple straw filled matress and a blanket." return
+}
+
+object blanket a plain blanket
+ inventory "blanket"
+ mass      scenery
+
+{take
+write "Blankets are a very personal thing, I sugest leaving it." return
+}
+
+{examine
+write "The blanket has little ducks sewn all over it." return
+}
+
+object vial a glass vial
+ has       CLOSABLE CLOSED CONTAINER
+ inventory "glass vial"
+ described "There is a glass vial here."
+ quantity   1
+ mass       5
+ starts     here
+
+{examine
+write "A small white label on the outside of the vial indicates that it "
+write "contains some sort of strength potion. "
+execute "global_details"
+}
+
+object potion a green potion
+ has       LIQUID
+ inventory "green potion"
+ mass      1
+ starts childof vial
+
+{drink
+write "You drink the pale green potion. At first you notice nothing out "
+write "of the ordinary then suddenly a feeling of great strength wells up "
+write "in your body." return
+set POTION_DRUNK to true
+}
+
+location track_east "Track (East)"
+ east    track_end
+ west    junction
+
+{look
+write "You are on a track running east-west throughout the forest. To the "
+write "east the track appears to become narrower and less defined." return
+}
+
+location track_end "End of Track"
+ west    track_east
+
+{look
+write "At this point the track ceases to be a track. Thick bushes here "
+write "prevent any further progress in any direction other than back west "
+write "towards the junction." return
+}
+
+object bushes some plain bushes
+ inventory "bushes"
+ mass      scenery
+
+{examine
+if clove has CUSTOM 
+   write "There is a Hujara plant growing amongst the bushes." return
+   break
+endif
+write "Searching through the bushes you come across a small green plant. On "
+write "closer examination you recognise it to be a Hujara plant with a large "
+write "healthy clove hanging from one of it's upper branches." return
+move clove to here
+move plant to here
+}
+
+object plant a hujara plant
+ inventory "Hujara plant"
+ mass      scenery
+ starts    limbo
+
+{examine
+if clove has CUSTOM 
+   write "It is a Hujara plant." return
+   break
+endif
+write "The Hujara plant has a healthy clove hanging from one of it's "
+write "upper branches." return
+}
+
+object clove a plain clove
+ inventory "clove of Hujara"
+ described "There is a clove of Hujara here." return
+ initial   "There is a clove of Hujara hanging on the plant."
+ starts    limbo
+ mass      2
+
+{take_override
+if clove hasnt CUSTOM 
+   write "You pluck the clove from the Hujara plant." return
+endif
+if clove has CUSTOM
+   write "You take the clove." return
+endif
+move clove to player
+ensure clove has CUSTOM
+}
+
+{give_to_councillor_override
+write quote "Ah! Excellent!" quote " the councillor exclaims as you hand him "
+write "the clove." return
+points 5
+move clove to councillor 
+}
+
+{eat
+write "Not particularly pleasant tasting, but..." return
+move clove to limbo
+}
+
+location ledge "Rocky Ledge"
+ south   m_path
+ up      m_path
+ west    tunnel
+
+{look
+write "The mountain path ends here on a small rocky ledge protruding from the "
+write "western wall of the chasm. To the west a large cave entrance leads "
+write "into the granite wall around which large clawed footprints can be "
+write "seen." return 
+}
+
+location tunnel "Tunnel"
+ east    ledge
+ west    lair
+
+{look
+write "You are halfway along a tunnel that slopes downwards to the west. "
+write "Footprints similar to those outside can be seem heading up and down this tunnel." return
+}
+
+location lair "Dragon's Lair"
+ east    tunnel
+
+{look
+write "The tunnel opens up here in a large cavern. Perched proudly atop "
+write "an enourmous pile of treasure is a rather large dragon peering at you "
+write "cautiously through one half open eye." return
+}
+
+object dragon a gold dragon
+ has       ANIMATE
+ inventory "gold dragon"
+ mass      scenery
+
+{examine
+write "The dragon is peering at out of one half open eye." return
+}
+
+{talk_to
+if dragon hasnt CUSTOM
+   write "You begin to inform the dragon of the pleasant weather outside, but "
+   write "are stopped short by a curl of smoke that rises menacingly from the "
+   write "dragons left nostril." return
+   ensure dragon has CUSTOM
+   break
+endif
+write "Don't push your luck..." return
+}
+
+{attack_with_sword
+write "Bravely lunging at the dragon with you sword held high you are sliced "
+write "into four even segments by a single swift blow of the dragon's "
+write "taloned paw." return return
+execute "global_death"
+}
+
+object treasure a plain treasure
+ inventory "pile of treasure"
+ mass      scenery
+
+{examine
+write "The pile of treasure is a sight beyond anything you have ever seen "
+write "before. Golden chalices and crowns, strings of giant pearls and "
+write "diamonds lie amongst an uncountable mountain of gold and silver "
+write "coins. The spectacle is marred only by the rather large dragon "
+write "perched on top, guarding it like a mother would her children." return
+}
+
+object amulet a large amulet
+ has       WEARABLE
+ inventory "large amulet"
+ described "Resting on the pile of treasure, near the front, is a large amulet."
+ mass      10
+
+{examine
+write "The amulet is a smooth jade stone set into an ornately carved gold "
+write "plate which a fine chain allows to be worn." return
+}
+
+{give_to_angel
+write "Okay, I guess it will have to do..." return return
+more
+move amulet to angel
+set kryten(location) to church
+ensure monk has CUSTOM
+write return
+look
+}
+
+{take_override
+if kryten(location) = lair
+   if DRAGON_PEPPERED > 1
+      if DRAGON_PEPPERED < 4
+         write "You sneak over and grab the amulet while the dragon has his "
+         write "eyes closed preparing to sneeze." return
+         points 5 
+         move amulet to player 
+         describe amulet as "Lying on the ground is an amulet."
+         break
+endif
+if kryten(location) = lair
+   write "Bad career move. As you reach out and take the amulet, the dragon "
+   write "reaches out and takes your spleen. Needless to say, this does very "
+   write "little for your well being." return
+   execute "global_death"
+endif
+write "You take the amulet." return
+move amulet to player 
+}
+
+location trail "Trail"
+ north   mountains
+ south   junction
+ up      mountains
+
+{look
+write "At this point the forest road is nothing more than a narrow rocky "
+write "trail that winds it's way up the steep southern peaks of the great "
+write "mountain range. It is noticeably colder here than the forest below."
+write return
+}
+
+location mountains "Mountains"
+ south   trail
+ east    courtyard
+ west    m_path
+ down    trail
+
+{look
+write "The trail bends sharply here, heading down to the south and flatly to "
+write "the east where it passes through an open archway leading into a giant "
+write "castle perched high between the mountain peaks. A light snow is falling "
+write "here, slowly covering the bare stone ground beneath you feet." return
+}
+
+object snow some plain snow
+ inventory "snow"
+
+{examine
+write "The snow is quite icy making the ground here very treacherous in "
+write "places." return 
+}
+
+object archway an plain archway
+  inventory "archway"
+
+{examine
+write "The archway is set into the high stone wall that surrounds the castle. "
+write return
+}
+
+{look_through
+write "Through the archway you can see a checkered courtyard within the "
+write "castle grounds." return
+}
+
+location m_path "Mountain Path"
+ east    mountains
+ north   ledge
+ down    ledge
+
+{look
+write "You are standing on a narrow path that heads east through the "
+write "mountains. From here the path winds steeply down to the north curling "
+write "around the western wall of a deep chasm." return
+}
+
+location courtyard "Courtyard"
+ north   dungeon
+ south   balcony
+ east    tower
+ west    mountains
+ down    dungeon
+
+{look
+write "This is the main courtyard of the castle. The floor is a large "
+write "checkerboard pattern made from giant squares of marble. There are "
+write "doorways to the north and east here while a large balcony can be "
+write "reached to the south. Proceeded by a small set of steps, the "
+write "northern doorway leads down beneath the courtyard; the western into "
+write "a tall black tower." return
+}
+
+object floor a checkerboard floor
+ inventory "checkerboard floor"
+
+{examine
+write "The floor of the courtyard is made from giant squares of marble "
+write "formed into a checkboard pattern." return
+}
+
+object tower_obj a black tower
+ inventory "tall black tower"
+
+{examine
+write "The tower is several stories high and made from dark granite blocks. "
+write "It may be entered to the east through an open doorway." return
+}
+
+location balcony "Balcony"
+ north   courtyard
+
+{look
+write "You are standing on a large Balcony surrounded by an ornately carved "
+write "wall. Peering over the wall reveals a drop of several hundred feet "
+write "causing your stomach to lurch and your feet to involuntarily step back "
+write "away from the edge." return
+if here(in) != false
+   write "Standing majestically in the centre of the balcony is a hot air "
+   write "balloon." return
+}
+
+location dungeon "Dungeon"
+ east    cell
+ west    armoury
+ south   courtyard
+ up      courtyard
+
+{look
+write "This is the castle's dungeon. Although sheltered from the wind in "
+write "here, it is bitterly cold due to minimal amount of sunlight that "
+write "filters through a small doorway at the top of a set of stairs to "
+write "the south. Both the ceiling, floor and all four walls are made from "
+write "large stone blocks. Rusted doors lay crumpled on the ground allowing "
+write "access through two dark doorways, one in the west wall, one is the "
+write "east. An assortment of racks and shackles are set into the north "
+write "wall." return
+}
+
+object rusted_doors a rusted door
+ inventory "rusted door"
+ mass      scenery
+
+{examine
+write "Laying rusted on the floor it has been long time since the doors have "
+write "served their purpose." return
+}
+
+object torture some torture racks
+ inventory "torture racks"
+ mass      scenery
+
+{examine
+write "The torture racks make you cringle as your mind imagines the horror "
+write "of being a prisioner in a dungeon such as this." return
+}
+
+object shackles some plain shackles
+ inventory "shackles"
+ mass      scenery
+
+{examine
+write "Rusted and broken the shackles are no longer usable." return
+}
+
+location armoury "Armoury"
+ has     DARK
+ east    dungeon
+
+{look
+write "Ransacked long ago, the armoury is all but empty. Splintered racks "
+write "line the walls, while many rusted, broken weapons litter the floor. "
+write "The only exit from here is back into the dungeon." return
+}
+
+object knife a sharp knife
+ inventory "sharp knife"
+ described "Hanging a rack amongst the other rusted and damaged weapons is a sharp knife."
+ mass      8
+
+{examine
+if knife has CUSTOM
+   write "The knife is almost a foot long, extremely sharp and covered in "
+   write "fresh blood." return
+   break
+endif
+write "The knife is almost a foot long and extremely sharp." return
+}
+
+{global_blood_spotted
+write "Spotting the blood dripping from the knife you are grabbed and "
+write "disarmed. Before long sailors have searched the ship and island, "
+write "discovering the guards body and sentencing you to immediate "
+write "execution." return
+execute "global_death"
+}
+
+{clean
+if knife has CUSTOM
+   write "You wipe the blood off the knife using your shirt then pull your "
+   write "coat closed to conceal the stains." return
+   ensure knife hasnt CUSTOM
+   break
+endif
+write "The knife is already quite clean." return
+}
+
+location cell "Cell"
+ has     DARK
+ west    dungeon
+
+{look
+write "A dark depressing place, this small confined cell was the final home "
+write "of many a poor soul. Strange markings cover the bare stone walls "
+write "while the rooms only furnishing, a hard wooden bench, rests stained "
+write "and scratched on the cold, uneven floor." return
+}
+
+object bench a wooden bench
+ inventory "wooden bench"
+ mass      scenery
+
+{examine
+write "Needless to say it doesn't look very comfortable." return
+}
+
+{sit_on
+write "Not a very tempting prospect I'm afraid." return
+}
+
+object pearl a smooth pearl
+ described "A smooth pearl rolls about your feet." return
+ inventory "smooth pearl"
+ mass      5
+ starts    limbo
+
+{give_to_angel
+write "Rubbing the pearl on his teeth the angel concedes that it is real "
+write "and that you shall be returned to the nearest earth based office "
+write "immediately." return 
+points 5
+write return
+more
+move pearl to angel
+set kryten(location) to church
+ensure monk has CUSTOM
+write return
+look
+}
+
+object thief a sly thief 
+ has       ANIMATE
+ inventory "sly looking thief"
+ described "Leaning against the wall in one corner a sly looking thief eyes you smugly."
+
+{ask_for_knife
+write quote "Having second thoughts are we?" quote " sneers the thief."
+write return
+}
+
+{attack_with_sword
+if knife childof thief
+   write "Lunging at the thief with the sword, he quickly darts to once side "
+   write "cutting you with the knife at you pass. Without turning, you swing "
+   write "the sword behind you wildly, giving you the space you need to regain "
+   write "your composure. Standing face to face, you circle about the room "
+   write "until the thief darts out a stab with the knife barely missing your "
+   write "neck. Taking advantage of his over extension, you push him into the "
+   write "back wall of the cell then deliver a fatal blow with the sword "
+   write "before he recovers. As he collapses, slumping over the bench, a "
+   write "smooth white pearl rolls of from his pocket and onto the floor."
+   write return
+   move pearl to here
+   points 5
+   ensure thief has DEAD 
+   describe thief as "The body of the thief lies slumped over the bench."
+   ensure sword has CUSTOM
+   describe sword as "A blood stained sword rests as your feet."
+   break
+endif
+write "Seeing you draw the sword, the thief changes his stance and "
+write "smiles. " quote "You wouldn't attack an unarmed man would you?" quote
+write " the thief questions as he holds his hands up for you to see. "
+write "Although suspicious of the thief, you lower the sword." return
+}
+
+{attack_with_knife
+if sword childof thief
+   write "You lung at the thief with the knife slicing his side. Startled, "
+   write "he jumps onto the bench and swings the sword wildly at your head "
+   write "missing by only an inch. In retaliation, you thrust the knife "
+   write "upward towards the thief's stomach but, he is ready and returns "
+   write "the attack, taking advantage of the swords extra range.  Wounded, "
+   write "you step backwards, only to have the thief leaps off the bench "
+   write "bringing the sword crashing down onto your head." return
+   execute "global_death"
+endif
+write "Seeing you draw the knife, the thief changes his stance and "
+write "smiles. " quote "You wouldn't attack an unarmed man would you?" quote
+write " the thief questions as he holds his hands up for you to see. "
+write " Although suspicious of the thief, you lower the knife." return
+}
+
+location tower "Tower"
+ west    courtyard
+ up      nowhere 
+ no_up   "The bird pecks at you with it's giant beak prompting you to change your mind."
+ down    nowhere 
+
+{look
+write "You are in the base of a tall black tower. Besides the doorway to the "
+write "east, and a set of rickety wooden stairs leading up, the only other "
+write "feature worthy of mention is a stone idol that stands about six foot "
+write "high in very centre of the room." return
+if idol has CUSTOM 
+   write "A square opening in the floor leads down into darkness." return
+endif
+if BIRD_EATING != false
+   write "An enourmous mystical bird is perched before a gaint piece of "
+   write "fruit, consuming it's ripe flesh at an astounding rate." return
+   break
+endif
+write "An enourmous mystical bird is perched on the bottom step of the stairs."
+write return
+}
+
+object stair_bot a wooden stairs
+ inventory "set of wooden stairs"
+ mass      scenery
+
+{examine
+write "The stairs lead up into the top of the tower." return
+}
+
+{climb
+proxy "u"
+}
+
+{climb_up
+proxy "u"
+}
+
+{climb_down
+write "You are already at the bottom of the stairs." return
+}
+
+object sign a wooden sign
+ inventory "wooden sign"
+ mass      scenery
+
+{read
+execute "examine_sign"
+}
+
+object bird a mystical bird 
+ inventory "mystical bird"
+ mass      scenery
+
+{attack
+write "The bird dexterously avoid you attack with a single flap of it's "
+write "enourmous wings." return
+}
+
+{attack_with_knife
+write "The bird dexterously avoid you attack with a single flap of it's "
+write "enourmous wings." return
+}
+
+{attack_with_sword
+write "The bird dexterously avoid you attack with a single flap of it's "
+write "enourmous wings." return
+}
+
+object idol a stone idol
+ inventory "stone idol"
+ mass      scenery
+
+{move
+if POTION_DRUNK = false
+   write "You push will all you might by are unable to budge the idol." return
+   break
+endif
+if idol hasnt CUSTOM 
+   ensure idol has CUSTOM
+   write "Utilising your new found strength you push the idol far enough "
+   write "to one side to reveal a square opening in the floor." return
+   set here(down) to laboratory 
+   points 5
+   break
+endif
+write "You push the idol back to where it was, covering the opening in the "
+write "floor." return
+set here(down) to nowhere
+ensure idol hasnt CUSTOM
+}
+
+{examine
+write "No." return
+}
+
+location study "Study"
+ down    tower
+
+{look
+write "The first thing you notice about this room is the books. Literally "
+write "thousands of them line the walls, precariously balanced on crooked "
+write "wooden shelves. In the centre of the room stands an enormous wooden "
+write "desk cluttered with a variety of mysterious odds and ends, obviously "
+write "magical in nature." return
+}
+
+object stair_top a wooden stairs
+ inventory "set of wooden stairs"
+ mass      scenery
+
+{examine
+write "The stairs lead down into the base of the tower." return
+}
+
+{climb
+proxy "d"
+}
+
+{climb_up
+write "You are already at the top of the stairs." return
+}
+
+{climb_down
+proxy "d"
+}
+
+object shelves a crooked shelves
+ inventory "set of crooked shelves"
+ mass      scenery
+
+{examine
+write "The crooked wooden shelves are filled with leather bound books of all "
+write "descriptions." return
+}
+
+object desk a plain desk
+ inventory "desk"
+ mass      scenery
+
+{examine
+write "The desk is covered in an assortment of mysterious odds and ends that "
+write "you wouldn't even begin to know how to use." return
+}
+
+object books some plain books
+ inventory "books"
+ mass      scenery
+
+{examine
+write "The books cover various topics from basic spell casting to world "
+write "domination." return
+}
+
+{take_override
+write "Although an avid reader, the thought of lugging books all the way "
+write "back home does not appeal." return
+}
+
+{press
+write "I really do wish that a secret passage would open up allowing you "
+write "to follow a trail of Scooby Snacks into to a secret room full of "
+write "treasure but the reality is that I'm just too damn lazy." return
+}
+
+object head name eldor's head
+ inventory "Eldor's head"
+ described "Eldor's head rests motionless on the ground."
+ mass      10
+ starts    limbo
+
+synonym eldors eldor's
+
+{show_to_councillor
+write "Seeing the head, a smile breaks out on both the councillor and the "
+write "historian's faces. Calling for a guard, the councillor orders for the "
+write "head to be taken away and destroyed." return
+move head to limbo
+points 5
+set DEATH_PROOVED to true
+}
+
+{show_to_historian
+execute "show_to_councillor_head"
+}
+
+{give_to_councillor_override
+proxy "show head to councillor"
+}
+
+{give_to_historian_override
+proxy "show head to councillor"
+}
+
+{examine
+write "There's not much I really care to say about that I'm afraid." return
+}
+
+object eldor name plain eldor
+ has       ANIMATE
+ inventory "Eldor"
+ described "Eldor is standing here glaring at you ominously."
+
+{attack
+write "You leap at Eldor in attempt to grab his throat only to find yourself "
+write "impaled on a long sword that he produces from within his cloak. "
+write "gasping you colapse to the ground as he pushes you off with the heal "
+write "of his boot then begins to laugh insanely. It is the last sound you " 
+write "hear." return
+execute "global_death"
+}
+
+{attack_with_knife
+write "You draw the knife and slowly advance, adjusting your grip on it's "
+write "handle as you approach. " return return
+write quote "Your time is up Eldor!" quote " you bark confidently." return 
+write return quote "Not today pesant, not today..." return return
+write "Drawing his sword, Eldor kicks over his desk and leaps over the "
+write "scattered books driving the tip of his sword deep into your chest. "
+write "Pushing you back with the heal of his boot Eldor begin to laugh "
+write "insanely. It is the last sound you hear." return
+execute "global_death"
+}
+
+{attack_with_sword
+write "Leaping over the counter you swing your sword wildly causing Eldor "
+write "to step back hastily. Drawing his sword he spirals around to your left "
+write "where your swords clash in a fortunate parry. Mustering all your "
+write "strength, you kick Eldor away then attack ferociously, decapitating "
+write "Eldor with a single blow." return
+move head to here
+describe eldor as "The headless body of Eldor lies slumped on the floor."
+ensure eldor has DEAD 
+points 5 
+}
+
+{examine
+if eldor hasnt DEAD 
+   write "A tall and menacing character, Eldor stands behind is desk, leaning "
+   write "forward as if to stare you into submission." return
+   break
+endif
+write "There is nothing special about Eldor." return return
+write "Well, unless of course you consider the fact that he no longer has a "
+write "head to slightly out of the ordinary." return
+}
+
+location laboratory "Laboratory"
+ has     DARK
+ up      tower
+ south   nowhere 
+ no_south "The fan is turning to quickly for you to get past." 
+ go_south "Nervously you squeeze through the blades of the fan."
+
+{look
+write "This room is odd. Many strange contraptions and apparatus line the "
+write "walls and adorn the solid work benches scattered throughout. In the "
+write "centre of the room a ladder leads up through a small opening. "
+if FAN_STOPPED = true
+   write "There is a large fan set into the southern wall. A tree branch, "
+   write "wedged into the blades, prevents it from spinning causing it to "
+   write "hum loudly." return
+   break
+endif
+write "There is a large turning fan set into the southern wall." return
+}
+
+object apparatus some strange apparatus
+ inventory "strange apparatus"
+ mass      scenery
+
+synonym contraptions apparatus
+
+{take_override
+write "Probably not a good idea." return
+}
+
+{examine
+write "Look at the strange contraptions and apparatus you recall your "
+write "mother's advice not to touch what you don't understand." return
+}
+
+object benches some work benches
+ inventory "work benches"
+ mass      scenery
+
+synonym bench benches
+
+{examine
+write "The work benches are covered in all sorts of strange contraptions and "
+write "apparatus." return
+}
+
+object fan a plain fan
+ inventory "fan"
+ mass      scenery
+
+{examine
+if FAN_STOPPED = true
+   write "There is a large branch wedged into the blades of the fan "
+   write "preventing it from spinning. Behind the fan you can see a "
+   write "dark alcove." return
+   break
+endif
+write "Through the blades of the spinning fan you can barely make out "
+write "a dark alcove behind it." return
+}
+
+location alcove "Alcove"
+ has     DARK
+ north   laboratory
+
+{look
+write "You are standing in dark alcove about ten foot square. To the north "
+write "you can see into the laboratory through the blades of the fan." return
+}
+
+object statue a black statue
+ described "There is small black statue of a woman here."
+ inventory "black statue" 
+ mass      10
+
+{insert_in_niche
+write "As you place the statue in the niche it starts to glow a pale green "
+write "colour, steadily increasing in intensity until it is so bright you "
+write "have no choice but to turn away. Moments later the glowing ceases "
+write "completely and the front of the altar turns to a completely smooth "
+write "stone surface. Looking up from where the niche once was you notice "
+write "that a crumpled scroll has appeared on the top of the altar." return
+points 5
+move scroll to here
+}
+
+{examine
+write "Small and black, the statue is of a woman." return
+}
+
+location east_road "Great Eastern Road"
+ no_north "You dare not venture from the road into the wilderness."
+ no_south "You dare not venture from the road into the wilderness."
+ east    riverbank_west
+ west    outskirts
+
+{look
+write "You are standing on the Great Eastern Road. Built over six "
+write "hundred years ago when people first landed here, hundreds of "
+write "thousands of people have since travelled it's length. Heading east "
+write "from the sea port town of Jurin they would seek a new beginning, a "
+write "chance to claim a piece of land as their own and begin the peaceful "
+write "life of farmer, far away from the increasing crime and corruption of "
+write "Jurin." return
+}
+
+location outskirts "Village Outskirts"
+ east    east_road
+ no_south "There is nothing of interest in the hovels."
+ west    main_street
+ no_north "The river, now wide and deep, blocks you path."
+
+{look
+write "You have entered the outskirts of the sea port town of Jurin. Small "
+write "hovels line the hills on the south side of the road while the river "
+write "to the north is beginning to widen. From here you can make out the "
+write "town centre to the west while the road disappears over the horizon "
+write "to the east." return
+}
+
+location main_street "Main Street"
+ north   inn 
+ east    outskirts
+ west    dock
+ 
+{look
+write "You are standing in the main street of Jurin. To the west the street "
+write "winds it's way down to the docks, while to the north lies the "
+write "Angler's Rest, the towns main inn. The Great Eastern Road stretches "
+write "out east from here as far as the eye can see. Many people as milling "
+write "about here, tending to their daily business." return
+}
+
+location storage "Storage Area"
+ north   dock
+ east    boat_house
+
+{look
+write "This is a large flat area filled almost entirely with shipping "
+write "crates. To the east lies a small run-down boat house." return
+}
+
+object ship_crates some shipping crates
+ inventory "shipping crates"
+ mass      scenery
+
+synonym crate crates
+
+{examine
+write "The shipping crates are plain wooden boxes." return
+}
+
+{open
+write "It would take several men to open a crate of that size." return
+}
+
+location boat_house "Boat House"
+ west    storage
+
+{look
+write "You are standing in a small run down boat house. The smell of fish and "
+write "salt is almost overwhelming here. A moderate fishing boat, currently "
+write "under repair fills the majority of the space here. The only exit is "
+write "back west, out onto the storage area." return
+}
+
+object boat a fishing boat
+ has       CONTAINER
+ inventory "fishing boat"
+ mass      scenery
+ quantity  100
+
+{examine
+write "The fishing boat is currently having a long tear down it's side "
+write "repaired. "
+execute "global_details" 
+}
+
+object uniform a black uniform
+ has       WEARABLE
+ described "There is a plain black uniform here."
+ inventory "black uniform"
+ mass      10
+ starts childof boat
+
+{global_no_uniform
+write return "Spotting you as an outsider a group of sailors descend upon you, "
+write "quickly wrestling you to the ground. Once tied, you are carried off "
+write "and thrown into the water where you sink and drown." return
+execute "global_death"
+}
+
+{wear_override
+write "Slipping into the black sailors uniform you raise the collar and "
+write "adjust the cuffs - not a bad fit." return
+ensure uniform has WORN 
+}
+
+location inn "The Angler's Rest"
+ north   bar
+ south   main_street
+ west    fire
+
+{look
+write "This is the Angler's Rest, undoubtedly the most famous inn in the "
+write "entire land. First opened only twelve years after the first settlers "
+write "arrived here, almost fifteen hundred years ago now, the pub as "
+write "flourished endlessly. The room here is filled with smoke and the "
+write "roar of hundreds of voices enthusiastically recalling tales of a "
+write "time gone by. To the north you can make out a bar through the crowd, "
+write "while a large open fire can be seen roaring to the west." return
+}
+
+location fire "By the Fire"
+ east    inn 
+
+{look
+write "This end of the inn is a lot more subdued than the common room to "
+write "the east. A few men wearing plain black uniforms sit quietly around "
+write "a roughly cut table, warming themselves by the fire. The wheel from "
+write "an ancient ship hangs proudly above the hearth." return
+}
+
+object by_fire name plain fire
+ inventory "fire"
+ mass      scenery
+
+{examine
+write "Reasonably ordinary as far as open fires go." return
+}
+
+object wheel a plain wheel
+ inventory "wheel"
+ mass      scenery
+
+{examine
+write "The ancient wheel is typical of the decorations here." return
+}
+
+{turn
+write "I would like to say that a myserious secret passage opens up beside "
+write "the hearth but unfortunately all that actually happens is that people "
+write "stop to look at the stranger who is obviously so drunk that they "
+write "decided it would be fun to play sailor." return
+}
+
+object sailor a swarthy sailor
+ has       ANIMATE
+ inventory "swarthy sailor"
+ described "An old, swarthy looking sailor is here talking to the other men."
+ mass      heavy
+
+{talk_to
+write "You don't have to go getting yourself beaten up in a bar to win this "
+write "game." return
+}
+
+{hello
+write quote "Hello Sailor!" quote ", you call the swarthy looking man. "
+write write "Looking up he gives you a strange knowing look then returns to "
+write "his conversation." return
+}
+
+{listen_to
+if SAILOR_LISTENED = false
+   write "You draw closer to hear what the sailor is discussing. Although "
+   write "hard to hear over the background noise, you make out that the "
+   write "ship he owns is about to set sailor for a small island somewhere "
+   write "in the northern sea, and island where he hides the majority of his "
+   write "valuable loot - if you believe his boasting that is..." return
+   set SAILOR_LISTENED to true
+   break
+endif
+if SAILOR_LISTENED > false
+   if SAILOR_LISTENED < 10
+      write "The sailor continues to discuss the imminent departure of "
+      write "his ship." return
+      break
+endif
+write "The sailor is now silently thinking." return
+}
+
+object men some uniformed men
+ has ANIMATE
+ inventory "uniformed men"
+
+{talk_to
+write "You don't have to go getting yourself beaten up in a bar to win this "
+write "game." return
+}
+
+{listen_to
+if SAILOR_LISTENED = false
+   write "The men are listening intently to the swarthy sailor." return
+   break
+endif
+if SAILOR_LISTEN > false
+   if SAILOR_LISTENED < 10
+      write "The men are discussing the imminent deprature of the swathy "
+      write "sailor's ship with him." return
+      break
+endif
+write "The sailors are now furiously debating who can drink the most." return
+}
+
+location bar "Bar"
+ south   inn
+ down    cellar
+ west    cellar
+
+{look
+write "You are standing by the bar of the Angler's Rest. Over a thousand "
+write "years of stains and scratches clearly show the heritage of the inn. "
+write "Several gruff looking men sit at the bar, perched firmly on "
+write "tall stools drinking mugs of ale. A narrow set of stairs lead down "
+write "on the west side of the bar while an old and beaten poker machine "
+write "stands against the wall." return
+}
+
+object men a gruff men
+ inventory "group of gruff looking men"
+
+{talk
+if men hasnt CUSTOM
+   write "The men turn around, look at you, then turn back to their drinks "
+   write "without saying a word." return
+   ensure men has CUSTOM
+   break
+endif
+write "The men don't respond." return
+}
+
+object stools a bar stool
+ inventory "bar stool"
+
+synonym stools stool
+
+{sit
+write "There are none free." return
+}
+
+{take
+if stools hasnt CUSTOM
+   write "Ripping a stool out from beneath one of the gruff looking men "
+   write "would not be a great idea." return
+   break
+endif
+write "What did I just tell you?!" return
+}
+
+object drink a plain drink
+ inventory "drink"
+ starts    limbo
+
+{order
+proxy "ask bartender for ale
+}
+
+object bartender a elderly bartender
+ has       ANIMATE
+ inventory "bartender"
+ described "An elderly bartender stands behind the bar washing glasses."
+ mass      heavy
+
+synonym landlord bartender
+synonym barman   bartender 
+synonym publican bartender 
+
+{talk_to
+write "The bartender listens to your tale with a professional ear." return
+}
+
+{pay
+proxy "give coin to bartender"
+}
+
+{ask_for_drink
+proxy "ask bartender for ale"
+}
+
+{ask_for_ale
+if mug(location) != limbo
+   write "Now I don't want to sound like your mother but I don't think it's "
+   write "appropriate for you to sit around drinking ale all day when the "
+   write "village is about to be destroyed by an evil curse." return
+   break
+endif
+if drink has CUSTOM
+   write "I don't think he's forgotten your order, perhaps you should give "
+   write "him the money." return
+   break
+endif
+write "You stride up to the bar and order a mug of ale. " 
+if bartender has CUSTOM
+   write quote "There you go sir." quote " the landlord says as he places "
+   write "the mug on the bar top, " quote "thankyou very much." quote return
+   ensure bartender hasnt CUSTOM
+   move mug to here
+   break 
+endif
+write quote "That will be one copper piece thank you sir" quote  " the "
+write "bartender requests." return
+ensure drink has CUSTOM
+}
+
+object ale a plain ale 
+ has       LIQUID
+ inventory "quantity of ale"
+ mass      5
+ starts childof mug
+
+synonym lager  ale
+synonym beer   ale 
+synonym usual  ale 
+synonym bitter ale
+
+{order
+proxy "ask bartender for ale"
+}
+
+{drink
+write quote "Cheers." quote return return
+write "Moments after you finish your ale you begin to feel slightly "
+write "intoxicated. Well, slightly is probably a bit of an "
+write "understatement..." return
+set INTOXICATION_LEVEL to 10
+move ale to limbo
+}
+
+object mug a large mug
+ has       CONTAINER
+ inventory "large mug"
+ initial   "There is a large mug on the counter."
+ described "A large mug is nearby." return
+ mass      5
+ quantity  5
+ starts    limbo 
+ 
+{give_to_bartender
+write "The bartender thanks you for returning the mug." return
+move mug to bartender 
+}
+
+object matches a plain matches
+ has       IGNITABLE
+ initial   "There is a book of matches resting on the bar."
+ described "There is a book of matches resting here."
+ inventory "book of matches"
+ mass      2
+
+object machine a poker machine
+ inventory "poker machine"
+ mass      scenery 
+
+{examine
+write "The poker machine is old an beaten. On the front there is a display "
+write "with three turning wheels and a coin slot. Attached to it's right "
+write "side is a long handle while a metal tray runs along it's width at "
+write "waist height. A small plaque above the slot reads " quote
+write "ONE SILVER COIN" quote . return
+}
+
+object g_coin a gold coin
+ described "There is a gold coin here."
+ inventory "gold coin"
+ starts    limbo
+ mass      1
+
+synonym piece   coin
+
+{give_to_bartender
+write quote "I'm sorry, I don't have any change" quote " the bartender "
+write "appologises. " quote "Do you have anything smaller?" quote return
+}
+
+{insert_in_machine
+write "When you insert the gold coin into the slot, it falls straight "
+write "through the poker machine and into the metal tray." return
+move g_coin to tray
+}
+
+{insert_in_slot
+write "When you insert the gold coin into the slot, it falls straight "
+write "through the poker machine and into the metal tray." return
+move g_coin to tray
+}
+
+{give_to_monk
+write "Gleefully pocketing the gold coin the monk hands you the insurance "
+write "policy." return
+move g_coin to monk
+move policy to player
+}
+
+object s_coin a silver coin
+ described "There is a silver coin here."
+ inventory "silver coin"
+ starts childof kryten  
+ mass      1
+
+{insert_in_machine
+if INTOXICATION_LEVEL < 1 
+   write "No body in their right mind would gamble away their last silver "
+   write "coin in a machine like that." return
+   break
+endif
+write "In you drunken state you happily insert your last silver coin into "
+write "the poker machine which responds with a loud click." return
+move s_coin to limbo
+ensure machine has CUSTOM
+}
+
+{insert_in_slot
+proxy "insert_in_machine_s_coin"
+}
+
+{give_to_bartender
+write quote "I'm sorry, I don't have any change" quote " the bartender "
+write "appologises. " quote "Do you have anything smaller?" quote return
+}
+
+object c_coin a copper coin
+ described "There is a copper coin here."
+ inventory "copper coin"
+ starts childof kryten 
+ mass      1
+
+{insert_in_machine
+write "When you insert the copper coin into the slot, it falls straight "
+write "through the poker machine and into the metal tray." return
+move c_coin to tray
+}
+
+{insert_in_slot
+write "When you insert the copper coin into the slot, it falls straight "
+write "through the poker machine and into the metal tray." return
+move c_coin to tray
+}
+
+{give_to_bartender
+move c_coin to bartender 
+if drink hasnt CUSTOM
+   write quote "Is this a tip or is there something I can get for you?"
+   write quote " the bartender inquires cheekily." return
+   move c_coin to bartender 
+   ensure bartender has CUSTOM
+   break
+endif
+write quote "There you go sir." quote " the landlord says as he places "
+write "the mug on the bar top, " quote "thankyou very much." quote return
+ensure drink hasnt CUSTOM
+move mug to here
+move c_coin to limbo
+}
+
+object tray a metal tray 
+ has       CONTAINER
+ inventory "metal tray"
+ quantity  10 
+  
+object slot a plain slot
+ inventory "slot"
+
+object handle a plain handle
+ inventory "handle"
+ 
+{pull
+if machine has CUSTOM
+   write "As you pull the handle the wheels in the display of the "
+   write "poker machine begin to spin rapidly eventually coming to rest "
+   write "on:" return return
+   write "    CAMEL   CAMEL   COCONUT" return return
+   write "A gold coin drops into the metal tray." return
+   ensure machine hasnt CUSTOM
+   move g_coin to tray
+   points 5 
+   break 
+endif
+write "You pull the handle on the poker machine resulting in the handle on "
+write "the poker machine being pulled." return
+}
+
+location cellar "Cellar"
+ up      bar
+ east    bar
+
+{look
+write "This dimly lit room is the inn's cellar. Well stocked, the cellar is "
+write "a fine example of the affluence of the west. Racks of wine, line the "
+write "walls, while crates of food cover the floor. The only exit from here "
+write "is back up the stairs to the bar." return
+}
+
+object food some plain food
+ inventory "food"
+
+{take
+write "The food is all packed into crates, and besides, I don't think it "
+write "go down to well the management if you were to walk off this it." return
+}
+
+{examine
+write "The food is all packed into crates having been recently shiped from "
+write "rural areas in the south." return
+}
+
+object crates some wooden crates
+ inventory "wooden crates"
+
+{examine
+write "The crates are all filled with various food stuffs." return
+}
+
+{open
+write "The crates are all tightly nailed shut." return
+}
+
+object wine some plain wine
+ inventory "wine"
+
+{examine
+write "The wines are some of the finest produced locally and overseas." return
+}
+
+{take
+write "Just say no!" return
+}
+
+{take_override
+write "Fortunately for the programmer you are not much of wine drinker and "
+write "decide to leave the bottle of wine alone." return
+}
+
+object racks some wine racks
+ inventory "wine racks"
+
+synonym rack racks
+
+{examine
+write "The racks are filled with bottles of some of the finest wine produced "
+write "both locally and overseas." return
+}
+
+object corn a pepper corn 
+ has EDIBLE
+ inventory "pepper corn"
+ described "There is a large pepper corn here."
+ mass      2
+
+{eat
+write "You pop the pepper corn in your mouth an swallow it whole." return
+move corn to limbo
+}
+
+{insert_in_cogs
+proxy "insert corn in cog"
+}
+
+{insert_in_cog
+write "Careful not crush your hand you put the pepper on the main cog. "
+write "Before long it has turned to the point where the corn is crushed "
+write "between the main cog and a smaller one causing a small pile of "
+write "pepper to form on the floor." return
+points 5
+move corn to limbo
+move pepper to here
+}
+
+{insert_on_cog
+proxy "insert corn in cog"
+}
+
+object pepper a crushed pepper
+ inventory "pinch of pepper"
+ described "There is a small pile of pepper on the ground."
+ mass      2
+ starts    limbo
+
+{eat
+write "Well, I hope you enjoyed it..." return
+move pepper to limbo
+}
+
+{throw_at_dragon
+proxy "blow pepper at dragon"
+}
+
+{blow_at_dragon
+write "Getting as close as you dare, you place the grains of pepper onto your "
+write "palm, hold out you hand, then blow the them at the dragon. At first "
+write "the dragon seems unaffected, but moments later it's nose begins to "
+write "twitch." return
+set DRAGON_PEPPERED to 1
+move pepper to limbo
+}
+
+location dock "Dock"
+ south   storage
+ west    deck_docked
+ no_west "There is no ship currently docked." 
+ east    main_street
+ 
+{look
+write "You are standing in the docks. A heavy mist covers entire area "
+write "reducing visibility to only a few hundred feet. A storage area for "
+write "incoming and outgoing cargo can be seen to the south while waves can "
+write "be heard crashing against the dock to the west. The road winds east "
+write "from here into the centre of town. " 
+if here(west) != false
+   write "A long gangplank leads west from here onto the deck of an enourmous "
+   write "wooden pirate ship that is crawling, quite predicatably, with "
+   write "pirates." return
+   break
+endif
+write return
+}
+
+{global_pirate_death
+write "Not very smart. Within seconds a group of sailors descend upon you, "
+write "quickly wrestling you to the ground. Once tied, you are carried off "
+write "and thrown into the water where you sink and drown." return
+execute "global_death"
+}
+
+location stern "Stern"
+ south   deck_docked
+ down    hold
+ no_down "The trap door is currently closed."
+ go_down "Hanging from the edge of a trap door's frame you drop carefully to the floor below."
+ 
+{look
+write "You are at the stern of the ship. A strong wooden railing lines this "
+write "area, preventing any unwary passenger or sailor from falling overboard "
+write "during rough seas. A large number of pirates are here scrubbing the "
+write "decks. "
+if trap_door hasnt CLOSED
+   write "An open trap door leads down into the cargo hold." return
+   break
+endif
+write "A trap door lies closed at your feet." return
+}
+
+object s_pirates some plain pirates
+ has ANIMATE
+ inventory "pirates"
+
+{talk_to
+write quote "Get back to work!" quote ", a rather seedy looking pirate "
+write "responds." return
+}
+
+{attack
+execute "global_pirate_death"
+}
+
+{attack_with_sword
+execute "global_pirate_death"
+}
+
+{attack_with_knife
+execute "global_pirate_death"
+}
+
+location bow "Bow"
+ north   deck_docked 
+
+{look
+write "This is the bow of the ship. Standing  here, a strange sensation comes "
+write "over you, the feeling that you can somehow share the experience of the "
+write "hundreds of miles this vessel has travelled, the storms it has "
+write "weathered and the sights it has been witness to. A small group of "
+write "pirates are here adjusting the rigging." return
+}
+
+object b_pirates some plain pirates
+ has ANIMATE
+ inventory "pirates"
+
+{talk_to
+write "A rough growl is your only reply." return
+}
+
+{attack
+execute "global_pirate_death"
+}
+
+{attack_with_sword
+execute "global_pirate_death"
+}
+
+{attack_with_knife
+execute "global_pirate_death"
+}
+
+location galley "Galley"
+ north   hold
+ south   cabin
+ up      deck_docked
+
+{look
+write "Although cramped, the ship's galley is plentiful and well organised. "
+write "Old, but comfortable benches surround the main dining table in the "
+write "centre of the room. The hold can be entered to the north while the "
+write "captains cabin lies to the south." return
+}
+
+location hold "Hold"
+ south   galley
+ no_up   "The trap door is far too high to climb through." return
+
+{look
+write "By far the largest room below deck, the hold is currently all but "
+write "empty. "
+if trap_door hasnt CLOSED
+   write "Light streams in from an open trap door high above your head."
+   write return
+   break
+endif
+write "A tightly shut trap door hangs high above your head." return
+}
+
+object trap_door a trap door
+ has OUT_OF_REACH CLOSED CLOSABLE
+ inventory "trap door"
+
+{open_override
+write "Pulling with all your strength you manage to open the trap door." return
+ensure noun1 hasnt CLOSED 
+set stern(down) to hold
+}
+
+{close_override
+write "With a loud slam the trap door falls into position." return
+ensure noun1 has CLOSED
+set stern(down) to false
+}
+
+location cabin "Captain's Cabin"
+ north   galley
+
+{look
+write "The captains cabin is simply but tastefully decorated with the spoils "
+write "of his many years at sea travelling to strange, distant lands. A "
+write "large soft bed fills the centre of the room while a small oak writing "
+write "desk stands in the corner. Round windows afford a view of the "
+write "ocean outside." return
+}
+
+object desk a writting desk
+ inventory "writting desk" 
+
+{examine
+write "Flicking through the various charts and papers on the desk you come "
+write "across nothing of interest." return
+}
+
+object bed a plain bed
+ inventory "bed"
+
+{look_under
+if bed has CUSTOM 
+   write "There is nothing else of interest under the bed." return
+   break
+endif
+write "Bending down to look under the bed you notice a large iron key lying "
+write "on the floor." return
+move key to here
+ensure bed has CUSTOM
+points 5
+}
+
+object key an iron key
+ inventory "iron key"
+ described "There is a large iron key lying under the bed."
+ starts    limbo 
+ mass      2
+
+location deck_docked "Ship's Deck (Docked)"
+ east    dock
+ north   stern
+ south   bow
+ down    galley
+ up      nest_docked
+
+{look
+write "You are standing on the deck of a large wooden ship. A set of stairs "
+write "lead down from here while the stern can be reached to the north and "
+write "the bow to the south. The main mast raises up tall and straight from "
+write "here with a web of ropes allowing access to the crow's nest hight "
+write "above your head. A sinister group of pirates are lurking around the "
+write "top of the gang plank that heads east back onto the docks." return
+}
+
+object pirates some plain pirates
+ has ANIMATE
+ inventory "pirates"
+
+{talk_to
+write "The pirates glare at you then return to their work." return
+}
+
+{attack
+execute "global_pirate_death"
+}
+
+{attack_with_sword
+execute "global_pirate_death"
+}
+
+{attack_with_knife
+execute "global_pirate_death"
+}
+
+location nest_docked "Crow's Nest (Docked)"
+ down    deck_docked
+
+{look
+write "Perched precariously in the crow's nest you have a commanding view of "
+write "the docks and town below. The wind here is strong and bitterly cold."
+write return
+}
+
+location deck_sea "Ship's Deck (At Sea)"
+ north   stern
+ south   bow
+ down    galley
+ up      nest_sea
+ east    nowhere
+ no_east "You can't leave the ship whilst at sea."
+
+{look
+write "You are standing on the deck of a large wooden ship. A set of stairs "
+write "lead down from here while the stern can be reached to the north and "
+write "the bow to the south. The main mast raises up tall and straight from "
+write "here with a web of ropes allowing access to the crow's nest hight "
+write "above your head. All around you the ocean stretches to every horizon. "
+write "The pirates are all busy working the ropes as the ship rocks endlessly "
+write "in the moderate swell." return
+}
+
+location nest_sea "Crow's Nest (At Sea)"
+ down    deck_sea
+
+{look
+write "Perched precariously in the crow's nest you have a commanding view of "
+write "the surrounding ocean. The wind on your face is refreshing as the "
+write "strong aft wind speeds you to your destination." return
+}
+
+location deck_cove "Ship's Deck (In Cove)"
+ north   stern
+ south   bow
+ down    galley
+ up      nest_cove 
+ east    beach
+
+{look
+write "You are standing on the deck of a large wooden ship. A set of stairs "
+write "lead down from here while the stern can be reached to the north and "
+write "the bow to the south. The main mast raises up tall and straight from "
+write "here with a web of ropes allowing access to the crow's nest hight "
+write "above your head. To the east an improbably long gang plank leads down "
+write "onto the white sandy beach of a small remote island." return
+}
+
+location nest_cove "Crow's Nest (In Cove)"
+ down    deck_cove 
+
+{look
+write "Perched precariously in the crow's nest you have a commanding view "
+write "of the small island below. Anchored on the beach there appears to be "
+write "a hot air balloon. The sun here is quite warm." return
+}
+
+location beach "Beach"
+ west    deck_cove 
+ north   island
+ up      balloon_beach
+ in      balloon_beach
+
+{look
+write "You are standing on the beach of a small island somewhere in the "
+write "northern sea. A small trail heads north through a group of palm trees "
+write "over a hill while the ship can be boarded to the west. Anchored here "
+write "is a silk hot air balloon. Small wooden footholds enable you "
+write "to climb easily up into the basket." return
+}
+
+object i_pirates some plain pirates
+ has ANIMATE
+ inventory "pirates"
+
+{talk_to
+write "The pirates are all too busy to pay you any attention." return
+}
+
+{attack
+execute "global_pirate_death"
+}
+
+{attack_with_sword
+execute "global_pirate_death"
+}
+
+{attack_with_knife
+execute "global_pirate_death"
+}
+
+location island "Island"
+ south   beach
+ east    nowhere
+ no_east "The guard raises his sword to block your path." 
+
+{look
+write "You are standing at the western end of a small island. A narrow trail "
+write "heads south while a small cave can be entered to the east." return
+}
+
+object sword a broad sword
+ inventory "broad sword"
+ described "A finely crafted broad sword rests gently at your feet."
+ starts childof guard    
+ mass      10
+
+{examine
+write "The quite large and made from the finest steel. It's handle is both "
+write "ornate and comfortable to the hand. Overall the sword feels quite "
+write "balanced, obviously of a fine make." return
+}
+
+object guard a plain guard
+ has       ANIMATE
+ inventory "guard"
+ described "There is a guard standing here blocking the entrance to the cave."
+ 
+{ask_for_sword
+write "Nice try..." return
+}
+
+{examine
+if guard hasnt DEAD
+   write "The guard is standing here blocking the enterance to the cave. "
+   write "This duty is facilitated by a rather large sword which he is "
+   write "brandishing menacingly." return
+   break
+endif
+write "The guards body lies slumped on the ground by the entrance to the "
+write "cave." return
+}
+
+{attack_with_knife
+write "Glancing from one side to the other you approach the guard, smile "
+write "sweetly, put you arm around his shoulder then stick the knife between "
+write "his ribs. Dropping his sword, he collapses to the ground." return
+ensure guard has DEAD
+describe guard as "The limp corpse of the guard lies here."
+describe knife as "A long blood stained knife rests here."
+ensure knife has CUSTOM
+set here(east) to cave 
+move sword to here
+}
+ 
+{attack
+write "You walk up to the guard and punch him fair and square on the nose. "
+write "Shaking his head clear the guard removes your's with one almighty "
+write "swing of his sword." return
+execute "global_death"
+}
+
+location cave "Cave"
+ west    island
+
+{look
+write "This is a small dry cave deep in the side of hill. The only exit from "
+write "here is back west. There is a wooden chest here half buried in the "
+write "sand." return
+}
+
+object chest a plain chest 
+ has       CLOSABLE LOCKABLE LOCKED CLOSED
+ inventory "chest"
+
+{unlock_with_key
+write "You insert the key into the lock of the chest and turn it "
+write "producing an audible click." return
+ensure chest hasnt LOCKED 
+}
+
+{lock_with_key
+write "You lock the chest using the key." return
+ensure chest has LOCKED 
+}
+
+object crystal a large crystal
+ inventory "large crystal"
+ described "A crystal of unparalleled beauty rests at your feet."
+ mass      10
+ starts childof chest
+
+{examine
+write "The crystal, almost the size of a small apple, sparkles with the "
+write "clarity and purity of the brightest star on a clear winter's night."
+write return 
+}
+
+{insert_in_depression
+write "Wiping away a thin film of slim, you stand of the tips of your toes "
+write "and insert the crystal in the circular depression in the ceiling. As "
+write "you do so it begins to glow, showering the bare tree in a golden "
+write "light. Moments later, a radiant pink flower grows out from the tip of "
+write "one of the upper branches before your very eyes." return
+move pink_flower to here
+move crystal to depression 
+points 5
+}
+
+{give_to_angel
+write "Examining the crystal the angel's eye's light up, " quote "Very nice "
+write "indeed. Okay, on your bike..." return return
+more
+move crystal to angel
+set kryten(location) to church
+ensure monk has CUSTOM
+write return
+look
+}
+
+{global_crystal_stolen
+write "Seeing you with the crystal a group of sailors descend upon you and "
+write "tackle you to the ground. Once back of your feet they lead take you to "
+write "the captain who on realising you to be an intruder, orders your "
+write "execution." return
+execute "global_death"
+}
+
+location balloon_beach "Balloon (On Beach)"
+ down    beach
+ out     beach
+
+{look
+write "You are standing in a large wicker basket suspended beneath a "
+write "balloon of silk that is filled with hot air. Just above your head, a "
+write "crude furnace idles with a low flame keeping the balloon inflated. "
+write "Climbing down, out of the basket leads onto a small, white sand beach."
+write return
+}
+
+object burner a plain burner
+ inventory "burner"
+
+{examine
+write "The burner is suspended just above your head, below the opening to the "
+write "balloon. A large pipe leads from the burner to gas tank near your "
+write "feet. Halfway along the pipe is a valve with small tap attached." return
+}
+
+object tap a plain tap
+ inventory "tap"
+
+{turn
+toggle TAP_POSITION
+if TAP_POSITION = true 
+   write "You turn the tap to the open position. As you do so, the burner "
+   write "splutters then emits a tall hot flame causing the balloon to rise "
+   write "gently into the air." return
+   if kryten(location) = balloon_beach
+      write return "Below you many sailors gather, waving cutlasses "
+      write "menacingly in your direction as the balloon blows eastward, "
+      write "towards the mainland." return return
+      break
+endif
+if TAP_POSITION = true 
+   if kryten(location) = balloon_balcony
+      execute "global_frombalcony"
+      set kryten(location) to balloon_castle
+      write return
+      break
+endif
+if TAP_POSITION = false
+   write "You turn the tap to the closed position. As you do so, the flame "
+   write "above the burner shrinks back to a low idle causing the balloon to "
+   write "begin descending slowly." return return
+if kryten(location) = balloon_sea
+   write "Before long the balloon splashes down in the middle of the Northern "
+   write "Sea. As the basket begins to sink you notice several shark fins "
+   write "slowly circling you..." return
+   execute "global_death"
+endif
+if kryten(location) = balloon_forest 
+   write "Before long the balloon's basket has reached the level of the "
+   write "tallest tree tops where is catches, throwing you from the basket "
+   write "to the earth below..." return
+   execute "global_death"
+endif
+if kryten(location) = balloon_mountains
+   write "Before long the balloon's basket has reached the level of the "
+   write "mountain range's highest peaks where is catching, throwing you from "
+   write "the basket into a valley several miles below..." return
+   execute "global_death"
+endif
+if kryten(location) = balloon_castle 
+   write "Before long the balloon's basket comes to rest in the centre "
+   write "of a large balcony at the southern end of a castle." return 
+   execute "global_landing"
+   set balcony(up) to balloon_balcony
+   set balcony(in) to balloon_balcony
+   points 5
+   write return
+   look
+}
+
+{global_frombeach
+loop
+  if noun3(location) = balloon_beach
+     move noun3 to balloon_sea
+  endif
+endloop
+}
+
+{global_fromsea
+loop
+  if noun3(location) = balloon_sea
+     move noun3 to balloon_forest
+  endif
+endloop
+}
+
+{global_fromforest
+loop
+  if noun3(location) = balloon_forest
+     move noun3 to balloon_mountains
+  endif
+endloop
+}
+
+{global_frommountains
+loop
+  if noun3(location) = balloon_mountains
+     move noun3 to balloon_castle
+  endif
+endloop
+}
+
+{global_frombalcony
+loop
+  if noun3(location) = balloon_balcony
+     move noun3 to balloon_castle
+  endif
+endloop
+}
+
+{global_landing
+loop
+  if noun3(location) = balloon_castle
+     move noun3 to balloon_balcony
+  endif
+endloop
+}
+
+object valve a gas valve
+ inventory "gas valve"
+
+{examine
+write "The valve is situated halfway along the pipe between the burner and "
+write "the gas tank. The valve has a small tap attached to it." return
+}
+
+location balloon_sea "Balloon (Over Sea)"
+ down    nowhere
+ no_down "You would fall to your death if you jumped out now."
+ out     nowhere
+ no_out  "You would fall to your death if you jumped out now."
+
+{look
+write "You are standing in a large wicker basket suspended beneath a "
+write "balloon of silk that is filled with hot air. Just above your head, a "
+write "crude furnace burns furiously keeping the balloon aloft. "
+write "Looking down you can see the ocean far below." return
+}
+
+location balloon_forest "Balloon (Over Forest)"
+ down    nowhere
+ no_down "You would fall to your death if you jumped out now."
+ out     nowhere
+ no_out  "You would fall to your death if you jumped out now."
+
+{look
+write "You are standing in a large wicker basket suspended beneath a "
+write "balloon of silk that is filled with hot air. Just above your head, a "
+write "crude furnace burns furiously keeping the balloon aloft. "
+write "Looking down you can see the tops of the forest trees." return
+}
+
+location balloon_mountains "Balloon (Over Mountains)"
+ down    nowhere
+ no_down "You would fall to your death if you jumped out now."
+ out     nowhere
+ no_out  "You would fall to your death if you jumped out now."
+
+{look
+write "You are standing in a large wicker basket suspended beneath a "
+write "balloon of silk that is filled with hot air. Just above your head, a "
+write "crude furnace burns furiously keeping the balloon aloft. "
+write "Looking down you can see the peaks of a northern mountain range."
+write return
+}
+
+location balloon_castle "Balloon (Over Castle)"
+ down    nowhere
+ no_down "You would fall to your death if you jumped out now."
+ out     nowhere
+ no_out  "You would fall to your death if you jumped out now."
+
+{look
+write "You are standing in a large wicker basket suspended beneath a "
+write "balloon of silk that is filled with hot air. Just above your head, a "
+write "crude furnace burns furiously keeping the balloon aloft. "
+write "Looking down you can see the balcony of a large castle." return
+}
+
+location balloon_balcony "Balloon (On Balcony)"
+ down    balcony
+ out     balcony
+
+{look
+write "You are standing in a large wicker basket suspended beneath a "
+write "balloon of silk that is filled with hot air. Just above your head, a "
+write "crude furnace idles with a low flame keeping the balloon inflated. "
+write "Climbing down, out of the basket, leads onto a large balcony." return
+}
+
+{global_death
+write return " *** YOU HAVE DIED *** " return return
+execute "global_score"
+if policy childof player
+   write return "After a momentary feeling of disorientation you realise "
+   write "that you surroundings have changed..." return return
+   more
+   set kryten(location) to heaven
+   move policy to angel
+   look
+   break
+endif
+endgame
+}
+
+{global_end
+write return
+execute "global_score"
+write return
+write "Having killed Eldor and recovered all the items necessary to remove "
+write "the curse the Historian sets about weaving his magic. Anxious crowds "
+write "being to gather outside and word spreads that soon the land with "
+write "prosper again. Before long you, the historian and the councillor "
+write "emerge from the town hall and announce that the curse has been lifted. "
+write "Moments later you are carried into the local tavern on the shoulders "
+write "of the joyous crowd." return return
+more
+endgame
+}
+
+{global_movement
+if kryten has SITTING
+   write return "(Getting off the bench first.)" return return
+   ensure kryten hasnt SITTING
+endif
+if here = inn 
+   if destination = main_street 
+      if mug childof player  
+          write quote "Those mugs cost money you know!" quote " the bartender "
+          write "yells as he cuts you off at the door. " quote "I don't know, "
+          write "a man tries to make an honest living..." quote " he mumbles "
+          write "as he takes the mug back to the bar." return
+          move mug to limbo 
+          break true
+endif
+break false
+}
+
+;  ***********************************************************************
+;  ***  JACL library file by Stuart Allen                              ***
+;  ***  Release 2, Copyright (C) Plenty Good Software 1996.            *** 
+;  ***********************************************************************
+
+filter the
+filter a
+filter of
+filter please
+filter quickly
+filter carefully
+filter quietly
+
+variable           INDEX
+variable           OBJECT_BACKUP
+variable           OXYGEN
+
+synonym onto       on
+synonym into       in
+synonym inside     in
+synonym floor      ground
+synonym self       myself
+synonym me         myself
+
+object kryten name plain myself 
+ has       ANIMATE
+ inventory "yourself"
+ mass      scenery
+
+;[LOCAL] The next 20 lines are local this game.
+{attack
+write "You beat your hands upon your chest achieving nothing more than a mild "
+write "cinematic effect." return
+}
+
+{attack_with_knife
+write "In a fit of desperation, you slit your throat from ear to ear." return
+execute "global_death"
+}
+
+{attack_with_sword
+write "In a fit of desperation, you slit your throat from ear to ear." return
+execute "global_death"
+}
+
+{examine
+write "God's gift to grues." return return
+execute "global_inventory"
+}
+
+{global_death
+write return " *** YOU HAVE DIED *** " return return
+execute "global_score"
+write return
+endgame
+}
+
+{global_end
+write return
+execute "global_score"
+write return "Congratulations you have completed the adventure!" return return
+more
+endgame
+}
+
+{global_grued
+write return
+write "Oh dear... Your efforts at stumbling around in the dark trying to "
+write "find the light switch appear to have been cut tragically short by "
+write "the salivating fangs of a Grue sinking deep into your person." return
+execute "global_death"
+}
+
+{global_starved
+write return
+write "Collapsing to the ground you lay unconscious for several hours "
+write "before eventually dying of hunger." return
+execute "global_death"
+}
+
+grammar say xyzzy ->xyzzy
+grammar xyzzy     ->xyzzy
+
+{global_xyzzy
+write "Suddenly a magical white glove appears floating in the air before you, "
+write "slaps you several times across the face, then disappears." return
+}
+
+grammar offer to held *present  ->help_other
+grammar help *present           ->help_other
+grammar help out *present       ->help_other
+
+{global_help_other
+write "How did you intend to help " noun1 ? return
+}
+
+grammar help ->help
+
+{global_help
+write "Some common verbs to try are..." return return
+
+write bold N    plain "   To travel north."   bold "     TAKE"    plain
+write "    To pick up an object." return
+write bold S    plain "   To travel south."   bold "     DROP"    plain
+write "    To drop an object you are carrying." return
+write bold E    plain "   To travel east."    bold "      EXAMINE" plain
+write " To examine an object closely." return
+write bold W    plain "   To travel west."    bold "      OPEN"    plain
+write "    To open an object." return
+write bold U    plain "   To travel up."      bold "        CLOSE"   plain
+write "   To close an object." return
+write bold D    plain "   To travel down."    bold "      LOOK"    plain
+write "    To read the location description again." return
+write bold IN   plain "  To enter location."  bold "   I"       plain
+write "       To see a list of what you are carrying." return
+write bold OUT  plain " To leave a location." bold " EAT"     plain
+write "     To eat an object." return
+
+write return "Characters can be interacted with using the "
+write "following..." return return
+
+write bold "TALK TO" plain " <character>" return
+write bold GIVE plain " <object> " bold TO plain " <character>" return
+write bold ASK plain " <character> " bold FOR plain " <object>" return
+write bold ASK plain " <character> " bold ABOUT plain " <object>" return
+write bold TELL plain " <character> " bold ABOUT plain " <object>" return
+
+write return "For more specific help type " bold HELP plain ", followed by "
+write "the topic you require help with." return
+noturn
+}
+
+grammar help games ->help_games
+
+{global_help_games
+write "`GAMES' REFERS TO MODELS, SIMULATIONS AND GAMES WHICH HAVE TACTICAL "
+write "AND STRATEGIC APPLICATIONS." return
+}
+
+grammar hug *present     ->hug
+grammar comfort *present ->hug
+grammar cuddle *present  ->hug
+grammar console *present ->hug
+
+{global_hug
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 hasnt ANIMATE
+   write "Odd." return
+   break
+endif
+write "I'm sure " noun1 " feels a whole lot better now." return
+}
+
+grammar kiss *present ->kiss
+grammar snog *present ->kiss
+
+{global_kiss
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+write "Hmmmmmm..." return
+}
+
+grammar pick *present with *held ->pick_with
+
+{pick_with
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+write "You can't pick " noun1 " with " noun2 . return
+}
+
+grammar rub *present    ->rub
+grammar pat *present    ->rub
+grammar stroke *present ->rub
+
+{global_rub
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+write "I'm sure " noun1 " feels a lot better now." return
+}
+
+grammar rub *present with *held    ->rub_with
+grammar stroke *present with *held ->rub_with
+grammar pat *present with *held    ->rub_with
+
+{global_rub_with
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+write "They both just get a little warmer." return
+}
+
+grammar lick *present  ->lick
+grammar taste *present ->lick
+
+{global_lick
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+write "Yeuucck!" return
+}
+
+grammar pull *present ->pull
+grammar yank *present ->pull
+grammar tug *present  ->pull
+
+{global_pull
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+write "You can't pull " noun1 . return
+}
+
+grammar break *present   ->break
+grammar smash *present   ->break
+grammar crush *present   ->break
+grammar destroy *present ->break
+grammar wrech *present   ->break
+grammar crack *present   ->break
+
+{global_break
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+write "Don't be so destructive." return
+}
+
+grammar clean *present  ->clean
+grammar wipe   *present ->clean
+grammar scrub  *present ->clean
+grammar polish *present ->clean
+
+{global_clean
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+write "That's very thoughtful of you." return
+}
+
+grammar swear    ->swear
+grammar shit     ->swear
+grammar crap     ->swear
+grammar bollocks ->swear
+grammar bugger   ->swear
+grammar smeg     ->swear
+
+{global_swear
+write "Delightful." return
+}
+
+grammar yell at *present   ->yell_at
+grammar scream at *present ->yell_at
+grammar roar at *present   ->yell_at
+
+
+{global_yell_at
+write "Oooo scary..." return
+}
+
+grammar pay *present       ->pay
+grammar reimburse *present ->pay
+
+{global_pay
+write "You can't pay" noun1 . return
+}
+
+grammar order *anywhere ->order
+grammar buy *anywhere   ->order
+
+
+{global_order
+write "Your order appears to have fallen on deaf ears." return
+}
+
+grammar knock on *present ->knock_on
+grammar rap on *present   ->knock_on
+
+{global_knock_on
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+write "Devastating productive..." return
+}
+
+grammar play *held ->play
+
+{global_play
+write "You can't play " noun1 . return
+noturn
+}
+
+grammar fill *held with *present ->fill_with
+
+{global_fill_with
+if noun2 has OUT_OF_REACH
+   write Noun2 " is out of reach." return
+   break
+endif
+if noun1 hasnt CONTAINER 
+   write "You can't fill " noun1 . return
+   break
+endif
+if noun1 has CLOSABLE 
+   if noun1 has CLOSED 
+      write Noun1 " is closed." return
+      noturn
+      break
+endif
+if noun1(info) < noun2(mass)
+   write "There is not enough room in " noun1 . return
+   noturn
+   break
+endif
+override
+if noun2 hasnt LIQUID
+   write "You can only fill " noun1 " with a liquid." return
+   break
+endif
+write "You fill " noun1 " with " noun2 . return
+move noun1 to noun2
+}
+
+grammar fill *held ->fill
+
+{global_fill
+write "What did you want to fill " noun1 " with?" return
+noturn
+}
+
+grammar stand    ->stand
+grammar stand up ->stand
+
+{global_stand
+if kryten has SITTING
+   write "Using your arms to push yourself off the bench, you stand up."
+   write return
+   ensure kryten hasnt SITTING
+   break
+endif
+write "You are already standing." return
+}
+
+grammar sit on *present ->sit_on
+grammar sit in *present ->sit_on
+
+
+{global_sit_on
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+write "You can't sit on " noun1 . return
+}
+
+grammar empty *present                      ->take_all_from
+grammar pick up everything on *present      ->take_all_from
+grammar pick up everything from on *present ->take_all_from
+grammar take everything on *present         ->take_all_from
+grammar take everything from on *present    ->take_all_from
+grammar pick up everything in *present      ->take_all_from
+grammar pick up everything from in *present ->take_all_from
+grammar take everything in *present         ->take_all_from
+grammar take everything from in *present    ->take_all_from
+grammar pick everything up from *present    ->take_all_from
+grammar pick up everything from *present    ->take_all_from
+grammar take everything from *present       ->take_all_from
+grammar pick everything up from *present    ->take_all_from
+
+synonym taek take
+
+{global_take_all_from
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 has ANIMATE 
+   write "You will have to ask " noun1 " for anything that you want." return
+   break
+endif
+if noun1 hasnt CONTAINER 
+   write "It's a bit hard to know what to say to that..." return
+   break
+endif
+if noun1 has CLOSED 
+   write "It's going to be a bit hard to take anything from " noun1 " while "
+   write "it is closed." return
+   break
+endif
+set INDEX to 0
+loop
+if noun3 childof noun1 
+   if noun3(mass) != scenery
+      if noun3 hasnt LIQUID
+         if noun3(mass) <= MAX_CARRIED
+            set OBJECT_BACKUP to noun1
+            proxy "take " noun3
+            set noun1 to OBJECT_BACKUP
+            increment INDEX
+endif
+if noun3 childof noun1
+   if noun3(mass) != scenery
+      if noun3 hasnt LIQUID
+         if noun3(mass) > MAX_CARRIED
+            write "You are carrying too much to take " noun3 . return
+            increment INDEX
+endif
+if noun3 childof noun1 
+   if noun3(mass) != scenery
+      if noun3(mass) <= MAX_CARRIED
+         if noun3 has LIQUID
+            write Noun4 " runs through your fingers." return
+            increment INDEX
+endif
+endloop
+if INDEX = 0
+   write "I don't see what you are referring to." return
+endif
+}
+
+grammar pick everything up ->take_all
+grammar pick up everything ->take_all
+grammar take everything    ->take_all
+
+synonym all everything
+
+{global_take_all
+set INDEX to 0
+loop
+if noun3(location) = here 
+   if noun3(mass) != scenery
+      if noun3 hasnt LIQUID
+         if noun3(mass) <= MAX_CARRIED
+            proxy "take " noun3
+            increment INDEX
+endif
+if noun3(location) = here
+   if noun3(mass) != scenery
+      if noun3 hasnt LIQUID
+         if noun3(mass) > MAX_CARRIED
+            write "You are carrying too much to take " noun3 . return
+            increment INDEX
+endif
+if noun3(location) = here 
+   if noun3(mass) != scenery
+      if noun3(mass) <= MAX_CARRIED
+         if noun3 has LIQUID
+            write Noun4 " runs through your fingers." return
+            increment INDEX
+endif
+endloop
+if INDEX = 0
+   write "I don't see what you are referring to." return
+endif
+}
+
+grammar pick *here up ->take
+grammar pick up *here ->take
+grammar take *here    ->take
+grammar pick *here    ->take
+
+synonym get             take
+synonym steal           take
+synonym snatch          take
+synonym snaffle         take
+
+{global_take
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1(mass) >= heavy 
+   write "You can't be serious..." return
+   noturn
+   break
+endif
+if noun1(mass) > MAX_CARRIED
+   write "You are carrying too much to take " noun1 . return
+   noturn
+   break
+endif
+if noun1 has LIQUID 
+   write Noun1 " runs through your fingers." return
+   noturn
+   break
+endif
+override
+write "You take " noun1 . return
+move noun1 to player 
+ensure noun1 has TOUCHED
+}
+
+grammar drop everything          ->drop_all
+grammar put everything down      ->drop_all
+grammar put everything on ground ->drop_all
+grammar put down everything      ->drop_all
+grammar lose everything          ->drop_all
+
+{global_drop_all
+if here has ON_WATER 
+   write "Dropping everything you own into the water probably isn't such "
+   write "a great idea." return
+   break
+endif
+set INDEX to 0
+loop
+if noun3 childof player 
+   if noun3 hasnt WEARABLE 
+      proxy "drop " noun3
+      increment INDEX
+endif
+if noun3 childof player 
+   if noun3 has WEARABLE 
+      if noun3 hasnt WORN 
+         proxy "drop " noun3
+         increment INDEX
+endif
+if noun3 childof player
+   if noun3 has WEARABLE 
+      if noun3 has WORN 
+         write "You must first remove " noun3 . return
+         increment INDEX
+endif
+endloop
+if INDEX = 0
+   write "You are not carrying anything." return
+endif
+}
+
+grammar drop *held          ->drop
+grammar put *held down      ->drop
+grammar put *held on ground ->drop
+grammar put down *held      ->drop
+grammar lose *held          ->drop
+
+{global_drop
+if noun1 has WEARABLE 
+  if noun1 has WORN 
+     write "You must first remove " noun1 . return
+     noturn
+     break
+endif
+override
+if here has ON_WATER 
+   write "You drop " noun1 " into the water where it rapidly sinks, "
+   write "disappearing from site." return
+   move noun1 to limbo
+   break
+endif
+write "You drop " noun1 . return
+move noun1 to here
+}
+
+grammar insert *held on *present ->insert_on
+grammar poke *held on *present   ->insert_on
+
+synonym wedge   insert
+synonym thrust  insert
+synonym put     insert
+
+{global_insert_on
+if noun2 has OUT_OF_REACH
+   write Noun2 " is out of reach." return
+   break
+endif
+if noun2 childof noun1
+   write "I'm afraid that's just not possible." return
+   noturn
+   break
+endif
+if noun1 has WEARABLE 
+  if noun1 has WORN 
+     write "You must first remove " noun1 . return
+     noturn
+     break
+endif
+if noun2 hasnt SURFACE 
+   write "There isn't a flat surface on " noun2 . return
+   noturn
+   break
+endif
+if noun2(info) < noun1(mass)
+   write "There is not enough room on " noun2 " for " noun1 . return
+   noturn
+   break
+endif
+override
+write "You put " noun1 " on " noun2 . return
+move noun1 to noun2
+}
+
+grammar insert *held in *present ->insert_in
+grammar poke *held in *present   ->insert_in
+
+
+{global_insert_in
+if noun2 has OUT_OF_REACH
+   write Noun2 " is out of reach." return
+   break
+endif
+if noun2 childof noun1
+   write "I'm afraid that's just not possible." return
+   noturn
+   break
+endif
+if noun1 has WEARABLE 
+  if noun1 has WORN 
+     write "You must first remove " noun1 . return
+     noturn
+     break
+endif
+if noun2 hasnt CONTAINER 
+   write Noun2 " isn't designed to receive " noun1 . return
+   noturn
+   break
+endif
+if noun2 has CLOSED 
+   write Noun2 " is closed." return
+   noturn
+   break
+endif
+if noun2(info) < noun1(mass)
+   write "There is not enough room in " noun2 " for " noun1 . return
+   noturn
+   break
+endif
+override
+write "You put " noun1 " in " noun2 . return
+move noun1 to noun2
+}
+
+grammar insert everything in *present ->insert_all_in
+grammar poke everything in *present   ->insert_all_in
+
+{global_insert_all_in
+if noun1 hasnt CONTAINER 
+   write Noun1 " isn't designed to hold things." return
+   noturn
+   break
+endif
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 has CLOSED 
+   write Noun1 " is closed." return
+   noturn
+   break
+endif
+set INDEX to 0
+loop
+  if noun3 !childof player
+     endloop
+     execute "global_encumbered"
+     break
+  endif
+  if noun3 = noun1
+     endloop
+     execute "global_encumbered"
+     break
+  endif
+  if noun3 has WEARABLE 
+     if noun1 has WORN 
+        write "You must first remove " noun3 " . return
+        increment INDEX
+        endloop
+        break
+  endif
+  set OBJECT_BACKUP to noun1
+  proxy "insert " noun3 " in " noun1
+  set noun1 to OBJECT_BACKUP
+  increment INDEX 
+endloop
+}
+
+grammar insert everything on *present ->insert_all_on
+
+{global_insert_all_on
+if noun1 hasnt SURFACE 
+   write "There is no flat surface on the " noun1 " to put things." return
+   noturn
+   break
+endif
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+set INDEX to 0
+loop
+  if noun3 !childof player
+     endloop
+     execute "global_encumbered"
+     break
+  endif
+  if noun3 = noun1
+     endloop
+     execute "global_encumbered"
+     break
+  endif
+  if noun3 has WEARABLE 
+     if noun1 has WORN 
+        write "You must first remove " noun3 " . return
+        increment INDEX
+        endloop
+        break
+  endif
+  set OBJECT_BACKUP to noun1
+  proxy "insert " noun3 " on " noun1
+  set noun1 to OBJECT_BACKUP
+  increment INDEX 
+endloop
+}
+
+{global_encumbered
+if INDEX = 0 
+   write "You are not carrying anything." return
+}
+
+grammar ask *present for *anywhere ->ask_for
+
+{global_ask_for
+if here has UNDER_WATER
+   write "Talking under water isn't very easy." return
+   noturn
+   break
+endif
+if noun1 hasnt ANIMATE
+   write Noun1 " seems to be ignoring your request." return
+   break
+endif
+if noun1 has DEAD 
+   write Noun1 " is a bit too dead to respond." return
+   noturn
+   break
+endif
+if noun1 = CURRENT_PLAYER
+   write "I think it might be time to take a break and get a cup of tea." return
+   break
+endif
+if noun2 childof noun1
+   if noun2(mass) > MAX_CARRIED
+      write "With your current load you are unable to accept " noun2 . return
+      noturn
+      break
+endif
+if noun2 childof noun1
+   override
+   write Noun1 " hands you " noun2 . return
+   move noun2 to player
+   break
+endif
+write Noun1 " doesn't seem to have " noun2 . return
+}
+
+grammar tell *present about *anywhere     ->tell_about
+grammar tell *present all about *anywhere ->tell_about
+
+{global_tell_about
+if here has UNDER_WATER
+   write "Talking under water isn't very easy." return
+   noturn
+   break
+endif
+if noun1 hasnt ANIMATE
+   write "I don't think talking to " noun1 " is going to help somehow." return
+   noturn
+   break
+endif
+if noun1 has DEAD 
+   write Noun1 " is a bit too dead to even pretend to be interested." return
+   noturn
+   break
+endif
+if noun1 = CURRENT_PLAYER
+   write "It's the first sign of madness you know..." return
+   break
+endif
+override
+write Noun1 " seems fascinated by your story about " noun2 . return
+}
+
+grammar ask *present about *anywhere     ->ask_about
+grammar ask *present all about *anywhere ->ask_about
+
+{global_ask_about
+if here has UNDER_WATER
+   write "Talking under water isn't very easy." return
+   noturn
+   break
+endif
+if noun1 hasnt ANIMATE
+   write "I don't think talking to " noun1 " is going to help somehow." return
+   noturn
+   break
+endif
+if noun1 has DEAD 
+   write Noun1 " is a bit too dead to tell you anything useful." return
+   noturn
+   break
+endif
+if noun1 = CURRENT_PLAYER
+   write "It's the first sign of madness you know..." return
+   break
+endif
+override
+write Noun1 " reluctantly admits to knowing little about " noun2 . return
+}
+
+grammar offer *held to *present     ->give_to
+grammar give *held to *present      ->give_to
+grammar give over *held to *present ->give_to
+
+{global_give_to
+if noun2 hasnt ANIMATE
+   write "You can't give " noun1 " to " noun2 . return
+   noturn
+   break
+endif
+if noun2 = CURRENT_PLAYER
+   write "I think it might be time to take a break and get a cup of tea." return
+   break
+endif
+if noun2 has OUT_OF_REACH
+   write Noun2 " is out of reach." return
+   break
+endif
+override
+;[LOCAL] The next 4 lines are local to this game.
+if noun2 = angel
+   write "Don't bother, it's not nearly good enough." return
+   break
+endif
+move noun1 to noun2
+write "You give " noun1 " to " noun2 . return
+}
+
+grammar move *present         ->move
+grammar push against *present ->move
+grammar push *present         ->move
+
+{global_move
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1(mass) >= heavy 
+   write "You can't be serious..." return
+   noturn
+   break
+endif
+if noun1 has LIQUID
+   write Noun1 " runs through your fingers." return
+   noturn
+   break
+endif
+if noun1 has WEARABLE
+   if noun1 has WORN 
+      write "You must first remove " noun1 . return
+      noturn
+      break
+endif
+if noun1 childof player 
+   override
+   write "You juggle " noun1 " in your hands." return
+   break
+endif
+override
+write "You move " noun1 " a short distance to one side." return
+ensure noun1 has TOUCHED
+}
+
+grammar read *present ->read
+
+{global_read
+write "There is nothing on " noun1 " to read." return
+}
+
+grammar look down ->look_down
+
+{global_look_down
+if here has TIGHT_ROPE
+   write "You see the ground far below." return
+   break
+endif
+if here has MID_AIR 
+   write "You see the ground far below." return
+   break
+endif
+if here has ON_WATER
+   write "You can't see beyond the surface of the water." return
+   break
+endif
+write "You take a moment to admire your investigating feet." return
+}
+
+grammar look up *anywhere in *present ->look_up_in
+
+{global_look_up_in
+write "You don't find any reference to " noun1 " in " noun2 . return
+}
+
+grammar look up ->look_up
+
+{global_look_up
+if here has OUTDOORS
+   write "You scan the sky with your eyes to no avail." return
+   break
+endif
+if here has UNDER_WATER
+   write "You can see the surface of the water ripling above your head." return
+   break
+endif
+write "There is nothing unusual about the ceiling." return
+}
+
+grammar feel *present  ->feel
+grammar touch *present ->feel
+grammar grope *present ->feel
+
+{global_feel
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 has ANIMATE
+   write "I'm not so sure that would be polite." return
+   break
+endif
+write "Feels just like " noun1(inventory) . return
+}
+
+grammar smell *present ->smell
+grammar sniff *present ->smell
+
+{global_smell
+write "Smells an awful lot like " noun1(inventory) . return
+}
+
+grammar taste *present ->taste
+grammar lick *present  ->taste
+
+{global_taste
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 has ANIMATE
+   write "You are one sick puppy." return
+   break
+endif
+write "Tastes just like you would expect " noun1(inventory) " to taste." return
+}
+
+grammar look *present    ->examine
+grammar look at *present ->examine
+grammar look in *present ->examine
+grammar look on *present ->examine
+grammar examine *present ->examine
+
+synonym watch              examine
+synonym search             examine
+synonym x                  examine
+synonym exmaine            examine
+synonym examein            examine
+synonym examien            examine
+
+{global_examine
+if noun1 hasnt CLOSABLE
+   if noun1 hasnt CONTAINER
+      if noun1 hasnt SURFACE
+         write "There is nothing special about " noun1 . return
+         break
+endif
+if noun1 has CLOSABLE 
+   execute "global_details"
+   break
+endif
+set INDEX to 0 
+loop
+  if noun3 childof noun1
+     increment INDEX 
+  endif
+endloop
+if INDEX = 0 
+   write "There is nothing special about " noun1 . return
+   break
+endif
+execute "global_details"
+}
+
+{global_details
+if noun1 has CLOSABLE
+   if noun1 hasnt CLOSED 
+      write Noun1 " is open" 
+endif
+if noun1 has CLOSABLE
+   if noun1 has CLOSED 
+      write Noun1 " is closed." return
+break
+endif
+if noun1 has CONTAINER 
+   execute "global_contents"
+   break
+endif
+}
+
+{global_contents
+set INDEX to 0 
+loop
+  if noun3 childof noun1
+     increment INDEX 
+  endif
+endloop
+if INDEX = 0 
+   if noun1 has CLOSABLE 
+      if noun1 has CONTAINER 
+         write . return
+         break
+endif
+if INDEX = 0
+   if noun1 hasnt SURFACE 
+      write return
+      break
+endif
+if INDEX = 0
+   break
+endif
+if noun1 has CONCEALING
+      break
+endif
+if noun1 has ANIMATE 
+   write Noun1 " is carrying "
+endif
+if noun1 has SURFACE 
+   write "On " noun1 " there is "
+endif
+if noun1 has CONTAINER 
+   if noun1 has CLOSABLE 
+      write " and contains "
+endif
+if noun1 has CONTAINER 
+   if noun1 hasnt CLOSABLE 
+   write Noun1 " contains "
+endif
+loop
+  if noun3 childof noun1
+     decrement INDEX
+     if INDEX > 1
+        write noun3(inventory) ", " 
+  endif
+  if noun3 childof noun1
+     if INDEX = 1
+        write noun3(inventory) " and "
+  endif
+  if noun3 childof noun1
+     if INDEX = 0
+        write noun3(inventory) . return
+     break
+  endif
+endloop
+}
+
+grammar inventory ->inventory
+
+synonym i           inventory 
+synonym inv         inventory
+
+{global_inventory
+set INDEX to 0
+loop
+  if noun3 childof player
+     increment INDEX
+  endif
+endloop
+if INDEX = 0
+   write "You are empty handed." return
+   break
+endif
+write "You are carrying "
+loop
+  if noun3 childof player 
+     decrement INDEX
+     write noun3(inventory)
+     execute "global_additional"
+     if INDEX = 0
+        write . return
+        break
+  endif
+endloop
+}
+
+{global_additional
+if noun3 has WEARABLE
+   if noun3 has WORN 
+      write " (being worn)"
+endif
+if noun3 has LUMINOUS 
+   write " (providing light)"
+endif
+if noun3 has ON
+   write " (on)"
+endif
+if noun3 has CLOSABLE
+   if noun3 hasnt CLOSED 
+      write " (open)"
+endif
+if INDEX > 1
+   write ", " 
+endif
+if INDEX = 1
+   write " and "
+endif
+}
+
+grammar relax ->relax
+
+{global_relax
+write "Taking a deep breath you release the tension from your mind and "
+write "muscles as you exhale slowly." return
+}
+
+grammar thanks   ->thankyou
+grammar thankyou ->thankyou
+
+{global_thankyou
+write "You're welcome." return
+}
+
+grammar thank *present ->thank
+
+{global_thank
+if noun1 hasnt ANIMATE
+   write "Cooky." return
+   break
+endif
+write Noun1 " nods." return
+}
+
+grammar greet *present ->greet
+
+{global_greet
+if noun1 hasnt ANIMATE
+   write "I wouldn't hold your breath waiting for a reply." return
+   break
+endif
+write Noun1 " smiles and returns your greeting." return
+}
+
+grammar score ->score
+
+{global_score
+noturn
+if TOTAL_MOVES = 1
+   write "Your score is " CURRENT_SCORE "% in 1 move giving you the rank of "
+endif
+if TOTAL_MOVES != 1
+   write "Your score is " CURRENT_SCORE "% in " TOTAL_MOVES " moves giving "
+   write "you the rank of "
+endif
+if CURRENT_SCORE = 0
+   write "Pleb's Assistant." return
+   break
+endif
+if CURRENT_SCORE < 20
+   write "Self Professed Hero." return
+   break
+endif
+if CURRENT_SCORE < 40
+   write "Amateur Explorer." return
+   break
+endif
+if CURRENT_SCORE < 60
+   write "Explorer." return
+   break
+endif
+if CURRENT_SCORE < 80
+   write "Novice Adventurer." return
+   break
+endif
+if CURRENT_SCORE < 100
+   write "Adventurer." return
+   break
+endif
+write "Master Adventurer." return
+}
+
+grammar open *present ->open
+
+{global_open
+if noun1 hasnt CLOSABLE 
+   write "You can't open " noun1 . return
+   noturn
+   break
+endif
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 has LOCKED 
+   write Noun1 " is locked." return
+   noturn
+   break
+endif
+if noun1 hasnt CLOSED 
+   write Noun1 " is already open." return
+   noturn
+   break
+endif
+override
+write "You open " noun1 . return
+ensure noun1 hasnt CLOSED 
+}
+
+grammar close *present ->close
+
+synonym shut close
+
+{global_close
+if noun1 hasnt CLOSABLE 
+   write "You can't close " noun1 . return
+   noturn
+   break
+endif
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 has CLOSED 
+   write Noun1 " is already closed." return
+   noturn
+   break
+endif
+override
+write "You close " noun1 . return
+ensure noun1 has CLOSED 
+}
+
+grammar lock *present ->lock
+
+{global_lock
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 has LOCKABLE
+   if noun1 has LOCKED 
+      write Noun1 " is already locked." return
+      break
+endif
+if noun1 hasnt LOCKABLE
+   write "You can't lock " noun1 . return
+   break
+endif
+override
+write "What did you want to lock " noun1 " with?" return
+}
+
+grammar lock *present with *held ->lock_with
+
+{global_lock_with
+if noun1 hasnt LOCKABLE
+   write "You can't lock " noun1 . return
+   noturn
+   break
+endif
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 has LOCKED 
+   write Noun1 " is already locked." return
+   break
+endif
+override
+write "You can't lock " noun1 " with " noun2 . return
+noturn
+}
+
+grammar unlock *present ->unlock
+
+{global_unlock
+if noun1 hasnt LOCKABLE 
+   write "You can't unlock " noun1 . return
+   noturn
+   break
+endif
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 hasnt LOCKED 
+   write Noun1 " is already unlocked." return
+   noturn
+   break
+endif
+override
+write "What did you want to unlock " noun1 " with?" return
+}
+
+grammar unlock *present with *held ->unlock_with
+
+{global_unlock_with
+if noun1 hasnt LOCKABLE
+   write "You can't unlock " noun1 . return
+   noturn
+   break
+endif
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 hasnt LOCKED 
+   write Noun1 " is already unlocked." return
+   break
+endif
+override
+write "You can't unlock " noun1 " with " noun2 . return
+noturn
+}
+
+grammar show *held to *present     ->show_to
+grammar show off *held to *present ->show_to
+grammar display *held to *present  ->show_to
+grammar present *held to *present  ->show_to
+
+{global_show_to
+if noun1 = noun2
+   write "You can't show " noun1 " to itself." return
+   noturn
+   break
+endif
+override
+write Noun2 " doesn't seem overly impressed by " noun1 . return
+}
+
+grammar attack *present ->attack
+
+synonym thump             attack
+synonym hit               attack
+synonym fight             attack
+synonym kill              attack
+synonym murder            attack
+synonym punch             attack
+
+{global_attack
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 has ANIMATE
+   if noun1 has DEAD 
+      write Noun1 " is already dead." return
+      noturn
+      break
+endif
+override
+write "Attacking " noun1 " with your hands has little effect." return
+}
+
+grammar attack *present with *held ->attack_with
+
+{global_attack_with
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun2 has LIQUID
+   write Noun1 " runs through your fingers." return
+   noturn
+   break
+endif
+if noun2 has WEARABLE
+   if noun1 has WORN 
+      write "You must first remove " noun1 . return
+      noturn
+      break
+endif
+if noun1 has ANIMATE
+   if noun1 has DEAD 
+      write Noun1 " is already dead." return
+      noturn
+      break
+endif
+override
+write "Attacking " noun1 " with " noun2 " has little effect." return
+}
+
+grammar jump on to *here ->jump_on
+grammar hop on to *here  ->jump_on
+grammar leap on to *here ->jump_on
+grammar jump on *here    ->jump_on
+grammar hop on *here     ->jump_on
+grammar leap on *here    ->jump_on
+grammar stamp on *here   ->jump_on
+grammar stand on *here   ->jump_on
+
+{global_jump_on
+write "You can't jump on " noun1 . return
+noturn
+}
+
+grammar jump             ->jump
+grammar jump up and down ->jump
+grammar jump around      ->jump
+grammar jump about       ->jump
+
+{global_jump
+if here has MID_AIR
+   write "Not likely." return
+   break
+endif
+if here has TIGHT_ROPE
+   write "Something tells me that might be a bit too dangerous, not to "
+   write "mention totally unnecessary." return
+   break
+endif
+if here has UNDER_WATER
+   write "Whilst underwater?" return
+   break
+endif
+if here has ON_WATER
+   write "Whilst in water?" return
+   break
+endif
+write "Consider it done." return
+}
+
+grammar yes ->yes
+
+{global_yes
+write "That was a rhetorical question." return
+noturn
+}
+
+grammar no ->no
+
+{global_no
+write "That was a rhetorical question." return
+noturn
+}
+
+grammar blow *held at *here ->blow_at
+grammar blow *held to *here ->blow_at
+
+{global_blow_at
+write "You can't blow " noun1 " at " noun2 . return
+}
+
+grammar throw *held at *here ->throw_at
+grammar throw *held to *here ->throw_at
+
+synonym chuck                  throw
+synonym pitch                  throw
+synonym lob                    throw
+synonym hurl                   throw
+
+{global_throw_at
+if noun1 has WEARABLE
+   if noun1 has WORN 
+      write "You must first remove " noun1 . return
+      noturn
+      break
+if noun2(location) > 100
+   write "You can't throw " noun1 " at " noun2 " while it is in "
+   write "something else." return
+   noturn
+   break
+endif
+override
+if kryten(location) >= ben_bridge
+   if kryten(location) <= ben_waterfall
+      write "You throw " noun1 " at " noun2 " which it bounces off of landing "
+      write "in the water where it rapidly sinks, disappearing from site."
+      write return
+      move noun1 to limbo
+      break
+endif
+write Noun1 " bounces off " noun2 " and lands on the ground." return
+move noun1 to here
+}
+
+grammar shed *present     ->remove
+grammar remove *present   ->remove
+grammar take off *present ->remove
+grammar doff *present     ->remove
+
+{global_remove
+if noun1 has WEARABLE
+   if noun1 has WORN 
+      override
+      ensure noun1 hasnt WORN 
+      write "You remove " noun1 . return
+      break
+endif
+write "You are not wearing " noun1 . return
+noturn
+}
+
+grammar wear *held   ->wear
+grammar put on *held ->wear
+grammar put *held on ->wear
+grammar don *held    ->wear
+
+{global_wear
+if noun1 hasnt WEARABLE
+   write "You can't wear " noun1 . return
+   noturn
+   break
+endif
+if noun1 has WORN
+   write "You are already wearing " noun1 . return
+   noturn
+   break
+endif
+override
+ensure noun1 has WORN
+write "You put on " noun1 . return
+}
+
+grammar talk to *present ->talk_to
+
+synonym speak              talk
+
+{global_talk_to
+if here has UNDER_WATER
+   write "Talking under water isn't very easy." return
+   noturn
+   break
+endif
+if noun1 hasnt ANIMATE
+   write "I don't think talking to " noun1 " is going to help somehow." return
+   noturn
+   break
+endif
+if noun1 has DEAD 
+   write Noun1 " is a bit too dead to respond." return
+   noturn
+   break
+endif
+if noun1 = CURRENT_PLAYER
+   write "It's the first sign of madness you know..." return
+   break
+endif
+override
+write Noun1 " doesn't appear very interested in a conversation." return
+}
+
+grammar eat *held     ->eat
+grammar consume *held ->eat
+grammar munch *held   ->eat
+grammar gobble *held  ->eat
+
+{global_eat
+write "You can't eat " noun1 . return
+noturn
+}
+
+grammar drink *anywhere ->drink
+
+{global_drink
+set noun3 parentof noun1
+if noun3 has CLOSED
+   write "I don't see " noun1 " here." return
+   noturn
+   break
+endif
+if noun3(location) = here
+   override
+   write "You drink " noun1 . return
+   break
+endif
+if noun3(location) = 100
+   override
+   write "You drink " noun1 . return
+   break
+endif
+write "I don't see " noun1 " here." return
+noturn
+}
+
+grammar press *present ->press
+
+{global_press
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 has LIQUID
+   write "A wet hand is your only reward." return
+   break
+endif
+override
+write "Pressing " noun1 " has no discernible effect." return
+}
+
+grammar light *present with *held  ->light_with
+grammar burn *present with *held   ->light_with
+grammar ignite *present with *held ->light_with
+
+{global_light_with
+if here has UNDER_WATER
+   write "I don't think you are going to be lighting anything under water."
+   write return
+   noturn
+   break
+endif
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 hasnt FLAMMABLE 
+   write "You can't light " noun1 " with " noun2 . return
+   noturn
+   break
+endif
+if noun2 hasnt IGNITABLE 
+   write "I don't see how you can light " noun1 " using " noun2 . return
+   noturn
+   break
+endif
+if noun1(info) = 0
+   write Noun1 " has run out." return
+   break
+endif
+if noun1 has BURNING 
+   write Noun1 " is already lit." return
+   noturn
+   break
+endif
+override
+write "You light " noun1 " using " noun2 . return
+ensure noun1 has BURNING 
+ensure noun1 has LUMINOUS
+}
+
+grammar burn *present   ->light
+grammar light *present  ->light
+grammar ignite *present ->light
+
+{global_light
+if here has UNDER_WATER
+   write "I don't think you are going to be lighting anything under water."
+   write return
+   noturn
+   break
+endif
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 has IGNITABLE 
+   override
+   write "You produce a brief flame." return
+   break
+endif
+if noun1 hasnt FLAMMABLE
+   write "You can't light " noun1 . return
+   noturn
+   break
+endif
+if noun1 has BURNING 
+   write Noun1 " is already alight." return
+   noturn
+   break
+endif
+write "What did you intent to light " noun1 " with?" return
+noturn
+}
+
+grammar extinguish *present ->extinguish
+grammar put out *present    ->extinguish
+
+{global_extinguish
+if noun1 hasnt BURNING
+   write Noun1 " is not lit." return
+   noturn
+   break
+endif
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+override
+write "You put out " noun1 . return
+ensure noun1 hasnt BURNING 
+ensure noun1 hasnt LUMINOUS 
+}
+
+grammar swim west ->swim_west
+
+synonym paddle      swim
+
+{global_swim_west
+if here has UNDER_WATER
+   move player west
+   break
+endif
+if here has ON_WATER
+   move player west
+   break
+endif
+write "I don't see how you can swim when you are not in water." return
+noturn
+}
+
+grammar west      ->west
+grammar go west   ->west
+grammar walk west ->west
+
+synonym w      west
+
+{global_west
+move player west
+}
+
+grammar swim east ->swim_east
+
+{global_swim_east
+if here has UNDER_WATER
+   move player east
+   break
+endif
+if here has ON_WATER
+   move player east
+   break
+endif
+write "I don't see how you can swim when you are not in water." return
+noturn
+}
+
+grammar east      ->east
+grammar go east   ->east
+grammar walk east ->east
+
+synonym e      east
+
+{global_east
+move player east
+}
+
+grammar swim south ->swim_south
+
+{global_swim_south
+if here has UNDER_WATER
+   move player south
+   break
+endif
+if here has ON_WATER
+   move player south
+   break
+endif
+write "I don't see how you can swim when you are not in water." return
+noturn
+}
+
+grammar south      ->south
+grammar go south   ->south
+grammar walk south ->south
+
+synonym s       south
+
+{global_south
+move player south
+}
+
+grammar swim southeast ->swim_southeast
+
+{global_swim_southeast
+if here has UNDER_WATER
+   move player southeast
+   break
+endif
+if here has ON_WATER
+   move player southeast
+   break
+endif
+write "I don't see how you can swim when you are not in water." return
+noturn
+}
+
+grammar southeast      ->southeast
+grammar go southeast   ->southeast
+grammar walk southeast ->southeast
+
+synonym se          southeast
+
+{global_southeast
+move player southeast
+}
+
+grammar swim southwest ->swim_southwest
+
+{global_swim_southwest
+if here has UNDER_WATER
+   move player southwest
+   break
+endif
+if here has ON_WATER
+   move player southwest
+   break
+endif
+write "I don't see how you can swim when you are not in water." return
+noturn
+}
+
+grammar southwest      ->southwest
+grammar go southwest   ->southwest
+grammar walk southwest ->southwest
+
+synonym sw          southwest
+
+{global_southwest
+move player southwest
+}
+
+grammar swim north ->swim_north
+
+{global_swim_north
+if here has UNDER_WATER
+   move player north
+   break
+endif
+if here has ON_WATER
+   move player north
+   break
+endif
+write "I don't see how you can swim when you are not in water." return
+noturn
+}
+
+grammar north      ->north
+grammar go north   ->north
+grammar walk north ->north
+
+synonym n       north
+
+{global_north
+move player north
+}
+
+grammar swim northeast ->swim_northeast
+
+{global_swim_northeast
+if here has UNDER_WATER
+   move player northeast
+   break
+endif
+if here has ON_WATER
+   move player northeast
+   break
+endif
+write "I don't see how you can swim when you are not in water." return
+noturn
+}
+
+grammar northeast      ->northeast
+grammar go northeast   ->northeast
+grammar walk northeast ->northeast
+
+synonym ne          northeast
+
+{global_northeast
+move player northeast
+}
+
+grammar swim northwest ->swim_northwest
+
+{global_swim_northwest
+if here has UNDER_WATER
+   move player northwest
+   break
+endif
+if here has ON_WATER
+   move player northwest
+   break
+endif
+write "I don't see how you can swim when you are not in water." return
+noturn
+}
+
+grammar northwest      ->northwest
+grammar go northwest   ->northwest
+grammar walk northwest ->northwest
+
+synonym nw          northwest
+
+{global_northwest
+move player northwest
+}
+
+grammar climb up *here ->climb_up
+grammar walk up *here  ->climb_up
+grammar go up *here    ->climb_up
+
+{global_climb_up
+write "You can not climb up " noun1 . return
+}
+
+grammar climb down *here ->climb_down
+grammar walk down *here  ->climb_down
+grammar go down *here    ->climb_down
+
+{global_climb_down
+write "You can not climb down " noun1 . return
+}
+
+grammar climb *here ->climb
+grammar scale *here ->climb
+
+{global_climb
+write "You can not climb up " noun1 . return
+}
+
+grammar swim in ->swim_in
+
+{global_swim_in
+if here has UNDER_WATER
+   move player in
+   break
+endif
+if here has ON_WATER
+   move player in
+   break
+endif
+write "I don't see how you can swim when you are not in water." return
+noturn
+}
+
+grammar get in   ->in
+grammar climb in ->in
+grammar in       ->in
+grammar enter    ->in
+grammar walk in  ->in
+grammar get in   ->in
+
+{global_in
+move player in
+}
+
+grammar swim out ->swim_out
+
+{global_swim_out
+if here has UNDER_WATER
+   move player out
+   break
+endif
+if here has ON_WATER
+   move player out
+   break
+endif
+write "I don't see how you can swim when you are not in water." return
+noturn
+}
+
+grammar get out   ->out
+grammar out       ->out
+grammar leave     ->out
+grammar climb out ->out
+grammar walk out  ->out
+grammar go out    ->out
+
+{global_out
+move player out
+}
+
+grammar surface ->swim_up
+grammar swim up ->swim_up
+
+{global_swim_up
+if here has UNDER_WATER
+   move player up
+   break
+endif
+if here has ON_WATER
+   move player up
+   break
+endif
+write "I don't see how you can swim when you are not in water." return
+noturn
+}
+
+grammar up       ->up
+grammar climb    ->up
+grammar climb up ->up
+grammar go up    ->up
+grammar walk up  ->up
+
+synonym u          up
+
+{global_up
+move player up
+}
+
+grammar swim down ->swim_down
+grammar dive down ->swim_down
+grammar dive      ->swim_down
+
+{global_swim_down
+if here has UNDER_WATER
+   move player down
+   break
+endif
+if here has ON_WATER
+   move player down
+   break
+endif
+write "I don't see how you can swim when you are not in water." return
+noturn
+}
+
+grammar down       ->down
+grammar climb down ->down
+grammar go down    ->down
+grammar walk down  ->down
+
+synonym d            down
+
+{global_down
+move player down
+}
+
+grammar look  ->look_around
+grammar watch ->look_around
+
+synonym l      look
+synonym ls     look
+
+{global_look_around
+look
+}
+
+grammar look under *present ->look_under
+
+synonym beneath under
+
+{global_look_under
+if noun1(mass) = scenery
+   write "You can't see under " noun1 . return
+   noturn
+   break
+endif
+write "There is nothing unusual under " noun1 . return
+}
+
+grammar look behind *present ->look_behind
+
+{global_look_behind
+if noun1(mass) = scenery
+   write "You can't see behind " noun1 . return
+   noturn
+   break
+endif
+write "There is nothing unusual behind " noun1 . return
+}
+
+grammar look through *present ->look_through
+
+{global_look_through
+write "You can't look through " noun1 . return
+noturn
+}
+
+grammar look at *present through *held ->look_at_through
+
+{global_look_at_through
+if noun1 = noun2
+   write "You can't look at " noun1 " through itself." return
+   noturn
+   break
+endif
+write "You can't look at " noun1 " through " noun2 . return
+noturn
+}
+
+grammar wait ->wait
+
+synonym z      wait
+
+{global_wait
+write "Time passes..." return
+}
+
+grammar listen ->listen
+
+{global_listen
+write "You don't hear anything out of the ordinary." return
+}
+
+grammar listen to *present ->listen_to
+
+{global_listen_to
+write "You don't hear anything out of the ordinary." return
+}
+
+grammar rotate *present  ->turn
+grammar turn *present    ->turn
+grammar twist *present   ->turn
+
+{global_turn
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+write "You can't turn " noun1 . return
+noturn
+}
+
+grammar turn on *present   ->turn_on
+grammar turn *present on   ->turn_on
+grammar switch on *present ->turn_on
+grammar switch *present on ->turn_on
+
+{global_turn_on
+if noun1 hasnt SWITCHABLE
+   write "You can't turn " noun1 " on." return
+   noturn
+   break
+endif
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 has ON 
+   write Noun1 " is already on." return
+   noturn
+   break
+endif
+override
+write "You switch on " noun1 . return
+ensure noun1 has ON
+}
+
+grammar turn off *present   ->turn_off
+grammar turn *present off   ->turn_off
+grammar switch off *present ->turn_on
+grammar switch *present off ->turn_on
+
+{global_turn_off
+if noun1 hasnt SWITCHABLE
+   write "You can't turn " noun1 " off." return
+   noturn
+   break
+endif
+if noun1 has OUT_OF_REACH
+   write Noun1 " is out of reach." return
+   break
+endif
+if noun1 hasnt ON 
+   write Noun1 " is already off." return
+   noturn
+   break
+endif
+override
+write "You switch off " noun1 . return
+ensure noun1 hasnt ON
+}
+
+grammar pour *anywhere ->pour
+
+{global_pour
+if noun1 hasnt LIQUID
+   write "You can't pour " noun1 . return
+   noturn
+   break
+endif
+set noun3 parentof noun1
+if noun3 has CLOSED 
+   write "I don't see " noun1 " here." return
+   noturn
+   break
+endif
+if noun3 !childof player 
+   write "You do not have " noun1 . return
+   noturn
+   break
+endif
+override
+write "You pour " noun1 " all over the ground." return
+move noun1 to here 
+}
+
+grammar pour *anywhere on *present   ->pour_on
+grammar pour *anywhere in *present   ->pour_on
+grammar pour *anywhere over *present ->pour_on
+
+{global_pour_on
+if noun1 hasnt LIQUID
+   write "You can't pour " noun1 . return
+   noturn
+   break
+endif
+set noun3 parentof noun1
+if noun3 has CLOSED
+   write "I don't see " noun1 " here." return
+   noturn
+   break
+endif
+if noun3 !childof player 
+   write "You do not have " noun1 . return
+   noturn
+   break
+endif
+if noun2 has OUT_OF_REACH
+   write Noun2 " is out of reach." return
+   break
+endif
+if noun2 has CONTAINER
+   if noun2 hasnt CLOSED 
+      override
+      write "You pour " noun1 " into " noun2 . return
+      move noun1 to noun2
+      break
+endif
+if noun2(location) > objects
+   set noun3 parentof noun2
+   if noun3 has CONTAINER
+      if noun3 hasnt CLOSED
+         write Noun1 " runs off " noun2 " and goes into " noun3 . return
+         move noun1 to noun3
+         ;[LOCAL] The next 3 lines are local to this game.
+         if noun2 = branch
+            ensure branch has CUSTOM 
+         endif 
+         break
+endif
+write Noun1 " runs off " noun2 " and goes all over the ground." return
+move noun1 to limbo
+}
+
+; Grammar statements beginning with an object must be defined last in the game
+; to avoid confusion with verbs that may also be objects such as "drink drink"
+
+grammar *present give myself *anywhere    ->ask_for
+grammar *present give *anywhere to myself ->ask_for
+
+grammar *present tell myself about *anywhere     ->ask_about
+grammar *present tell myself all about *anywhere ->ask_about
+
+grammar *present thanks   ->thank
+grammar *present thankyou ->thank
+
+grammar *present hello    ->greet
+grammar *present hi there ->greet
+grammar *present hi       ->greet
