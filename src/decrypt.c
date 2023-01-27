@@ -22,12 +22,15 @@ main(int argc, char *argv[])
      if ((file = fopen(argv[1], "r")) != NULL) {
           while (!feof(file)) {
                fgets(text_buffer, 1024, file);
-			if (!strncmp(text_buffer, "#encrypted", 9)) {
+			if (strstr(text_buffer, "#encrypted")) {
 				encrypted = 1;
-			} else if (encrypted) {
-				jacl_decrypt(text_buffer);
-				puts(text_buffer);
+				continue;
 			}
+			if (encrypted) {
+				jacl_decrypt(text_buffer);
+			}
+			stripwhite(text_buffer);
+			printf("%s", text_buffer);
 		}
 	}
 }
