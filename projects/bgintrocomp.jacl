@@ -1,3 +1,9 @@
+#!../bin/jacl
+#processed:202
+#                                                               THE BLOODY GUNS
+# -----------------------------------------------------------------------------
+# Copyright (C) Stuart Allen 2008. All rights reserved.
+# -----------------------------------------------------------------------------
 
 constant 	game_release	1
 constant 	game_build		6
