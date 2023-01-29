@@ -606,10 +606,14 @@ read_gamefile()
         if (encrypted) jacl_decrypt(text_buffer);
     }
 
+#ifndef WARN_ONLY
     if (errors) {
         totalerrs(errors);
         terminate(48);
     }
+#endif
+
+log_error("Starting second pass^", PLUS_STDERR);
 
 /*************************************************************************
  * START OF SECOND PASS                                                  *
@@ -660,13 +664,14 @@ read_gamefile()
         line++;
     }
     if (encrypted) jacl_decrypt(text_buffer);
-
+log_error("Starting functions^", PLUS_STDERR);
 #ifdef GLK
     while (result)
 #else
     while (!feof(file))
 #endif
     {
+        log_error("Processing a line^", PLUS_STDERR);
         encapsulate();
         if (word[0] == NULL);
         else if (text_buffer[0] == '{') {
@@ -677,13 +682,14 @@ read_gamefile()
                 nofnamerr(line);
                 errors++;
             } else {
+                log_error("Processing a function^", PLUS_STDERR);
                 // BY DEFAULT FUNCTIONS ARE NOT STATIC UNLESS EXPLICITLY DECLARED AS SUCH
                 is_static = FALSE;
 
                 // LOOP THROUGH ALL THE NAMES OF THIS FUNCTION, CREATING A NEW FUNCTION
                 // FOR EACH NAME (UNLESS THE DIRECTIVE 'static')
                 while (word[wp] != NULL && wp < MAX_WORDS) {
-                    if (word[wp][0] == '+') {
+                    if (word[wp][0] == '+' || strncmp(word[wp], "+global_", 7)) {
                         strncpy(function_name, word[wp], 80);
                         function_name[80] = 0;
                         self_parent = 0;
@@ -704,7 +710,7 @@ read_gamefile()
                             self_parent = 0;
                         }
                     } else if (!strcmp(word[wp], "static")) {
-                        // ALL FUNCTION AFTER THIS POINT ARE STATIC.
+                        // ALL FUNCTIONS AFTER THIS POINT ARE STATIC.
                         is_static = TRUE;    
                         // THIS IS ONLY A DIRECTIVE CHANGING FUTURE FUNCTION DECLARATIONS,
                         // NOT A REAL FUNCTION, SO MOVE ON TO THE NEXT WORD
@@ -745,6 +751,7 @@ read_gamefile()
                 }
             }
 
+log_error("Finished functions^", PLUS_STDERR);
 #ifdef GLK
             while (result) {
                 result = glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
@@ -823,6 +830,8 @@ read_gamefile()
         else if (!strcmp(word[0], "string"));
         else if (!strcmp(word[0], "attribute"));
         else if (!strcmp(word[0], "parameter"));
+        else if (!strcmp(word[0], "initial"));
+        else if (!strcmp(word[0], "no_go"));
         else if (!strcmp(word[0], "synonym"));
         else if (!strcmp(word[0], "grammar"));
         else if (!strcmp(word[0], "filter"));
@@ -936,7 +945,7 @@ read_gamefile()
                 errors++;
             } else
                 player = object_count;
-        } else if (!strcmp(word[0], "short")) {
+        } else if (!strcmp(word[0], "short" || !strcmp(word[0], "inventory"))) {
             if (word[2] == NULL) {
                 noproperr(line);
                 errors++;
@@ -960,7 +969,25 @@ read_gamefile()
                 strncpy(object[object_count]->definite, word[1], 10);
                 object[object_count]->definite[10] = 0;
             }
-        } else if (!strcmp(word[0], "long")) {
+        } else if (!strcmp(word[0], "starts")) {
+            if (word[1] == NULL) {
+                noproperr(line);
+                errors++;
+            } else if (object_count == 0) {
+                noobjerr(line);
+                errors++;
+            } else {
+                if (!strcmp(word[1], "here")) {
+                    // DO NOTHING, THIS IS THE DEFAULT
+                } else if (!strcmp(word[1], "limbo")) {
+                    object[object_count]->PARENT = 0;
+                } else {
+                    if (!strcmp(word[1], "childof") && word[2] != NULL) {
+                        object[object_count]->PARENT = value_of(word[2], FALSE);
+                    }
+                }
+            }
+        } else if (!strcmp(word[0], "long") || !strcmp(word[0], "described")) {
             if (word[1] == NULL) {
                 noproperr(line);
                 errors++;

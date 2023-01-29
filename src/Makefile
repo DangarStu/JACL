@@ -11,12 +11,15 @@ bjorb : bjorb.c
 jacl : libglkterm.a jacl.c jacl.h glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c types.h libcsv.c csv.h 
 	$(CC) $(CFLAGS) -DGLK jacl.c glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c libcsv.c csv.h -Iglkterm -Lglkterm -lglkterm -lm -lncurses;
 
+warn : libglkterm.a jacl.c jacl.h glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c types.h libcsv.c csv.h 
+	$(CC) $(CFLAGS) -DGLK -DWARN_ONLY -g jacl.c glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c libcsv.c csv.h -Iglkterm -Lglkterm -lglkterm -lm -lncurses;
+
 jaclw : libglktermw.a jacl.c jacl.h glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c types.h libcsv.c csv.h
 	$(CC) $(CFLAGS) -DGLK -o jacl jacl.c glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c libcsv.c csv.h -Iglktermw -Lglktermw -lglktermw -lm -lncursesw;
 	
 cjacl : libcheapglk.a jacl.c jacl.h glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c types.h libcsv.c csv.h
 	$(CC) $(CFLAGS) -DGLK  jacl.c glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c libcsv.c csv.h -ICheapGlk -LCheapGlk -lm -lcheapglk;
-	
+
 cgijacl : libcgihtml.a webjacl.o cgijacl.c interpreter.c findroute.c loader.c saver.c cgijacl.h logging.c parser.c display.c utils.c jpp.c resolvers.c errors.o encapsulate.o language.h types.h libcsv.c csv.h 
 	$(CC) $(CFLAGS) -DWEBJACL cgijacl.c interpreter.c findroute.c loader.c saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.o encapsulate.o webjacl.o  libcsv.c csv.h -Icgihtml-1.69 -Iwebjacl -Lcgihtml-1.69 -lm -lcgihtml;
     

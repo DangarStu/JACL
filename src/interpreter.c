@@ -2048,7 +2048,7 @@ execute(const char *funcname)
                         if (execute("here.movement")) break;
 
                         if (integer_resolve("destination")->value == 0) {
-                            write_text("You can't go that way.^");
+                            write_text("You can't go that way.^");\
                             TIME->value = FALSE;
                         } else {
                             object[player]->PARENT = integer_resolve("destination")->value;
