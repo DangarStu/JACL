@@ -295,7 +295,9 @@ glk_main(void)
 
 	jacl_set_window(mainwin);
 
-	execute("+intro");
+	if(execute("+intro") == FALSE) {
+		execute("global_intro");
+	}
 
 	if (object[2] == NULL) {
 		log_error (CANT_RUN, PLUS_STDERR);

@@ -54,6 +54,8 @@ container_resolve(const char *container_name)
 		return (&noun[2]);
 	else if (!strcmp(container_name, "noun4"))
 		return (&noun[3]);
+	else if (!strcmp(container_name, "CURRENT_PLAYER"))
+		return (&player);
 	else if (!strcmp(container_name, "player"))
 		return (&player);
 	else if (!strcmp(container_name, "here"))
@@ -1300,7 +1302,7 @@ attribute_resolve(const char *attribute)
 		return (NPC);
 	else if (!strcmp(attribute, "DONE"))
 		return (DONE);
-	else if (!strcmp(attribute, "GAS"))
+	else if (!strcmp(attribute, "SWITCHABLE"))
 		return (MAPPED);
 	else if (!strcmp(attribute, "NO_TAB"))
 		return (NO_TAB);

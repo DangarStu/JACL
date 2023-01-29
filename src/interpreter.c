@@ -89,7 +89,7 @@ static const char * const object_attributes[] = {
  "LUMINOUS ", "WEARABLE ", "CLOSABLE ", "LOCKABLE ", "ANIMATE ", "LIQUID ",
  "CONTAINER ", "SURFACE ", "PLURAL ", "FLAMMABLE ", "BURNING ", "LOCATION ",
  "ON ", "DAMAGED ", "FEMALE ", "POSSESSIVE ", "OUT_OF_REACH ", "TOUCHED ",
- "SCORED ", "SITTING ", "NPC ", "DONE ", "GAS ", "NO_TAB ",
+ "SCORED ", "SITTING ", "NPC ", "DONE ", "SWITCHABLE ", "NO_TAB",
  "NOT_IMPORTANT ", NULL };
 
 static const char * const object_elements[] = {
@@ -1737,7 +1737,9 @@ execute(const char *funcname)
                 for (counter = 1; word[counter] != NULL && counter < MAX_WORDS; counter++) {
                     write_text(text_of_word(counter));
                 }
-            } else if (!strcmp(word[0], "write")) {
+            } else if (!strcmp(word[0], "write")
+                || (!strcmp(word[0], "right"))
+                || (!strcmp(word[0], "centre"))) {
                 for (counter = 1; word[counter] != NULL && counter < MAX_WORDS; counter++) {
                     output = text_of_word(counter);            
                     if (*output != 0) {

@@ -55,7 +55,7 @@
 #define SITTING         33554432
 #define NPC             67108864
 #define DONE            134217728
-#define GAS	         268435456
+#define SWITCHABLE	   268435456
 #define NO_TAB          536870912
 #define NOT_IMPORTANT   1073741824
 

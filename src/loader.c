@@ -120,6 +120,7 @@ read_gamefile()
     create_integer ("score", 0);
     create_integer ("display_mode", 0);
     create_integer ("internal_version", J_VERSION);
+    create_integer ("INTERNAL_VERSION", 3);
     create_integer ("max_rand", 100);
     create_integer ("destination", 0);
     create_integer ("interrupted", 0);
@@ -202,6 +203,7 @@ read_gamefile()
     create_cinteger ("in", IN_DIR);
     create_cinteger ("out", OUT_DIR);
     create_cinteger ("parent", 0);
+    create_cinteger ("location", 0);
     create_cinteger ("quantity", 1);
     create_cinteger ("capacity", 1);
     create_cinteger ("mass", 2);
@@ -332,8 +334,10 @@ read_gamefile()
                 if (word[1] == NULL) {
                     noproperr(line);
                     errors++;
+#ifndef WARN_ONLY
                 } else if (legal_label_check(word[1], line, OBJ_TYPE)) {    
                     errors++;
+#endif
                 } else {
                     objects++;
 
@@ -613,8 +617,6 @@ read_gamefile()
     }
 #endif
 
-log_error("Starting second pass^", PLUS_STDERR);
-
 /*************************************************************************
  * START OF SECOND PASS                                                  *
  *************************************************************************/
@@ -664,14 +666,13 @@ log_error("Starting second pass^", PLUS_STDERR);
         line++;
     }
     if (encrypted) jacl_decrypt(text_buffer);
-log_error("Starting functions^", PLUS_STDERR);
+
 #ifdef GLK
     while (result)
 #else
     while (!feof(file))
 #endif
     {
-        log_error("Processing a line^", PLUS_STDERR);
         encapsulate();
         if (word[0] == NULL);
         else if (text_buffer[0] == '{') {
@@ -682,7 +683,6 @@ log_error("Starting functions^", PLUS_STDERR);
                 nofnamerr(line);
                 errors++;
             } else {
-                log_error("Processing a function^", PLUS_STDERR);
                 // BY DEFAULT FUNCTIONS ARE NOT STATIC UNLESS EXPLICITLY DECLARED AS SUCH
                 is_static = FALSE;
 
@@ -751,7 +751,6 @@ log_error("Starting functions^", PLUS_STDERR);
                 }
             }
 
-log_error("Finished functions^", PLUS_STDERR);
 #ifdef GLK
             while (result) {
                 result = glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
@@ -801,7 +800,7 @@ log_error("Finished functions^", PLUS_STDERR);
                     current_integer = current_integer->next_integer;
                 }
             }
-        } else if (!strcmp(word[0], "integer")) {
+        } else if (!strcmp(word[0], "integer") || !strcmp(word[0], "variable")) {
             if (word[2] != NULL) {
                 current_integer = current_integer->next_integer;
                 current_integer->value = value_of(word[2], FALSE);
@@ -870,7 +869,6 @@ log_error("Finished functions^", PLUS_STDERR);
                 object[object_count]->attributes =
                     object[object_count]->attributes | LOCATION;
             }
-
 
             if ((object[object_count]->first_name =
                  (struct name_type *) malloc(sizeof(struct name_type)))
@@ -945,7 +943,7 @@ log_error("Finished functions^", PLUS_STDERR);
                 errors++;
             } else
                 player = object_count;
-        } else if (!strcmp(word[0], "short" || !strcmp(word[0], "inventory"))) {
+        } else if (!strcmp(word[0], "short") || !strcmp(word[0], "inventory")) {
             if (word[2] == NULL) {
                 noproperr(line);
                 errors++;
@@ -1015,10 +1013,14 @@ log_error("Finished functions^", PLUS_STDERR);
                     errors++;
                 }
             }
+#ifndef WARN_ONLY
         } else {
             unkkeyerr(line, 0);
             errors++;
         }
+#else
+        }
+#endif
 
 #ifdef GLK
         current_file_position = glk_stream_get_position(game_stream);

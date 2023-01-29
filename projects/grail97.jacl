@@ -1,17 +1,8 @@
-;                                                              THE UNHOLY GRAIL 
-; -----------------------------------------------------------------------------
-; Copyright (C) Stuart Allen 1996, 1997. All rights resevered.
-; email sallen@one.net.au
-;
-; Written for the 1997 rec.art.int-fiction Interactive Fiction Competition.
-;  
-; -----------------------------------------------------------------------------
-
-location control_centre
- no_go		"The only exit from here is to the south."
- south		pool
+attribute CUSTOM1 CUSTOM2 CUSTOM3 CUSTOM4 CUSTOM5
+location control_centre : control centre
+ no_go   "The only exit from here is to the south."
+ south   pool
  out		pool
-
 {look
 if here has VISITED
    write "You are back in the control centre." ^
