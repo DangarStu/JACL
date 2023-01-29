@@ -981,7 +981,7 @@ execute(const char *funcname)
 
                         /* EXPOSE THE CURRENT VALUE THROUGH A JACL CONSTANT
                            SO THAT GAME CODE CAN READ THE IT */
-                        cinteger_resolve("timer")->value = index;
+                        cinteger_resolve("timersetting")->value = index;
                     }
                 }
             } else if (!strcmp(word[0], "sound")) {
@@ -2029,6 +2029,38 @@ execute(const char *funcname)
                         }
                     }
                 }
+            } else if (!strcmp(word[0], "travel")) {
+				// THIS IS COMMAND IS HERE FOR BACKWARDS COMPATIBILITY
+                // ALL TRAVEL RELATED CODE IS NOW IN VERBS.LIBRARY
+				if (word[1] == NULL) {
+					/* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
+					noproprun();
+					return (exit_function(TRUE));
+				} else {
+                    index = value_of(word[1], TRUE);
+
+                    // NOT A VALID DIRECTION
+					if (index < 0 || index > 11) index = -1;
+
+					if (index != -1) {                      
+                        integer_resolve("destination")->value = object[HERE]->integer[index];
+                        if (execute("+movement")) break;
+                        if (execute("here.movement")) break;
+
+                        if (integer_resolve("destination")->value == 0) {
+                            write_text("You can't go that way.^");
+                            TIME->value = FALSE;
+                        } else {
+                            object[player]->PARENT = integer_resolve("destination")->value;
+                            object[HERE]->attributes &= ~1L;
+                            look_around();
+                            TIME->value = FALSE;
+                        }
+					} else {
+						unkdirrun(1);
+						return (exit_function(TRUE));
+					}
+				}
             } else if (!strcmp(word[0], "dir_to") ||
                        !strcmp(word[0], "npc_to")) {
                 /* CALCULATE THE FIRST DIRECTION TO TRAVEL IN GET TO 

@@ -14,7 +14,7 @@
 
 /* INDICATES THAT THE CURRENT '.j2' FILE BEING WORKED 
  * WITH IS ENCRYPTED */
-int                    encrypted = FALSE;
+int                   encrypted = FALSE;
 static int            in_print = FALSE;
 
 #ifdef GLK
@@ -28,6 +28,7 @@ struct parameter_type *new_parameter;
 
 static struct string_type *current_string = NULL;
 static struct integer_type *current_integer = NULL;
+static struct attribute_type *current_attribute = NULL;
 static struct integer_type *last_system_integer = NULL;
 
 int                                value_resolved;
@@ -37,6 +38,7 @@ static void create_language_constants(void);
 static void set_defaults(void);
 static void build_grammar_table(struct word_type *pointer);
 static void free_from(struct word_type *x);
+static void create_attribute(const char *name);
 static void create_cstring(const char *name, const char *value);
 static void create_string(const char *name, const char *value);
 static void create_integer(const char *name, int value);
@@ -68,7 +70,7 @@ read_gamefile()
 
     struct filter_type *current_filter = NULL;
     struct filter_type *new_filter = NULL;
-    struct attribute_type *current_attribute = NULL;
+
     struct attribute_type *new_attribute = NULL;
     struct cinteger_type *resolved_cinteger = NULL;
     struct synonym_type *current_synonym = NULL;
@@ -133,6 +135,9 @@ read_gamefile()
     create_integer ("local_y", 0);
     create_integer ("local_a", 0);
     create_integer ("linebreaks", 1);
+
+    // CREATE DEFAULT ATTRIBUTE FOR BACKWARDS COMPATIBILITY
+    create_attribute("FIRST");
 
     /* STORE THIS SO THE SECOND PASS KNOWS WHERE TO START 
      * SETTING VALUES FROM (EVERYTHING BEFORE THIS IN THE
@@ -202,13 +207,14 @@ read_gamefile()
     create_cinteger ("mass", 2);
     create_cinteger ("bearing", 3);
     create_cinteger ("velocity", 4);
+    create_cinteger ("timer", 4);
     create_cinteger ("next", 5);
     create_cinteger ("previous", 6);
     create_cinteger ("child", 7);
     create_cinteger ("index", 8);
     create_cinteger ("status", 9);
     create_cinteger ("state", 10);
-    create_cinteger ("counter", 11);
+    create_cinteger ("accumulator", 11);
     create_cinteger ("points", 12);
     create_cinteger ("class", 13);
     create_cinteger ("x", 14);
@@ -221,7 +227,7 @@ read_gamefile()
     create_cinteger ("volume", 100);
     create_cinteger ("volume", 100);
     create_cinteger ("volume", 100);
-    create_cinteger ("timer", 500);
+    create_cinteger ("timersetting", 500);
 
     set_defaults();
 
@@ -460,32 +466,8 @@ read_gamefile()
                 if (word[1] == NULL) {
                     noproperr(line);
                     errors++;
-                } else if (legal_label_check(word[1], line, ATT_TYPE)) {    
-                    errors++;
-                } else if (current_attribute != NULL && current_attribute->value == 1073741824) {    
-                    maxatterr(line, 1);
-                    errors++;
                 } else {
-                    if ((new_attribute = (struct attribute_type *)
-                         malloc(sizeof(struct attribute_type))) == NULL)
-                        outofmem();
-                    else {
-                        if (attribute_table == NULL) {
-                            attribute_table = new_attribute;
-                            new_attribute->value = 1;
-                        } else {
-                            current_attribute->next_attribute = new_attribute;
-                            new_attribute->value = current_attribute->value * 2;
-                        }
-                        current_attribute = new_attribute;
-                        strncpy(current_attribute->name, word[1], 40);
-                        current_attribute->name[40] = 0;
-                        current_attribute->next_attribute = NULL;
-                    }
-
-                    /* CHECK IF MORE THAN ONE VALUE IS SUPPLIED AND CREATE
-                       ADDITIONAL CONSTANTS IF REQUIRED */
-                    index = 2;
+                    index = 1;
                     while (word[index] != NULL && index < MAX_WORDS) {
                         if (legal_label_check(word[index], line, ATT_TYPE)) {    
                             errors++;
@@ -493,17 +475,7 @@ read_gamefile()
                             maxatterr(line, index);
                             errors++;
                         } else {
-                            if ((new_attribute = (struct attribute_type *)
-                                 malloc(sizeof(struct attribute_type))) == NULL)
-                                outofmem();
-                            else {
-                                current_attribute->next_attribute = new_attribute;
-                                new_attribute->value = current_attribute->value * 2;
-                                current_attribute = new_attribute;
-                                strncpy(current_attribute->name, word[index], 40);
-                                current_attribute->name[40] = 0;
-                                current_attribute->next_attribute = NULL;
-                            }
+                            create_attribute(word[index]);
                         }
                         index++;
                     }
@@ -1429,6 +1401,30 @@ set_defaults()
     it = 0;
     her = 0;
     him = 0;
+}
+
+void
+create_attribute(const char *name) 
+{
+    struct attribute_type *new_attribute = NULL;
+    int index;
+
+  if ((new_attribute = (struct attribute_type *)
+     malloc(sizeof(struct attribute_type))) == NULL) {
+     outofmem();
+  } else {
+     if (attribute_table == NULL) {
+        attribute_table = new_attribute;
+        new_attribute->value = 1;
+     } else {
+        current_attribute->next_attribute = new_attribute;
+        new_attribute->value = current_attribute->value * 2;
+     }
+        current_attribute = new_attribute;
+        strncpy(current_attribute->name, name, 40);
+        current_attribute->name[40] = 0;
+        current_attribute->next_attribute = NULL;
+     }
 }
 
 void
