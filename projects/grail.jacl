@@ -1096,7 +1096,7 @@ write "Just a wall.^"
 object lisas_clothes: lisas lisa's clothes
  has		PLURAL
  short		name "Lisa's clothes"
- parent wardrobe
+ parent 	wardrobe
 
 {take
 write "I don't think Lisa would appreciate you walking off with her clothes.^"

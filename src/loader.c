@@ -134,6 +134,9 @@ read_gamefile()
     create_integer ("local_a", 0);
     create_integer ("linebreaks", 1);
 
+    // CREATE DEFAULT ATTRIBUTE FOR BACKWARDS COMPATIBILITY
+    create_attribute("FIRST");
+
     /* STORE THIS SO THE SECOND PASS KNOWS WHERE TO START 
      * SETTING VALUES FROM (EVERYTHING BEFORE THIS IN THE
      * VARIABLE TABLE IS A SYSTEM VARIABLE */
