@@ -28,6 +28,7 @@ struct parameter_type *new_parameter;
 
 static struct string_type *current_string = NULL;
 static struct integer_type *current_integer = NULL;
+static struct attribute_type *current_attribute = NULL;
 static struct integer_type *last_system_integer = NULL;
 
 int                                value_resolved;
@@ -474,42 +475,11 @@ read_gamefile()
                          malloc(sizeof(struct attribute_type))) == NULL)
                         outofmem();
                     else {
-                        if (attribute_table == NULL) {
-                            attribute_table = new_attribute;
-                            new_attribute->value = 1;
-                        } else {
-                            current_attribute->next_attribute = new_attribute;
-                            new_attribute->value = current_attribute->value * 2;
-                        }
-                        current_attribute = new_attribute;
-                        strncpy(current_attribute->name, word[1], 40);
-                        current_attribute->name[40] = 0;
-                        current_attribute->next_attribute = NULL;
-                    }
-
-                    /* CHECK IF MORE THAN ONE VALUE IS SUPPLIED AND CREATE
-                       ADDITIONAL CONSTANTS IF REQUIRED */
-                    index = 2;
-                    while (word[index] != NULL && index < MAX_WORDS) {
-                        if (legal_label_check(word[index], line, ATT_TYPE)) {    
-                            errors++;
-                        } else if (current_attribute != NULL && current_attribute->value == 1073741824) {    
-                            maxatterr(line, index);
-                            errors++;
-                        } else {
-                            if ((new_attribute = (struct attribute_type *)
-                                 malloc(sizeof(struct attribute_type))) == NULL)
-                                outofmem();
-                            else {
-                                current_attribute->next_attribute = new_attribute;
-                                new_attribute->value = current_attribute->value * 2;
-                                current_attribute = new_attribute;
-                                strncpy(current_attribute->name, word[index], 40);
-                                current_attribute->name[40] = 0;
-                                current_attribute->next_attribute = NULL;
-                            }
-                        }
+                        index = 1;
+                     while (word[index] != NULL && index < MAX_WORDS) {
+                        create_attribute(word[index]);
                         index++;
+                    }
                     }
                 }
             } else if (!strcmp(word[0], "string")) {
