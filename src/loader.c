@@ -34,6 +34,7 @@ int                                value_resolved;
 
 static int legal_label_check(const char *word, int line, int type);
 static void create_language_constants(void);
+static void create_attribute(const char *name);
 static void set_defaults(void);
 static void build_grammar_table(struct word_type *pointer);
 static void free_from(struct word_type *x);
