@@ -1436,6 +1436,30 @@ set_defaults()
 }
 
 void
+create_attribute(const char *name) 
+{
+    struct attribute_type *new_attribute = NULL;
+    int index;
+
+  if ((new_attribute = (struct attribute_type *)
+     malloc(sizeof(struct attribute_type))) == NULL) {
+     outofmem();
+  } else {
+     if (attribute_table == NULL) {
+        attribute_table = new_attribute;
+        new_attribute->value = 1;
+     } else {
+        current_attribute->next_attribute = new_attribute;
+        new_attribute->value = current_attribute->value * 2;
+     }
+        current_attribute = new_attribute;
+        strncpy(current_attribute->name, name, 40);
+        current_attribute->name[40] = 0;
+        current_attribute->next_attribute = NULL;
+     }
+}
+
+void
 create_cinteger (const char *name, int value)
 {
     struct cinteger_type *new_cinteger = NULL;
