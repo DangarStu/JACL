@@ -94,7 +94,7 @@ static const char * const object_attributes[] = {
 
 static const char * const object_elements[] = {
  "parent", "capacity", "mass", "bearing", "velocity", "next", "previous",
- "child", "index", "status", "state", "counter", "points", "class", "x", "y", 
+ "child", "index", "status", "timer", "counter", "points", "class", "x", "y", 
  NULL };
 
 static const char * const location_elements[] = {
@@ -981,7 +981,7 @@ execute(const char *funcname)
 
                         /* EXPOSE THE CURRENT VALUE THROUGH A JACL CONSTANT
                            SO THAT GAME CODE CAN READ THE IT */
-                        cinteger_resolve("timer")->value = index;
+                        cinteger_resolve("event_timer")->value = index;
                     }
                 }
             } else if (!strcmp(word[0], "sound")) {

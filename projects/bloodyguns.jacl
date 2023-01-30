@@ -46,7 +46,6 @@ constant sound_Windlass						24
 # -----------------------------------------------------------------------------
 
 attribute WOUND
-attribute FIRST
 attribute TALKED_TO
 attribute PRIMED
 attribute REPORTED

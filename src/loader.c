@@ -212,7 +212,7 @@ read_gamefile()
     create_cinteger ("child", 7);
     create_cinteger ("index", 8);
     create_cinteger ("status", 9);
-    create_cinteger ("state", 10);
+    create_cinteger ("timer", 10);
     create_cinteger ("counter", 11);
     create_cinteger ("points", 12);
     create_cinteger ("class", 13);
@@ -226,7 +226,7 @@ read_gamefile()
     create_cinteger ("volume", 100);
     create_cinteger ("volume", 100);
     create_cinteger ("volume", 100);
-    create_cinteger ("timer", 500);
+    create_cinteger ("event_timer", 500);
 
     set_defaults();
 
@@ -465,21 +465,18 @@ read_gamefile()
                 if (word[1] == NULL) {
                     noproperr(line);
                     errors++;
-                } else if (legal_label_check(word[1], line, ATT_TYPE)) {    
-                    errors++;
-                } else if (current_attribute != NULL && current_attribute->value == 1073741824) {    
-                    maxatterr(line, 1);
-                    errors++;
                 } else {
-                    if ((new_attribute = (struct attribute_type *)
-                         malloc(sizeof(struct attribute_type))) == NULL)
-                        outofmem();
-                    else {
-                        index = 1;
-                     while (word[index] != NULL && index < MAX_WORDS) {
-                        create_attribute(word[index]);
+                    index = 1;
+                    while (word[index] != NULL && index < MAX_WORDS) {
+                        if (legal_label_check(word[index], line, ATT_TYPE)) {    
+                            errors++;
+                        } else if (current_attribute != NULL && current_attribute->value == 1073741824) {    
+                            maxatterr(line, index);
+                            errors++;
+                        } else {
+                            create_attribute(word[index]);
+                        }
                         index++;
-                    }
                     }
                 }
             } else if (!strcmp(word[0], "string")) {
