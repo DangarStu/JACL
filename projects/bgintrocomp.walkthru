@@ -1,0 +1,20 @@
+take ball
+take bar
+x gun
+set fuse to 42
+give shell to jenkins
+nw
+s
+take all
+n
+n
+n
+wait
+wait
+s
+s
+e
+se
+d
+wait
+enter canoe
