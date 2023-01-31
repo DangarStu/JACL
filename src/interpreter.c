@@ -2271,6 +2271,8 @@ execute(const char *funcname)
                         fputc('\n', (FILE *)outfile);
                     }
                 }
+            } else if (!strcmp(word[0], "endgame")) {
+                    terminate(0);              
             } else if (!strcmp(word[0], "inspect")) {
                 if (word[1] == NULL) {
                     // NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND
