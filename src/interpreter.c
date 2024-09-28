@@ -442,7 +442,7 @@ execute(const char *funcname)
 
             if (encrypted) jacl_decrypt(text_buffer);
 
-            while (text_buffer[0] != '.' || text_buffer[0] != '}') {
+            while (text_buffer[0] != '.') {
                 // GET THE NEXT LINE
 #ifdef GLK
                 glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
