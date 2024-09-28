@@ -1,5 +1,4 @@
 # ignore all logs
-bin/
 *.log
 *.o
 *.a
