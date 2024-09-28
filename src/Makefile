@@ -1,6 +1,6 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = -Wall -O2 -arch arm64
+CFLAGS = -Wall -O2
 
 # Directories
 CGIHTML_DIR = cgihtml-1.69

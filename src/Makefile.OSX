@@ -1,7 +1,7 @@
 # Unix Makefile for JACL Adventure Creation Language
 
 CC = gcc
-CFLAGS = -Wall -O2
+CFLAGS = -Wall -O2 -arch arm64
 
 all : jacl cgijacl fcgijacl bjorb
 
