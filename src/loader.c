@@ -770,7 +770,7 @@ read_gamefile()
                 } else if (text_buffer[0] == '.') {
                     // NOW BACK OUT OF THE PRINT BLOCK AGAIN
                     in_print = FALSE;
-                } else if (text_buffer[0] == '}') {
+                } else if (in_print == FALSE && text_buffer[0] == '}') {
 		    in_print = FALSE;
                     break;
                 }

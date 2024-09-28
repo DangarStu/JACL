@@ -10,11 +10,11 @@
 
 # Pick a C compiler.
 #CC = cc
-CC = gcc -ansi
+CC = gcc -ansi -arch arm64
 
 # You may need to set directories to pick up the ncurses library.
-#INCLUDEDIRS = -I/usr/5include
-#LIBDIRS = -L/usr/5lib 
+INCLUDEDIRS = -I/opt/homebrew/include
+LIBDIRS = -L/opt/homebrew/lib
 LIBS = -lncurses
 
 OPTIONS = -O

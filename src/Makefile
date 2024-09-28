@@ -1,53 +1,70 @@
-# Unix Makefile for JACL Adventure Creation Language
-
+# Compiler and flags
 CC = gcc
-CFLAGS = -Wall -O2
+CFLAGS = -Wall -O2 -arch arm64
 
-all : jacl cgijacl fcgijacl bjorb
+# Directories
+CGIHTML_DIR = cgihtml-1.69
+GLKTERM_DIR = glkterm
+GLKTERMW_DIR = glktermw
+CHEAPGLK_DIR = CheapGlk
 
-bjorb : bjorb.c
+# Source files for each target
+COMMON_SRC = findroute.c interpreter.c loader.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c libcsv.c
+
+# Targets
+all: jacl cgijacl fcgijacl bjorb cjacl
+
+# Bjorb target
+bjorb: bjorb.c
 	$(CC) $(CFLAGS) -o bjorb bjorb.c
 
-jacl : libglkterm.a jacl.c jacl.h glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c types.h libcsv.c csv.h 
-	$(CC) $(CFLAGS) -DGLK jacl.c glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c libcsv.c csv.h -Iglkterm -Lglkterm -lglkterm -lm -lncurses;
+# Jacl target
+jacl: libglkterm.a
+	$(CC) $(CFLAGS) -DGLK jacl.c glk_startup.c $(COMMON_SRC) glk_saver.c -I$(GLKTERM_DIR) -L$(GLKTERM_DIR) -lglkterm -lm -lncurses -o jacl
 
-jaclw : libglktermw.a jacl.c jacl.h glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c types.h libcsv.c csv.h
-	$(CC) $(CFLAGS) -DGLK -o jacl jacl.c glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c libcsv.c csv.h -Iglktermw -Lglktermw -lglktermw -lm -lncursesw;
-	
-cjacl : libcheapglk.a jacl.c jacl.h glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c types.h libcsv.c csv.h
-	$(CC) $(CFLAGS) -DGLK  jacl.c glk_startup.c findroute.c interpreter.c loader.c glk_saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c libcsv.c csv.h -ICheapGlk -LCheapGlk -lm -lcheapglk;
-	
-cgijacl : libcgihtml.a webjacl.o cgijacl.c interpreter.c findroute.c loader.c saver.c cgijacl.h logging.c parser.c display.c utils.c jpp.c resolvers.c errors.o encapsulate.o language.h types.h libcsv.c csv.h 
-	$(CC) $(CFLAGS) -DWEBJACL cgijacl.c interpreter.c findroute.c loader.c saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.o encapsulate.o webjacl.o  libcsv.c csv.h -Icgihtml-1.69 -Iwebjacl -Lcgihtml-1.69 -lm -lcgihtml;
-    
-fcgijacl : libcgihtml.a cgijacl.c cgijacl.h interpreter.c findroute.c loader.c saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.o encapsulate.o language.h types.h libcsv.c csv.h 
-	$(CC) $(CFLAGS) -DFCGIJACL -o fcgijacl cgijacl.c interpreter.c findroute.c loader.c saver.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.o encapsulate.o  libcsv.c csv.h -Icgihtml-1.69 -Lcgihtml-1.69 -lm -lcgihtml -lfcgi;
-    
-webjacl.o : webjacl.c webjacl.h language.h
-	$(CC) $(CFLAGS) -o webjacl.o -c webjacl.c;
+# Cjacl target
+cjacl: libcheapglk.a
+	$(CC) $(CFLAGS) -DGLK jacl.c glk_startup.c $(COMMON_SRC) glk_saver.c -I$(CHEAPGLK_DIR) -L$(CHEAPGLK_DIR) -lcheapglk -lm -o cjacl
 
-libcheapglk.a :
-	cd CheapGlk; make libcheapglk.a
+# Cgijacl target
+cgijacl: libcgihtml.a webjacl.o
+	$(CC) $(CFLAGS) -DWEBJACL cgijacl.c $(COMMON_SRC) saver.c webjacl.o -I$(CGIHTML_DIR) -Iwebjacl -L$(CGIHTML_DIR) -lcgihtml -lm -o cgijacl
 
-libglktermw.a :
-	cd glktermw; make libglktermw.a
+# Fcgijacl target
+fcgijacl: libcgihtml.a
+	$(CC) $(CFLAGS) -DFCGIJACL cgijacl.c $(COMMON_SRC) saver.c -I$(CGIHTML_DIR) -L$(CGIHTML_DIR) -lcgihtml -lfcgi -lm -I/opt/homebrew/include -L/opt/homebrew/lib -o fcgijacl
 
-libglkterm.a :
-	cd glkterm; make libglkterm.a
+# webjacl.o target
+webjacl.o: webjacl.c webjacl.h language.h
+	$(CC) $(CFLAGS) -c webjacl.c -o webjacl.o
 
-libcgihtml.a :
-	cd cgihtml-1.69; make libcgihtml.a
+# External libraries targets
+libcheapglk.a:
+	cd $(CHEAPGLK_DIR) && make libcheapglk.a
 
+libglktermw.a:
+	cd $(GLKTERMW_DIR) && make libglktermw.a
+
+libglkterm.a:
+	cd $(GLKTERM_DIR) && make libglkterm.a
+
+libcgihtml.a:
+	cd $(CGIHTML_DIR) && make libcgihtml.a
+
+# Install binaries to the bin directory
 install: all
 	mv jacl ../bin
 	mv bjorb ../bin
 	mv cgijacl ../bin
 	mv fcgijacl ../bin
+	mv cjacl ../bin
 
+# Clean up
 clean:
 	rm -f *.o
-	rm -f cgihtml-1.69/*.o
-	rm -f glkterm/*.o
-	rm -f glkterm/*.a
-	rm -f glktermw/*.o
-	rm -f glktermw/*.a
+	rm -f cgijacl fcgijacl bjorb jacl cjacl
+	cd $(CGIHTML_DIR) && make clean
+	cd $(GLKTERM_DIR) && make clean
+	cd $(GLKTERMW_DIR) && make clean
+	cd $(CHEAPGLK_DIR) && make clean
+

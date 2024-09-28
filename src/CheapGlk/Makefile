@@ -12,7 +12,10 @@
 # It's based on Unicode character data, which is not platform-dependent.
 
 # Pick a C compiler.
-CC = gcc -ansi
+CC = gcc -ansi -arch arm64
+
+INCLUDEDIRS = -I/opt/homebrew/include
+LIBDIRS = -L/opt/homebrew/lib
 
 OPTIONS = -O
 
