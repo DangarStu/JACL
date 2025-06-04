@@ -522,6 +522,8 @@ listen_again:
 
 		if (request[0] == 0) {
 			fprintf(stderr, "Invalid request, ignoring.\n");
+			shutdown(clientFd, 2);
+			clientFd = -1;
 			goto listen_again;
 		}	
 
