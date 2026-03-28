@@ -196,7 +196,7 @@ button "Read Map"
 
 <p>It is possible to use a second HTML control, such as a list box, in conjunction with a submit button to create verb-noun commands. See the <b>control</b> command below for more information.
  
-<h2><a class="section" name="http7">The HYPERLINK Command</a></h2>
+<h2><a class="section" name="http7">The HYPERLINK and HYPERLINKNE Commands</a></h2>
 
 <p>The command <b>hyperlink</b> is a simple method of creating a hyperlink that issues a command for the player. It can accept either two or three parameters.
 The first is the visible text to be displayed. The second parameter is the command to be issued when the link is clicked. The third, optional, parameter is the name of a CSS class that should be applied to the link. Below are some sample hyperlinks:
@@ -211,8 +211,10 @@ hyperlink "Where am I?" look big
 
 <table class="infowarn"><tr>
 <td><img src="warning.png"></td>
-<td>When using the <b>hyperlink</b> command, any spaces in the third parameter (the command to be executed), must be replaced with plus signs. This is due to the fact that the command is pasted as part of the URL sent to the web browser, and spaces are not valid in a URL.</td>
+<td>When using the <b>hyperlink</b> command, any spaces in the second parameter (the command to be executed), must be replaced with plus signs. This is due to the fact that the command is passed as part of the URL sent to the web browser, and spaces are not valid in a URL.</td>
 </tr></table>
+
+<p>The <b>hyperlinkNE</b> command works in the same way as the <b>hyperlink</b> command except that it does not URL-encode the command parameter. This can be useful when the command string has already been encoded or when constructing complex URLs manually.
 
 <p>When manually creating special-purpose hyperlinks, the <b>{+name}</b> macro is very useful. For more information, see the chapter on <a href="screendisplay.html">Screen Display</a>.
 
@@ -269,7 +271,26 @@ parameter destination SOME_VARIABLE
 
 <p>When this form is submitted, the <b>cgijacl</b> interpreter will look for the parameter <b>destination</b>, as it has been defined using a <b>parameter</b> statement. This parameter will contain the internal number of the object that was selected and this number will be copied into the location specified by the <b>parameter</b> statement. In this case, a variable called <b>SOME_VARIABLE</b>. For more information see the section on <a href="definitions.html#definitions10">parameters</a>.
 
-<h2><a class="section" name="http10">The IMAGE Command</a></h2>
+<h2><a class="section" name="http10">The GETENV Command</a></h2>
+
+<p>The <b>getenv</b> command is used to retrieve the value of an environment variable and store it in a JACL string variable. This is primarily useful for reading CGI environment variables such as HTTP headers and request parameters. A <b>getenv</b> command must be of the following format:
+
+<pre>
+<b>getenv</b> <i>StringVariable EnvironmentVariableName</i>
+</pre>
+
+<p>The first parameter is the JACL string variable to store the value in. The second parameter is the name of the environment variable to read. If the specified environment variable does not exist, the string variable will be set to an empty string. Below is an example of its use:
+
+<pre>
+string current_user
+
+{+header
+getenv current_user "REMOTE_USER"
+write "&lt;p&gt;Welcome, " current_user "!&lt;/p&gt;"
+}
+</pre>
+
+<h2><a class="section" name="http11">The IMAGE Command</a></h2>
 
 <p>The <b>image</b> command is used to display an image &mdash; no surprise there. It requires three parameters using the following syntax:
 	
@@ -285,7 +306,7 @@ image "/images/view.jpg" left "[View from the balcony]"
 
 <p>This command displays the image <b>/images/view.jpg</b> aligned to the left. If the picture is not found, or is displayed in a text-only browser such as Lynx, the text <b>[View from the balcony]</b> will be displayed instead. This is also the text that will be displayed by most graphical browsers when the cursor is held over the image.
 
-<h2><a class="section" name="http11">The Media File</a></h2>
+<h2><a class="section" name="http12">The Media File</a></h2>
 
 <p>When played with the <b>cgijacl</b> interpreter, each game will require a corresponding <b>.media</b> file in order to serve multi-media content such as images. This file must have the same name as the game, with a <b>.media</b> suffix in place of the <b>.jacl</b> suffix. For example, the game <b>grail.jacl</b> has a matching media file called <b>grail.media</b>. As this game only has one image, its media file only has one line:
 

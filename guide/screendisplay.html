@@ -280,7 +280,23 @@ print:
 }
 
 </pre>
-<h2><a class="section" name="screendisplay10">The LOOK Command</a></h2>
+<h2><a class="section" name="screendisplay10">The OUTPUT Command</a></h2>
+
+<p>The <b>output</b> command reads the entire contents of a file and writes it to the game's output stream. The file is read from the game's data directory. A single parameter specifying the filename is required:
+
+<pre>
+<b>output</b> <i>FileName</i>
+</pre>
+
+<p>For example, the following command will read and display the contents of a file called <b>welcome_text</b> from the data directory:
+
+<pre>
+output welcome_text
+</pre>
+
+<p>This command is useful for including large blocks of pre-written text that would be unwieldy to embed directly in the game source code.
+
+<h2><a class="section" name="screendisplay11">The LOOK Command</a></h2>
 
 <P>The <b>look</b> command will print the long description of the current location and any visible objects that are in the current location. A <b>look</b> command is executed implicitly by the JACL interpreter whenever a description of the player's current location is required. This is at times such as when then player moves into a location for the first time or restores a saved game.
 
@@ -304,7 +320,7 @@ write here{The} ^
 
 <P>It is a convention to have a <B>look</B> command at the end of the <B>+intro </B>function so the player can see where they are and what objects are nearby when the game begins.
 
-<h2><a class="section" name="screendisplay11">The MORE Command</a></h2>
+<h2><a class="section" name="screendisplay12">The MORE Command</a></h2>
 
 <p>The <b>more</b> command will print a message and then wait for the player to press a key before continuing. The message to print is passed as the only parameter of a <b>more</b> command. If no message is provided, the message <b>[MORE]</b> is used as a default. Below is an example of using the <b>more</b> command with a custom message:
 
