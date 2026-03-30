@@ -132,6 +132,40 @@ append data last_id firstname_data surname_data email_data home_phone_data mobil
 write firstname_data " " surname_data " added to database.^^"
 </pre>
 
+<h2><a class="section" name="csv4">The APPEND_FC, APPEND_NT and APPEND_LC Commands</a></h2>
+
+<p>These three commands are used together to build a single CSV row incrementally across multiple commands. This is useful when the number of columns in a row is not known in advance, such as when iterating over a variable-length data set.
+
+<p>The commands use the following format:
+
+<pre>
+<B>append_fc</B> <I>&lt;FileName&gt;</I> <I>&lt;Field0&gt;</I> [<I>&lt;Field1&gt;</I>...]
+<B>append_nt</B> <I>&lt;FileName&gt;</I> <I>&lt;Field0&gt;</I> [<I>&lt;Field1&gt;</I>...]
+<B>append_lc</B> <I>&lt;FileName&gt;</I> <I>&lt;Field0&gt;</I> [<I>&lt;Field1&gt;</I>...]
+</pre>
+
+<p>The <b>append_fc</b> (first column) command starts a new line in the CSV file and writes the specified fields. It does not terminate the line, leaving it open for further fields to be added.
+
+<p>The <b>append_nt</b> (no terminate) command continues writing fields to the current open line without terminating it. This command can be called multiple times to add additional columns.
+
+<p>The <b>append_lc</b> (last column) command continues writing fields to the current open line and then terminates the line with a newline character, closing the file.
+
+<p>Below is an example of these three commands being used together to build a row with a variable number of columns:
+
+<pre>
+append_fc results date time name
+iterate data skip_header
+   if COUNT &lt; obs_count
+      append_nt results observations[INDEX]
+      set COUNT + 1
+   else
+      append_lc results observations[INDEX]
+   endif
+enditerate
+</pre>
+
+<p>In this example, <b>append_fc</b> starts the row with three fixed columns. The <b>iterate</b> loop then adds a variable number of observation columns using <b>append_nt</b>, with the final column being written using <b>append_lc</b> to close the line.
+
 <!-- END OF BODY -->
 <p><a href="index.html">Back to Contents</b>
 </body>

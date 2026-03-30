@@ -216,6 +216,16 @@ if save_timer = 0
 endif
 </pre>
 
+<h2><a class="section" name="special14">The FLUSH Command</a></h2>
+
+<p>The <b>flush</b> command forces the display buffer to be flushed to the screen. This command takes no parameters:
+
+<pre>
+flush
+</pre>
+
+<p>This command is platform-specific. On the Nintendo DS interpreter it forces the display to update immediately. On Glk and CGI interpreters this command has no effect and is safely ignored. It is included primarily to allow games that target the Nintendo DS to control when output appears on the screen.
+
 <h2><a class="section" name="special12">The TERMINATE Command</a></h2> 
 
 <p>The <b>terminate</b> command will directly initiate the termination of the JACL interpreter.

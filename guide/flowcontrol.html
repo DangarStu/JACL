@@ -9,7 +9,7 @@
 
 <h1><a class="title" name="flowcontrol0">Flow Control</a></h1>
 
-<h2><a class="section" name="flowcontrol1">The IF, IFALL and ENDIF Commands</a></h2>
+<h2><a class="section" name="flowcontrol1">The IF, IFALL, ENDIF and ENDALL Commands</a></h2>
 
 <P>An <b>if</b> command tests whether an expression is true or false for the purpose of selectively executing code. If the expression is true, execution will continue from the next line. If the expression is false, execution will continue from the line after the matching <b>endif</b> or <b>else</b> command. If no <b>endif</b> command is found by the end of the function, the function will terminate normally with an implicit <b>return true</b>. An <b>if</b> command must be of the format:
 
@@ -134,6 +134,18 @@ if sword(parent) = field
 
 <P>It is possible to nest <B>if</B> statements. Nesting involves placing a second <B>if</B> command before the matching <B>endif</B> command of a first. The end result of this is that the code between the second <B>if</B> command and its matching <B>endif</B> command will only be executed if both statements are true &mdash; a logical <b>AND</b>.
 
+<p>The <b>endall</b> command can be used to exit all nested conditional blocks at once by immediately resetting the nesting level to zero. This is useful when deeply nested <b>if</b> statements all need to be exited at a certain point without requiring a matching <b>endif</b> for each level. For example:
+
+<pre>
+if condition1
+   if condition2
+      if condition3
+         write "All three conditions are true.^"
+      endall
+</pre>
+
+<p>In the above code, the <b>endall</b> command exits all three <b>if</b> blocks at once, removing the need for three separate <b>endif</b> commands.
+
 <h2><a class="section" name="flowcontrol2">The IFSTRING Command</a></h2>
 
 <p>An <b>ifstring</b> command is used to compare two strings of text. If the string of text is to contain any spaces, it must be enclosed in double quotes. An <b>ifstring</b> command must use the following format:
@@ -175,6 +187,13 @@ if sword(parent) = field
 </tr><tr>
 <td><b>!containsC</b></td>
 <td>This tests if the first string doesn't contain the second string including case</td>
+</tr>
+<tr>
+<td><b>beginswith</b></td>
+<td>This tests if the first string begins with the second string</td>
+</tr><tr>
+<td><b>!beginswith</b></td>
+<td>This tests if the first string doesn't begin with the second string</td>
 </tr>
 </table>
 </center>
@@ -369,9 +388,9 @@ The following scopes can be used with the <b>select</b> command:
 <tr><td><img src="info.png" alt="Information"></td>
 <td>As only a single parameter can be used with a <b>select</b> command it is more efficient to use the criterion that selects the smallest set of the object when <b>if</b> statements are required to filter the list further. For example, if you wanted a list of all the objects that are being carried by the player that don't have a <b>mass</b> of <b>scenery</b>, the it would be more efficient to use the <b>select</b> command to find the objects that are children of the player and then <b>if</b> statements to check their mass. This is because there will generally be fewer objects in the game that are currently being carried by the player than objects with a <b>mass</b> that isn't set to <b>scenery</b>. If the <b>select</b> command has been used to find all the objects that aren't scenery, the <b>if</b> statement to check if each object is also carried by the player would need to be executed many more times.
 </td></tr></table>
-<h2><a class="section" name="flowcontrol7">The REPEAT and UNTIL Commands</a></h2>
+<h2><a class="section" name="flowcontrol7">The REPEAT, UNTIL and UNTILALL Commands</a></h2>
 
-<P>A <B>repeat</B>... <B>until</B> loop allows you to repeat a section of code until a specified condition is true. The expression or expressions to be tested should follow the <B>until</B> statement, using the same syntax as an <B>if </B>statement. 
+<P>A <B>repeat</B>... <B>until</B> loop allows you to repeat a section of code until a specified condition is true. The expression or expressions to be tested should follow the <B>until</B> statement, using the same syntax as an <B>if </B>statement.
 
 <P>The following is an example of a <B>repeat</B>... <B>until</B> loop:
 
@@ -381,6 +400,14 @@ repeat
   write "DON'T PANIC! "
   set INDEX - 1
 until INDEX = 0
+</pre>
+
+<p>The <b>untilall</b> command works in the same way as <b>until</b> except that when multiple expressions are supplied, the loop only exits when all of the expressions are true &mdash; a logical <b>AND</b>. This is equivalent to the relationship between <b>if</b> and <b>ifall</b>. For example:
+
+<pre>
+repeat
+   set counter + 1
+untilall counter = 10 : status = 1
 </pre>
 
 <table class="infowarn"><tr>
@@ -411,7 +438,7 @@ endloop
 </td>
 </tr></table>
 
-<h2><a class="section" name="flowcontrol8">The WHILE and ENDWHILE Commands</a></h2>
+<h2><a class="section" name="flowcontrol8">The WHILE, WHILEALL and ENDWHILE Commands</a></h2>
 
 <p>As a <b>repeat</b> loop will always happen at least once, if there is any chance that a loop should happen zero times, a <b>while</b> loop must be used. A <b>while</b> loop performs its test first, then executes the code following the expression if it evaluates to <b>true</b>. On reaching an <b>endwhile</b> command it will return to the matching <b>while</b> command and re-evaluate the expression. When the expression eventually evaluates to <b>false</b>, execution will continue from the line after the <b>endwhile</b> command. For example, the following function will output the value of the passed arguments:
 
@@ -424,6 +451,29 @@ while INDEX != @arg
 endwhile
 }
 </pre>
+
+<p>The <b>whileall</b> command works in the same way as <b>while</b> except that when multiple expressions are supplied, the loop continues only if all of the expressions are true &mdash; a logical <b>AND</b>. This is equivalent to the relationship between <b>if</b> and <b>ifall</b>. For example:
+
+<pre>
+whileall counter &lt; 10 : status = 1
+   set counter + 1
+endwhile
+</pre>
+
+<h2><a class="section" name="flowcontrol10">The BREAK Command</a></h2>
+
+<p>The <b>break</b> command is used to immediately exit the current loop. When a <b>break</b> command is executed, execution continues from the line after the end of the loop (<b>endwhile</b>, <b>until</b>, <b>endloop</b>, <b>endselect</b>, <b>enditerate</b>, etc.). For example:
+
+<pre>
+while counter &lt; 100
+   if counter = 50
+      break
+   endif
+   set counter + 1
+endwhile
+</pre>
+
+<p>In the above code, if <b>counter</b> reaches 50, the <b>break</b> command will exit the <b>while</b> loop immediately and execution will continue from after the <b>endwhile</b> command.
 
 <h2><a class="section" name="flowcontrol9">The RETURN Command</a></h2>
 
