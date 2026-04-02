@@ -60,18 +60,12 @@ read_gamefile()
     int            is_static = FALSE;
 
     long           start_of_file = 0;
-#ifdef GLK
-    glui32         current_file_position;
-#else
-    long         current_file_position;
-#endif
 
     long           bit_mask;
 
     struct filter_type *current_filter = NULL;
     struct filter_type *new_filter = NULL;
     struct attribute_type *current_attribute = NULL;
-    struct attribute_type *new_attribute = NULL;
     struct cinteger_type *resolved_cinteger = NULL;
     struct synonym_type *current_synonym = NULL;
     struct synonym_type *new_synonym = NULL;
@@ -994,10 +988,8 @@ read_gamefile()
         }
 
 #ifdef GLK
-        current_file_position = glk_stream_get_position(game_stream);
         result = glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
 #else
-        current_file_position = ftell(file);
         fgets(text_buffer, 1024, file);
 #endif
         line++;
@@ -1407,7 +1399,6 @@ void
 create_attribute(const char *name) 
 {
     struct attribute_type *new_attribute = NULL;
-    int index;
 
   if ((new_attribute = (struct attribute_type *)
      malloc(sizeof(struct attribute_type))) == NULL) {
