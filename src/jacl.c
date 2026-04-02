@@ -112,7 +112,7 @@ int             player = 0;
 static int      noun3_backup;
 static int      player_backup = 0;
 
-static int      variable_contents;
+
 int             oec;
 int            *object_element_address,
 			   *object_backup_address;
@@ -892,8 +892,6 @@ newline()
 void
 more(const char* message)
 {
-	int character;
-
 	jacl_set_window(inputwin);
 
 	if (inputwin == promptwin) {
@@ -905,7 +903,7 @@ more(const char* message)
 	write_text(message);
 	glk_set_style(style_Normal);
 
-	character = get_key();
+	get_key();
 
 	if (inputwin == mainwin) newline();
 }

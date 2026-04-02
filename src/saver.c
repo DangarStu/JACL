@@ -11,7 +11,6 @@
 static void write_integer(FILE *file, int x);
 static void write_long(FILE *file, long x);
 static int  read_integer(FILE *file);
-static long read_long(FILE *file);
 
 int
 save_game(const char *filename)
@@ -213,13 +212,4 @@ write_long(FILE *file, long x)
     putc(c, file);
 }
 
-long 
-read_long(FILE *file)
-{
-    long a, b, c, d;
-    a = (long) getc(file);
-    b = (long) getc(file);
-    c = (long) getc(file);
-    d = (long) getc(file);
-    return a | (b << 8) | (c << 16) | (d << 24);
-}
+

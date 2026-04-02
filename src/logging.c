@@ -106,6 +106,8 @@ log_message(const char *message, int console)
 	char 			consoleMessage[256];
 	char 			temp_buffer[256];
 
+	time(&tnow);
+
 	/* MAKE THE LOG MESSAGE WITH GAME PREFIX */
 	sprintf(temp_buffer, "%s - %s - %s\n", strip_return(ctime(&tnow)), prefix, message);
 

@@ -75,8 +75,10 @@ static int            read_fd;
 static struct flock    write_lck;
 static int            write_fd;
 
+#ifndef GLK
 static char *url_encode(const char *str);
 static char to_hex(char code);
+#endif
 
 static const char * const location_attributes[] = {
  "VISITED ", "DARK ", "ON_WATER ", "UNDER_WATER ", "WITHOUT_AIR ", "OUTDOORS ",
@@ -117,7 +119,9 @@ static struct stack_type        backup[STACK_SIZE];
 static struct proxy_type        proxy_backup[STACK_SIZE];
 
 static struct function_type *resolved_function = NULL;
+#if defined(GLK) || defined(__NDS__)
 static struct string_type *resolved_string = NULL;
+#endif
 
 static struct string_type *new_string = NULL;
 struct string_type *current_cstring = NULL;
@@ -144,7 +148,9 @@ static int                        criterion_type = 0;
 static int                        criterion_negate = FALSE;
 static int                         current_level;
 static int                         execution_level;
+#if defined(GLK) || defined(__NDS__)
 static int                         *ask_integer;
+#endif
 static int                        new_x;
 static int                        new_y;
 
@@ -313,7 +319,6 @@ execute(const char *funcname)
     /* THESE ARE USED AS FILE POINTER OFFSETS TO RETURN TO FIXED
      * POINTS IN THE GAME FILE */
 #ifdef GLK
-    int                result;
     glsi32            before_command = 0;
 #else
     long            before_command = 0;
@@ -368,7 +373,7 @@ execute(const char *funcname)
 #ifdef GLK
     glk_stream_set_position(game_stream, executing_function->position, seekmode_Start);
     before_command = executing_function->position;
-    result = glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
+    glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
 #else
     fseek(file, executing_function->position, SEEK_SET);
     before_command = executing_function->position;
@@ -1404,7 +1409,7 @@ execute(const char *funcname)
                     }
 
                     if (!strcmp(word[0], "hyperlink")) {
-                            free (encoded); 
+                            free ((void *)encoded);
                     }
 
                     write_text(string_buffer);
@@ -3530,6 +3535,7 @@ select_next()
     return (FALSE);
 }
 
+#ifndef GLK
 /* Converts an integer value to its hex character*/
 char to_hex(char code) {
     static char hex[] = "0123456789abcdef";
@@ -3542,9 +3548,9 @@ char *url_encode(const char *str) {
     const char *pstr = str;
     char *buf = malloc(strlen(str) * 3 + 1), *pbuf = buf;
     while (*pstr) {
-        if (isalnum(*pstr) || *pstr == '-' || *pstr == '_' || *pstr == '.' || *pstr == '~') 
+        if (isalnum(*pstr) || *pstr == '-' || *pstr == '_' || *pstr == '.' || *pstr == '~')
             *pbuf++ = *pstr;
-        else if (*pstr == ' ') 
+        else if (*pstr == ' ')
             *pbuf++ = '+';
         else {
             *pbuf++ = '%'; *pbuf++ = to_hex(*pstr >> 4); *pbuf++ = to_hex(*pstr & 15);
@@ -3554,3 +3560,4 @@ char *url_encode(const char *str) {
     *pbuf = '\0';
     return buf;
 }
+#endif

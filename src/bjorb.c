@@ -106,14 +106,14 @@ str_short (char *f, unsigned int v)
 }
 
 static void
-write_id (FILE * f, unsigned char *s)
+write_id (FILE * f, const char *s)
 /*
  * write_id writes a string to a file as a blorb ID string (4 bytes, space
- * padded) 
+ * padded)
  */
 {
   int i;
-  unsigned char sp = ' ';
+  char sp = ' ';
 
   for (i = 0; i < strlen (s); i++)
     fwrite (&s[i], 1, 1, f);
@@ -122,11 +122,11 @@ write_id (FILE * f, unsigned char *s)
 }
 
 static void
-str_id (char *f, unsigned char *s)
+str_id (char *f, const char *s)
 // str_id writes a blorb identifier to a string
 {
   int i;
-  unsigned char sp = ' ';
+  char sp = ' ';
 
   for (i = 0; i < strlen (s); i++)
     f[i] = s[i];
@@ -284,7 +284,7 @@ BuildIndex (FILE * f)
   // space
   Blorb[0]->Length = (12 * n) + 4;
   Blorb[0]->Data = (char *) my_malloc (Blorb[0]->Length);
-  Index = (long *) my_malloc (n * sizeof (unsigned long));
+  Index = (unsigned long *) my_malloc (n * sizeof (unsigned long));
   // The first thing in the data chunk is the number of entries
   str_long (Blorb[0]->Data, n);
   // Now, scroll through the chunks, noting each one in the index chunk
