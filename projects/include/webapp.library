@@ -36,7 +36,6 @@ print:
 write "<title>" game_title "</title>"
 execute "+styles"
 call "+user_styles"
-write "<script src=~/include/jquery-3.6.0.min.js~></script>"
 
 ifstring favicon_image = "none"
 	write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
@@ -44,7 +43,7 @@ else
 	write "<link rel=~icon~ href=~" favicon_image "~ type=~image/x-icon~>"
 endif
 print:
-   <script language=~JavaScript~>^
+   <script>^
 	if (window.matchMedia("(max-width: 767px)").matches) {
 .
 		if WEBAPP_device != WEBAPP_mobile

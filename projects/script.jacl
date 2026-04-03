@@ -1,6 +1,6 @@
 #!../bin/cgijacl
 
-string game_title       "jQuery Example"
+string game_title       "JavaScript Example"
 constant game_author    "Stuart Allen"
 constant ifid           "JACL-011"
 
@@ -10,7 +10,7 @@ string environment
 getenv environment "SERVER_SOFTWARE"
 write "Server is ~" environment "~.^^"
 
-write "^^Welcome to the jQuery example game.^"
+write "^^Welcome to the JavaScript example game.^"
 execute "+look_around"
 }
 
@@ -29,7 +29,7 @@ object button : change title button
 if interpreter = CGI
    print:
      <script>
-        $('h1:first').text("Button has been pressed");
+        document.querySelector('h1').textContent = "Button has been pressed";
      </script>
    .
 write "You press the ~Change Title~ button.^

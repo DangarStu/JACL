@@ -5,33 +5,32 @@ string current_image "none"
 {+header
 set linebreaks = false
 print:
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"^
-  "http://www.w3.org/TR/html4/loose.dtd">^
+<!DOCTYPE html>
 <html><head>
-<link href="http://fonts.googleapis.com/css?family=Merriweather" rel="stylesheet" type="text/css">
-<meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<link href="https://fonts.googleapis.com/css?family=Merriweather" rel="stylesheet" type="text/css">
+<meta charset="UTF-8">
 .
 write "<title>" game_title "</title>"
 execute "+styles"
 print:
-   <script src="/include/jquery-3.6.0.min.js"></script>
-   <script language="JavaScript">^
+   <script>^
 
    function KeyPressed() {^
-      if ($("#JACLCommandPrompt").val() == "") { 
-         main.scrollTop = main.scrollHeight; 
-      } 
+      if (document.getElementById('JACLCommandPrompt').value === '') {
+         var main = document.getElementById('main');
+         main.scrollTop = main.scrollHeight;
+      }
    }^
 
    function changeInterface() {^
-      document.JACLInterfaceForm.submit(); 
+      document.JACLInterfaceForm.submit();
    }^
 .
 #include "ajax.library"
 write "</script>^"
 write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
 write "</head>^"
-write "<body onLoad=~$('#JACLCommandPrompt').focus();~>^"
+write "<body onLoad=~document.getElementById('JACLCommandPrompt').focus();~>^"
 write "<div id=~header~>"
 ifstring title_image = "none"
   write "<h1 name=~title~>" game_title "</h1>"
@@ -75,7 +74,8 @@ print:
    </div>
    </form></div>^
    <script>
-          function submitForm() {^
+          function submitForm(e) {^
+               e.preventDefault();^
                ajaxForm({^
                     command: document.getElementById('JACLCommandPrompt').value,^
                     replace: false,^
@@ -83,7 +83,7 @@ print:
                });^
                return false;^
           }^
-          $('#commandForm').submit ( submitForm );^
+          document.getElementById('commandForm').addEventListener('submit', submitForm);^
    </script>^
    </body></html>^
 .
@@ -93,30 +93,31 @@ set linebreaks = true
 {+local_success
 print:
       var maintext = document.getElementById("maintext");^
-      $('#maintext').find('audio').remove();^
-      $('#maintext').find('script').remove();^
+      maintext.querySelectorAll('audio').forEach(function(el) { el.remove(); });^
+      maintext.querySelectorAll('script').forEach(function(el) { el.remove(); });^
 
       maintext.innerHTML += "<br><b>&gt;" + details.command + "</b><br>"
     + data;^
 
       var main = document.getElementById("main");^
       var textAdded = main.scrollHeight - main.scrollTop;
-      if (textAdded > $("#main").height()) { 
-         main.scrollTop += $("#main").height(); 
-      } else { 
-         main.scrollTop = main.scrollHeight;^ 
+      var mainHeight = main.offsetHeight;
+      if (textAdded > mainHeight) {
+         main.scrollTop += mainHeight;
+      } else {
+         main.scrollTop = main.scrollHeight;^
       }
       document.JACLGameForm.command.value = "";^
-      var sound = $('#maintext').find('audio')[0];^
+      var sound = maintext.querySelector('audio');^
       if (sound != null) {^
-         sound.play(); 
+         sound.play();
       }^
-      var jaclscript = $('#maintext').find('script')[0];^
-      if (jaclscript != null) {^ 
-         eval (jaclscript.text); 
+      var jaclscript = maintext.querySelector('script');^
+      if (jaclscript != null) {^
+         (new Function(jaclscript.text))();
       }^
-      $('#JACLCommandPrompt').focus();
-      return false; 
+      document.getElementById('JACLCommandPrompt').focus();
+      return false;
 .
 }
 
@@ -156,7 +157,7 @@ select VISITED topic
          set node_y + 30
 
          write node_x " " node_y "~);^"
-      endif   
+      endif
       set INDEX + 1
    until INDEX = 8
 endselect
@@ -182,16 +183,16 @@ select VISITED topic
    # ADD THE TOPIC'S LABEL TO THE CENTRE OF THE NODE
    set node_x + 30
    set node_y + 30
-   write "var label = paper.text(" node_x ", " node_y ", ~" 
+   write "var label = paper.text(" node_x ", " node_y ", ~"
    split array_count topic{The} " " label
 
    if array_count = 0
-      write topic{The}         
+      write topic{The}
      else
       set INDEX = 0
       repeat
          write label[INDEX]
-         write "\n"            
+         write "\n"
          set INDEX + 1
       until INDEX = array_count
    endif
