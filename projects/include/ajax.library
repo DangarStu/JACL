@@ -5,11 +5,9 @@ if remote_user = false
 else
 	write ";^"
 endif
-print:
-	fetch(url_string)
-		.then(function(response) { return response.text(); })
-		.then(function(data) {^
-.
+write "fetch(url_string)^"
+write "  .then(function(response) { return response.text(); })^"
+write "  .then(function(data) {^"
 ifexecute "+local_success"
 	# RESULT HANDLED BY LOCAL APPLICATION
 else
@@ -22,10 +20,8 @@ print:
 			}^
 .
 endif
-print:
-		});^
-}^
-.
+write "  });^"
+write "}^"
 write "function ajaxRequest(details) {^"
 write "var url_string = ~" $url "?ajax=true&command=~ + encodeURIComponent(details.command)"
 if remote_user = false
@@ -33,11 +29,9 @@ if remote_user = false
 else
 	write ";^"
 endif
-print:
-	fetch(url_string)
-		.then(function(response) { return response.text(); })
-		.then(function(data) {^
-.
+write "fetch(url_string)^"
+write "  .then(function(response) { return response.text(); })^"
+write "  .then(function(data) {^"
 ifexecute "+local_success"
 	# RESULT HANDLED BY LOCAL APPLICATION
 else
@@ -50,7 +44,5 @@ else
 			}^
    .
 endif
-print:
-		});^
-}^
-.
+write "  });^"
+write "}^"
