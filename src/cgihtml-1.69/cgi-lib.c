@@ -202,7 +202,6 @@ int cgetline(char s[], int lim)
 
 int parse_form_encoded(llist* entries)
 {
-  long content_length;
   entrytype entry;
   node* window;
   FILE *uploadfile = NULL;
@@ -219,9 +218,7 @@ int parse_form_encoded(llist* entries)
   setmode(fileno(stdin), O_BINARY);   /* define stdin as binary */
   _fmode = BINARY;                    /* default all file I/O as binary */
 #endif
-  if (CONTENT_LENGTH != NULL)
-    content_length = atol(CONTENT_LENGTH);
-  else
+  if (CONTENT_LENGTH == NULL)
     return 0;
   /* get boundary */
   tempstr = newstr(CONTENT_TYPE);
