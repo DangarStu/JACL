@@ -1,0 +1,4901 @@
+# --- JACL INCLUDE FILE: indonesian_verbs.library
+# Copyright (c) Stuart Allen 1992-2010.
+
+#include "indonesian.library"
+
+constant	library_version		27
+
+filter the
+filter a
+filter yang
+filter itu
+filter ini
+filter si
+filter sang
+filter ke
+filter di
+
+integer COUNTER
+integer INDEX
+integer TEMP
+integer RETURN_VALUE
+integer OXYGEN_LEFT
+integer direction
+
+synonym onto            on
+synonym into            in
+synonym inside          in
+synonym using           with
+synonym gentleman       man
+
+synonym dengan          with
+synonym dalam           in
+synonym kedalam         in
+synonym keluar          out
+synonym menggunakan     with
+synonym kepada          to
+
+synonym one				1
+synonym two				2
+synonym three			3
+synonym four			4
+synonym five			5
+synonym six				6
+synonym seven			7
+synonym eight			8
+synonym nine			9
+synonym ten				10
+synonym eleven			11
+synonym twelve			12
+synonym thirteen		13
+synonym fourteen		14
+synonym fifteen			15
+synonym sixteen			16
+synonym seventeen		17
+synonym eighteen		18
+synonym nineteen		19
+synonym twenty			20
+
+synonym satu			1
+synonym dua				2
+synonym tiga			3
+synonym empat			4
+synonym lima			5
+synonym enam			6
+synonym tujuh			7
+synonym delapan			8
+synonym sembilan		9
+synonym sepuluh			10
+synonym sebelas			11
+synonym duabelas		12
+synonym tigabelas		13
+synonym empatbelas		14
+synonym limabelas		15
+synonym enambelas		16
+synonym tujuhbelas		17
+synonym delapanbelas	18
+synonym sembilanbelas	19
+synonym duapuluh		20
+
+synonym taje            take
+synonym taek            take
+synonym all             everything
+synonym speak           talk
+synonym depress         press
+synonym w               west
+synonym barat           west
+synonym e               east
+synonym timur           east
+synonym s               south
+synonym selatan         south
+synonym se              southeast
+synonym sw              southwest
+synonym n               north
+synonym utara           north
+synonym ne              northeast
+synonym nw              northwest
+synonym u               up
+synonym atas            up
+synonym d               down
+synonym bawah           down
+synonym l               look
+synonym lihat           look
+synonym beneath         under
+synonym bawah           under
+
+# Map Indonesian commands to English equivalents
+synonym ya              yes
+synonym tidak           no
+synonym keluar          quit
+synonym batalkan        undo
+synonym panduan         walkthru
+synonym lagi            again
+synonym ulang           restart
+synonym simpan          save
+synonym pulihkan        restore
+
+integer_array available_exits 12 0
+string dir_command utara selatan timur barat timurlaut baratlaut
+string dir_command tenggara baratdaya atas bawah masuk keluar
+
+grammar about >about
+
+{+about
+style note
+write game_title
+style normal
+write ", Copyright (c) " game_author "^"
+write "Release " game_release " / build " game_build 
+write " / JACL verb.library version " library_version "^^"
+}
+
+constant NO_GO 22000
+
+grammar exits >exits
+
+{+exits
+execute "+calculate_exits"
+write "Anda bisa pergi ke "
+if INDEX = 0
+   write "mana pun!^"
+   set time = false
+   return true
+endif
+set COUNTER = 0
+repeat
+   if available_exits[COUNTER] != nowhere
+      hyperlink dir_command[COUNTER] dir_command[COUNTER]
+      if available_exits[COUNTER] has KNOWN
+         write " ke " available_exits[COUNTER]{the}
+      endif
+      set INDEX - 1
+      execute "+or_structure"
+   endif
+   set COUNTER + 1
+until COUNTER = 12
+write ".^"
+set time = false
+}
+
+{+calculate_exits
+execute "+clear_list"
+# LOOP THROUGH ALL THE EXITS OF THE CURRENT LOCATION
+set COUNTER = 0
+set INDEX = 0
+repeat
+   ifall here(COUNTER) != nowhere : here(COUNTER) != NO_GO : +in_list<here(COUNTER) = false
+      set available_exits[COUNTER] = here(COUNTER)
+      set INDEX + 1 # THIS IS COUNTING THE NUMBER OF EXITS FOR PUNCTUATION
+   else
+      set available_exits[COUNTER] = 0
+   endif
+   set COUNTER + 1
+until COUNTER = 12
+}
+
+{+in_list
+set TEMP = 0
+repeat
+   if available_exits[TEMP] = arg[0]
+      return true
+   endif
+   set TEMP + 1
+until TEMP = 12
+return false
+}
+
+{+clear_list
+set TEMP = 0
+repeat
+   set available_exits[TEMP] = 0
+   set TEMP + 1
+until TEMP = 12
+}
+
+{+darkness
+if here has DARKNESS
+   execute "+no_light"
+   return true
+endif
+return false
+}
+
+{+can_talk
+if here has UNDER_WATER
+   write "Berbicara di bawah air tidaklah mudah.^"
+   set time = false
+   return true
+endif
+if arg[0] = player
+   write "Itu tanda pertama kegilaan, Anda tahu...^"
+   set time = false
+   return true
+endif
+if arg[0] hasnt ANIMATE
+   write "Saya rasa berbicara dengan " arg[0]{the} " tidak akan membantu.^"
+   set time = false
+   return true
+endif
+if arg[0] has DEAD
+   write  arg[0]{The} " " arg[0]{is} " terlalu mati untuk merespons.^"
+   set time = false
+   return true
+endif
+return false
+}
+
+{+important
+if arg[0] has NOT_IMPORTANT
+   write  arg[0]{The} " " arg[0]{is} " tidak penting; Anda tidak perlu mengkhawatirkan " arg[0]{obj} ".^"
+   set time = false
+   return true
+endif
+return false
+}
+
+{+reach
+if arg[0] has OUT_OF_REACH
+   write  arg[0]{The} " " arg[0]{is} " tidak terjangkau.^"
+   set time = false
+   return true
+endif
+return false
+}
+
+{+possessed
+set INDEX grandof noun1
+ifall INDEX has ANIMATE : INDEX != player : noun1 != INDEX
+   write INDEX{The} " menolak" INDEX{s} " memberikan " noun1{the} .^
+   set time = false
+   return true
+else
+   return false
+endif
+}
+
+# Open an object if possible in order to perform typed command.
+{+closed
+if arg[0] hasnt CLOSED
+   return false
+endif
+proxy "open " arg[0]{names}
+if arg[0] has CLOSED
+   set time = false
+   return true
+endif
+return false
+}
+
+# Stop wearing an object if possible in order to perform typed command.
+{+worn
+if arg[0] hasnt WORN
+   return false
+endif
+proxy "remove " arg[0]{names}
+if arg[0] has WORN
+   set time = false
+   return true
+endif
+return false
+}
+
+# Take an object if possible in order to perform typed command.
+{+not_held
+if arg[0] is *held
+   return false
+endif
+proxy "take " arg[0]{names}
+if arg[0] isnt *held
+   set time = false
+   return true
+endif
+return false
+}
+
+location limbo : limbo
+
+grammar shake >shake_only
+
+{+shake_only
+write "Takut?^"
+set time = false
+}
+
+grammar shake *held   >shake
+grammar wave *held    >shake
+
+{+shake
+if +not_held<noun1 = true
+   return
+endif
+write "Sudah dilakukan.^"
+}
+
+grammar say xyzzy >xyzzy
+grammar xyzzy     >xyzzy
+
+{+xyzzy
+set time = false
+if @+xyzzy != 1
+   write "~Pergi. Tinggalkan kami sendiri.~^"
+   return true
+endif
+write "~Itu kata sandinya, buka pintunya.~^^"
+write "~Kamu yakin? Aku tidak mengenali suaranya.~^^"
+write "~Jangan berdebat, buka saja pintunya!~^^"
+write "Sebuah pintu yang sebelumnya tak terlihat terbuka. Di balik pintu Anda "
+write "melihat apa yang hanya bisa Anda bayangkan sebagai bengkel Tuhan.^^"
+write "write ~Sial! Sudah kubilang itu bukan dia!" caret "~;^"
+write "set bouncer_1(panic) + 5;^"
+write "write ~Cepat! Tutup pintunya." caret "~;^"
+write "set poo(parent) = bouncer_2s_trousers;^"
+write "ensure magic_door has CLOSED;^"
+write "^Pintu itu tertutup dan menghilang lagi. Sesuatu memberitahu Anda bahwa "
+write "ini akan menjadi salah satu hari yang berat...^"
+}
+
+grammar save $string >named_save
+
+{+named_save
+savegame INDEX $string
+if INDEX = true
+   write "Permainan disimpan.^"
+endif
+set time = false
+}
+
+grammar restore $string >named_restore
+
+{+named_restore
+restoregame INDEX $string
+if INDEX = true
+   write "Permainan tersimpan dipulihkan.^^"
+   ensure here hasnt VISITED
+   execute "+display_location"
+endif
+set time = false
+}
+
+string filename
+
+{+load_saved
+repeat
+   write "Apakah Anda ingin memulihkan permainan tersimpan?^"
+   getyesorno TEMP
+   if TEMP = true
+       restoregame INDEX
+       if INDEX = true
+          write "Permainan tersimpan dipulihkan.^^"
+   		  ensure here hasnt VISITED
+          execute "+display_location"
+          return true
+       endif
+   endif
+until TEMP = false
+return false
+}
+
+grammar save >save_game
+
+{+save_game
+savegame INDEX
+if INDEX = true
+   write "Permainan disimpan.^"
+endif
+set time = false
+}
+
+grammar restore >restore_game
+
+{+restore_game
+restoregame INDEX
+if INDEX = true
+   write "Permainan tersimpan dipulihkan.^^"
+   ensure here hasnt VISITED
+   execute "+display_location"
+endif
+set time = false
+}
+
+grammar status on >status_on
+
+{+status_on
+if status_window = 1
+write "Jendela status sudah dinyalakan.^"
+else
+set status_window = 1
+write "Jendela status dinyalakan.^"
+endif
+set time = false
+}
+
+grammar status off >status_off
+
+{+status_off
+if status_window = 0
+write "Jendela status sudah dimatikan.^"
+else
+set status_window = 0
+write "Jendela status dimatikan.^"
+endif
+set time = false
+}
+
+grammar sound on >sound_on
+
+{+sound_on
+if sound_enabled = true
+write "Suara sudah diaktifkan.^"
+else
+set sound_enabled = true
+write "Suara diaktifkan.^"
+endif
+set time = false
+}
+
+grammar sound off >sound_off
+
+{+sound_off
+if sound_enabled = false
+write "Suara sudah dinonaktifkan.^"
+else
+set sound_enabled = false
+write "Suara dinonaktifkan.^"
+stop 0
+stop 1
+stop 2
+stop 3
+endif
+set time = false
+}
+
+grammar graphics on >graphics_on
+
+{+graphics_on
+if graphics_enabled = true
+write "Grafis sudah diaktifkan.^"
+else
+set graphics_enabled = true
+write "Grafis diaktifkan.^"
+endif
+set time = false
+}
+
+grammar graphics off >graphics_off
+
+{+graphics_off
+if graphics_enabled = false
+write "Grafis sudah dinonaktifkan.^"
+else
+set graphics_enabled = false
+write "Grafis dinonaktifkan.^"
+endif
+set time = false
+}
+
+grammar timer on >timer_on
+
+{+timer_on
+if timer_enabled = true
+write "Penghitung waktu sudah diaktifkan.^"
+else
+set timer_enabled = true
+write "Penghitung waktu diaktifkan.^"
+endif
+set time = false
+}
+
+grammar timer off >timer_off
+
+{+timer_off
+if timer_enabled = false
+write "Penghitung waktu sudah dinonaktifkan.^"
+else
+set timer_enabled = false
+write "Penghitung waktu dinonaktifkan.^"
+endif
+set time = false
+}
+
+grammar verbose >verbose
+
+{+verbose
+if display_mode = 1
+   write "Mode tampilan sudah diatur ke lengkap.^"
+   set time = false
+   return true
+endif
+write "Mode tampilan diatur ke lengkap.^^"
+set display_mode = 1
+look
+set time = false
+}
+
+grammar brief >brief
+
+{+brief
+if display_mode = 0
+   write "Mode tampilan sudah diatur ke singkat.^"
+   set time = false
+   return true
+endif
+write "Mode tampilan diatur ke singkat.^"
+set display_mode = 0
+set time = false
+}
+
+grammar help *present           >help_other
+
+{+help_other
+write "Bagaimana Anda bermaksud membantu " noun1{the} ?^
+}
+
+grammar hint *present	>hint_nonum
+grammar hint			>hint_nonum
+
+{+hint_nonum
+if noun1 = false
+   proxy "hint 1"
+else
+   proxy "hint 1 " noun1{names} 
+endif
+}
+
+grammar hint $integer *present	>hint
+grammar hint $integer			>hint
+
+{+hint
+if noun1 = false
+   write "Tidak ada petunjuk yang tersedia untuk lokasi ini.^"
+else
+   write "Tidak ada petunjuk yang tersedia untuk " noun1{the} .^
+endif
+set time = false
+}
+
+grammar help games >help_games
+
+{+help_games
+write "`GAMES' MENGACU PADA MODEL, SIMULASI DAN PERMAINAN YANG MEMILIKI APLIKASI "
+write "TAKTIS DAN STRATEGIS.^"
+}
+
+grammar hug			>hug_only
+grammar comfort		>hug_only
+grammar cuddle		>hug_only
+grammar console		>hug_only
+
+{+hug_only
+if +get_animate != 0
+   proxy "hug " candidate{names}
+   return
+endif
+write "Siapa yang ingin Anda peluk?^"
+setstring question "hug "
+set time = false
+}
+
+grammar hug *present     >hug
+grammar comfort *present >hug
+grammar cuddle *present  >hug
+grammar console *present >hug
+
+{+hug
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+if noun1 hasnt ANIMATE
+   write "Aneh.^"
+   return true
+endif
+write "Pasti " noun1{the} " merasa jauh lebih baik sekarang.^"
+}
+
+grammar kiss	>kiss_only
+grammar pash	>kiss_only
+grammar snog	>kiss_only
+
+{+kiss_only
+if +get_animate != 0
+   proxy "kiss " candidate{names}
+   return
+endif
+write "Siapa yang ingin Anda cium?^"
+setstring question "kiss "
+set time = false
+}
+
+grammar kiss *present >kiss
+grammar pash *present >kiss
+grammar snog *present >kiss
+
+{+kiss
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Hmmmmmm...^"
+}
+
+grammar dig *present			>dig_in
+grammar dig in *present			>dig_in
+grammar dig up *present			>dig_in
+grammar dig through *present	>dig_in
+grammar dig thru *present		>dig_in
+
+{+dig_in
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Anda tidak bisa menggali di " noun1{the} ".^"
+set time = false
+}
+
+grammar dig >dig
+
+{+dig
+if here hasnt OUTDOORS
+   print:
+      Anda tidak bisa menggali di sini.^
+   .
+else
+   print:
+      Tidak perlu menggali di sini.^
+   .
+endif
+set time = false
+}
+
+grammar pick >pick_only
+
+{+pick_only
+write "Apa yang ingin Anda petik?^"
+setstring question "pick "
+set time = false
+}
+
+grammar pick *present >pick_one
+
+{+pick_one
+if +get_dropable != 0
+   proxy "pick " noun1{the} " with " candidate{names}
+   return
+endif
+write "Dengan apa Anda ingin memetik " noun1{the} "?^"
+setstring question "pick " noun1{the} " with "
+set time = false
+}
+
+grammar pick *present with *held >pick_with
+
+{+pick_with
+if +not_held<noun2 = true
+   return
+endif
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Anda tidak bisa memetik " noun1{the} " dengan " noun2{the} .^
+}
+
+grammar rub *present    >rub
+grammar pat *present    >rub
+
+{+rub
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true 
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Pasti " noun1{the} " " noun1{is} " merasa jauh lebih baik sekarang.^"
+}
+
+grammar rub *held on *present         >rub_on
+
+{+rub_on
+if +not_held<noun1 = true
+   return
+endif
+if +important<noun2 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+override
+proxy "rub " noun2{names} " with " noun1{names}
+}
+
+grammar rub *present with *held    >rub_with
+
+{+rub_with
+if +not_held<noun2 = true
+   return
+endif
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Keduanya hanya menjadi sedikit lebih hangat.^"
+}
+
+grammar lick *present  >lick
+grammar taste *present >lick
+
+{+lick
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Yeuucck!^"
+}
+
+grammar pull **present >pull
+grammar tug **present  >pull
+
+{+pull
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Anda tidak bisa menarik " noun1{the} .^
+}
+
+grammar cut *present  >cut
+grammar chop *present >cut
+grammar stab *present >cut
+
+{+cut
+write "Dengan apa Anda ingin memotong " noun1{the} "?^"
+setstring question "cut " noun1{names} " with "
+set time = false
+}
+
+grammar cut *present with *held       >cut_with
+grammar chop *present with *held      >cut_with
+grammar stab *present with *held      >cut_with
+
+{+cut_with
+if +not_held<noun2 = true
+   return
+endif
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+if noun1 has ANIMATE
+   proxy "attack " noun1{names} " with " noun2{names}
+   return true
+endif
+write "Perusak!^"
+set time = false
+}
+
+grammar peel *present		>peel
+grammar skin *present		>peel
+
+{+peel
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Anda tidak bisa mengupas " noun1{the} ".^"
+set time = false
+}
+
+grammar break *present		>break
+grammar smash *present		>break
+grammar crush *present		>break
+grammar destroy *present	>break
+grammar wreck *present		>break
+grammar crack *present		>break
+grammar tear **present		>break
+grammar tear up **present	>break
+grammar tear **present up	>break
+grammar tear off **present	>break
+grammar tear **present off	>break
+grammar rip **present		>break
+grammar rip up **present	>break
+grammar rip **present up	>break
+grammar rip off **present	>break
+grammar rip **present off	>break
+
+{+break
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+if noun1 has ANIMATE
+   write "Jangan terlalu agresif.^"
+else
+   write "Jangan terlalu merusak.^"
+endif
+set time = false
+}
+
+grammar clean *present        >clean
+grammar wash *present         >clean
+grammar wipe *present         >clean
+grammar scrub *present        >clean
+grammar polish *present       >clean
+
+{+clean
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 has LIQUID
+   write "Bagaimana Anda membersihkan cairan?^"
+   set time = false
+   return true
+endif
+override
+write "Anda sangat perhatian.^"
+}
+
+grammar clean *present with *held     >clean_with
+grammar wipe *present with *held      >clean_with
+grammar scrub *present with *held     >clean_with
+grammar brush *present with *held     >clean_with
+
+{+clean_with
+if +not_held<noun2 = true
+   return
+endif
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+if noun1 has LIQUID
+   write "Bagaimana Anda membersihkan cairan?^"
+   set time = false
+   return true
+endif
+override
+write "Anda tidak bisa membersihkan " noun1{the} " dengan " noun2{the} .^
+set time = false
+}
+
+grammar yell at *present      >yell_at
+grammar scream at *present    >yell_at
+
+{+yell_at
+write "Oooo, menakutkan...^"
+}
+
+grammar yell      >yell
+grammar scream    >yell
+
+{+yell
+write "Tenggorokan Anda sekarang sakit.^"
+}
+
+grammar pay *present       >pay
+
+{+pay
+write "Anda tidak bisa membayar " noun1{the} .^
+}
+
+grammar order *anywhere       >order
+grammar buy *anywhere         >order
+
+{+order
+write "Pesanan Anda tampaknya tidak didengar.^"
+}
+
+grammar knock on *present     >knock_on
+grammar tap on *present       >knock_on
+grammar tap *present          >knock_on
+
+{+knock_on
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+if noun1 has ANIMATE
+   proxy "attack " noun1{names}
+   endif
+endif
+if noun1 has LIQUID
+   write "Tangan basah adalah satu-satunya hadiah Anda.^"
+   return true
+endif
+write "Anda mengetuk pelan " noun1{the}.^"
+}
+
+grammar smoke *present >smoke
+
+{+smoke
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Anda tidak bisa merokok " noun1{the} .^
+set time = false
+}
+
+grammar play *present	>play
+grammar sound *present	>play
+grammar ring *present	>play
+
+{+play
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Anda tidak bisa memainkan " noun1{the} .^
+set time = false
+}
+
+grammar play *present with *held	>play_with
+grammar sound *present with *held	>play_with
+grammar ring *present with *held	>play_with
+
+{+play_with
+if +not_held<noun2 = true
+   return
+endif
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Anda tidak bisa memainkan " noun1{the} " dengan " noun1{the} .^
+set time = false
+}
+
+grammar pump *present >pump
+
+{+pump
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Anda tidak bisa memompa " noun1{the} .^
+set time = false
+}
+
+grammar unload *here    >empty
+grammar empty *here     >empty
+
+{+empty
+proxy "take all from " noun1{names}
+}
+
+grammar extract **here with *held	>take_with
+grammar get **here with *held		>take_with
+grammar take **here with *held		>take_with
+grammar take out **here with *held	>take_with
+grammar hold **here with *held		>take_with
+grammar empty **present with *held	>take_with
+
+{+take_with
+if +not_held<noun2 = true
+   return
+endif
+proxy "fill " noun2{names} " with " noun1{names}
+}
+
+grammar fill *held from *present      >fill_from
+
+{+fill_from
+if +not_held<noun1 = true
+   return
+endif
+if +important<noun2 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +contains_liquid?<noun2 == false
+   write  noun2{The} " " noun2{doesnt} "mengandung cairan untuk mengisi " noun1{the}
+   write ".^"
+   set time = false
+   return true
+endif
+proxy "fill " noun1{names} " with " CHILD{names}
+}
+
+grammar fill *held with *present >fill_with
+
+{+fill_with
+if +not_held<noun1 = true
+   return
+endif
+if +important<noun2 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun2 = true
+   return true
+endif
+if noun2 hasnt LIQUID 
+   if +contains_liquid?<noun2 = true
+      set noun2 = CHILD
+   else
+      write "Anda hanya bisa mengisi " noun1{the} " dengan cairan.^"
+      return true
+   endif
+endif
+if noun1 hasnt CONTAINER
+   write  noun1{The} " " noun1{isnt} " wadah dan oleh karena itu tidak bisa "
+   write "diisi.^"
+   return true
+endif
+if noun1 has CLOSED
+   write "Anda tidak bisa mengisi " noun1{the} " selagi " noun1{the} " tertutup.^"
+   set time = false
+   return true
+endif
+if +contains_liquid?<noun1 = true
+   write  noun1{The} " sudah berisi " CHILD{the} ". Jika Anda juga "
+   write "menambahkan " noun2{the} " keduanya akan tercampur.^"
+   set time = false
+   return true
+endif
+if noun1(quantity) < noun2(mass)
+   write  noun1{The} " " noun1{isnt} " cukup besar untuk menampung "
+   write noun2{the} .^
+   set time = false
+   return true
+endif
+override
+write "Anda mengisi " noun1{the} " dengan " noun2{the} .^
+move noun2 to noun1
+}
+
+{+contains_liquid?
+# CHECK IF THE SPECIFIED OBJECT CONTAINS ANY LIQUIDS
+select LIQUID CHILD
+   if CHILD(parent) = arg[0]
+      return true
+   endif
+endselect
+return false
+}
+
+grammar fill *held >fill
+
+{+fill
+if +important<noun1 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+override
+write "Dengan apa Anda ingin mengisi " noun1{the} "?^"
+setstring question "fill " noun1{names} " with "
+set time = false
+}
+
+grammar stand         >stand
+grammar stand up      >stand
+grammar get up        >stand
+
+{+stand
+if player has SITTING
+   write "Menggunakan lengan untuk mendorong diri, Anda berdiri.^"
+   ensure player hasnt SITTING
+   return true
+endif
+write "Anda sudah berdiri.^"
+}
+
+grammar sleep         >sleep
+
+{+sleep
+write "Akan ada banyak waktu untuk itu nanti...^"
+set time = false
+}
+
+grammar lie on *present       >lie_on
+grammar lie down on *present  >lie_on
+grammar sleep on *present     >lie_on
+grammar sleep in *present     >lie_on
+
+{+lie_on
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write  noun1{The} " " noun1{doesnt} " terlihat seperti tempat ideal untuk tidur "
+write "siang.^"
+}
+
+grammar sit			>sit
+grammar sit down	>sit
+grammar squat		>sit
+grammar squat down	>sit
+
+{+sit
+set time = false
+if player has SITTING
+   write "Anda sudah duduk.^"
+   return true
+endif
+if here has UNDER_WATER
+   write "Selagi di bawah air?^"
+   return true
+endif
+if here has ON_WATER
+   write "Selagi di air?^"
+   return true
+endif
+write "Anda duduk untuk istirahat sejenak.^"
+ensure player has SITTING
+}
+
+grammar sit *here	  >sit_on
+grammar sit on *here  >sit_on
+grammar sit in *here  >sit_on
+
+{+sit_on
+if +important<noun1 = true
+   return true
+endif
+if noun1 is *held
+   write "Sulit untuk duduk di atas sesuatu sementara Anda memegangnya.^"
+   set time = false
+   return
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write  noun1{The} " " noun1{doesnt} " terlihat sangat nyaman.^"
+}
+
+grammar kick *present           >kick
+
+{+kick
+if +worn<noun1 = true
+   return true
+endif
+override
+if noun1 has ANIMATE
+   proxy "attack " noun1{names}
+   return
+endif
+if noun1(mass) = scenery
+   if noun1 grandof player
+      write "Gerakan akrobatik itu di luar kemampuan Anda.^"
+      set time = false
+      return
+   else
+      proxy "attack " noun1{names}
+      return
+   endif
+endif
+write "Anda menendang " noun1{the} " sejauh jarak pendek.^"
+move noun1 to here
+}
+
+grammar throw *held	>throw
+grammar lob *held	>throw
+grammar hurl *held	>throw
+grammar pitch *held	>throw
+grammar cast *held	>throw
+
+{+throw
+if +not_held<noun1 = true
+   return
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+if here has MID_WATER : here has ON_WATER
+   write "Anda melempar " noun1{the} " yang dengan cepat tenggelam" noun1{s} " dari "
+   write "pandangan.^"
+   move noun1 to limbo
+   return true
+endif
+write "Anda melempar " noun1{the} " sejauh jarak pendek.^"
+move noun1 to here
+}
+
+grammar drop 		>drop_only
+grammar put down	>drop_only
+
+{+drop_only
+if +get_dropable != 0
+   proxy "drop " candidate{names}
+   return
+endif
+write "Apa yang ingin Anda jatuhkan?^"
+setstring question "drop "
+set time = false
+}
+
+grammar drop **held		>drop
+grammar put **held down	>drop
+grammar put down **held	>drop
+
+{+drop
+if noun1 isnt *held
+   write "Anda tidak membawa " noun1{the} ".^"
+   set time = false
+   return
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+if here has MID_WATER : here has ON_WATER
+   write "Anda menjatuhkan " noun1{the} " yang dengan cepat tenggelam" noun1{s} " dari "
+   write "pandangan.^"
+   move noun1 to limbo
+   return true
+endif
+write "Anda menjatuhkan " noun1{the} .^
+move noun1 to here
+}
+
+grammar take 		>take_only
+grammar take out	>take_only
+grammar hold 		>take_only
+grammar pick		>take_only
+grammar pick		>take_only
+grammar get			>take_only
+
+{+take_only
+if +get_takeable != 0
+   proxy "take " candidate{names}
+   return
+endif
+write "Apa yang ingin Anda ambil?^"
+setstring question "take "
+set time = false
+}
+
+grammar take **here		>take
+grammar take out **here	>take
+grammar hold **here		>take
+grammar pick up **here	>take
+grammar pick **here up	>take
+grammar get **here		>take
+
+{+take
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if +possessed<noun1 = true
+   return
+endif
+if noun1 is *held
+   write "Anda sudah memegang " noun1{the} ".^"
+   set time = false
+   return
+endif
+if player has SITTING
+   write "Anda harus berdiri terlebih dahulu.^"
+   set time = false
+   return true
+endif
+if noun1 has ANIMATE
+   write "Saya rasa " noun1{sub} " tidak akan menghargai itu.^"
+   set time = false
+   return true
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if noun1(mass) > player(quantity)
+   write "Anda membawa terlalu banyak untuk mengambil " noun1{the} .^
+   set time = false
+   return true
+endif
+if noun1 has LIQUID
+   write  noun1{The} " mengalir" noun1{s} " melalui jari-jari Anda.^"
+   return true
+endif
+override
+write "Anda mengambil " noun1{the} .^
+move noun1 to player
+ensure noun1 has TOUCHED
+}
+
+{+move_scenery
+if arg[0] has LOCATION
+   write "Itu akan menjadi prestasi kekuatan yang mengesankan.^"
+   set time = false
+   return true
+endif
+if arg[0](mass) => heavy
+   set noun3 = noun1(parent)
+   set INDEX = noun3
+   if noun3 has LOCATION
+      write "Anda tidak bisa mengambil " noun1{the} ".^"
+      return true
+   else
+      write noun1{The} " " noun1{is} " terpasang pada " noun3{the} .^
+   endif
+   set time = false
+   return true
+endif
+return false
+}
+
+grammar insert **held on *present	>insert_on
+grammar put **held on *present		>insert_on
+grammar place **held on *present	>insert_on
+
+{+insert_on
+if +important<noun2 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun2 = true
+   return true
+endif
+if noun2 = noun1
+   write "Meletakkan " noun1{the} " di atas "
+   if noun1 has PLURAL
+      write "diri mereka sendiri?"
+   else
+      write "dirinya sendiri?"
+   endif
+   write " Saya rasa tidak.^"
+   set time = false
+   return true
+endif
+if noun2(parent) = noun1
+   write "Sayangnya itu tidak mungkin.^"
+   set time = false
+   return true
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if noun2 hasnt SURFACE
+   write "Tidak ada permukaan datar pada " noun2{the} .^
+   set time = false
+   return true
+endif
+if noun2(quantity) < noun1(mass)
+   write "Tidak cukup ruang di atas " noun2{the} " untuk " noun1{the} .^
+   set time = false
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+write "Anda meletakkan " noun1{the} " di atas " noun2{the} .^
+move noun1 to noun2
+}
+
+grammar insert **held under *present	>insert_under
+grammar put **held under *present		>insert_under
+grammar place **held under *present		>insert_under
+
+{+insert_under
+if +important<noun2 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun2 = true
+   return true
+endif
+if noun2 = noun1
+   write "Meletakkan " noun1{the} " di bawah "
+   if noun1 has PLURAL
+      write "diri mereka sendiri?"
+   else
+      write "dirinya sendiri?"
+   endif
+   write " Saya rasa tidak.^"
+   set time = false
+   return true
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+override
+proxy "drop " noun1{names}
+}
+
+grammar insert **held in *present	>insert_in
+grammar put **held in *present		>insert_in
+grammar place **held in *present	>insert_in
+
+{+insert_in
+if +important<noun2 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun2 = true
+   return true
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if noun2 = noun1
+   write "Meletakkan " noun1{the} " di dalam "
+   if noun1 has PLURAL
+      write "diri mereka sendiri?"
+   else
+      write "dirinya sendiri?"
+   endif
+   write " Saya rasa tidak.^"
+   set time = false
+   return true
+endif
+if noun2(parent) = noun1
+   write "Sayangnya itu tidak mungkin.^"
+   set time = false
+   return true
+endif
+if noun2 = player
+   write "Saya ingin bertanya bagaimana Anda berniat melakukan itu, tapi sesuatu memberitahu saya bahwa saya "
+   write "tidak ingin tahu.^"
+   set time = false
+   return true
+endif
+if noun2 hasnt CONTAINER
+   write noun2{The} " " noun2{isnt} " dirancang untuk menerima "
+   write noun1{the} .^
+   set time = false
+   return true
+endif
+if +closed<noun2 = true
+   return true
+endif
+if noun2(quantity) < noun1(mass)
+   write "Tidak cukup ruang di dalam " noun2{the} " untuk " noun1{the} .^
+   set time = false
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+write "Anda meletakkan " noun1{the} " di dalam " noun2{the} .^
+move noun1 to noun2
+}
+
+{+encumbered
+if INDEX = 0
+   write "Anda tidak membawa apa-apa.^"
+   set time = false
+endif
+}
+
+grammar ask *present for **inside			>ask_for
+grammar tell *present to give me **inside	>ask_for
+
+{+ask_for
+if +can_talk<noun1 = true
+   return true
+endif
+if noun1 !grandof noun2
+   write  noun1{The} " " noun1{doesnt} " tampaknya memiliki " noun2{the} .^
+   set time = false
+   return true
+endif
+if +possessed<noun1 = true
+   return
+endif
+if noun2(mass) > player(quantity)
+   write "Dengan beban Anda saat ini, Anda tidak bisa menerima "
+   write noun2{the} .^
+   set time = false
+   return true
+endif
+override
+move noun2 to player
+if noun2 has WORN
+   write  noun1{The} " melepas" noun1{s} " " noun2{the} " lalu memberikan" noun1{s}
+   write " kepada Anda.^"
+   ensure noun2 hasnt WORN
+   return true
+endif
+write  noun1{The} " memberikan " noun2{the} " kepada Anda.^"
+}
+
+grammar tell *present about *anywhere		>tell_about
+grammar talk to *present about *anywhere	>tell_about
+grammar talk *present about *anywhere		>tell_about
+grammar talk with *present about *anywhere	>tell_about
+
+{+tell_about
+if +can_talk<noun1 = true
+   return true
+endif
+override
+write  noun1{The} " tampak" noun1{s} " terpesona oleh cerita Anda tentang "
+write noun2{the} .^
+}
+
+grammar ask *present about *anywhere  >ask_about
+
+{+ask_about
+if +can_talk<noun1 = true
+   return true
+endif
+override
+if noun2 = noun1
+   write noun1{The} " terlalu pemalu untuk banyak bicara.^"
+   return true
+endif
+write noun1{The} " " noun1{doesnt} " punya apa pun untuk dikatakan tentang " noun2{the}
+write ".^"
+}
+
+grammar offer *held to *present			>give_to
+grammar give *held to *present			>give_to
+grammar give *held over to *present		>give_to
+grammar pass *held to *present			>give_to
+grammar pass *held up to *present		>give_to
+grammar pass *held down to *present		>give_to
+grammar pass *held over to *present		>give_to
+grammar hand *held to *present			>give_to
+grammar hand *held up to *present		>give_to
+grammar hand *held down to *present		>give_to
+grammar hand *held over to *present		>give_to
+grammar heave *held to *present			>give_to
+grammar heave *held up to *present		>give_to
+grammar heave *held over to *present	>give_to
+grammar lower *held down to *present	>give_to
+
+{+give_to
+if +not_held<noun1 = true
+   return
+endif
+if noun2 hasnt ANIMATE
+   write "Anda tidak bisa memberikan " noun1{the} " kepada " noun2{the} .^
+   set time = false
+   return true
+endif
+if noun2 = player
+   write "Saya rasa sudah waktunya istirahat dan minum secangkir "
+   write "teh.^"
+   return true
+endif
+if +reach<noun2 = true
+   return true
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+move noun1 to noun2
+write "Anda memberikan " noun1{the} " kepada " noun2{the} .^
+}
+
+grammar offer *held		>give_only
+grammar give *held		>give_only
+grammar give *held		>give_only
+grammar pass *held		>give_only
+grammar pass *held		>give_only
+grammar pass *held		>give_only
+grammar pass *held		>give_only
+grammar hand *held		>give_only
+grammar hand *held		>give_only
+grammar hand *held		>give_only
+grammar hand *held		>give_only
+grammar heave *held		>give_only
+grammar heave *held		>give_only
+grammar heave *held		>give_only
+
+{+give_only
+if +get_animate != 0
+   proxy "give " noun1{names} " to " candidate{names}
+   return
+endif
+write "Kepada siapa Anda ingin memberikan " noun1{the} "?^"
+setstring question "give " noun1{names} " to "
+set time = false
+}
+
+grammar wiggle *present	>move
+grammar jiggle *present	>move
+grammar move *present	>move
+grammar push *present	>move
+
+{+move
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if player has SITTING
+   write "Anda harus berdiri terlebih dahulu.^"
+   set time = false
+   return true
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if noun1 has LIQUID
+   write  noun1{The} " mengalir" noun1{s} " melalui jari-jari Anda.^"
+   return true
+endif
+if noun1(parent) = player
+   override
+   write "Anda memainkan " noun1{the} " di tangan Anda.^"
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+write "Anda menggeser " noun1{the} " sedikit ke samping.^"
+ensure noun1 has TOUCHED
+}
+
+grammar read *present >read
+
+{+read
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+write "Tidak ada yang bisa dibaca pada " noun1{the} ".^"
+}
+
+grammar look down >look_down
+
+{+look_down
+if +darkness = true
+   return true
+endif
+if here has TIGHT_ROPE : here has MID_AIR
+   write "Anda melihat tanah jauh di bawah.^"
+   return true
+endif
+if here has ON_WATER
+   write "Anda tidak bisa melihat melampaui permukaan air.^"
+   return true
+endif
+write "Anda meluangkan waktu sejenak untuk mengagumi kaki penjelajah Anda.^"
+}
+
+grammar look up >look_up
+
+{+look_up
+if +darkness = true
+   return true
+endif
+override
+if here hasnt OUTDOORS
+   write "Anda tidak melihat sesuatu yang istimewa.^"
+else
+   write "Anda hanya melihat langit.^"
+endif
+}
+
+grammar look up *anywhere in *present         >look_up_in
+grammar look for *anywhere in *present        >look_up_in
+
+{+look_up_in
+if +important<noun1 = true
+   return true
+endif
+if +important<noun2 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+write "Anda tidak menemukan referensi tentang " noun1{the} " di " noun2{the} .^
+}
+
+grammar consult *present about *anywhere      >consult
+grammar consult *present re *anywhere         >consult
+grammar consult *present on *anywhere         >consult
+
+{+consult
+proxy "look up " noun2{names} " in " noun1{names}
+}
+
+grammar feel *present  >feel
+grammar touch *present >feel
+
+{+feel
+if +reach<noun1 = true
+   return true
+endif
+if noun1 has ANIMATE
+   write "Saya tidak yakin itu akan sopan.^"
+   return true
+endif
+write "Terasa persis seperti " noun1{list} .^
+}
+
+grammar smell		>sniff
+grammar sniff		>sniff
+
+{+sniff
+if here has UNDER_WATER
+   write "Anda tidak bisa mencium apa pun selagi di bawah air.^"
+   return
+endif
+write "Anda tidak mencium sesuatu yang tidak biasa.^"
+}
+
+grammar smell *present	>smell
+grammar sniff *present	>smell
+
+{+smell
+if here has UNDER_WATER
+   write "Anda tidak bisa mencium apa pun selagi di bawah air.^"
+   return
+endif
+if noun1 has ANIMATE
+   write "Saya tidak yakin itu akan sopan.^"
+   return true
+endif
+write "Baunya sangat mirip " noun1{list} .^
+}
+
+grammar taste *present >taste
+grammar lick *present  >taste
+
+{+taste
+if +reach<noun1 = true
+   return true
+endif
+if noun1 has ANIMATE
+   write "Anda benar-benar aneh.^"
+   return true
+endif
+write "Rasanya persis seperti yang Anda harapkan dari " noun1{list} .^
+}
+
+grammar look in *present      >look_in
+
+{+look_in
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 hasnt CONTAINER
+   write "Tidak ada apa-apa di dalam " noun1{the} .^
+   return true
+endif
+if noun1 has CLOSED
+   write  noun1{The} " " noun1{is} " saat ini tertutup.^"
+   return true
+endif
+set INDEX = +child_count<noun1
+if INDEX = 0
+   write "Tidak ada apa-apa di dalam " noun1{the} .^
+   return true
+endif
+execute "+details<noun1"
+write "^"
+}
+
+grammar search *present		>search
+
+{+search
+ifexecute "noun1.search"
+   return
+endif
+if noun1 has ANIMATE
+   write "Saya tidak yakin itu akan sopan.^"
+   return true
+endif
+proxy "examine " noun1{names}
+}
+
+grammar look *present		>examine
+grammar look at *present	>examine
+grammar l at *present		>examine
+grammar look on *present	>examine
+grammar examine *present	>examine
+grammar x *present			>examine
+grammar l *present			>examine
+grammar watch *present		>examine
+
+{+examine
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+override
+if noun1 has LOCATION
+   proxy "look"
+   return
+endif
+ifall noun1 hasnt CLOSABLE : noun1 hasnt CONTAINER : noun1 hasnt SURFACE
+   write "Tidak ada yang istimewa tentang " noun1{the} .^
+   return true
+endif
+if noun1 has CLOSABLE
+   execute "+details<noun1"
+   write "^"
+   return true
+endif
+set INDEX = 0
+select noun1
+   if noun3(mass) != scenery
+      set INDEX + 1
+   endif
+endselect
+if INDEX = 0
+   write "Tidak ada yang istimewa tentang " noun1{the} .^
+   return true
+endif
+execute "+details<noun1"
+write "^"
+}
+
+{+details
+if arg[0] has CLOSABLE 
+   if arg[0] hasnt CLOSED
+      write  noun1{The} " " arg[0]{is} " terbuka"
+   else
+      write  noun1{The} " " arg[0]{is} " tertutup."
+      return true
+   endif
+endif
+if arg[0] has CONTAINER : arg[0] has SURFACE
+   execute "+contents<arg[0]"
+endif
+}
+
+{+contents
+set INDEX = +child_count<arg[0]
+if INDEX = 0 : arg[0] has CONCEALING 
+   ifall arg[0] has CONTAINER : arg[0] has CLOSABLE
+      write "."
+   endif
+   return true
+endif
+execute "+list_items<arg[0]"
+}
+
+{+clean_contents
+set INDEX = 0
+select arg[0]
+   if noun3(mass) != scenery
+      set INDEX + 1
+   endif
+endselect
+if INDEX = 0 : arg[0] has CONCEALING 
+   return true
+endif
+execute "+list_items<arg[0]"
+}
+
+{+list_items
+if INDEX = 0 : arg[0] has CONCEALING
+   return true
+endif
+if arg[0] has ANIMATE
+   write arg[0]{The} " " arg[0]{is} " membawa "
+endif
+if arg[0] has SURFACE
+   write "Di atas " arg[0]{the} " ada "
+endif
+if arg[0] has CONTAINER
+   if arg[0] has CLOSABLE
+      write " dan berisi "
+   else
+      write arg[0]{The} " berisi "
+   endif
+endif
+select arg[0] CHILD
+   if CHILD(mass) != scenery
+      set INDEX - 1
+      write CHILD{list}
+      execute "+object_info<CHILD"
+      execute "+list_structure"
+      if INDEX = 0
+	     return true
+      endif
+   endif
+endselect
+}
+
+{+spaced_contents
+set INDEX = 0
+select arg[0]
+   if noun3(mass) != scenery
+      set INDEX + 1
+   endif
+endselect
+if INDEX = 0
+   return true
+endall
+write "^"
+execute "+list_items<arg[0]"
+write "^"
+}
+
+integer CHILD
+
+{+first_child
+select arg[0] CHILD
+   return true
+endselect
+return false
+}
+
+{+child_count
+set INDEX = 0
+select arg[0] CHILD
+   if CHILD(mass) != scenery
+      set INDEX + 1
+   endif
+endselect
+return INDEX
+}
+
+grammar i   >list_inventory
+grammar list  >list_inventory
+
+integer INVENTORY
+
+{+list_inventory
+set INDEX = 0
+select player
+   if noun3(mass) != scenery
+      set INDEX + 1
+   endif
+endselect
+if INDEX = 0
+   write "Anda tidak membawa apa-apa.^"
+   return true
+endif
+write "Anda membawa:^"
+select player INVENTORY
+   if INVENTORY(mass) != scenery
+      if interpreter = GLK
+         write "  " INVENTORY{list}
+      else
+         write "&nbsp;&nbsp;" INVENTORY{list}
+      endif
+      execute "+object_info<INVENTORY"
+      if INVENTORY has CONTAINER : INVENTORY has SURFACE
+         ifall INVENTORY hasnt CLOSED : +child_count<INVENTORY != 0
+			write ", yang berisi:^"
+	        execute "+object_children<INVENTORY"
+         else
+            write "^"
+         endif
+      else
+         write "^"
+	  endif
+   endif
+endselect
+set time = false
+}
+
+integer CHILDREN
+
+{+object_children
+set INDEX = 0
+select arg[0] CHILDREN
+   if CHILDREN(mass) != scenery
+      set INDEX + 1
+      if interpreter = GLK
+         write "    " CHILDREN{list}
+      else
+         write "&nbsp;&nbsp;&nbsp;&nbsp;" CHILDREN{list}
+      endif
+      execute "+object_info<CHILDREN"
+      write "^"
+   endif
+endselect
+if INDEX = 0
+   if interpreter = GLK
+      write "    tidak ada apa-apa^"
+   else
+      write "&nbsp;&nbsp;&nbsp;tidak ada apa-apa^"
+   endif
+endif
+}
+
+grammar inventory	>inventory
+grammar inv			>inventory
+
+{+inventory
+set time = false
+set INDEX = +child_count<player
+if INDEX = 0
+   write "Anda tidak membawa apa-apa.^"
+   return true
+endif
+write "Anda membawa "
+select player INVENTORY
+   if INVENTORY(mass) != scenery
+      set INDEX - 1
+      write INVENTORY{list}
+      execute "+object_info<INVENTORY"
+      execute "+list_structure"
+      if INDEX = 0
+	     write "^"
+	     return true
+      endif
+   endif
+endselect
+}
+
+{+or_structure
+if INDEX > 1
+   write ", "
+endif
+if INDEX = 1
+   write " atau "
+endif
+}
+
+{+list_structure
+if INDEX > 1
+   write ", "
+endif
+if INDEX = 1
+   write " dan "
+endif
+if INDEX = 0
+   write "."
+endif
+}
+
+{+object_info
+if arg[0] has WORN
+   write " (dipakai)"
+endif
+if arg[0] has LUMINOUS
+   write " (menerangi)"
+endif
+if arg[0] has ON
+   write " (menyala)"
+endif
+ifall arg[0] has CLOSABLE : arg[0] hasnt CLOSED
+   write " (terbuka)"
+endif
+}
+
+grammar sorry >sorry
+
+{+sorry
+write "Tidak apa-apa.^"
+}
+
+grammar thanks        >thankyou
+grammar thank you     >thankyou
+
+{+thankyou
+write "Sama-sama.^"
+}
+
+grammar notify >notify
+
+{+notify
+if notify = false
+   set notify = true
+   write "Notifikasi skor diatur ke aktif.^"
+else
+   set notify = false
+   write "Notifikasi skor diatur ke nonaktif.^"
+endif
+set time = false
+}
+
+grammar notify on >notify_on
+
+{+notify_on
+if notify = true
+    write "Notifikasi skor sudah diatur ke aktif.^"
+else
+    set notify = true
+    write "Notifikasi skor diatur ke aktif.^"
+endif
+set time = false
+}
+
+grammar notify off >notify_off
+
+{+notify_off
+if notify = false
+    write "Notifikasi skor sudah diatur ke nonaktif.^"
+else
+    set notify = false
+    write "Notifikasi skor diatur ke nonaktif.^"
+endif
+set time = false
+}
+
+grammar debug >debug
+
+{+debug
+if debug = false
+   set debug = true
+   write "Pesan debug diatur ke aktif.^"
+else
+   set debug = false
+   write "Pesan debug diatur ke nonaktif.^"
+endif
+set time = false
+}
+
+grammar debug on >debug_on
+
+{+debug_on
+if debug = true
+    write "Pesan debug sudah diatur ke aktif.^"
+else
+    set debug = true
+    write "Pesan debug diatur ke aktif.^"
+endif
+set time = false
+}
+
+grammar debug off >debug_off
+
+{+debug_off
+if debug = false
+    write "Pesan debug sudah diatur ke nonaktif.^"
+else
+    set debug = false
+    write "Pesan debug diatur ke nonaktif.^"
+endif
+set time = false
+}
+
+grammar score >score_command
+grammar points >score_command
+
+{+score_command
+execute "+score"
+}
+
+{+score
+set time = false
+if total_moves = 1
+   write "Skor Anda " score "% dalam 1 langkah.^"
+else
+   write "Skor Anda " score "% dalam " total_moves " langkah.^"
+endif
+}
+
+grammar loosen	>open_only
+grammar open 	>open_only
+
+{+open_only
+if +get_openable != 0
+   proxy "open " candidate{names}
+   return
+endif
+write "Apa yang ingin Anda buka?^"
+setstring question "open "
+set time = false
+}
+
+grammar loosen *present	>open
+grammar open *present	>open
+
+{+open
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 has LOCKED
+   write  noun1{The} " " noun1{is} " terkunci.^"
+   set time = false
+   return true
+endif
+if noun1 hasnt CLOSABLE
+   write "Anda tidak bisa membuka " noun1{the} .^
+   set time = false
+   return true
+endif
+if noun1 hasnt CLOSED
+   write  noun1{The} " " noun1{is} " sudah terbuka.^"
+   set time = false
+   return true
+endif
+override
+ensure noun1 hasnt CLOSED
+if noun1 has CONTAINER
+   execute "+revealing"
+   return true
+endif
+write "Anda membuka " noun1{the} .^
+}
+
+{+revealing
+set INDEX = 0
+select noun1
+   set INDEX + 1
+endselect
+write "Anda membuka " noun1{the}
+if INDEX = 0
+   write ", yang " noun1{is} " kosong.^"
+   return true
+endif
+write " memperlihatkan "
+select noun1
+   set INDEX - 1
+   write noun3{list}
+   execute "+object_info<noun3"
+   execute "+list_structure"
+   if INDEX = 0
+      write "^"
+      return true
+   endif
+endselect
+}
+
+grammar tighten	>close_only
+grammar close	>close_only
+grammar shut	>close_only
+
+{+close_only
+if +get_closable != 0
+   proxy "close " candidate{names}
+   return
+endif
+write "Apa yang ingin Anda tutup?^"
+setstring question "close "
+set time = false
+}
+
+grammar tighten	*present	>close
+grammar close *present		>close
+grammar shut *present		>close
+
+{+close
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 hasnt CLOSABLE
+   write "Anda tidak bisa menutup " noun1{the} .^
+   set time = false
+   return true
+endif
+if noun1 has CLOSED
+   write  noun1{The} " " noun1{is} " sudah tertutup.^"
+   set time = false
+   return true
+endif
+override
+write "Anda menutup " noun1{the} .^
+ensure noun1 has CLOSED
+}
+
+grammar lock *present >lock
+
+{+lock
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+ifall noun1 has LOCKABLE : noun1 has LOCKED
+   write  noun1{The} " " noun1{is} " sudah terkunci.^"
+   return true
+endif
+ifall noun1 has CLOSABLE : noun1 hasnt CLOSED
+   write "Anda tidak bisa mengunci " noun1{the} " selagi " noun1{the} " terbuka.^"
+   set time = false
+   return true
+endif
+if noun1 hasnt LOCKABLE
+   write "Anda tidak bisa mengunci " noun1{the} .^
+   return true
+endif
+override
+write "Dengan apa Anda ingin mengunci " noun1{the} "?^"
+setstring "lock " noun1{names} " with " 
+set time = false
+}
+
+grammar lock *present with *held >lock_with
+
+{+lock_with
+if +important<noun1 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if noun1 hasnt LOCKABLE
+   write "Anda tidak bisa mengunci " noun1{the} .^
+   set time = false
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 has LOCKED
+   write  noun1{The} " " noun1{is} " sudah terkunci.^"
+   return true
+endif
+ifall noun1 has CLOSABLE : noun1 hasnt CLOSED
+   write "Anda tidak bisa mengunci " noun1{the} " selagi " noun1{the} " terbuka.^"
+   set time = false
+   return true
+endif
+override
+write "Anda tidak bisa mengunci " noun1{the} " dengan " noun2{the} .^
+set time = false
+}
+
+grammar unlock >unlock_only
+
+{+unlock_only
+write "Apa yang ingin Anda buka kuncinya?^"
+setstring question "unlock "
+set time = false
+}
+
+grammar unlock *present >unlock
+
+{+unlock
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 hasnt LOCKABLE
+   write "Anda tidak bisa membuka kunci " noun1{the} .^
+   set time = false
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 hasnt LOCKED
+   write noun1{The} " " noun1{is} " sudah tidak terkunci.^"
+   set time = false
+   return true
+endif
+override
+write "Dengan apa Anda ingin membuka kunci " noun1{the} "?^"
+setstring question "unlock " noun1{names} " with "
+set time = false
+}
+
+grammar unlock *present with *held    >unlock_with
+grammar open *present with *held      >unlock_with
+
+{+unlock_with
+if +not_held<noun2 = true
+   return
+endif
+if noun1 hasnt LOCKABLE
+   write "Anda tidak bisa membuka kunci " noun1{the} .^
+   set time = false
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 hasnt LOCKED
+   write  noun1{The} " " noun1{is} " already unlocked.^"
+   return true
+endif
+override
+write "Anda tidak bisa membuka kunci " noun1{the} " dengan " noun2{the} .^
+set time = false
+}
+
+grammar show *held	>show
+
+{+show
+write "Kepada siapa Anda ingin menunjukkan " noun1{the} "?^"
+setstring question "show " noun1{names} " to "
+set time = false
+}
+
+grammar show *held to *present        >show_to
+
+{+show_to
+if +important<noun2 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if noun1 = noun2
+   write "Anda tidak bisa menunjukkan " noun1{the} " kepada "
+   if noun1 has PLURAL
+     write "diri mereka sendiri."
+   else
+      write "dirinya sendiri.^"
+   endif
+   set time = false
+   return true
+endif
+override
+write noun2{The} " " noun2{doesnt} " tampak terlalu terkesan oleh "
+write noun1{the} .^
+}
+
+grammar untie	>untie_only
+grammar free	>untie_only
+grammar undo	>untie_only
+
+{+untie_only
+write "Apa yang ingin Anda lepaskan?^"
+setstring question "untie "
+set time = false
+}
+
+grammar untie *present        >untie
+grammar free *present         >untie
+grammar undo *present         >untie
+
+{+untie
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+write  noun1{The} " " noun1{is} " tidak terikat pada apa pun.^"
+set time = false
+}
+
+grammar tie *held     >tie
+grammar attach *held  >tie
+
+{+tie
+if +important<noun1 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+write "Pada apa Anda ingin mengikat " noun1{the} "?^"
+setstring question "tie " noun1{names} " to "
+set time = false
+}
+
+grammar fix *present	>repair
+grammar repair *present	>repair
+
+{+repair
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Anda tidak yakin bagaimana memperbaiki " noun1{the} ".^"
+set time = false
+}
+
+grammar tie *held to *present         >tie_to
+grammar fix *held to *present         >tie_to
+grammar attach *held to *present      >tie_to
+
+{+tie_to
+if +important<noun2 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun2 = true
+   return true
+endif
+override
+write "Anda tidak bisa mengikat " noun1{the} " pada " noun2{the} .^
+set time = false
+}
+
+grammar attack *present       >attack
+grammar hit *present          >attack
+grammar fight *present        >attack
+grammar kill *present         >attack
+grammar murder *present       >attack
+grammar punch *present        >attack
+
+{+attack
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+ifall noun1 has ANIMATE : noun1 has DEAD
+   write  noun1{The} " " noun1{is} " sudah mati.^"
+   set time = false
+   return true
+endif
+override
+write "Menyerang " noun1{the} " dengan tangan kosong tidak akan banyak "
+write "berpengaruh.^"
+set time = false
+}
+
+grammar attack *present with *held	>attack_with
+grammar hit *present with *held		>attack_with
+grammar fight *present with *held	>attack_with
+grammar kill *present with *held	>attack_with
+grammar murder *present with *held	>attack_with
+grammar stab *present with *held	>attack_with
+grammar poke *present with *held	>attack_with
+grammar break *present with	*held	>attack_with
+grammar smash *present with *held	>attack_with
+grammar crush *present with *held	>attack_with
+grammar destroy *present with *held	>attack_with
+grammar wreck *present with *held	>attack_with
+
+
+{+attack_with
+if +important<noun1 = true
+   return true
+endif
+if +not_held<noun2 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun2 has LIQUID
+   write  noun2{The} " mengalir" noun2{s} " melalui jari-jari Anda.^"
+   return true
+endif
+ifall noun1 has ANIMATE : noun1 has DEAD
+   write  noun1{The} " " noun1{is} " sudah mati.^"
+   set time = false
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+write "Menyerang " noun1{the} " dengan " noun2{the} " tidak akan banyak "
+write "berpengaruh.^"
+set time = false
+}
+
+grammar wave  >wave
+
+{+wave
+write "Anda melambaikan tangan sedikit.^"
+}
+
+grammar wave to *present      >wave_to
+
+{+wave_to
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 hasnt ANIMATE
+   write "Tidak mengherankan, Anda tidak mendapat respons.^"
+   return true
+endif
+write  noun1{The} " hampir tidak mengangkat alis.^"
+}
+
+grammar salute 	>salute
+
+{+salute
+print:
+   Anda memberikan salah satu hormat terbaik Anda.^
+.
+}
+
+grammar salute *present		>salute_at
+grammar salute at *present	>salute_at
+grammar salute to *present	>salute_at
+
+{+salute_at
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 hasnt ANIMATE
+   write "Tidak mengherankan, Anda tidak mendapat respons.^"
+   return true
+endif
+override
+write "Anda memberi hormat kepada " noun1{the} ".^"
+}
+
+grammar jump on to *here >jump_on
+grammar jump on *here    >jump_on
+grammar hop on *here     >jump_on
+grammar stand on *here   >jump_on
+
+{+jump_on
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 is *held
+   write "Sulit untuk melompat ke atas sesuatu sementara Anda memegangnya.^"
+   set time = false
+   return
+endif
+set time = false
+if noun1 hasnt SURFACE
+   write "Anda tidak bisa melompat ke atas " noun1{the} .^
+   return true
+endif
+write "Itu tidak akan menghasilkan apa-apa.^"
+}
+
+grammar jump over *here       >jump_over
+
+{+jump_over
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 is *held
+   write "Sulit untuk melompati sesuatu sementara Anda memegangnya.^"
+   set time = false
+   return
+endif
+override
+write "Anda tidak bisa melompati " noun1{the} .^
+set time = false
+}
+
+grammar jump             >jump
+
+{+jump
+if here has MID_AIR
+   write "Tidak mungkin."
+   return true
+endif
+if here has TIGHT_ROPE
+   write "Sesuatu memberitahu saya itu mungkin terlalu berbahaya, belum lagi "
+   write "sama sekali tidak perlu.^"
+   return true
+endif
+if here has UNDER_WATER : here has ON_WATER
+   write "Selagi di bawah air?^"
+   return true
+endif
+if player has SITTING
+   write "Anda harus berdiri terlebih dahulu.^"
+   return true
+endif
+write "Sudah dilakukan.^"
+}
+
+grammar say yes >yes
+grammar yes   	>yes
+grammar okay  	>yes
+grammar yeah  	>yes
+
+{+yes
+write "Itu pertanyaan retoris.^"
+set time = false
+}
+
+grammar say no	>no
+grammar nah 	>no
+grammar no		>no
+grammar no way	>no
+
+{+no
+write "Itu pertanyaan retoris.^"
+set time = false
+}
+
+grammar say yes to *present 	>say_yes
+grammar yes to *present  		>say_yes
+grammar say okay to *present 	>say_yes
+grammar say yeah to *present 	>say_yes
+grammar *present comma yes		>say_yes
+grammar *present comma okay		>say_yes
+grammar *present comma yeah		>say_yes
+grammar *present comma okay		>say_yes
+
+{+say_yes
+if +can_talk<noun1 = true
+   return true
+endif
+override
+write  noun1{The} " tampak" noun1{s} " tidak memperhatikan.^"
+}
+
+grammar say no to *present	>say_no
+grammar nah to *present 	>say_no
+grammar no to *present		>say_no
+grammar no way to *present	>say_no
+grammar *present comma no	>say_no
+
+{+say_no
+if +can_talk<noun1 = true
+   return true
+endif
+override
+write  noun1{The} " tampak" noun1{s} " tidak memperhatikan.^"
+}
+
+grammar say *anywhere >say_object
+
+{+say_object
+if here has UNDER_WATER
+   write "Berbicara di bawah air tidaklah mudah.^"
+   set time = false
+   return true
+endif
+override
+write "Anda berkata, ~" noun1{the} ".~^"
+}
+
+grammar say *anywhere to *present	>say_object_to
+
+{+say_object_to
+execute "+can_talk<noun2"
+override
+write "Anda berkata, ~" noun1{the} "~ kepada " noun2{the} ".^"
+}
+
+grammar why   >why
+grammar why?  >why
+
+{+why
+write "Karena.^"
+set time = false
+}
+
+grammar blow *held at *present   >blow_at
+grammar blow *held to *present   >blow_at
+
+{+blow_at
+if +important<noun2 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+write "Anda tidak bisa meniup " noun1{the} " ke " noun2{the} .^
+set time = false
+}
+
+grammar point *held at *present	>point_at
+grammar aim *held at *present	>point_at
+
+{+point_at
+if +important<noun2 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+if noun2 has ANIMATE
+   write noun2{The} " memandang Anda dengan bingung.^"
+   return true
+endif
+write "Anda mengarahkan " noun1{the} " ke " noun2{the} ".^"
+}
+
+grammar throw *held in *here	>throw_at
+grammar hurl *held in *here		>throw_at
+grammar pitch *held in *here	>throw_at
+grammar cast *held in *here		>throw_at
+grammar throw *held on *here	>throw_at
+grammar hurl *held on *here		>throw_at
+grammar pitch *held on *here	>throw_at
+grammar cast *held on *here		>throw_at
+grammar throw *held at *here	>throw_at
+grammar throw *held to *here	>throw_at
+grammar cast *held to *here		>throw_at
+grammar cast *held at *here		>throw_at
+grammar pitch *held to *here	>throw_at
+grammar pitch *held at *here	>throw_at
+grammar lob *held to *here		>throw_at
+grammar lob *held at *here		>throw_at
+grammar hurl *held to *here		>throw_at
+grammar hurl *held at *here		>throw_at
+
+{+throw_at
+if +important<noun2 = true
+   return true
+endif
+if +not_held<noun1 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if noun2 has LOCATION
+   write noun1{The} " jatuh di dekat sini.^"
+   move noun1 to here
+   return
+endif
+if noun2 is *held
+   write "Sulit untuk melempar apa pun ke " noun2{the} " sementara Anda "
+   write "memegang " noun2{obj} ".^"
+   set time = false
+   return
+endif
+if noun2(parent) hasnt LOCATION
+   write "Anda tidak bisa melempar " noun1{the} " ke " noun2{the} " selagi "
+   write noun2{the} " di dalam sesuatu yang lain.^"
+   set time = false
+   return true
+endif
+if +move_scenery<noun1 = true
+   return true
+endif
+if +worn<noun1 = true
+   return true
+endif
+override
+if noun2 has ANIMATE
+   write "Saya rasa " noun2{the} " tidak akan menghargai Anda melempar "
+   write noun1{the} " ke arahnya.^"
+   set time = false
+   return true
+endif
+if noun1(mass) => 20
+   write noun1{The} " terlalu berat untuk dilempar-lempar.^"
+   set time = false
+   return true
+endif
+if here has UNDER_WATER
+   write "Melempar benda di bawah air tidak pernah semudah yang Anda "
+   write "kira.^"
+   set time = false
+   return true
+endif
+if here has ON_WATER
+   write "Anda melempar " noun1{the} " ke " noun2{the} " yang "
+   write "memantul, jatuh ke air di mana "
+   write noun1{the} " dengan cepat tenggelam" noun1{s} ", menghilang dari pandangan.^"
+   move noun1 to limbo
+   return true
+endif
+write  noun1{The} " memantul" noun1{s} " dari " noun2{the} " dan jatuh" noun1{s}
+write " ke tanah.^"
+move noun1 to here
+}
+
+grammar remove **held       >remove
+grammar take off **held     >remove
+grammar doff **held         >remove
+
+{+remove
+ifall noun1(parent) has CONTAINER : noun1 isnt *held
+   proxy "take " noun1{names}
+   return
+endif
+if noun1 hasnt WORN : noun1 isnt *held
+   write "Anda tidak memakai " noun1{the} .^
+   set time = false
+   return true
+endif
+if noun1(mass) > player(quantity)
+   write "Anda membawa terlalu banyak untuk melepas " noun1{the} .^
+   set time = false
+   return true
+endif
+override
+set player(quantity) - noun1(mass)
+ensure noun1 hasnt WORN
+write "Anda melepas " noun1{the} .^
+}
+
+grammar wear **held		>wear
+grammar put on **held	>wear
+grammar put **held on	>wear
+grammar don **held		>wear
+
+{+wear
+if +not_held<noun1 = true
+   return
+endif
+if noun1 hasnt WEARABLE
+   write "Anda tidak bisa memakai " noun1{the} .^
+   set time = false
+   return true
+endif
+if noun1 has WORN
+   write "Anda sudah memakai " noun1{the} .^
+   set time = false
+   return true
+endif
+override
+set player(quantity) + noun1(mass)
+ensure noun1 has WORN
+write "Anda memakai " noun1{the} .^
+}
+
+grammar talk		>talk_only
+grammar talk to		>talk_only
+grammar talk with	>talk_only
+
+{+talk_only
+if +get_animate != 0
+   proxy "talk to " candidate{names}
+   return
+endif
+write "Dengan siapa Anda ingin berbicara?^"
+setstring question "talk to "
+set time = false
+}
+
+grammar talk *present		>talk_to
+grammar talk to *present	>talk_to
+grammar talk with *present	>talk_to
+
+{+talk_to
+if +can_talk<noun1 = true
+   return true
+endif
+override
+write  noun1{The} " " noun1{doesnt} " tampak tertarik untuk "
+write "bercakap-cakap.^"
+}
+
+grammar consume *present	>eat
+grammar eat *present		>eat
+
+{+eat
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+write "Anda tidak bisa memakan " noun1{the} .^
+set time = false
+}
+
+grammar eat	>eat_only
+
+{+eat_only
+write "Apa yang ingin Anda makan?^"
+setstring question "eat "
+set time = false
+}
+
+grammar drink from *present   >drink_from
+grammar sip from *present     >drink_from
+
+{+drink_from
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +contains_liquid?<noun1 = true
+   proxy "drink " CHILD{names}
+   set time = false
+   return true
+endif
+write "Tidak ada yang bisa diminum di " noun1{the} .^
+set time = false
+}
+
+grammar drink *present        >drink
+grammar sip *present          >drink
+
+{+drink
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 hasnt LIQUID
+   write "Anda tidak bisa meminum " noun1{the} .^
+   set time = false
+   return true
+endif
+override
+write "Anda meminum " noun1{the} .^
+move noun1 to limbo
+}
+
+grammar drink	>drink_only
+
+{+drink_only
+write "Apa yang ingin Anda minum?^"
+setstring question "drink "
+set time = false
+}
+
+grammar flick **present >flick
+grammar flip **present >flick
+
+{+flick
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 has LIQUID
+   write "Tangan basah adalah satu-satunya hadiah Anda.^"
+   return true
+endif
+override
+write "Menjentik " noun1{the} " tidak menghasilkan apa-apa selain menyebabkan rasa sakit "
+write "yang tajam di jari telunjuk Anda.^"
+}
+
+grammar press **present        >press
+grammar poke **present         >press
+
+{+press
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 has LIQUID
+   write "Tangan basah adalah satu-satunya hadiah Anda.^"
+   return true
+endif
+override
+write "Menekan " noun1{the} " tidak memberikan efek yang terlihat.^"
+}
+
+grammar light *present with *held     >light_with
+grammar burn *present with *held      >light_with
+grammar ignite *present with *held    >light_with
+grammar set fire to *present with *held >light_with
+
+{+light_with
+if +not_held<noun2 = true
+   return
+endif
+if here has UNDER_WATER
+   write "Saya rasa Anda tidak akan bisa menyalakan apa pun di bawah "
+   write "air.^"
+   set time = false
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 hasnt FLAMMABLE
+   write  noun1{The} " " noun1{is} " sama sekali tidak mudah terbakar.^"
+   set time = false
+   return true
+endif
+if noun2 hasnt IGNITABLE
+   write "Saya tidak melihat bagaimana Anda bisa menyalakan " noun1{the} " menggunakan " noun2 .^
+   set time = false
+   return true
+endif
+if noun1(quantity) = 0
+   write  noun1{The} " sudah habis.^"
+   return true
+endif
+if noun1 has BURNING
+   write  noun1{The} " " noun1{is} " sudah menyala.^"
+   set time = false
+   return true
+endif
+override
+write "Anda menyalakan " noun1{the} " menggunakan " noun2 .^
+ensure noun1 has BURNING
+ensure noun1 has LUMINOUS
+}
+
+grammar set *present to $integer	>set_to_integer
+grammar turn *present to $integer	>set_to_integer
+
+{+set_to_integer
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Anda tidak bisa mengatur " noun1{the} " ke apa pun.^"
+set time = false
+}
+
+grammar set *present to $integer with *held >set_to_integer_with
+grammar turn *present to $integer with *held >set_to_integer_with
+
+{+set_to_integer_with
+if +important<noun1 = true
+   return true
+endif
+if +not_held<noun2 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Anda tidak bisa mengatur " noun1{the} " dengan " noun2{the} "^"
+}
+
+grammar burn *present         >light
+grammar light *present        >light
+grammar ignite *present       >light
+grammar set fire to *present  >light
+
+{+light
+if here has UNDER_WATER
+   write "Saya rasa Anda tidak akan bisa menyalakan apa pun di bawah "
+   write "air.^"
+   set time = false
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+if noun1 has IGNITABLE
+   override
+   write "Anda menghasilkan nyala api singkat.^"
+   return true
+endif
+if noun1 hasnt FLAMMABLE
+   write  noun1{The} " " noun1{is} " sama sekali tidak mudah terbakar.^"
+   set time = false
+   return true
+endif
+if noun1 has BURNING
+   write  noun1{The} " " noun1{is} " sudah menyala.^"
+   set time = false
+   return true
+endif
+write "Dengan apa Anda berniat menyalakan " noun1{the} "?^"
+setstring question "light " noun1{names} " with "
+set time = false
+}
+
+grammar extinguish *present   >extinguish
+grammar put out *present      >extinguish
+
+{+extinguish
+if noun1 hasnt BURNING
+   write  noun1{The} " " noun1{is} " tidak menyala.^"
+   set time = false
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Anda memadamkan " noun1{the} .^
+ensure noun1 hasnt BURNING
+ensure noun1 hasnt LUMINOUS
+}
+
+{+sitting
+if player has SITTING
+   proxy "stand up"
+   write "^"
+endif
+if player has SITTING
+   write "Anda tidak bisa bergerak selagi duduk!^"
+   set time = false
+   return true
+endif
+return false
+}
+
+integer from_location 0
+
+{+travel
+set compass = arg[0]
+if compass < 0 : compass > 11
+   write "ERROR: Unable to move in direction: " compass ".^"
+   return
+endif
+set destination = here(compass)
+ifexecute "+movement"
+   # THE MOVE HAS BEEN STOPPED, JUST RETURN
+   set time = false
+   return
+endif
+ifexecute "here.movement"
+   # THE MOVE HAS BEEN STOPPED, JUST RETURN
+   set time = false
+   return
+endif
+if destination = 0
+   write "Anda tidak bisa pergi ke arah itu.^"
+   set time = false 
+else
+   # COULD WE OUTPUT A DATA TAG HERE TO TELL THE INTERFACE
+   # A SUCESSFUL MOVE HAS TAKEN PLACE?
+   set from_location = here
+   set player(parent) = destination
+   execute "+display_location"
+   set time = true
+endif
+}
+
+grammar swim >swim_only
+
+{+swim_only
+if here has UNDER_WATER : here has ON_WATER
+   write "Anda harus menentukan arah mana yang ingin Anda renangkan.^"
+   set time = false
+   return
+endif
+write "Anda tidak bisa berenang di sini.^"
+set time = false
+}
+
+grammar swim west >swim_west
+
+{+swim_west
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<west"
+   return true
+endif
+write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
+set time = false
+}
+
+grammar west      >west
+grammar go west   >west
+grammar walk west >west
+
+{+west
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<west"
+}
+
+grammar swim east >swim_east
+
+{+swim_east
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<east"
+   return true
+endif
+write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
+set time = false
+}
+
+grammar east      >east
+grammar go east   >east
+grammar walk east >east
+
+{+east
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<east"
+}
+
+grammar swim south >swim_south
+
+{+swim_south
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<south"
+   return true
+endif
+write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
+set time = false
+}
+
+grammar south      >south
+grammar go south   >south
+grammar walk south >south
+
+{+south
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<south"
+}
+
+grammar swim southeast >swim_southeast
+
+{+swim_southeast
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<southeast"
+   return true
+endif
+write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
+set time = false
+}
+
+grammar southeast      >southeast
+grammar go southeast   >southeast
+grammar walk southeast >southeast
+
+{+southeast
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<southeast"
+}
+
+grammar swim southwest >swim_southwest
+
+{+swim_southwest
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<southwest"
+   return true
+endif
+write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
+set time = false
+}
+
+grammar southwest      >southwest
+grammar go southwest   >southwest
+grammar walk southwest >southwest
+
+{+southwest
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<southwest"
+}
+
+grammar swim north >swim_north
+
+{+swim_north
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<north"
+   return true
+endif
+write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
+set time = false
+}
+
+grammar north         >north
+grammar go north      >north
+grammar walk north    >north
+
+{+north
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<north"
+}
+
+grammar swim northeast >swim_northeast
+
+{+swim_northeast
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<northeast"
+   return true
+endif
+write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
+set time = false
+}
+
+grammar northeast             >northeast
+grammar go northeast          >northeast
+grammar walk northeast        >northeast
+
+{+northeast
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<northeast"
+}
+
+grammar swim northwest >swim_northwest
+
+{+swim_northwest
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<northwest"
+   return true
+endif
+write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
+set time = false
+}
+
+grammar northwest             >northwest
+grammar go northwest          >northwest
+grammar walk northwest        >northwest
+
+{+northwest
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<northwest"
+}
+
+grammar climb *here			>climb_up
+grammar climb up *here		>climb_up
+grammar walk up *here		>climb_up
+grammar go up *here			>climb_up
+
+{+climb_up
+if noun1 is *held
+   write "Sulit untuk memanjat " noun{2}{the} " sementara Anda "
+   write "memegangnya.^"
+   set time = false
+   return
+endif
+override
+write "Anda tidak bisa memanjat " noun1{the} .^
+set time = false
+}
+
+grammar climb down *here      >climb_down
+grammar walk down *here       >climb_down
+grammar go down *here         >climb_down
+
+{+climb_down
+if noun1 is *held
+   write "Sulit untuk menuruni " noun{2}{the} " sementara Anda "
+   write "memegangnya.^"
+   set time = false
+   return
+endif
+override
+write "Anda tidak bisa menuruni " noun1{the} .^
+set time = false
+}
+
+grammar enter *present		>enter
+grammar go through *present	>enter
+grammar go thru *present	>enter
+grammar go in *present		>enter
+grammar climb on *present	>enter
+grammar climb in *present	>enter
+grammar get in *present		>enter
+grammar jump in *present	>enter
+grammar get on *present		>enter
+
+{+enter
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+write "Anda tidak bisa memasuki " noun1{the} .^
+set time = false
+}
+
+integer NEARBY
+
+grammar follow *anywhere	>follow
+
+{+follow
+if noun1 is *present
+   write noun1{The} " ada di sini!^"
+   set time = false
+   return
+endif
+
+set INDEX = -1
+
+# LOOP THROUGH ALL THE EXITS OF THE CURRENT LOCATION
+set COUNTER = 0
+repeat
+   if here(COUNTER) = noun1(parent)
+      set INDEX = COUNTER
+   endif
+   set COUNTER + 1
+until COUNTER = 12
+
+if INDEX != -1
+   execute "+go_direction<INDEX"
+else
+   write "Anda tidak yakin ke mana harus pergi.^"
+   set time = false
+endif
+}
+
+grammar go back		>go_back
+grammar back		>go_back
+grammar return		>go_back
+
+{+go_back
+if from_location != 0
+   proxy "go to " from_location{names}
+   return true
+endif
+write "Anda perlu pergi ke suatu tempat terlebih dahulu!^"
+set time = false
+}
+
+grammar head to *location		>go_to
+grammar head towards *location	>go_to
+grammar head over to *location	>go_to
+grammar head down to *location	>go_to
+grammar head up to *location	>go_to
+grammar report to *location		>go_to
+grammar move to *location		>go_to
+grammar walk to *location		>go_to
+grammar go up to *location		>go_to
+grammar go down to *location	>go_to
+grammar go over to *location	>go_to
+grammar go to *location			>go_to
+grammar go *location			>go_to
+
+{+go_to
+if noun1 = here
+   write "Anda sudah ada di sana!^"
+   set time = false
+   return
+endif
+dir_to INDEX here noun1
+if INDEX = -1
+   write "Anda tidak yakin ke mana harus pergi.^"
+   set time = false
+   return
+endif
+write "] "
+style input
+write dir_command[INDEX] ^
+style normal
+execute "+go_direction<INDEX"
+}
+
+{+go_direction
+if arg[0] = north
+   proxy "go north"
+   return true
+endif
+if arg[0] = northeast
+   proxy "go northeast"
+   return true
+endif
+if arg[0] = east
+   proxy "go east"
+   return true
+endif
+if arg[0] = southeast
+   proxy "go southeast"
+   return true
+endif
+if arg[0] = south
+   proxy "go south"
+   return true
+endif
+if arg[0] = southwest
+   proxy "go southwest"
+   return true
+endif
+if arg[0] = west
+   proxy "go west"
+   return true
+endif
+if arg[0] = northwest
+   proxy "go northwest"
+   return true
+endif
+if arg[0] = up
+   proxy "go up"
+   return true
+endif
+if arg[0] = down
+   proxy "go down"
+   return true
+endif
+if arg[0] = in
+   proxy "go in"
+   return true
+endif
+if arg[0] = out
+   proxy "go out"
+   return true
+endif
+}
+
+grammar swim in >swim_in
+
+{+swim_in
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<in"
+   return true
+endif
+write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
+set time = false
+}
+
+grammar go in		>in
+grammar get in		>in
+grammar climb in	>in
+grammar in			>in
+grammar enter		>in
+grammar walk in		>in
+
+{+in
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<in"
+}
+
+grammar swim out >swim_out
+
+{+swim_out
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<out"
+   return true
+endif
+write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
+set time = false
+}
+
+grammar get out		>out
+grammar out			>out
+grammar exit		>out
+grammar leave		>out
+grammar climb out	>out
+grammar walk out	>out
+grammar go out		>out
+
+{+out
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<out"
+}
+
+grammar surface >swim_up
+grammar swim up >swim_up
+
+{+swim_up
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<up"
+   return true
+endif
+write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
+set time = false
+}
+
+grammar up            >up
+grammar climb         >up
+grammar climb up      >up
+grammar jump up       >up
+grammar go up         >up
+grammar walk up       >up
+
+{+up
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<up"
+}
+
+grammar swim down     >swim_down
+grammar dive down     >swim_down
+grammar dive          >swim_down
+
+{+swim_down
+if here has UNDER_WATER : here has ON_WATER
+   execute "+travel<down"
+   return true
+endif
+write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
+set time = false
+}
+
+grammar down          >down
+grammar climb down    >down
+grammar jump down     >down
+grammar go down       >down
+grammar walk down     >down
+
+{+down
+if +sitting = true
+   return true
+endif
+override
+execute "+travel<down"
+}
+
+grammar look around	>look_around
+grammar look		>look_around
+grammar ls			>look_around
+grammar watch		>look_around
+
+{+look_around
+ensure here hasnt VISITED
+execute "+display_location"
+set time = false
+}
+
+{+display_location
+ifexecute "+before_look"
+  return
+endif
+ifexecute "here.before_look"
+  return
+endif
+if here has DARKNESS
+   execute "+no_light"
+   return
+endif
+call "+title"
+if display_mode = true
+   ensure here hasnt VISITED
+endif
+ifexecute "here.look"
+   # THERE IS A LOCATION SPECIFIC LOOK FUNCTION,
+   # NO NEED TO PERFORM THE DEFAULT ACTION
+else
+   execute "+look"
+endif
+ensure here has KNOWN
+ensure here has VISITED
+ensure here has MAPPED
+execute "+object_descriptions"
+call "here.after_look"
+call "+after_look"
+}
+
+{+look
+write "Anda bisa melihat "
+set INDEX = 0
+loop
+   ifall here grandof noun3 : player !grandof noun3 : noun3 hasnt LOCATION
+      set INDEX + 1
+   endif
+endloop
+if INDEX = 0
+   write "tidak ada yang istimewa.^"
+   return true
+endif
+loop
+   ifall here grandof noun3 : player !grandof noun3 : noun3 hasnt LOCATION
+      set INDEX - 1
+      write noun3{list}
+      execute "+object_info<noun3"
+      execute "+list_structure"
+      if INDEX = 0
+         write "^"
+         return true
+      endif
+   endif
+endloop
+}
+
+{+object_descriptions
+select here
+   ifall noun3(mass) < scenery : noun3 hasnt LOCATION
+      write ^ noun3{long}
+   endif
+endselect
+}
+
+{+no_light
+write "Terlalu gelap untuk melihat.^"
+}
+
+grammar look under *present		>look_under
+grammar search under *present	>look_under
+
+{+look_under
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1(mass) >= heavy : noun1 has LOCATION
+   write "Anda tidak bisa melihat di bawah " noun1{the} .^
+   set time = false
+   return true
+endif
+write "Tidak ada yang aneh di bawah " noun1{the} .^
+}
+
+grammar look behind *present	>look_behind
+grammar search behind *present	>look_behind
+
+{+look_behind
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1(mass) >= heavy : noun1 has LOCATION
+   write "Anda tidak bisa melihat di belakang " noun1{the} .^
+   set time = false
+   return true
+endif
+write "Tidak ada yang aneh di belakang " noun1{the} .^
+}
+
+grammar look through *present	>look_through
+grammar look thru *present		>look_through
+grammar look out *present		>look_through
+
+{+look_through
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+write "Anda tidak bisa melihat melalui " noun1{the} .^
+set time = false
+}
+
+grammar look through *held at *present	>look_through_at
+grammar look thru *held at *present		>look_through_at
+
+{+look_through_at
+proxy "look at " noun2{names} " through " noun1{names}
+}
+
+grammar look at *present through *held	>look_at_through
+grammar look at *present thru *held		>look_at_through
+grammar look at *present with *held		>look_at_through
+
+{+look_at_through
+if +important<noun1 = true
+   return true
+endif
+if +not_held<noun2 = true
+   return
+endif
+if +darkness = true
+   return true
+endif
+if noun1 = noun2
+   write "Anda tidak bisa melihat " noun1{the} " melalui "
+   if noun1 has PLURAL
+      write "diri mereka sendiri.^"
+   else
+      write "dirinya sendiri.^"
+   set time = false
+   return true
+endif
+override
+write "Anda tidak bisa melihat " noun1{the} " melalui " noun2{the} .^
+set time = false
+}
+
+grammar wait				>wait
+grammar z					>wait
+
+{+wait
+write "Waktu berlalu...^"
+}
+
+grammar listen        >listen
+
+{+listen
+override
+write "Anda tidak mendengar sesuatu yang tidak biasa.^"
+}
+
+grammar listen to *present    >listen_to
+grammar listen at *present    >listen_to
+
+{+listen_to
+write "Anda tidak mendengar sesuatu yang tidak biasa.^"
+}
+
+grammar use *present          >use
+grammar work *present         >use
+grammar operate *present      >use
+
+{+use
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 has ANIMATE
+   write "Saya akui saya mungkin tidak ingin tahu jawabannya, "
+   write "tapi dengan cara apa Anda ingin menggunakan " noun1{the} .^
+   set time = false
+   return true
+endif
+write "Sayangnya Anda harus lebih spesifik "
+write "tentang bagaimana Anda ingin menggunakan " noun1{the} ".^"
+}
+
+grammar rotate *present		>turn
+grammar turn *present		>turn
+grammar twist *present		>turn
+grammar twiddle *present	>turn
+grammar spin *present		>turn
+
+{+turn
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+write "Anda tidak bisa memutar " noun1{the} .^
+set time = false
+}
+
+grammar rotate *present clockwise	>turn_clockwise
+grammar turn *present clockwise		>turn_clockwise
+grammar twist *present clockwise 	>turn_clockwise
+grammar twiddle *present clockwise	>turn_clockwise
+grammar spin *present clockwise		>turn_clockwise
+
+{+turn_clockwise
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+write "Anda tidak bisa memutar " noun1{the} " searah jarum jam.^"
+set time = false
+}
+
+grammar rotate *present anticlockwise	>turn_anticlockwise
+grammar turn *present anticlockwise		>turn_anticlockwise
+grammar twist *present anticlockwise 	>turn_anticlockwise
+grammar twiddle *present anticlockwise	>turn_anticlockwise
+grammar spin *present anticlockwise		>turn_anticlockwise
+
+{+turn_anticlockwise
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+write "Anda tidak bisa memutar " noun1{the} " berlawanan arah jarum jam.^"
+set time = false
+}
+
+grammar engage *present		>turn_on
+grammar turn on *present	>turn_on
+grammar activate *present	>turn_on
+grammar turn *present on	>turn_on
+grammar switch on *present	>turn_on
+grammar switch *present on	>turn_on
+grammar start *present		>turn_on
+
+{+turn_on
+if +reach<noun1 = true
+   return true
+endif
+override
+if noun1 has ON
+   write  noun1{The} " " noun1{is} " sudah menyala.^"
+else
+   write "Anda tidak bisa menyalakan " noun1{the} .^
+endif
+set time = false
+}
+
+grammar disengage *present	>turn_on
+grammar turn off *present	>turn_off
+grammar turn *present off	>turn_off
+grammar shut down *present	>turn_off
+grammar power down *present	>turn_off
+grammar shut off *present	>turn_off
+grammar power off *present	>turn_off
+grammar switch off *present	>turn_off
+grammar switch *present off	>turn_off
+grammar stop *present		>turn_off
+
+{+turn_off
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Anda tidak bisa mematikan " noun1{the} .^
+set time = false
+}
+
+grammar pour *present         >pour
+
+{+pour
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 hasnt LIQUID
+   write "Anda tidak bisa menuangkan " noun1{the} .^
+   set time = false
+   return true
+endif
+set noun3 = noun1(parent)
+if noun3 = false : noun3(parent) <> player
+   write "Anda tidak punya " noun1{the} .^
+   set time = false
+   return true
+endif
+if +closed<noun3 = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Anda menuangkan " noun1{the} " ke seluruh tanah.^"
+move noun1 to limbo
+}
+
+grammar type $string on *present >type_on
+grammar write $string in *present >type_on
+
+{+type_on
+if +important<noun1 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+override
+write "Anda tidak bisa mengetik pada " noun1{the} ".^"
+set time = false
+}
+
+grammar list objects >list_objs
+
+{+list_objs
+select noun3(mass) > 0 
+   write noun3{The} 
+next
+}
+
+grammar tip *present on *present      >pour_on
+grammar tip *present down *present    >pour_on
+grammar tip *present in *present      >pour_on
+grammar tip *present over *present    >pour_on
+grammar pour *present down *present   >pour_on
+grammar pour *present on *present     >pour_on
+grammar pour *present in *present     >pour_on
+grammar pour *present over *present   >pour_on
+
+{+pour_on
+if +important<noun1 = true
+   return true
+endif
+if +important<noun2 = true
+   return true
+endif
+if +darkness = true
+   return true
+endif
+if noun1 hasnt LIQUID
+   write "Anda tidak bisa menuangkan " noun1{the} .^
+   set time = false
+   return true
+endif
+if +reach<noun1 = true
+   return true
+endif
+set noun3 = noun1(parent)
+if noun3 = false : noun3(parent) <> player
+   write "Anda tidak punya " noun1{the} .^
+   set time = false
+   return true
+endif
+if +closed<noun3 = true
+   return true
+endif
+if +closed<noun2 = true
+   return true
+endif
+if +reach<noun2 = true
+   return true
+endif
+override
+if +contains_liquid?<noun2 = true
+   write noun2{The} " sudah berisi" noun2{s} " " CHILD{the} ". Jika Anda "
+   write "juga menambahkan " noun1{the} " keduanya akan tercampur.^"
+   set time = false
+   return true
+endif
+ifall noun2 has CONTAINER : noun2 hasnt CLOSED
+   override
+   write "Anda menuangkan " noun1{the} " ke dalam " noun2{the} .^
+   move noun1 to noun2
+   return true
+endif
+ifall noun2(parent) hasnt LOCATION : noun2(parent) has CONTAINER
+   set noun3 = noun2(parent)
+   write noun1{The} " mengalir" noun1{s} " dari " noun2{the} " dan masuk ke "
+   write noun3{the} ".^"
+   move noun1 to noun3
+   return true
+endif
+write noun1{The} " mengalir dari " noun2{the} " dan membasahi seluruh "
+write "tanah.^"
+move noun1 to limbo
+}
+
+grammar blankjacl >blankjacl
+
+{+blankjacl
+write "Gerakan yang sangat cerdik.^"
+set time = false
+}
+
+grammar instructions	>instructions
+grammar help		>instructions
+
+{+instructions
+print:
+   Fiksi interaktif melibatkan pembaca dengan cara yang tidak dilakukan oleh
+   cerita statis. Alih-alih membaca secara berurutan dari awal sampai akhir,
+   Anda mengendalikan tindakan karakter utama dengan mengetikkan perintah dalam
+   bentuk kalimat sederhana. Sebelum memulai petualangan Anda, ada beberapa
+   konsep yang harus dijelaskan agar Anda dapat berinteraksi dengan sukses
+   dengan dunia virtual yang dibuat oleh penulis.^^
+   Ruang fisik yang akan Anda jelajahi dibagi menjadi unit-unit terpisah yang
+   disebut lokasi. Lokasi dapat ditempuh menggunakan perintah berikut:^^
+.
+style preformatted
+set linebreaks = false
+print:
+   ||n  untuk utara^
+   ||s  untuk selatan^
+   ||e  untuk timur^
+   ||w  untuk barat^
+   ||ne untuk timurlaut^
+   ||nw untuk baratlaut^
+   ||se untuk tenggara^
+   ||sw untuk baratdaya^
+   ||u  untuk atas^
+   ||d  untuk bawah^^
+.
+style normal
+set linebreaks = true
+print:
+   Deskripsi setiap lokasi akan memberi tahu Anda ke arah mana Anda
+   bisa bergerak. Namun perlu diketahui bahwa beberapa jalan keluar
+   mungkin hanya tersedia dalam keadaan tertentu seperti saat pintu
+   terbuka atau jembatan diturunkan.^^
+   Di dalam lokasi-lokasi ini Anda akan menemukan banyak benda yang
+   dapat Anda manipulasi. Benda-benda ini dapat dirujuk dengan sedikit
+   atau sebanyak mungkin nama mereka yang diperlukan untuk
+   mengidentifikasinya secara unik. Misalnya, jika cerita memberi tahu
+   Anda bahwa ~Ada kunci perak tergeletak di sini.~ Maka bisa dirujuk
+   sebagai ~perak~, ~kunci~ atau ~kunci perak~. Jika rujukan Anda ambigu,
+   seperti menggunakan ~kunci~ saat ada kunci perak dan kunci emas di
+   lokasi saat ini, maka Anda akan diminta untuk lebih spesifik.^^
+
+   Konsep utama berikutnya dari fiksi interaktif yang perlu dipahami
+   adalah cara Anda berinteraksi dengan benda-benda ini di dalam
+   lokasi. Aspek utama dari antarmuka perintah yang perlu dikuasai
+   adalah skalanya, dengan kata lain, berapa banyak yang bisa dicapai
+   dengan satu perintah. Seperti yang telah Anda lihat sebelumnya,
+   berpindah dari satu lokasi ke lokasi lain memerlukan satu perintah.
+   Perintah seperti ~cari dave~ atau ~pergi ke perpustakaan~ tidak
+   valid. Anda harus bergerak secara manual di dunia yang tersedia
+   untuk mencapai tugas-tugas ini sendiri. Untuk alasan ini, membuat
+   peta saat Anda berjalan sangat disarankan.^^
+   Struktur kalimat dasar yang dipahami oleh permainan adalah:^
+.
+style preformatted
+set linebreaks = false
+print:
+   aksi                              cth. teriak ^
+   aksi objek                        cth. ambil buku ^
+   aksi objek preposisi objek        cth. buka pintu dengan kunci ^^
+.
+style normal
+set linebreaks = true
+print:
+   Sebuah aksi tidak harus berupa satu kata. Misalnya,
+   ~periksa batu melalui kaca pembesar~, contoh dari sintaks terakhir,
+   juga bisa dinyatakan sebagai ~lihat batu melalui kaca
+   pembesar~.^^
+   Untuk lebih menggambarkan berapa banyak yang bisa dicapai dalam satu
+   giliran, pertimbangkan daftar berikut (hanya beberapa dari aksi yang
+   valid):^^
+.
+style preformatted
+set linebreaks = false
+print:
+   putar   baca    tarik   dorong  makan  potong^
+   kunci   buka    gosok   serang  cicipi minum^
+   pecah   cium    dengar  tuang   pindah nyala^
+   serang  tiup    lempar  pakai   buka   tutup^
+   ambil   jatuh   masuk   lepas^^
+   .
+style normal
+set linebreaks = true
+
+print:
+   Kata ~it,~ ~them,~ ~him~ dan ~her~ dapat digunakan untuk menunjukkan
+   objek terakhir yang tepat yang dirujuk dalam salah satu perintah Anda.
+   Kata ~itself,~ ~themselves,~ ~himself~ dan ~herself~ dapat digunakan
+   untuk merujuk pada subjek perintah saat ini seperti, ~tanya dan tentang
+   dirinya~.^^
+   Kata ~all~ atau ~everything~ dapat digunakan sebagai pengganti objek
+   saat menggunakan salah satu kata kerja di baris bawah tabel di atas.^^
+
+   Namun, tugas seperti menjinakkan bom umumnya tidak akan tercapai dengan
+   mengetik ~jinakkan bom~. Berikut adalah contoh transkrip untuk memberi
+   Anda gambaran lebih baik tentang bagaimana tugas seperti ini bisa
+   dicapai.^^
+.
+
+set linebreaks = false
+style preformatted
+print:
+> periksa bom^
+Bom itu berukuran sekitar satu kaki persegi dan memiliki^
+panel kecil di permukaan atasnya. Panel saat ini^
+tertutup.^^
+> dengarkan bom^
+Bom itu mengeluarkan suara detak yang mengancam.^^
+>buka panel^
+Anda membuka panel memperlihatkan kabel merah, kabel^
+hijau, kabel biru, jam dan beberapa dinamit.^^
+> i^
+Anda membawa manual bom, polis^
+asuransi dan pemotong kabel.^^
+> baca manual^
+Membolak-balik buku Anda sampai ke halaman tentang^
+penjinakan. Tampak cukup mudah, cukup^
+potong kabel biru lalu yang merah.^^
+> potong kabel biru dengan pemotong^
+Dengan hati-hati menjangkau ke dalam casing bom, Anda^
+memotong kabel biru. Sejauh ini bagus.^^
+> potong kabel merah dengan pemotong^
+Menahan napas, Anda memotong kabel merah.^^
+> dengarkan bom^
+.
+style normal
+set linebreaks = true
+print:
+   Bom itu, untungnya, sekarang diam.^^
+   Seperti yang Anda lihat, setiap tugas yang ingin Anda capai harus^
+   dipecah menjadi aksi-aksi komponennya.^^
+
+   Selama perjalanan cerita Anda mungkin menemui karakter lain yang^
+   dikendalikan komputer. Karakter-karakter ini dapat diajak berinteraksi^
+   menggunakan perintah berikut:^^
+.
+style preformatted
+set linebreaks = false
+print:
+   ||bicara dengan KARAKTER^
+   ||berikan OBJEK kepada KARAKTER^
+   ||tunjukkan OBJEK kepada KARAKTER^
+   ||minta KARAKTER untuk OBJEK^
+   ||tanya KARAKTER tentang OBJEK^
+   ||ceritakan KARAKTER tentang OBJEK^^
+.
+style normal
+set linebreaks = true
+print:
+   Ada juga beberapa perintah khusus untuk berinteraksi dengan
+   program daripada dunia yang disimulasikannya:^^
+.
+style preformatted
+set linebreaks = false
+print:
+   ||Perintah   Aksi^^
+   ||VERBOSE    selalu deskripsikan lokasi ^
+   ||BRIEF      hanya deskripsikan lokasi baru ^
+   ||RESTART    mulai dari awal ^
+   ||SCORE      tampilkan skor dan peringkat Anda ^
+   ||LOOK       deskripsikan lokasi saat ini ^
+   ||SAVE       simpan posisi saat ini ^
+   ||RESTORE    pulihkan posisi tersimpan ^
+   ||I          daftar horizontal barang bawaan ^
+   ||INV        daftar vertikal barang bawaan ^
+   ||UNDO       batalkan perintah terakhir ^
+   ||AGAIN      ulangi perintah terakhir ^
+   ||INFO       tampilkan informasi versi ^^
+.
+style normal
+set linebreaks = true
+print:
+   CATATAN: Jika Anda mencari petunjuk yang relevan dengan lokasi tertentu,
+   ketik ~hint~, ~first hint~ atau ~hint one~ di lokasi itu. Petunjuk
+   pertama akan berupa petunjuk halus dengan ~hint two~ lebih terang-terangan dan
+   ~hint three~ berupa perintah tepat yang harus diketik.^^
+
+   Anda sekarang siap untuk memulai petualangan pertama Anda ke
+   dunia fiksi interaktif.
+   Ingatlah untuk membuat peta saat Anda berjalan dan baca setiap
+   bagian dengan cermat karena petunjuk penting mungkin tersembunyi dalam
+   deskripsi lokasi dan objek yang Anda temui. Memeriksa setiap objek yang
+   bisa Anda rujuk adalah ide yang bagus, begitu juga menyimpan posisi Anda
+   sesering mungkin. Nah, selamat beruntung, dan yang terpenting bersenang-senanglah!^
+.
+set time = false
+}
+
+;                                                    SPEAKING TO OTHER OBJECTS
+; ----------------------------------------------------------------------------
+; Grammar statements beginning with an object must be defined last in the game
+; to avoid confusion with verbs that may also be objects such as "drink drink"
+
+grammar *present comma press *present		>tell_to_press
+grammar *present comma push *present		>tell_to_press
+
+{+tell_to_press
+if +can_talk<noun1 = true
+   return true
+endif
+write "~Kamu yang tekan,~ " noun1{the} " menjawab.^"
+}
+
+grammar *present comma give me *anywhere		>ask_for
+grammar *present comma give *anywhere to myself	>ask_for
+grammar *present comma give *anywhere to me		>ask_for
+
+grammar *present comma tell me about *anywhere			>ask_about
+grammar *present comma tell me all about *anywhere		>ask_about
+grammar *present comma what do you know about *anwhere	>ask_about
+
+grammar *present comma who are you		>who?
+grammar *present comma what is your name	>who?
+grammar *present comma what is your name?	>who?
+
+{+who?
+if +can_talk<noun1 = true
+   return true
+endif
+proxy "ask " noun1{names} " about " noun1{names}
+}
+
+grammar *present comma sorry		>apologise
+grammar *present comma im sorry	>apologise
+grammar *present comma i am sorry	>apologise
+grammar apologise to *present	>apologise
+
+{+apologise
+if +can_talk<noun1 = true
+   return true
+endif
+write  noun1{the} " meyakinkan" noun1{s} " Anda bahwa tidak perlu minta "
+write "maaf.^"
+}
+
+grammar *present comma thanks		>thank
+grammar *present comma thank you	>thank
+grammar thank *present		>thank
+
+{+thank
+if +can_talk<noun1 = true
+   return true
+endif
+write "~Tidak perlu,~ " noun1{the} " menjawab.^"
+}
+
+grammar hi *present					>greet
+grammar hello *present				>greet
+grammar greet *present				>greet
+grammar *present comma hello		>greet
+grammar *present comma hello sailor	>greet
+grammar *present comma hi there		>greet
+grammar *present comma dr			>greet
+grammar *present comma doctor		>greet
+grammar *present comma hi			>greet
+
+{+greet
+if +can_talk<noun1 = true
+   return true
+endif
+override
+write  noun1{The} " mengangguk.^"
+}
+ 
+grammar *present comma *anywhere	>object_object
+
+{+object_object
+if +can_talk<noun1 = true
+   return true
+endif
+override
+write "Anda tidak mendapat respons.^"
+}
+
+string question			"none"
+
+grammar *present	>noun_only
+grammar *anywhere	>noun_only
+
+{+noun_only
+ifstring question != "none"
+   addstring question noun1{names} 
+   proxy question
+   return
+else
+   if noun1 has LOCATION
+      write "] "
+      style input
+      write "go to " noun1{the} ^
+      style normal
+      proxy "go to " noun1{names}
+      return
+   endif
+   if noun1 isnt *present
+      write "Anda tidak melihat " noun1{the} " di sini.^"
+      set time = false
+      return
+   endif
+   ifall noun1 has ANIMATE : noun1 hasnt DEAD
+      write "] "
+      style input
+      write "talk to " noun1{the} ^
+      style normal
+      proxy "talk to " noun1{names}
+      return
+   endif
+   ifall noun1(mass) < heavy noun1 : hasnt OUT_OF_REACH : noun1 isnt *held
+      write "] "
+      style input
+      write "take " noun1{the} ^
+      style normal
+      proxy "take " noun1{names}
+      return
+   endif
+   write "] "
+   style input
+   write "examine " noun1{the} ^
+   style normal
+   proxy "examine " noun1{names}
+   return
+endif
+write "Tidak ada kata kerja dalam kalimat itu.^"
+set time = false
+}
+
+{+system_eachturn
+setstring question "none"
+}
+
+integer candidate
+
+{+get_animate
+set INDEX = 0
+set candidate = 0
+select *present
+  ifall noun3 has ANIMATE noun3 != player
+     set candidate = noun3
+     set INDEX + 1
+  endif
+endselect
+if INDEX = 1
+   return candidate
+else
+   return 0
+endif
+}
+
+{+get_inanimate
+set INDEX = 0
+set candidate = 0
+select *present noun3
+  ifall noun3 hasnt ANIMATE : noun3 is *present : noun3(mass) != scenery
+     set candidate = noun3
+     set INDEX + 1
+  endif
+endselect
+if INDEX = 1
+   return candidate
+else
+   return 0
+endif
+}
+
+{+get_openable
+set INDEX = 0
+set candidate = 0
+select *present noun3
+  ifall noun3 has CLOSABLE
+     set candidate = noun3
+     set INDEX + 1
+  endif
+endselect
+if INDEX = 1
+   return candidate
+endif
+if INDEX = 0
+   return 0
+else
+   # THERE ARE MORE THAN ONE, SEE IF IT CAN BE REDUCED BY OPEN LOOKING
+   # FOR CLOSED OBJECTS
+   set INDEX = 0
+   set candidate = 0
+   select *present noun3
+     ifall noun3 has CLOSABLE : noun3 has CLOSED
+        set candidate = noun3
+        set INDEX + 1
+     endif
+   endselect
+   if INDEX = 1
+      return candidate
+   else
+      return 0
+   endif
+endif
+}
+
+{+get_closable
+set INDEX = 0
+set candidate = 0
+select *present noun3
+  ifall noun3 has CLOSABLE
+     set candidate = noun3
+     set INDEX + 1
+  endif
+endselect
+if INDEX = 1
+   return candidate
+endif
+if INDEX = 0
+   return 0
+else
+   # THERE ARE MORE THAN ONE, SEE IF IT CAN BE REDUCED BY OPEN LOOKING
+   # FOR CLOSED OBJECTS
+   set INDEX = 0
+   set candidate = 0
+   select *present noun3
+     ifall noun3 has CLOSABLE : noun3 hasnt CLOSED
+        set candidate = noun3
+        set INDEX + 1
+     endif
+   endselect
+   if INDEX = 1
+      return candidate
+   else
+      return 0
+   endif
+endif
+}
+
+{+get_takeable
+set INDEX = 0
+set candidate = 0
+select *present noun3
+  ifall noun3(mass) < heavy : noun3 isnt *held : noun3 hasnt LOCATION
+     set candidate = noun3
+     set INDEX + 1
+  endif
+endselect
+if INDEX = 1
+   return candidate
+else
+   return 0
+endif
+}
+
+{+get_dropable
+set INDEX = 0
+set candidate = 0
+select *held noun3
+  if noun3(mass) < heavy
+     set candidate = noun3
+     set INDEX + 1
+  endif
+endselect
+if INDEX = 1
+   return candidate
+else
+   return 0
+endif
+}
+
+{+game_over
+write "^"
+execute "+score"
+select player
+   set noun3(parent) = limbo
+endselect
+set player(parent) = epilogue
+write "^"
+execute "+look_around"
+}
+
+location epilogue : epilogue
+   short	name "Permainan Selesai"
+
+{look
+if interpreter = GLK
+   write "Permainan telah selesai. Ketik "
+   style input
+   write "undo"
+   style normal
+   write ", "
+   style input
+   write "restart"
+   style normal
+   write " atau "
+   style input
+   write "restore"
+   style normal
+   write " diikuti nama file, atau "
+   style input
+   write "quit"
+   style normal
+   write ".^"
+else
+   write "Permainan telah selesai. Ketik <b>undo</b>, <b>restart</b> atau <b>restore</b> "
+   write "diikuti nama file.^"
+endif
+}
+
+{+title
+style subheader
+write here{The}
+style normal
+if interpreter != CGI
+   write "^"
+endif
+if here has WITHOUT_AIR
+   if tank hasnt WORN
+      write "(menahan napas)^"
+endall
+if player has SITTING
+      write "(duduk)^"
+endif
+}
+
+{+update_top_screen
+cursor 1 0
+style note
+write game_title "^"
+style normal
+write "------------------------------^"
+write "                              ^"
+cursor 3 0
+write "Skor:" score "% Langkah: " total_moves "^^"
+write "                              ^"
+style subheader
+cursor 5 0
+write here{The} "^^"
+style normal
+}

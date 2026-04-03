@@ -657,6 +657,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_language
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1279,6 +1280,12 @@ if test -n "$ac_init_help"; then
      short | recursive ) echo "Configuration of JACL 4.0:";;
    esac
   cat <<\_ACEOF
+
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-language=LANG    set interpreter language: english (default), french,
+                          german, indonesian
 
 Some influential environment variables:
   CC          C compiler command
@@ -3575,6 +3582,32 @@ if test "x$USER_CFLAGS_SET" = "x"; then
     CFLAGS="-Wall -O2"
 fi
 
+# -----------------------------------------------------------
+# Language selection
+# -----------------------------------------------------------
+
+# Check whether --with-language was given.
+if test ${with_language+y}
+then :
+  withval=$with_language; jacl_language=$withval
+else case e in #(
+  e) jacl_language=english ;;
+esac
+fi
+
+
+case "$jacl_language" in
+    english)     LANGUAGE_FLAG="-DNATIVE_LANGUAGE=1" ;;
+    german)      LANGUAGE_FLAG="-DNATIVE_LANGUAGE=2" ;;
+    french)      LANGUAGE_FLAG="-DNATIVE_LANGUAGE=3" ;;
+    indonesian)  LANGUAGE_FLAG="-DNATIVE_LANGUAGE=4" ;;
+    *)  as_fn_error $? "unknown language \"$jacl_language\" (choose: english, french, german, indonesian)" "$LINENO" 5 ;;
+esac
+
+CFLAGS="$CFLAGS $LANGUAGE_FLAG"
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: interpreter language: $jacl_language" >&5
+printf '%s\n' "$as_me: interpreter language: $jacl_language" >&6;}
+
 # Directories for bundled libraries
 CGIHTML_DIR=cgihtml-1.69
 GLKTERM_DIR=glkterm
@@ -5015,6 +5048,8 @@ echo "    fcgijacl      yes (FastCGI web)"
 else
 echo "    fcgijacl      no  (libfcgi not found)"
 fi
+echo ""
+echo "  Language: $jacl_language"
 echo ""
 echo "  Type 'make' to build, 'make install' to install to ../bin"
 echo ""
