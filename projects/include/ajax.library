@@ -1,58 +1,55 @@
 write "function ajaxForm(details) {^"
-write "var url_string = ~" $url "?ajax=true&command=~ + details.command + "~"
+write "var url_string = ~" $url "?ajax=true&command=~ + encodeURIComponent(details.command) + "~"
 if remote_user = false
 	write "+ ~&user_id=" $user_id "~;^"
 else
 	write ";^"
 endif
 print:
-	$.ajax({
-		url: url_string,^
-		success: function (data) {^
+	fetch(url_string)
+		.then(function(response) { return response.text(); })
+		.then(function(data) {^
 .
 ifexecute "+local_success"
 	# RESULT HANDLED BY LOCAL APPLICATION
 else
 print:
 	# DEFAULT ACTION
-			if (details.replace == true) {^
-				console.log(details);
-				$(details.element).html(data);^
+			if (details.replace === true) {^
+				document.querySelector(details.element).innerHTML = data;^
 			} else {^
-				console.log(details);
-				$(details.element).append(data);^
+				document.querySelector(details.element).innerHTML += data;^
 			}^
 .
 endif
 print:
-		}^
-	});^
+		});^
 }^
 .
 write "function ajaxRequest(event) {^"
 write "var url_string = ~" $url "?ajax=true&command=~ + "
-write "event.data.command"
+write "encodeURIComponent(event.data.command)"
 if remote_user = false
 	write "+ ~&user_id=" $user_id "~;^"
 else
 	write ";^"
 endif
-write "$.ajax({^url: url_string,^"
-write "		success: function (data) {^"
+write "fetch(url_string)^"
+write "		.then(function(response) { return response.text(); })^"
+write "		.then(function(data) {^"
 ifexecute "+local_success"
 	# RESULT HANDLED BY LOCAL APPLICATION
 else
 	# DEFAULT ACTION
 	print:
-			if (event.data.replace == true) {^
-				$(event.data.element).html(data);^
+			if (event.data.replace === true) {^
+				document.querySelector(event.data.element).innerHTML = data;^
 			} else {^
-				$(event.data.element).append(data);^
+				document.querySelector(event.data.element).innerHTML += data;^
 			}^
    .
 endif
 print:
-		}^
-	});^
+		});^
 }^
 .

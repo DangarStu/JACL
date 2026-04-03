@@ -2,12 +2,11 @@
 {+header
 set linebreaks = false
 print:
-	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">^
+	<!DOCTYPE html>
 	<html><head>^
 	<title>Test of Ajax fetch</title>^
-	<meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">^
-	<script src="/include/jquery-3.6.0.min.js"></script>^
-	<script language="JavaScript">^
+	<meta charset="UTF-8">^
+	<script>^
 .
 #include "ajax.library"
 print:
@@ -25,22 +24,25 @@ print:
 	<button id="option2"><img src="/images/tiles/red_chest.png"></button>^
 	<form name="command" id="commandForm">
 .
-		prompt	
+		prompt
 print:
 	</form>
-	<script language="JavaScript">^
-		$('#option1').click( { async: true, command: "greenchest", element: "#screen", replace: "false" }, ajaxRequest);^
-		$('#option2').click( { async: true, command: "redchest", element: "#screen", replace: "false" }, ajaxRequest);^
-		$('#commandForm').submit ( submitForm );^
-
-		function submitForm() {
-			ajaxForm({ 
+	<script>^
+		document.getElementById('option1').addEventListener('click', function() {^
+			ajaxRequest({ data: { command: "greenchest", element: "#screen", replace: "false" } });^
+		});^
+		document.getElementById('option2').addEventListener('click', function() {^
+			ajaxRequest({ data: { command: "redchest", element: "#screen", replace: "false" } });^
+		});^
+		document.getElementById('commandForm').addEventListener('submit', function(e) {^
+			e.preventDefault();^
+			ajaxForm({
 				command: document.getElementById('JACLCommandPrompt').value,
 				replace: false,
 				element: "#screen"
-			});
-			return false;
-		}
+			});^
+			return false;^
+		});^
 	</script>^
 	</body>
 </html>
@@ -61,7 +63,7 @@ write "You clicked on the red chest.<br>"
 
 {+intro
 print:
-<p>Test of jQuery.ajax.</p>
+<p>Test of fetch API.</p>
 .
 }
 
