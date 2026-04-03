@@ -11,6 +11,12 @@ The configure script will automatically detect your platform and available
 libraries, then build the appropriate interpreters. Binaries are installed
 to ../bin.
 
+Options:
+  --with-language=LANG  Set the interpreter language. Supported values:
+                        english (default), french, german, indonesian
+
+  Example: ./configure --with-language=french
+
 Optional dependencies:
   ncurses  - Required for 'jacl' (GlkTerm console interpreter)
   libfcgi  - Required for 'fcgijacl' (FastCGI web interpreter)
