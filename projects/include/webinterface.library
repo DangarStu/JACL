@@ -27,6 +27,17 @@ print:
    }^
 .
 #include "ajax.library"
+print:
+   function submitForm(e) {^
+        e.preventDefault();^
+        ajaxForm({^
+             command: document.getElementById('JACLCommandPrompt').value,^
+             replace: false,^
+             element: "#maintext"^
+        });^
+        return false;^
+   }^
+.
 write "</script>^"
 write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
 write "</head>^"
@@ -67,24 +78,12 @@ write "<div id=~footer~>^"
 write "<div class=~directions~>"
 execute "+exits"
 write "</div>"
-write "<form id=~commandForm~ name=~JACLGameForm~ method=~get~ autocomplete=~off~>"
+write "<form id=~commandForm~ name=~JACLGameForm~ method=~get~ autocomplete=~off~ onsubmit=~return submitForm(event);~>"
 write "<div class=~command_prompt~>^"
 prompt "KeyPressed();"
 print:
    </div>
    </form></div>^
-   <script>
-          function submitForm(e) {^
-               e.preventDefault();^
-               ajaxForm({^
-                    command: document.getElementById('JACLCommandPrompt').value,^
-                    replace: false,^
-                    element: "#maintext"^
-               });^
-               return false;^
-          }^
-          document.getElementById('commandForm').addEventListener('submit', submitForm);^
-   </script>^
    </body></html>^
 .
 set linebreaks = true
