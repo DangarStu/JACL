@@ -88,14 +88,13 @@ void glk_fileref_destroy(fileref_t *fref)
 
 frefid_t glk_fileref_create_temp(glui32 usage, glui32 rock)
 {
-    char *filename;
+    char filename[] = "/tmp/glk_XXXXXX";
     fileref_t *fref;
-    
-    /* This is a pretty good way to do this on Unix systems. On Macs,
-        it's pretty bad, but this library won't be used much on the Mac 
-        -- I hope. I have no idea about the DOS/Windows world. */
-        
-    filename = tmpnam(NULL);
+    int fd;
+
+    fd = mkstemp(filename);
+    if (fd >= 0)
+        close(fd);
     
     fref = gli_new_fileref(filename, usage, rock);
     if (!fref) {

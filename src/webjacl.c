@@ -66,7 +66,7 @@ struct media {
 
 struct media    mediadb;
 
-static void version_info(void);
+
 
 
 /*
@@ -191,7 +191,7 @@ wj_setup(int *pargc, char **pargv)
 					 */
 					for (j = i + 1; j < *pargc; j++)
 						strcpy(pargv[j - 1], pargv[j]);
-					*pargc--;
+					(*pargc)--;
 
 					/* Store port in global variable */
 					wj_port = port;
@@ -484,9 +484,7 @@ listen_again:
 		request[0] = '\0';
 
 		//fprintf(stderr, "Got a connection, reading first.\n");
-		fgets(request_line, WJ_MAX_REQ_SIZE - 1, stdin);
-
-		if (request_line != NULL) {
+		if (fgets(request_line, WJ_MAX_REQ_SIZE - 1, stdin) != NULL) {
 			request_len = strlen(request_line);
 		} else {
 			fprintf(stderr, "WebJACL: NULL request line read.\n");
@@ -509,9 +507,7 @@ listen_again:
 				strncpy(webjacl_cookies, &request_line[8], WJ_MAX_REQ_SIZE - 1);
 			}
 
-			fgets(request_line, WJ_MAX_REQ_SIZE - 1, stdin);
-
-			if (request_line != NULL) {
+			if (fgets(request_line, WJ_MAX_REQ_SIZE - 1, stdin) != NULL) {
 				request_len = strlen(request_line);
 			} else {
 				request_len = 0;

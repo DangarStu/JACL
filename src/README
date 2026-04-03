@@ -1,15 +1,31 @@
-Copy the appropriate Makefile for your operating system to 'Makefile' in both
-this directory and the 'glkterm' directory and type 'make install'. 
-This will compile the interpreters relevant to your system and the 'bjorb' 
-utility then move the binaries to ../bin. 
+To build JACL, run:
 
-See the Installation chapter in the Author's Guide (../guide/installation.html) 
-for more information.
+    ./configure
+    make install
+
+If the configure script does not exist, generate it with:
+
+    autoconf
+
+The configure script will automatically detect your platform and available
+libraries, then build the appropriate interpreters. Binaries are installed
+to ../bin.
+
+Optional dependencies:
+  ncurses  - Required for 'jacl' (GlkTerm console interpreter)
+  libfcgi  - Required for 'fcgijacl' (FastCGI web interpreter)
+
+If these libraries are not found, the corresponding interpreters will be
+skipped. The remaining interpreters (bjorb, cjacl, cgijacl) have no
+external dependencies beyond a C compiler.
 
 The interpreters available to be built are:
 
-jacl    - compiled with Andrew Plotkin's GlkTerm and either Ncurses or PDCurses.
-cjacl   - compiled with Andrew Plotkin's CheapGlk. 
-garjacl - compiled with Tor Andersson/ Ben Cressey's Gargoyle. 
-winjacl - compiled with David Kinder's WinGlk (requires MinGW to be built).
+jacl    - compiled with Andrew Plotkin's GlkTerm and Ncurses.
+cjacl   - compiled with Andrew Plotkin's CheapGlk.
+cgijacl - compiled to run as a CGI web application.
+fcgijacl - compiled to run as a FastCGI web application.
+bjorb   - utility for packaging game resources.
 
+See the Installation chapter in the Author's Guide (../guide/installation.html)
+for more information.

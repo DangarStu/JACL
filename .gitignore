@@ -10,3 +10,8 @@ a.out
 *.csv
 *.auto
 *.saved
+
+# autoconf generated files
+src/config.status
+src/config.log
+src/autom4te.cache/
