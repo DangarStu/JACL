@@ -29,10 +29,10 @@ print:
 	</form>
 	<script>^
 		document.getElementById('option1').addEventListener('click', function() {^
-			ajaxRequest({ data: { command: "greenchest", element: "#screen", replace: "false" } });^
+			ajaxRequest({ command: "greenchest", element: "#screen", replace: false });^
 		});^
 		document.getElementById('option2').addEventListener('click', function() {^
-			ajaxRequest({ data: { command: "redchest", element: "#screen", replace: "false" } });^
+			ajaxRequest({ command: "redchest", element: "#screen", replace: false });^
 		});^
 		document.getElementById('commandForm').addEventListener('submit', function(e) {^
 			e.preventDefault();^
