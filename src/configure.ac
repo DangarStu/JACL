@@ -11,6 +11,26 @@ if test "x$USER_CFLAGS_SET" = "x"; then
     CFLAGS="-Wall -O2"
 fi
 
+# -----------------------------------------------------------
+# Language selection
+# -----------------------------------------------------------
+AC_ARG_WITH([language],
+    [AS_HELP_STRING([--with-language=LANG],
+        [set interpreter language: english (default), french, german, indonesian])],
+    [jacl_language=$withval],
+    [jacl_language=english])
+
+case "$jacl_language" in
+    english)     LANGUAGE_FLAG="-DNATIVE_LANGUAGE=1" ;;
+    german)      LANGUAGE_FLAG="-DNATIVE_LANGUAGE=2" ;;
+    french)      LANGUAGE_FLAG="-DNATIVE_LANGUAGE=3" ;;
+    indonesian)  LANGUAGE_FLAG="-DNATIVE_LANGUAGE=4" ;;
+    *)  AC_MSG_ERROR([unknown language "$jacl_language" (choose: english, french, german, indonesian)]) ;;
+esac
+
+CFLAGS="$CFLAGS $LANGUAGE_FLAG"
+AC_MSG_NOTICE([interpreter language: $jacl_language])
+
 # Directories for bundled libraries
 CGIHTML_DIR=cgihtml-1.69
 GLKTERM_DIR=glkterm
@@ -171,6 +191,8 @@ echo "    fcgijacl      yes (FastCGI web)"
 else
 echo "    fcgijacl      no  (libfcgi not found)"
 fi
+echo ""
+echo "  Language: $jacl_language"
 echo ""
 echo "  Type 'make' to build, 'make install' to install to ../bin"
 echo ""
