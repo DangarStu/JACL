@@ -132,6 +132,7 @@ write " / JACL verb.library version " library_version "^^"
 constant NO_GO 22000
 
 grammar exits >exits
+grammar jalan_keluar >exits
 
 {+exits
 execute "+calculate_exits"
@@ -335,6 +336,7 @@ write "ini akan menjadi salah satu hari yang berat...^"
 }
 
 grammar save $string >named_save
+grammar simpan $string >named_save
 
 {+named_save
 savegame INDEX $string
@@ -345,6 +347,7 @@ set time = false
 }
 
 grammar restore $string >named_restore
+grammar pulihkan $string >named_restore
 
 {+named_restore
 restoregame INDEX $string
@@ -376,6 +379,7 @@ return false
 }
 
 grammar save >save_game
+grammar simpan >save_game
 
 {+save_game
 savegame INDEX
@@ -386,6 +390,7 @@ set time = false
 }
 
 grammar restore >restore_game
+grammar pulihkan >restore_game
 
 {+restore_game
 restoregame INDEX
@@ -532,6 +537,7 @@ write "Bagaimana Anda bermaksud membantu " noun1{the} ?^
 
 grammar hint *present	>hint_nonum
 grammar hint			>hint_nonum
+grammar petunjuk >hint_nonum
 
 {+hint_nonum
 if noun1 = false
@@ -635,6 +641,7 @@ grammar dig in *present			>dig_in
 grammar dig up *present			>dig_in
 grammar dig through *present	>dig_in
 grammar dig thru *present		>dig_in
+grammar gali *present >dig_in
 
 {+dig_in
 if +important<noun1 = true
@@ -652,6 +659,7 @@ set time = false
 }
 
 grammar dig >dig
+grammar gali >dig
 
 {+dig
 if here hasnt OUTDOORS
@@ -707,6 +715,7 @@ write "Anda tidak bisa memetik " noun1{the} " dengan " noun2{the} .^
 
 grammar rub *present    >rub
 grammar pat *present    >rub
+grammar gosok *present >rub
 
 {+rub
 if +important<noun1 = true
@@ -776,6 +785,7 @@ write "Yeuucck!^"
 
 grammar pull **present >pull
 grammar tug **present  >pull
+grammar tarik **present >pull
 
 {+pull
 if +important<noun1 = true
@@ -794,6 +804,7 @@ write "Anda tidak bisa menarik " noun1{the} .^
 grammar cut *present  >cut
 grammar chop *present >cut
 grammar stab *present >cut
+grammar potong *present >cut
 
 {+cut
 write "Dengan apa Anda ingin memotong " noun1{the} "?^"
@@ -804,6 +815,7 @@ set time = false
 grammar cut *present with *held       >cut_with
 grammar chop *present with *held      >cut_with
 grammar stab *present with *held      >cut_with
+grammar potong *present dengan *held >cut_with
 
 {+cut_with
 if +not_held<noun2 = true
@@ -861,6 +873,8 @@ grammar rip up **present	>break
 grammar rip **present up	>break
 grammar rip off **present	>break
 grammar rip **present off	>break
+grammar hancurkan *present >break
+grammar pecahkan *present >break
 
 {+break
 if +important<noun1 = true
@@ -886,6 +900,7 @@ grammar wash *present         >clean
 grammar wipe *present         >clean
 grammar scrub *present        >clean
 grammar polish *present       >clean
+grammar bersihkan *present >clean
 
 {+clean
 if +important<noun1 = true
@@ -1085,6 +1100,7 @@ proxy "fill " noun2{names} " with " noun1{names}
 }
 
 grammar fill *held from *present      >fill_from
+grammar isi *held dari *present >fill_from
 
 {+fill_from
 if +not_held<noun1 = true
@@ -1106,6 +1122,7 @@ proxy "fill " noun1{names} " with " CHILD{names}
 }
 
 grammar fill *held with *present >fill_with
+grammar isi *held dengan *present >fill_with
 
 {+fill_with
 if +not_held<noun1 = true
@@ -1166,6 +1183,7 @@ return false
 }
 
 grammar fill *held >fill
+grammar isi *held >fill
 
 {+fill
 if +important<noun1 = true
@@ -1186,6 +1204,7 @@ set time = false
 grammar stand         >stand
 grammar stand up      >stand
 grammar get up        >stand
+grammar berdiri >stand
 
 {+stand
 if player has SITTING
@@ -1197,6 +1216,7 @@ write "Anda sudah berdiri.^"
 }
 
 grammar sleep         >sleep
+grammar tidur >sleep
 
 {+sleep
 write "Akan ada banyak waktu untuk itu nanti...^"
@@ -1207,6 +1227,7 @@ grammar lie on *present       >lie_on
 grammar lie down on *present  >lie_on
 grammar sleep on *present     >lie_on
 grammar sleep in *present     >lie_on
+grammar berbaring di *present >lie_on
 
 {+lie_on
 if +important<noun1 = true
@@ -1227,6 +1248,7 @@ grammar sit			>sit
 grammar sit down	>sit
 grammar squat		>sit
 grammar squat down	>sit
+grammar duduk >sit
 
 {+sit
 set time = false
@@ -1249,6 +1271,7 @@ ensure player has SITTING
 grammar sit *here	  >sit_on
 grammar sit on *here  >sit_on
 grammar sit in *here  >sit_on
+grammar duduk di *here >sit_on
 
 {+sit_on
 if +important<noun1 = true
@@ -1270,6 +1293,7 @@ write  noun1{The} " " noun1{doesnt} " terlihat sangat nyaman.^"
 }
 
 grammar kick *present           >kick
+grammar tendang *present >kick
 
 {+kick
 if +worn<noun1 = true
@@ -1299,6 +1323,7 @@ grammar lob *held	>throw
 grammar hurl *held	>throw
 grammar pitch *held	>throw
 grammar cast *held	>throw
+grammar lempar *held >throw
 
 {+throw
 if +not_held<noun1 = true
@@ -1323,6 +1348,8 @@ move noun1 to here
 
 grammar drop 		>drop_only
 grammar put down	>drop_only
+grammar jatuhkan >drop_only
+grammar taruh >drop_only
 
 {+drop_only
 if +get_dropable != 0
@@ -1337,6 +1364,8 @@ set time = false
 grammar drop **held		>drop
 grammar put **held down	>drop
 grammar put down **held	>drop
+grammar jatuhkan **held >drop
+grammar taruh **held >drop
 
 {+drop
 if noun1 isnt *held
@@ -1367,6 +1396,7 @@ grammar hold 		>take_only
 grammar pick		>take_only
 grammar pick		>take_only
 grammar get			>take_only
+grammar ambil >take_only
 
 {+take_only
 if +get_takeable != 0
@@ -1384,6 +1414,7 @@ grammar hold **here		>take
 grammar pick up **here	>take
 grammar pick **here up	>take
 grammar get **here		>take
+grammar ambil **here >take
 
 {+take
 if +important<noun1 = true
@@ -1455,6 +1486,8 @@ return false
 grammar insert **held on *present	>insert_on
 grammar put **held on *present		>insert_on
 grammar place **held on *present	>insert_on
+grammar taruh **held di *present >insert_on
+grammar letakkan **held di *present >insert_on
 
 {+insert_on
 if +important<noun2 = true
@@ -1544,6 +1577,8 @@ proxy "drop " noun1{names}
 grammar insert **held in *present	>insert_in
 grammar put **held in *present		>insert_in
 grammar place **held in *present	>insert_in
+grammar taruh **held dalam *present >insert_in
+grammar masukkan **held dalam *present >insert_in
 
 {+insert_in
 if +important<noun2 = true
@@ -1648,6 +1683,7 @@ grammar tell *present about *anywhere		>tell_about
 grammar talk to *present about *anywhere	>tell_about
 grammar talk *present about *anywhere		>tell_about
 grammar talk with *present about *anywhere	>tell_about
+grammar ceritakan *present tentang *anywhere >tell_about
 
 {+tell_about
 if +can_talk<noun1 = true
@@ -1659,6 +1695,7 @@ write noun2{the} .^
 }
 
 grammar ask *present about *anywhere  >ask_about
+grammar tanya *present tentang *anywhere >ask_about
 
 {+ask_about
 if +can_talk<noun1 = true
@@ -1688,6 +1725,7 @@ grammar heave *held to *present			>give_to
 grammar heave *held up to *present		>give_to
 grammar heave *held over to *present	>give_to
 grammar lower *held down to *present	>give_to
+grammar berikan *held ke *present >give_to
 
 {+give_to
 if +not_held<noun1 = true
@@ -1746,6 +1784,7 @@ grammar wiggle *present	>move
 grammar jiggle *present	>move
 grammar move *present	>move
 grammar push *present	>move
+grammar dorong *present >move
 
 {+move
 if +important<noun1 = true
@@ -1783,6 +1822,7 @@ ensure noun1 has TOUCHED
 }
 
 grammar read *present >read
+grammar baca *present >read
 
 {+read
 if +important<noun1 = true
@@ -1851,6 +1891,8 @@ proxy "look up " noun2{names} " in " noun1{names}
 
 grammar feel *present  >feel
 grammar touch *present >feel
+grammar sentuh *present >feel
+grammar raba *present >feel
 
 {+feel
 if +reach<noun1 = true
@@ -1865,6 +1907,7 @@ write "Terasa persis seperti " noun1{list} .^
 
 grammar smell		>sniff
 grammar sniff		>sniff
+grammar cium >sniff
 
 {+sniff
 if here has UNDER_WATER
@@ -1876,6 +1919,7 @@ write "Anda tidak mencium sesuatu yang tidak biasa.^"
 
 grammar smell *present	>smell
 grammar sniff *present	>smell
+grammar cium *present >smell
 
 {+smell
 if here has UNDER_WATER
@@ -1891,6 +1935,7 @@ write "Baunya sangat mirip " noun1{list} .^
 
 grammar taste *present >taste
 grammar lick *present  >taste
+grammar cicipi *present >taste
 
 {+taste
 if +reach<noun1 = true
@@ -1904,6 +1949,7 @@ write "Rasanya persis seperti yang Anda harapkan dari " noun1{list} .^
 }
 
 grammar look in *present      >look_in
+grammar lihat dalam *present >look_in
 
 {+look_in
 if +important<noun1 = true
@@ -1930,6 +1976,8 @@ write "^"
 }
 
 grammar search *present		>search
+grammar cari *present >search
+grammar geledah *present >search
 
 {+search
 ifexecute "noun1.search"
@@ -1950,6 +1998,8 @@ grammar examine *present	>examine
 grammar x *present			>examine
 grammar l *present			>examine
 grammar watch *present		>examine
+grammar periksa *present >examine
+grammar lihat *present >examine
 
 {+examine
 if +important<noun1 = true
@@ -2155,6 +2205,7 @@ endif
 
 grammar inventory	>inventory
 grammar inv			>inventory
+grammar inventaris >inventory
 
 {+inventory
 set time = false
@@ -2215,6 +2266,7 @@ endif
 }
 
 grammar sorry >sorry
+grammar maaf >sorry
 
 {+sorry
 write "Tidak apa-apa.^"
@@ -2222,6 +2274,7 @@ write "Tidak apa-apa.^"
 
 grammar thanks        >thankyou
 grammar thank you     >thankyou
+grammar terima kasih >thankyou
 
 {+thankyou
 write "Sama-sama.^"
@@ -2303,6 +2356,7 @@ set time = false
 
 grammar score >score_command
 grammar points >score_command
+grammar skor >score_command
 
 {+score_command
 execute "+score"
@@ -2319,6 +2373,7 @@ endif
 
 grammar loosen	>open_only
 grammar open 	>open_only
+grammar buka >open_only
 
 {+open_only
 if +get_openable != 0
@@ -2332,6 +2387,7 @@ set time = false
 
 grammar loosen *present	>open
 grammar open *present	>open
+grammar buka *present >open
 
 {+open
 if +important<noun1 = true
@@ -2393,6 +2449,7 @@ endselect
 grammar tighten	>close_only
 grammar close	>close_only
 grammar shut	>close_only
+grammar tutup >close_only
 
 {+close_only
 if +get_closable != 0
@@ -2407,6 +2464,7 @@ set time = false
 grammar tighten	*present	>close
 grammar close *present		>close
 grammar shut *present		>close
+grammar tutup *present >close
 
 {+close
 if +important<noun1 = true
@@ -2434,6 +2492,7 @@ ensure noun1 has CLOSED
 }
 
 grammar lock *present >lock
+grammar kunci *present >lock
 
 {+lock
 if +important<noun1 = true
@@ -2465,6 +2524,7 @@ set time = false
 }
 
 grammar lock *present with *held >lock_with
+grammar kunci *present dengan *held >lock_with
 
 {+lock_with
 if +important<noun1 = true
@@ -2507,6 +2567,7 @@ set time = false
 }
 
 grammar unlock *present >unlock
+grammar buka kunci *present >unlock
 
 {+unlock
 if +important<noun1 = true
@@ -2536,6 +2597,7 @@ set time = false
 
 grammar unlock *present with *held    >unlock_with
 grammar open *present with *held      >unlock_with
+grammar buka kunci *present dengan *held >unlock_with
 
 {+unlock_with
 if +not_held<noun2 = true
@@ -2567,6 +2629,7 @@ set time = false
 }
 
 grammar show *held to *present        >show_to
+grammar tunjukkan *held ke *present >show_to
 
 {+show_to
 if +important<noun2 = true
@@ -2606,6 +2669,7 @@ set time = false
 grammar untie *present        >untie
 grammar free *present         >untie
 grammar undo *present         >untie
+grammar lepas *present >untie
 
 {+untie
 if +important<noun1 = true
@@ -2638,6 +2702,7 @@ set time = false
 
 grammar fix *present	>repair
 grammar repair *present	>repair
+grammar perbaiki *present >repair
 
 {+repair
 if +important<noun1 = true
@@ -2657,6 +2722,7 @@ set time = false
 grammar tie *held to *present         >tie_to
 grammar fix *held to *present         >tie_to
 grammar attach *held to *present      >tie_to
+grammar ikat *held ke *present >tie_to
 
 {+tie_to
 if +important<noun2 = true
@@ -2682,6 +2748,8 @@ grammar fight *present        >attack
 grammar kill *present         >attack
 grammar murder *present       >attack
 grammar punch *present        >attack
+grammar serang *present >attack
+grammar pukul *present >attack
 
 {+attack
 if +important<noun1 = true
@@ -2716,6 +2784,7 @@ grammar smash *present with *held	>attack_with
 grammar crush *present with *held	>attack_with
 grammar destroy *present with *held	>attack_with
 grammar wreck *present with *held	>attack_with
+grammar serang *present dengan *held >attack_with
 
 
 {+attack_with
@@ -2750,12 +2819,14 @@ set time = false
 }
 
 grammar wave  >wave
+grammar lambaikan >wave
 
 {+wave
 write "Anda melambaikan tangan sedikit.^"
 }
 
 grammar wave to *present      >wave_to
+grammar lambaikan ke *present >wave_to
 
 {+wave_to
 if +important<noun1 = true
@@ -2802,6 +2873,7 @@ grammar jump on to *here >jump_on
 grammar jump on *here    >jump_on
 grammar hop on *here     >jump_on
 grammar stand on *here   >jump_on
+grammar lompat ke *here >jump_on
 
 {+jump_on
 if +important<noun1 = true
@@ -2843,6 +2915,7 @@ set time = false
 }
 
 grammar jump             >jump
+grammar lompat >jump
 
 {+jump
 if here has MID_AIR
@@ -2869,6 +2942,7 @@ grammar say yes >yes
 grammar yes   	>yes
 grammar okay  	>yes
 grammar yeah  	>yes
+grammar ya >yes
 
 {+yes
 write "Itu pertanyaan retoris.^"
@@ -2879,6 +2953,7 @@ grammar say no	>no
 grammar nah 	>no
 grammar no		>no
 grammar no way	>no
+grammar tidak >no
 
 {+no
 write "Itu pertanyaan retoris.^"
@@ -2917,6 +2992,7 @@ write  noun1{The} " tampak" noun1{s} " tidak memperhatikan.^"
 }
 
 grammar say *anywhere >say_object
+grammar katakan *anywhere >say_object
 
 {+say_object
 if here has UNDER_WATER
@@ -3006,6 +3082,7 @@ grammar lob *held to *here		>throw_at
 grammar lob *held at *here		>throw_at
 grammar hurl *held to *here		>throw_at
 grammar hurl *held at *here		>throw_at
+grammar lempar *held ke *here >throw_at
 
 {+throw_at
 if +important<noun2 = true
@@ -3073,6 +3150,8 @@ move noun1 to here
 grammar remove **held       >remove
 grammar take off **held     >remove
 grammar doff **held         >remove
+grammar lepas **held >remove
+grammar lepaskan **held >remove
 
 {+remove
 ifall noun1(parent) has CONTAINER : noun1 isnt *held
@@ -3099,6 +3178,8 @@ grammar wear **held		>wear
 grammar put on **held	>wear
 grammar put **held on	>wear
 grammar don **held		>wear
+grammar pakai **held >wear
+grammar kenakan **held >wear
 
 {+wear
 if +not_held<noun1 = true
@@ -3123,6 +3204,7 @@ write "Anda memakai " noun1{the} .^
 grammar talk		>talk_only
 grammar talk to		>talk_only
 grammar talk with	>talk_only
+grammar bicara >talk_only
 
 {+talk_only
 if +get_animate != 0
@@ -3137,6 +3219,7 @@ set time = false
 grammar talk *present		>talk_to
 grammar talk to *present	>talk_to
 grammar talk with *present	>talk_to
+grammar bicara dengan *present >talk_to
 
 {+talk_to
 if +can_talk<noun1 = true
@@ -3149,6 +3232,7 @@ write "bercakap-cakap.^"
 
 grammar consume *present	>eat
 grammar eat *present		>eat
+grammar makan *present >eat
 
 {+eat
 if +important<noun1 = true
@@ -3162,6 +3246,7 @@ set time = false
 }
 
 grammar eat	>eat_only
+grammar makan >eat_only
 
 {+eat_only
 write "Apa yang ingin Anda makan?^"
@@ -3190,6 +3275,7 @@ set time = false
 
 grammar drink *present        >drink
 grammar sip *present          >drink
+grammar minum *present >drink
 
 {+drink
 if +important<noun1 = true
@@ -3212,6 +3298,7 @@ move noun1 to limbo
 }
 
 grammar drink	>drink_only
+grammar minum >drink_only
 
 {+drink_only
 write "Apa yang ingin Anda minum?^"
@@ -3347,6 +3434,8 @@ grammar burn *present         >light
 grammar light *present        >light
 grammar ignite *present       >light
 grammar set fire to *present  >light
+grammar nyalakan *present >light
+grammar bakar *present >light
 
 {+light
 if here has UNDER_WATER
@@ -3380,6 +3469,7 @@ set time = false
 
 grammar extinguish *present   >extinguish
 grammar put out *present      >extinguish
+grammar padamkan *present >extinguish
 
 {+extinguish
 if noun1 hasnt BURNING
@@ -3442,6 +3532,7 @@ endif
 }
 
 grammar swim >swim_only
+grammar berenang >swim_only
 
 {+swim_only
 if here has UNDER_WATER : here has ON_WATER
@@ -3641,6 +3732,8 @@ grammar climb *here			>climb_up
 grammar climb up *here		>climb_up
 grammar walk up *here		>climb_up
 grammar go up *here			>climb_up
+grammar panjat *here >climb_up
+grammar naiki *here >climb_up
 
 {+climb_up
 if noun1 is *held
@@ -3657,6 +3750,7 @@ set time = false
 grammar climb down *here      >climb_down
 grammar walk down *here       >climb_down
 grammar go down *here         >climb_down
+grammar turun dari *here >climb_down
 
 {+climb_down
 if noun1 is *held
@@ -3679,6 +3773,8 @@ grammar climb in *present	>enter
 grammar get in *present		>enter
 grammar jump in *present	>enter
 grammar get on *present		>enter
+grammar masuk *present >enter
+grammar masuki *present >enter
 
 {+enter
 if +important<noun1 = true
@@ -3697,6 +3793,7 @@ set time = false
 integer NEARBY
 
 grammar follow *anywhere	>follow
+grammar ikuti *anywhere >follow
 
 {+follow
 if noun1 is *present
@@ -3727,6 +3824,7 @@ endif
 grammar go back		>go_back
 grammar back		>go_back
 grammar return		>go_back
+grammar kembali >go_back
 
 {+go_back
 if from_location != 0
@@ -3750,6 +3848,7 @@ grammar go down to *location	>go_to
 grammar go over to *location	>go_to
 grammar go to *location			>go_to
 grammar go *location			>go_to
+grammar pergi ke *location >go_to
 
 {+go_to
 if noun1 = here
@@ -3919,6 +4018,20 @@ grammar climb down    >down
 grammar jump down     >down
 grammar go down       >down
 grammar walk down     >down
+grammar utara >north
+grammar selatan >south
+grammar timur >east
+grammar barat >west
+grammar timurlaut >northeast
+grammar baratlaut >northwest
+grammar tenggara >southeast
+grammar baratdaya >southwest
+grammar atas >up
+grammar naik >up
+grammar bawah >down
+grammar turun >down
+grammar masuk >in
+grammar keluar >out
 
 {+down
 if +sitting = true
@@ -3932,6 +4045,8 @@ grammar look around	>look_around
 grammar look		>look_around
 grammar ls			>look_around
 grammar watch		>look_around
+grammar lihat sekeliling >look_around
+grammar lihat >look_around
 
 {+look_around
 ensure here hasnt VISITED
@@ -4008,6 +4123,7 @@ write "Terlalu gelap untuk melihat.^"
 
 grammar look under *present		>look_under
 grammar search under *present	>look_under
+grammar lihat bawah *present >look_under
 
 {+look_under
 if +important<noun1 = true
@@ -4026,6 +4142,7 @@ write "Tidak ada yang aneh di bawah " noun1{the} .^
 
 grammar look behind *present	>look_behind
 grammar search behind *present	>look_behind
+grammar lihat belakang *present >look_behind
 
 {+look_behind
 if +important<noun1 = true
@@ -4094,12 +4211,14 @@ set time = false
 
 grammar wait				>wait
 grammar z					>wait
+grammar tunggu >wait
 
 {+wait
 write "Waktu berlalu...^"
 }
 
 grammar listen        >listen
+grammar dengar >listen
 
 {+listen
 override
@@ -4108,6 +4227,7 @@ write "Anda tidak mendengar sesuatu yang tidak biasa.^"
 
 grammar listen to *present    >listen_to
 grammar listen at *present    >listen_to
+grammar dengarkan *present >listen_to
 
 {+listen_to
 write "Anda tidak mendengar sesuatu yang tidak biasa.^"
@@ -4116,6 +4236,8 @@ write "Anda tidak mendengar sesuatu yang tidak biasa.^"
 grammar use *present          >use
 grammar work *present         >use
 grammar operate *present      >use
+grammar gunakan *present >use
+grammar pakai *present >use
 
 {+use
 if +important<noun1 = true
@@ -4139,6 +4261,7 @@ grammar turn *present		>turn
 grammar twist *present		>turn
 grammar twiddle *present	>turn
 grammar spin *present		>turn
+grammar putar *present >turn
 
 {+turn
 if +important<noun1 = true
@@ -4201,6 +4324,8 @@ grammar turn *present on	>turn_on
 grammar switch on *present	>turn_on
 grammar switch *present on	>turn_on
 grammar start *present		>turn_on
+grammar nyalakan *present >turn_on
+grammar hidupkan *present >turn_on
 
 {+turn_on
 if +reach<noun1 = true
@@ -4225,6 +4350,8 @@ grammar power off *present	>turn_off
 grammar switch off *present	>turn_off
 grammar switch *present off	>turn_off
 grammar stop *present		>turn_off
+grammar matikan *present >turn_off
+grammar padamkan *present >turn_off
 
 {+turn_off
 if +reach<noun1 = true
@@ -4236,6 +4363,7 @@ set time = false
 }
 
 grammar pour *present         >pour
+grammar tuang *present >pour
 
 {+pour
 if +important<noun1 = true
@@ -4300,6 +4428,7 @@ grammar pour *present down *present   >pour_on
 grammar pour *present on *present     >pour_on
 grammar pour *present in *present     >pour_on
 grammar pour *present over *present   >pour_on
+grammar tuang *present ke *present >pour_on
 
 {+pour_on
 if +important<noun1 = true
@@ -4368,6 +4497,7 @@ set time = false
 
 grammar instructions	>instructions
 grammar help		>instructions
+grammar bantuan >instructions
 
 {+instructions
 print:
@@ -4623,6 +4753,8 @@ grammar *present comma hi there		>greet
 grammar *present comma dr			>greet
 grammar *present comma doctor		>greet
 grammar *present comma hi			>greet
+grammar halo *present >greet
+grammar salam *present >greet
 
 {+greet
 if +can_talk<noun1 = true
