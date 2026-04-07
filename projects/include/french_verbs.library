@@ -627,6 +627,22 @@ set display_mode = 0
 set time = false
 }
 
+grammar parler >speak
+
+{+speak
+write "Synth&egrave;se vocale activ&eacute;e.^"
+write "<script>enableSpeak();</script>"
+set time = false
+}
+
+grammar silence >mute
+
+{+mute
+write "Synth&egrave;se vocale d&eacute;sactiv&eacute;e.^"
+write "<script>disableSpeak();</script>"
+set time = false
+}
+
 grammar help *present           >help_other
 
 grammar aider *held    >aider
