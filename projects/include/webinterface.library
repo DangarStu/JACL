@@ -119,10 +119,6 @@ print:
       maintext.innerHTML += "<br><b>&gt;" + details.command + "</b><br>"
     + data;^
 
-      if (isSpeakEnabled()) {^
-         speakText(data);^
-      }^
-
       var main = document.getElementById("main");^
       var textAdded = main.scrollHeight - main.scrollTop;
       var mainHeight = main.offsetHeight;
@@ -139,6 +135,9 @@ print:
       var jaclscript = maintext.querySelector('script');^
       if (jaclscript != null) {^
          (new Function(jaclscript.text))();
+      }^
+      if (isSpeakEnabled()) {^
+         speakText(data);^
       }^
       document.getElementById('JACLCommandPrompt').focus();
       return false;
