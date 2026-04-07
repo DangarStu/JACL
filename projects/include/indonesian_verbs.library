@@ -529,6 +529,22 @@ set display_mode = 0
 set time = false
 }
 
+grammar bicara >speak
+
+{+speak
+write "Sintesis suara diaktifkan.^"
+write "<script>enableSpeak();</script>"
+set time = false
+}
+
+grammar bisu >mute
+
+{+mute
+write "Sintesis suara dinonaktifkan.^"
+write "<script>disableSpeak();</script>"
+set time = false
+}
+
 grammar help *present           >help_other
 
 {+help_other

@@ -22,6 +22,27 @@ print:
       }
    }^
 
+   function speakText(text) {^
+      var clean = text.replace(/<[^>]*>/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();^
+      if (clean.length > 0) {^
+         var utterance = new SpeechSynthesisUtterance(clean);^
+         speechSynthesis.speak(utterance);^
+      }^
+   }^
+
+   function enableSpeak() {^
+      localStorage.setItem('jaclSpeak', 'true');^
+   }^
+
+   function disableSpeak() {^
+      speechSynthesis.cancel();^
+      localStorage.setItem('jaclSpeak', 'false');^
+   }^
+
+   function isSpeakEnabled() {^
+      return localStorage.getItem('jaclSpeak') === 'true';^
+   }^
+
    function changeInterface() {^
       document.JACLInterfaceForm.submit();
    }^
@@ -97,6 +118,10 @@ print:
 
       maintext.innerHTML += "<br><b>&gt;" + details.command + "</b><br>"
     + data;^
+
+      if (isSpeakEnabled()) {^
+         speakText(data);^
+      }^
 
       var main = document.getElementById("main");^
       var textAdded = main.scrollHeight - main.scrollTop;

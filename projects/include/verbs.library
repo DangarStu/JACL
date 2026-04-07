@@ -472,6 +472,22 @@ set display_mode = 0
 set time = false
 }
 
+grammar speak >speak
+
+{+speak
+write "Speech synthesis enabled.^"
+write "<script>enableSpeak();</script>"
+set time = false
+}
+
+grammar mute >mute
+
+{+mute
+write "Speech synthesis disabled.^"
+write "<script>disableSpeak();</script>"
+set time = false
+}
+
 grammar help *present           >help_other
 
 {+help_other

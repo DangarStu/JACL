@@ -43,7 +43,7 @@ synonym eins		1
 synonym zwei		2
 synonym drei		3
 synonym vier		4
-synonym fünf		5
+synonym fï¿½nf		5
 synonym sechs		6
 synonym sieben		7
 synonym acht		8
@@ -72,7 +72,7 @@ if arg[0] = 4
    break
 endif
 if arg[0] = 5
-   write "Fünf"
+   write "Fï¿½nf"
    break
 endif
 if arg[0] = 6
@@ -120,7 +120,7 @@ if arg[0] = 4
    break
 endif
 if arg[0] = 5
-   write "fünf"
+   write "fï¿½nf"
    break
 endif
 if arg[0] = 6
@@ -342,7 +342,7 @@ if COUNTER = 0
    break
 endif
 if COUNTER = 1
-   hyperlink noun4{the} "gehe+süd"
+   hyperlink noun4{the} "gehe+sï¿½d"
    break
 endif
 if COUNTER = 2
@@ -362,11 +362,11 @@ if COUNTER = 5
    break
 endif
 if COUNTER = 6
-   hyperlink noun4{the} "gehe+südost"
+   hyperlink noun4{the} "gehe+sï¿½dost"
    break
 endif
 if COUNTER = 7
-   hyperlink noun4{the} "gehe+südwest"
+   hyperlink noun4{the} "gehe+sï¿½dwest"
    break
 endif
 if COUNTER = 8
@@ -535,7 +535,7 @@ write "~einer von diesen Tagen~ werden.^"
 set XYZZY = true
 }
 
-grammar ausführlich >verbose
+grammar ausfï¿½hrlich >verbose
 
 {+verbose
 if DISPLAY_MODE = 1
@@ -556,6 +556,22 @@ if DISPLAY_MODE = 0
 endif
 write "Anzeigemodus auf 'einfach' gesetzt.^"
 set DISPLAY_MODE = 0
+}
+
+grammar sprechen >speak
+
+{+speak
+write "Sprachsynthese aktiviert.^"
+write "<script>enableSpeak();</script>"
+set time = false
+}
+
+grammar stumm >mute
+
+{+mute
+write "Sprachsynthese deaktiviert.^"
+write "<script>disableSpeak();</script>"
+set time = false
 }
 
 grammar help *present           >help_other
@@ -608,7 +624,7 @@ write "STRATEGISCHE APPLIKATIONEN BEINHALTEN.^"
 }
 
 grammar knuddel *present >hug
-grammar drücke *present >hug
+grammar drï¿½cke *present >hug
 
 {+hug
 break +darkness
@@ -621,7 +637,7 @@ endif
 write "Ich bin sicher, " noun1{the} " f&uuml;hlt " noun1{s} " jetzt viel besser.^"
 }
 
-grammar küsse *present >kiss
+grammar kï¿½sse *present >kiss
 
 {+kiss
 break +darkness
@@ -733,8 +749,8 @@ set TIME = false
 grammar breche *present          >break
 grammar trete *present           >break
 grammar schlage *present          >break
-grammar zertrümmer *present          >break
-grammar zerstöre *present        >break
+grammar zertrï¿½mmer *present          >break
+grammar zerstï¿½re *present        >break
 grammar zerbreche *present          >break
 grammar zerreisse*present          >break
 
@@ -746,7 +762,7 @@ write "Sei doch nicht so destruktiv.^"
 set TIME = false
 }
 
-grammar säubere *present        >clean
+grammar sï¿½ubere *present        >clean
 grammar putze *present         >clean
 grammar wische *present        >clean
 grammar schrubbe *present      >clean
@@ -765,10 +781,10 @@ override
 write "Das ist sehr nett von Dir.^"
 }
 
-grammar säubere *present mit *held   >clean_with
+grammar sï¿½ubere *present mit *held   >clean_with
 grammar wische *present  mit *held   >clean_with
 grammar schrubbe *present mit *held  >clean_with
-grammar bürste *present mit *held    >clean_with
+grammar bï¿½rste *present mit *held    >clean_with
 
 {+clean_with
 break +darkness
@@ -785,7 +801,7 @@ set TIME = false
 }
 
 grammar schreie *present an     >yell_at
-grammar brülle *present an  >yell_at
+grammar brï¿½lle *present an  >yell_at
 
 {+yell_at
 write "Ooohh, gef&auml;hrlich...^"
@@ -859,12 +875,12 @@ grammar entferne *present mit *held   >take_with
 grammar leere *present mit *held      >take_with
 
 {+take_with
-proxy "fülle " noun2 " mit " noun1
+proxy "fï¿½lle " noun2 " mit " noun1
 }
 
-grammar fülle *held von *present      >fill_from
-grammar fülle *held vom *present      >fill_from
-grammar fülle *held an  *present      >fill_from
+grammar fï¿½lle *held von *present      >fill_from
+grammar fï¿½lle *held vom *present      >fill_from
+grammar fï¿½lle *held an  *present      >fill_from
 
 {+fill_from
 break +darkness
@@ -875,10 +891,10 @@ if INDEX = false
   set TIME = false
   break
 endif
-proxy "fülle " noun1 " mit " noun3
+proxy "fï¿½lle " noun1 " mit " noun3
 }
 
-grammar fülle *held mit *present >fill_with
+grammar fï¿½lle *held mit *present >fill_with
 
 {+fill_with
 break +darkness
@@ -935,7 +951,7 @@ loop
 endloop
 }
 
-grammar fülle *present >fill
+grammar fï¿½lle *present >fill
 
 {+fill
 break +darkness
@@ -998,7 +1014,7 @@ if here has ON_WATER
   write "W&auml;hrend Du im Wasser bist?^"
   break
 endif
-write "Du setzt Dich für einen kurzen Moment nieder.^"
+write "Du setzt Dich fï¿½r einen kurzen Moment nieder.^"
 ensure player has SITTING
 }
 
@@ -1020,7 +1036,7 @@ grammar lege alles                  >drop_all
 grammar lege alles hin              >drop_all
 grammar lege alles ab               >drop_all
 grammar verliere alles              >drop_all
-grammar verliere alle gegenstände   >drop_all
+grammar verliere alle gegenstï¿½nde   >drop_all
 
 {+drop_all
 set TIME = false
@@ -1304,7 +1320,7 @@ write "Du legst " noun1{the} " auf " noun2{the} ".^"
 move noun1 to noun2
 }
 
-grammar füge *held in *present ein	>insert_in
+grammar fï¿½ge *held in *present ein	>insert_in
 grammar lege *held in *present		>insert_in
 
 {+insert_in
@@ -1357,7 +1373,7 @@ write "Du packst" noun1{the} " in " noun2{the} ".^"
 move noun1 to noun2
 }
 
-grammar füge alles in *present ein >insert_all_in
+grammar fï¿½ge alles in *present ein >insert_all_in
 grammar lege alles in *present    >insert_all_in
 
 {+insert_all_in
@@ -2670,8 +2686,8 @@ set WAY = EAST
 travel east
 }
 
-grammar schwimme nach süden >swim_south
-grammar schwimme süd        >swim_south
+grammar schwimme nach sï¿½den >swim_south
+grammar schwimme sï¿½d        >swim_south
 
 {+swim_south
 if here has UNDER_WATER
@@ -2688,9 +2704,9 @@ write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
 set TIME = false
 }
 
-grammar süden             >south
-grammar gehe nach süden   >south
-grammar gehe süd          >south
+grammar sï¿½den             >south
+grammar gehe nach sï¿½den   >south
+grammar gehe sï¿½d          >south
 
 {+south
 set WAY = SOUTH
@@ -2714,9 +2730,9 @@ write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
 set TIME = false
 }
 
-grammar südosten              >southeast
-grammar gehe nach südosten    >southeast
-grammar gehe südosten         >southeast
+grammar sï¿½dosten              >southeast
+grammar gehe nach sï¿½dosten    >southeast
+grammar gehe sï¿½dosten         >southeast
 
 {+southeast
 set WAY = SOUTHEAST
@@ -2740,9 +2756,9 @@ write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
 set TIME = false
 }
 
-grammar südwest               >southwest
-grammar gehe nach südwesten   >southwest
-grammar gehe südwesten        >southwest
+grammar sï¿½dwest               >southwest
+grammar gehe nach sï¿½dwesten   >southwest
+grammar gehe sï¿½dwesten        >southwest
 
 {+southwest
 set WAY = SOUTHWEST
