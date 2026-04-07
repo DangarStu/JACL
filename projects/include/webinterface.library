@@ -23,7 +23,9 @@ print:
    }^
 
    function speakText(text) {^
-      var clean = text.replace(/<[^>]*>/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();^
+      var doc = new DOMParser().parseFromString(text, 'text/html');^
+      var clean = doc.body.textContent || '';^
+      clean = clean.replace(/\s+/g, ' ').trim();^
       if (clean.length > 0) {^
          var utterance = new SpeechSynthesisUtterance(clean);^
          speechSynthesis.speak(utterance);^
