@@ -63,7 +63,7 @@ libcgihtml.a:
 # Install binaries and libraries
 install: all
 	@mkdir -p ../bin
-	mv bjorb ../bin; mv cjacl ../bin; mv cgijacl ../bin; mv jacl ../bin; mv fcgijacl ../bin
+	cp bjorb cjacl cgijacl jacl fcgijacl ../bin/; install bjorb cjacl cgijacl jacl fcgijacl /usr/local/bin/
 	@mkdir -p /usr/local/jacl/projects/include
 	@mkdir -p /usr/local/jacl/projects/temp
 	@mkdir -p /usr/local/jacl/logs

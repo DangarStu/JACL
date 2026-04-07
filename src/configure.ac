@@ -150,16 +150,16 @@ fi
 # Build the target list
 # -----------------------------------------------------------
 BUILD_TARGETS="bjorb cjacl cgijacl"
-INSTALL_CMDS="mv bjorb ../bin; mv cjacl ../bin; mv cgijacl ../bin"
+INSTALL_CMDS="cp bjorb cjacl cgijacl ../bin/; install bjorb cjacl cgijacl /usr/local/bin/"
 
 if test "$HAVE_NCURSES" = "yes"; then
     BUILD_TARGETS="$BUILD_TARGETS jacl"
-    INSTALL_CMDS="$INSTALL_CMDS; mv jacl ../bin"
+    INSTALL_CMDS="$INSTALL_CMDS; cp jacl ../bin/; install jacl /usr/local/bin/"
 fi
 
 if test "$HAVE_FCGI" = "yes"; then
     BUILD_TARGETS="$BUILD_TARGETS fcgijacl"
-    INSTALL_CMDS="$INSTALL_CMDS; mv fcgijacl ../bin"
+    INSTALL_CMDS="$INSTALL_CMDS; cp fcgijacl ../bin/; install fcgijacl /usr/local/bin/"
 fi
 
 AC_SUBST([BUILD_TARGETS])
