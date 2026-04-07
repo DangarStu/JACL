@@ -23,7 +23,7 @@ set linebreaks = false
 print:
 <!DOCTYPE html>
 .
-write "<html><head>"
+write "<html lang=~fr~><head>"
 write "<meta charset=~UTF-8~>"
 write "<title>" game_title "</title>"
 execute "+styles"

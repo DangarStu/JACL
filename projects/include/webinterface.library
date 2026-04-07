@@ -1,12 +1,15 @@
 # STANDARD HEADERS AND FOOTERS FOR WEB-BASED INTERACTIVE FICTION
 
 string current_image "none"
+string game_language "en"
 
 {+header
 set linebreaks = false
 print:
 <!DOCTYPE html>
-<html><head>
+.
+write "<html lang=~" game_language "~><head>"
+print:
 <link href="https://fonts.googleapis.com/css?family=Merriweather" rel="stylesheet" type="text/css">
 <meta charset="UTF-8">
 .
@@ -28,6 +31,7 @@ print:
       clean = clean.replace(/\s+/g, ' ').trim();^
       if (clean.length > 0) {^
          var utterance = new SpeechSynthesisUtterance(clean);^
+         utterance.lang = document.documentElement.lang || 'en';^
          speechSynthesis.speak(utterance);^
       }^
    }^
