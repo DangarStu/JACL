@@ -472,17 +472,17 @@ set display_mode = 0
 set time = false
 }
 
-grammar speak >speak
+grammar voice >voice
 
-{+speak
+{+voice
 write "Speech synthesis enabled.^"
 write "<script>enableSpeak();</script>"
 set time = false
 }
 
-grammar mute >mute
+grammar unvoice >unvoice
 
-{+mute
+{+unvoice
 write "Speech synthesis disabled.^"
 write "<script>disableSpeak();</script>"
 set time = false

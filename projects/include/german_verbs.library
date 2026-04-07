@@ -558,17 +558,17 @@ write "Anzeigemodus auf 'einfach' gesetzt.^"
 set DISPLAY_MODE = 0
 }
 
-grammar sprechen >speak
+grammar stimme >voice
 
-{+speak
+{+voice
 write "Sprachsynthese aktiviert.^"
 write "<script>enableSpeak();</script>"
 set time = false
 }
 
-grammar stumm >mute
+grammar stumm >unvoice
 
-{+mute
+{+unvoice
 write "Sprachsynthese deaktiviert.^"
 write "<script>disableSpeak();</script>"
 set time = false

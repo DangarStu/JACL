@@ -529,17 +529,17 @@ set display_mode = 0
 set time = false
 }
 
-grammar bicara >speak
+grammar suara >voice
 
-{+speak
+{+voice
 write "Sintesis suara diaktifkan.^"
 write "<script>enableSpeak();</script>"
 set time = false
 }
 
-grammar bisu >mute
+grammar bisu >unvoice
 
-{+mute
+{+unvoice
 write "Sintesis suara dinonaktifkan.^"
 write "<script>disableSpeak();</script>"
 set time = false

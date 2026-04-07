@@ -627,17 +627,17 @@ set display_mode = 0
 set time = false
 }
 
-grammar parler >speak
+grammar voix >voice
 
-{+speak
+{+voice
 write "Synth&egrave;se vocale activ&eacute;e.^"
 write "<script>enableSpeak();</script>"
 set time = false
 }
 
-grammar silence >mute
+grammar silence >unvoice
 
-{+mute
+{+unvoice
 write "Synth&egrave;se vocale d&eacute;sactiv&eacute;e.^"
 write "<script>disableSpeak();</script>"
 set time = false
