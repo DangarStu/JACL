@@ -9,6 +9,7 @@ constant game_author		"Stuart Allen"
 constant game_version		1
 
 location kamar_tidur : kamar tidur
+ short		name "Kamar Tidur"
  west		kamar_mandi
  south		ruang_tamu
 
@@ -53,6 +54,7 @@ execute "+game_over"
 }
 
 location kamar_mandi : kamar mandi
+ short		name "Kamar Mandi"
  east		kamar_tidur
 
 {look
@@ -92,8 +94,8 @@ object catatan: catatan oranye
 write "Catatan itu bertuliskan, ~Selamat datang di Jamaika dan semoga harimu menyenangkan.~^"
 }
 
-location ruang_tamu: ruang tamu
-  short		sebuah "ruang tamu"
+location ruang_tamu : ruang tamu
+  short		name "Ruang Tamu"
   north		kamar_tidur
 
 {look
