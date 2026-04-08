@@ -163,14 +163,17 @@ return false
 }
 
 {+intro
-write ""
-write "PERMAINAN TUTORIAL"
-write "oleh " game_author
-write ""
-write "Alarmmu berbunyi dan kamu bangun dari tempat tidur. "
-write "Senin pagi lagi. Yah, setidaknya rumahmu tidak punya "
-write "pintu depan jadi kamu punya alasan bagus untuk tidak "
-write "pergi kerja.^^"
+style bold
+write "^^" game_title
+style normal
+write " oleh " game_author "^^"
+
+print:
+   Alarmmu berbunyi dan kamu bangun dari tempat tidur.
+   Senin pagi lagi. Yah, setidaknya rumahmu tidak punya
+   pintu depan jadi kamu punya alasan bagus untuk tidak
+   pergi kerja.^^
+.
 if here hasnt OUTDOORS
   set north_wall(parent) = here
   set south_wall(parent) = here
