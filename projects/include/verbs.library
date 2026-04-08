@@ -4892,9 +4892,7 @@ endif
 style bold
 write here{The}
 style normal
-if interpreter != CGI
-   write "^"
-endif
+write "^"
 if here has WITHOUT_AIR
    if tank hasnt WORN
       write "(holding your breath)^"
