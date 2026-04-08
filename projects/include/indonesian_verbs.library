@@ -3649,6 +3649,7 @@ write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
 set time = false
 }
 
+grammar barat         >west
 grammar pergi barat   >west
 grammar jalan barat   >west
 grammar west      >west
@@ -3675,6 +3676,7 @@ write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
 set time = false
 }
 
+grammar timur         >east
 grammar pergi timur   >east
 grammar jalan timur   >east
 grammar east      >east
@@ -3701,6 +3703,7 @@ write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
 set time = false
 }
 
+grammar selatan       >south
 grammar pergi selatan   >south
 grammar jalan selatan   >south
 grammar south      >south
@@ -3727,6 +3730,7 @@ write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
 set time = false
 }
 
+grammar tenggara      >southeast
 grammar pergi tenggara   >southeast
 grammar jalan tenggara   >southeast
 grammar southeast      >southeast
@@ -3753,6 +3757,7 @@ write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
 set time = false
 }
 
+grammar baratdaya     >southwest
 grammar pergi baratdaya   >southwest
 grammar jalan baratdaya   >southwest
 grammar southwest      >southwest
@@ -3779,6 +3784,7 @@ write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
 set time = false
 }
 
+grammar utara             >north
 grammar pergi utara       >north
 grammar jalan utara       >north
 grammar north         >north
@@ -3805,6 +3811,7 @@ write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
 set time = false
 }
 
+grammar timurlaut             >northeast
 grammar pergi timurlaut       >northeast
 grammar jalan timurlaut       >northeast
 grammar northeast             >northeast
@@ -3831,6 +3838,7 @@ write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
 set time = false
 }
 
+grammar baratlaut             >northwest
 grammar pergi baratlaut       >northwest
 grammar jalan baratlaut       >northwest
 grammar northwest             >northwest
@@ -4050,6 +4058,7 @@ write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
 set time = false
 }
 
+grammar masuk		>in
 grammar go in		>in
 grammar get in		>in
 grammar climb in	>in
@@ -4077,6 +4086,7 @@ write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
 set time = false
 }
 
+grammar keluar		>out
 grammar get out		>out
 grammar out			>out
 grammar exit		>out
@@ -4107,6 +4117,8 @@ write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
 set time = false
 }
 
+grammar atas          >up
+grammar naik          >up
 grammar up            >up
 grammar climb         >up
 grammar climb up      >up
@@ -4138,25 +4150,13 @@ write "Saya tidak melihat bagaimana Anda bisa berenang saat tidak di air.^"
 set time = false
 }
 
+grammar turun >down
+grammar bawah >down
 grammar down          >down
 grammar climb down    >down
 grammar jump down     >down
 grammar go down       >down
 grammar walk down     >down
-grammar utara >north
-grammar selatan >south
-grammar timur >east
-grammar barat >west
-grammar timurlaut >northeast
-grammar baratlaut >northwest
-grammar tenggara >southeast
-grammar baratdaya >southwest
-grammar atas >up
-grammar naik >up
-grammar bawah >down
-grammar turun >down
-grammar masuk >in
-grammar keluar >out
 
 {+down
 if +sitting = true
