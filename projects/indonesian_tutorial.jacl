@@ -227,3 +227,5 @@ object ground: tanah lantai
 
 #include "indonesian.library"
 #include "indonesian_verbs.library"
+#include "webinterface.library"
+#include "webinterface.css"
