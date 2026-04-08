@@ -1,0 +1,224 @@
+#!../bin/jacl
+#                                                           JACL TUTORIAL GAME
+# -----------------------------------------------------------------------------
+# Indonesian translation of the JACL tutorial game.
+# -----------------------------------------------------------------------------
+
+constant game_title		"Permainan Tutorial"
+constant game_author		"Stuart Allen"
+constant game_version		1
+
+location kamar_tidur : kamar tidur
+ west		kamar_mandi
+ south		ruang_tamu
+
+{look
+write "Kamu berada di kamar tidur. Ada sebuah tempat tidur "
+write "yang besar dan empuk di tengah ruangan, sementara "
+write "sebuah pintu di sebelah barat menuju ke kamar mandi.^"
+}
+
+object tempat_tidur: tempat tidur
+  short		sebuah "tempat tidur"
+  mass		scenery
+
+{look_under
+if panduan_tv(parent) = limbo
+   write "Tersembunyi di bawah tempat tidur, kamu menemukan "
+   write "panduan acara televisi minggu ini.^"
+   set panduan_tv(parent) = here
+   points 50
+   return
+endif
+write "Kamu tidak menemukan apa-apa lagi.^"
+}
+
+object panduan_tv: panduan acara televisi tv
+  short		sebuah "panduan TV"
+  long		"Panduan TV ada di sini.^"
+  parent	limbo
+  mass		5
+
+{examine : read
+write "Berisi daftar acara televisi minggu ini.^"
+}
+
+{give_to_rick : show_to_rick
+write "~Keren!~ seru Rick sambil merebut panduan itu dari "
+write "tanganmu.^^"
+write "Merasa puas telah mencapai setidaknya satu hal "
+write "hari ini, kamu memutuskan untuk kembali tidur.^"
+points 50
+execute "+game_over"
+}
+
+location kamar_mandi : kamar mandi
+ east		kamar_tidur
+
+{look
+write "Kamu berada di kamar mandi. Satu-satunya jalan "
+write "keluar dari sini adalah kembali ke timur menuju "
+write "kamar tidur.^"
+}
+
+{movement
+if compass = east : compass = out
+   write "Kamu membenturkan kepalamu saat berjalan "
+   write "melewati pintu.^^"
+   return false
+endif
+write "Satu-satunya jalan keluar dari sini adalah ke timur.^"
+}
+
+object kotak: kotak kayu kecil
+  has		CONTAINER CLOSABLE CLOSED
+  short		sebuah "kotak kayu kecil"
+  long		"Ada sebuah kotak kayu kecil di sini.^"
+  mass		25
+  quantity	20
+
+{close_override
+write "Tutupnya berderit saat kamu menutupnya.^"
+ensure kotak has CLOSED
+}
+
+object catatan: catatan oranye
+  short		sebuah "catatan oranye"
+  long		"Sebuah catatan oranye tergeletak di lantai.^"
+  parent 	kotak
+  mass		5
+
+{read : examine
+write "Catatan itu bertuliskan, ~Selamat datang di Jamaika dan semoga harimu menyenangkan.~^"
+}
+
+location ruang_tamu: ruang tamu
+  short		sebuah "ruang tamu"
+  north		kamar_tidur
+
+{look
+if here has VISITED
+   write "Kamu kembali ke ruang tamu.^"
+else
+   write "Kamu berada di ruang tamu. Ada sebuah televisi kecil "
+   write "bertengger di atas meja rendah di depan sofa.^"
+endif
+}
+
+{eachturn
+set rick(status) + 1
+if rick(status) = 5
+   write "Rick menyeruput minumannya.^"
+   set rick(status) = 0
+endif
+}
+
+object televisi: televisi tv tele
+  short		sebuah "televisi"
+  mass		scenery
+
+{examine
+write "Saat ini sedang ada film kartun yang ditayangkan "
+write "di televisi.^"
+}
+
+{turn_off
+write "Saat kamu mengulurkan tangan dan mematikan televisi, "
+write "kamu sangat terkejut melihat Rick dengan cepat "
+write "menumbuhkan bulu dan mulutnya berbusa. Kejutan ini "
+write "hanya terlampaui oleh saat ia menancapkan taring "
+write "barunya ke lehermu.^"
+execute "+game_over"
+}
+
+object rick: anak laki remaja rick
+  has		ANIMATE
+  short		name "Rick"
+  long		"Rick ada di sini, menonton televisi.^"
+  mass		heavy
+
+{examine
+write "Rick menatap kosong ke layar televisi.^"
+}
+
+{talk_to
+write "~Eh, iya, nanti aku kerjakan,~ gumam Rick "
+write "tanpa mengangkat pandangannya. Kamu sangat "
+write "curiga bahwa dia sama sekali tidak mendengar "
+write "apa yang kamu katakan.^"
+}
+
+#-----------------------------------------------------------------------------
+# GLOBAL FUNCTIONS
+#-----------------------------------------------------------------------------
+
+{+default_ask_about
+if noun1 = rick
+   write "Rick memajukan bibir bawahnya lalu berkedip "
+   write "beberapa kali. Ini, yang telah kamu pahami selama "
+   write "bertahun-tahun, berarti, ~Tidak tahu.~^"
+   return
+endif
+return false
+}
+
+{+intro
+write ""
+write "PERMAINAN TUTORIAL"
+write "oleh " game_author
+write ""
+write "Alarmmu berbunyi dan kamu bangun dari tempat tidur. "
+write "Senin pagi lagi. Yah, setidaknya rumahmu tidak punya "
+write "pintu depan jadi kamu punya alasan bagus untuk tidak "
+write "pergi kerja.^^"
+if here hasnt OUTDOORS
+  set north_wall(parent) = here
+  set south_wall(parent) = here
+  set east_wall(parent) = here
+  set west_wall(parent) = here
+endif
+set ground(parent) = here
+look
+}
+
+object kryten: aku diri sendiri saya
+ has		ANIMATE
+ short		name "kamu"
+ quantity	42
+ parent		kamar_tidur
+ player
+
+{examine
+write "Secantik biasanya.^"
+execute "+inventory"
+}
+
+grammar tentang >about
+
+{+about
+write "Ini adalah permainan dari bagian tutorial Panduan Penulis JACL. "
+write "Lihat lampiran untuk kode sumber lengkap program ini.^"
+}
+
+object north_wall: utara dinding utara
+ has			NO_TAB
+ short          sebuah "dinding utara"
+
+object south_wall: selatan dinding selatan
+ has			NO_TAB
+ short          sebuah "dinding selatan"
+
+object east_wall: timur dinding timur
+ has			NO_TAB
+ short          sebuah "dinding timur"
+
+object west_wall: barat dinding barat
+ has			NO_TAB
+ short          sebuah "dinding barat"
+
+object ground: tanah lantai
+ has            SURFACE NO_TAB
+ short          sebuah "lantai"
+
+#include "indonesian.library"
+#include "indonesian_verbs.library"
