@@ -1,6 +1,6 @@
 # LIBRARY OF GERMAN PHRASES USED DIRECTLY BY THE JACL INTERPRETER
 
-string game_language "de"
+string game_language "de-DE"
 
 constant COMMENT_IGNORED "Kein Transkript aktiv, Kommentar ignoriert.^"
 constant COMMENT_RECORDED "Kommentar aufgezeichnet.^"

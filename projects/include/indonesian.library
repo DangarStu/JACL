@@ -1,6 +1,6 @@
 # LIBRARY OF INDONESIAN PHRASES USED DIRECTLY BY THE JACL INTERPRETER
 
-string game_language "id"
+string game_language "id-ID"
 
 constant COMMENT_IGNORED "Tidak ada transkrip yang berjalan, komentar diabaikan.^"
 constant COMMENT_RECORDED "Komentar tercatat.^"

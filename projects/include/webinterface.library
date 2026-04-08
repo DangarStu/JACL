@@ -1,7 +1,7 @@
 # STANDARD HEADERS AND FOOTERS FOR WEB-BASED INTERACTIVE FICTION
 
 string current_image "none"
-string game_language "en"
+string game_language "en-US"
 
 {+header
 set linebreaks = false
@@ -31,7 +31,7 @@ print:
       clean = clean.replace(/\s+/g, ' ').trim();^
       if (clean.length > 0) {^
          var utterance = new SpeechSynthesisUtterance(clean);^
-         utterance.lang = document.documentElement.lang || 'en';^
+         utterance.lang = document.documentElement.lang || 'en-US';^
          speechSynthesis.speak(utterance);^
       }^
    }^
