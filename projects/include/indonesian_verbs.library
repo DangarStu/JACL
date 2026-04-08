@@ -565,6 +565,8 @@ endif
 
 grammar hint $integer *present	>hint
 grammar hint $integer			>hint
+grammar petunjuk $integer *present	>hint
+grammar petunjuk $integer			>hint
 
 {+hint
 if noun1 = false
@@ -4669,27 +4671,27 @@ print:
 style preformatted
 set linebreaks = false
 print:
-   ||Perintah   Aksi^^
-   ||VERBOSE    selalu deskripsikan lokasi ^
-   ||BRIEF      hanya deskripsikan lokasi baru ^
-   ||RESTART    mulai dari awal ^
-   ||SCORE      tampilkan skor dan peringkat Anda ^
-   ||LOOK       deskripsikan lokasi saat ini ^
-   ||SAVE       simpan posisi saat ini ^
-   ||RESTORE    pulihkan posisi tersimpan ^
-   ||I          daftar horizontal barang bawaan ^
-   ||INV        daftar vertikal barang bawaan ^
-   ||UNDO       batalkan perintah terakhir ^
-   ||AGAIN      ulangi perintah terakhir ^
-   ||INFO       tampilkan informasi versi ^^
+   ||Perintah     Aksi^^
+   ||VERBOSE      selalu deskripsikan lokasi ^
+   ||BRIEF        hanya deskripsikan lokasi baru ^
+   ||ULANG        mulai dari awal ^
+   ||SKOR         tampilkan skor dan peringkat Anda ^
+   ||LIHAT        deskripsikan lokasi saat ini ^
+   ||SIMPAN       simpan posisi saat ini ^
+   ||PULIHKAN     pulihkan posisi tersimpan ^
+   ||I            daftar horizontal barang bawaan ^
+   ||INVENTARIS   daftar vertikal barang bawaan ^
+   ||BATALKAN     batalkan perintah terakhir ^
+   ||LAGI         ulangi perintah terakhir ^
+   ||INFO         tampilkan informasi versi ^^
 .
 style normal
 set linebreaks = true
 print:
    CATATAN: Jika Anda mencari petunjuk yang relevan dengan lokasi tertentu,
-   ketik ~hint~, ~first hint~ atau ~hint one~ di lokasi itu. Petunjuk
-   pertama akan berupa petunjuk halus dengan ~hint two~ lebih terang-terangan dan
-   ~hint three~ berupa perintah tepat yang harus diketik.^^
+   ketik ~petunjuk~, ~petunjuk 1~ atau ~petunjuk one~ di lokasi itu. Petunjuk
+   pertama akan berupa petunjuk halus dengan ~petunjuk two~ lebih terang-terangan dan
+   ~petunjuk three~ berupa perintah tepat yang harus diketik.^^
 
    Anda sekarang siap untuk memulai petualangan pertama Anda ke
    dunia fiksi interaktif.
@@ -4995,23 +4997,23 @@ location epilogue : epilogue
 if interpreter = GLK
    write "Permainan telah selesai. Ketik "
    style input
-   write "undo"
+   write "batalkan"
    style normal
    write ", "
    style input
-   write "restart"
+   write "ulang"
    style normal
    write " atau "
    style input
-   write "restore"
+   write "pulihkan"
    style normal
    write " diikuti nama file, atau "
    style input
-   write "quit"
+   write "keluar"
    style normal
    write ".^"
 else
-   write "Permainan telah selesai. Ketik <b>undo</b>, <b>restart</b> atau <b>restore</b> "
+   write "Permainan telah selesai. Ketik <b>batalkan</b>, <b>ulang</b> atau <b>pulihkan</b> "
    write "diikuti nama file.^"
 endif
 }
