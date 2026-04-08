@@ -1,5 +1,7 @@
 # LIBRARY OF FRENCH PHRASES USED DIRECTLY BY THE JACL INTERPRETER
 
+string game_language "fr"
+
 constant COMMENT_IGNORED "Pas de transcription en cours, commentaire ignoré.^"
 constant COMMENT_RECORDED "Commentaire enregistré.^"
 constant YES_WORD "oui"
