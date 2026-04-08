@@ -1,7 +1,49 @@
 # STANDARD HEADERS AND FOOTERS FOR WEB-BASED INTERACTIVE FICTION
 
+parameter interface gui_mode
+
+integer gui_mode STANDARD
+
 string current_image "none"
 string game_language "en"
+
+constant STANDARD	1
+constant GUI		2
+constant MOBILE		3
+
+# LOCALISATION STRINGS -- OVERRIDE THESE WITH setstring IN +bootstrap
+string link_instructions "Instructions"
+string link_about "About"
+string link_restart "Restart"
+string link_hint "Hint"
+string msg_standard_mode "Setting interface to standard mode."
+string label_you_can_see "You can see:"
+string label_you_carry "You are carrying:"
+string button_image_path "/images/buttons"
+string btn_look "look"
+string btn_take "take"
+string btn_drop "drop"
+string btn_use "use"
+string btn_open "open"
+string btn_close "close"
+string btn_talk "talk to"
+string btn_wear "wear"
+string btn_remove "remove"
+string btn_touch "touch"
+string btn_wait "wait"
+string btn_give "give"
+string btn_break "break"
+string btn_consume "consume"
+string btn_enter "enter"
+
+grammar standard >standard
+
+{+standard
+set gui_mode = STANDARD
+set time = false
+write msg_standard_mode
+write "^"
+}
 
 {+header
 set linebreaks = false
@@ -53,6 +95,7 @@ print:
       document.JACLInterfaceForm.submit();
    }^
 .
+if gui_mode = STANDARD : gui_mode = MOBILE
 #include "ajax.library"
 print:
    function submitForm(e) {^
@@ -65,6 +108,7 @@ print:
         return false;^
    }^
 .
+endif
 write "</script>^"
 write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
 write "</head>^"
@@ -75,17 +119,43 @@ ifstring title_image = "none"
 else
   write "<img class=~titleimage~ alt=~" game_title "~ src=~" title_image "~>"
 endif
-write "<div class=~links~>
-write " | "
-hyperlink "Instructions" "instructions" "header"
-write " | "
-hyperlink "About" "about" "header"
-write " | "
-hyperlink "Restart" "restart" "header"
-write " | "
-hyperlink "Hint" "hint" "header"
-write " |"
-write "</div>^"
+if gui_mode != MOBILE
+   write "<form name=~JACLInterfaceForm~ method=get>^"
+   write "<div class=~links~>"
+   write "| "
+   write "Interface: "
+   write "Standard<input type=~radio~ name=~interface~ value=~1~"
+   if gui_mode = STANDARD
+      write " checked onclick=~return changeInterface();~>"
+   else
+      write " onclick=~return changeInterface();~>"
+   endif
+   write " GUI<input type=~radio~ name=~interface~ value=~2~"
+   if gui_mode = GUI
+      write " checked onclick=~return changeInterface();~>"
+   else
+      write " onclick=~return changeInterface();~>"
+   endif
+   write " Mobile<input type=~radio~ name=~interface~ value=~3~"
+   if gui_mode = MOBILE
+      write " checked onclick=~return changeInterface();~>"
+   else
+      write " onclick=~return changeInterface();~>"
+   endif
+   hidden
+   write "<input type=~hidden~ name=~command~ value=~look~>"
+   write " | "
+   hyperlink link_instructions "instructions" "header"
+   write " | "
+   hyperlink link_about "about" "header"
+   write " | "
+   hyperlink link_restart "restart" "header"
+   write " | "
+   hyperlink link_hint "hint" "header"
+   write " |"
+   write "</div>^"
+   write "</form>^"
+endif
 write "</div>^"
 write "<div id=~main~>^"
 write "<div id=~maintext~ class=~maintext~>^"
@@ -96,23 +166,124 @@ set linebreaks = true
 set linebreaks = false
 write "</div>"
 write "</div>"
+if gui_mode != MOBILE
    ifstring current_image != "none"
       write "<div class=~picture~>"
       write "<img class=~main~ src=~" current_image "~>"
       write "</div>"
    endif
+endif
 write "<div id=~footer~>^"
 write "<div class=~directions~>"
 execute "+exits"
 write "</div>"
-write "<form id=~commandForm~ name=~JACLGameForm~ method=~get~ autocomplete=~off~ onsubmit=~return submitForm(event);~>"
-write "<div class=~command_prompt~>^"
-prompt "KeyPressed();"
-print:
-   </div>
-   </form></div>^
-   </body></html>^
-.
+if gui_mode = STANDARD : gui_mode = MOBILE
+   write "<form id=~commandForm~ name=~JACLGameForm~ method=~get~ autocomplete=~off~ onsubmit=~return submitForm(event);~>"
+   write "<div class=~command_prompt~>^"
+   prompt "KeyPressed();"
+   print:
+      </div>
+      </form>
+   .
+endif
+if gui_mode = GUI
+   write "<form name=~JACLGameForm~ method=get>^"
+   write "<div class=~interface~>^"
+   write "<input class=~button~ type=~image~ src=~" button_image_path "/look.png~ name=~verb~ value=~" btn_look "~>"
+   write "<input class=~button~ type=~image~ src=~" button_image_path "/take.png~ name=~verb~ value=~" btn_take "~>"
+   write "<input class=~button~ type=~image~ src=~" button_image_path "/drop.png~ name=~verb~ value=~" btn_drop "~>"
+   write "<br>"
+   write "<input class=~button~ type=~image~ src=~" button_image_path "/use.png~ name=~verb~ value=~" btn_use "~>"
+   write "<input class=~button~ type=~image~ src=~" button_image_path "/open.png~ name=~verb~ value=~" btn_open "~>"
+   write "<input class=~button~ type=~image~ src=~" button_image_path "/close.png~ name=~verb~ value=~" btn_close "~>"
+   write "<br>"
+   write "<input class=~button~ type=~image~ src=~" button_image_path "/talkto.png~ name=~verb~ value=~" btn_talk "~>"
+   write "<input class=~button~ type=~image~ src=~" button_image_path "/wear.png~ name=~verb~ value=~" btn_wear "~>"
+   write "<input class=~button~ type=~image~ src=~" button_image_path "/remove.png~ name=~verb~ value=~" btn_remove "~>"
+   write "<br>"
+   write "<input class=~button~ type=~image~ src=~" button_image_path "/touch.png~ name=~verb~ value=~" btn_touch "~>"
+   write "<input class=~button~ type=~image~ src=~" button_image_path "/wait.png~ name=~verb~ value=~" btn_wait "~>"
+   write "<input class=~button~ type=~image~ src=~" button_image_path "/give.png~ name=~verb~ value=~" btn_give "~>"
+   write "<br>"
+   write "<input class=~button~ type=~image~ src=~" button_image_path "/break.png~ name=~verb~ value=~" btn_break "~>"
+   write "<input class=~button~ type=~image~ src=~" button_image_path "/consume.png~ name=~verb~ value=~" btn_consume "~>"
+   write "<input class=~button~ type=~image~ src=~" button_image_path "/enter.png~ name=~verb~ value=~" btn_enter "~>"
+   write "</div>"
+   write "<div class=~interface~>^"
+   write "<b>" label_you_can_see "</b><br>^"
+   write "<select name=~noun~ size=8>"
+   loop
+      ifall here grandof noun3 : player !grandof noun3 : noun3 hasnt LOCATION
+         option noun3
+      else
+         if noun3 = player
+            option noun3
+         endif
+      endif
+   endloop
+   write "</select>"
+   write "</div>"
+   write "<div class=~interface~>^"
+   write "<b>" label_you_carry "</b><br>^"
+   write "<select name=~noun~ size=8>"
+   loop
+      ifall player grandof noun3 : noun3 != player
+         option noun3
+      endif
+   endloop
+   write "</select>"
+   hidden
+   write "</div>"
+   write "<div class=~compass~>"
+   ifall here(northwest) != nowhere : here(northwest) != NO_GO
+      hyperlink "<img class=~compass~ src=~/images/compass/northwest_blue.png~>" "nw"
+   else
+      write "<img src=~/images/compass/northwest.png~>"
+   endif
+   ifall here(north) != nowhere : here(north) != NO_GO
+      hyperlink "<img class=~compass~ src=~/images/compass/north_blue.png~>" "n"
+   else
+      write "<img src=~/images/compass/north.png~>"
+   endif
+   ifall here(northeast) != nowhere : here(northeast) != NO_GO
+      hyperlink "<img class=~compass~ src=~/images/compass/northeast_blue.png~>" "ne"
+   else
+      write "<img src=~/images/compass/northeast.png~>"
+   endif
+   write "<br>"
+   ifall here(west) != nowhere : here(west) != NO_GO
+      hyperlink "<img class=~compass~ src=~/images/compass/west_blue.png~>" "w"
+   else
+      write "<img src=~/images/compass/west.png~>"
+   endif
+   write "<img src=~/images/compass/centre.png~>"
+   ifall here(east) != nowhere : here(east) != NO_GO
+      hyperlink "<img class=~compass~ src=~/images/compass/east_blue.png~>" "east"
+   else
+      write "<img src=~/images/compass/east.png~>"
+   endif
+   write "<br>"
+   ifall here(southwest) != nowhere : here(southwest) != NO_GO
+      hyperlink "<img class=~compass~ src=~/images/compass/southwest_blue.png~>" "sw"
+   else
+      write "<img src=~/images/compass/southwest.png~>"
+   endif
+   ifall here(south) != nowhere : here(south) != NO_GO
+      hyperlink "<img class=~compass~ src=~/images/compass/south_blue.png~>" "s"
+   else
+      write "<img src=~/images/compass/south.png~>"
+   endif
+   ifall here(southeast) != nowhere : here(southeast) != NO_GO
+      hyperlink "<img class=~compass~ src=~/images/compass/southeast_blue.png~>" "se"
+   else
+      write "<img src=~/images/compass/southeast.png~>"
+   endif
+   write "</div>^"
+   hidden
+   write "</form>"
+endif
+write "</div>^"
+write "</body></html>^"
 set linebreaks = true
 }
 
