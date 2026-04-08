@@ -4889,7 +4889,7 @@ endif
 }
 
 {+title
-style subheader
+style bold
 write here{The}
 style normal
 if interpreter != CGI

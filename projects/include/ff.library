@@ -704,7 +704,7 @@ write "Luck: " player(luck) " out of " player(iluck) ".^"
 }
 
 {+title
-style subheader
+style bold
 write here{the} ^
 style normal
 }
