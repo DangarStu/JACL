@@ -30,8 +30,12 @@ print:
       var clean = doc.body.textContent || '';^
       clean = clean.replace(/\s+/g, ' ').trim();^
       if (clean.length > 0) {^
+         var lang = document.documentElement.lang || 'en-US';^
          var utterance = new SpeechSynthesisUtterance(clean);^
-         utterance.lang = document.documentElement.lang || 'en-US';^
+         utterance.lang = lang;^
+         var voices = speechSynthesis.getVoices();^
+         var voice = voices.find(function(v) { return v.lang === lang; });^
+         if (voice) utterance.voice = voice;^
          speechSynthesis.speak(utterance);^
       }^
    }^
