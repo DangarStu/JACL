@@ -103,16 +103,9 @@ synonym lihat           look
 synonym beneath         under
 synonym bawah           under
 
-# Map Indonesian commands to English equivalents
-synonym ya              yes
-synonym tidak           no
-synonym keluar          quit
-synonym batalkan        undo
-synonym panduan         walkthru
-synonym lagi            again
-synonym ulang           restart
-synonym simpan          save
-synonym pulihkan        restore
+# Indonesian equivalents of built-in commands are handled by the
+# constants in indonesian.library (RESTART_WORD, QUIT_WORD, etc.)
+# and by grammar statements in this file (simpan, pulihkan, etc.).
 
 integer_array available_exits 12 0
 string dir_command utara selatan timur barat timurlaut baratlaut
