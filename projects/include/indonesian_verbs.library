@@ -592,7 +592,7 @@ grammar arti $string >lookup_word
 set kata_ditemukan = false
 iterate "indonesian_words.csv" skip_header
    ifstring field[0] = $string
-      write $string ": " field[1] ^
+      write "The word " $string " means " field[1] ".^"
       set kata_ditemukan = true
    endif
 enditerate
