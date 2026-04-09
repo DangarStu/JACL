@@ -531,17 +531,23 @@ execute(const char *funcname)
 
                 top_of_iterate = before_command;
 
-                // infile REMAINS OPEN DURING THE ITERATION, ONLY NEEDS 
+                // infile REMAINS OPEN DURING THE ITERATION, ONLY NEEDS
                 // OPENING THE FIRST TIME
                 if (infile == NULL) {
                     strcpy (temp_buffer, data_directory);
-                    strcat (temp_buffer, prefix);
-                    strcat (temp_buffer, "-");
-                    strcat (temp_buffer, text_of_word(1));
-                    strcat (temp_buffer, ".csv");
+                    if (strstr(text_of_word(1), ".csv") != NULL) {
+                        // NAME CONTAINS .csv, USE AS-IS (GLOBAL FILE)
+                        strcat (temp_buffer, text_of_word(1));
+                    } else {
+                        // PREFIX WITH GAME NAME (PER-GAME FILE)
+                        strcat (temp_buffer, prefix);
+                        strcat (temp_buffer, "-");
+                        strcat (temp_buffer, text_of_word(1));
+                        strcat (temp_buffer, ".csv");
+                    }
 
                     infile = fopen(temp_buffer, "rb");
-    
+
                     if (word[2] != NULL && !strcmp(word[2], "skip_header")) {
                         fgets(csv_buffer, 2048, infile);
                     }
@@ -607,10 +613,14 @@ execute(const char *funcname)
                 // OPENING THE FIRST TIME
                 if (infile == NULL) {
                     strcpy (in_name, data_directory);
-                    strcat (in_name, prefix);
-                    strcat (in_name, "-");
-                    strcat (in_name, text_of_word(1));
-                    strcat (in_name, ".csv");
+                    if (strstr(text_of_word(1), ".csv") != NULL) {
+                        strcat (in_name, text_of_word(1));
+                    } else {
+                        strcat (in_name, prefix);
+                        strcat (in_name, "-");
+                        strcat (in_name, text_of_word(1));
+                        strcat (in_name, ".csv");
+                    }
 
                     infile = fopen(in_name, "rb");
                 }
@@ -618,12 +628,21 @@ execute(const char *funcname)
                 if (outfile == NULL) {
                     // OPEN A TEMPORARY OUTPUT FILE TO WRITE THE MODIFICATIONS TO
                     strcpy (out_name, data_directory);
-                    strcat (out_name, prefix);
-                    strcat (out_name, "-");
-                    strcat (out_name, text_of_word(1));
-                    strcat (out_name, "-");
-                    strcat (out_name, user_id);
-                    strcat (out_name, ".csv");
+                    if (strstr(text_of_word(1), ".csv") != NULL) {
+                        // STRIP .csv AND ADD -<user_id>.csv
+                        strcat (out_name, text_of_word(1));
+                        out_name[strlen(out_name) - 4] = 0;
+                        strcat (out_name, "-");
+                        strcat (out_name, user_id);
+                        strcat (out_name, ".csv");
+                    } else {
+                        strcat (out_name, prefix);
+                        strcat (out_name, "-");
+                        strcat (out_name, text_of_word(1));
+                        strcat (out_name, "-");
+                        strcat (out_name, user_id);
+                        strcat (out_name, ".csv");
+                    }
 
                     outfile = fopen(out_name, "wb");
                 }

@@ -585,11 +585,10 @@ set time = false
 integer kata_ditemukan
 
 grammar arti $string >lookup_word
-grammar kata $string >lookup_word
 
 {+lookup_word
 set kata_ditemukan = false
-iterate katakata skip_header
+iterate indonesian_words.csv skip_header
    ifstring field[0] = $string
       write $string ": " field[1] ^
       set kata_ditemukan = true
