@@ -6,7 +6,6 @@ CFLAGS = -Wall -O2
 # Directories
 CGIHTML_DIR = cgihtml-1.69
 GLKTERM_DIR = glkterm
-GLKTERMW_DIR = glktermw
 CHEAPGLK_DIR = CheapGlk
 
 # Detected library flags
@@ -51,9 +50,6 @@ webjacl.o: webjacl.c webjacl.h language.h
 libcheapglk.a:
 	cd $(CHEAPGLK_DIR) && $(MAKE) libcheapglk.a
 
-libglktermw.a:
-	cd $(GLKTERMW_DIR) && $(MAKE) libglktermw.a
-
 libglkterm.a:
 	cd $(GLKTERM_DIR) && $(MAKE) libglkterm.a
 
@@ -78,7 +74,6 @@ clean:
 	rm -f cgijacl fcgijacl bjorb jacl cjacl
 	cd $(CGIHTML_DIR) && $(MAKE) clean
 	cd $(GLKTERM_DIR) && $(MAKE) clean
-	cd $(GLKTERMW_DIR) && $(MAKE) clean
 	cd $(CHEAPGLK_DIR) && $(MAKE) clean
 
 distclean: clean

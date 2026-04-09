@@ -603,7 +603,6 @@ NCURSES_LIBS
 NCURSES_CFLAGS
 COMMON_SRC
 CHEAPGLK_DIR
-GLKTERMW_DIR
 GLKTERM_DIR
 CGIHTML_DIR
 AR
@@ -3611,7 +3610,6 @@ printf '%s\n' "$as_me: interpreter language: $jacl_language" >&6;}
 # Directories for bundled libraries
 CGIHTML_DIR=cgihtml-1.69
 GLKTERM_DIR=glkterm
-GLKTERMW_DIR=glktermw
 CHEAPGLK_DIR=CheapGlk
 
 

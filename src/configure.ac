@@ -34,11 +34,9 @@ AC_MSG_NOTICE([interpreter language: $jacl_language])
 # Directories for bundled libraries
 CGIHTML_DIR=cgihtml-1.69
 GLKTERM_DIR=glkterm
-GLKTERMW_DIR=glktermw
 CHEAPGLK_DIR=CheapGlk
 AC_SUBST([CGIHTML_DIR])
 AC_SUBST([GLKTERM_DIR])
-AC_SUBST([GLKTERMW_DIR])
 AC_SUBST([CHEAPGLK_DIR])
 
 # Common source files
