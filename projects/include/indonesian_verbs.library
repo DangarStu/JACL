@@ -584,11 +584,13 @@ set time = false
 
 integer kata_ditemukan
 
+grammar lookup $string >lookup_word
+grammar dict $string >lookup_word
 grammar arti $string >lookup_word
 
 {+lookup_word
 set kata_ditemukan = false
-iterate indonesian_words.csv skip_header
+iterate "indonesian_words.csv" skip_header
    ifstring field[0] = $string
       write $string ": " field[1] ^
       set kata_ditemukan = true
@@ -2257,7 +2259,7 @@ set time = false
 }
 
 
- CHILDREN
+integer CHILDREN
 
 {+object_children
 set INDEX = 0
