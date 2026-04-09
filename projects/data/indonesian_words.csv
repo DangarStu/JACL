@@ -154,7 +154,7 @@ toko,"shop, store"
 pasar,market
 sekolah,school
 kantor,office
-rumah_sakit,hospital
+rumah sakit,hospital
 gereja,church
 masjid,mosque
 taman,"park, garden"
@@ -365,7 +365,7 @@ celana,pants
 sepatu,shoes
 topi,hat
 kacamata,"glasses, spectacles"
-jam_tangan,watch
+jam tangan,watch
 cincin,ring
 kaos,t-shirt
 sarung,sarong
@@ -390,7 +390,7 @@ kambing,goat
 bebek,duck
 ular,snake
 tikus,mouse
-kupu_kupu,butterfly
+kupu kupu,butterfly
 semut,ant
 nyamuk,mosquito
 kutu,"louse, flea"
@@ -692,21 +692,21 @@ mbak,older sister (Javanese)
 bapak,"father, sir"
 salam,"greeting, peace"
 selamat,"congratulations, safe"
-terima_kasih,thank you
+terima kasih,thank you
 maaf,sorry
 silakan,"please, go ahead"
 permisi,excuse me
 tolong,please help
 halo,hello
-sampai_jumpa,goodbye
-selamat_pagi,good morning
-selamat_siang,good afternoon
-selamat_sore,good evening
-selamat_malam,good night
-apa_kabar,how are you
-baik_baik_saja,fine
-sama_sama,you're welcome
-laki_laki,male
+sampai jumpa,goodbye
+selamat pagi,good morning
+selamat siang,good afternoon
+selamat sore,good evening
+selamat malam,good night
+apa kabar,how are you
+baik baik saja,fine
+sama sama,you're welcome
+laki laki,male
 perempuan,female
 gadis,girl
 pemuda,young man
@@ -746,7 +746,7 @@ hijau,green
 putih,white
 hitam,black
 cokelat,brown
-abu_abu,gray
+abu abu,gray
 ungu,purple
 oranye,orange
 jingga,orange (color)
@@ -968,7 +968,7 @@ pelanggan,customer
 keripik,"chips, crackers"
 penjual,seller
 ramah,friendly
-nasi_goreng,fried rice
+nasi goreng,fried rice
 mie,noodles
 tenang,"calm, quiet"
 banjar,community hall (Balinese)
@@ -1060,7 +1060,7 @@ bab,"chapter, section"
 bahkan,even (emphasis)
 bahan,"material, ingredient"
 bahagia,happy
-bahu_membahu,cooperate
+bahu membahu,cooperate
 ban,tire
 bangkit,"rise, get up"
 bantu,"help, assist"
@@ -1175,7 +1175,7 @@ halang,"block, obstruct"
 hamil,pregnant
 hantam,hit hard
 hapus,"delete, erase"
-harga_diri,"self-esteem, dignity"
+harga diri,"self-esteem, dignity"
 hargai,appreciate
 harmoni,harmony
 hasil,"result, yield"
@@ -1190,7 +1190,7 @@ hubungan,relationship
 humoris,humorous
 ialah,"is, are (formal)"
 ibadah,worship
-ibu_kota,capital city
+ibu kota,capital city
 ide,idea
 ijin,"permission, permit"
 iklim,climate
@@ -1224,7 +1224,7 @@ kaget,startled
 kalah,lose
 kampanye,campaign
 kandung,"biological, womb"
-kapan_saja,anytime
+kapan saja,anytime
 karya,"work, creation"
 kasihan,"pity, poor thing"
 kasus,case
@@ -1260,9 +1260,9 @@ kepentingan,"interest, importance"
 kepercayaan,"trust, belief"
 keputusan,decision
 kerabat,relative
-kereta_api,train
+kereta api,train
 keriput,wrinkle
-kerja_sama,cooperation
+kerja sama,cooperation
 kerugian,loss
 kesalahan,"mistake, error"
 kesan,"impression, effect"
@@ -1325,7 +1325,7 @@ masal,mass
 masing-masing,each
 masyarakat,"society, community"
 maut,death
-mawas_diri,self-aware
+mawas diri,self-aware
 medan,"field, terrain"
 memang,"indeed, truly"
 memiliki,"own, possess"
@@ -1356,7 +1356,7 @@ merindukan,miss (someone)
 meskipun,although
 milik,"belonging, property"
 mimpi,dream
-minta_maaf,apologize
+minta maaf,apologize
 modal,capital (money)
 momen,moment
 mudik,go home (for holiday)
@@ -1402,7 +1402,7 @@ patah,"broken, fractured"
 patuh,obedient
 pawang,handler
 pedesaan,rural
-pejalan_kaki,pedestrian
+pejalan kaki,pedestrian
 pekerja,worker
 pelabuhan,"port, harbor"
 pelajaran,lesson
@@ -1469,7 +1469,7 @@ pinjam,borrow
 pintar,smart
 pipa,pipe
 pokok,"main, basic"
-pompa_bensin,gas station
+pompa bensin,gas station
 pos,post
 potensi,potential
 praktik,practice
@@ -1536,7 +1536,7 @@ seleksi,selection
 semoga,hopefully
 sempat,have time to
 sengaja,deliberately
-sepak_bola,football
+sepak bola,football
 sepi,quiet
 serangan,attack
 sesama,fellow
@@ -1549,14 +1549,14 @@ simpang,intersection
 siswa,student (school)
 situasi,situation
 sopan,polite
-suka_cita,joy
+suka cita,joy
 sumbangan,contribution
 sumur,well (water)
 sungkan,"reluctant, shy"
 suntik,inject
 sunyi,"silent, quiet"
 surga,heaven
-surat_kabar,newspaper
+surat kabar,newspaper
 susah,"difficult, troubled"
 susunan,"arrangement, structure"
 syarat,"condition, requirement"
@@ -1567,7 +1567,7 @@ tambah,add
 tampak,appear
 tandatangan,signature
 tangga,"stairs, ladder"
-tanggung_jawab,responsibility
+tanggung jawab,responsibility
 tangkap,catch
 tanjung,cape
 tantangan,challenge
@@ -1578,7 +1578,7 @@ tegur,reprimand
 tekanan,pressure
 teknik,technique
 teladan,example
-teman_sejawat,colleague
+teman sejawat,colleague
 tenggelam,sink
 tepat,"exact, right"
 tepuk,clap
@@ -1660,7 +1660,7 @@ angkat,"lift, raise"
 antar,"deliver, between"
 antri,"queue, line up"
 anugrah,"blessing, gift"
-api_unggun,campfire
+api unggun,campfire
 arsitektur,architecture
 asap,smoke
 asosiasi,association
@@ -1672,9 +1672,9 @@ awas,"watch out, beware"
 babat,"clear, slash"
 badut,clown
 bagasi,luggage
-bahasa_asing,foreign language
+bahasa asing,foreign language
 bahtera,ark
-baik_hati,kind-hearted
+baik hati,kind-hearted
 bakti,devotion
 balap,race
 balik,"reverse, return"
@@ -1685,7 +1685,7 @@ baris,"line, row"
 basa-basi,small talk
 basmi,exterminate
 batuk,cough
-bawah_tanah,underground
+bawah tanah,underground
 beasiswa,scholarship
 bebas,free
 beda,different
@@ -1709,7 +1709,7 @@ bernafas,breathe
 bernilai,valuable
 bersabar,be patient
 bersatu,unite
-berterima_kasih,be grateful
+berterima kasih,be grateful
 besaran,magnitude
 bibit,"seed, seedling"
 bidik,aim
@@ -1749,7 +1749,7 @@ dalih,excuse
 dampingi,accompany
 dana,fund
 dangkal,shallow
-dataran_tinggi,highlands
+dataran tinggi,highlands
 debat,debate
 dekati,approach
 dekorasi,decoration
@@ -1865,7 +1865,7 @@ investasi,investment
 jadwal,schedule
 jagoan,"hero, champion"
 jajah,colonize
-jalan_raya,highway
+jalan raya,highway
 jalur,"lane, path, route"
 jamuan,banquet
 jangka,"term, reach"
@@ -1879,7 +1879,7 @@ kabupaten,regency
 kalender,calendar
 kaliber,caliber
 kalori,calorie
-kambing_hitam,scapegoat
+kambing hitam,scapegoat
 kandang,"cage, stable"
 kantong,"pocket, bag"
 karakter,character
@@ -1887,7 +1887,7 @@ karangan,essay
 kargo,cargo
 karier,career
 kartu,card
-kata_sandi,password
+kata sandi,password
 kawal,escort
 kawasan,area
 kawat,wire
