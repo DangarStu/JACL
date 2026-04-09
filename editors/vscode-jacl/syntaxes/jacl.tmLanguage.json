@@ -1,0 +1,229 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "JACL",
+  "scopeName": "source.jacl",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#preprocessor" },
+    { "include": "#function-definition" },
+    { "include": "#function-close" },
+    { "include": "#print-block" },
+    { "include": "#grammar-statement" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#declarations" },
+    { "include": "#control-flow" },
+    { "include": "#commands" },
+    { "include": "#properties" },
+    { "include": "#special-variables" },
+    { "include": "#operators" },
+    { "include": "#attributes" },
+    { "include": "#object-accessors" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.number-sign.jacl",
+          "match": "^\\s*#(?!include|debug|encrypted|ifid).*$"
+        },
+        {
+          "name": "comment.line.semicolon.jacl",
+          "match": "^\\s*;.*$"
+        }
+      ]
+    },
+    "preprocessor": {
+      "patterns": [
+        {
+          "name": "meta.preprocessor.include.jacl",
+          "match": "^\\s*(#include|#debug)\\s+(\"[^\"]*\")",
+          "captures": {
+            "1": { "name": "keyword.control.import.jacl" },
+            "2": { "name": "string.quoted.double.jacl" }
+          }
+        },
+        {
+          "name": "meta.preprocessor.jacl",
+          "match": "^\\s*(#ifid|#encrypted)\\b.*$",
+          "captures": {
+            "1": { "name": "keyword.control.preprocessor.jacl" }
+          }
+        }
+      ]
+    },
+    "function-definition": {
+      "patterns": [
+        {
+          "name": "meta.function.jacl",
+          "match": "^\\{([+\\-]?[\\w<>]+(?:\\s*:\\s*[\\w<>]+)*)\\s*$",
+          "captures": {
+            "0": { "name": "entity.name.function.jacl" }
+          }
+        }
+      ]
+    },
+    "function-close": {
+      "patterns": [
+        {
+          "name": "entity.name.function.jacl",
+          "match": "^\\}\\s*$"
+        }
+      ]
+    },
+    "print-block": {
+      "name": "meta.print-block.jacl",
+      "begin": "^(print):\\s*$",
+      "end": "^\\.$",
+      "beginCaptures": {
+        "1": { "name": "keyword.other.command.jacl" }
+      },
+      "endCaptures": {
+        "0": { "name": "keyword.other.command.jacl" }
+      },
+      "contentName": "string.unquoted.print-block.jacl"
+    },
+    "grammar-statement": {
+      "patterns": [
+        {
+          "name": "meta.grammar.jacl",
+          "match": "^\\s*(grammar)\\s+(.+?)\\s+(>[\\w]+)\\s*$",
+          "captures": {
+            "1": { "name": "keyword.other.grammar.jacl" },
+            "2": { "name": "variable.parameter.jacl" },
+            "3": { "name": "entity.name.function.jacl" }
+          }
+        },
+        {
+          "name": "meta.synonym.jacl",
+          "match": "^\\s*(synonym)\\s+(\\w+)\\s+(\\w+)",
+          "captures": {
+            "1": { "name": "keyword.other.synonym.jacl" },
+            "2": { "name": "variable.parameter.jacl" },
+            "3": { "name": "variable.other.jacl" }
+          }
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.jacl",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.jacl",
+              "match": "\\^+"
+            },
+            {
+              "name": "constant.character.escape.jacl",
+              "match": "~"
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.jacl",
+          "match": "\\b\\d+\\b"
+        }
+      ]
+    },
+    "declarations": {
+      "patterns": [
+        {
+          "name": "meta.declaration.jacl",
+          "match": "^\\s*(location|object)\\s+(\\w+)\\s*:?\\s*(.*)?$",
+          "captures": {
+            "1": { "name": "storage.type.jacl" },
+            "2": { "name": "entity.name.type.jacl" },
+            "3": { "name": "string.unquoted.jacl" }
+          }
+        },
+        {
+          "match": "^\\s*(constant|string|integer|integer_array|string_array|variable|attribute|parameter|plural|filter)\\b",
+          "name": "storage.type.jacl"
+        }
+      ]
+    },
+    "control-flow": {
+      "patterns": [
+        {
+          "match": "\\b(if|ifall|ifstring|ifstringall|ifexecute|else|endif|endall|while|whileall|endwhile|repeat|until|untilall|loop|endloop|iterate|enditerate|update|endupdate|select|endselect|break|return)\\b",
+          "name": "keyword.control.jacl"
+        }
+      ]
+    },
+    "commands": {
+      "patterns": [
+        {
+          "match": "^\\s*(write|look|move|set|ensure|execute|call|proxy|setstring|addstring|padstring|split|length|points|append|append_fc|append_nt|append_lc|insert|cursor|style|sound|image|volume|timer|button|control|hyperlink|hyperlinkNE|hidden|option|prompt|clear|flush|more|getenv|savegame|restoregame|restartgame|endgame|undomove|terminate|inspect|output|mesg|error|travel|position|bearing|distance|dir_to|npc_to)\\b",
+          "name": "keyword.other.command.jacl"
+        }
+      ]
+    },
+    "properties": {
+      "patterns": [
+        {
+          "match": "^\\s+(short|long|parent|mass|quantity|has|hasnt|player|definite|static)\\b",
+          "name": "support.type.property.jacl"
+        },
+        {
+          "match": "^\\s+(north|south|east|west|northeast|northwest|southeast|southwest|up|down|in|out)\\b",
+          "name": "support.type.property.direction.jacl"
+        }
+      ]
+    },
+    "special-variables": {
+      "patterns": [
+        {
+          "match": "\\b(here|player|self|nowhere|noun1|noun2|noun3|noun4|limbo|true|false|interpreter|GLK|CGI)\\b",
+          "name": "variable.language.jacl"
+        },
+        {
+          "match": "(\\$string|\\$integer|\\$url|\\$user_id|\\$word)\\b",
+          "name": "variable.language.builtin.jacl"
+        },
+        {
+          "match": "\\b(field\\[\\d+\\]|field_count)\\b",
+          "name": "variable.language.csv.jacl"
+        },
+        {
+          "match": "\\b(game_title|game_author|game_version|game_release|total_moves|score|status_width|display_mode)\\b",
+          "name": "variable.language.game.jacl"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "match": "\\s(!=|>=|<=|=|>|<|\\+|\\-|\\*|/)\\s",
+          "name": "keyword.operator.jacl"
+        },
+        {
+          "match": "\\b(has|hasnt|contains|grandof)\\b",
+          "name": "keyword.operator.comparison.jacl"
+        }
+      ]
+    },
+    "attributes": {
+      "patterns": [
+        {
+          "match": "\\b(ANIMATE|SURFACE|CONTAINER|CLOSABLE|CLOSED|WORN|VISITED|KNOWN|DARKNESS|UNDER_WATER|ON_WATER|OUT_OF_REACH|LIQUID|NOT_IMPORTANT|DEAD|PLURAL|OUTDOORS|NO_TAB|WITHOUT_AIR|SITTING|SCENERY|LOCATION)\\b",
+          "name": "constant.language.attribute.jacl"
+        }
+      ]
+    },
+    "object-accessors": {
+      "patterns": [
+        {
+          "match": "\\{(the|The|a|A|is|isnt|doesnt|obj|sub|names|long|list|label|s)\\}",
+          "name": "support.function.accessor.jacl"
+        }
+      ]
+    }
+  }
+}

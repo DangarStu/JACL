@@ -1,0 +1,30 @@
+{
+  "name": "jacl",
+  "displayName": "JACL",
+  "description": "Syntax highlighting for the JACL Adventure Creation Language",
+  "version": "0.1.0",
+  "publisher": "DangarStu",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "jacl",
+        "aliases": ["JACL", "jacl"],
+        "extensions": [".jacl", ".library"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "jacl",
+        "scopeName": "source.jacl",
+        "path": "./syntaxes/jacl.tmLanguage.json"
+      }
+    ]
+  }
+}
