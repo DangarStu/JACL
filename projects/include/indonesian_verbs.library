@@ -582,6 +582,25 @@ endif
 set time = false
 }
 
+integer kata_ditemukan
+
+grammar arti $string >lookup_word
+grammar kata $string >lookup_word
+
+{+lookup_word
+set kata_ditemukan = false
+iterate katakata skip_header
+   ifstring field[0] = $string
+      write $string ": " field[1] ^
+      set kata_ditemukan = true
+   endif
+enditerate
+if kata_ditemukan = false
+   write "Kata ~" $string "~ tidak ditemukan.^"
+endif
+set time = false
+}
+
 grammar help games >help_games
 
 {+help_games
