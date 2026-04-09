@@ -11,7 +11,9 @@
 
 <p>A comma-separated values (CSV) file stores tabular data (numbers and text) in plain-text form. Each column in the file is, as the name suggests, separated by commas. JACL supports both the reading and writing of CSV files. By default, CSV files are stored in a directory named <b>data</b> in the same location as the program that is accessing them. For example, the demonstration program <b>contacts.jacl</b> lives in the <b>projects</b> directory and stores its data in <b>projects/data</b>.
 
-When referring to a CSV file using any of the commands detailed in this section only a portion of the filename is specified. This supplied name is used to build the full name of the file using the following formula:
+When referring to a CSV file using any of the commands detailed in this section, there are two ways to specify the filename:
+
+<p><b>Per-game files</b> &mdash; supply a short name without a file extension. This name is used to build the full filename using the following formula:
 
 <pre>
 <i>&lt;DataDirectory&gt;</i><b>/</b><i>&lt;ProgramName&gt;</i><b>-</b><i>&lt;Name&gt;</i><b>.csv</b>
@@ -24,6 +26,22 @@ When referring to a CSV file using any of the commands detailed in this section 
 </pre>
 
 <p>This system ensures that no two JACL programs can overwrite each others data or access arbitrary files from the filesystem of the webserver.</p>
+
+<p><b>Global files</b> &mdash; supply a filename that includes the <b>.csv</b> extension. The file is accessed directly from the data directory without any program name prefix:
+
+<pre>
+<i>&lt;DataDirectory&gt;</i><b>/</b><i>&lt;Name&gt;</i>
+</pre>
+
+<p>For example, a shared vocabulary file called <b>indonesian_words.csv</b> can be accessed by any program:</p>
+
+<pre>
+iterate <b>indonesian_words.csv</b> skip_header
+   write field[0] ": " field[1] ^
+enditerate
+</pre>
+
+<p>This is useful for reference data that is shared across multiple programs.</p>
 
 <h2><a class="section" name="csv1">The ITERATE and ENDITERATE Commands</a></h2>
 
