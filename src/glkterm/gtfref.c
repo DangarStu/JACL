@@ -112,14 +112,16 @@ static char *gli_suffix_for_usage(glui32 usage)
 
 frefid_t glk_fileref_create_temp(glui32 usage, glui32 rock)
 {
-    char filename[] = "/tmp/glk_XXXXXX";
+    char filename[] = "/tmp/glktempfref-XXXXXX";
     fileref_t *fref;
-    int fd;
-
-    fd = mkstemp(filename);
-    if (fd >= 0)
-        close(fd);
     
+    /* This is a pretty good way to do this on Unix systems. It doesn't
+       make sense on Windows, but anybody compiling this library on
+       Windows has already set up some kind of Unix-like environment,
+       I hope. */
+        
+    mkstemp(filename);
+
     fref = gli_new_fileref(filename, usage, rock);
     if (!fref) {
         gli_strict_warning("fileref_create_temp: unable to create fileref.");

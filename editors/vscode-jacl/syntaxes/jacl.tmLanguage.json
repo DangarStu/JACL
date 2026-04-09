@@ -86,21 +86,27 @@
     "grammar-statement": {
       "patterns": [
         {
-          "name": "meta.grammar.jacl",
-          "match": "^\\s*(grammar)\\s+(.+?)\\s+(>[\\w]+)\\s*$",
+          "match": "^(grammar)\\s+(.+?)\\s*(>)(\\w+)\\s*$",
           "captures": {
             "1": { "name": "keyword.other.grammar.jacl" },
             "2": { "name": "variable.parameter.jacl" },
-            "3": { "name": "entity.name.function.jacl" }
+            "3": { "name": "keyword.operator.jacl" },
+            "4": { "name": "entity.name.function.jacl" }
           }
         },
         {
-          "name": "meta.synonym.jacl",
-          "match": "^\\s*(synonym)\\s+(\\w+)\\s+(\\w+)",
+          "match": "^(synonym)\\s+(\\S+)\\s+(\\S+)",
           "captures": {
             "1": { "name": "keyword.other.synonym.jacl" },
             "2": { "name": "variable.parameter.jacl" },
             "3": { "name": "variable.other.jacl" }
+          }
+        },
+        {
+          "match": "^(filter)\\s+(\\S+)",
+          "captures": {
+            "1": { "name": "keyword.other.filter.jacl" },
+            "2": { "name": "variable.parameter.jacl" }
           }
         }
       ]
@@ -110,7 +116,7 @@
         {
           "name": "string.quoted.double.jacl",
           "begin": "\"",
-          "end": "\"",
+          "end": "\"|$",
           "patterns": [
             {
               "name": "constant.character.escape.jacl",
@@ -144,8 +150,11 @@
           }
         },
         {
-          "match": "^\\s*(constant|string|integer|integer_array|string_array|variable|attribute|parameter|plural|filter)\\b",
-          "name": "storage.type.jacl"
+          "match": "^\\s*(constant|string|integer|integer_array|string_array|variable|attribute|parameter|plural)\\s+(\\w+)",
+          "captures": {
+            "1": { "name": "storage.type.jacl" },
+            "2": { "name": "variable.other.jacl" }
+          }
         }
       ]
     },
@@ -160,7 +169,7 @@
     "commands": {
       "patterns": [
         {
-          "match": "^\\s*(write|look|move|set|ensure|execute|call|proxy|setstring|addstring|padstring|split|length|points|append|append_fc|append_nt|append_lc|insert|cursor|style|sound|image|volume|timer|button|control|hyperlink|hyperlinkNE|hidden|option|prompt|clear|flush|more|getenv|savegame|restoregame|restartgame|endgame|undomove|terminate|inspect|output|mesg|error|travel|position|bearing|distance|dir_to|npc_to)\\b",
+          "match": "^\\s*(write|look|move|set|ensure|execute|call|proxy|setstring|addstring|padstring|split|length|points|append|append_fc|append_nt|append_lc|insert|cursor|style|sound|image|volume|timer|button|control|hyperlink|hyperlinkNE|hidden|option|prompt|clear|flush|more|getenv|savegame|restoregame|restartgame|endgame|undomove|terminate|inspect|output|mesg|error|travel|position|bearing|distance|dir_to|npc_to|override|print)\\b",
           "name": "keyword.other.command.jacl"
         }
       ]

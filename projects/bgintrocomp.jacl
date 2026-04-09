@@ -3910,7 +3910,7 @@ if noun1 has LIQUID
 write "A wet hand is your only reward.^"
 return true
 endif
-write "You gently tap on " noun1{the}.^"
+write "You gently tap on " noun1{the} ".^"
 }
 
 grammar smoke *present >smoke
@@ -6988,4 +6988,4 @@ return true
 endif
 return false
 }
-‚
+ï¿½

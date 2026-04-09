@@ -1,2 +1,0 @@
-LINKLIBS = -L/opt/homebrew/lib
-GLKLIB = -lcheapglk

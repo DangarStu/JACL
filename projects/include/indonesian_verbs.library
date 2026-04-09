@@ -1060,7 +1060,7 @@ if noun1 has LIQUID
    write "Tangan basah adalah satu-satunya hadiah Anda.^"
    return true
 endif
-write "Anda mengetuk pelan " noun1{the}.^"
+write "Anda mengetuk pelan " noun1{the} ".^"
 }
 
 grammar hisap *present >smoke
@@ -2256,7 +2256,8 @@ endselect
 set time = false
 }
 
-integer CHILDREN
+
+ CHILDREN
 
 {+object_children
 set INDEX = 0

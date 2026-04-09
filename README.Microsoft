@@ -4,5 +4,12 @@ For a quick-start look at some of the games included with this distribution,
 change into the 'bin' directory and type, for example: 
 'garjacl ..\projects\grail.jacl'
 
-For instructions and installation information see the appropriate chapter 
+For instructions and installation information see the appropriate chapter
 in the Author's Guide (guide/installation.html).
+
+VS Code syntax highlighting
+----------------------------
+
+To install the JACL extension for Visual Studio Code:
+
+    code --install-extension editors\vscode-jacl\jacl-0.1.0.vsix

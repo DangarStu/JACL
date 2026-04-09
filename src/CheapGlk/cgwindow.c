@@ -510,6 +510,18 @@ void glk_window_set_background_color(winid_t win, glui32 color)
     gli_strict_warning("window_set_background_color: graphics not supported.");
 }
 
+#ifdef GLK_MODULE_IMAGE2
+
+glui32 glk_image_draw_scaled_ext(winid_t win, glui32 image, 
+    glsi32 val1, glsi32 val2, glui32 width, glui32 height,
+    glui32 imagerule, glui32 maxwidth)
+{
+    gli_strict_warning("image_draw_scaled_ext: graphics not supported.");
+    return FALSE;
+}
+
+#endif /* GLK_MODULE_IMAGE2 */
+
 #endif /* GLK_MODULE_IMAGE */
 
 #ifdef GLK_MODULE_HYPERLINKS
@@ -535,3 +547,22 @@ void glk_cancel_hyperlink_event(winid_t win)
 }
 
 #endif /* GLK_MODULE_HYPERLINKS */
+
+#ifdef GLK_MODULE_LINE_ECHO
+
+void glk_set_echo_line_event(winid_t win, glui32 val)
+{
+    gli_strict_warning("set_echo_line_event: not supported.");
+}
+
+#endif /* GLK_MODULE_LINE_ECHO */
+
+#ifdef GLK_MODULE_LINE_TERMINATORS
+
+void glk_set_terminators_line_event(winid_t win, glui32 *keycodes, 
+    glui32 count)
+{
+    gli_strict_warning("set_terminators_line_event: not supported.");
+}
+
+#endif /* GLK_MODULE_LINE_TERMINATORS */
