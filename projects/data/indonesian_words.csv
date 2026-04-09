@@ -1,11 +1,11 @@
 indonesian,english
 aku,"I, me"
 saya,"I, me (formal)"
-kamu,"you (informal)"
+kamu,you (informal)
 anda,you (formal)
 dia,"he, she"
-kami,"we (exclusive)"
-kita,"we (inclusive)"
+kami,we (exclusive)
+kita,we (inclusive)
 mereka,"they, them"
 ini,"this, these"
 itu,"that, those"
@@ -169,7 +169,6 @@ sawah,rice field
 tanah,"land, soil"
 langit,sky
 matahari,sun
-bulan,moon
 bintang,star
 awan,cloud
 hujan,rain
@@ -385,11 +384,9 @@ binatang,animal
 anjing,dog
 kucing,cat
 burung,bird
-ikan,fish
 kuda,horse
 sapi,cow
 kambing,goat
-ayam,chicken
 bebek,duck
 ular,snake
 tikus,mouse
@@ -422,9 +419,7 @@ pemain,player
 perang,war
 damai,peace
 senjata,weapon
-tentara,army
 musuh,enemy
-teman,friend
 bangsa,nation
 negara,country
 pemerintah,government
@@ -433,7 +428,6 @@ aturan,"rule, regulation"
 kebijakan,policy
 pengadilan,court (of law)
 kerajaan,kingdom
-baik,good
 benar,"right, correct, true"
 salah,"wrong, mistake"
 betul,"correct, true"
@@ -460,7 +454,6 @@ tujuan,"goal, purpose"
 cara,way
 hal,"thing, matter"
 sesuatu,something
-banyak,many
 saja,"only, just"
 pun,also
 sih,(emphasis particle)
@@ -487,14 +480,11 @@ se,one/each
 ku,"my, I (prefix)"
 mu,your (suffix)
 nya,"his, her, its"
-di,(prefix: passive)
 ber,(prefix: intransitive verb)
 me,(prefix: active verb)
 ter,(prefix: superlative/accidental)
 pe,(prefix: doer/noun)
-ke,(prefix: ordinal/noun)
 an,(suffix: noun)
-kan,(suffix: causative)
 bagi,"for, divide"
 gila,"crazy, insane"
 keren,"cool, awesome"
@@ -507,7 +497,6 @@ fokus,focus
 santai,"relaxed, easy-going"
 semangat,"spirit, enthusiasm"
 dewasa,"adult, mature"
-wanita,"woman, female"
 cewek,girl (informal)
 cowok,boy (informal)
 gue,I (Jakarta slang)
@@ -535,7 +524,7 @@ darimana,from where
 mengapa,why
 bilamana,when (formal)
 bakar,"burn, grill"
-pasang,"pair; install; tide"
+pasang,pair; install; tide
 putar,"turn, rotate, spin"
 gelar,"title, degree"
 simpan,"save, store, keep"
@@ -625,7 +614,6 @@ jauh,far
 sini,here
 situ,there
 sana,there (far)
-mana,where
 sekitar,"around, approximately"
 tengah,"middle, center"
 samping,side
@@ -643,7 +631,7 @@ tong,"barrel, drum"
 batang,"stem, trunk, bar"
 bel,"bell, doorbell"
 muka,face
-liat,"tough; see (informal)"
+liat,tough; see (informal)
 pekan,week
 ganda,double
 sara,sensitive/taboo topic
@@ -652,7 +640,7 @@ rob,tidal flood
 bang,brother (informal)
 bak,"like, as; tub, basin"
 soda,soda
-apel,"apple; roll call"
+apel,apple; roll call
 anggur,"grape, wine; unemployed"
 bibi,aunt
 buta,blind
@@ -667,11 +655,11 @@ gawat,"critical, serious"
 medali,medal
 jarak,distance
 jalang,"wild, stray"
-banci,"census; transgender (informal)"
+banci,census; transgender (informal)
 segel,seal
 roma,pore
-koma,"comma; coma"
-tambang,"mine; rope"
+koma,comma; coma
+tambang,mine; rope
 derek,"crane, tow truck"
 tata,"order, arrangement"
 badai,storm
@@ -694,7 +682,6 @@ alam,"nature, world"
 bom,bomb
 pelacur,prostitute
 keranjang,basket
-perahu,boat
 komentar,comment
 alat,"tool, device"
 pak,"sir, Mr."
@@ -736,7 +723,6 @@ bos,boss
 karyawan,employee
 manajer,manager
 pegawai,staff
-tentara,soldier
 pilot,pilot
 sopir,driver
 nelayan,fisherman
@@ -746,7 +732,7 @@ pengacara,lawyer
 ilmuwan,scientist
 insinyur,engineer
 perawat,nurse
-kali,"time (occurrence); river"
+kali,time (occurrence); river
 dasar,"base, basis"
 sumber,source
 bagian,part
@@ -757,7 +743,6 @@ warna,color
 merah,red
 kuning,yellow
 hijau,green
-biru,blue
 putih,white
 hitam,black
 cokelat,brown
@@ -766,10 +751,6 @@ ungu,purple
 oranye,orange
 jingga,orange (color)
 pink,pink
-emas,gold (color)
-perak,silver (color)
-muda,light (color)
-tua,dark (color)
 tebal,thick
 tipis,thin
 bulat,round
@@ -795,7 +776,6 @@ plastik,plastic
 karet,rubber
 kapas,cotton
 sutra,silk
-kulit,leather; skin
 bambu,bamboo
 rotan,rattan
 bata,brick
@@ -827,7 +807,6 @@ sendok,spoon
 garpu,fork
 pisau,knife
 gelas,glass (drinking)
-botol,bottle
 panci,pot
 wajan,frying pan
 kompor,stove
@@ -835,7 +814,6 @@ kulkas,refrigerator
 kipas,fan
 telepon,telephone
 komputer,computer
-layar,screen
 radio,radio
 televisi,television
 kamera,camera
@@ -846,11 +824,9 @@ musik,music
 lagu,song
 suara,"voice, sound"
 bunyi,sound
-warna,color
 bau,"smell, odor"
 rasa,"taste, feeling"
 sentuhan,touch
-sakit,pain
 nikmat,pleasure
 manis,sweet
 asin,salty
@@ -864,10 +840,8 @@ harum,fragrant
 wangi,fragrant
 basi,stale
 mentah,raw
-matang,"ripe, cooked"
 goreng,fried
 rebus,boiled
-bakar,"grilled, burned"
 panggang,roasted
 kukus,steamed
 potong,"cut, piece"
@@ -888,19 +862,15 @@ bayam,spinach
 kangkung,water spinach
 terong,eggplant
 mentimun,cucumber
-kentang,potato
 jagung,corn
 kacang,"bean, nut"
-tahu,"know; tofu"
 tempe,tempeh
 santan,coconut milk
 kelapa,coconut
 pisang,banana
 mangga,mango
 jeruk,orange (fruit)
-apel,apple
 semangka,watermelon
-anggur,grape
 pepaya,papaya
 durian,durian
 rambutan,rambutan
@@ -1073,3 +1043,959 @@ restoran,restaurant
 obat,"medicine, drug"
 sabun,soap
 istirahat,"rest, break"
+acara,"event, program"
+akibat,"consequence, result"
+alergi,allergy
+amal,"charity, good deed"
+ambisi,ambition
+ancaman,threat
+aneh,"strange, weird"
+anggota,"member, limb"
+angkutan,transportation
+anjuran,"advice, recommendation"
+arah,direction
+arena,arena
+asli,"original, genuine"
+bab,"chapter, section"
+bahkan,even (emphasis)
+bahan,"material, ingredient"
+bahagia,happy
+bahu_membahu,cooperate
+ban,tire
+bangkit,"rise, get up"
+bantu,"help, assist"
+bawaan,"innate, default"
+bea,"fee, duty"
+beban,"burden, load"
+becak,pedicab
+bedak,powder
+bela,"defend, champion"
+belah,"split, half"
+beli,buy
+benda,"object, thing"
+bendera,flag
+bengkel,workshop
+berbelanja,go shopping
+berdoa,pray
+berhasil,succeed
+berjuang,struggle
+berjanji,promise
+berkembang,develop
+berlaku,"apply, be valid"
+bermacam-macam,various
+bermimpi,dream (verb)
+bernama,named
+berpakaian,dressed
+bersama,"together, with"
+bersedia,willing
+bertahan,endure
+bertemu,meet
+bertengkar,quarrel
+bertindak,act
+biaya,"cost, fee"
+bidang,"field, area"
+bijak,wise
+bingung,confused
+bisnis,business
+bolak-balik,back and forth
+bukit,hill
+bulu,"feather, fur"
+butir,"grain, item"
+cabang,"branch, chapter"
+cadangan,"reserve, backup"
+cair,liquid
+cakap,"capable, chat"
+campur,mix
+candu,"opium, addiction"
+canggih,sophisticated
+catat,"note, record"
+celaka,"unlucky, disaster"
+cemburu,jealous
+cenderung,"tend to, inclined"
+cerdas,"smart, intelligent"
+cerewet,fussy
+cita-cita,"dream, aspiration"
+cuaca,weather
+cuci,wash
+curhat,confide
+daerah,"area, region"
+dahulu,"before, formerly"
+dampak,impact
+dapat,"can, get, obtain"
+daratan,mainland
+darurat,emergency
+debu,dust
+demam,fever
+denda,fine (penalty)
+dendam,grudge
+deras,"heavy, swift (rain/flow)"
+dermawan,generous
+desain,design
+dilarang,forbidden
+diri,self
+diskon,discount
+doa,prayer
+dompet,wallet
+donasi,donation
+duduki,occupy
+duga,"guess, suspect"
+duka,"grief, sorrow"
+dukung,support
+dulang,pan (mining)
+dunia,world
+erat,"tight, close"
+fajar,dawn
+fakta,fact
+fasilitas,facility
+gagal,fail
+galak,fierce
+gangguan,disturbance
+gantung,hang
+garansi,warranty
+gawang,goal (sports)
+gelombang,wave
+gempa,earthquake
+genangan,puddle
+genap,even (number)
+generasi,generation
+gerbang,gate
+gerakan,movement
+giliran,"turn, shift"
+gosip,gossip
+gratis,free (no cost)
+gudang,warehouse
+gugup,nervous
+gulai,curry
+guna,"use, purpose"
+habis,"finished, used up"
+hadiah,"gift, prize"
+hadapi,face (confront)
+hafal,memorize
+halang,"block, obstruct"
+hamil,pregnant
+hantam,hit hard
+hapus,"delete, erase"
+harga_diri,"self-esteem, dignity"
+hargai,appreciate
+harmoni,harmony
+hasil,"result, yield"
+hati-hati,"be careful, cautious"
+hemat,"economical, save"
+heran,"amazed, surprised"
+hewan,animal
+hiasan,decoration
+hina,insult
+hormati,respect
+hubungan,relationship
+humoris,humorous
+ialah,"is, are (formal)"
+ibadah,worship
+ibu_kota,capital city
+ide,idea
+ijin,"permission, permit"
+iklim,climate
+imbalan,reward
+impian,dream
+informasi,information
+isyarat,signal
+izin,"permission, permit"
+jabatan,"position, office"
+jaga,"guard, watch"
+jamu,herbal medicine
+janji,"promise, appointment"
+jasa,"service, merit"
+jatah,ration
+jatuh,fall
+jawab,answer
+jejak,"trail, track"
+jelas,clear
+jembatan,bridge
+jemput,"pick up, fetch"
+jenis,"type, kind"
+jerat,"trap, snare"
+jiwa,"soul, spirit"
+juara,"champion, winner"
+judul,title
+julukan,nickname
+juru,expert
+kabar,news
+kadar,"level, content"
+kaget,startled
+kalah,lose
+kampanye,campaign
+kandung,"biological, womb"
+kapan_saja,anytime
+karya,"work, creation"
+kasihan,"pity, poor thing"
+kasus,case
+kawin,"marry, mate"
+kebanggaan,pride
+kebun,"garden, plantation"
+kecelakaan,accident
+kecewa,disappointed
+kecuali,except
+kecurigaan,suspicion
+kedatangan,arrival
+kegembiraan,joy
+kegiatan,activity
+keindahan,beauty
+kejadian,"event, incident"
+kejahatan,crime
+kekalahan,defeat
+kekayaan,wealth
+kekuatan,"strength, power"
+kekurangan,"shortage, lack"
+kelakuan,behavior
+kelembutan,gentleness
+keliling,around
+kelompok,group
+kemauan,"will, desire"
+kemenangan,victory
+kemerdekaan,"freedom, independence"
+kemiskinan,poverty
+kemungkinan,"possibility, chance"
+kendaraan,vehicle
+kepada,to (person)
+kepentingan,"interest, importance"
+kepercayaan,"trust, belief"
+keputusan,decision
+kerabat,relative
+kereta_api,train
+keriput,wrinkle
+kerja_sama,cooperation
+kerugian,loss
+kesalahan,"mistake, error"
+kesan,"impression, effect"
+kesehatan,health
+kesempatan,"opportunity, chance"
+kesenangan,pleasure
+kesetiaan,loyalty
+keterampilan,skill
+ketika,when
+kewajiban,obligation
+khawatir,worried
+khusus,special
+kilat,lightning
+kisah,story
+kirim,"send, deliver"
+klaim,claim
+komunitas,community
+kondisi,condition
+konsumen,consumer
+korban,victim
+kritik,criticism
+kualitas,quality
+kuasa,"power, authority"
+kubur,grave
+kunjungi,visit
+kuota,quota
+kurikulum,curriculum
+kursus,course
+laba,profit
+lahir,"born, birth"
+lalai,negligent
+lalu,then
+lanjut,"continue, advanced"
+larang,forbid
+lawan,opponent
+layak,"worthy, decent"
+lembaga,institution
+lembah,valley
+lengkap,"complete, full"
+libur,"holiday, off"
+lindungi,protect
+lomba,"race, competition"
+lobi,lobby
+logika,logic
+lotere,lottery
+lucu,funny
+lukis,paint (art)
+lumayan,"fairly, not bad"
+luncurkan,launch
+lurah,village head
+mahal,expensive
+mahasiswa,university student
+makhluk,creature
+malah,"instead, on the contrary"
+malu,shy
+mampu,able
+manfaat,benefit
+manusia,"human, mankind"
+masal,mass
+masing-masing,each
+masyarakat,"society, community"
+maut,death
+mawas_diri,self-aware
+medan,"field, terrain"
+memang,"indeed, truly"
+memiliki,"own, possess"
+memimpin,lead
+memperhatikan,pay attention
+memutuskan,decide
+menang,win
+menari,dance
+mencintai,"to love, be in love with"
+menduga,suspect
+mengagumkan,amazing
+mengaku,confess
+mengalami,experience
+mengejutkan,surprising
+mengeluh,complain
+menghargai,appreciate
+menghitung,count
+mengobati,treat (medical)
+mengubah,change
+mengunjungi,visit
+menikah,marry
+menikmati,enjoy
+menilai,"judge, evaluate"
+menonjol,prominent
+menolong,help
+menyetujui,approve
+merindukan,miss (someone)
+meskipun,although
+milik,"belonging, property"
+mimpi,dream
+minta_maaf,apologize
+modal,capital (money)
+momen,moment
+mudik,go home (for holiday)
+mulia,noble
+murid,"student, pupil"
+murah,cheap
+musim,"season, monsoon"
+nada,"tone, pitch"
+nafsu,"desire, appetite"
+nakal,naughty
+nasehat,advice
+nasib,"fate, destiny"
+negeri,"land, state"
+nekat,reckless
+niaga,"commerce, trade"
+nilai,"value, grade"
+niscaya,certainly
+noda,stain
+nomor,number
+normal,normal
+nuansa,nuance
+nyala,"flame, lit"
+nyaring,loud
+nyata,"real, actual"
+nyeri,pain
+nyonya,"Mrs., madam"
+ogah,reluctant
+olahraga,sport
+operasi,operation
+opini,opinion
+otak,brain
+otomatis,automatic
+pabrik,factory
+pahala,"merit, reward"
+pajak,tax
+paket,package
+panik,panic
+pangkat,"rank, grade"
+partai,party (political)
+pasien,patient
+pasukan,troops
+patah,"broken, fractured"
+patuh,obedient
+pawang,handler
+pedesaan,rural
+pejalan_kaki,pedestrian
+pekerja,worker
+pelabuhan,"port, harbor"
+pelajaran,lesson
+pelatihan,training
+pelemahan,weakening
+pelepasan,release
+pemandangan,view
+pembantu,assistant
+pembangunan,development
+pembayaran,payment
+pembelian,purchase
+pemberian,gift
+pembicaraan,conversation
+pemikiran,thought
+pemilihan,election
+pemilik,owner
+penampilan,appearance
+pendapatan,income
+pendidikan,education
+penelitian,research
+penerbangan,flight
+pengaruh,influence
+pengetahuan,knowledge
+pengalaman,experience
+penghasilan,earnings
+pengiriman,delivery
+pengobatan,treatment
+pengumuman,announcement
+penilaian,assessment
+penjara,prison
+penjualan,sales
+pensiunan,retiree
+penyakit,disease
+penyesalan,regret
+peradaban,civilization
+perasaan,feeling
+perban,bandage
+perbuatan,act
+perdagangan,"trade, commerce"
+perjanjian,"agreement, contract"
+perjuangan,struggle
+perjalanan,"journey, trip"
+perkara,"case, matter"
+perkawinan,marriage
+perkembangan,development
+perlengkapan,equipment
+perlindungan,protection
+permintaan,request
+pernikahan,wedding
+perpustakaan,library
+persaingan,competition
+persetujuan,approval
+pertandingan,match (sports)
+pertolongan,"help, rescue"
+pertumbuhan,growth
+perubahan,change
+perusahaan,company
+peserta,participant
+peta,map
+piala,"trophy, cup"
+pikiran,mind
+pilih,choose
+pinjam,borrow
+pintar,smart
+pipa,pipe
+pokok,"main, basic"
+pompa_bensin,gas station
+pos,post
+potensi,potential
+praktik,practice
+prakarsa,initiative
+profesi,profession
+proyek,project
+proses,process
+puas,satisfied
+puisi,poetry
+pulang,"go home, return"
+puncak,"peak, summit"
+punya,"have, own"
+pura-pura,pretend
+pusaka,heirloom
+pusing,dizzy
+putus,"broken, severed"
+racun,poison
+raih,"reach, achieve"
+rakyat,"people, populace"
+ramai,"crowded, busy"
+rambat,spread
+rampas,seize
+rancang,"design, plan"
+rantai,chain
+rawan,"vulnerable, prone"
+rawat,"treat, care for"
+reaksi,reaction
+rela,willing
+rencana,plan
+resep,recipe
+resmi,"official, formal"
+respon,response
+rindu,"miss, longing"
+riwayat,"history, record"
+robek,torn
+rohani,"spiritual, soul"
+romantis,romantic
+rombongan,group
+ruang,"room, space"
+runtuh,collapse
+rusak,"broken, damaged"
+rutin,routine
+saat,"moment, when"
+sadar,"aware, conscious"
+sah,"legal, valid"
+saksi,witness
+saldo,balance (account)
+salju,snow
+sambil,while
+sambung,connect
+sambutan,welcome
+sampah,garbage
+sandal,sandals
+sangsi,"doubt, sanction"
+santap,eat (formal)
+santunan,compensation
+saran,"suggestion, advice"
+sastra,literature
+segan,reluctant
+sehari-hari,daily
+seimbang,balanced
+sejarah,history
+seleksi,selection
+semoga,hopefully
+sempat,have time to
+sengaja,deliberately
+sepak_bola,football
+sepi,quiet
+serangan,attack
+sesama,fellow
+setia,"faithful, loyal"
+setuju,agree
+siaran,"broadcast, show"
+siksa,torture
+silau,glare
+simpang,intersection
+siswa,student (school)
+situasi,situation
+sopan,polite
+suka_cita,joy
+sumbangan,contribution
+sumur,well (water)
+sungkan,"reluctant, shy"
+suntik,inject
+sunyi,"silent, quiet"
+surga,heaven
+surat_kabar,newspaper
+susah,"difficult, troubled"
+susunan,"arrangement, structure"
+syarat,"condition, requirement"
+tabung,"tube, savings"
+takdir,"destiny, fate"
+takhta,throne
+tambah,add
+tampak,appear
+tandatangan,signature
+tangga,"stairs, ladder"
+tanggung_jawab,responsibility
+tangkap,catch
+tanjung,cape
+tantangan,challenge
+tarif,rate
+tawaran,offer
+tegar,"firm, strong"
+tegur,reprimand
+tekanan,pressure
+teknik,technique
+teladan,example
+teman_sejawat,colleague
+tenggelam,sink
+tepat,"exact, right"
+tepuk,clap
+terikat,bound
+terinspirasi,inspired
+terkejut,"shocked, startled"
+terlambat,late
+termasuk,including
+ternyata,"it turns out, apparently"
+tersedia,available
+tertulis,written
+tewas,"killed, perish"
+tiba,arrive
+tindakan,"action, measure"
+titik,"point, dot"
+toleransi,tolerance
+topik,topic
+tradisi,tradition
+tren,trend
+tugas,"task, duty"
+tukar,"exchange, swap"
+tumit,heel
+tumpah,spill
+tunda,postpone
+tuntut,"demand, sue"
+turut,"join, follow"
+uji,"test, examine"
+ulangi,repeat
+umpan,"bait, feed"
+undang,invite
+undian,lottery
+ungkap,express
+unik,unique
+universitas,university
+untung,"lucky, profit"
+urai,"unravel, elaborate"
+urgensi,urgency
+urusan,"matter, affair"
+usaha,"effort, business"
+usir,"drive away, expel"
+utama,"main, primary"
+utuh,"whole, intact"
+vaksin,vaccine
+variasi,variation
+versi,version
+visi,vision
+wacana,discourse
+wajah,face
+wajib,"obligatory, must"
+wakil,"deputy, representative"
+warisan,"inheritance, heritage"
+waspada,alert
+wisata,"tour, tourism"
+wisatawan,tourist
+yayasan,foundation
+zona,zone
+zaman,"age, era"
+abadi,eternal
+abstrak,abstract
+adegan,scene
+administrasi,administration
+adopsi,adoption
+aduk,stir
+agama,religion
+agresi,aggression
+akses,access
+aksi,action
+alamat,address
+alas,"base, mat"
+album,album
+alkohol,alcohol
+alur,"plot, flow"
+ambang,"threshold, brink"
+ampun,mercy
+analisis,analysis
+angan,"dream, fantasy"
+angkasa,sky
+angkat,"lift, raise"
+antar,"deliver, between"
+antri,"queue, line up"
+anugrah,"blessing, gift"
+api_unggun,campfire
+arsitektur,architecture
+asap,smoke
+asosiasi,association
+asrama,dormitory
+asuh,"care for, foster"
+atasan,"superior, boss"
+atlet,athlete
+awas,"watch out, beware"
+babat,"clear, slash"
+badut,clown
+bagasi,luggage
+bahasa_asing,foreign language
+bahtera,ark
+baik_hati,kind-hearted
+bakti,devotion
+balap,race
+balik,"reverse, return"
+banding,compare
+bangkrut,bankrupt
+banteng,bull
+baris,"line, row"
+basa-basi,small talk
+basmi,exterminate
+batuk,cough
+bawah_tanah,underground
+beasiswa,scholarship
+bebas,free
+beda,different
+bedah,surgery
+belokan,turn
+bencana,disaster
+bendungan,dam
+benteng,fort
+berakhir,end
+berbahaya,dangerous
+bercerai,divorce
+berdebat,debate
+bergabung,join
+berguna,useful
+bergerak,move
+berharap,hope
+berisi,contain
+berlebihan,excessive
+bermakna,meaningful
+bernafas,breathe
+bernilai,valuable
+bersabar,be patient
+bersatu,unite
+berterima_kasih,be grateful
+besaran,magnitude
+bibit,"seed, seedling"
+bidik,aim
+bimbang,hesitant
+bisik,whisper
+blok,block
+bocor,leak
+bosan,bored
+boyong,move (relocate)
+bubar,disperse
+budak,slave
+bujuk,persuade
+bunga,"flower, interest"
+bunuh,kill
+bupati,regent
+bursa,"exchange, market"
+cacat,"defect, disability"
+cagar,reserve
+calun,candidate
+cambuk,whip
+cangkok,transplant
+cari,search
+cek,check
+celurit,sickle
+cemerlang,brilliant
+cenderamata,souvenir
+cengkeram,grip
+ceramah,lecture
+ceria,cheerful
+cermat,"meticulous, careful"
+cipta,"create, creation"
+cuit,tweet
+cuma,only
+curang,cheat
+cuti,leave (time off)
+dalih,excuse
+dampingi,accompany
+dana,fund
+dangkal,shallow
+dataran_tinggi,highlands
+debat,debate
+dekati,approach
+dekorasi,decoration
+demi,for the sake of
+denah,"floor plan, layout"
+denyut,pulse
+depresi,depression
+dermaga,dock
+deteksi,detect
+dewi,goddess
+dialog,dialogue
+didik,educate
+dikit,a little (informal)
+dimensi,dimension
+diplomasi,diplomacy
+dirikan,establish
+disiplin,discipline
+distribusi,distribution
+dongkrak,jack (lift)
+drama,drama
+drastis,drastic
+efek,effect
+efektif,effective
+efisien,efficient
+egoisme,selfishness
+ekologi,ecology
+ekonomi,economy
+ekspor,export
+eksperimen,experiment
+ekspresi,expression
+elektronik,electronic
+elemen,element
+empati,empathy
+energi,energy
+esok,"tomorrow, next"
+etika,ethics
+evaluasi,evaluation
+evolusi,evolution
+festival,festival
+figur,figure
+filosofi,philosophy
+final,final
+finansial,financial
+fisik,physical
+flu,flu
+formal,formal
+formulir,form (document)
+forum,forum
+frekuensi,frequency
+frustasi,frustration
+fungsi,function
+furnitur,furniture
+gabung,merge
+gagasan,idea
+galeri,gallery
+gampang,easy
+gandum,wheat
+ganja,marijuana
+garap,"work on, cultivate"
+garasi,garage
+garis,line
+gelisah,restless
+gema,echo
+gemilang,glorious
+geografi,geography
+gerak,motion
+gerombolan,gang
+giat,active
+gizi,nutrition
+global,global
+golongan,"group, class"
+goresan,scratch
+grogi,nervous
+gubah,compose
+hadir,present
+hadirin,audience
+hakikat,essence
+hamba,"servant, slave"
+hambat,hinder
+hancur,"destroyed, ruined"
+hantu,ghost
+hartawan,wealthy person
+hayat,life
+hebat,"great, awesome"
+helikopter,helicopter
+helm,helmet
+heroin,heroin
+hidangan,dish (food)
+hierarki,hierarchy
+hitung,count
+hormon,hormone
+hostel,hostel
+hukuman,punishment
+humor,humor
+huruf,letter (alphabet)
+ibukota,capital city
+identitas,identity
+ideologi,ideology
+ijazah,diploma
+iklan,advertisement
+imam,imam
+imbang,balanced
+impor,import
+industri,industry
+infrastruktur,infrastructure
+inspirasi,inspiration
+insting,instinct
+instruksi,instruction
+internal,internal
+interaksi,interaction
+internasional,international
+investasi,investment
+jadwal,schedule
+jagoan,"hero, champion"
+jajah,colonize
+jalan_raya,highway
+jalur,"lane, path, route"
+jamuan,banquet
+jangka,"term, reach"
+jaringan,network
+jernih,clear (water)
+jinak,tame
+jurang,cliff
+jurnal,journal
+jurus,"method, technique"
+kabupaten,regency
+kalender,calendar
+kaliber,caliber
+kalori,calorie
+kambing_hitam,scapegoat
+kandang,"cage, stable"
+kantong,"pocket, bag"
+karakter,character
+karangan,essay
+kargo,cargo
+karier,career
+kartu,card
+kata_sandi,password
+kawal,escort
+kawasan,area
+kawat,wire
+kebersihan,cleanliness
+kecanduan,addiction
+kehadiran,attendance
+kehormatan,honor
+kejam,cruel
+kejutan,surprise
+kekerasan,violence
+keluhan,complaint
+kemalangan,misfortune
+kemewahan,luxury
+kemuliaan,glory
+kepadatan,density
+kerajinan,"craft, diligence"
+keringat,sweat
+kerohanian,spirituality
+kerumunan,crowd
+kesabaran,patience
+kesadaran,awareness
+kesatuan,unity
+keselamatan,safety
+kesiapan,readiness
+ketakutan,fear
+ketentuan,provision
+ketidakadilan,injustice
+kewarganegaraan,citizenship
+khidmat,solemn
+kiblat,direction (prayer)
+kimia,chemistry
+kiprah,performance
+klien,client
+kolam,"pool, pond"
+koleksi,collection
+komisi,commission
+komitmen,commitment
+kompetisi,competition
+kompleks,complex
+konflik,conflict
+kongres,congress
+konsep,concept
+konservasi,conservation
+konstitusi,constitution
+konstruksi,construction
+konsultasi,consultation
+kontrak,contract
+kontribusi,contribution
+kontroversi,controversy
+koordinasi,coordination
+korupsi,corruption
+kos,boarding house
+kredit,credit
+kreativitas,creativity
+kuburan,cemetery
+kuliah,college lecture
+kumpul,gather
+kunang-kunang,firefly
+kunjungan,visit
+kupon,coupon
+kurva,curve
+kutip,quote
+kutub,pole (geography)
+lancar,"smooth, fluent"
+landasan,"foundation, runway"
+langka,rare
+lapangan,"field, court"
+lapisan,layer
+lapor,report
+latar,"background, setting"
+latih,train
+layanan,service
+ledakan,explosion
+legal,legal
+leluhur,ancestor
+lembar,"sheet, piece"
+lengan,arm
+level,level
+liar,wild
+liberal,liberal
+lindung,shelter
+lingkungan,environment
+lipat,fold
+lisensi,license
+literatur,literature
+lokasi,location
+longsor,landslide
+lulusan,graduate
+lumpur,mud
+majalah,magazine
+makam,tomb
+makmur,prosperous
+maksud,"meaning, intention"
+mangkir,absent
+manufaktur,manufacturing
+mapan,established
+marginal,marginal
+maritim,maritime
+megah,magnificent
+mekah,Mecca
+melodi,melody
+memonitor,monitor
+mempelajari,study
+memperbarui,update
+menakjubkan,astonishing
+mencurigakan,suspicious
+menebus,redeem
+menghormati,honor
+menoleh,"turn, glance"
+menyambut,welcome
+merawat,"take care of, treat"
