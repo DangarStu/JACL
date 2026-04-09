@@ -267,7 +267,9 @@ main(int argc, char *argv[])
 	write_text("Loading...");
 	jflush();
 
-	read_gamefile();
+	if (read_gamefile()) {
+		terminate(48);
+	}
 
 	clrscrn();
 	execute("+intro");

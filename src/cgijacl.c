@@ -294,11 +294,19 @@ main(int argc, char *argv[])
         terminate(42);
     }
 
-    read_gamefile();
+    if (read_gamefile()) {
+        printf("Content-type: text/html\r\n\r\n");
+        printf("<html><head><title>Error</title></head><body>");
+        printf("<h1>Game Load Error</h1>");
+        printf("<p>The game file contains errors and could not be loaded. ");
+        printf("Please check the error log for details.</p>");
+        printf("</body></html>");
+        terminate(48);
+    }
 
     // INTIALISE THE CSV PARSER
     csv_init(&parser_csv, CSV_APPEND_NULL);
-  
+
     // CODE THAT IS ONLY RUN ONCE WHEN THE GAME IS LOADED
     execute ("+bootstrap");
 

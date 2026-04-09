@@ -263,7 +263,9 @@ glk_main(void)
 	csv_init(&parser_csv, CSV_APPEND_NULL);
   
 	/* NO PREPROCESSOR ERRORS, LOAD THE GAME FILE */
-	read_gamefile();
+	if (read_gamefile()) {
+		terminate(48);
+	}
 
 	execute ("+bootstrap");
 

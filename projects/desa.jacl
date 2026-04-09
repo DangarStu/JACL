@@ -1,0 +1,333 @@
+#!../bin/jacl
+#                                                                    KEHIDUPAN DESA
+# -----------------------------------------------------------------------------
+# An Indonesian language learning game set in a Balinese village.
+# -----------------------------------------------------------------------------
+
+constant game_title		"Kehidupan Desa"
+constant game_author	"Stuart Allen"
+constant game_version	1
+
+string header_colour "#5a7a3a"
+string linkbar_colour "#6e8c52"
+string maintext_colour "#f5f0e8"
+
+# -----------------------------------------------------------------------------
+# LOCATIONS
+# -----------------------------------------------------------------------------
+
+location rumah : rumah pondok gubuk
+  short		name "Rumah"
+  south		sawah
+
+{look
+print:
+   Kamu berada di dalam rumahmu yang kecil tapi nyaman.
+   Dindingnya terbuat dari bambu dan atapnya dari daun
+   kelapa. Ada sebuah tikar di lantai dan sebuah meja
+   kayu kecil di sudut. Pintu mengarah ke selatan menuju
+   sawah.^
+.
+}
+
+object tikar : tikar
+  short		sebuah "tikar"
+  mass		scenery
+
+{examine
+write "Tikar ini terbuat dari anyaman pandan. Kamu tidur di atasnya setiap malam.^"
+}
+
+object meja : meja kayu
+  short		sebuah "meja kayu"
+  has		SURFACE
+  mass		scenery
+
+{examine
+write "Meja kayu kecil yang sederhana. Permukaannya halus karena sudah sering dipakai.^"
+}
+
+object cangkir : cangkir kopi
+  short		sebuah "cangkir kopi"
+  long		"Sebuah cangkir kopi ada di atas meja.^"
+  parent	meja
+  mass		5
+
+{examine
+write "Cangkir keramik berisi kopi hitam yang masih hangat.^"
+}
+
+{drink
+write "Kamu menyeruput kopi hitam. Pahit tapi enak.^"
+}
+
+# -----------------------------------------------------------------------------
+
+location sawah : sawah padi
+  short		name "Sawah"
+  north		rumah
+  west		jalan_utama
+
+{look
+print:
+   Kamu berdiri di tepi sawah yang luas. Tanaman padi
+   berwarna hijau terang bergoyang tertiup angin. Di
+   kejauhan, kamu bisa melihat gunung. Rumahmu yang kecil
+   terletak di sebelah utara. Jalan menuju desa ada di
+   sebelah barat.^
+.
+}
+
+object padi : padi tanaman
+  short		name "padi"
+  mass		scenery
+
+{examine
+write "Tanaman padi tumbuh subur. Butirnya hampir siap dipanen.^"
+}
+
+object capung : capung
+  short		seekor "capung"
+  mass		scenery
+
+{examine
+write "Capung berwarna biru terbang rendah di atas air sawah.^"
+}
+
+# -----------------------------------------------------------------------------
+
+location jalan_utama : jalan utama
+  short		name "Jalan Utama"
+  east		sawah
+  north		warung
+  south		banjar
+
+{look
+print:
+   Kamu berada di jalan utama desa. Jalan tanah ini
+   menghubungkan seluruh desa. Di sebelah utara ada
+   sebuah warung kecil. Sebuah jalan kecil menuju ke
+   selatan ke banjar. Ke timur, jalan mengarah ke sawah.^
+.
+}
+
+object pohon : pohon besar
+  short		sebuah "pohon besar"
+  mass		scenery
+
+{examine
+write "Pohon beringin yang besar dan tua. Akarnya menjalar ke mana-mana.^"
+}
+
+object anjing : anjing
+  short		seekor "anjing"
+  long		"Seekor anjing tidur di bawah pohon.^"
+  mass		scenery
+
+{examine
+write "Anjing kampung yang kurus sedang tidur di bawah pohon. "
+write "Telinganya bergerak-gerak mengusir lalat.^"
+}
+
+{talk_to
+write "Anjing itu mengangkat kepalanya sebentar, lalu tidur lagi.^"
+}
+
+# -----------------------------------------------------------------------------
+
+location warung : warung kedai toko
+  short		name "Warung"
+  south		jalan_utama
+
+{look
+print:
+   Kamu berada di sebuah warung kecil di pinggir jalan.
+   Ada sebuah meja panjang dengan beberapa bangku. Bau
+   makanan yang sedap mengisi udara. Di belakang meja
+   ada rak berisi berbagai makanan ringan dan minuman.
+   Jalan utama ada di sebelah selatan.^
+.
+}
+
+object bangku : bangku
+  short		sebuah "bangku"
+  mass		scenery
+
+{examine
+write "Bangku kayu panjang untuk duduk para pelanggan.^"
+}
+
+{sit_on
+write "Kamu duduk di bangku. Enak untuk istirahat sebentar.^"
+}
+
+object rak : rak
+  short		sebuah "rak"
+  mass		scenery
+
+{examine
+write "Rak kayu berisi keripik, kacang, air mineral, dan beberapa botol kecap.^"
+}
+
+object ibu_warung : ibu wanita penjual
+  short		name "Ibu Warung"
+  long		"Ibu Warung berdiri di belakang meja, tersenyum ramah.^"
+  has		ANIMATE
+  mass		heavy
+
+{examine
+write "Ibu Warung adalah wanita paruh baya yang ramah. "
+write "Dia selalu tersenyum kepada pelanggannya.^"
+}
+
+{talk_to
+write "~Selamat datang!~ kata Ibu Warung. ~Mau pesan apa hari ini?~^"
+}
+
+{ask_about_makanan
+write "~Hari ini ada nasi goreng dan mie goreng,~ kata Ibu Warung.^"
+}
+
+{ask_about_desa
+write "~Desa ini sudah ada sejak lama,~ kata Ibu Warung. "
+write "~Kehidupan di sini tenang dan damai.~^"
+}
+
+# -----------------------------------------------------------------------------
+
+location banjar : banjar balai aula
+  short		name "Banjar"
+  north		jalan_utama
+
+{look
+print:
+   Kamu berada di banjar, balai pertemuan desa. Bangunan
+   ini terbuka di sisinya dengan atap tinggi yang ditopang
+   oleh tiang-tiang kayu. Ada beberapa kursi dan sebuah
+   meja besar di tengah ruangan. Jalan kembali ke utara
+   menuju jalan utama.^
+.
+}
+
+object tiang : tiang kayu
+  short		sebuah "tiang kayu"
+  mass		scenery
+
+{examine
+write "Tiang-tiang kayu yang kokoh menopang atap banjar. "
+write "Ada ukiran sederhana di permukaannya.^"
+}
+
+object meja_besar : meja besar
+  short		sebuah "meja besar"
+  has		SURFACE
+  mass		scenery
+
+{examine
+write "Meja besar tempat warga desa berkumpul untuk rapat dan upacara.^"
+}
+
+object buku_tamu : buku tamu
+  short		sebuah "buku tamu"
+  long		"Sebuah buku tamu tergeletak di atas meja.^"
+  parent	meja_besar
+  mass		5
+
+{examine : read
+write "Buku ini berisi nama-nama tamu yang pernah mengunjungi desa. "
+write "Halaman terakhir masih kosong.^"
+}
+
+# -----------------------------------------------------------------------------
+# PLAYER
+# -----------------------------------------------------------------------------
+
+object kryten : aku diri sendiri saya
+  has		ANIMATE
+  short		name "kamu"
+  quantity	42
+  parent	rumah
+  player
+
+{examine
+write "Kamu merasa sehat dan siap untuk memulai hari.^"
+execute "+inventory"
+}
+
+# -----------------------------------------------------------------------------
+# SCENERY OBJECTS (MOVED TO LOCATIONS AS NEEDED)
+# -----------------------------------------------------------------------------
+
+object north_wall : utara dinding utara
+  has		NO_TAB
+  short		sebuah "dinding utara"
+
+object south_wall : selatan dinding selatan
+  has		NO_TAB
+  short		sebuah "dinding selatan"
+
+object east_wall : timur dinding timur
+  has		NO_TAB
+  short		sebuah "dinding timur"
+
+object west_wall : barat dinding barat
+  has		NO_TAB
+  short		sebuah "dinding barat"
+
+object ground : tanah lantai
+  has		SURFACE NO_TAB
+  short		sebuah "lantai"
+
+# -----------------------------------------------------------------------------
+# GLOBAL FUNCTIONS
+# -----------------------------------------------------------------------------
+
+{+intro
+style bold
+write "^^" game_title
+style normal
+write " oleh " game_author "^^"
+
+print:
+   Matahari pagi bersinar cerah di atas desa. Ayam
+   berkokok di kejauhan dan udara terasa sejuk. Hari
+   ini adalah hari yang baik untuk menjelajahi desa
+   dan bertemu dengan tetangga.^^
+.
+
+if here hasnt OUTDOORS
+   move north_wall to here
+   move south_wall to here
+   move east_wall to here
+   move west_wall to here
+endif
+
+set ground(parent) = here
+look
+}
+
+{+movement
+ifall destination != nowhere : destination hasnt OUTDOORS
+   move north_wall to destination
+   move south_wall to destination
+   move east_wall to destination
+   move west_wall to destination
+endif
+return false
+}
+
+grammar tentang >about
+
+{+about
+write "Kehidupan Desa adalah permainan untuk belajar bahasa Indonesia. "
+write "Jelajahi desa, bicara dengan penduduk, dan pelajari kata-kata baru.^"
+}
+
+# -----------------------------------------------------------------------------
+# INCLUDES
+# -----------------------------------------------------------------------------
+
+#include "indonesian.library"
+#include "indonesian_verbs.library"
+#include "webinterface.library"
+#include "webinterface.css"

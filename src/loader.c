@@ -44,7 +44,7 @@ static void create_string(const char *name, const char *value);
 static void create_integer(const char *name, int value);
 static void create_cinteger(const char *name, int value);
 
-void
+int
 read_gamefile()
 {
     int            index,
@@ -601,7 +601,7 @@ read_gamefile()
 
     if (errors) {
         totalerrs(errors);
-        terminate(48);
+        return errors;
     }
 
 /*************************************************************************
@@ -1019,8 +1019,10 @@ read_gamefile()
 
     if (errors) {
         totalerrs(errors);
-        terminate(48);
+        return errors;
     }
+
+    return 0;
 }
 
 void
@@ -1372,7 +1374,9 @@ restart_game()
     free_from(grammar_table);
     grammar_table = NULL;
 
-    read_gamefile();
+    if (read_gamefile()) {
+        log_error("Game reload failed due to errors, keeping previous state.", PLUS_STDERR);
+    }
 }
 
 void
