@@ -8,9 +8,9 @@ constant game_title		"Kehidupan Desa"
 constant game_author	"Stuart Allen"
 constant game_version	1
 
-string header_colour "#5a7a3a"
-string linkbar_colour "#6e8c52"
-string maintext_colour "#f5f0e8"
+constant header_colour "#5a7a3a"
+constant linkbar_colour "#6e8c52"
+constant maintext_colour "#f5f0e8"
 
 # -----------------------------------------------------------------------------
 # LOCATIONS
