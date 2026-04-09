@@ -68,6 +68,8 @@ install: all
 	@mkdir -p /usr/local/jacl/projects/temp
 	@mkdir -p /usr/local/jacl/logs
 	cp ../projects/include/*.library /usr/local/jacl/projects/include/
+	@mkdir -p /usr/local/jacl/projects/data
+	cp ../projects/data/*.csv /usr/local/jacl/projects/data/
 	cp ../etc/cgijacl.conf /usr/local/jacl/
 
 # Clean up
