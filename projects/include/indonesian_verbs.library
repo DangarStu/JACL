@@ -1375,7 +1375,7 @@ if noun1 has ANIMATE
 endif
 if noun1(mass) = scenery
    if noun1 grandof player
-      write "Gerakan akrobatik itu di luar kemampuan Anda.^"
+      write "Langkah akrobatik itu di luar kemampuan Anda.^"
       set time = false
       return
    else
@@ -4646,7 +4646,7 @@ move noun1 to limbo
 grammar blankjacl >blankjacl
 
 {+blankjacl
-write "Gerakan yang sangat cerdik.^"
+write "Anda perlu mengetik perintah. Ketik ~bantuan~ untuk informasi lebih lanjut.^"
 set time = false
 }
 

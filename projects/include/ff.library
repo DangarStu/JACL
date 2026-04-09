@@ -321,7 +321,8 @@ endif
 
  
 {+blankjacl
-write "Invalid command^"
+write "You need to type a command. Type ~help~ for more information.^"
+set time = false
 }
 
 {+number

@@ -4380,7 +4380,7 @@ move noun1 to limbo
 grammar blankjacl >blankjacl
 
 {+blankjacl
-write "A fiendishly clever move.^"
+write "You need to type a command. Type ~help~ for more information.^"
 set time = false
 }
 

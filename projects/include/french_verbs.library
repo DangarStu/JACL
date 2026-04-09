@@ -5089,8 +5089,7 @@ move noun1 to limbo
 grammar blankjacl >blankjacl
 
 {+blankjacl
-write "Je vous demande pardon ?^"
-#A fiendishly clever move
+write "Vous devez taper une commande. Tapez ~aide~ pour plus d'informations.^"
 set time = false
 }
 

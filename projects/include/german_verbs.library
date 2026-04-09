@@ -3352,7 +3352,8 @@ move noun1 to limbo
 grammar blankjacl >blankjacl
 
 {+blankjacl
-write "A fiendishly clever move.^"
+write "Sie müssen einen Befehl eingeben. Geben Sie ~hilfe~ ein, um weitere Informationen zu erhalten.^"
+set time = false
 }
 
 grammar instructions	>instructions
