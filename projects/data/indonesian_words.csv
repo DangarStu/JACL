@@ -179,6 +179,7 @@ bawah,"below, bottom"
 bawah tanah,underground
 bawang,onion
 bayam,spinach
+bayar,pay
 bayi,baby
 bea,"fee, duty"
 beasiswa,scholarship
@@ -271,6 +272,8 @@ bertahan,endure
 bertanya,ask
 bertemu,meet
 bertengkar,quarrel
+berteriak,"to yell, scream"
+berterima,to give thanks (used in berterima kasih)
 berterima kasih,be grateful
 bertindak,act
 beruang,bear (animal)
@@ -387,6 +390,7 @@ cincin,ring
 cinta,love
 cipta,"create, creation"
 cita-cita,"dream, aspiration"
+cium,"smell, kiss"
 coba,try
 cocok,"suitable, match"
 cokelat,brown
@@ -443,6 +447,7 @@ denah,"floor plan, layout"
 denda,fine (penalty)
 dendam,grudge
 dengan,with
+dengar,hear
 dengarkan,listen to
 denyut,pulse
 depan,front
@@ -677,6 +682,7 @@ hingga,until
 hisap,"suck, inhale"
 hitam,black
 hitung,count
+hormat,"salute, respect"
 hormati,respect
 hormon,hormone
 hostel,hostel
@@ -745,6 +751,7 @@ jahat,"evil, bad"
 jahe,ginger
 jajah,colonize
 jalan,"road, street, walk"
+jalan keluar,exit
 jalan raya,highway
 jalang,"wild, stray"
 jalur,"lane, path, route"
@@ -775,6 +782,7 @@ jembatan,bridge
 jemput,"pick up, fetch"
 jendela,window
 jenis,"type, kind"
+jentik,flick
 jerat,"trap, snare"
 jernih,clear (water)
 jeruk,orange (fruit)
@@ -1108,6 +1116,7 @@ lembut,soft
 lempar,throw
 lengan,arm
 lengkap,"complete, full"
+lepas,"release, remove"
 lepaskan,"release, untie"
 letakkan,"put, place"
 level,level
@@ -1117,6 +1126,7 @@ liat,tough; see (informal)
 liberal,liberal
 libur,"holiday, off"
 lidah,tongue
+lihat,"look, see"
 lilin,candle
 lima,five
 lindung,shelter
@@ -1209,42 +1219,82 @@ megah,magnificent
 meja,table
 mekah,Mecca
 melalui,through
+melambaikan,to wave
+melempar,to throw
+melepas,"to release, remove"
+melepaskan,"to release, untie"
 meletakkan,put
 melihat,see
 melodi,melody
+melompat,to jump
+melompati,to jump over
+memadamkan,"to extinguish, put out"
+memainkan,to play (something)
+memakai,"to wear, use"
+memakan,to eat
 memang,"indeed, truly"
+memanjat,to climb
 memasak,cook
 memastikan,ensure
+memasuki,to enter
+memasukkan,"to insert, put in"
+mematikan,"to turn off, switch off"
 membaca,read
+membakar,"to burn, grill"
 membantu,help
 membawa,bring
 membayar,pay
 membeli,buy
 memberi,give
+memberikan,"to give, hand over"
+memberitahu,"to tell, inform"
+membersihkan,to clean
 membosankan,boring
 membuat,make
+membuka,to open
+memecahkan,"to break, shatter"
+memeluk,"to hug, embrace"
+memeriksa,"to examine, check"
+memesan,to order
+memetik,"to pick, pluck"
 memiliki,"own, possess"
 memimpin,lead
+meminta,"to request, ask for"
+meminum,to drink
+memompa,to pump
 memonitor,monitor
+memotong,to cut
 mempelajari,study
+memperbaiki,"to fix, repair"
 memperbarui,update
 memperhatikan,pay attention
+memukul,"to hit, strike"
+memutar,"to turn, rotate"
 memutuskan,decide
+menaiki,"to ride, get on"
 menakjubkan,astonishing
 menang,win
 menantu,son/daughter-in-law
+menanyakan,to ask about
 menari,dance
 menarik,interesting
 menaruh,"put, place"
 mencari,search
+menceritakan,"to narrate, tell a story"
+mencicipi,"to taste, try"
 mencintai,"to love, be in love with"
+mencium,"to smell, kiss"
 mencoba,try
 mencurigakan,suspicious
 mendekati,approach
 mendengar,hear
+mendengarkan,to listen to
+mendorong,to push
 menduga,suspect
 menebus,redeem
+menekan,to press
 menemukan,find
+menendang,to kick
 menerima,receive
 mengagumkan,amazing
 mengajar,teach
@@ -1252,23 +1302,46 @@ mengaku,confess
 mengalami,experience
 mengambil,take
 mengapa,why
+mengarahkan,"to aim, point"
+mengatur,"to set, arrange"
+mengecup,to kiss
 mengejutkan,surprising
 mengeluh,complain
+mengenakan,"to wear, put on"
 mengerti,understand
+mengetuk,to knock
+menggali,to dig
+menggeledah,"to search, frisk"
+menggosok,"to rub, scrub"
+menggunakan,to use
+mengguncang,to shake
+menghancurkan,to destroy
 menghargai,appreciate
+menghidupkan,"to turn on, activate"
+menghisap,"to suck, inhale"
 menghitung,count
 menghormati,honor
+mengikat,"to tie, bind"
+mengikuti,to follow
 mengirim,send
+mengisi,to fill
 mengobati,treat (medical)
+mengosongkan,to empty
 mengubah,change
+mengunci,to lock
 mengunjungi,visit
+mengupas,to peel
 mengurus,"handle, take care of"
 menikah,marry
 menikmati,enjoy
 menilai,"judge, evaluate"
 menit,minute
+meniup,to blow
 menjadi,become
+menjatuhkan,to drop
 menjawab,answer
+menjentik,to flick
+menjilat,to lick
 menjual,sell
 menoleh,"turn, glance"
 menolong,help
@@ -1276,14 +1349,21 @@ menonjol,prominent
 mentah,raw
 mental,mental
 mentimun,cucumber
+menuang,to pour
 menulis,write
 menunggu,wait
 menunjukkan,show
 menurun,"decrease, decline"
+menuruni,to descend
 menurut,according to
+menutup,to close
+menyalakan,"to turn on, light"
 menyambut,welcome
+menyentuh,to touch
+menyerang,to attack
 menyetujui,approve
 menyewa,rent
+meraba,"to feel, grope"
 merah,red
 merasa,feel
 merawat,"take care of, treat"
@@ -1365,6 +1445,7 @@ nyata,"real, actual"
 nyeri,pain
 nyonya,"Mrs., madam"
 obat,"medicine, drug"
+objek,object
 ogah,reluctant
 olahraga,sport
 oleh,by
@@ -1385,6 +1466,7 @@ pahala,"merit, reward"
 pahit,bitter
 pajak,tax
 pak,"sir, Mr."
+pakai,"wear, use"
 paket,package
 paksa,"force, compel"
 paling,most (superlative)
@@ -1715,6 +1797,7 @@ sejarah,history
 sejuk,"cool, refreshing"
 sekali,very; once
 sekarang,now
+sekeliling,"around, surroundings"
 sekitar,"around, approximately"
 sekolah,school
 selalu,always
@@ -1854,6 +1937,7 @@ tantangan,challenge
 tanya,ask
 tapi,but
 tarif,rate
+tarik,"pull, tug"
 taruh,"put, place"
 tas,bag
 tata,"order, arrangement"
@@ -1862,6 +1946,7 @@ tebal,thick
 tegar,"firm, strong"
 tegur,reprimand
 teh,tea
+tekan,"press, push"
 tekanan,pressure
 teknik,technique
 teladan,example
@@ -1894,6 +1979,7 @@ terbuka,open
 terhadap,"toward, against"
 teriak,"yell, scream"
 terikat,bound
+terima,receive
 terima kasih,thank you
 terinspirasi,inspired
 terjadi,happen
@@ -1951,6 +2037,7 @@ tujuh,seven
 tukang,craftsman
 tukar,"exchange, swap"
 tulang,bone
+tulis,write
 tumbuh,grow
 tumit,heel
 tumpah,spill
@@ -2020,90 +2107,53 @@ yayasan,foundation
 yuk,let's go
 zaman,"age, era"
 zona,zone
-bayar,pay
-cium,"smell, kiss"
-dengar,hear
-hormat,"salute, respect"
-jalan keluar,exit
-jentik,flick
-lepas,"release, remove"
-lihat,"look, see"
-objek,object
-pakai,"wear, use"
-sekeliling,"around, surroundings"
-tarik,"pull, tug"
-tekan,"press, push"
-terima,receive
-tulis,write
-berterima,"to give thanks (used in berterima kasih)"
-mengguncang,to shake
-memeluk,"to hug, embrace"
-mengecup,to kiss
-menggali,to dig
-memetik,"to pick, pluck"
-menggosok,"to rub, scrub"
-menjilat,to lick
-memotong,to cut
-mengupas,to peel
-menghancurkan,to destroy
-memecahkan,"to break, shatter"
-membersihkan,to clean
-berteriak,"to yell, scream"
-memesan,to order
-mengetuk,to knock
-menghisap,"to suck, inhale"
-memainkan,to play (something)
-memompa,to pump
-mengosongkan,to empty
-memasukkan,"to insert, put in"
-menanyakan,to ask about
-meminta,"to request, ask for"
-memberitahu,"to tell, inform"
-menceritakan,"to narrate, tell a story"
-memberikan,"to give, hand over"
-mendorong,to push
-memeriksa,"to examine, check"
-menyentuh,to touch
-meraba,"to feel, grope"
-mencium,"to smell, kiss"
-mencicipi,"to taste, try"
-menggeledah,"to search, frisk"
-membuka,to open
-menutup,to close
-mengunci,to lock
-melepaskan,"to release, untie"
-melepas,"to release, remove"
-mengikat,"to tie, bind"
-memperbaiki,"to fix, repair"
-menyerang,to attack
-memukul,"to hit, strike"
-melambaikan,to wave
-melompat,to jump
-melompati,to jump over
-meniup,to blow
-mengarahkan,"to aim, point"
-melempar,to throw
-memakai,"to wear, use"
-mengenakan,"to wear, put on"
-memakan,to eat
-meminum,to drink
-menjentik,to flick
-menekan,to press
-menyalakan,"to turn on, light"
-membakar,"to burn, grill"
-memadamkan,"to extinguish, put out"
-mematikan,"to turn off, switch off"
-menghidupkan,"to turn on, activate"
-memanjat,to climb
-menaiki,"to ride, get on"
-memasuki,to enter
-mengikuti,to follow
-menggunakan,to use
-memutar,"to turn, rotate"
-menuang,to pour
-mendengarkan,to listen to
-menendang,to kick
-menjatuhkan,to drop
-mengisi,to fill
-mengatur,"to set, arrange"
-menuruni,to descend
+akarnya,its roots
+atapnya,its roof
+atasnya,on top of it
+baya,"age (as in paruh baya, middle-aged)"
+berada,to be located
+berbagai,various
+bergerak-gerak,moving around repeatedly
+bergoyang,swaying
+berkokok,to crow (rooster)
+berkumpul,to gather
+bersinar,to shine
+berwarna,colored
+butirnya,its grains
+dindingnya,its wall
+dipakai,to be used
+dipanen,to be harvested
+ditopang,to be supported
+jelajahi,explore (imperative)
+kata-kata,words
+kejauhan,in the distance
+kepalanya,his/her head
+kurus,"thin, skinny"
+memulai,to begin
+mengangkat,to lift
+mengarah,to lead toward
+menghubungkan,to connect
+mengusir,to chase away
+menjalar,to spread/creep
+menjelajahi,to explore
+menopang,to support
+menuju,to head toward
+menyeruput,to sip
+mineral,mineral
+nama-nama,names
+paruh,"half, beak"
+pelajari,"to study, learn"
+pelanggannya,its customers
+permukaannya,its surface
+rumahmu,your house
+sebentar,"a moment, briefly"
+sisinya,its side
+telinganya,its ears
+terakhir,"last, final"
+terasa,"feels, is felt"
+terbuat,made of
+tergeletak,lying (on a surface)
+terletak,"located, situated"
+tersenyum,to smile
+tertiup,blown by
+tiang-tiang,"pillars, poles"
