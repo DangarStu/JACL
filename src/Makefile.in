@@ -79,6 +79,7 @@ apache: install
 	@cp ../projects/*.blorb /usr/local/jacl/projects/ 2>/dev/null || true
 	@cp ../projects/*.media /usr/local/jacl/projects/ 2>/dev/null || true
 	@if [ -d ../projects/www ]; then cp -r ../projects/www /usr/local/jacl/projects/; fi
+	@if [ -d ../projects/images ]; then cp -r ../projects/images /usr/local/jacl/projects/; fi
 	@for game in /usr/local/jacl/projects/*.jacl; do \
 		name=$$(basename "$$game" .jacl); \
 		wrapper="/usr/local/jacl/fcgi-bin/$$name.fcgi"; \
