@@ -480,6 +480,8 @@ write "<script>enableSpeak();</script>"
 set time = false
 }
 
+grammar silience >unvoice
+grammar stop talking >unvoice
 grammar unvoice >unvoice
 
 {+unvoice

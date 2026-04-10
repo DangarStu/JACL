@@ -535,6 +535,7 @@ set display_mode = 0
 set time = false
 }
 
+grammar voice >voice
 grammar suara >voice
 
 {+voice
@@ -543,6 +544,9 @@ write "<script>enableSpeak();</script>"
 set time = false
 }
 
+grammar stop talking >unvoice
+grammar unvoice >unvoice
+grammar diam >unvoice
 grammar bisu >unvoice
 
 {+unvoice
