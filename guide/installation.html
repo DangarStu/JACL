@@ -9,7 +9,13 @@
 
 <h1><a class="title" name="installation0">Installation</a></h1>
 
-<p>The latest version of JACL can be found at <a href="http://code.google.com/p/jacl">http://code.google.com/p/jacl</a>. JACL is available as a zip file for Microsoft Windows and tar file for Unix operating systems. Once you have extracted the appropriate archive you will have a directory called <b>jacl</b> with several subdirectories. You will find the executable files in the <b>bin</b> subdirectory. In the Linux distribution you will find four interpreters: <b>jacl</b> is a console interpreter that uses the GlkTerm library by Andrew Plotkin, <b>garjacl</b> is a graphical interpreter that uses the Gargoyle library by Tor Andersson and Ben Cressey, while <b>cgijacl</b> and <b>fcgijacl</b> are the two web-based interpreters. <b>cgijacl</b> can be run directly from the command line and is used more for development purposes while <b>fcgijacl</b> must be used with a FastCGI-enabled webserver and is used more for production deployments. You will also find the program <b>bjorb</b>, a small utility (based on <b>blc</b> by Ross Raszewski) for creating the Blorb resource files that will contain any images and sounds you wish to use in your games. In the Microsoft Windows distribution you will find a single interpreter called <b>garjacl</b> and the same <b>bjorb</b> utility as in the Linux version. 
+<p>The latest version of JACL can be found on GitHub at <a href="https://github.com/DangarStu/JACL">https://github.com/DangarStu/JACL</a>. To get a copy of the source, clone the repository:
+
+<pre>
+git clone https://github.com/DangarStu/JACL.git
+</pre>
+
+<p>This will create a directory called <b>JACL</b> with several subdirectories. You will find the executable files in the <b>bin</b> subdirectory after compilation. In the Linux distribution you will find four interpreters: <b>jacl</b> is a console interpreter that uses the GlkTerm library by Andrew Plotkin, <b>cjacl</b> is a console interpreter that uses the CheapGlk library, while <b>cgijacl</b> and <b>fcgijacl</b> are the two web-based interpreters. <b>cgijacl</b> can be run directly from the command line and is used more for development purposes while <b>fcgijacl</b> must be used with a FastCGI-enabled webserver such as Apache and is used more for production deployments. You will also find the program <b>bjorb</b>, a small utility (based on <b>blc</b> by Ross Raszewski) for creating the Blorb resource files that will contain any images and sounds you wish to use in your games.
 
 <h2><a class="section" name="installation1">Compilation</a></h2>
 
@@ -24,8 +30,8 @@
 <td>GlkTerm by Andrew Plotkin (included) and ncursesw.
 </td>
 </tr><tr>
-<td><b>garjacl</b></td>
-<td>Gargoyle by Tor Andersson (included as a DLL and .so shared library).</td>
+<td><b>cjacl</b></td>
+<td>CheapGlk by Andrew Plotkin (included). No additional libraries required.</td>
 </tr><tr>
 <td><b>cgijacl</b></td>
 <td>No special libraries are required to compile <b>cgijacl</b>, however a POSIX compliant system is needed.
@@ -45,37 +51,18 @@ sudo apt install libfcgi-dev libapache2-mod-fcgid
 make install
 </pre>
 
-<p>This will compile all the relevant programs and copy the executable binaries into the <b>bin</b> subdirectory.
+<p>This will compile all the relevant programs and copy the executable binaries into the <b>bin</b> subdirectory, as well as installing the binaries, libraries, and configuration files to <b>/usr/local/jacl/</b>.
 
-<p>All the extra DLLs required for Microsoft Windows are included in the <b>bin</b> directory. In Linux distributions, only the core Gargoyle share library is included. This is file <b>libgarglk.so</b> in the <b>src/Gargoyle</b> directory and should be copied to the directory <b>/usr/local/lib</b>. Other required libraries should be installed using your operating systems packaging system. Below is the output of <b>ldd</b> to showing the complete list of libraries required:
+<p>In the <b>projects</b> directory you will find several JACL games. A JACL game consists of one or more <b>.jacl</b> files and an optional <b>.blorb</b> file that contains multimedia resources used by the game. If a JACL game consists of more than one <b>.jacl</b> file, the other file will be one of the library files from the <b>include</b> directory.
 
-<pre>
-libgarglk.so           libjpeg.so.62
-linux-gate.so.1        libm.so.6
-libc.so.6              ld-linux.so.2
-libfreetype.so.6       libz.so.1
-libgtk-1.2.so.0        libgdk-1.2.so.0
-libXi.so.6             libXext.so.6
-libX11.so.6            libglib-1.2.so.0
-libpng12.so.0          libSDL_mixer-1.2.so.0
-libSDL-1.2.so.0        libgmodule-1.2.so.0
-libdl.so.2             libXau.so.6
-libxcb-xlib.so.0       libxcb.so.1
-libasound.so.2         libdirectfb-1.0.so.0
-libfusion-1.0.so.0     libdirect-1.0.so.0
-libpthread.so.0        libXdmcp.so.6
-</pre> 
-
-<p>In the <b>games</b> directory you will find several JACL games. A JACL game consists of one or more <b>.jacl</b> files and an optional <b>.blorb</b> file that contains multimedia resources used by the game. If a JACL game consists of more than one <b>.jacl</b> file, the other file will be one of the library files from the <b>include</b> directory.
-
-<p>Inside the <b>games</b> directory you will also find a <b>temp</b> directory. This is the directory where the interpreter will create the <b>.j2</b> files. A <b>.j2</b> file is a concatenation of a main game file and all other files included from that file. They are created by the interpreter when the game is first run and are encrypted by default.
+<p>Inside the <b>projects</b> directory you will also find a <b>temp</b> directory. This is the directory where the interpreter will create the <b>.j2</b> files. A <b>.j2</b> file is a concatenation of a main game file and all other files included from that file. They are created by the interpreter when the game is first run and are encrypted by default.
 
 <table class="infowarn"><tr>
 <td><img src="warning.png" alt="Warning"></td>
 <td>Under Unix, the user the JACL interpreter is run as must have write permissions to the <b>temp</b> directory.</td>
 </tr></table>
 
-<p>The <b>include</b> directory is found inside the <b>games</b> directory. In the <b>include</b> directory you will find <b>verbs.library</b>, the main interactive fiction library and <b>frame.jacl</b>, a skeleton program used as a starting point when writing a new piece of interactive fiction.
+<p>The <b>include</b> directory is found inside the <b>projects</b> directory. In the <b>include</b> directory you will find <b>verbs.library</b>, the main interactive fiction library and other language-specific libraries.
 
 <p>In the <b>guide</b> directory you will find this documentation.
 
@@ -84,7 +71,7 @@ libpthread.so.0        libXdmcp.so.6
 <p>Once you have compiled versions of the JACL interpreters, try running one of the provided games by changing to the <b>bin</b> directory and typing the command:
 
 <pre>
-./garjacl ../games/grail.jacl
+./jacl ../projects/grail.jacl
 </pre>
 
 <p>When you do so, you should see something like the screen below:
@@ -125,10 +112,10 @@ libpthread.so.0        libXdmcp.so.6
 # "cgijacl.conf"
 # CGIJACL interpreter configuration file.
 
-access_log     "/usr/local/jacl/log/error.log" 
-access_log     "/usr/local/jacl/log/access.log" 
-temp           "/usr/local/jacl/games/temp/"
-include        "/usr/local/jacl/games/include/"
+access_log    "/usr/local/jacl/logs/access.log"
+error_log     "/usr/local/jacl/logs/error.log"
+temp          "/usr/local/jacl/projects/temp/"
+include       "/usr/local/jacl/projects/include/"
 </pre>
 
 <h2><a class="section" name="installation5">Playing the Sample Games</a></h2>
@@ -136,16 +123,15 @@ include        "/usr/local/jacl/games/include/"
 <p>Once you have compiled the JACL interpreters, try running one of the provided games by changing to the <b>bin</b> directory and typing the command:
 
 <pre>
-./cgijacl ../games/blackjacl.jacl
+./cgijacl ../projects/desa.jacl
 </pre>
 
 <p>This command will start the JACL interpreter on the default port of 4269, resulting in the following output:
 
 <pre>
-JACL Interpreter v2.7.0
-WebJACL: Registered 8 media.
+CGIJACL Interpreter v4.6.1
 WebJACL: No port number specified (-p <number>), using default port 4269.
-WebJACL server configured on WOPR:4269
+WebJACL server configured on localhost:4269
 </pre>
 
 <p>To play this game, open your favourite web browser and navigate to the URL <b>http://localhost:4269</b>. When you do so, you should see something like the screen below. If not, see the section on <a href="troubleshooting.html">Trouble Shooting</a>.
@@ -155,7 +141,7 @@ WebJACL server configured on WOPR:4269
 <p>To play this same game from the console, try the following command from the <b>bin</b> directory:
 
 <pre>
-./jacl ../games/blackjack.jacl
+./jacl ../projects/desa.jacl
 </pre>
 
 <h2><a class="section" name="installation6">Using JACL with FastCGI and Apache</a></h2>
