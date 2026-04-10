@@ -85,29 +85,8 @@ apache: install
 		chmod 755 "$$wrapper"; \
 		echo "  $$name.fcgi"; \
 	done
-	@echo "Creating Apache configuration..."
-	@printf '<IfModule mod_fcgid.c>\n\
-  FcgidMaxProcesses 10\n\
-  FcgidMaxProcessesPerClass 1\n\
-  FcgidIOTimeout 120\n\
-  FcgidIdleTimeout 300\n\
-  FcgidProcessLifeTime 3600\n\
-\n\
-  ScriptAlias /jacl/ "/usr/local/jacl/fcgi-bin/"\n\
-\n\
-  <Directory "/usr/local/jacl/fcgi-bin">\n\
-    SetHandler fcgid-script\n\
-    Options +ExecCGI\n\
-    Require all granted\n\
-  </Directory>\n\
-\n\
-  Alias /www/ "/usr/local/jacl/projects/www/"\n\
-\n\
-  <Directory "/usr/local/jacl/projects/www">\n\
-    Options -Indexes\n\
-    Require all granted\n\
-  </Directory>\n\
-</IfModule>\n' > /etc/apache2/conf-available/jacl.conf
+	@echo "Installing Apache configuration..."
+	cp ../etc/jacl-apache.conf /etc/apache2/conf-available/jacl.conf
 	a2enconf jacl
 	@echo "Setting permissions..."
 	chown -R www-data:www-data /usr/local/jacl/projects/temp
