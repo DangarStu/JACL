@@ -3858,6 +3858,8 @@ printf '%s\n' "$as_me: libfcgi found -- will build fcgijacl" >&6;}
 else
     { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: libfcgi not found -- fcgijacl will not be built" >&5
 printf '%s\n' "$as_me: WARNING: libfcgi not found -- fcgijacl will not be built" >&2;}
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: On Debian/Ubuntu install with: sudo apt install libfcgi-dev" >&5
+printf '%s\n' "$as_me: WARNING: On Debian/Ubuntu install with: sudo apt install libfcgi-dev" >&2;}
 fi
 
 # -----------------------------------------------------------
