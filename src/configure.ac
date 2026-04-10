@@ -34,10 +34,8 @@ AC_MSG_NOTICE([interpreter language: $jacl_language])
 # Directories for bundled libraries
 CGIHTML_DIR=cgihtml-1.69
 GLKTERM_DIR=glkterm
-CHEAPGLK_DIR=CheapGlk
 AC_SUBST([CGIHTML_DIR])
 AC_SUBST([GLKTERM_DIR])
-AC_SUBST([CHEAPGLK_DIR])
 
 # Common source files
 COMMON_SRC="findroute.c interpreter.c loader.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c libcsv.c"
@@ -161,8 +159,8 @@ fi
 # -----------------------------------------------------------
 # Build the target list
 # -----------------------------------------------------------
-BUILD_TARGETS="bjorb cjacl cgijacl"
-INSTALL_CMDS="cp bjorb cjacl cgijacl ../bin/; install bjorb cjacl cgijacl /usr/local/bin/"
+BUILD_TARGETS="bjorb cgijacl"
+INSTALL_CMDS="cp bjorb cgijacl ../bin/; install bjorb cgijacl /usr/local/bin/"
 
 if test "$HAVE_NCURSES" = "yes"; then
     BUILD_TARGETS="$BUILD_TARGETS jacl"
@@ -180,7 +178,7 @@ AC_SUBST([INSTALL_CMDS])
 # -----------------------------------------------------------
 # Generate output files
 # -----------------------------------------------------------
-AC_CONFIG_FILES([Makefile glkterm/Makefile CheapGlk/Makefile])
+AC_CONFIG_FILES([Makefile glkterm/Makefile])
 AC_OUTPUT
 
 # -----------------------------------------------------------
@@ -191,7 +189,6 @@ echo "JACL $PACKAGE_VERSION configured."
 echo ""
 echo "  Interpreters to build:"
 echo "    bjorb         yes (utility)"
-echo "    cjacl         yes (CheapGlk console)"
 echo "    cgijacl       yes (CGI web)"
 if test "$HAVE_NCURSES" = "yes"; then
 echo "    jacl          yes (GlkTerm console)"

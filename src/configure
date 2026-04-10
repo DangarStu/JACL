@@ -3610,7 +3610,6 @@ printf '%s\n' "$as_me: interpreter language: $jacl_language" >&6;}
 # Directories for bundled libraries
 CGIHTML_DIR=cgihtml-1.69
 GLKTERM_DIR=glkterm
-CHEAPGLK_DIR=CheapGlk
 
 
 
@@ -3865,8 +3864,8 @@ fi
 # -----------------------------------------------------------
 # Build the target list
 # -----------------------------------------------------------
-BUILD_TARGETS="bjorb cjacl cgijacl"
-INSTALL_CMDS="cp bjorb cjacl cgijacl ../bin/; install bjorb cjacl cgijacl /usr/local/bin/"
+BUILD_TARGETS="bjorb cgijacl"
+INSTALL_CMDS="cp bjorb cgijacl ../bin/; install bjorb cgijacl /usr/local/bin/"
 
 if test "$HAVE_NCURSES" = "yes"; then
     BUILD_TARGETS="$BUILD_TARGETS jacl"
@@ -3884,7 +3883,7 @@ fi
 # -----------------------------------------------------------
 # Generate output files
 # -----------------------------------------------------------
-ac_config_files="$ac_config_files Makefile glkterm/Makefile CheapGlk/Makefile"
+ac_config_files="$ac_config_files Makefile glkterm/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -4541,7 +4540,6 @@ do
   case $ac_config_target in
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "glkterm/Makefile") CONFIG_FILES="$CONFIG_FILES glkterm/Makefile" ;;
-    "CheapGlk/Makefile") CONFIG_FILES="$CONFIG_FILES CheapGlk/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: '$ac_config_target'" "$LINENO" 5;;
   esac
@@ -5007,7 +5005,6 @@ echo "JACL $PACKAGE_VERSION configured."
 echo ""
 echo "  Interpreters to build:"
 echo "    bjorb         yes (utility)"
-echo "    cjacl         yes (CheapGlk console)"
 echo "    cgijacl       yes (CGI web)"
 if test "$HAVE_NCURSES" = "yes"; then
 echo "    jacl          yes (GlkTerm console)"

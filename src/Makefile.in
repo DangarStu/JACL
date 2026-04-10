@@ -6,7 +6,6 @@ CFLAGS = @CFLAGS@ -Wno-unused-result
 # Directories
 CGIHTML_DIR = @CGIHTML_DIR@
 GLKTERM_DIR = @GLKTERM_DIR@
-CHEAPGLK_DIR = @CHEAPGLK_DIR@
 
 # Detected library flags
 NCURSES_CFLAGS = @NCURSES_CFLAGS@
@@ -30,10 +29,6 @@ bjorb: bjorb.c
 jacl: libglkterm.a
 	$(CC) $(CFLAGS) -DGLK jacl.c glk_startup.c $(COMMON_SRC) glk_saver.c -I$(GLKTERM_DIR) -L$(GLKTERM_DIR) -lglkterm -lm $(NCURSES_LIBS) -o jacl
 
-# Cjacl target (CheapGlk console, no ncurses needed)
-cjacl: libcheapglk.a
-	$(CC) $(CFLAGS) -DGLK jacl.c glk_startup.c $(COMMON_SRC) glk_saver.c -I$(CHEAPGLK_DIR) -L$(CHEAPGLK_DIR) -lcheapglk -lm -o cjacl
-
 # Cgijacl target (CGI web)
 cgijacl: libcgihtml.a webjacl.o
 	$(CC) $(CFLAGS) -DWEBJACL cgijacl.c $(COMMON_SRC) saver.c webjacl.o -I$(CGIHTML_DIR) -Iwebjacl -L$(CGIHTML_DIR) -lcgihtml -lm -o cgijacl
@@ -47,9 +42,6 @@ webjacl.o: webjacl.c webjacl.h language.h
 	$(CC) $(CFLAGS) -c webjacl.c -o webjacl.o
 
 # External libraries targets
-libcheapglk.a:
-	cd $(CHEAPGLK_DIR) && $(MAKE) libcheapglk.a
-
 libglkterm.a:
 	cd $(GLKTERM_DIR) && $(MAKE) libglkterm.a
 
@@ -140,12 +132,10 @@ apache: install
 # Clean up
 clean:
 	rm -f *.o
-	rm -f cgijacl fcgijacl bjorb jacl cjacl
+	rm -f cgijacl fcgijacl bjorb jacl
 	cd $(CGIHTML_DIR) && $(MAKE) clean
 	cd $(GLKTERM_DIR) && $(MAKE) clean
-	cd $(CHEAPGLK_DIR) && $(MAKE) clean
 
 distclean: clean
 	rm -f Makefile config.log config.status
 	rm -f $(GLKTERM_DIR)/Makefile
-	rm -f $(CHEAPGLK_DIR)/Makefile

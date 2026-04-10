@@ -15,7 +15,7 @@
 git clone https://github.com/DangarStu/JACL.git
 </pre>
 
-<p>This will create a directory called <b>JACL</b> with several subdirectories. You will find the executable files in the <b>bin</b> subdirectory after compilation. In the Linux distribution you will find four interpreters: <b>jacl</b> is a console interpreter that uses the GlkTerm library by Andrew Plotkin, <b>cjacl</b> is a console interpreter that uses the CheapGlk library, while <b>cgijacl</b> and <b>fcgijacl</b> are the two web-based interpreters. <b>cgijacl</b> can be run directly from the command line and is used more for development purposes while <b>fcgijacl</b> must be used with a FastCGI-enabled webserver such as Apache and is used more for production deployments. You will also find the program <b>bjorb</b>, a small utility (based on <b>blc</b> by Ross Raszewski) for creating the Blorb resource files that will contain any images and sounds you wish to use in your games.
+<p>This will create a directory called <b>JACL</b> with several subdirectories. You will find the executable files in the <b>bin</b> subdirectory after compilation. In the Linux distribution you will find three interpreters: <b>jacl</b> is a console interpreter that uses the GlkTerm library by Andrew Plotkin, while <b>cgijacl</b> and <b>fcgijacl</b> are the two web-based interpreters. <b>cgijacl</b> can be run directly from the command line and is used more for development purposes while <b>fcgijacl</b> must be used with a FastCGI-enabled webserver such as Apache and is used more for production deployments. You will also find the program <b>bjorb</b>, a small utility (based on <b>blc</b> by Ross Raszewski) for creating the Blorb resource files that will contain any images and sounds you wish to use in your games.
 
 <h2><a class="section" name="installation1">Compilation</a></h2>
 
@@ -29,9 +29,6 @@ git clone https://github.com/DangarStu/JACL.git
 <td><b>jacl</b> (Posix)</td>
 <td>GlkTerm by Andrew Plotkin (included) and ncursesw.
 </td>
-</tr><tr>
-<td><b>cjacl</b></td>
-<td>CheapGlk by Andrew Plotkin (included). No additional libraries required.</td>
 </tr><tr>
 <td><b>cgijacl</b></td>
 <td>No special libraries are required to compile <b>cgijacl</b>, however a POSIX compliant system is needed.

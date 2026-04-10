@@ -6,7 +6,6 @@ CFLAGS = -Wall -O2 -Wno-unused-result
 # Directories
 CGIHTML_DIR = cgihtml-1.69
 GLKTERM_DIR = glkterm
-CHEAPGLK_DIR = CheapGlk
 
 # Detected library flags
 NCURSES_CFLAGS = -I/opt/homebrew/include
@@ -18,7 +17,7 @@ FCGI_LIBS = -L/opt/homebrew/lib -lfcgi
 COMMON_SRC = findroute.c interpreter.c loader.c logging.c parser.c display.c utils.c jpp.c resolvers.c errors.c encapsulate.c libcsv.c
 
 # Targets determined by configure
-BUILD_TARGETS = bjorb cjacl cgijacl jacl fcgijacl
+BUILD_TARGETS = bjorb cgijacl jacl fcgijacl
 
 all: $(BUILD_TARGETS)
 
@@ -29,10 +28,6 @@ bjorb: bjorb.c
 # Jacl target (GlkTerm console, requires ncurses)
 jacl: libglkterm.a
 	$(CC) $(CFLAGS) -DGLK jacl.c glk_startup.c $(COMMON_SRC) glk_saver.c -I$(GLKTERM_DIR) -L$(GLKTERM_DIR) -lglkterm -lm $(NCURSES_LIBS) -o jacl
-
-# Cjacl target (CheapGlk console, no ncurses needed)
-cjacl: libcheapglk.a
-	$(CC) $(CFLAGS) -DGLK jacl.c glk_startup.c $(COMMON_SRC) glk_saver.c -I$(CHEAPGLK_DIR) -L$(CHEAPGLK_DIR) -lcheapglk -lm -o cjacl
 
 # Cgijacl target (CGI web)
 cgijacl: libcgihtml.a webjacl.o
@@ -47,9 +42,6 @@ webjacl.o: webjacl.c webjacl.h language.h
 	$(CC) $(CFLAGS) -c webjacl.c -o webjacl.o
 
 # External libraries targets
-libcheapglk.a:
-	cd $(CHEAPGLK_DIR) && $(MAKE) libcheapglk.a
-
 libglkterm.a:
 	cd $(GLKTERM_DIR) && $(MAKE) libglkterm.a
 
@@ -140,12 +132,10 @@ apache: install
 # Clean up
 clean:
 	rm -f *.o
-	rm -f cgijacl fcgijacl bjorb jacl cjacl
+	rm -f cgijacl fcgijacl bjorb jacl
 	cd $(CGIHTML_DIR) && $(MAKE) clean
 	cd $(GLKTERM_DIR) && $(MAKE) clean
-	cd $(CHEAPGLK_DIR) && $(MAKE) clean
 
 distclean: clean
 	rm -f Makefile config.log config.status
 	rm -f $(GLKTERM_DIR)/Makefile
-	rm -f $(CHEAPGLK_DIR)/Makefile
