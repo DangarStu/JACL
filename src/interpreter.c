@@ -364,7 +364,12 @@ execute(const char *funcname)
     // SET function_name TO THE CORE NAME STORED IN THE FUNCTION OBJECT
     // LEAVING called_name TO CONTAIN THE FULL ARGUMENT LIST
     strncpy (function_name, executing_function->name, 80);
-    strncpy (cstring_resolve("function_name")->value, executing_function->name, 80);
+    function_name[80] = 0;
+    {
+        struct string_type *fname_cstring = cstring_resolve("function_name");
+        strncpy (fname_cstring->value, executing_function->name, 80);
+        fname_cstring->value[80] = 0;
+    }
 
     //sprintf(temp_buffer, "--- starting to execute %s^", function_name);
     //write_text(temp_buffer);
@@ -847,7 +852,8 @@ execute(const char *funcname)
                             || !strcmp(argument_buffer, "*anywhere")
                             || !strcmp(argument_buffer, "*present")) {
                     criterion_type = CRI_SCOPE;
-                    strncpy(scope_criterion, argument_buffer, 20);
+                    strncpy(scope_criterion, argument_buffer, 23);
+                    scope_criterion[23] = 0;
                 } else if ((criterion_value = attribute_resolve(argument_buffer))) {
                     criterion_type = CRI_ATTRIBUTE;
                 } else if ((criterion_value = user_attribute_resolve(argument_buffer))) {
@@ -1918,6 +1924,7 @@ execute(const char *funcname)
                      * IT INTO THE STRING */
                     if (!strcmp(word[0], "setstring")) {
                         strncpy (resolved_setstring->value, setstring_buffer, 1023);
+                        resolved_setstring->value[1023] = 0;
                     } else {
                         /* CALCULATE HOW MUCH SPACE IS LEFT IN THE STRING */
                         counter = 1023 - strlen(resolved_setstring->value);
@@ -1950,6 +1957,7 @@ execute(const char *funcname)
                     /* setstring_buffer IS NOW FILLED, COPY THE UP TO 1023 BYTES OF
                      * IT INTO THE STRING */
                     strncpy (resolved_setstring->value, setstring_buffer, 1023);
+                    resolved_setstring->value[1023] = 0;
                 }
             } else if (!strcmp(word[0], "return")) {
                 /* RETURN FROM THIS FUNCTION, POSSIBLY RETURNING AN INTEGER VALUE */
@@ -2724,12 +2732,14 @@ pop_stack()
     /* RESTORE THE CONTENTS OF called_name */
     //for (counter = 0; counter < 256; counter++)
     //called_name[counter] = backup[stack].called_name[counter];
-    strncpy(called_name, backup[stack].called_name, 1024);
+    strncpy(called_name, backup[stack].called_name, 1023);
+    called_name[1023] = 0;
 
     /* RESTORE THE CONTENTS OF scope_criterion */
     //for (counter = 0; counter < 21; counter++)
     //    scope_criterion[counter] = backup[stack].scope_criterion[counter];
-    strncpy(scope_criterion, backup[stack].scope_criterion, 20);
+    strncpy(scope_criterion, backup[stack].scope_criterion, 23);
+    scope_criterion[23] = 0;
 
     /* RESTORE THE STORED FUNCTION NAMES THAT ARE USED WHEN AN
      * 'override' COMMAND IS ENCOUNTERED IN THE CURRENT FUNCTION */
@@ -2745,8 +2755,12 @@ pop_stack()
     executing_function = backup[stack].function;
 
     if (executing_function != NULL) {
+        struct string_type *fname_cstring;
         strncpy (function_name, executing_function->name, 80);
-        strncpy (cstring_resolve("function_name")->value, executing_function->name, 80);
+        function_name[80] = 0;
+        fname_cstring = cstring_resolve("function_name");
+        strncpy (fname_cstring->value, executing_function->name, 80);
+        fname_cstring->value[80] = 0;
     }
 
     wp = backup[stack].wp;
@@ -2824,10 +2838,12 @@ push_stack(long file_pointer)
             backup[stack].text_buffer[counter] = text_buffer[counter];
 
         /* MAKE A COPY OF THE CURRENT CONTENTS OF called_name */
-        strncpy(backup[stack].called_name, called_name, 1024);
+        strncpy(backup[stack].called_name, called_name, 1023);
+        backup[stack].called_name[1023] = 0;
 
         // MAKE A COPY OF THE CURRENT CONTENTS OF scope_criterion
-        strncpy(backup[stack].scope_criterion, scope_criterion, 20);
+        strncpy(backup[stack].scope_criterion, scope_criterion, 23);
+        backup[stack].scope_criterion[23] = 0;
 
         /* COPY THE STORED FUNCTION NAMES THAT ARE USED WHEN AN
          * 'override' COMMAND IS ENCOUNTERED IN THE CURRENT FUNCTION */
@@ -2865,7 +2881,9 @@ push_stack(long file_pointer)
         if (current_cstring != NULL) {
             do {
                 if (!strcmp(current_cstring->name, "string_arg")) {
-                    strncpy(backup[stack].str_arguments[index++], current_cstring->value, 1023);
+                    strncpy(backup[stack].str_arguments[index], current_cstring->value, 255);
+                    backup[stack].str_arguments[index][255] = 0;
+                    index++;
                 }
 
                 current_cstring = current_cstring->next_string;
@@ -2977,11 +2995,13 @@ push_proxy()
         if (current_cstring != NULL) {
             do {
                 if (!strcmp(current_cstring->name, "$string")) {
-                    strncpy(proxy_backup[proxy_stack].text[text++], current_cstring->value, 254);
-                    proxy_backup[proxy_stack].text[counter++][255] = 0;
+                    strncpy(proxy_backup[proxy_stack].text[text], current_cstring->value, 255);
+                    proxy_backup[proxy_stack].text[text][255] = 0;
+                    text++;
                 } else if (!strcmp(current_cstring->name, "$word")) {
-                    strncpy(proxy_backup[proxy_stack].command[command++], current_cstring->value, 254);
-                    proxy_backup[proxy_stack].command[command++][255] = 0;
+                    strncpy(proxy_backup[proxy_stack].command[command], current_cstring->value, 255);
+                    proxy_backup[proxy_stack].command[command][255] = 0;
+                    command++;
                 }
 
                 current_cstring = current_cstring->next_string;

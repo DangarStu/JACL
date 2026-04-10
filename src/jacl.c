@@ -1038,6 +1038,7 @@ get_string(char *string_buffer)
 
 	// COPY UP TO 255 BYTES OF THE ENTERED TEXT INTO THE SUPPLIED STRING
 	strncpy (string_buffer, cx, 255);
+	string_buffer[255] = 0;
 }
 
 int
