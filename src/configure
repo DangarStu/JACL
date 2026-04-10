@@ -3794,85 +3794,56 @@ fi
 
 # -----------------------------------------------------------
 # Check for libfcgi (needed for fcgijacl)
+# Check that we can both #include <fcgi_stdio.h> and link against
+# -lfcgi. On Debian/Ubuntu the libfcgi-dev headers live in
+# /usr/include/fastcgi/, not /usr/include/.
 # -----------------------------------------------------------
 FCGI_CFLAGS=""
 FCGI_LIBS=""
 HAVE_FCGI=no
 
-for fcgi_dir in /opt/homebrew /usr/local /usr ""; do
-    if test -n "$fcgi_dir"; then
-        test_cflags="-I$fcgi_dir/include"
-        test_ldflags="-L$fcgi_dir/lib"
-    else
-        test_cflags=""
-        test_ldflags=""
-    fi
-
-    save_CFLAGS="$CFLAGS"
-    save_LDFLAGS="$LDFLAGS"
-    CFLAGS="$CFLAGS $test_cflags"
-    LDFLAGS="$LDFLAGS $test_ldflags"
-
-    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for FCGI_Accept in -lfcgi" >&5
-printf %s "checking for FCGI_Accept in -lfcgi... " >&6; }
-if test ${ac_cv_lib_fcgi_FCGI_Accept+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lfcgi  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.
-   The 'extern "C"' is for builds by C++ compilers;
-   although this is not generally supported in C code supporting it here
-   has little cost and some practical benefit (sr 110532).  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char FCGI_Accept (void);
-int
-main (void)
-{
-return FCGI_Accept ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_fcgi_FCGI_Accept=yes
-else case e in #(
-  e) ac_cv_lib_fcgi_FCGI_Accept=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS ;;
-esac
-fi
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_fcgi_FCGI_Accept" >&5
-printf '%s\n' "$ac_cv_lib_fcgi_FCGI_Accept" >&6; }
-if test "x$ac_cv_lib_fcgi_FCGI_Accept" = xyes
-then :
-
-        HAVE_FCGI=yes
-        if test -n "$fcgi_dir" && test "$fcgi_dir" != "/usr"; then
-            FCGI_CFLAGS="$test_cflags"
-            FCGI_LIBS="$test_ldflags -lfcgi"
+for fcgi_inc in /opt/homebrew/include /usr/local/include /usr/include/fastcgi /usr/include ""; do
+    for fcgi_lib in /opt/homebrew/lib /usr/local/lib ""; do
+        if test -n "$fcgi_inc"; then
+            test_cflags="-I$fcgi_inc"
         else
-            FCGI_LIBS="-lfcgi"
+            test_cflags=""
+        fi
+        if test -n "$fcgi_lib"; then
+            test_ldflags="-L$fcgi_lib"
+        else
+            test_ldflags=""
         fi
 
-fi
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for fcgi_stdio.h and libfcgi ($test_cflags $test_ldflags)" >&5
+printf %s "checking for fcgi_stdio.h and libfcgi ($test_cflags $test_ldflags)... " >&6; }
 
+        cat > conftest.$ac_ext <<_ACEOF
+#include <fcgi_stdio.h>
+int main(void) { FCGI_Accept(); return 0; }
+_ACEOF
 
-    CFLAGS="$save_CFLAGS"
-    LDFLAGS="$save_LDFLAGS"
+        if $CC $CFLAGS $test_cflags conftest.$ac_ext $test_ldflags -lfcgi -o conftest$ac_exeext >/dev/null 2>&1; then
+            HAVE_FCGI=yes
+            FCGI_CFLAGS="$test_cflags"
+            if test -n "$test_ldflags"; then
+                FCGI_LIBS="$test_ldflags -lfcgi"
+            else
+                FCGI_LIBS="-lfcgi"
+            fi
+            { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+        else
+            { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+        fi
 
+        rm -f conftest.$ac_ext conftest$ac_exeext conftest.o
+
+        if test "$HAVE_FCGI" = "yes"; then
+            break
+        fi
+    done
     if test "$HAVE_FCGI" = "yes"; then
         break
     fi

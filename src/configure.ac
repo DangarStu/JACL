@@ -103,33 +103,47 @@ FCGI_CFLAGS=""
 FCGI_LIBS=""
 HAVE_FCGI=no
 
-for fcgi_dir in /opt/homebrew /usr/local /usr ""; do
-    if test -n "$fcgi_dir"; then
-        test_cflags="-I$fcgi_dir/include"
-        test_ldflags="-L$fcgi_dir/lib"
-    else
-        test_cflags=""
-        test_ldflags=""
-    fi
-
-    save_CFLAGS="$CFLAGS"
-    save_LDFLAGS="$LDFLAGS"
-    CFLAGS="$CFLAGS $test_cflags"
-    LDFLAGS="$LDFLAGS $test_ldflags"
-
-    AC_CHECK_LIB([fcgi], [FCGI_Accept], [
-        HAVE_FCGI=yes
-        if test -n "$fcgi_dir" && test "$fcgi_dir" != "/usr"; then
-            FCGI_CFLAGS="$test_cflags"
-            FCGI_LIBS="$test_ldflags -lfcgi"
+# Try common include and lib path combinations. On Debian/Ubuntu the
+# headers from libfcgi-dev are installed to /usr/include/fastcgi/
+# rather than /usr/include/.
+for fcgi_inc in /opt/homebrew/include /usr/local/include /usr/include/fastcgi /usr/include ""; do
+    for fcgi_lib in /opt/homebrew/lib /usr/local/lib ""; do
+        if test -n "$fcgi_inc"; then
+            test_cflags="-I$fcgi_inc"
         else
-            FCGI_LIBS="-lfcgi"
+            test_cflags=""
         fi
-    ], [], [])
+        if test -n "$fcgi_lib"; then
+            test_ldflags="-L$fcgi_lib"
+        else
+            test_ldflags=""
+        fi
 
-    CFLAGS="$save_CFLAGS"
-    LDFLAGS="$save_LDFLAGS"
+        save_CFLAGS="$CFLAGS"
+        save_LDFLAGS="$LDFLAGS"
+        CFLAGS="$CFLAGS $test_cflags"
+        LDFLAGS="$LDFLAGS $test_ldflags"
 
+        AC_MSG_CHECKING([for fcgi_stdio.h and libfcgi in ($test_cflags $test_ldflags)])
+        AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <fcgi_stdio.h>]],
+                                        [[FCGI_Accept();]])],
+            [HAVE_FCGI=yes
+             AC_MSG_RESULT([yes])
+             FCGI_CFLAGS="$test_cflags"
+             if test -n "$test_ldflags"; then
+                 FCGI_LIBS="$test_ldflags -lfcgi"
+             else
+                 FCGI_LIBS="-lfcgi"
+             fi],
+            [AC_MSG_RESULT([no])])
+
+        CFLAGS="$save_CFLAGS"
+        LDFLAGS="$save_LDFLAGS"
+
+        if test "$HAVE_FCGI" = "yes"; then
+            break
+        fi
+    done
     if test "$HAVE_FCGI" = "yes"; then
         break
     fi
