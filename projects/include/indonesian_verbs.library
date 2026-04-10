@@ -297,6 +297,8 @@ set time = false
 }
 
 grammar guncang *held   >shake
+grammar mengguncang >shake_only
+grammar mengguncang *held   >shake
 grammar shake *held   >shake
 grammar wave *held    >shake
 
@@ -626,6 +628,8 @@ set time = false
 }
 
 grammar peluk *present   >hug
+grammar memeluk		>hug_only
+grammar memeluk *present   >hug
 grammar hug *present     >hug
 grammar comfort *present >hug
 grammar cuddle *present  >hug
@@ -665,6 +669,8 @@ set time = false
 }
 
 grammar kecup *present >kiss
+grammar mengecup	>kiss_only
+grammar mengecup *present >kiss
 grammar kiss *present >kiss
 grammar pash *present >kiss
 grammar snog *present >kiss
@@ -708,6 +714,9 @@ set time = false
 
 grammar dig >dig
 grammar gali >dig
+grammar menggali *present >dig_in
+grammar menggali dalam *present >dig_in
+grammar menggali >dig
 
 {+dig
 if here hasnt OUTDOORS
@@ -745,6 +754,9 @@ set time = false
 }
 
 grammar petik *present dengan *held >pick_with
+grammar memetik >pick_only
+grammar memetik *present >pick_one
+grammar memetik *present dengan *held >pick_with
 grammar pick *present with *held >pick_with
 
 {+pick_with
@@ -800,6 +812,9 @@ proxy "rub " noun2{names} " with " noun1{names}
 }
 
 grammar gosok *present dengan *held    >rub_with
+grammar menggosok *present >rub
+grammar menggosok *held di *present       >rub_on
+grammar menggosok *present dengan *held    >rub_with
 grammar rub *present with *held    >rub_with
 
 {+rub_with
@@ -820,6 +835,7 @@ write "Keduanya hanya menjadi sedikit lebih hangat.^"
 }
 
 grammar jilat *present >lick
+grammar menjilat *present >lick
 grammar lick *present  >lick
 grammar taste *present >lick
 
@@ -840,6 +856,7 @@ write "Yeuucck!^"
 grammar pull **present >pull
 grammar tug **present  >pull
 grammar tarik **present >pull
+grammar menarik **present >pull
 
 {+pull
 if +important<noun1 = true
@@ -870,6 +887,8 @@ grammar cut *present with *held       >cut_with
 grammar chop *present with *held      >cut_with
 grammar stab *present with *held      >cut_with
 grammar potong *present dengan *held >cut_with
+grammar memotong *present >cut
+grammar memotong *present dengan *held >cut_with
 
 {+cut_with
 if +not_held<noun2 = true
@@ -894,6 +913,7 @@ set time = false
 }
 
 grammar kupas *present		>peel
+grammar mengupas *present		>peel
 grammar peel *present		>peel
 grammar skin *present		>peel
 
@@ -929,7 +949,9 @@ grammar rip **present up	>break
 grammar rip off **present	>break
 grammar rip **present off	>break
 grammar hancurkan *present >break
+grammar menghancurkan *present >break
 grammar pecahkan *present >break
+grammar memecahkan *present >break
 
 {+break
 if +important<noun1 = true
@@ -977,6 +999,8 @@ write "Anda sangat perhatian.^"
 }
 
 grammar bersihkan *present dengan *held >clean_with
+grammar membersihkan *present >clean
+grammar membersihkan *present dengan *held >clean_with
 grammar clean *present with *held     >clean_with
 grammar wipe *present with *held      >clean_with
 grammar scrub *present with *held     >clean_with
@@ -1015,6 +1039,8 @@ write "Oooo, menakutkan...^"
 }
 
 grammar teriak    >yell
+grammar berteriak ke *present    >yell_at
+grammar berteriak    >yell
 grammar yell      >yell
 grammar scream    >yell
 
@@ -1023,6 +1049,7 @@ write "Tenggorokan Anda sekarang sakit.^"
 }
 
 grammar bayar *present     >pay
+grammar membayar *present     >pay
 grammar pay *present       >pay
 
 {+pay
@@ -1030,7 +1057,9 @@ write "Anda tidak bisa membayar " noun1{the} .^
 }
 
 grammar pesan *anywhere       >order
+grammar memesan *anywhere       >order
 grammar beli *anywhere        >order
+grammar membeli *anywhere        >order
 grammar order *anywhere       >order
 grammar buy *anywhere         >order
 
@@ -1039,6 +1068,7 @@ write "Pesanan Anda tampaknya tidak didengar.^"
 }
 
 grammar ketuk *present        >knock_on
+grammar mengetuk *present        >knock_on
 grammar knock on *present     >knock_on
 grammar tap on *present       >knock_on
 grammar tap *present          >knock_on
@@ -1066,6 +1096,7 @@ write "Anda mengetuk pelan " noun1{the} ".^"
 }
 
 grammar hisap *present >smoke
+grammar menghisap *present >smoke
 grammar smoke *present >smoke
 
 {+smoke
@@ -1104,6 +1135,8 @@ set time = false
 }
 
 grammar mainkan *present dengan *held	>play_with
+grammar memainkan *present	>play
+grammar memainkan *present dengan *held	>play_with
 grammar play *present with *held	>play_with
 grammar sound *present with *held	>play_with
 grammar ring *present with *held	>play_with
@@ -1127,6 +1160,7 @@ set time = false
 }
 
 grammar pompa *present >pump
+grammar memompa *present >pump
 grammar pump *present >pump
 
 {+pump
@@ -1145,6 +1179,7 @@ set time = false
 }
 
 grammar kosongkan *here >empty
+grammar mengosongkan *here >empty
 grammar unload *here    >empty
 grammar empty *here     >empty
 
@@ -1252,6 +1287,9 @@ return false
 
 grammar fill *held >fill
 grammar isi *held >fill
+grammar mengisi *held dari *present >fill_from
+grammar mengisi *held dengan *present >fill_with
+grammar mengisi *held >fill
 
 {+fill
 if +important<noun1 = true
@@ -1363,6 +1401,7 @@ write  noun1{The} " " noun1{doesnt} " terlihat sangat nyaman.^"
 
 grammar kick *present           >kick
 grammar tendang *present >kick
+grammar menendang *present >kick
 
 {+kick
 if +worn<noun1 = true
@@ -1434,6 +1473,8 @@ grammar drop **held		>drop
 grammar put **held down	>drop
 grammar put down **held	>drop
 grammar jatuhkan **held >drop
+grammar menjatuhkan >drop_only
+grammar menjatuhkan **held >drop
 grammar taruh **held >drop
 
 {+drop
@@ -1484,6 +1525,9 @@ grammar pick up **here	>take
 grammar pick **here up	>take
 grammar get **here		>take
 grammar ambil **here >take
+grammar mengambil **here dengan *held	>take_with
+grammar mengambil >take_only
+grammar mengambil **here >take
 
 {+take
 if +important<noun1 = true
@@ -1610,6 +1654,8 @@ move noun1 to noun2
 
 grammar taruh **held bawah *present		>insert_under
 grammar letakkan **held bawah *present	>insert_under
+grammar meletakkan **held di *present >insert_on
+grammar meletakkan **held bawah *present	>insert_under
 grammar insert **held under *present	>insert_under
 grammar put **held under *present		>insert_under
 grammar place **held under *present		>insert_under
@@ -1649,7 +1695,13 @@ grammar insert **held in *present	>insert_in
 grammar put **held in *present		>insert_in
 grammar place **held in *present	>insert_in
 grammar taruh **held dalam *present >insert_in
+grammar menaruh >drop_only
+grammar menaruh **held >drop
+grammar menaruh **held di *present >insert_on
+grammar menaruh **held bawah *present		>insert_under
+grammar menaruh **held dalam *present >insert_in
 grammar masukkan **held dalam *present >insert_in
+grammar memasukkan **held dalam *present >insert_in
 
 {+insert_in
 if +important<noun2 = true
@@ -1753,11 +1805,13 @@ write  noun1{The} " memberikan " noun2{the} " kepada Anda.^"
 }
 
 grammar beritahu *present tentang *anywhere >tell_about
+grammar memberitahu *present tentang *anywhere >tell_about
 grammar tell *present about *anywhere		>tell_about
 grammar talk to *present about *anywhere	>tell_about
 grammar talk *present about *anywhere		>tell_about
 grammar talk with *present about *anywhere	>tell_about
 grammar ceritakan *present tentang *anywhere >tell_about
+grammar menceritakan *present tentang *anywhere >tell_about
 
 {+tell_about
 if +can_talk<noun1 = true
@@ -1770,6 +1824,8 @@ write noun2{the} .^
 
 grammar ask *present about *anywhere  >ask_about
 grammar tanya *present tentang *anywhere >ask_about
+grammar menanyakan *present untuk **inside		>ask_for
+grammar menanyakan *present tentang *anywhere >ask_about
 
 {+ask_about
 if +can_talk<noun1 = true
@@ -1830,6 +1886,8 @@ write "Anda memberikan " noun1{the} " kepada " noun2{the} .^
 }
 
 grammar berikan *held	>give_only
+grammar memberikan *held ke *present >give_to
+grammar memberikan *held	>give_only
 grammar offer *held		>give_only
 grammar give *held		>give_only
 grammar give *held		>give_only
@@ -1860,6 +1918,7 @@ grammar jiggle *present	>move
 grammar move *present	>move
 grammar push *present	>move
 grammar dorong *present >move
+grammar mendorong *present >move
 
 {+move
 if +important<noun1 = true
@@ -1898,6 +1957,7 @@ ensure noun1 has TOUCHED
 
 grammar read *present >read
 grammar baca *present >read
+grammar membaca *present >read
 
 {+read
 if +important<noun1 = true
@@ -1971,7 +2031,9 @@ proxy "look up " noun2{names} " in " noun1{names}
 grammar feel *present  >feel
 grammar touch *present >feel
 grammar sentuh *present >feel
+grammar menyentuh *present >feel
 grammar raba *present >feel
+grammar meraba *present >feel
 
 {+feel
 if +reach<noun1 = true
@@ -1999,6 +2061,8 @@ write "Anda tidak mencium sesuatu yang tidak biasa.^"
 grammar smell *present	>smell
 grammar sniff *present	>smell
 grammar cium *present >smell
+grammar mencium >sniff
+grammar mencium *present >smell
 
 {+smell
 if here has UNDER_WATER
@@ -2015,6 +2079,7 @@ write "Baunya sangat mirip " noun1{list} .^
 grammar taste *present >taste
 grammar lick *present  >taste
 grammar cicipi *present >taste
+grammar mencicipi *present >taste
 
 {+taste
 if +reach<noun1 = true
@@ -2056,7 +2121,10 @@ write "^"
 
 grammar search *present		>search
 grammar cari *present >search
+grammar mencari *anywhere dalam *present         >look_up_in
+grammar mencari *present >search
 grammar geledah *present >search
+grammar menggeledah *present >search
 
 {+search
 ifexecute "noun1.search"
@@ -2078,6 +2146,8 @@ grammar x *present			>examine
 grammar l *present			>examine
 grammar watch *present		>examine
 grammar periksa *present >examine
+grammar memeriksa *present tentang *anywhere    >consult
+grammar memeriksa *present >examine
 grammar lihat *present >examine
 
 {+examine
@@ -2552,6 +2622,8 @@ grammar tighten	*present	>close
 grammar close *present		>close
 grammar shut *present		>close
 grammar tutup *present >close
+grammar menutup >close_only
+grammar menutup *present >close
 
 {+close
 if +important<noun1 = true
@@ -2612,6 +2684,8 @@ set time = false
 
 grammar lock *present with *held >lock_with
 grammar kunci *present dengan *held >lock_with
+grammar mengunci *present >lock
+grammar mengunci *present dengan *held >lock_with
 
 {+lock_with
 if +important<noun1 = true
@@ -2685,6 +2759,10 @@ set time = false
 grammar unlock *present with *held    >unlock_with
 grammar open *present with *held      >unlock_with
 grammar buka kunci *present dengan *held >unlock_with
+grammar membuka >open_only
+grammar membuka *present >open
+grammar membuka kunci *present >unlock
+grammar membuka kunci *present dengan *held >unlock_with
 
 {+unlock_with
 if +not_held<noun2 = true
@@ -2707,6 +2785,7 @@ write "Anda tidak bisa membuka kunci " noun1{the} " dengan " noun2{the} .^
 set time = false
 }
 
+grammar menunjukkan *held	>show
 grammar tunjukkan *held	>show
 grammar show *held	>show
 
@@ -2794,6 +2873,7 @@ set time = false
 grammar fix *present	>repair
 grammar repair *present	>repair
 grammar perbaiki *present >repair
+grammar memperbaiki *present >repair
 
 {+repair
 if +important<noun1 = true
@@ -2814,6 +2894,8 @@ grammar tie *held to *present         >tie_to
 grammar fix *held to *present         >tie_to
 grammar attach *held to *present      >tie_to
 grammar ikat *held ke *present >tie_to
+grammar mengikat *held    >tie
+grammar mengikat *held ke *present >tie_to
 
 {+tie_to
 if +important<noun2 = true
@@ -2841,6 +2923,7 @@ grammar murder *present       >attack
 grammar punch *present        >attack
 grammar serang *present >attack
 grammar pukul *present >attack
+grammar memukul *present >attack
 
 {+attack
 if +important<noun1 = true
@@ -2876,6 +2959,8 @@ grammar crush *present with *held	>attack_with
 grammar destroy *present with *held	>attack_with
 grammar wreck *present with *held	>attack_with
 grammar serang *present dengan *held >attack_with
+grammar menyerang *present >attack
+grammar menyerang *present dengan *held >attack_with
 
 
 {+attack_with
@@ -2918,6 +3003,8 @@ write "Anda melambaikan tangan sedikit.^"
 
 grammar wave to *present      >wave_to
 grammar lambaikan ke *present >wave_to
+grammar melambaikan >wave
+grammar melambaikan ke *present >wave_to
 
 {+wave_to
 if +important<noun1 = true
@@ -2943,6 +3030,8 @@ print:
 }
 
 grammar hormat ke *present	>salute_at
+grammar menghormati	>salute
+grammar menghormati ke *present	>salute_at
 grammar salute *present		>salute_at
 grammar salute at *present	>salute_at
 grammar salute to *present	>salute_at
@@ -2989,6 +3078,7 @@ write "Itu tidak akan menghasilkan apa-apa.^"
 }
 
 grammar lompati *here         >jump_over
+grammar melompati *here         >jump_over
 grammar jump over *here       >jump_over
 
 {+jump_over
@@ -3010,6 +3100,8 @@ set time = false
 
 grammar jump             >jump
 grammar lompat >jump
+grammar melompat ke *here >jump_on
+grammar melompat >jump
 
 {+jump
 if here has MID_AIR
@@ -3126,6 +3218,7 @@ set time = false
 }
 
 grammar tiup *held ke *present   >blow_at
+grammar meniup *held ke *present   >blow_at
 grammar blow *held at *present   >blow_at
 grammar blow *held to *present   >blow_at
 
@@ -3144,6 +3237,7 @@ set time = false
 }
 
 grammar arahkan *held ke *present	>point_at
+grammar mengarahkan *held ke *present	>point_at
 grammar point *held at *present	>point_at
 grammar aim *held at *present	>point_at
 
@@ -3190,6 +3284,8 @@ grammar lob *held at *here		>throw_at
 grammar hurl *held to *here		>throw_at
 grammar hurl *held at *here		>throw_at
 grammar lempar *held ke *here >throw_at
+grammar melempar *held >throw
+grammar melempar *held ke *here >throw_at
 
 {+throw_at
 if +important<noun2 = true
@@ -3258,7 +3354,12 @@ grammar remove **held       >remove
 grammar take off **held     >remove
 grammar doff **held         >remove
 grammar lepas **held >remove
+grammar melepas *present >untie
+grammar melepas **held >remove
 grammar lepaskan **held >remove
+grammar melepaskan	>untie_only
+grammar melepaskan *present     >untie
+grammar melepaskan **held >remove
 
 {+remove
 ifall noun1(parent) has CONTAINER : noun1 isnt *held
@@ -3287,6 +3388,7 @@ grammar put **held on	>wear
 grammar don **held		>wear
 grammar pakai **held >wear
 grammar kenakan **held >wear
+grammar mengenakan **held >wear
 
 {+wear
 if +not_held<noun1 = true
@@ -3327,6 +3429,8 @@ grammar talk *present		>talk_to
 grammar talk to *present	>talk_to
 grammar talk with *present	>talk_to
 grammar bicara dengan *present >talk_to
+grammar berbicara >talk_only
+grammar berbicara dengan *present >talk_to
 
 {+talk_to
 if +can_talk<noun1 = true
@@ -3354,6 +3458,8 @@ set time = false
 
 grammar eat	>eat_only
 grammar makan >eat_only
+grammar memakan *present >eat
+grammar memakan >eat_only
 
 {+eat_only
 write "Apa yang ingin Anda makan?^"
@@ -3407,6 +3513,9 @@ move noun1 to limbo
 
 grammar drink	>drink_only
 grammar minum >drink_only
+grammar meminum dari *present   >drink_from
+grammar meminum *present >drink
+grammar meminum >drink_only
 
 {+drink_only
 write "Apa yang ingin Anda minum?^"
@@ -3415,6 +3524,7 @@ set time = false
 }
 
 grammar jentik **present >flick
+grammar menjentik **present >flick
 grammar flick **present >flick
 grammar flip **present >flick
 
@@ -3438,6 +3548,7 @@ write "yang tajam di jari telunjuk Anda.^"
 }
 
 grammar tekan **present        >press
+grammar menekan **present        >press
 grammar press **present        >press
 grammar poke **present         >press
 
@@ -3524,6 +3635,8 @@ set time = false
 }
 
 grammar atur *present ke $integer dengan *held >set_to_integer_with
+grammar mengatur *present ke $integer	>set_to_integer
+grammar mengatur *present ke $integer dengan *held >set_to_integer_with
 grammar set *present to $integer with *held >set_to_integer_with
 grammar turn *present to $integer with *held >set_to_integer_with
 
@@ -3550,6 +3663,8 @@ grammar ignite *present       >light
 grammar set fire to *present  >light
 grammar nyalakan *present >light
 grammar bakar *present >light
+grammar membakar *present dengan *held    >light_with
+grammar membakar *present >light
 
 {+light
 if here has UNDER_WATER
@@ -3879,7 +3994,9 @@ grammar climb up *here		>climb_up
 grammar walk up *here		>climb_up
 grammar go up *here			>climb_up
 grammar panjat *here >climb_up
+grammar memanjat *here >climb_up
 grammar naiki *here >climb_up
+grammar menaiki *here >climb_up
 
 {+climb_up
 if noun1 is *held
@@ -3921,6 +4038,7 @@ grammar jump in *present	>enter
 grammar get on *present		>enter
 grammar masuk *present >enter
 grammar masuki *present >enter
+grammar memasuki *present >enter
 
 {+enter
 if +important<noun1 = true
@@ -3940,6 +4058,7 @@ integer NEARBY
 
 grammar follow *anywhere	>follow
 grammar ikuti *anywhere >follow
+grammar mengikuti *anywhere >follow
 
 {+follow
 if noun1 is *present
@@ -4172,6 +4291,8 @@ set time = false
 }
 
 grammar turun >down
+grammar menuruni dari *here >climb_down
+grammar menuruni >down
 grammar bawah >down
 grammar down          >down
 grammar climb down    >down
@@ -4331,6 +4452,18 @@ proxy "look at " noun2{names} " through " noun1{names}
 
 grammar lihat *present melalui *held	>look_at_through
 grammar lihat *present dengan *held		>look_at_through
+grammar melihat bawah >look_down
+grammar melihat atas >look_up
+grammar melihat dalam *present >look_in
+grammar melihat *present >examine
+grammar melihat sekeliling >look_around
+grammar melihat >look_around
+grammar melihat bawah *present >look_under
+grammar melihat belakang *present >look_behind
+grammar melihat melalui *present	>look_through
+grammar melihat melalui *held ke *present	>look_through_at
+grammar melihat *present melalui *held	>look_at_through
+grammar melihat *present dengan *held		>look_at_through
 grammar look at *present through *held	>look_at_through
 grammar look at *present thru *held		>look_at_through
 grammar look at *present with *held		>look_at_through
@@ -4362,6 +4495,7 @@ set time = false
 grammar wait				>wait
 grammar z					>wait
 grammar tunggu >wait
+grammar menunggu >wait
 
 {+wait
 write "Waktu berlalu...^"
@@ -4369,6 +4503,7 @@ write "Waktu berlalu...^"
 
 grammar listen        >listen
 grammar dengar >listen
+grammar mendengar >listen
 
 {+listen
 override
@@ -4378,6 +4513,7 @@ write "Anda tidak mendengar sesuatu yang tidak biasa.^"
 grammar listen to *present    >listen_to
 grammar listen at *present    >listen_to
 grammar dengarkan *present >listen_to
+grammar mendengarkan *present >listen_to
 
 {+listen_to
 write "Anda tidak mendengar sesuatu yang tidak biasa.^"
@@ -4387,7 +4523,10 @@ grammar use *present          >use
 grammar work *present         >use
 grammar operate *present      >use
 grammar gunakan *present >use
+grammar menggunakan *present >use
 grammar pakai *present >use
+grammar memakai **held >wear
+grammar memakai *present >use
 
 {+use
 if +important<noun1 = true
@@ -4449,6 +4588,9 @@ set time = false
 }
 
 grammar putar *present kiri	>turn_anticlockwise
+grammar memutar *present >turn
+grammar memutar *present kanan	>turn_clockwise
+grammar memutar *present kiri	>turn_anticlockwise
 grammar rotate *present anticlockwise	>turn_anticlockwise
 grammar turn *present anticlockwise		>turn_anticlockwise
 grammar twist *present anticlockwise 	>turn_anticlockwise
@@ -4477,7 +4619,11 @@ grammar switch on *present	>turn_on
 grammar switch *present on	>turn_on
 grammar start *present		>turn_on
 grammar nyalakan *present >turn_on
+grammar menyalakan *present dengan *held >light_with
+grammar menyalakan *present >light
+grammar menyalakan *present >turn_on
 grammar hidupkan *present >turn_on
+grammar menghidupkan *present >turn_on
 
 {+turn_on
 if +reach<noun1 = true
@@ -4503,7 +4649,10 @@ grammar switch off *present	>turn_off
 grammar switch *present off	>turn_off
 grammar stop *present		>turn_off
 grammar matikan *present >turn_off
+grammar mematikan *present >turn_off
 grammar padamkan *present >turn_off
+grammar memadamkan *present >extinguish
+grammar memadamkan *present >turn_off
 
 {+turn_off
 if +reach<noun1 = true
@@ -4548,6 +4697,7 @@ move noun1 to limbo
 
 grammar ketik $string di *present >type_on
 grammar tulis $string di *present >type_on
+grammar menulis $string di *present >type_on
 grammar type $string on *present >type_on
 grammar write $string in *present >type_on
 
@@ -4584,6 +4734,8 @@ grammar pour *present on *present     >pour_on
 grammar pour *present in *present     >pour_on
 grammar pour *present over *present   >pour_on
 grammar tuang *present ke *present >pour_on
+grammar menuang *present >pour
+grammar menuang *present ke *present >pour_on
 
 {+pour_on
 if +important<noun1 = true
@@ -4890,6 +5042,8 @@ grammar *present comma sorry		>apologise
 grammar *present comma im sorry	>apologise
 grammar *present comma i am sorry	>apologise
 grammar minta maaf ke *present	>apologise
+grammar meminta *present untuk **inside		>ask_for
+grammar meminta maaf ke *present	>apologise
 grammar apologise to *present	>apologise
 
 {+apologise
