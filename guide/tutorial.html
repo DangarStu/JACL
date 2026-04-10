@@ -35,11 +35,11 @@
 ../bin/jacl grail.jacl
 </pre>
 
-<p>This line presumes that all games are run from the <b>games</b> directory of your JACL distribution and that you are currently in that directory. To remove this restriction change the first line of your game to indicate the full absolute path to your JACL interpreter of choice. For example:
+<p>This line presumes that all games are run from the <b>projects</b> directory of your JACL distribution and that you are currently in that directory. To remove this restriction change the first line of your game to indicate the full absolute path to your JACL interpreter of choice. For example:
 
 
 <pre>
-#!/usr/local/bin/garjacl
+#!/usr/local/bin/jacl
 </pre>
 
 <table class="infowarn"><tr>
@@ -61,7 +61,7 @@ Other than comments, the only text that can appear outside a function is one of 
 
 <h2><a class="section" name="tutorial3">Getting Started</a></h2>
 
-<p>To begin writing your first adventure game using JACL you will need to copy the file <b>frame.jacl</b> from the directory <b>jacl/games/include</b> to a file called <b>game.jacl</b> in the directory <b>jacl/games</b>. This new file is the one you will edit to create your game.
+<p>To begin writing your first adventure game using JACL you will need to copy the file <b>frame.jacl</b> from the directory <b>jacl/projects/include</b> to a file called <b>game.jacl</b> in the directory <b>jacl/projects</b>. This new file is the one you will edit to create your game.
 
 <p>The file <B>frame.jacl</B> is a skeleton program that provides a good starting point when writing a piece of interactive fiction from scratch. The file <b>verbs.library</b>, is also included from the last line of <b>frame.jacl</b>. While the code in <b>frame.jacl</b> should be modified to suit your game, the code in <b>verbs.library</b> should never be modified. This allows new versions of <b>verbs.library</b> to be installed without adversely affecting your game. <b>verbs.library</b> contains a extensive set of verbs for use by the player during the game.
 
@@ -301,10 +301,10 @@ return false
 
 <h2><a class="section" name="tutorial7">Objects</a></h2>
 
-<P>You can now try playing the beginnings of this game by first typing the command from within the <b>games</b> subdirectory: 
+<P>You can now try playing the beginnings of this game by first typing the command from within the <b>projects</b> subdirectory:
 
 <pre>
-../bin/garjacl game.jacl
+../bin/jacl game.jacl
 </pre> 
 
 <p>When you do so, you should see something like the screen below:

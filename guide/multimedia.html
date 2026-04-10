@@ -11,7 +11,7 @@
 
 <p>Glk is a portable application programming interface (API) for applications, like JACL, with a predominantly text-based user interface. By communicating with this API, JACL is able to work with a variety of user interfaces implemented by third parties for a variety of platforms. The Glk specification was written by Andrew Plotkin, and many thanks to him for having done so. Of equal importance are the various implementations of the Glk specification. 
 
-<p>So what does all this mean? The Glk specification defines a set of multimedia functionality that the native console version of JACL does not provide. Currently JACL can be compiled using WindowsGlk by David Kinder and Gargoyle by Tor Andersson. Many thanks to both these gentlemen for writing their libraries and assisting in the porting of JACL to use them. The commands detailed below are available for use by a JACL interpreter that is compiled with either WindowsGlk or Gargoyle. In the standard Unix distribution, the JACL interpreter is also compiled with GlkTerm. GlkTerm is a Glk library written by Andrew Plotkin using ncurses. GlkTerm does not support graphics or sound. The multimedia commands detailed in this chapter will be ignored without error by interpreters that do not support multimedia.
+<p>So what does all this mean? The Glk specification defines a set of multimedia functionality that the native console version of JACL does not provide. In the standard Unix distribution, the JACL interpreter is compiled with GlkTerm, a Glk library written by Andrew Plotkin using ncurses. GlkTerm does not support graphics or sound, so the multimedia commands detailed in this chapter are ignored without error by the console interpreter. Multimedia is fully supported by the web interpreters (<b>cgijacl</b> and <b>fcgijacl</b>) which deliver images and sounds through HTML.
 
 <p>If you would like to have your game behave differently is certain Glk features are supported by the interpreter, you can test whether the integer constants <b>graphics_supported</b>, <b>sound_supported</b> and <b>timer_supported</b> are set to <b>true</b> or <b>false</b>.
 
@@ -57,14 +57,10 @@ bjorb example.blc example.blorb
 <p>This command will create the Blorb file <b>example.blorb</b> that will be automatically read by the game <b>example.jacl</b>. When the <b>bjorb</b> utility runs, it will output some JACL code that will create a constant for each image or sound. If you find these convenient you can cut and paste this code into your game. <p>For example, when reading this <b>.blc</b> file:
 
 <pre>
-Pict 1 PNG images/blackjack.png
-Pict 2 PNG images/chip25.png
-Pict 3 PNG images/chip50.png
-Pict 4 PNG images/chip100.png
-Pict 5 PNG images/club.png
-Pict 6 PNG images/diamond.png
-Pict 7 PNG images/spade.png
-Pict 8 PNG images/heart.png
+Pict 1 PNG images/title.png
+Pict 2 PNG images/sword.png
+Pict 3 PNG images/shield.png
+Pict 4 PNG images/dragon.png
 </pre>
 
 <p><b>bjorb</b> will produce the following output:
@@ -74,14 +70,10 @@ bjorb 1.0 (Apr 30 2008) by Stuart Allen, based on
 Blorb Packager Version .5b by L. Ross Raszewski
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE
-constant IMAGE_blackjack 1
-constant IMAGE_chip25 2
-constant IMAGE_chip50 3
-constant IMAGE_chip100 4
-constant IMAGE_club 5
-constant IMAGE_diamond 6
-constant IMAGE_spade 7
-constant IMAGE_heart 8
+constant IMAGE_title 1
+constant IMAGE_sword 2
+constant IMAGE_shield 3
+constant IMAGE_dragon 4
 </pre>
 
 <p>If you pass only a single command-line argument to <b>bjorb</b>, that argument will be used as the base name for both the <b>.blc</b> control file and the <b>.blorb</b> output file. As an example, the following two commands are equivalent:

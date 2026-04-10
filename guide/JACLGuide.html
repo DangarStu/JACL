@@ -18,13 +18,13 @@
 <p>&nbsp;
 <center>
 	<a href="index.html"><img border=0 src="front.jpg"></a><br>
-	<p><i>Sixth Edition</i>
+	<p><i>Seventh Edition</i>
 </center>
-	<p style="page-break-before: always">JACL Interpreter v2.7<br>
-	<a href="http://code.google.com/p/jacl">http://code.google.com/p/jacl</a><br>
+	<p style="page-break-before: always">JACL Interpreter v4.6<br>
+	<a href="https://github.com/DangarStu/JACL">https://github.com/DangarStu/JACL</a><br>
 	&nbsp;<br>
 	&nbsp;<br>
-	<P>JACL Interpreter copyright 1992-2010 Stuart Allen <br>
+	<P>JACL Interpreter copyright 1992-2026 Stuart Allen <br>
 	Please send any bugs or feature requests to <a href="mailto:stuartallen1972@gmail.com">stuartallen1972@gmail.com</a><br>
 	<p>Webserver and preprocessor code copyright 2001-2002 Andreas Matthias.
 	<p>Internationalisation by Niels Haedecke, Thomas Schwarz and Eric Forgeot.
@@ -293,9 +293,9 @@ Ave, Cambridge, MA 02139, USA.
 
 <p>JACL is an interpreted language, so once you have written your games they can be run without modification on any platform that has a JACL interpreter. The JACL interpreter uses the Glk API to talk to its user interface which allows it to be compiled with many different Glk implementations on many different operating systems. Although interactive fiction is primarily a text-based medium, many of these Glk interfaces allow you to also fill your games with pictures and sound.
 
-<p>JACL also has two web-enabled interpreters that are easy to configure and run. If desired, games that do not require a complex graphical interface can be written in such a way that the same game file can be run by both the console-based and web-based interpreters. If desired, however, the web-enabled interpreters can be used to create a variety of turn-based games with interfaces vastly different to interactive fiction. The Blackjack game included with this distribution is one such example.
+<p>JACL also has two web-enabled interpreters that are easy to configure and run. If desired, games that do not require a complex graphical interface can be written in such a way that the same game file can be run by both the console-based and web-based interpreters. The web-enabled interpreters can also be used to create a variety of turn-based games with interfaces vastly different from traditional interactive fiction.
 
-<p>The latest version of JACL can be found at <a href="http://code.google.com/p/jacl/">http://code.google.com/p/jacl/</a>.
+<p>The latest version of JACL can be found on GitHub at <a href="https://github.com/DangarStu/JACL">https://github.com/DangarStu/JACL</a>.
 
 <p>I would also like to take this opportunity to thank some of the people who have contributed to this system:  Robert Osztolykan and Parham Doustdar for their invaluable beta testing, editing and suggestions; Andreas Matthias for contributing the internal web server and preprocessor code; Thomas Schwarz for his Javascript, CSS and user registration code; David Fisher for contributing the route-finding code; Niels Haedecke, Thomas Schwarz and Eric Forgeot for their work on translation and internationalisation; Andrew Plotkin, David Kinder, Tor Andersson and Ben Cressey for their Glk libraries. I would also like to thank Ben Cressey for his assistance in adding Unicode support to JACL.
 
@@ -304,7 +304,7 @@ Ave, Cambridge, MA 02139, USA.
 <table width=100%><tr><td align="right">
 Stuart Allen<br>
 Sydney, Australia<br>
-April 2010<br>
+April 2026<br>
 <a href="mailto:stuartallen1972@gmail.com">stuartallen1972@gmail.com</a>
 </td></tr></table>
 
@@ -335,7 +335,13 @@ April 2010<br>
 
 <h1><a class="title" name="installation0">Installation</a></h1>
 
-<p>The latest version of JACL can be found at <a href="http://code.google.com/p/jacl">http://code.google.com/p/jacl</a>. JACL is available as a zip file for Microsoft Windows and tar file for Unix operating systems. Once you have extracted the appropriate archive you will have a directory called <b>jacl</b> with several subdirectories. You will find the executable files in the <b>bin</b> subdirectory. In the Linux distribution you will find four interpreters: <b>jacl</b> is a console interpreter that uses the GlkTerm library by Andrew Plotkin, <b>garjacl</b> is a graphical interpreter that uses the Gargoyle library by Tor Andersson and Ben Cressey, while <b>cgijacl</b> and <b>fcgijacl</b> are the two web-based interpreters. <b>cgijacl</b> can be run directly from the command line and is used more for development purposes while <b>fcgijacl</b> must be used with a FastCGI-enabled webserver and is used more for production deployments. You will also find the program <b>bjorb</b>, a small utility (based on <b>blc</b> by Ross Raszewski) for creating the Blorb resource files that will contain any images and sounds you wish to use in your games. In the Microsoft Windows distribution you will find a single interpreter called <b>garjacl</b> and the same <b>bjorb</b> utility as in the Linux version. 
+<p>The latest version of JACL can be found on GitHub at <a href="https://github.com/DangarStu/JACL">https://github.com/DangarStu/JACL</a>. To get a copy of the source, clone the repository:
+
+<pre>
+git clone https://github.com/DangarStu/JACL.git
+</pre>
+
+<p>This will create a directory called <b>JACL</b> with several subdirectories. You will find the executable files in the <b>bin</b> subdirectory after compilation. In the Linux distribution you will find three interpreters: <b>jacl</b> is a console interpreter that uses the GlkTerm library by Andrew Plotkin, while <b>cgijacl</b> and <b>fcgijacl</b> are the two web-based interpreters. <b>cgijacl</b> can be run directly from the command line and is used more for development purposes while <b>fcgijacl</b> must be used with a FastCGI-enabled webserver such as Apache and is used more for production deployments. You will also find the program <b>bjorb</b>, a small utility (based on <b>blc</b> by Ross Raszewski) for creating the Blorb resource files that will contain any images and sounds you wish to use in your games.
 
 <h2><a class="section" name="installation1">Compilation</a></h2>
 
@@ -350,17 +356,14 @@ April 2010<br>
 <td>GlkTerm by Andrew Plotkin (included) and ncursesw.
 </td>
 </tr><tr>
-<td><b>garjacl</b></td>
-<td>Gargoyle by Tor Andersson (included as a DLL and .so shared library).</td>
-</tr><tr>
+
 <td><b>cgijacl</b></td>
 <td>No special libraries are required to compile <b>cgijacl</b>, however a POSIX compliant system is needed.
 </tr><tr>
 <td><b>fcgijacl</b></td>
-<td>FastCGI, available from <a href="http://www.fastcgi.com/index.html">http://www.fastcgi.com/index.html</a>, or as the Debian packages:
+<td>FastCGI development library and Apache module:
 <pre>
-libfcgi-dev
-libfci0c2
+sudo apt install libfcgi-dev libapache2-mod-fcgid
 </pre>
 
 </table>
@@ -374,35 +377,18 @@ make install
 
 <p>This will compile all the relevant programs and copy the executable binaries into the <b>bin</b> subdirectory.
 
-<p>All the extra DLLs required for Microsoft Windows are included in the <b>bin</b> directory. In Linux distributions, only the core Gargoyle share library is included. This is file <b>libgarglk.so</b> in the <b>src/Gargoyle</b> directory and should be copied to the directory <b>/usr/local/lib</b>. Other required libraries should be installed using your operating systems packaging system. Below is the output of <b>ldd</b> to showing the complete list of libraries required:
+<p>The build will install the binaries and supporting files to <b>/usr/local/jacl/</b> as well as copying them to the <b>bin</b> subdirectory of the source tree.
 
-<pre>
-libgarglk.so           libjpeg.so.62
-linux-gate.so.1        libm.so.6
-libc.so.6              ld-linux.so.2
-libfreetype.so.6       libz.so.1
-libgtk-1.2.so.0        libgdk-1.2.so.0
-libXi.so.6             libXext.so.6
-libX11.so.6            libglib-1.2.so.0
-libpng12.so.0          libSDL_mixer-1.2.so.0
-libSDL-1.2.so.0        libgmodule-1.2.so.0
-libdl.so.2             libXau.so.6
-libxcb-xlib.so.0       libxcb.so.1
-libasound.so.2         libdirectfb-1.0.so.0
-libfusion-1.0.so.0     libdirect-1.0.so.0
-libpthread.so.0        libXdmcp.so.6
-</pre> 
+<p>In the <b>projects</b> directory you will find several JACL games. A JACL game consists of one or more <b>.jacl</b> files and an optional <b>.blorb</b> file that contains multimedia resources used by the game. If a JACL game consists of more than one <b>.jacl</b> file, the other file will be one of the library files from the <b>include</b> directory.
 
-<p>In the <b>games</b> directory you will find several JACL games. A JACL game consists of one or more <b>.jacl</b> files and an optional <b>.blorb</b> file that contains multimedia resources used by the game. If a JACL game consists of more than one <b>.jacl</b> file, the other file will be one of the library files from the <b>include</b> directory.
-
-<p>Inside the <b>games</b> directory you will also find a <b>temp</b> directory. This is the directory where the interpreter will create the <b>.j2</b> files. A <b>.j2</b> file is a concatenation of a main game file and all other files included from that file. They are created by the interpreter when the game is first run and are encrypted by default.
+<p>Inside the <b>projects</b> directory you will also find a <b>temp</b> directory. This is the directory where the interpreter will create the <b>.j2</b> files. A <b>.j2</b> file is a concatenation of a main game file and all other files included from that file. They are created by the interpreter when the game is first run and are encrypted by default.
 
 <table class="infowarn"><tr>
 <td><img src="warning.png" alt="Warning"></td>
 <td>Under Unix, the user the JACL interpreter is run as must have write permissions to the <b>temp</b> directory.</td>
 </tr></table>
 
-<p>The <b>include</b> directory is found inside the <b>games</b> directory. In the <b>include</b> directory you will find <b>verbs.library</b>, the main interactive fiction library and <b>frame.jacl</b>, a skeleton program used as a starting point when writing a new piece of interactive fiction.
+<p>The <b>include</b> directory is found inside the <b>projects</b> directory. In the <b>include</b> directory you will find <b>verbs.library</b>, the main interactive fiction library and <b>frame.jacl</b>, a skeleton program used as a starting point when writing a new piece of interactive fiction.
 
 <p>In the <b>guide</b> directory you will find this documentation.
 
@@ -411,7 +397,7 @@ libpthread.so.0        libXdmcp.so.6
 <p>Once you have compiled versions of the JACL interpreters, try running one of the provided games by changing to the <b>bin</b> directory and typing the command:
 
 <pre>
-./garjacl ../games/grail.jacl
+./jacl ../projects/grail.jacl
 </pre>
 
 <p>When you do so, you should see something like the screen below:
@@ -452,10 +438,10 @@ libpthread.so.0        libXdmcp.so.6
 # "cgijacl.conf"
 # CGIJACL interpreter configuration file.
 
-access_log     "/usr/local/jacl/log/error.log" 
-access_log     "/usr/local/jacl/log/access.log" 
-temp           "/usr/local/jacl/games/temp/"
-include        "/usr/local/jacl/games/include/"
+access_log    "/usr/local/jacl/logs/access.log"
+error_log     "/usr/local/jacl/logs/error.log"
+temp          "/usr/local/jacl/projects/temp/"
+include       "/usr/local/jacl/projects/include/"
 </pre>
 
 <h2><a class="section" name="installation5">Playing the Sample Games</a></h2>
@@ -463,89 +449,112 @@ include        "/usr/local/jacl/games/include/"
 <p>Once you have compiled the JACL interpreters, try running one of the provided games by changing to the <b>bin</b> directory and typing the command:
 
 <pre>
-./cgijacl ../games/blackjacl.jacl
+./cgijacl ../projects/desa.jacl
 </pre>
 
 <p>This command will start the JACL interpreter on the default port of 4269, resulting in the following output:
 
 <pre>
-JACL Interpreter v2.7.0
-WebJACL: Registered 8 media.
+CGIJACL Interpreter v4.6.1
 WebJACL: No port number specified (-p <number>), using default port 4269.
-WebJACL server configured on WOPR:4269
+WebJACL server configured on localhost:4269
 </pre>
 
 <p>To play this game, open your favourite web browser and navigate to the URL <b>http://localhost:4269</b>. When you do so, you should see something like the screen below. If not, see the section on <a href="troubleshooting.html">Trouble Shooting</a>.
 
-<center>&nbsp;<br><img src="blackjacl.png"><br>&nbsp;<br></center>
+
 
 <p>To play this same game from the console, try the following command from the <b>bin</b> directory:
 
 <pre>
-./jacl ../games/blackjack.jacl
+./jacl ../projects/desa.jacl
 </pre>
 
 <h2><a class="section" name="installation6">Using JACL with FastCGI and Apache</a></h2>
 
-<p>While the <b>cgijacl</b> interpreter is able to respond to HTTP requests internally, the <b>fcgijacl</b> interpreter is designed to be used with a FastCGI-enabled webserver such as Apache. The <b>cgijacl</b> interpreter is very easy to use and is ideal for developing a new game or allowing a small number of users to play your completed games. The <b>fcgijacl</b> interpreter, when used with a production-quality web server such as Apache, is probably better choice for situations where a high level of traffic is expected.
+<p>While the <b>cgijacl</b> interpreter is able to respond to HTTP requests internally, the <b>fcgijacl</b> interpreter is designed to be used with a FastCGI-enabled webserver such as Apache. The <b>cgijacl</b> interpreter is very easy to use and is ideal for developing a new game or allowing a small number of users to play your completed games. The <b>fcgijacl</b> interpreter, when used with a production-quality web server such as Apache, is a better choice for situations where a high level of traffic is expected.
 
-<p>Before the <b>fcgijacl</b> interpreter can be successfully used with an Apache server, the <b>mod_fastcgi</b> module must the installed and configured. There are many different ways to install both the Apache server and the <b>mod_fastcgi</b> module, all of which are detailed in their respective documentation. <b>mod_fastcgi</b> is available from <a href="http://freshmeat.net/projects/mod_fastcgi/index.html">http://freshmeat.net/projects/mod_fastcgi</a> or as the Debian package: 
+<p>FastCGI is a system for interfacing a web server with an external binary program, in this case the JACL interpreter. With normal CGI, a program is started to handle each individual request. The program executes, produces some output then terminates. With FastCGI, programs are run once then wait in a loop, processing requests as they are made. This suits the JACL interpreter perfectly as it has a fair amount of processing to do when a game is first run, yet very little for an individual move made by a player.
+
+<h3><a class="section" name="installation7">Automated Setup</a></h3>
+
+<p>The easiest way to set up <b>fcgijacl</b> with Apache is to use the provided <b>make apache</b> target. This requires Apache2 to be installed on an Ubuntu or Debian system. From the <b>src</b> directory, run:
 
 <pre>
-libapache2-mod-fastcgi 
+sudo make apache
 </pre>
 
-<p>FastCGI is a system for interfacing a web server with an external binary program, in this case the JACL interpreter. With normal CGI, a program is started to handle each individual request. The program executes, produces some output then terminates. Depending on the startup time of the specific program this can be an extemely inefficient process. With FastCGI, programs are run once then wait in a loop, processing requests as they are made. This suits programs such as the JACL interpreter perfectly as it has a fair amount of processing to do when a game is first run, yet very little for an individual move made by a player.
+<p>This command will install and enable <b>mod_fcgid</b> if needed, copy game files to <b>/usr/local/jacl/</b>, create FastCGI wrapper scripts in <b>/usr/local/jacl/fcgi-bin/</b>, install the Apache configuration at <b>/etc/apache2/conf-available/jacl.conf</b>, set permissions for the <b>www-data</b> user, and restart Apache. Once complete, your games will be available at <b>http://localhost/jacl/<i>gamename</i>.fcgi</b>.
 
-<p>Once <b>mod_fastcgi</b> is installed, Apache requires a file called <b>fastcgi.load</b> in your <b>mods-enabled</b> directory that contains the line:
+<h3><a class="section" name="installation8">Manual Setup</a></h3>
+
+<p>If you prefer to configure Apache manually, install Apache2 and the <b>mod_fcgid</b> module:
 
 <pre>
-LoadModule fastcgi_module /usr/lib/apache2/modules/mod_fastcgi.so
+sudo apt install apache2 libapache2-mod-fcgid
+sudo a2enmod fcgid
 </pre>
 
-<p>To configure FastCGI, you must edit the file <b>fastcgi.conf</b> in your <b>mods-enabled</b> directory to read:
+<p>Create an Apache configuration file at <b>/etc/apache2/conf-available/jacl.conf</b> with the following contents:
 
 <pre>
-&lt;IfModule mod_fastcgi.c&gt;
-  AddHandler fastcgi-script .fcgi
+&lt;IfModule mod_fcgid.c&gt;
+  FcgidMaxProcesses 10
+  FcgidMaxProcessesPerClass 1
+  FcgidIOTimeout 120
+  FcgidIdleTimeout 300
+  FcgidProcessLifeTime 3600
 
-  ScriptAlias /fastcgi-bin/ "/usr/local/fastcgi-bin/"
+  ScriptAlias /jacl/ "/usr/local/jacl/fcgi-bin/"
 
-  &lt;Location /fastcgi-bin&gt;
-    SetHandler fastcgi-script
-    Options ExecCGI
-  &lt;/Location&gt;
+  &lt;Directory "/usr/local/jacl/fcgi-bin"&gt;
+    SetHandler fcgid-script
+    Options +ExecCGI
+    Require all granted
+  &lt;/Directory&gt;
 
-  FastCgiIpcDir /var/lib/apache2/fastcgi
+  Alias /www/ "/usr/local/jacl/projects/www/"
+
+  &lt;Directory "/usr/local/jacl/projects/www"&gt;
+    Options -Indexes
+    Require all granted
+  &lt;/Directory&gt;
+
+  Alias /images/ "/usr/local/jacl/projects/images/"
+
+  &lt;Directory "/usr/local/jacl/projects/images"&gt;
+    Options -Indexes
+    Require all granted
+  &lt;/Directory&gt;
 &lt;/IfModule&gt;
 </pre>
 
-<P>This configuration creates a script alias of <b>/fastcgi-bin</b> that points to the directory <b>/usr/local/fastcgi-bin</b>. This directory must be created so that the user that the Apache server runs as has read and execute premissions to it. A script alias is a way of mapping URLs to directories on your file system. The above script alias says that any resource being accessed using a URL starting with <b>/fastcgi-bin</b> should be looked for in the directory <b>/usr/local/fastcgi-bin</b>.
-
-<p>The location block says that any scripts accessed within the <b>/usr/local/apache/fastcgi-bin</b> directory are to be handled by <b>mod_fastcgi</b> and that the execution of CGI scripts is permitted. As you have probably guessed, this is directory where all your JACL games will be placed. You may alternatively wish to set a script alias like <b>/fastcgi-jacl</b> to point to the directory <b>/usr/local/jacl/games/</b> or wherever your JACL games reside.
-
-<p>The <b>images</b> directory beneath the <b>games</b> directory of your JACL distribution will need to be copied to the Apache document root. The sample games are designed to read the images from <b>/images</b> when played with <b>fcgijacl</b>. It is necessary to load images from somewhere beneath the document root as Apache attempts to run any resource accessed from beneath <b>/fastcgi-bin</b> as a FastCGI script, which the images are not.
-
-<p>Next, the file <b>cgijacl.conf</b> must be moved from <b>jacl/etc</b> to <b>/etc</b>. This file contains several configuration details, the most imortant directive for <b>fcgijacl</b> is <b>temp</b>. This specifies the directory that all persistant data will be written to. By default this is specified in <b>cgijacl.conf</b> as <b>/usr/local/jacl/games/temp</b>. It is important to ensure that the user the Apache server runs as has read and write permissions to whichever directory you specify by using a command such as:
+<p>Enable the configuration and restart Apache:
 
 <pre>
-chmod 777 /usr/local/jacl/games/temp
+sudo a2enconf jacl
+sudo apache2ctl graceful
 </pre>
 
-<p>Regardless of where you locate your JACL games, you will need to edit the first line of each game to point to the <b>fcgijacl</b> interpreter. For example:
+<p>For each JACL game, create a small wrapper script in <b>/usr/local/jacl/fcgi-bin/</b>. For example, for a game called <b>desa.jacl</b>:
 
 <pre>
-#!/usr/local/jacl/bin/fcgijacl
+#!/bin/sh
+exec /usr/local/bin/fcgijacl /usr/local/jacl/projects/desa.jacl
 </pre>
 
-<p>The below line will appear in the Apache error log if the first line of the game points to the interpreter in the wrong location. The line can be misleading as it is not the file <b>grail.jacl</b> that cannot be found but the interpreter binary it is attempting to run itself using.
+<p>Save this as <b>/usr/local/jacl/fcgi-bin/desa.fcgi</b> and make it executable with <b>chmod 755</b>. The game will then be accessible at <b>http://localhost/jacl/desa.fcgi</b>.
+
+<p>Ensure the Apache user (<b>www-data</b> on Debian/Ubuntu) has write permissions to the temp and log directories:
 
 <pre>
-FastCGI: can't start server "/usr/local/fastcgi-bin/grail.jacl" (pid 2539), exec
-le() failed: No such file or directory
+sudo chown -R www-data:www-data /usr/local/jacl/projects/temp
+sudo chown -R www-data:www-data /usr/local/jacl/logs
+sudo chmod 775 /usr/local/jacl/projects/temp
+sudo chmod 775 /usr/local/jacl/logs
 </pre>
 
-<p>Once you have finished configuring JACL and Apache, start Apache and open the following URL from your browser: <b>http://localhost/fastcgi-bin/tutorial.jacl</b>. If all has gone well, you should see the title page for this game. If not, try looking in Apache's <b>error_log</b> and <b>/usr/local/jacl/log/error.log</b>. 
+<p>If a game does not load, check <b>/var/log/apache2/error.log</b> for Apache errors and <b>/usr/local/jacl/logs/error.log</b> for JACL interpreter errors.
 
 
 
@@ -751,7 +760,7 @@ luck, and above all have fun!
 
 <h1><a class="title" name="tutorial0">Tutorial Game</a></h1>
 
-<P>JACL is a language for writing interactive fiction. By providing short definitions for objects and locations you will rapidly build your virtual world. By associating small amounts of simple code with these objects and locations you will bring your world to life. During the course of this tutorial you will see the construction of a small text-only game from beginning to end. The full <a href="tutorialsource.html">source code</a> for this tutorial game is included in Appendix D and in the <b>games</b> subdirectory of your JACL distribution. 
+<P>JACL is a language for writing interactive fiction. By providing short definitions for objects and locations you will rapidly build your virtual world. By associating small amounts of simple code with these objects and locations you will bring your world to life. During the course of this tutorial you will see the construction of a small text-only game from beginning to end. The full <a href="tutorialsource.html">source code</a> for this tutorial game is included in Appendix D and in the <b>projects</b> subdirectory of your JACL distribution. 
 
 <h2><a class="section" name="tutorial1">Language Syntax</a></h2>
 
@@ -777,11 +786,11 @@ luck, and above all have fun!
 ../bin/jacl grail.jacl
 </pre>
 
-<p>This line presumes that all games are run from the <b>games</b> directory of your JACL distribution and that you are currently in that directory. To remove this restriction change the first line of your game to indicate the full absolute path to your JACL interpreter of choice. For example:
+<p>This line presumes that all games are run from the <b>projects</b> directory of your JACL distribution and that you are currently in that directory. To remove this restriction change the first line of your game to indicate the full absolute path to your JACL interpreter of choice. For example:
 
 
 <pre>
-#!/usr/local/bin/garjacl
+#!/usr/local/bin/jacl
 </pre>
 
 <table class="infowarn"><tr>
@@ -803,7 +812,7 @@ Other than comments, the only text that can appear outside a function is one of 
 
 <h2><a class="section" name="tutorial3">Getting Started</a></h2>
 
-<p>To begin writing your first adventure game using JACL you will need to copy the file <b>frame.jacl</b> from the directory <b>jacl/games/include</b> to a file called <b>game.jacl</b> in the directory <b>jacl/games</b>. This new file is the one you will edit to create your game.
+<p>To begin writing your first adventure game using JACL you will need to copy the file <b>frame.jacl</b> from the directory <b>jacl/projects/include</b> to a file called <b>game.jacl</b> in the directory <b>jacl/projects</b>. This new file is the one you will edit to create your game.
 
 <p>The file <B>frame.jacl</B> is a skeleton program that provides a good starting point when writing a piece of interactive fiction from scratch. The file <b>verbs.library</b>, is also included from the last line of <b>frame.jacl</b>. While the code in <b>frame.jacl</b> should be modified to suit your game, the code in <b>verbs.library</b> should never be modified. This allows new versions of <b>verbs.library</b> to be installed without adversely affecting your game. <b>verbs.library</b> contains a extensive set of verbs for use by the player during the game.
 
@@ -1043,10 +1052,10 @@ return false
 
 <h2><a class="section" name="tutorial7">Objects</a></h2>
 
-<P>You can now try playing the beginnings of this game by first typing the command from within the <b>games</b> subdirectory: 
+<P>You can now try playing the beginnings of this game by first typing the command from within the <b>projects</b> subdirectory:
 
 <pre>
-../bin/garjacl game.jacl
+../bin/jacl game.jacl
 </pre> 
 
 <p>When you do so, you should see something like the screen below:
@@ -2008,7 +2017,7 @@ write here{The} ^
 
 <p>Glk is a portable application programming interface (API) for applications, like JACL, with a predominantly text-based user interface. By communicating with this API, JACL is able to work with a variety of user interfaces implemented by third parties for a variety of platforms. The Glk specification was written by Andrew Plotkin, and many thanks to him for having done so. Of equal importance are the various implementations of the Glk specification. 
 
-<p>So what does all this mean? The Glk specification defines a set of multimedia functionality that the native console version of JACL does not provide. Currently JACL can be compiled using WindowsGlk by David Kinder and Gargoyle by Tor Andersson. Many thanks to both these gentlemen for writing their libraries and assisting in the porting of JACL to use them. The commands detailed below are available for use by a JACL interpreter that is compiled with either WindowsGlk or Gargoyle. In the standard Unix distribution, the JACL interpreter is also compiled with GlkTerm. GlkTerm is a Glk library written by Andrew Plotkin using ncurses. GlkTerm does not support graphics or sound. The multimedia commands detailed in this chapter will be ignored without error by interpreters that do not support multimedia.
+<p>So what does all this mean? The Glk specification defines a set of multimedia functionality that the native console version of JACL does not provide. In the standard Unix distribution, the JACL interpreter is compiled with GlkTerm, a Glk library written by Andrew Plotkin using ncurses. GlkTerm does not support graphics or sound, so the multimedia commands detailed in this chapter are ignored without error by the console interpreter. Multimedia is fully supported by the web interpreters (<b>cgijacl</b> and <b>fcgijacl</b>) which deliver images and sounds through HTML.
 
 <p>If you would like to have your game behave differently is certain Glk features are supported by the interpreter, you can test whether the integer constants <b>graphics_supported</b>, <b>sound_supported</b> and <b>timer_supported</b> are set to <b>true</b> or <b>false</b>.
 
@@ -2054,14 +2063,10 @@ bjorb example.blc example.blorb
 <p>This command will create the Blorb file <b>example.blorb</b> that will be automatically read by the game <b>example.jacl</b>. When the <b>bjorb</b> utility runs, it will output some JACL code that will create a constant for each image or sound. If you find these convenient you can cut and paste this code into your game. <p>For example, when reading this <b>.blc</b> file:
 
 <pre>
-Pict 1 PNG images/blackjack.png
-Pict 2 PNG images/chip25.png
-Pict 3 PNG images/chip50.png
-Pict 4 PNG images/chip100.png
-Pict 5 PNG images/club.png
-Pict 6 PNG images/diamond.png
-Pict 7 PNG images/spade.png
-Pict 8 PNG images/heart.png
+Pict 1 PNG images/title.png
+Pict 2 PNG images/sword.png
+Pict 3 PNG images/shield.png
+Pict 4 PNG images/dragon.png
 </pre>
 
 <p><b>bjorb</b> will produce the following output:
@@ -2071,14 +2076,10 @@ bjorb 1.0 (Apr 30 2008) by Stuart Allen, based on
 Blorb Packager Version .5b by L. Ross Raszewski
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE
-constant IMAGE_blackjack 1
-constant IMAGE_chip25 2
-constant IMAGE_chip50 3
-constant IMAGE_chip100 4
-constant IMAGE_club 5
-constant IMAGE_diamond 6
-constant IMAGE_spade 7
-constant IMAGE_heart 8
+constant IMAGE_title 1
+constant IMAGE_sword 2
+constant IMAGE_shield 3
+constant IMAGE_dragon 4
 </pre>
 
 <p>If you pass only a single command-line argument to <b>bjorb</b>, that argument will be used as the base name for both the <b>.blc</b> control file and the <b>.blorb</b> output file. As an example, the following two commands are equivalent:
@@ -2499,7 +2500,7 @@ write "&lt;input type=~hidden~ name=~user_id~ "
 write "value=~" $user_id "~&gt;"
 </pre>
 
-<p>In the first set of <b>write</b> statements, the token <b>$user_id</b> is added directly to the end of the URL being linked to as the value of the HTTP parameter <b>user_id</b>. Also used is the token <b>$url</b>. This token displays the URL of the game, such as <b>/fastcgi-bin/game.jacl</b>.
+<p>In the first set of <b>write</b> statements, the token <b>$user_id</b> is added directly to the end of the URL being linked to as the value of the HTTP parameter <b>user_id</b>. Also used is the token <b>$url</b>. This token displays the URL of the game, such as <b>/jacl/game.fcgi</b>.
 
 <table class="infowarn"><tr>
 <td><img src="info.png"></td>
