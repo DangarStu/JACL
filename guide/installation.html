@@ -31,10 +31,9 @@
 <td>No special libraries are required to compile <b>cgijacl</b>, however a POSIX compliant system is needed.
 </tr><tr>
 <td><b>fcgijacl</b></td>
-<td>FastCGI, available from <a href="http://www.fastcgi.com/index.html">http://www.fastcgi.com/index.html</a>, or as the Debian packages:
+<td>FastCGI development library and Apache module:
 <pre>
-libfcgi-dev
-libfci0c2
+sudo apt install libfcgi-dev libapache2-mod-fcgid
 </pre>
 
 </table>
@@ -161,69 +160,107 @@ WebJACL server configured on WOPR:4269
 
 <h2><a class="section" name="installation6">Using JACL with FastCGI and Apache</a></h2>
 
-<p>While the <b>cgijacl</b> interpreter is able to respond to HTTP requests internally, the <b>fcgijacl</b> interpreter is designed to be used with a FastCGI-enabled webserver such as Apache. The <b>cgijacl</b> interpreter is very easy to use and is ideal for developing a new game or allowing a small number of users to play your completed games. The <b>fcgijacl</b> interpreter, when used with a production-quality web server such as Apache, is probably better choice for situations where a high level of traffic is expected.
+<p>While the <b>cgijacl</b> interpreter is able to respond to HTTP requests internally, the <b>fcgijacl</b> interpreter is designed to be used with a FastCGI-enabled webserver such as Apache. The <b>cgijacl</b> interpreter is very easy to use and is ideal for developing a new game or allowing a small number of users to play your completed games. The <b>fcgijacl</b> interpreter, when used with a production-quality web server such as Apache, is a better choice for situations where a high level of traffic is expected.
 
-<p>Before the <b>fcgijacl</b> interpreter can be successfully used with an Apache server, the <b>mod_fastcgi</b> module must the installed and configured. There are many different ways to install both the Apache server and the <b>mod_fastcgi</b> module, all of which are detailed in their respective documentation. <b>mod_fastcgi</b> is available from <a href="http://freshmeat.net/projects/mod_fastcgi/index.html">http://freshmeat.net/projects/mod_fastcgi</a> or as the Debian package: 
+<p>FastCGI is a system for interfacing a web server with an external binary program, in this case the JACL interpreter. With normal CGI, a program is started to handle each individual request. The program executes, produces some output then terminates. With FastCGI, programs are run once then wait in a loop, processing requests as they are made. This suits the JACL interpreter perfectly as it has a fair amount of processing to do when a game is first run, yet very little for an individual move made by a player.
+
+<h3><a class="section" name="installation7">Automated Setup</a></h3>
+
+<p>The easiest way to set up <b>fcgijacl</b> with Apache is to use the provided <b>make apache</b> target. This requires Apache2 to be installed on an Ubuntu or Debian system. From the <b>src</b> directory, run:
 
 <pre>
-libapache2-mod-fastcgi 
+sudo make apache
 </pre>
 
-<p>FastCGI is a system for interfacing a web server with an external binary program, in this case the JACL interpreter. With normal CGI, a program is started to handle each individual request. The program executes, produces some output then terminates. Depending on the startup time of the specific program this can be an extemely inefficient process. With FastCGI, programs are run once then wait in a loop, processing requests as they are made. This suits programs such as the JACL interpreter perfectly as it has a fair amount of processing to do when a game is first run, yet very little for an individual move made by a player.
+<p>This command will:
 
-<p>Once <b>mod_fastcgi</b> is installed, Apache requires a file called <b>fastcgi.load</b> in your <b>mods-enabled</b> directory that contains the line:
+<ol>
+<li>Install and enable <b>mod_fcgid</b> if not already present</li>
+<li>Copy game files, libraries, and data to <b>/usr/local/jacl/</b></li>
+<li>Create FastCGI wrapper scripts in <b>/usr/local/jacl/fcgi-bin/</b></li>
+<li>Create and enable the Apache configuration at <b>/etc/apache2/conf-available/jacl.conf</b></li>
+<li>Set correct ownership and permissions for the <b>www-data</b> user</li>
+<li>Restart Apache</li>
+</ol>
+
+<p>Once complete, your games will be available at <b>http://localhost/jacl/<i>gamename</i>.fcgi</b>.
+
+<h3><a class="section" name="installation8">Manual Setup</a></h3>
+
+<p>If you prefer to configure Apache manually, or are using a non-Debian system, the steps below describe the process in detail.
+
+<p>First, install Apache2 and the <b>mod_fcgid</b> module. On Ubuntu/Debian:
 
 <pre>
-LoadModule fastcgi_module /usr/lib/apache2/modules/mod_fastcgi.so
+sudo apt install apache2 libapache2-mod-fcgid
+sudo a2enmod fcgid
 </pre>
 
-<p>To configure FastCGI, you must edit the file <b>fastcgi.conf</b> in your <b>mods-enabled</b> directory to read:
+<p>Next, create an Apache configuration file at <b>/etc/apache2/conf-available/jacl.conf</b> with the following contents:
 
 <pre>
-&lt;IfModule mod_fastcgi.c&gt;
-  AddHandler fastcgi-script .fcgi
+&lt;IfModule mod_fcgid.c&gt;
+  FcgidMaxProcesses 10
+  FcgidMaxProcessesPerClass 1
+  FcgidIOTimeout 120
+  FcgidIdleTimeout 300
+  FcgidProcessLifeTime 3600
 
-  ScriptAlias /fastcgi-bin/ "/usr/local/fastcgi-bin/"
+  ScriptAlias /jacl/ "/usr/local/jacl/fcgi-bin/"
 
-  &lt;Location /fastcgi-bin&gt;
-    SetHandler fastcgi-script
-    Options ExecCGI
-  &lt;/Location&gt;
+  &lt;Directory "/usr/local/jacl/fcgi-bin"&gt;
+    SetHandler fcgid-script
+    Options +ExecCGI
+    Require all granted
+  &lt;/Directory&gt;
 
-  FastCgiIpcDir /var/lib/apache2/fastcgi
+  Alias /www/ "/usr/local/jacl/projects/www/"
+
+  &lt;Directory "/usr/local/jacl/projects/www"&gt;
+    Options -Indexes
+    Require all granted
+  &lt;/Directory&gt;
 &lt;/IfModule&gt;
 </pre>
 
-<P>This configuration creates a script alias of <b>/fastcgi-bin</b> that points to the directory <b>/usr/local/fastcgi-bin</b>. This directory must be created so that the user that the Apache server runs as has read and execute premissions to it. A script alias is a way of mapping URLs to directories on your file system. The above script alias says that any resource being accessed using a URL starting with <b>/fastcgi-bin</b> should be looked for in the directory <b>/usr/local/fastcgi-bin</b>.
+<p>The <b>ScriptAlias</b> directive maps URLs beginning with <b>/jacl/</b> to the wrapper scripts directory. The <b>FcgidMaxProcessesPerClass 1</b> setting ensures only one process runs per game, which is appropriate as <b>fcgijacl</b> handles multiple users via session cookies. The <b>FcgidIdleTimeout</b> keeps idle processes alive for 5 minutes to avoid the startup cost of reloading game files.
 
-<p>The location block says that any scripts accessed within the <b>/usr/local/apache/fastcgi-bin</b> directory are to be handled by <b>mod_fastcgi</b> and that the execution of CGI scripts is permitted. As you have probably guessed, this is directory where all your JACL games will be placed. You may alternatively wish to set a script alias like <b>/fastcgi-jacl</b> to point to the directory <b>/usr/local/jacl/games/</b> or wherever your JACL games reside.
-
-<p>The <b>images</b> directory beneath the <b>games</b> directory of your JACL distribution will need to be copied to the Apache document root. The sample games are designed to read the images from <b>/images</b> when played with <b>fcgijacl</b>. It is necessary to load images from somewhere beneath the document root as Apache attempts to run any resource accessed from beneath <b>/fastcgi-bin</b> as a FastCGI script, which the images are not.
-
-<p>Next, the file <b>cgijacl.conf</b> must be moved from <b>jacl/etc</b> to <b>/etc</b>. This file contains several configuration details, the most imortant directive for <b>fcgijacl</b> is <b>temp</b>. This specifies the directory that all persistant data will be written to. By default this is specified in <b>cgijacl.conf</b> as <b>/usr/local/jacl/games/temp</b>. It is important to ensure that the user the Apache server runs as has read and write permissions to write both the .j2 game files and the .auto save files.</p>
-
-<p>For example:</p>
+<p>Enable the configuration and restart Apache:
 
 <pre>
-chmod 777 /usr/local/jacl/projects
-chmod 777 /usr/local/jacl/projects/temp
-chmod 777 /usr/local/jacl/games/temp
+sudo a2enconf jacl
+sudo apache2ctl graceful
 </pre>
 
-<p>Regardless of where you locate your JACL games, you will need to edit the first line of each game to point to the <b>fcgijacl</b> interpreter. For example:
+<p>For each JACL game, create a small wrapper script in <b>/usr/local/jacl/fcgi-bin/</b>. For example, to set up a game called <b>desa.jacl</b>:
 
 <pre>
-#!/usr/local/jacl/bin/fcgijacl
+#!/bin/sh
+exec /usr/local/bin/fcgijacl /usr/local/jacl/projects/desa.jacl
 </pre>
 
-<p>The below line will appear in the Apache error log if the first line of the game points to the interpreter in the wrong location. The line can be misleading as it is not the file <b>grail.jacl</b> that cannot be found but the interpreter binary it is attempting to run itself using.
+<p>Save this as <b>/usr/local/jacl/fcgi-bin/desa.fcgi</b> and make it executable with <b>chmod 755</b>. The game will then be accessible at <b>http://localhost/jacl/desa.fcgi</b>.
+
+<p>Finally, ensure the Apache user (<b>www-data</b> on Debian/Ubuntu) has write permissions to the temp and log directories:
 
 <pre>
-FastCGI: can't start server "/usr/local/fastcgi-bin/grail.jacl" (pid 2539), exec
-le() failed: No such file or directory
+sudo chown -R www-data:www-data /usr/local/jacl/projects/temp
+sudo chown -R www-data:www-data /usr/local/jacl/logs
+sudo chmod 775 /usr/local/jacl/projects/temp
+sudo chmod 775 /usr/local/jacl/projects/data
+sudo chmod 775 /usr/local/jacl/logs
 </pre>
 
-<p>Once you have finished configuring JACL and Apache, start Apache and open the following URL from your browser: <b>http://localhost/fastcgi-bin/tutorial.jacl</b>. If all has gone well, you should see the title page for this game. If not, try looking in Apache's <b>error_log</b> and <b>/usr/local/jacl/log/error.log</b>. 
+<h3><a class="section" name="installation9">Troubleshooting</a></h3>
+
+<p>If a game does not load, check the following log files for error messages:
+
+<ul>
+<li><b>/var/log/apache2/error.log</b> &mdash; Apache errors, including mod_fcgid process failures</li>
+<li><b>/usr/local/jacl/logs/error.log</b> &mdash; JACL interpreter errors</li>
+</ul>
+
+<p>Common issues include incorrect file permissions on the <b>temp</b> directory, a missing or misconfigured <b>cgijacl.conf</b> file, or the <b>fcgijacl</b> binary not being found at the path specified in the wrapper script.
 
 <!-- END OF BODY -->
 <p><a href="index.html">Back to Contents</b>

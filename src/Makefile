@@ -67,6 +67,75 @@ install: all
 	@mkdir -p /usr/local/jacl/projects/data
 	cp ../projects/data/*.csv /usr/local/jacl/projects/data/
 	cp ../etc/cgijacl.conf /usr/local/jacl/
+	cp ../etc/cgijacl.conf /etc/cgijacl.conf 2>/dev/null || true
+
+# Apache2 + mod_fcgid setup (Ubuntu/Debian)
+apache: install
+	@echo "=== JACL Apache2 + mod_fcgid Setup ==="
+	@which apache2ctl > /dev/null 2>&1 || { echo "ERROR: apache2ctl not found. Install Apache2 first: sudo apt install apache2"; exit 1; }
+	@if ! apache2ctl -M 2>/dev/null | grep -q fcgid_module; then \
+		echo "Installing and enabling mod_fcgid..."; \
+		apt-get install -y libapache2-mod-fcgid || { echo "ERROR: Could not install libapache2-mod-fcgid. Run: sudo apt install libapache2-mod-fcgid"; exit 1; }; \
+		a2enmod fcgid; \
+	else \
+		echo "mod_fcgid already enabled."; \
+	fi
+	@mkdir -p /usr/local/jacl/fcgi-bin
+	@echo "Creating wrapper scripts..."
+	@cp ../projects/*.jacl /usr/local/jacl/projects/ 2>/dev/null || true
+	@cp ../projects/*.blorb /usr/local/jacl/projects/ 2>/dev/null || true
+	@cp ../projects/*.media /usr/local/jacl/projects/ 2>/dev/null || true
+	@if [ -d ../projects/www ]; then cp -r ../projects/www /usr/local/jacl/projects/; fi
+	@for game in /usr/local/jacl/projects/*.jacl; do \
+		name=$$(basename "$$game" .jacl); \
+		wrapper="/usr/local/jacl/fcgi-bin/$$name.fcgi"; \
+		printf '#!/bin/sh\nexec /usr/local/bin/fcgijacl %s\n' "$$game" > "$$wrapper"; \
+		chmod 755 "$$wrapper"; \
+		echo "  $$name.fcgi"; \
+	done
+	@echo "Creating Apache configuration..."
+	@printf '<IfModule mod_fcgid.c>\n\
+  FcgidMaxProcesses 10\n\
+  FcgidMaxProcessesPerClass 1\n\
+  FcgidIOTimeout 120\n\
+  FcgidIdleTimeout 300\n\
+  FcgidProcessLifeTime 3600\n\
+\n\
+  ScriptAlias /jacl/ "/usr/local/jacl/fcgi-bin/"\n\
+\n\
+  <Directory "/usr/local/jacl/fcgi-bin">\n\
+    SetHandler fcgid-script\n\
+    Options +ExecCGI\n\
+    Require all granted\n\
+  </Directory>\n\
+\n\
+  Alias /www/ "/usr/local/jacl/projects/www/"\n\
+\n\
+  <Directory "/usr/local/jacl/projects/www">\n\
+    Options -Indexes\n\
+    Require all granted\n\
+  </Directory>\n\
+</IfModule>\n' > /etc/apache2/conf-available/jacl.conf
+	a2enconf jacl
+	@echo "Setting permissions..."
+	chown -R www-data:www-data /usr/local/jacl/projects/temp
+	chown -R www-data:www-data /usr/local/jacl/logs
+	chmod 755 /usr/local/jacl/projects
+	chmod 775 /usr/local/jacl/projects/temp
+	chmod 775 /usr/local/jacl/projects/data
+	chmod 775 /usr/local/jacl/logs
+	@echo "Restarting Apache..."
+	apache2ctl graceful
+	@echo ""
+	@echo "=== JACL Apache Setup Complete ==="
+	@echo ""
+	@echo "Configuration: /etc/apache2/conf-available/jacl.conf"
+	@echo "Wrapper scripts: /usr/local/jacl/fcgi-bin/"
+	@echo "Game files: /usr/local/jacl/projects/"
+	@echo "Logs: /usr/local/jacl/logs/"
+	@echo ""
+	@echo "Games are available at: http://localhost/jacl/<gamename>.fcgi"
+	@echo ""
 
 # Clean up
 clean:
