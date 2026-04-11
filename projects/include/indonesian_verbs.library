@@ -4966,24 +4966,30 @@ print:
 style preformatted
 set linebreaks = false
 print:
-   ||Perintah     Aksi^^
-   ||VERBOSE      selalu deskripsikan lokasi ^
-   ||BRIEF        hanya deskripsikan lokasi baru ^
-   ||ULANG        mulai dari awal ^
-   ||SKOR         tampilkan skor dan peringkat Anda ^
-   ||LIHAT        deskripsikan lokasi saat ini ^
-   ||SIMPAN       simpan posisi saat ini ^
-   ||PULIHKAN     pulihkan posisi tersimpan ^
-   ||I            daftar horizontal barang bawaan ^
-   ||INVENTARIS   daftar vertikal barang bawaan ^
-   ||BATALKAN     batalkan perintah terakhir ^
-   ||LAGI         ulangi perintah terakhir ^
-   ||INFO         tampilkan informasi versi ^^
+   ||Perintah         Aksi^^
+   ||VERBOSE          selalu deskripsikan lokasi ^
+   ||BRIEF            hanya deskripsikan lokasi baru ^
+   ||ULANG            mulai dari awal ^
+   ||SKOR             tampilkan skor dan peringkat Anda ^
+   ||LIHAT            deskripsikan lokasi saat ini ^
+   ||SIMPAN           simpan posisi saat ini ^
+   ||PULIHKAN         pulihkan posisi tersimpan ^
+   ||I                daftar horizontal barang bawaan ^
+   ||INVENTARIS       daftar vertikal barang bawaan ^
+   ||BATALKAN         batalkan perintah terakhir ^
+   ||LAGI             ulangi perintah terakhir ^
+   ||ARTI <kata>      cari arti kata bahasa Indonesia ^
+   ||SUARA NYALA/MATI nyalakan atau matikan suara ^
+   ||INFO             tampilkan informasi versi ^^
 .
 style normal
 set linebreaks = true
 print:
-   CATATAN: Jika Anda mencari petunjuk yang relevan dengan lokasi tertentu,
+   CATATAN: Perintah ~arti~ membuka kamus internal yang berisi lebih dari
+   2000 kata bahasa Indonesia. Untuk mencari kata gabungan seperti ~rumah
+   sakit~, gunakan tanda kutip: ~arti "rumah sakit"~.^^
+
+   Jika Anda mencari petunjuk yang relevan dengan lokasi tertentu,
    ketik ~petunjuk~, ~petunjuk 1~ atau ~petunjuk one~ di lokasi itu. Petunjuk
    pertama akan berupa petunjuk halus dengan ~petunjuk two~ lebih terang-terangan dan
    ~petunjuk three~ berupa perintah tepat yang harus diketik.^^
