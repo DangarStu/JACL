@@ -4541,19 +4541,21 @@ print:
 style preformatted
 set linebreaks = false
 print:
-   ||Command    Action^^
-   ||VERBOSE    always describe locations ^
-   ||BRIEF      only describe new locations ^
-   ||RESTART    start from the beginning ^
-   ||SCORE      display your score and rank ^
-   ||LOOK       describe the current location ^
-   ||SAVE       save the current position ^
-   ||RESTORE    restore a saved position ^
-   ||I          horizontal list of possessions ^
-   ||INV        vertical list of possessions ^
-   ||UNDO       take back last command ^
-   ||AGAIN      repeat the last command ^
-   ||INFO       display version information ^^
+   ||Command         Action^^
+   ||VERBOSE         always describe locations ^
+   ||BRIEF           only describe new locations ^
+   ||RESTART         start from the beginning ^
+   ||SCORE           display your score and rank ^
+   ||LOOK            describe the current location ^
+   ||SAVE            save the current position ^
+   ||RESTORE         restore a saved position ^
+   ||I               horizontal list of possessions ^
+   ||INV             vertical list of possessions ^
+   ||UNDO            take back last command ^
+   ||AGAIN           repeat the last command ^
+   ||SOUND ON/OFF    turn sound effects on or off ^
+   ||VOICE/UNVOICE   turn speech synthesis on or off ^
+   ||INFO            display version information ^^
 .
 style normal
 set linebreaks = true

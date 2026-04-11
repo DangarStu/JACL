@@ -558,6 +558,33 @@ write "Anzeigemodus auf 'einfach' gesetzt.^"
 set DISPLAY_MODE = 0
 }
 
+grammar ton an >sound_on
+grammar ton ein >sound_on
+grammar sound on >sound_on
+
+{+sound_on
+if sound_enabled = true
+   write "Ton ist bereits aktiviert.^"
+else
+   set sound_enabled = true
+   write "Ton aktiviert.^"
+endif
+set time = false
+}
+
+grammar ton aus >sound_off
+grammar sound off >sound_off
+
+{+sound_off
+if sound_enabled = false
+   write "Ton ist bereits deaktiviert.^"
+else
+   set sound_enabled = false
+   write "Ton deaktiviert.^"
+endif
+set time = false
+}
+
 grammar stimme >voice
 
 {+voice
