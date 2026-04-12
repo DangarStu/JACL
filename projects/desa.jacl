@@ -32,10 +32,15 @@ print:
 
 object tikar : tikar
   short		sebuah "tikar"
-  mass		scenery
+  mass		heavy
 
 {examine
 write "Tikar ini terbuat dari anyaman pandan. Kamu tidur di atasnya setiap malam.^"
+}
+
+{take
+write "Tikar itu terlalu berat untuk dibawa sendiri.^"
+set time = false
 }
 
 object meja : meja kayu
