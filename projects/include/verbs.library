@@ -483,6 +483,7 @@ set time = false
 grammar silience >unvoice
 grammar stop talking >unvoice
 grammar unvoice >unvoice
+grammar mute >unvoice
 
 {+unvoice
 write "Speech synthesis disabled.^"
@@ -1623,6 +1624,9 @@ write  noun1{The} " hands you " noun2{the} .^
 
 grammar tell *present about *anywhere		>tell_about
 grammar talk to *present about *anywhere	>tell_about
+grammar speak to *present about *anywhere	>tell_about
+grammar speak with *present about *anywhere	>tell_about
+grammar seak to *present about *anywhere	>tell_about
 grammar talk *present about *anywhere		>tell_about
 grammar talk with *present about *anywhere	>tell_about
 
@@ -3143,6 +3147,7 @@ write "You put " noun1{the} " on.^"
 grammar talk		>talk_only
 grammar talk to		>talk_only
 grammar talk with	>talk_only
+grammat speak with >talk_only
 
 {+talk_only
 if +get_animate != 0
@@ -3156,7 +3161,8 @@ set time = false
 
 grammar talk *present		>talk_to
 grammar talk to *present	>talk_to
-grammar talk with *present	>talk_to
+grammar speak to *present	>talk_to
+grammar speak with *present	>talk_to
 
 {+talk_to
 if +can_talk<noun1 = true
