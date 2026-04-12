@@ -33,7 +33,7 @@ print:
    function speakText(text) {^
       var doc = new DOMParser().parseFromString(text, 'text/html');^
       var html = doc.body.innerHTML;^
-      html = html.replace(/<p[^~>]*>/gi, '\n\n');^
+      html = html.replace(/<p\b.*?>/gi, '\n\n');^
       html = html.replace(/<br\s*\/?>/gi, '\n');^
       var temp = document.createElement('div');^
       temp.innerHTML = html;^
