@@ -32,17 +32,32 @@ print:
 
    function speakText(text) {^
       var doc = new DOMParser().parseFromString(text, 'text/html');^
-      var clean = doc.body.textContent || '';^
-      clean = clean.replace(/\s+/g, ' ').trim();^
-      if (clean.length > 0) {^
-         var lang = document.documentElement.lang || 'en-US';^
-         var utterance = new SpeechSynthesisUtterance(clean);^
+      var html = doc.body.innerHTML;^
+      html = html.replace(/<p[^~>]*>/gi, '\n\n');^
+      html = html.replace(/<br\s*\/?>/gi, '\n');^
+      var temp = document.createElement('div');^
+      temp.innerHTML = html;^
+      var raw = temp.textContent || '';^
+      var paragraphs = raw.split(/\n\s*\n/).map(function(p) {^
+         return p.replace(/\s+/g, ' ').trim();^
+      }).filter(function(p) { return p.length > 0; });^
+      if (paragraphs.length === 0) return;^
+      var lang = document.documentElement.lang || 'en-US';^
+      var voices = speechSynthesis.getVoices();^
+      var voice = voices.find(function(v) { return v.lang === lang; });^
+      function speakNext(i) {^
+         if (i >= paragraphs.length) return;^
+         var utterance = new SpeechSynthesisUtterance(paragraphs[i]);^
          utterance.lang = lang;^
-         var voices = speechSynthesis.getVoices();^
-         var voice = voices.find(function(v) { return v.lang === lang; });^
          if (voice) utterance.voice = voice;^
+         utterance.onend = function() {^
+            if (i < paragraphs.length - 1 && isSpeakEnabled()) {^
+               setTimeout(function() { speakNext(i + 1); }, 500);^
+            }^
+         };^
          speechSynthesis.speak(utterance);^
       }^
+      speakNext(0);^
    }^
 
    function enableSpeak() {^
