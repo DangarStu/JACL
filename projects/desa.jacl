@@ -293,6 +293,14 @@ write "^^" game_title
 style normal
 write " oleh " game_author "^^"
 
+if interpreter = CGI
+   write "Apakah Anda ingin permainan ini berbicara?  "
+   hyperlink "Ya" "suara nyala"
+   write "  "
+   hyperlink "Tidak" "suara mati"
+   write "^^"
+endif
+
 print:
    Matahari pagi bersinar cerah di atas desa. Ayam
    berkokok di kejauhan dan udara terasa sejuk. Hari
