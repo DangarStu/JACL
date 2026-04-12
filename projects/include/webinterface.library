@@ -88,6 +88,17 @@ print:
         });^
         return false;^
    }^
+
+   function lookupWord(e) {^
+        var sel = window.getSelection().toString().trim();^
+        if (sel.length > 0 && sel.indexOf(' ') === -1) {^
+           ajaxForm({^
+                command: 'arti ' + sel,^
+                replace: false,^
+                element: "#maintext"^
+           });^
+        }^
+   }^
 .
 write "</script>^"
 write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
@@ -112,7 +123,7 @@ write " |"
 write "</div>^"
 write "</div>^"
 write "<div id=~main~>^"
-write "<div id=~maintext~ class=~maintext~>^"
+write "<div id=~maintext~ class=~maintext~ ondblclick=~lookupWord(event);~>^"
 set linebreaks = true
 }
 
