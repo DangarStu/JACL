@@ -527,8 +527,14 @@ main(int argc, char *argv[])
             /* DUMMY RETRIEVE OF 'HERE' FOR TESTING OF GAME STATE */
             get_here();
 
-            /* TIME PASSES BEFORE THE PLAYER SEES THE FIRST COMMAND PROMPT */
-            eachturn();
+            /* TIME PASSES BEFORE THE PLAYER SEES THE FIRST COMMAND PROMPT
+             * BUT NOT IF THERE IS A PENDING QUESTION FROM THE INTRO */
+            {
+                struct integer_type *ptype = PENDING_QUESTION_TYPE;
+                if (ptype == NULL || ptype->value == 0) {
+                    eachturn();
+                }
+            }
 
         } else {
 
