@@ -3147,7 +3147,7 @@ write "You put " noun1{the} " on.^"
 grammar talk		>talk_only
 grammar talk to		>talk_only
 grammar talk with	>talk_only
-grammat speak with >talk_only
+grammar speak with >talk_only
 
 {+talk_only
 if +get_animate != 0
