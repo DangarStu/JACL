@@ -1,0 +1,144 @@
+# MAPPING LIBRARY
+#
+# Provides a `map` command that renders an inline SVG map of the player's
+# explored territory using the Raphael JavaScript library.
+#
+# USAGE
+# -----
+# 1. In your game file:
+#        #include "mapping.library"
+#
+# 2. Add raphael to the page head by overriding +local_header in your game:
+#        {+local_header
+#        print:
+#           <script src="/include/raphael.min.js"></script>
+#        .
+#        }
+#
+# 3. Give every mappable location integer `x` and `y` properties. These are
+#    grid coordinates; by convention the `north` exit should lead to a
+#    location with a smaller `y`, `east` to a larger `x`, etc. Example:
+#
+#        location kitchen : kitchen
+#           x       3
+#           y       2
+#           north   hallway
+#           east    pantry
+#           ...
+#
+# BEHAVIOUR
+# ---------
+# Only locations with the VISITED attribute are drawn as labelled nodes.
+# Exit lines are drawn for every exit from a visited location, including
+# exits whose destination has not yet been visited -- so the map shows
+# where the player can go, but not what is there until they arrive. The
+# current location (`here`) is highlighted.
+
+# Layout constants (inlined below because JACL constants aren't accepted
+# inside `set` arithmetic or `write` argument lists):
+#   grid size   = 100 pixels per unit of (x, y)
+#   node size   = 60x60 pixels with 10-pixel rounded corners
+#   canvas size = 1500x1500 pixels
+
+integer map_x
+integer map_y
+integer map_dest_x
+integer map_dest_y
+integer map_loop
+integer map_target
+integer map_word_count
+integer map_word_index
+string map_label_parts
+
+grammar map >map
+grammar m >map
+
+{+map
+print:
+   <div id="jacl_map"></div>
+   <script>
+.
+write "var paper = Raphael(~jacl_map~, 1500, 1500, null);^"
+
+# DRAW EXIT LINES FROM EVERY VISITED LOCATION.
+# Iterates all 12 compass exits; any non-zero, non-NO_GO destination gets a
+# line drawn to its (x, y). Destinations that are themselves unvisited still
+# get a line -- that's the "you can go this way, contents unknown" hint.
+select VISITED map_here
+   set map_loop = 0
+   repeat
+      ifall map_here(map_loop) != nowhere : map_here(map_loop) != NO_GO
+         set map_x = map_here(x)
+         set map_x * 100
+         set map_x + 35
+         set map_y = map_here(y)
+         set map_y * 100
+         set map_y + 35
+
+         set map_target = map_here(map_loop)
+         set map_dest_x = map_target(x)
+         set map_dest_x * 100
+         set map_dest_x + 35
+         set map_dest_y = map_target(y)
+         set map_dest_y * 100
+         set map_dest_y + 35
+
+         write "paper.path(~M" map_x " " map_y "L" map_dest_x " " map_dest_y "~).attr(~stroke~, ~#888~);^"
+      endif
+      set map_loop + 1
+   until map_loop = 12
+endselect
+
+# DRAW A LABELLED NODE FOR EACH VISITED LOCATION.
+select VISITED map_here
+   set map_x = map_here(x)
+   set map_x * 100
+   set map_x + 5
+   set map_y = map_here(y)
+   set map_y * 100
+   set map_y + 5
+   write "var node = paper.rect(" map_x ", " map_y ", 60, 60, 10);^"
+   if map_here = here
+      write "node.attr(~fill~, ~#BDD8D6~);^"
+   else
+      write "node.attr(~fill~, ~#eee~);^"
+   endif
+
+   # CENTRE THE LABEL; WRAP LONG NAMES ACROSS LINES.
+   set map_x + 30
+   set map_y + 30
+   write "paper.text(" map_x ", " map_y ", ~"
+   split map_word_count map_here{The} " " map_label_parts
+   if map_word_count = 0
+      write map_here{The}
+   else
+      set map_word_index = 0
+      repeat
+         write map_label_parts[map_word_index]
+         write "\n"
+         set map_word_index + 1
+      until map_word_index = map_word_count
+   endif
+   write "~);^"
+endselect
+
+# CENTRE THE VIEWPORT ON THE CURRENT LOCATION.
+set map_x = here(x)
+set map_x * 100
+set map_x + 35
+set map_y = here(y)
+set map_y * 100
+set map_y + 35
+
+write "var mapMain = document.getElementById(~main~);^"
+write "if (mapMain) {^"
+write "  mapMain.scrollLeft = " map_x " - mapMain.offsetWidth / 2;^"
+write "  mapMain.scrollTop = " map_y " - mapMain.offsetHeight / 2;^"
+write "}^"
+
+print:
+   </script>
+.
+
+set time = false
+}
