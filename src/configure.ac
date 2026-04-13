@@ -11,6 +11,17 @@ if test "x$USER_CFLAGS_SET" = "x"; then
     CFLAGS="-Wall -O2"
 fi
 
+# Suppress warnings that are false positives or from third-party code.
+# These flags are gcc-specific so check before adding them.
+for wflag in -Wno-unused-result -Wno-stringop-truncation -Wno-unused-but-set-variable; do
+    save_CFLAGS="$CFLAGS"
+    CFLAGS="$CFLAGS $wflag"
+    AC_MSG_CHECKING([whether $CC supports $wflag])
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],
+        [AC_MSG_RESULT([yes])],
+        [AC_MSG_RESULT([no]); CFLAGS="$save_CFLAGS"])
+done
+
 # -----------------------------------------------------------
 # Language selection
 # -----------------------------------------------------------

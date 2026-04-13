@@ -3607,6 +3607,27 @@ CFLAGS="$CFLAGS $LANGUAGE_FLAG"
 { printf '%s\n' "$as_me:${as_lineno-$LINENO}: interpreter language: $jacl_language" >&5
 printf '%s\n' "$as_me: interpreter language: $jacl_language" >&6;}
 
+# Suppress warnings that are false positives or from third-party code.
+# These flags are gcc-specific so check before adding them.
+for wflag in -Wno-unused-result -Wno-stringop-truncation -Wno-unused-but-set-variable; do
+    save_CFLAGS="$CFLAGS"
+    CFLAGS="$CFLAGS $wflag"
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC supports $wflag" >&5
+printf %s "checking whether $CC supports $wflag... " >&6; }
+    cat > conftest.c <<_ACEOF
+int main(void) { return 0; }
+_ACEOF
+    if $CC $CFLAGS -Werror conftest.c -o conftest >/dev/null 2>&1; then
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+    else
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+        CFLAGS="$save_CFLAGS"
+    fi
+    rm -f conftest.c conftest
+done
+
 # Directories for bundled libraries
 CGIHTML_DIR=cgihtml-1.69
 GLKTERM_DIR=glkterm
