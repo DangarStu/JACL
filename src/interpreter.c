@@ -1413,22 +1413,26 @@ execute(const char *funcname)
                         encoded = text_of_word(2);
                     }
 
-                    if (word[3] == NULL) {
-                        if (REMOTE_USER_USED->value == TRUE) {
-                            sprintf (string_buffer, "<a href=\"?command=%s\">", encoded);
+                    {
+                        struct cinteger_type *remote_user = REMOTE_USER_USED;
+                        int use_user_id = (remote_user == NULL || remote_user->value == FALSE);
+
+                        if (word[3] == NULL) {
+                            if (use_user_id) {
+                                sprintf (string_buffer, "<a href=\"?command=%s&amp;user_id=%s\">", encoded, user_id);
+                            } else {
+                                sprintf (string_buffer, "<a href=\"?command=%s\">", encoded);
+                            }
+                            strcat (string_buffer, text_of_word(1));
+                            strcat (string_buffer, "</a>");
                         } else {
-                            sprintf (string_buffer, "<a href=\"?command=%s&amp;user_id=%s\">", encoded, user_id);
-                        }
-                        strcat (string_buffer, text_of_word(1));
-                        strcat (string_buffer, "</a>");
-                    } else {
-                        sprintf (string_buffer, "<a class=\"%s\" href=\"?command=", text_of_word(3));
-                        strcat (string_buffer, encoded);
-                        if (REMOTE_USER_USED->value == FALSE) {
-                            sprintf (option_buffer, "&amp;user_id=%s\">%s</a>", user_id, text_of_word(1));
-                            strcat (string_buffer, option_buffer);
-                        } else {
-                            sprintf (option_buffer, "\">%s</a>", text_of_word(1));
+                            sprintf (string_buffer, "<a class=\"%s\" href=\"?command=", text_of_word(3));
+                            strcat (string_buffer, encoded);
+                            if (use_user_id) {
+                                sprintf (option_buffer, "&amp;user_id=%s\">%s</a>", user_id, text_of_word(1));
+                            } else {
+                                sprintf (option_buffer, "\">%s</a>", text_of_word(1));
+                            }
                             strcat (string_buffer, option_buffer);
                         }
                     }
