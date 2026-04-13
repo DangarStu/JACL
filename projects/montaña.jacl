@@ -1,0 +1,479 @@
+#!../bin/jacl
+#                                                                  VIDA EN LA MONTAÑA
+# -----------------------------------------------------------------------------
+# A Spanish language learning game set in the mountains of Chile.
+# -----------------------------------------------------------------------------
+
+constant game_title		"Vida en la Montaña"
+constant game_author	"Stuart Allen"
+constant game_version	1
+
+constant header_colour "#4a6741"
+constant linkbar_colour "#5c7a53"
+constant maintext_colour "#f0ece4"
+
+# -----------------------------------------------------------------------------
+# LOCATIONS
+# -----------------------------------------------------------------------------
+
+location cabaña : cabaña casa refugio
+  short		name "Cabaña"
+
+{look
+write "Estás dentro de una pequeña cabaña de madera en las montañas. "
+write "Las paredes son de troncos gruesos y el techo de tejas oscuras. "
+write "Hay una chimenea de piedra en una esquina y una mesa rústica "
+write "junto a la ventana. "
+if puerta has CLOSED
+   write "Una puerta de madera al sur está cerrada.^"
+else
+   write "Una puerta de madera al sur está abierta, dejando entrar el aire fresco de la montaña.^"
+endif
+}
+
+{movement
+if compass = south
+   if destination = nowhere
+      write "La puerta está cerrada. Tienes que abrirla primero.^"
+      return
+   endall
+return false
+}
+
+object puerta : puerta
+  short		una "puerta de madera"
+  has		CLOSABLE CLOSED
+  mass		scenery
+
+{examine
+if puerta has CLOSED
+   write "Una puerta de madera robusta con bisagras de hierro. Está cerrada.^"
+else
+   write "La puerta está abierta. A través de ella puedes ver el sendero que baja por la montaña.^"
+endif
+}
+
+{open_override
+ensure puerta hasnt CLOSED
+write "Abres la puerta de madera. El aire frío de la montaña entra en la cabaña.^"
+set cabaña(south) = sendero
+set sendero(north) = cabaña
+}
+
+{close_override
+ensure puerta has CLOSED
+write "Cierras la puerta de madera.^"
+set cabaña(south) = nowhere
+set sendero(north) = nowhere
+}
+
+object chimenea : chimenea fogón fuego
+  short		una "chimenea de piedra"
+  mass		scenery
+
+{examine
+write "Una chimenea construida con piedras del río. "
+write "Todavía hay brasas calientes de anoche. El calor se siente agradable.^"
+}
+
+object mesa_cabaña : mesa rústica
+  short		una "mesa rústica"
+  has		SURFACE
+  mass		scenery
+
+{examine
+write "Una mesa hecha de tablones de madera sin pulir. Tiene marcas de uso y algunas quemaduras.^"
+}
+
+object ventana : ventana
+  short		una "ventana"
+  mass		scenery
+
+{examine
+write "A través de la ventana puedes ver el bosque de araucarias "
+write "y, a lo lejos, la silueta de un volcán cubierto de nieve.^"
+}
+
+object taza : taza mate
+  short		una "taza de mate"
+  long		"Una taza de mate está sobre la mesa.^"
+  parent	mesa_cabaña
+  mass		5
+
+{examine
+write "Una taza de cerámica con mate caliente. El aroma de las hierbas es reconfortante.^"
+}
+
+{drink
+write "Tomas un sorbo de mate. Está amargo pero te da energía para el día.^"
+}
+
+# -----------------------------------------------------------------------------
+
+location sendero : sendero camino
+  short		name "Sendero"
+  has		OUTDOORS
+  west		bosque
+  south		mirador
+
+{look
+print:
+   Estás en un sendero de tierra que serpentea por la ladera
+   de la montaña. El aire es fresco y limpio. A tu alrededor
+   crecen arbustos nativos y flores silvestres de colores
+   brillantes. Al oeste, el sendero se adentra en un bosque
+   oscuro de araucarias. Hacia el sur, el camino sube hasta
+   un mirador. Tu cabaña está al norte.^
+.
+}
+
+object arbustos : arbustos plantas
+  short		name "arbustos"
+  mass		scenery
+
+{examine
+write "Arbustos nativos con pequeñas bayas rojas. Algunos tienen flores amarillas.^"
+}
+
+object flores : flores silvestres
+  short		unas "flores silvestres"
+  mass		scenery
+
+{examine
+write "Flores silvestres de colores vivos: rojas, amarillas y violetas. "
+write "Atraen a varias mariposas que revolotean entre ellas.^"
+}
+
+{take
+write "Mejor dejarlas donde están. Son más bonitas en la naturaleza.^"
+set time = false
+}
+
+{smell
+write "Las flores tienen un perfume dulce y delicado.^"
+}
+
+object mariposas : mariposas
+  short		unas "mariposas"
+  has		ANIMATE
+  mass		scenery
+
+{examine
+write "Mariposas de colores brillantes vuelan entre las flores. "
+write "Sus alas tienen patrones de naranja y negro.^"
+}
+
+{take
+write "Las mariposas se alejan volando antes de que puedas acercarte.^"
+set time = false
+}
+
+# -----------------------------------------------------------------------------
+
+location bosque : bosque araucarias
+  short		name "Bosque"
+  has		OUTDOORS
+  east		sendero
+
+{look
+print:
+   Estás dentro de un antiguo bosque de araucarias. Los árboles
+   enormes se elevan hacia el cielo, sus ramas formando un dosel
+   que filtra la luz del sol. El suelo está cubierto de hojas
+   secas y piñones caídos. El aire huele a tierra húmeda y
+   resina. Se oyen los cantos de pájaros escondidos entre las
+   ramas. El sendero de regreso está al este.^
+.
+}
+
+object araucarias : araucarias árboles
+  short		unas "araucarias"
+  mass		scenery
+
+{examine
+write "Las araucarias son árboles milenarios con troncos gruesos y rectos. "
+write "Sus ramas tienen forma de paraguas y están cubiertas de hojas duras y puntiagudas. "
+write "Son árboles sagrados para el pueblo mapuche.^"
+}
+
+object piñones : piñones
+  short		unos "piñones"
+  long		"Hay varios piñones caídos en el suelo.^"
+  mass		5
+
+{examine
+write "Los piñones son las semillas de la araucaria. Son grandes y tienen forma ovalada. "
+write "Son un alimento tradicional de los mapuche.^"
+}
+
+{eat
+write "Muerdes un piñón. Tiene un sabor suave y ligeramente dulce, parecido a la castaña.^"
+}
+
+object carpintero : carpintero pájaro ave
+  short		un "carpintero"
+  long		"Un pájaro carpintero golpea rítmicamente un tronco.^"
+  has		ANIMATE
+  mass		scenery
+
+{examine
+write "Un pájaro carpintero de plumaje negro con una cresta roja brillante. "
+write "Golpea el tronco de una araucaria buscando insectos.^"
+}
+
+{take
+write "El carpintero vuela a un árbol más alto, fuera de tu alcance.^"
+set time = false
+}
+
+{listen
+write "El golpeteo rítmico del carpintero resuena por todo el bosque.^"
+}
+
+object zorro : zorro
+  short		un "zorro"
+  has		ANIMATE
+  mass		scenery
+
+{examine
+write "Un pequeño zorro chilote de pelaje gris rojizo. "
+write "Te observa con curiosidad desde detrás de un tronco caído.^"
+}
+
+{talk_to
+write "El zorro inclina la cabeza y te mira fijamente, pero no se acerca.^"
+}
+
+{take
+write "El zorro se escabulle rápidamente entre los arbustos y desaparece.^"
+set time = false
+}
+
+# -----------------------------------------------------------------------------
+
+location mirador : mirador vista
+  short		name "Mirador"
+  has		OUTDOORS
+  north		sendero
+  west		lago
+
+{look
+print:
+   Estás en un mirador natural en lo alto de la montaña. La
+   vista es impresionante. Hacia el este puedes ver un valle
+   verde con un río serpenteante. Al sur, dos volcanes enormes
+   se alzan majestuosos, sus cumbres cubiertas de nieve
+   brillando bajo el sol. Hacia el oeste, un camino rocoso
+   desciende hasta un lago de aguas cristalinas. El sendero
+   de regreso baja hacia el norte.^
+.
+}
+
+object volcanes : volcanes montañas
+  short		name "volcanes"
+  mass		scenery
+
+{examine
+write "Dos volcanes dominan el horizonte. El más grande tiene "
+write "una columna de humo saliendo de su cráter. El más pequeño "
+write "está cubierto de nieve desde la cumbre hasta la mitad. "
+write "La vista es majestuosa y un poco intimidante.^"
+}
+
+object valle : valle río
+  short		un "valle"
+  mass		scenery
+
+{examine
+write "Un valle extenso cubierto de pastos verdes. Un río plateado "
+write "serpentea por el centro. Se pueden ver algunas casas pequeñas "
+write "a lo lejos, probablemente un pueblo.^"
+}
+
+object banco_piedra : banco piedra roca
+  short		un "banco de piedra"
+  mass		scenery
+
+{examine
+write "Un banco natural formado por una roca plana. Es un buen lugar para sentarse y contemplar el paisaje.^"
+}
+
+{sit_on
+write "Te sientas en el banco de piedra. La vista de los volcanes y el valle es espectacular. "
+write "Sientes una profunda paz.^"
+}
+
+# -----------------------------------------------------------------------------
+
+location lago : lago orilla
+  short		name "Lago"
+  has		OUTDOORS
+  east		mirador
+
+{look
+print:
+   Estás en la orilla de un lago de montaña de aguas
+   cristalinas. El agua es de un azul profundo que refleja
+   las montañas y el cielo. La orilla está cubierta de
+   piedras lisas y arena oscura. Algunas truchas saltan
+   ocasionalmente en la superficie. Un viejo bote de madera
+   descansa en la orilla. El camino de regreso al mirador
+   está al este.^
+.
+}
+
+object agua_lago : agua lago
+  short		name "agua"
+  mass		scenery
+
+{examine
+write "El agua del lago es increíblemente clara. Puedes ver el fondo "
+write "con piedras de colores y algunas truchas nadando.^"
+}
+
+{drink
+write "Te arrodillas y bebes un poco de agua del lago. Está fría y pura, "
+write "con un sabor fresco que solo tiene el agua de montaña.^"
+}
+
+{swim
+write "El agua está demasiado fría para nadar. Tus pies se entumecen solo con tocar la superficie.^"
+set time = false
+}
+
+object truchas : truchas peces
+  short		unas "truchas"
+  has		ANIMATE
+  mass		scenery
+
+{examine
+write "Truchas de colores brillantes nadan cerca de la superficie. "
+write "Sus escamas brillan como plata cuando les da el sol.^"
+}
+
+{take
+write "Las truchas son demasiado rápidas. Necesitarías una caña de pescar.^"
+set time = false
+}
+
+object bote : bote lancha barca
+  short		un "bote de madera"
+  long		"Un viejo bote de madera descansa en la orilla del lago.^"
+  mass		scenery
+
+{examine
+write "Un bote de madera viejo pero sólido. La pintura azul está descascarada "
+write "por el sol y la lluvia. Tiene dos remos dentro.^"
+}
+
+{enter
+write "Subes al bote, pero no tiene sentido salir al lago sin un propósito claro. "
+write "Además, el agua se ve muy fría.^"
+set time = false
+}
+
+object remos : remos
+  short		unos "remos"
+  mass		scenery
+
+{examine
+write "Dos remos de madera gastados por el uso. Están dentro del bote.^"
+}
+
+{take
+write "Los remos son parte del bote. Mejor dejarlos donde están.^"
+set time = false
+}
+
+object piedras : piedras guijarros
+  short		unas "piedras lisas"
+  mass		scenery
+
+{examine
+write "Piedras lisas de río de diferentes colores: grises, blancas y algunas con vetas rojizas.^"
+}
+
+# -----------------------------------------------------------------------------
+# PLAYER
+# -----------------------------------------------------------------------------
+
+object jugador : yo mismo mi
+  has		ANIMATE
+  short		name "tú"
+  quantity	42
+  parent	cabaña
+  player
+
+{examine
+write "Te sientes bien, respirando el aire puro de la montaña. "
+write "Estás listo para explorar.^"
+execute "+inventory"
+}
+
+# -----------------------------------------------------------------------------
+# GLOBAL FUNCTIONS
+# -----------------------------------------------------------------------------
+
+integer speech_choice
+
+{+intro
+style bold
+write "^^" game_title
+style normal
+write " por " game_author "^^"
+
+write "¿Quieres que el juego hable? (sí/no)^"
+getyesorno speech_choice
+if interpreter = GLK
+   execute "+start_game"
+endif
+}
+
+{+start_game
+if speech_choice = true
+   write "Síntesis de voz activada.^^"
+   write "<script>enableSpeak();</script>"
+else
+   write "Síntesis de voz desactivada.^^"
+   write "<script>disableSpeak();</script>"
+endif
+
+print:
+   El sol de la mañana ilumina las cumbres nevadas de los
+   volcanes. El aire fresco de la montaña huele a pino y
+   tierra húmeda. Los pájaros cantan en el bosque cercano.
+   Es un día perfecto para explorar las montañas de Chile
+   y descubrir sus secretos.^^
+.
+
+look
+}
+
+{+eachturn
+if total_moves = 0
+   execute "+start_game"
+endif
+}
+
+{+movement
+return false
+}
+
+grammar acerca >about
+grammar sobre >about
+
+{+about
+write "Vida en la Montaña es un juego para aprender español. "
+write "Explora las montañas, el bosque y el lago. Habla con los animales "
+write "y descubre la naturaleza de Chile. Usa ~significado~ o ~lookup~ "
+write "para buscar el significado de una palabra.^"
+}
+
+# -----------------------------------------------------------------------------
+# INCLUDES
+# -----------------------------------------------------------------------------
+
+#include "spanish.library"
+#include "spanish_verbs.library"
+#include "webinterface.library"
+#include "webinterface.css"
