@@ -933,7 +933,12 @@ word_check()
             }
 
             execute("+intro");
-            eachturn();
+            {
+                struct integer_type *ptype = PENDING_QUESTION_TYPE;
+                if (ptype == NULL || ptype->value == 0) {
+                    eachturn();
+                }
+            }
         }
     } else if (!strcmp(word[wp], cstring_resolve("OOPS_WORD")->value)) {
         if (word[++wp] != NULL) {
