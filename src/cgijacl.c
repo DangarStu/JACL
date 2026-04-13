@@ -607,11 +607,13 @@ main(int argc, char *argv[])
                 strcpy(current_command, text_buffer);
 
                 /* CHECK IF THERE IS A PENDING QUESTION FROM A PREVIOUS
-                 * GETYESORNO OR GETNUMBER COMMAND */
+                 * GETYESORNO OR GETNUMBER COMMAND.
+                 * THE RESTART COMMAND ALWAYS BYPASSES THE PENDING CHECK */
                 {
                     struct integer_type *ptype = PENDING_QUESTION_TYPE;
 
-                    if (ptype != NULL && ptype->value != 0) {
+                    if (ptype != NULL && ptype->value != 0
+                        && strcasecmp(text_buffer, cstring_resolve("RESTART_WORD")->value)) {
                         int question_type = ptype->value;
                         int answer_valid = FALSE;
                         int answer_value = 0;
