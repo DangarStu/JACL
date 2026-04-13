@@ -21,13 +21,36 @@ location rumah : rumah pondok gubuk
   south		sawah
 
 {look
-print:
-   Kamu berada di dalam rumahmu yang kecil tapi nyaman.
-   Dindingnya terbuat dari bambu dan atapnya dari daun
-   kelapa. Ada sebuah tikar di lantai dan sebuah meja
-   kayu kecil di sudut. Pintu mengarah ke selatan menuju
-   sawah.^
-.
+write "Kamu berada di dalam rumahmu yang kecil tapi nyaman. "
+write "Dindingnya terbuat dari bambu dan atapnya dari daun "
+write "kelapa. Ada sebuah tikar di lantai dan sebuah meja "
+write "kayu kecil di sudut. "
+if pintu has CLOSED
+   write "Sebuah pintu kayu ke selatan tertutup.^"
+else
+   write "Sebuah pintu kayu ke selatan terbuka, menuju sawah.^"
+endif
+}
+
+{movement_south
+if pintu has CLOSED
+   write "Pintu tertutup. Kamu harus membukanya terlebih dahulu.^"
+   return true
+endif
+return false
+}
+
+object pintu : pintu
+  short		sebuah "pintu kayu"
+  has		CLOSABLE CLOSED
+  mass		scenery
+
+{examine
+if pintu has CLOSED
+   write "Sebuah pintu kayu sederhana yang tertutup. Pintunya mengarah ke selatan.^"
+else
+   write "Sebuah pintu kayu sederhana yang terbuka. Melalui pintu, kamu bisa melihat sawah.^"
+endif
 }
 
 object tikar : tikar
