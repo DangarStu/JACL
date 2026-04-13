@@ -17,3 +17,6 @@ src/autom4te.cache/
 src/configure~
 src/Makefile
 src/glkterm/Makefile
+
+# compiled binaries
+bin/
