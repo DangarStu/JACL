@@ -30,6 +30,38 @@
 
 extern int            style_index;
 
+/* Returns 1 for yes, 0 for no, -1 for invalid */
+static int
+resolve_yes_or_no(const char *input)
+{
+    char lower[256];
+    int i;
+
+    strncpy(lower, input, 255);
+    lower[255] = 0;
+    for (i = 0; lower[i]; i++)
+        lower[i] = tolower((int)lower[i]);
+
+    /* Strip leading whitespace */
+    char *s = lower;
+    while (*s == ' ' || *s == '\t') s++;
+
+    /* Strip trailing whitespace/newlines */
+    i = strlen(s) - 1;
+    while (i >= 0 && (s[i] == ' ' || s[i] == '\t' || s[i] == '\n' || s[i] == '\r'))
+        s[i--] = 0;
+
+    if (!strcmp(s, "yes") || !strcmp(s, "y") || !strcmp(s, "ya") ||
+        !strcmp(s, "oui") || !strcmp(s, "ja") || !strcmp(s, "si"))
+        return 1;
+
+    if (!strcmp(s, "no") || !strcmp(s, "n") || !strcmp(s, "tidak") ||
+        !strcmp(s, "non") || !strcmp(s, "nein"))
+        return 0;
+
+    return -1;
+}
+
 char            include_directory[81] = "\0";
 char            temp_directory[81] = "\0";
 char            data_directory[81] = "\0";
@@ -566,25 +598,107 @@ main(int argc, char *argv[])
                 log_access(temp_buffer);
     
                 strcpy(current_command, text_buffer);
-    
+
+                /* CHECK IF THERE IS A PENDING QUESTION FROM A PREVIOUS
+                 * GETYESORNO OR GETNUMBER COMMAND */
+                {
+                    struct integer_type *ptype = PENDING_QUESTION_TYPE;
+
+                    if (ptype != NULL && ptype->value != 0) {
+                        int question_type = ptype->value;
+                        int answer_valid = FALSE;
+                        int answer_value = 0;
+
+                        if (question_type == 1) {
+                            /* GETYESORNO */
+                            int result = resolve_yes_or_no(text_buffer);
+                            if (result != -1) {
+                                answer_value = result;
+                                answer_valid = TRUE;
+                            } else {
+                                write_text("Please answer yes or no.^");
+                            }
+                        } else if (question_type == 2 || question_type == 3) {
+                            /* GETNUMBER (2=insistent) OR ASKNUMBER (3=non-insistent) */
+                            struct integer_type *plow = PENDING_NUMBER_LOW;
+                            struct integer_type *phigh = PENDING_NUMBER_HIGH;
+                            char *endptr;
+                            long val;
+
+                            if (plow != NULL && phigh != NULL) {
+                                val = strtol(text_buffer, &endptr, 10);
+                                /* CHECK IF INPUT IS A VALID NUMBER */
+                                while (*endptr == ' ' || *endptr == '\t' || *endptr == '\n') endptr++;
+                                if (*endptr == '\0' && endptr != text_buffer) {
+                                    if (val >= plow->value && val <= phigh->value) {
+                                        answer_value = (int)val;
+                                        answer_valid = TRUE;
+                                    } else if (question_type == 3) {
+                                        /* ASKNUMBER: NON-INSISTENT, ACCEPT ANYWAY */
+                                        answer_value = (int)val;
+                                        answer_valid = TRUE;
+                                    } else {
+                                        sprintf(temp_buffer, "Please enter a number between %d and %d.^", plow->value, phigh->value);
+                                        write_text(temp_buffer);
+                                    }
+                                } else if (question_type == 3) {
+                                    /* ASKNUMBER: NON-INSISTENT, ACCEPT 0 */
+                                    answer_value = 0;
+                                    answer_valid = TRUE;
+                                } else {
+                                    sprintf(temp_buffer, "Please enter a number between %d and %d.^", plow->value, phigh->value);
+                                    write_text(temp_buffer);
+                                }
+                            }
+                        }
+
+                        if (answer_valid) {
+                            /* STORE THE ANSWER IN THE TARGET VARIABLE */
+                            struct string_type *ptarget = string_resolve("pending_target");
+                            if (ptarget != NULL && ptarget->value[0] != 0) {
+                                int *target = container_resolve(ptarget->value);
+                                if (target != NULL) {
+                                    *target = answer_value;
+                                }
+                            }
+
+                            /* CLEAR PENDING STATE */
+                            ptype->value = 0;
+                            {
+                                struct integer_type *plow = PENDING_NUMBER_LOW;
+                                struct integer_type *phigh = PENDING_NUMBER_HIGH;
+                                struct string_type *ptarget2 = string_resolve("pending_target");
+                                if (plow != NULL) plow->value = 0;
+                                if (phigh != NULL) phigh->value = 0;
+                                if (ptarget2 != NULL) ptarget2->value[0] = 0;
+                            }
+
+                            TIME->value = TRUE;
+                        }
+                        /* SKIP NORMAL COMMAND PROCESSING WHEN PENDING */
+                        goto skip_command;
+                    }
+                }
+
                 command_encapsulate();
                 jacl_truncate();
-    
-                /* IF THERE IS NO COMMAND, SET THE COMMAND TO 'blankjacl' SO 
+
+                /* IF THERE IS NO COMMAND, SET THE COMMAND TO 'blankjacl' SO
                  * THE GAME CAN CODE A CUSTOM RESPONSE */
                 if (word[0] == NULL) {
                     strcpy(text_buffer, "blankjacl");
                     encapsulate();
                 }
-    
+
              /* SET THE INTEGER INTERRUPTED TO FALSE. IF THIS IS SET TO
              * TRUE BY ANY COMMAND, FURTHER PROCESSING WILL STOP */
                 INTERRUPTED->value = FALSE;
-    
+
                 interrupted = FALSE;
-    
+
                 /* CALL THE PARSER TO START PROCESSING THE COMMAND */
                 preparse();
+skip_command:
     
                 if (current_command[0] != 0) {
                     strcpy(last_command, current_command);

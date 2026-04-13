@@ -80,6 +80,7 @@ read_gamefile()
     // TO THE INTERPRETER AS JACL FUNCTION CAN ONLY RETURN
     // AN INTEGER
     create_string ("return_value", "");
+    create_string ("pending_target", "");
 
     create_cstring ("function_name", "JACL*Internal");
 
@@ -129,6 +130,9 @@ read_gamefile()
     create_integer ("local_y", 0);
     create_integer ("local_a", 0);
     create_integer ("linebreaks", 1);
+    create_integer ("pending_question_type", 0);
+    create_integer ("pending_number_low", 0);
+    create_integer ("pending_number_high", 0);
 
     // CREATE DEFAULT ATTRIBUTE FOR BACKWARDS COMPATIBILITY
     create_attribute("FIRST");

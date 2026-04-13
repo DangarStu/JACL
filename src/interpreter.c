@@ -1551,7 +1551,35 @@ execute(const char *funcname)
             } else if (!strcmp(word[0], "volume")) {
             } else if (!strcmp(word[0], "askstring") || !strcmp(word[0], "getstring")) {
             } else if (!strcmp(word[0], "asknumber") || !strcmp(word[0], "getnumber")) {
+                if (word[3] != NULL) {
+                    struct integer_type *ptype = PENDING_QUESTION_TYPE;
+                    struct integer_type *plow = PENDING_NUMBER_LOW;
+                    struct integer_type *phigh = PENDING_NUMBER_HIGH;
+                    struct string_type *ptarget = string_resolve("pending_target");
+                    if (ptype != NULL && plow != NULL && phigh != NULL && ptarget != NULL) {
+                        if (!strcmp(word[0], "getnumber")) {
+                            ptype->value = 2;
+                        } else {
+                            ptype->value = 3;
+                        }
+                        plow->value = value_of(word[2], TRUE);
+                        phigh->value = value_of(word[3], TRUE);
+                        strncpy(ptarget->value, var_text_of_word(1), 1023);
+                        ptarget->value[1023] = 0;
+                        return(exit_function(TRUE));
+                    }
+                }
             } else if (!strcmp(word[0], "getyesorno")) {
+                if (word[1] != NULL) {
+                    struct integer_type *ptype = PENDING_QUESTION_TYPE;
+                    struct string_type *ptarget = string_resolve("pending_target");
+                    if (ptype != NULL && ptarget != NULL) {
+                        ptype->value = 1;
+                        strncpy(ptarget->value, var_text_of_word(1), 1023);
+                        ptarget->value[1023] = 0;
+                        return(exit_function(TRUE));
+                    }
+                }
             } else if (!strcmp(word[0], "clear")) {
             } else if (!strcmp(word[0], "more")) {
             } else if (!strcmp(word[0], "terminate")) {
