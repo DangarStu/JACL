@@ -304,10 +304,10 @@ endif
 
 {+start_game
 if speech_choice = true
-   write "Sintesis suara diaktifkan.^"
+   write "Sintesis suara diaktifkan.^^"
    write "<script>enableSpeak();</script>"
 else
-   write "Sintesis suara dinonaktifkan.^"
+   write "Sintesis suara dinonaktifkan.^^"
    write "<script>disableSpeak();</script>"
 endif
 
