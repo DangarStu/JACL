@@ -607,11 +607,32 @@ main(int argc, char *argv[])
                 strcpy(current_command, text_buffer);
 
                 /* CHECK IF THERE IS A PENDING QUESTION FROM A PREVIOUS
-                 * GETYESORNO OR GETNUMBER COMMAND */
+                 * GETYESORNO OR GETNUMBER COMMAND.
+                 * ALLOW SYSTEM COMMANDS (RESTART) TO BYPASS THE PENDING CHECK */
                 {
                     struct integer_type *ptype = PENDING_QUESTION_TYPE;
+                    char *restart_word = cstring_resolve("RESTART_WORD")->value;
+                    int is_system_command = FALSE;
 
-                    if (ptype != NULL && ptype->value != 0) {
+                    /* MAKE A LOWERCASE COPY FOR COMPARISON */
+                    {
+                        char lower_cmd[1024];
+                        int ci;
+                        strncpy(lower_cmd, text_buffer, 1023);
+                        lower_cmd[1023] = 0;
+                        for (ci = 0; lower_cmd[ci]; ci++)
+                            lower_cmd[ci] = tolower((int)lower_cmd[ci]);
+                        /* STRIP LEADING WHITESPACE */
+                        char *cmd = lower_cmd;
+                        while (*cmd == ' ' || *cmd == '\t') cmd++;
+                        if (!strcmp(cmd, restart_word)) {
+                            is_system_command = TRUE;
+                            /* CLEAR PENDING STATE SO RESTART STARTS CLEAN */
+                            if (ptype != NULL) ptype->value = 0;
+                        }
+                    }
+
+                    if (!is_system_command && ptype != NULL && ptype->value != 0) {
                         int question_type = ptype->value;
                         int answer_valid = FALSE;
                         int answer_value = 0;
