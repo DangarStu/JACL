@@ -135,6 +135,26 @@ object capung : capung
 write "Capung berwarna biru terbang rendah di atas air sawah.^"
 }
 
+object kuntul : kuntul burung bangau putih
+  short		seekor "kuntul putih"
+  long		"Seekor kuntul putih berdiri diam di tepi sawah, mengawasi air.^"
+  has		ANIMATE
+  mass		scenery
+
+{examine
+write "Burung kuntul putih dengan kaki panjang dan paruh kuning. "
+write "Dia berdiri sabar menunggu ikan atau katak kecil di air sawah.^"
+}
+
+{take
+write "Kuntul itu terbang menjauh sebelum kamu bisa mendekat.^"
+set time = false
+}
+
+{talk
+write "Kuntul itu memiringkan kepalanya dan menatapmu sejenak, lalu kembali mengawasi air.^"
+}
+
 # -----------------------------------------------------------------------------
 
 location jalan_utama : jalan utama

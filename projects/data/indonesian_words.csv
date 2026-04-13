@@ -22,6 +22,7 @@ aja,just (informal)
 ajak,"invite, ask along"
 ajar,"teach, learn"
 akan,"will, shall, going to"
+akarnya,its roots
 akhir,end
 akibat,"consequence, result"
 akses,access
@@ -87,8 +88,10 @@ asrama,dormitory
 astaga,oh my
 asuh,"care for, foster"
 atap,roof
+atapnya,its roof
 atas,"above, top"
 atasan,"superior, boss"
+atasnya,on top of it
 atau,or
 atlet,athlete
 atom,atom
@@ -178,6 +181,7 @@ bawaan,"innate, default"
 bawah,"below, bottom"
 bawah tanah,underground
 bawang,onion
+baya,"age (as in paruh baya, middle-aged)"
 bayam,spinach
 bayar,pay
 bayi,baby
@@ -217,11 +221,13 @@ bensin,gasoline
 benteng,fort
 bentuk,"shape, form"
 ber,(prefix: intransitive verb)
+berada,to be located
 berakhir,end
 berani,brave
 berapa,how much/many
 beras,rice (uncooked)
 berat,heavy
+berbagai,various
 berbahaya,dangerous
 berbaring,lie down
 berbeda,different
@@ -234,6 +240,8 @@ berdoa,pray
 berenang,swim
 bergabung,join
 bergerak,move
+bergerak-gerak,moving around repeatedly
+bergoyang,swaying
 berguna,useful
 berharap,hope
 berhasil,succeed
@@ -251,6 +259,8 @@ berkas,"file, document"
 berkat,"blessing, thanks to"
 berkata,say
 berkembang,develop
+berkokok,to crow (rooster)
+berkumpul,to gather
 berlaku,"apply, be valid"
 berlari,run
 berlebihan,excessive
@@ -268,6 +278,7 @@ bersatu,unite
 bersedia,willing
 bersih,clean
 bersihkan,clean (verb)
+bersinar,to shine
 bertahan,endure
 bertanya,ask
 bertemu,meet
@@ -278,6 +289,7 @@ berterima kasih,be grateful
 bertindak,act
 beruang,bear (animal)
 beruntung,lucky
+berwarna,colored
 besar,"big, large"
 besaran,magnitude
 besi,iron
@@ -339,6 +351,7 @@ bus,bus
 busuk,rotten
 buta,blind
 butir,"grain, item"
+butirnya,its grains
 butuh,need
 cabai,chili
 cabang,"branch, chapter"
@@ -471,14 +484,18 @@ dilarang,forbidden
 dimana,where
 dimensi,dimension
 dinding,wall
+dindingnya,its wall
 dingin,cold
 dini,early
+dipakai,to be used
+dipanen,to be harvested
 diplomasi,diplomacy
 diri,self
 dirikan,establish
 disiplin,discipline
 diskon,discount
 distribusi,distribution
+ditopang,to be supported
 doa,prayer
 doang,"only, just (informal)"
 dokter,doctor
@@ -776,6 +793,7 @@ jauh,far
 jawab,answer
 jawaban,answer
 jejak,"trail, track"
+jelajahi,explore (imperative)
 jelas,clear
 jelek,ugly
 jembatan,bridge
@@ -860,6 +878,7 @@ kasur,mattress
 kasus,case
 kata,word
 kata sandi,password
+kata-kata,words
 katak,frog
 katakan,"say, tell"
 kaus,"t-shirt, socks"
@@ -897,6 +916,7 @@ kejadian,"event, incident"
 kejahatan,crime
 kejam,cruel
 kejar,chase
+kejauhan,in the distance
 kejutan,surprise
 kekalahan,defeat
 kekayaan,wealth
@@ -932,6 +952,7 @@ kentang,potato
 kepada,to (person)
 kepadatan,density
 kepala,head
+kepalanya,his/her head
 kepentingan,"interest, importance"
 kepercayaan,"trust, belief"
 keputusan,decision
@@ -1061,6 +1082,7 @@ kurang,less
 kurikulum,curriculum
 kursi,chair
 kursus,course
+kurus,"thin, skinny"
 kurva,curve
 kutip,quote
 kutu,"louse, flea"
@@ -1269,6 +1291,7 @@ memperbaiki,"to fix, repair"
 memperbarui,update
 memperhatikan,pay attention
 memukul,"to hit, strike"
+memulai,to begin
 memutar,"to turn, rotate"
 memutuskan,decide
 menaiki,"to ride, get on"
@@ -1301,7 +1324,9 @@ mengajar,teach
 mengaku,confess
 mengalami,experience
 mengambil,take
+mengangkat,to lift
 mengapa,why
+mengarah,to lead toward
 mengarahkan,"to aim, point"
 mengatur,"to set, arrange"
 mengecup,to kiss
@@ -1321,6 +1346,7 @@ menghidupkan,"to turn on, activate"
 menghisap,"to suck, inhale"
 menghitung,count
 menghormati,honor
+menghubungkan,to connect
 mengikat,"to tie, bind"
 mengikuti,to follow
 mengirim,send
@@ -1332,24 +1358,29 @@ mengunci,to lock
 mengunjungi,visit
 mengupas,to peel
 mengurus,"handle, take care of"
+mengusir,to chase away
 menikah,marry
 menikmati,enjoy
 menilai,"judge, evaluate"
 menit,minute
 meniup,to blow
 menjadi,become
+menjalar,to spread/creep
 menjatuhkan,to drop
 menjawab,answer
+menjelajahi,to explore
 menjentik,to flick
 menjilat,to lick
 menjual,sell
 menoleh,"turn, glance"
 menolong,help
 menonjol,prominent
+menopang,to support
 mentah,raw
 mental,mental
 mentimun,cucumber
 menuang,to pour
+menuju,to head toward
 menulis,write
 menunggu,wait
 menunjukkan,show
@@ -1361,6 +1392,7 @@ menyalakan,"to turn on, light"
 menyambut,welcome
 menyentuh,to touch
 menyerang,to attack
+menyeruput,to sip
 menyetujui,approve
 menyewa,rent
 meraba,"to feel, grope"
@@ -1378,6 +1410,7 @@ mie,noodles
 mil,mile
 milik,"belonging, property"
 mimpi,dream
+mineral,mineral
 minggu,week
 minta,"request, ask for"
 minta maaf,apologize
@@ -1409,6 +1442,7 @@ naik,"go up, ride"
 naiki,"ride, get on"
 nakal,naughty
 nama,name
+nama-nama,names
 nanas,pineapple
 nanti,later
 napas,breath
@@ -1486,6 +1520,7 @@ panjat,climb
 pantai,"beach, coast"
 para,the (plural marker)
 partai,party (political)
+paruh,"half, beak"
 pasang,pair; install; tide
 pasar,market
 pasien,patient
@@ -1509,7 +1544,9 @@ pekerjaan,job
 pelabuhan,"port, harbor"
 pelacur,prostitute
 pelajaran,lesson
+pelajari,"to study, learn"
 pelanggan,customer
+pelanggannya,its customers
 pelatihan,training
 pelayan,"waiter, servant"
 pelemahan,weakening
@@ -1596,6 +1633,7 @@ permainan,game
 permen,"candy, sweets"
 permintaan,request
 permisi,excuse me
+permukaannya,its surface
 pernah,ever
 pernikahan,wedding
 perpustakaan,library
@@ -1725,6 +1763,7 @@ ruangan,room (space)
 rudal,missile
 rumah,house
 rumah sakit,hospital
+rumahmu,your house
 runtuh,collapse
 rusak,"broken, damaged"
 rutin,routine
@@ -1777,6 +1816,7 @@ se,one/each
 sebatang,a (long object classifier)
 sebelah,"beside, next to"
 sebelum,before
+sebentar,"a moment, briefly"
 sebuah,"a, an (object classifier)"
 sedang,"currently, in the process of"
 sedap,"tasty, savory"
@@ -1869,6 +1909,7 @@ simpang,intersection
 singkat,"brief, short"
 sini,here
 sintesis,synthesis
+sisinya,its side
 siswa,student (school)
 situ,there
 situasi,situation
@@ -1953,6 +1994,7 @@ teladan,example
 telepon,telephone
 televisi,television
 telinga,ear
+telinganya,its ears
 telur,egg
 teman,friend
 teman sejawat,colleague
@@ -1972,10 +2014,14 @@ tepat,"exact, right"
 tepi,"edge, bank"
 tepuk,clap
 ter,(prefix: superlative/accidental)
+terakhir,"last, final"
 terang,bright
 terapi,therapy
+terasa,"feels, is felt"
 terbang,fly (verb)
+terbuat,made of
 terbuka,open
+tergeletak,lying (on a surface)
 terhadap,"toward, against"
 teriak,"yell, scream"
 terikat,bound
@@ -1987,12 +2033,15 @@ terkejut,"shocked, startled"
 terkini,latest
 terlalu,too (excessive)
 terlambat,late
+terletak,"located, situated"
 termasuk,including
 ternyata,"it turns out, apparently"
 terong,eggplant
 tersedia,available
+tersenyum,to smile
 tertarik,interested
 tertata,organised
+tertiup,blown by
 tertulis,written
 tertutup,closed
 terus,"continue, keep on"
@@ -2000,6 +2049,7 @@ tetangga,neighbor
 tetap,"remain, still"
 tewas,"killed, perish"
 tiang,"pole, pillar"
+tiang-tiang,"pillars, poles"
 tiba,arrive
 tidak,not
 tidur,sleep
@@ -2102,58 +2152,18 @@ wisata,"tour, tourism"
 wisatawan,tourist
 wortel,carrot
 ya,"yes, right"
+yakin,certain
 yang,"which, that, who"
 yayasan,foundation
 yuk,let's go
 zaman,"age, era"
 zona,zone
-akarnya,its roots
-atapnya,its roof
-atasnya,on top of it
-baya,"age (as in paruh baya, middle-aged)"
-berada,to be located
-berbagai,various
-bergerak-gerak,moving around repeatedly
-bergoyang,swaying
-berkokok,to crow (rooster)
-berkumpul,to gather
-bersinar,to shine
-berwarna,colored
-butirnya,its grains
-dindingnya,its wall
-dipakai,to be used
-dipanen,to be harvested
-ditopang,to be supported
-jelajahi,explore (imperative)
-kata-kata,words
-kejauhan,in the distance
-kepalanya,his/her head
-kurus,"thin, skinny"
-memulai,to begin
-mengangkat,to lift
-mengarah,to lead toward
-menghubungkan,to connect
-mengusir,to chase away
-menjalar,to spread/creep
-menjelajahi,to explore
-menopang,to support
-menuju,to head toward
-menyeruput,to sip
-mineral,mineral
-nama-nama,names
-paruh,"half, beak"
-pelajari,"to study, learn"
-pelanggannya,its customers
-permukaannya,its surface
-rumahmu,your house
-sebentar,"a moment, briefly"
-sisinya,its side
-telinganya,its ears
-terakhir,"last, final"
-terasa,"feels, is felt"
-terbuat,made of
-tergeletak,lying (on a surface)
-terletak,"located, situated"
-tersenyum,to smile
-tertiup,blown by
-tiang-tiang,"pillars, poles"
+kuntul,egret (white wading bird)
+bangau,"heron, stork"
+sabar,"patient, patience"
+memiringkan,to tilt
+menatapmu,to stare at you
+sejenak,for a moment
+mengawasi,"to watch, observe"
+menjauh,to move away
+mendekat,to approach
