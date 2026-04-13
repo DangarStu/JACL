@@ -524,14 +524,15 @@ main(int argc, char *argv[])
             /* DISPLAY THE GAMES INTRODUCTION AS THIS IS THE FIRST MOVE */
             execute("+intro");
 
-            /* DUMMY RETRIEVE OF 'HERE' FOR TESTING OF GAME STATE */
-            get_here();
-
-            /* TIME PASSES BEFORE THE PLAYER SEES THE FIRST COMMAND PROMPT
-             * BUT NOT IF THERE IS A PENDING QUESTION FROM THE INTRO */
+            /* IF THERE IS A PENDING QUESTION FROM THE INTRO, SKIP
+             * THE INITIAL GAME STATE CHECK AND EACHTURN - THESE WILL
+             * RUN AFTER THE PLAYER ANSWERS THE QUESTION */
             {
                 struct integer_type *ptype = PENDING_QUESTION_TYPE;
                 if (ptype == NULL || ptype->value == 0) {
+                    /* DUMMY RETRIEVE OF 'HERE' FOR TESTING OF GAME STATE */
+                    get_here();
+                    /* TIME PASSES BEFORE THE PLAYER SEES THE FIRST PROMPT */
                     eachturn();
                 }
             }
