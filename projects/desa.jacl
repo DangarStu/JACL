@@ -32,7 +32,7 @@ print:
 
 object tikar : tikar
   short		sebuah "tikar"
-  mass		heavy
+  mass		scenery
 
 {examine
 write "Tikar ini terbuat dari anyaman pandan. Kamu tidur di atasnya setiap malam.^"
@@ -293,11 +293,10 @@ write "^^" game_title
 style normal
 write " oleh " game_author "^^"
 
-if interpreter = CGI
-   write "Apakah Anda ingin permainan ini berbicara?  "
-   hyperlink "Ya" "suara nyala"
-   write "  "
-   hyperlink "Tidak" "suara mati"
+if interpreter != GLK
+   write "Apakah Anda ingin permainan ini berbicara? "
+   write "<a style=~padding: 4px 12px; border: 1px solid; border-radius: 4px; text-decoration: none; margin: 0 4px;~ href=~?command=suara%20nyala&amp;user_id=" $user_id "~>Ya</a> "
+   write "<a style=~padding: 4px 12px; border: 1px solid; border-radius: 4px; text-decoration: none; margin: 0 4px;~ href=~?command=suara%20mati&amp;user_id=" $user_id "~>Tidak</a>"
    write "^^"
 endif
 
