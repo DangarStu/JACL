@@ -287,17 +287,24 @@ object ground : tanah lantai
 # GLOBAL FUNCTIONS
 # -----------------------------------------------------------------------------
 
+integer speech_choice
+
 {+intro
 style bold
 write "^^" game_title
 style normal
 write " oleh " game_author "^^"
 
-if interpreter != GLK
-   write "Apakah Anda ingin permainan ini berbicara? "
-   write "<a style=~padding: 4px 12px; border: 1px solid; border-radius: 4px; text-decoration: none; margin: 0 4px;~ href=~?command=suara%20nyala&amp;user_id=" $user_id "~>Ya</a> "
-   write "<a style=~padding: 4px 12px; border: 1px solid; border-radius: 4px; text-decoration: none; margin: 0 4px;~ href=~?command=suara%20mati&amp;user_id=" $user_id "~>Tidak</a>"
-   write "^^"
+write "Apakah Anda ingin permainan ini berbicara? (ya/tidak)^"
+getyesorno speech_choice
+if interpreter = GLK
+   execute "+start_game"
+endif
+}
+
+{+start_game
+if speech_choice = true
+   write "<script>enableSpeak();</script>"
 endif
 
 print:
@@ -316,6 +323,12 @@ endif
 
 set ground(parent) = here
 look
+}
+
+{+eachturn
+if total_moves = 0
+   execute "+start_game"
+endif
 }
 
 {+movement

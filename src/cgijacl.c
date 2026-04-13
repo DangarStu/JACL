@@ -674,6 +674,9 @@ main(int argc, char *argv[])
                             }
 
                             TIME->value = TRUE;
+                            /* RUN EACHTURN SO THE GAME CAN REACT TO THE ANSWER */
+                            execute("+eachturn");
+                            execute("+system_eachturn");
                         }
                         /* SKIP NORMAL COMMAND PROCESSING WHEN PENDING */
                         goto skip_command;
