@@ -254,6 +254,35 @@ write "~Desa ini sudah ada sejak lama,~ kata Ibu Warung. "
 write "~Kehidupan di sini tenang dan damai.~^"
 }
 
+object kucing : kucing
+  short		seekor "kucing belang"
+  long		"Seekor kucing belang sedang tidur melingkar di bawah bangku.^"
+  has		ANIMATE
+  mass		scenery
+
+{examine
+write "Kucing belang yang gemuk dan tampak puas. "
+write "Bulunya lembut berwarna oranye dan putih. "
+write "Dia sering diberi sisa makanan oleh Ibu Warung.^"
+}
+
+{take
+write "Kucing itu mengeong protes dan melompat dari tanganmu.^"
+set time = false
+}
+
+{talk_to
+write "Kucing itu mendongak dan mengeong pelan, lalu kembali tidur.^"
+}
+
+{touch
+write "Kamu mengelus kucing itu. Dia mendengkur dengan senang.^"
+}
+
+{wake
+write "Kucing itu membuka satu mata, menatapmu sebentar, lalu menutup matanya lagi.^"
+}
+
 # -----------------------------------------------------------------------------
 
 location banjar : banjar balai aula
