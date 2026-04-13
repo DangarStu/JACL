@@ -31,6 +31,15 @@ else
 endif
 }
 
+{movement
+if compass = south
+   if destination = nowhere
+      write "Pintu tertutup. Kamu harus membukanya terlebih dahulu.^"
+      return
+   endall
+return false
+}
+
 object pintu : pintu
   short		sebuah "pintu kayu"
   has		CLOSABLE CLOSED
