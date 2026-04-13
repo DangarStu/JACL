@@ -27,7 +27,7 @@ done
 # -----------------------------------------------------------
 AC_ARG_WITH([language],
     [AS_HELP_STRING([--with-language=LANG],
-        [set interpreter language: english (default), french, german, indonesian])],
+        [set interpreter language: english (default), french, german, indonesian, spanish])],
     [jacl_language=$withval],
     [jacl_language=english])
 
@@ -36,7 +36,8 @@ case "$jacl_language" in
     german)      LANGUAGE_FLAG="-DNATIVE_LANGUAGE=2" ;;
     french)      LANGUAGE_FLAG="-DNATIVE_LANGUAGE=3" ;;
     indonesian)  LANGUAGE_FLAG="-DNATIVE_LANGUAGE=4" ;;
-    *)  AC_MSG_ERROR([unknown language "$jacl_language" (choose: english, french, german, indonesian)]) ;;
+    spanish)     LANGUAGE_FLAG="-DNATIVE_LANGUAGE=5" ;;
+    *)  AC_MSG_ERROR([unknown language "$jacl_language" (choose: english, french, german, indonesian, spanish)]) ;;
 esac
 
 CFLAGS="$CFLAGS $LANGUAGE_FLAG"
