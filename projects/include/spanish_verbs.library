@@ -610,6 +610,27 @@ write "`JUEGOS' SE REFIERE A MODELOS, SIMULACIONES Y JUEGOS QUE TIENEN "
 write "APLICACIONES TACTICAS Y ESTRATEGICAS.^"
 }
 
+integer palabra_encontrada
+
+grammar lookup $string >lookup_word
+grammar dict $string >lookup_word
+grammar significado $string >lookup_word
+grammar definir $string >lookup_word
+
+{+lookup_word
+set palabra_encontrada = false
+iterate "spanish_words.csv" skip_header
+   ifstring field[0] = $string
+      write "The word " $string " means " field[1] ".^"
+      set palabra_encontrada = true
+   endif
+enditerate
+if palabra_encontrada = false
+   write "La palabra ~" $string "~ no se encontró.^"
+endif
+set time = false
+}
+
 grammar abrazar		>hug_only
 grammar consolar	>hug_only
 grammar hug			>hug_only
