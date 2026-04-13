@@ -18,7 +18,6 @@ constant maintext_colour "#f5f0e8"
 
 location rumah : rumah pondok gubuk
   short		name "Rumah"
-  south		sawah
 
 {look
 write "Kamu berada di dalam rumahmu yang kecil tapi nyaman. "
@@ -32,14 +31,6 @@ else
 endif
 }
 
-{movement_south
-if pintu has CLOSED
-   write "Pintu tertutup. Kamu harus membukanya terlebih dahulu.^"
-   return true
-endif
-return false
-}
-
 object pintu : pintu
   short		sebuah "pintu kayu"
   has		CLOSABLE CLOSED
@@ -51,6 +42,20 @@ if pintu has CLOSED
 else
    write "Sebuah pintu kayu sederhana yang terbuka. Melalui pintu, kamu bisa melihat sawah.^"
 endif
+}
+
+{open_override
+ensure pintu hasnt CLOSED
+write "Kamu membuka pintu kayu.^"
+set rumah(south) = sawah
+set sawah(north) = rumah
+}
+
+{close_override
+ensure pintu has CLOSED
+write "Kamu menutup pintu kayu.^"
+set rumah(south) = nowhere
+set sawah(north) = nowhere
 }
 
 object tikar : tikar
@@ -93,7 +98,6 @@ write "Kamu menyeruput kopi hitam. Pahit tapi enak.^"
 
 location sawah : sawah padi
   short		name "Sawah"
-  north		rumah
   west		jalan_utama
 
 {look
