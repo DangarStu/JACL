@@ -650,15 +650,41 @@ main(int argc, char *argv[])
                                     write_text(temp_buffer);
                                 }
                             }
+                        } else if (question_type == 4 || question_type == 5) {
+                            /* GETSTRING (4=insistent) OR ASKSTRING (5=non-insistent) */
+                            /* STRIP LEADING/TRAILING WHITESPACE */
+                            char *s = text_buffer;
+                            int len;
+                            while (*s == ' ' || *s == '\t') s++;
+                            len = strlen(s);
+                            while (len > 0 && (s[len-1] == ' ' || s[len-1] == '\t' || s[len-1] == '\n' || s[len-1] == '\r'))
+                                len--;
+
+                            if (len > 0 || question_type == 5) {
+                                /* STORE DIRECTLY INTO THE TARGET STRING */
+                                struct string_type *ptarget = string_resolve("pending_target");
+                                if (ptarget != NULL && ptarget->value[0] != 0) {
+                                    struct string_type *target_str = string_resolve(ptarget->value);
+                                    if (target_str != NULL) {
+                                        strncpy(target_str->value, s, len < 1023 ? len : 1023);
+                                        target_str->value[len < 1023 ? len : 1023] = 0;
+                                    }
+                                }
+                                answer_valid = TRUE;
+                            } else {
+                                write_text("Please enter a response.^");
+                            }
                         }
 
                         if (answer_valid) {
-                            /* STORE THE ANSWER IN THE TARGET VARIABLE */
-                            struct string_type *ptarget = string_resolve("pending_target");
-                            if (ptarget != NULL && ptarget->value[0] != 0) {
-                                int *target = container_resolve(ptarget->value);
-                                if (target != NULL) {
-                                    *target = answer_value;
+                            /* STORE THE ANSWER IN THE TARGET VARIABLE (for integer types) */
+                            if (question_type <= 3) {
+                                struct string_type *ptarget = string_resolve("pending_target");
+                                if (ptarget != NULL && ptarget->value[0] != 0) {
+                                    int *target = container_resolve(ptarget->value);
+                                    if (target != NULL) {
+                                        *target = answer_value;
+                                    }
                                 }
                             }
 

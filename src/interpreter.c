@@ -1550,6 +1550,20 @@ execute(const char *funcname)
             } else if (!strcmp(word[0], "timer")) {
             } else if (!strcmp(word[0], "volume")) {
             } else if (!strcmp(word[0], "askstring") || !strcmp(word[0], "getstring")) {
+                if (word[1] != NULL) {
+                    struct integer_type *ptype = PENDING_QUESTION_TYPE;
+                    struct string_type *ptarget = string_resolve("pending_target");
+                    if (ptype != NULL && ptarget != NULL) {
+                        if (!strcmp(word[0], "getstring")) {
+                            ptype->value = 4;
+                        } else {
+                            ptype->value = 5;
+                        }
+                        strncpy(ptarget->value, word[1], 1023);
+                        ptarget->value[1023] = 0;
+                        return(exit_function(TRUE));
+                    }
+                }
             } else if (!strcmp(word[0], "asknumber") || !strcmp(word[0], "getnumber")) {
                 if (word[3] != NULL) {
                     struct integer_type *ptype = PENDING_QUESTION_TYPE;
