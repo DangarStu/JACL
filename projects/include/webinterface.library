@@ -93,7 +93,7 @@ print:
         var sel = window.getSelection().toString().trim();^
         if (sel.length > 0 && sel.indexOf(' ') === -1) {^
            ajaxForm({^
-                command: 'arti ' + sel,^
+                command: 'lookup ' + sel,^
                 replace: false,^
                 element: "#maintext"^
            });^

@@ -650,6 +650,14 @@ write "`SPIEL' BEZIEHT SICH AUF SIMULATIONEN UND SPIELE WELCHE TAKTISCHE UND "
 write "STRATEGISCHE APPLIKATIONEN BEINHALTEN.^"
 }
 
+grammar lookup $string >lookup_word
+grammar dict $string >lookup_word
+
+{+lookup_word
+write "Für dieses Spiel ist kein Wörterbuch verfügbar.^"
+set time = false
+}
+
 grammar knuddel *present >hug
 grammar dr�cke *present >hug
 

@@ -527,6 +527,14 @@ write "`GAMES' REFERS TO MODELS, SIMULATIONS AND GAMES WHICH HAVE TACTICAL "
 write "AND STRATEGIC APPLICATIONS.^"
 }
 
+grammar lookup $string >lookup_word
+grammar dict $string >lookup_word
+
+{+lookup_word
+write "No dictionary is available for this game.^"
+set time = false
+}
+
 grammar hug			>hug_only
 grammar comfort		>hug_only
 grammar cuddle		>hug_only
