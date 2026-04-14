@@ -55,9 +55,9 @@
 
 # Layout constants used below (inlined because JACL constants aren't
 # accepted inside arithmetic or write argument lists):
-#   grid size        = 80 pixels per unit of (x, y)
+#   grid size        = 70 pixels per unit of (x, y)
 #   node size        = 60x60 pixels with 10-pixel rounded corners
-#                      (so gap between adjacent nodes is 20 px)
+#                      (so gap between adjacent nodes is 10 px)
 #   padding          = 1 grid cell on each side of content
 #   label overhang   = 40 extra pixels of canvas on the right/bottom
 #                      so long labels that extend past their node
@@ -153,13 +153,13 @@ set map_offset_y - map_min_y
 set map_canvas_w = map_max_x
 set map_canvas_w - map_min_x
 set map_canvas_w + 2
-set map_canvas_w * 80
+set map_canvas_w * 70
 set map_canvas_w + 40
 
 set map_canvas_h = map_max_y
 set map_canvas_h - map_min_y
 set map_canvas_h + 2
-set map_canvas_h * 80
+set map_canvas_h * 70
 set map_canvas_h + 40
 }
 
@@ -190,11 +190,11 @@ select VISITED map_here
          # Source pixel (center of map_here's node).
          set map_x = map_here(x)
          set map_x + map_offset_x
-         set map_x * 80
+         set map_x * 70
          set map_x + 35
          set map_y = map_here(y)
          set map_y + map_offset_y
-         set map_y * 80
+         set map_y * 70
          set map_y + 35
 
          # Destination GRID coords: always a 1-cell stub in the direction
@@ -223,10 +223,10 @@ select VISITED map_here
 
          # Destination pixel (center of target cell).
          set map_dest_x + map_offset_x
-         set map_dest_x * 80
+         set map_dest_x * 70
          set map_dest_x + 35
          set map_dest_y + map_offset_y
-         set map_dest_y * 80
+         set map_dest_y * 70
          set map_dest_y + 35
 
          write "paper.path(~M" map_x " " map_y "L" map_dest_x " " map_dest_y "~).attr(~stroke~, ~#888~);"
@@ -243,11 +243,11 @@ select VISITED map_here
    else
    set map_x = map_here(x)
    set map_x + map_offset_x
-   set map_x * 80
+   set map_x * 70
    set map_x + 5
    set map_y = map_here(y)
    set map_y + map_offset_y
-   set map_y * 80
+   set map_y * 70
    set map_y + 5
    write "var node = paper.rect(" map_x ", " map_y ", 60, 60, 10);"
    if map_here = here
@@ -304,11 +304,11 @@ execute "+map_body"
 # Centre the popup's map container on `here`.
 set map_x = here(x)
 set map_x + map_offset_x
-set map_x * 80
+set map_x * 70
 set map_x + 35
 set map_y = here(y)
 set map_y + map_offset_y
-set map_y * 80
+set map_y * 70
 set map_y + 35
 write "var c = mapWindow.document.getElementById(~jacl_map~);"
 write "if (c) { c.scrollLeft = " map_x " - mapWindow.innerWidth / 2; c.scrollTop = " map_y " - mapWindow.innerHeight / 2; }"
@@ -348,11 +348,11 @@ if map_window_mode = 1
    execute "+map_body"
    set map_x = here(x)
    set map_x + map_offset_x
-   set map_x * 80
+   set map_x * 70
    set map_x + 35
    set map_y = here(y)
    set map_y + map_offset_y
-   set map_y * 80
+   set map_y * 70
    set map_y + 35
    write "var c = mapWindow.document.getElementById(~jacl_map~);"
    write "if (c) { c.scrollLeft = " map_x " - mapWindow.innerWidth / 2; c.scrollTop = " map_y " - mapWindow.innerHeight / 2; }"
