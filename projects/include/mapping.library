@@ -88,6 +88,8 @@ integer map_arm_base_x
 integer map_arm_base_y
 integer map_arrow_dx
 integer map_arrow_dy
+integer map_arrow_pos_x
+integer map_arrow_pos_y
 string_array map_label_parts 8
 
 # Bounding-box globals populated by +map_bounds and consumed by +map_body.
@@ -248,53 +250,73 @@ select VISITED map_here
             set map_stub_y = -1
          endif
 
-         # Endpoint = destination centre pixel - (stub * 30) on each
-         # axis, so the line terminates at the nearest edge of the
-         # destination node (30 = node half-width).
+         # Endpoint = destination centre pixel (no trim). Drawing
+         # centre-to-centre means matched up/down pairs (each side drawing
+         # its own line) produce the same line segment instead of two
+         # parallel lines offset by the node-half trim -- and the
+         # destination's own node, drawn later on top, covers the
+         # central portion that sits inside the box.
          set map_dest_x = map_target(x)
          set map_dest_x + map_offset_x
          set map_dest_x * 90
          set map_dest_x + 45
-         set map_arm_x = map_stub_x
-         set map_arm_x * 30
-         set map_dest_x - map_arm_x
 
          set map_dest_y = map_target(y)
          set map_dest_y + map_offset_y
          set map_dest_y * 90
          set map_dest_y + 45
-         set map_arm_y = map_stub_y
-         set map_arm_y * 30
-         set map_dest_y - map_arm_y
 
          write "paper.path(~M" map_x " " map_y "L" map_dest_x " " map_dest_y "~).attr(~stroke~, ~#888~);"
 
          # ARROWHEADS FOR UP/DOWN EXITS
          #
-         # The arrow's tip always points at the LOWER (down) room of the
-         # up/down pair, using the in-game up/down semantics -- NOT the
-         # map's geometric north/south direction. That way a down-exit
-         # whose destination is drawn northeast of the source (because of
-         # layout constraints) still has its arrow tip pointing toward
-         # the NE room, correctly telling the reader "that room is down
-         # from here."
+         # The arrow is drawn at the LOWER room's edge on the line,
+         # pointing into the lower room. This way BOTH sides of a
+         # matched up/down pair (down from the higher room, up from the
+         # lower room) produce the same arrow at the same position --
+         # they coincide into a single visible arrowhead. For an
+         # unvisited destination only one side is drawn but the
+         # placement still reads correctly.
          #
-         # For a DOWN exit the tip points along the stub direction
-         # (destination = lower room). For an UP exit it points opposite
-         # the stub (source = lower room); the arm-base is past the stub
-         # tip so the arrowhead visually sits at the stub endpoint with
-         # its point aimed back at the source.
+         # For a DOWN exit (map_loop = 9), lower room = destination.
+         # Arrow position = dest_centre - stub*30 (dest's edge facing
+         # source); arrow points along the stub.
+         #
+         # For an UP exit (map_loop = 8), lower room = source. Arrow
+         # position = source_centre + stub*30 (source's edge facing
+         # destination); arrow points opposite the stub (back into
+         # source).
          set map_arrow_dx = 0
          set map_arrow_dy = 0
+         set map_arrow_pos_x = 0
+         set map_arrow_pos_y = 0
          if map_loop = 8
+            # UP exit
             set map_arrow_dx = 0
             set map_arrow_dx - map_stub_x
             set map_arrow_dy = 0
             set map_arrow_dy - map_stub_y
+            set map_arm_x = map_stub_x
+            set map_arm_x * 30
+            set map_arrow_pos_x = map_x
+            set map_arrow_pos_x + map_arm_x
+            set map_arm_y = map_stub_y
+            set map_arm_y * 30
+            set map_arrow_pos_y = map_y
+            set map_arrow_pos_y + map_arm_y
          endif
          if map_loop = 9
+            # DOWN exit
             set map_arrow_dx = map_stub_x
             set map_arrow_dy = map_stub_y
+            set map_arm_x = map_stub_x
+            set map_arm_x * 30
+            set map_arrow_pos_x = map_dest_x
+            set map_arrow_pos_x - map_arm_x
+            set map_arm_y = map_stub_y
+            set map_arm_y * 30
+            set map_arrow_pos_y = map_dest_y
+            set map_arrow_pos_y - map_arm_y
          endif
          ifall map_arrow_dx = 0 : map_arrow_dy = 0
             # Not an up/down exit, skip arrow.
@@ -302,11 +324,11 @@ select VISITED map_here
             # Arm base = tip - arrow_dir * 5
             set map_arm_x = map_arrow_dx
             set map_arm_x * 5
-            set map_arm_base_x = map_dest_x
+            set map_arm_base_x = map_arrow_pos_x
             set map_arm_base_x - map_arm_x
             set map_arm_y = map_arrow_dy
             set map_arm_y * 5
-            set map_arm_base_y = map_dest_y
+            set map_arm_base_y = map_arrow_pos_y
             set map_arm_base_y - map_arm_y
 
             # Perpendicular to arrow direction: (-dy, dx).
@@ -318,7 +340,7 @@ select VISITED map_here
             set map_arm_y = map_arrow_dx
             set map_arm_y * 5
             set map_arm_y + map_arm_base_y
-            write "paper.path(~M" map_dest_x " " map_dest_y "L" map_arm_x " " map_arm_y "~).attr(~stroke~, ~#888~);"
+            write "paper.path(~M" map_arrow_pos_x " " map_arrow_pos_y "L" map_arm_x " " map_arm_y "~).attr(~stroke~, ~#888~);"
 
             # Arm 2 = arm_base - perp * 5
             set map_arm_x = map_arrow_dy
@@ -328,7 +350,7 @@ select VISITED map_here
             set map_arm_y - map_arrow_dx
             set map_arm_y * 5
             set map_arm_y + map_arm_base_y
-            write "paper.path(~M" map_dest_x " " map_dest_y "L" map_arm_x " " map_arm_y "~).attr(~stroke~, ~#888~);"
+            write "paper.path(~M" map_arrow_pos_x " " map_arrow_pos_y "L" map_arm_x " " map_arm_y "~).attr(~stroke~, ~#888~);"
          endif
       endif
       set map_loop + 1
