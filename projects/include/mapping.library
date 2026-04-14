@@ -55,15 +55,14 @@
 
 # Layout constants used below (inlined because JACL constants aren't
 # accepted inside arithmetic or write argument lists):
-#   grid size        = 75 pixels per unit of (x, y)
-#   node size        = 60x60 pixels. Adjacent room centres are 75 px
-#                      apart, so node edges are 15 px apart.
-#   stub lengths     = 60 px orthogonal, 85 px diagonal. Half the
-#                      previous lengths, matching the halved cell
-#                      spacing. Stub extends from the source centre
-#                      (60/75 = 80% of the way to the next cell),
-#                      just past the neighbour's edge -- so the box
-#                      "just overlaps" the line end.
+#   grid size        = 90 pixels per unit of (x, y)
+#   node size        = 60x60 pixels. Adjacent room centres are 90 px
+#                      apart, so node edges are 30 px apart and the
+#                      60-px orthogonal stub just reaches the
+#                      neighbour's edge.
+#   stub lengths     = 60 px orthogonal, 85 px diagonal. Unchanged from
+#                      the 75-cell layout -- only the cell spacing was
+#                      stretched to match the stub length.
 #   padding          = 1 grid cell on each side of content
 #   label overhang   = 40 extra pixels of canvas on the right/bottom
 #                      so long labels that extend past their node
@@ -163,13 +162,13 @@ set map_offset_y - map_min_y
 set map_canvas_w = map_max_x
 set map_canvas_w - map_min_x
 set map_canvas_w + 2
-set map_canvas_w * 75
+set map_canvas_w * 90
 set map_canvas_w + 40
 
 set map_canvas_h = map_max_y
 set map_canvas_h - map_min_y
 set map_canvas_h + 2
-set map_canvas_h * 75
+set map_canvas_h * 90
 set map_canvas_h + 40
 }
 
@@ -200,12 +199,12 @@ select VISITED map_here
          # Source pixel (center of map_here's node).
          set map_x = map_here(x)
          set map_x + map_offset_x
-         set map_x * 75
-         set map_x + 38
+         set map_x * 90
+         set map_x + 45
          set map_y = map_here(y)
          set map_y + map_offset_y
-         set map_y * 75
-         set map_y + 38
+         set map_y * 90
+         set map_y + 45
 
          # Draw a short stub from the source node in the direction of the
          # destination. Two adjacent visited rooms each draw a stub toward
@@ -264,12 +263,12 @@ select VISITED map_here
    # means offset (cell-node)/2 = 45 px into the cell, not cell/2.
    set map_x = map_here(x)
    set map_x + map_offset_x
-   set map_x * 75
-   set map_x + 8
+   set map_x * 90
+   set map_x + 15
    set map_y = map_here(y)
    set map_y + map_offset_y
-   set map_y * 75
-   set map_y + 8
+   set map_y * 90
+   set map_y + 15
    write "var node = paper.rect(" map_x ", " map_y ", 60, 60, 10);"
    if map_here = here
       write "node.attr(~fill~, ~#BDD8D6~);"
@@ -354,12 +353,12 @@ execute "+map_body"
 # Centre the popup's map container on `here`.
 set map_x = here(x)
 set map_x + map_offset_x
-set map_x * 75
-set map_x + 38
+set map_x * 90
+set map_x + 45
 set map_y = here(y)
 set map_y + map_offset_y
-set map_y * 75
-set map_y + 38
+set map_y * 90
+set map_y + 45
 write "var c = mapWindow.document.getElementById(~jacl_map~);"
 write "if (c) { c.scrollLeft = " map_x " - mapWindow.innerWidth / 2; c.scrollTop = " map_y " - mapWindow.innerHeight / 2; }"
 
@@ -398,12 +397,12 @@ if map_window_mode = 1
    execute "+map_body"
    set map_x = here(x)
    set map_x + map_offset_x
-   set map_x * 75
-   set map_x + 38
+   set map_x * 90
+   set map_x + 45
    set map_y = here(y)
    set map_y + map_offset_y
-   set map_y * 75
-   set map_y + 38
+   set map_y * 90
+   set map_y + 45
    write "var c = mapWindow.document.getElementById(~jacl_map~);"
    write "if (c) { c.scrollLeft = " map_x " - mapWindow.innerWidth / 2; c.scrollTop = " map_y " - mapWindow.innerHeight / 2; }"
    write "});"
