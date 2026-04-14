@@ -81,8 +81,8 @@ print:
    }^
 
    function jaclDefaultVoice(voices) {^
-      var prefs = ['Samantha', 'Google US English', 'Google UK English Female', 'Google UK English Male',^
-                   'Daniel', 'Karen', 'Moira', 'Tessa', 'Fiona', 'Serena',^
+      var prefs = ['Google UK English Male', 'Google UK English Female', 'Google US English',^
+                   'Samantha', 'Daniel', 'Karen', 'Moira', 'Tessa', 'Fiona', 'Serena',^
                    'Amelie', 'Thomas', 'Audrey',^
                    'Anna', 'Markus', 'Petra',^
                    'Paulina', 'Jorge', 'Monica', 'Diego',^
