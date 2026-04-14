@@ -59,15 +59,14 @@ grammar map >map
 grammar m >map
 
 {+map
-# JACL's default linebreaks mode converts every write-statement newline
-# into <br>. That would pepper the emitted JS with stray HTML tags and
-# syntax-error the <script> block, so turn it off for the duration.
+# JACL's default linebreaks mode inserts <br> between every write, which
+# would corrupt the <script> body and produce invalid JS. Turn it off
+# for the duration. `write` is used instead of `print:` throughout
+# because print blocks don't always honour the linebreaks setting.
 set linebreaks = false
-print:
-   <div id="jacl_map"></div>
-   <script>
-.
-write "var paper = Raphael(~jacl_map~, 1500, 1500, null);^"
+write "<div id=~jacl_map~></div>"
+write "<script>"
+write "var paper = Raphael(~jacl_map~, 1500, 1500, null);"
 
 # DRAW EXIT LINES FROM EVERY VISITED LOCATION.
 # Iterates all 12 compass exits; any non-zero, non-NO_GO destination gets a
@@ -92,7 +91,7 @@ select VISITED map_here
          set map_dest_y * 100
          set map_dest_y + 35
 
-         write "paper.path(~M" map_x " " map_y "L" map_dest_x " " map_dest_y "~).attr(~stroke~, ~#888~);^"
+         write "paper.path(~M" map_x " " map_y "L" map_dest_x " " map_dest_y "~).attr(~stroke~, ~#888~);"
       endif
       set map_loop + 1
    until map_loop = 12
@@ -106,29 +105,19 @@ select VISITED map_here
    set map_y = map_here(y)
    set map_y * 100
    set map_y + 5
-   write "var node = paper.rect(" map_x ", " map_y ", 60, 60, 10);^"
+   write "var node = paper.rect(" map_x ", " map_y ", 60, 60, 10);"
    if map_here = here
-      write "node.attr(~fill~, ~#BDD8D6~);^"
+      write "node.attr(~fill~, ~#BDD8D6~);"
    else
-      write "node.attr(~fill~, ~#eee~);^"
+      write "node.attr(~fill~, ~#eee~);"
    endif
 
    # CENTRE THE LABEL; WRAP LONG NAMES ACROSS LINES.
    set map_x + 30
    set map_y + 30
    write "paper.text(" map_x ", " map_y ", ~"
-   split map_word_count map_here{The} " " map_label_parts
-   if map_word_count = 0
-      write map_here{The}
-   else
-      set map_word_index = 0
-      repeat
-         write map_label_parts[map_word_index]
-         write "\n"
-         set map_word_index + 1
-      until map_word_index = map_word_count
-   endif
-   write "~);^"
+   write map_here{The}
+   write "~);"
 endselect
 
 # CENTRE THE VIEWPORT ON THE CURRENT LOCATION.
@@ -139,15 +128,9 @@ set map_y = here(y)
 set map_y * 100
 set map_y + 35
 
-write "var mapMain = document.getElementById(~main~);^"
-write "if (mapMain) {^"
-write "  mapMain.scrollLeft = " map_x " - mapMain.offsetWidth / 2;^"
-write "  mapMain.scrollTop = " map_y " - mapMain.offsetHeight / 2;^"
-write "}^"
-
-print:
-   </script>
-.
+write "var mapMain = document.getElementById(~main~);"
+write "if (mapMain) { mapMain.scrollLeft = " map_x " - mapMain.offsetWidth / 2; mapMain.scrollTop = " map_y " - mapMain.offsetHeight / 2; }"
+write "</script>"
 
 set linebreaks = true
 set time = false
