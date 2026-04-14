@@ -13104,3 +13104,10 @@ constant maintext_colour "#eeeeee"
 #include "npc.library"
 #include "utils.library"
 #include "verbs.library"
+#include "mapping.library"
+
+{+local_header
+print:
+   <script src="/include/raphael.min.js"></script>
+.
+}
