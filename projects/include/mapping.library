@@ -355,9 +355,9 @@ select LOCATION map_here
                set map_cheby = 1
             endif
 
-            # arm_back vector: -line_dir * 10 / cheby for DOWN (back
-            # toward source); +line_dir * 10 / cheby for UP (back
-            # toward destination).
+            # arm_back vector: scaled so the arms sit 6 px from the tip
+            # along the line direction (previously 10 px). Smaller
+            # arrowhead, easier to read on a busy map.
             if map_loop = 9
                set map_arm_base_x = 0
                set map_arm_base_x - map_line_dx
@@ -368,21 +368,21 @@ select LOCATION map_here
                set map_arm_base_x = map_line_dx
                set map_arm_base_y = map_line_dy
             endif
-            set map_arm_base_x * 10
+            set map_arm_base_x * 6
             set map_arm_base_x / map_cheby
             set map_arm_base_x + map_arrow_pos_x
-            set map_arm_base_y * 10
+            set map_arm_base_y * 6
             set map_arm_base_y / map_cheby
             set map_arm_base_y + map_arrow_pos_y
 
-            # Perpendicular to line: (-line_dy, line_dx), scaled the
-            # same way.
+            # Perpendicular to line: (-line_dy, line_dx), scaled to the
+            # same 6 px so arm spread matches arm length.
             set map_perp_x = 0
             set map_perp_x - map_line_dy
-            set map_perp_x * 10
+            set map_perp_x * 6
             set map_perp_x / map_cheby
             set map_perp_y = map_line_dx
-            set map_perp_y * 10
+            set map_perp_y * 6
             set map_perp_y / map_cheby
 
             # Arm 1 = arm_base + perp
