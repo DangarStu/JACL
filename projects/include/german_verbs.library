@@ -159,6 +159,10 @@ synonym no              northeast
 synonym nw              northwest
 synonym u               up
 synonym r               down
+synonym ob              up         # oben
+synonym un              down       # unten
+synonym hoch            up
+synonym runter          down
 synonym l               look
 synonym beneath         under
 

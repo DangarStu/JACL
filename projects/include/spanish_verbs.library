@@ -107,8 +107,10 @@ synonym noroeste        northwest
 synonym no              northwest
 synonym u               up
 synonym arriba          up
+synonym ar              up
 synonym d               down
 synonym abajo           down
+synonym ab              down
 synonym l               look
 synonym mira            look
 synonym beneath         under
