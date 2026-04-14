@@ -419,8 +419,8 @@ select LOCATION map_here
       set map_should_draw = 1
    endif
    if map_should_draw = 1
-   # Rect takes top-left as the origin; for cell=90 and node=60 that
-   # means offset (cell-node)/2 = 15 px into the cell, not cell/2.
+   # Rect takes top-left as the origin; for cell=120 and node=80 that
+   # means offset (cell-node)/2 = 20 px into the cell.
    set map_x = map_here(x)
    set map_x + map_offset_x
    set map_x * 120
@@ -436,16 +436,15 @@ select LOCATION map_here
       write "node.attr(~fill~, ~#eee~);"
    endif
 
-   # CENTRE THE LABEL. If the name has multiple words, put the first on
-   # the top line and the rest on the bottom line so the label stays
-   # inside the 60-px square node.
-   set map_x + 30
-   set map_y + 30
+   # CENTRE THE LABEL. map_x/map_y are still the rect's top-left, so
+   # add half the node size (40) to reach the rect's centre.
+   set map_x + 40
+   set map_y + 40
    # Two separate paper.text calls for multi-word labels -- safer than
    # trying to embed a newline inside a JS string literal (whose
    # escaping through JACL's write/print layers is finicky). Top line
-   # shifted up 7 px, bottom line shifted down 7 px, giving ~14 px
-   # total line-height inside the 60-px node.
+   # shifted up 9 px, bottom line shifted down 9 px, giving ~18 px
+   # total line-height inside the 80-px node.
    split map_word_count map_here{The} " " map_label_parts
    if map_word_count < 2
       write "paper.text(" map_x ", " map_y ", ~"
