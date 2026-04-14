@@ -45,15 +45,13 @@
 #   node size   = 60x60 pixels with 10-pixel rounded corners
 #   canvas size = 1500x1500 pixels
 
+integer map_here
+integer map_target
 integer map_x
 integer map_y
 integer map_dest_x
 integer map_dest_y
 integer map_loop
-integer map_target
-integer map_word_count
-integer map_word_index
-string map_label_parts
 
 grammar map >map
 grammar m >map
