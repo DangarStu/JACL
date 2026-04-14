@@ -87,6 +87,49 @@ apache: install
 		chmod 755 "$$wrapper"; \
 		echo "  $$name.fcgi"; \
 	done
+	@echo "Building landing-page index.html..."
+	@mkdir -p /var/www/html
+	@{ \
+	  printf '%s\n' '<!DOCTYPE html>'; \
+	  printf '%s\n' '<html lang="en">'; \
+	  printf '%s\n' '<head>'; \
+	  printf '%s\n' '  <meta charset="UTF-8">'; \
+	  printf '%s\n' '  <meta name="viewport" content="width=device-width, initial-scale=1">'; \
+	  printf '%s\n' '  <title>JACL Interactive Fiction</title>'; \
+	  printf '%s\n' '  <style>'; \
+	  printf '%s\n' '    body { font-family: Georgia, Palatino, Times, serif; max-width: 640px; margin: 2em auto; padding: 0 1em; color: #333; line-height: 1.5; }'; \
+	  printf '%s\n' '    h1 { border-bottom: 1px solid #ccc; padding-bottom: 0.3em; }'; \
+	  printf '%s\n' '    ul.games { list-style: none; padding: 0; }'; \
+	  printf '%s\n' '    ul.games li { margin: 0.4em 0; padding: 0.3em 0; }'; \
+	  printf '%s\n' '    ul.games a { text-decoration: none; color: #42596d; font-weight: bold; }'; \
+	  printf '%s\n' '    ul.games a:hover { text-decoration: underline; }'; \
+	  printf '%s\n' '    footer { margin-top: 3em; color: #888; font-size: 0.85em; border-top: 1px solid #eee; padding-top: 1em; }'; \
+	  printf '%s\n' '  </style>'; \
+	  printf '%s\n' '</head>'; \
+	  printf '%s\n' '<body>'; \
+	  printf '%s\n' '  <h1>JACL Interactive Fiction</h1>'; \
+	  printf '%s\n' '  <p><strong>Interactive fiction</strong> is a genre of text-based computer games where'; \
+	  printf '%s\n' '     you read a description of a scene and type simple commands (for example'; \
+	  printf '%s\n' '     <em>go north</em>, <em>take lamp</em>, or <em>examine desk</em>) to move'; \
+	  printf '%s\n' '     through a story and solve its puzzles. It is a direct descendant of the'; \
+	  printf '%s\n' '     text adventures of the 1970s and 80s &mdash; titles like <em>Zork</em>,'; \
+	  printf '%s\n' '     <em>Adventure</em>, and <em>The Hitchhiker&rsquo;s Guide to the Galaxy</em>'; \
+	  printf '%s\n' '     &mdash; and has a thriving modern community of authors and players.</p>'; \
+	  printf '%s\n' '  <p>Choose a game below to start playing:</p>'; \
+	  printf '%s\n' '  <ul class="games">'; \
+	  for game in /usr/local/jacl/projects/*.jacl; do \
+	    [ -e "$$game" ] || continue; \
+	    name=$$(basename "$$game" .jacl); \
+	    title=$$(grep '^constant game_title' "$$game" 2>/dev/null | head -1 | sed -E 's/.*"([^"]+)".*/\1/'); \
+	    if [ -z "$$title" ] || [ "$$title" = "$$(grep '^constant game_title' "$$game" | head -1)" ]; then \
+	      continue; \
+	    fi; \
+	    printf '    <li><a href="/jacl/%s.fcgi">%s</a></li>\n' "$$name" "$$title"; \
+	  done; \
+	  printf '%s\n' '  </ul>'; \
+	  printf '%s\n' '  <footer>Served by JACL. Each link runs a game via the fcgijacl interpreter.</footer>'; \
+	  printf '%s\n' '</body></html>'; \
+	} > /var/www/html/index.html
 	@echo "Installing Apache configuration..."
 	cp ../etc/jacl-apache.conf /etc/apache2/conf-available/jacl.conf
 	a2enconf jacl
@@ -107,6 +150,7 @@ apache: install
 	@echo "Game files: /usr/local/jacl/projects/"
 	@echo "Logs: /usr/local/jacl/logs/"
 	@echo ""
+	@echo "Landing page: http://localhost/"
 	@echo "Games are available at: http://localhost/jacl/<gamename>.fcgi"
 	@echo ""
 
