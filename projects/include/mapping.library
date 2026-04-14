@@ -69,6 +69,8 @@ integer map_x
 integer map_y
 integer map_dest_x
 integer map_dest_y
+integer map_stub_x
+integer map_stub_y
 integer map_loop
 integer map_window_mode 0
 
@@ -128,29 +130,17 @@ select VISITED map_here
          endif
       endif
 
-      # Also include each exit destination so lines to unvisited rooms
-      # don't run off the canvas.
-      set map_loop = 0
-      repeat
-         ifall map_here(map_loop) != nowhere : map_here(map_loop) != NO_GO
-            set map_target = map_here(map_loop)
-            if map_target(x) < map_min_x
-               set map_min_x = map_target(x)
-            endif
-            if map_target(x) > map_max_x
-               set map_max_x = map_target(x)
-            endif
-            if map_target(y) < map_min_y
-               set map_min_y = map_target(y)
-            endif
-            if map_target(y) > map_max_y
-               set map_max_y = map_target(y)
-            endif
-         endif
-         set map_loop + 1
-      until map_loop = 12
    endif
 endselect
+
+# Lines to unvisited destinations are 1-cell stubs (see +map_body), so
+# pad the bounds by one cell in every direction to guarantee those stubs
+# fit on the canvas even when a visited edge location has an unvisited
+# exit pointing outward.
+set map_min_x - 1
+set map_max_x + 1
+set map_min_y - 1
+set map_max_y + 1
 
 # offset shifts content so the min coord maps to grid cell 1 (one cell
 # of padding on the left/top).
@@ -195,6 +185,9 @@ select VISITED map_here
    set map_loop = 0
    repeat
       ifall map_here(map_loop) != nowhere : map_here(map_loop) != NO_GO
+         set map_target = map_here(map_loop)
+
+         # Source pixel (center of map_here's node).
          set map_x = map_here(x)
          set map_x + map_offset_x
          set map_x * 80
@@ -204,12 +197,38 @@ select VISITED map_here
          set map_y * 80
          set map_y + 35
 
-         set map_target = map_here(map_loop)
-         set map_dest_x = map_target(x)
+         # Destination GRID coords: actual location if visited, else a
+         # 1-cell stub in the direction of the destination (clamped sign
+         # of the coord delta in each axis) so unvisited-exit lines are
+         # always the same length as adjacent visited-exit lines.
+         ifall map_target has VISITED : map_target has LOCATION
+            set map_dest_x = map_target(x)
+            set map_dest_y = map_target(y)
+         else
+            set map_stub_x = 0
+            if map_target(x) > map_here(x)
+               set map_stub_x = 1
+            endif
+            if map_target(x) < map_here(x)
+               set map_stub_x = -1
+            endif
+            set map_stub_y = 0
+            if map_target(y) > map_here(y)
+               set map_stub_y = 1
+            endif
+            if map_target(y) < map_here(y)
+               set map_stub_y = -1
+            endif
+            set map_dest_x = map_here(x)
+            set map_dest_x + map_stub_x
+            set map_dest_y = map_here(y)
+            set map_dest_y + map_stub_y
+         endif
+
+         # Destination pixel (center of target cell).
          set map_dest_x + map_offset_x
          set map_dest_x * 80
          set map_dest_x + 35
-         set map_dest_y = map_target(y)
          set map_dest_y + map_offset_y
          set map_dest_y * 80
          set map_dest_y + 35
