@@ -58,13 +58,12 @@
 # Layout constants used below (inlined because JACL constants aren't
 # accepted inside arithmetic or write argument lists):
 #   grid size        = 90 pixels per unit of (x, y)
-#   node size        = 60x60 pixels. Adjacent room centres are 90 px
-#                      apart, so node edges are 30 px apart and the
-#                      60-px orthogonal stub just reaches the
-#                      neighbour's edge.
-#   stub lengths     = 60 px orthogonal, 85 px diagonal. Unchanged from
-#                      the 75-cell layout -- only the cell spacing was
-#                      stretched to match the stub length.
+#   node size        = 60x60 pixels (node half-width = 30 px used when
+#                      trimming line endpoints back to node edges).
+#   line length      = full distance from source centre to destination
+#                      edge, scaling with actual grid distance. A
+#                      2-cell-away exit draws a line twice as long as a
+#                      1-cell one, matching the outboard-project style.
 #   padding          = 1 grid cell on each side of content
 #   label overhang   = 40 extra pixels of canvas on the right/bottom
 #                      so long labels that extend past their node
@@ -227,18 +226,13 @@ select VISITED map_here
          set map_y * 90
          set map_y + 45
 
-         # Draw a short stub from the source node in the direction of the
-         # destination. Two adjacent visited rooms each draw a stub toward
-         # each other; those stubs overlap in the middle and read as a
-         # single connecting line. A visited room with an unvisited exit
-         # shows just its own short whisker -- a hint that an exit exists
-         # without pulling the eye across empty space.
-         #
-         # Orthogonal stubs use 40 px per axis (10 past the 30-px node
-         # half-width). Diagonal stubs use 57 px per axis so the stub
-         # reaches along the hypotenuse of the adjacent cell rather than
-         # stopping short; without this, NE/NW/SE/SW exits fall noticeably
-         # short of their neighbour's node even when both are visited.
+         # Draw a line from the source node centre all the way to the
+         # destination's edge, regardless of how many cells apart they
+         # are. The line length scales with the actual grid distance
+         # between the two locations (like the outboard project does),
+         # so a 2-cell-away exit draws a line twice as long as a 1-cell
+         # one. For unvisited destinations the line still extends to
+         # where the (not-yet-drawn) destination node would sit.
          set map_stub_x = 0
          if map_target(x) > map_here(x)
             set map_stub_x = 1
@@ -254,19 +248,24 @@ select VISITED map_here
             set map_stub_y = -1
          endif
 
-         # Per-axis stub length: 57 if diagonal (both signs nonzero),
-         # else 40. Multiplied by the sign to get the axis offset.
-         set map_dest_x = map_stub_x
-         set map_dest_y = map_stub_y
-         ifall map_stub_x != 0 : map_stub_y != 0
-            set map_dest_x * 85
-            set map_dest_y * 85
-         else
-            set map_dest_x * 60
-            set map_dest_y * 60
-         endif
-         set map_dest_x + map_x
-         set map_dest_y + map_y
+         # Endpoint = destination centre pixel - (stub * 30) on each
+         # axis, so the line terminates at the nearest edge of the
+         # destination node (30 = node half-width).
+         set map_dest_x = map_target(x)
+         set map_dest_x + map_offset_x
+         set map_dest_x * 90
+         set map_dest_x + 45
+         set map_arm_x = map_stub_x
+         set map_arm_x * 30
+         set map_dest_x - map_arm_x
+
+         set map_dest_y = map_target(y)
+         set map_dest_y + map_offset_y
+         set map_dest_y * 90
+         set map_dest_y + 45
+         set map_arm_y = map_stub_y
+         set map_arm_y * 30
+         set map_dest_y - map_arm_y
 
          write "paper.path(~M" map_x " " map_y "L" map_dest_x " " map_dest_y "~).attr(~stroke~, ~#888~);"
 
