@@ -59,11 +59,13 @@
 #   node size        = 60x60 pixels (kept small; cell is padded around
 #                      them). Adjacent room nodes are 150 px apart edge-
 #                      to-edge.
-#   stub lengths     = 120 px orthogonal, 171 px diagonal. Chosen so two
-#                      visited adjacent rooms each drawing a stub toward
-#                      the other overlap in the middle by ~30 px and
-#                      read as a single connecting line. Unvisited exits
-#                      show just the source's whisker.
+#   stub lengths     = 40 px orthogonal, 57 px diagonal. These are the
+#                      "short whisker" lengths -- each room draws just
+#                      enough of a stub to hint at its exits, not enough
+#                      to span the 150-px gap to the next node. Visited
+#                      adjacent pairs show two whiskers pointing at each
+#                      other with empty space between them, rather than
+#                      a long connecting line.
 #   padding          = 1 grid cell on each side of content
 #   label overhang   = 40 extra pixels of canvas on the right/bottom
 #                      so long labels that extend past their node
@@ -239,11 +241,11 @@ select VISITED map_here
          set map_dest_x = map_stub_x
          set map_dest_y = map_stub_y
          ifall map_stub_x != 0 : map_stub_y != 0
-            set map_dest_x * 171
-            set map_dest_y * 171
+            set map_dest_x * 57
+            set map_dest_y * 57
          else
-            set map_dest_x * 120
-            set map_dest_y * 120
+            set map_dest_x * 40
+            set map_dest_y * 40
          endif
          set map_dest_x + map_x
          set map_dest_y + map_y
