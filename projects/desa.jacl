@@ -18,6 +18,8 @@ constant maintext_colour "#f5f0e8"
 
 location rumah : rumah pondok gubuk
  short         name "Rumah"
+ x             2
+ y             1
 
 {look
 write "Kamu berada di dalam rumahmu yang kecil tapi nyaman. "
@@ -108,6 +110,8 @@ write "Kamu menyeruput kopi hitam. Pahit tapi enak.^"
 location sawah : sawah padi
  short         name "Sawah"
  west          jalan_utama
+ x             2
+ y             2
 
 {look
 print:
@@ -164,7 +168,7 @@ location jalan_utama : jalan utama
  south         banjar
  northeast     gang
  x             1
- y             1
+ y             2
 
 {look
 print:
@@ -220,6 +224,8 @@ write "Anjing itu mengangkat kepalanya sebentar, lalu tidur lagi.^"
 location warung : warung kedai toko
  short         name "Warung"
  south         jalan_utama
+ x             1
+ y             1
 
 {look
 print:
@@ -309,6 +315,8 @@ write "Kucing itu membuka satu mata, menatapmu sebentar, lalu menutup matanya la
 location banjar : banjar balai aula
  short         name "Banjar"
  north         jalan_utama
+ x             1
+ y             3
 
 {look
 print:

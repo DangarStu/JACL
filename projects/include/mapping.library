@@ -118,6 +118,7 @@ grammar map window >map_window_on
 grammar map open >map_window_on
 grammar map close >map_window_off
 grammar map all >map_all
+grammar map everything >map_all
 
 # -------------------------------------------------------------------
 # +library_header -- called by webinterface.library's +header emission
@@ -146,13 +147,21 @@ set map_min_y = 0
 set map_max_y = 0
 
 # Iterate over all LOCATION objects. Include a location in the bounds
-# calculation if either map_show_all = 1 (draw everything) or the
-# location has VISITED set (normal mode, draw only what the player
-# has been).
+# calculation if either map_show_all = 1 (draw everything with real
+# coords) or the location has VISITED set.
+#
+# In map_show_all mode we also require at least one of x/y to be
+# non-zero. Verbs libraries declare a hidden `limbo` location (plus
+# Indonesian has Permainan Selesai, etc.) that defaults to (0, 0);
+# without this guard those would show up on every map.
 select LOCATION map_here
    set map_should_draw = 0
    if map_show_all = 1
-      set map_should_draw = 1
+      ifall map_here(x) = 0 : map_here(y) = 0
+         # Skip: no coords set, probably a library meta-location.
+      else
+         set map_should_draw = 1
+      endif
    endif
    if map_here has VISITED
       set map_should_draw = 1
@@ -228,7 +237,11 @@ set map_canvas_h + 40
 select LOCATION map_here
    set map_should_draw = 0
    if map_show_all = 1
-      set map_should_draw = 1
+      ifall map_here(x) = 0 : map_here(y) = 0
+         # Skip library meta-locations (limbo etc. with unset coords).
+      else
+         set map_should_draw = 1
+      endif
    endif
    if map_here has VISITED
       set map_should_draw = 1
@@ -396,7 +409,11 @@ endselect
 select LOCATION map_here
    set map_should_draw = 0
    if map_show_all = 1
-      set map_should_draw = 1
+      ifall map_here(x) = 0 : map_here(y) = 0
+         # Skip library meta-locations with unset coords.
+      else
+         set map_should_draw = 1
+      endif
    endif
    if map_here has VISITED
       set map_should_draw = 1
