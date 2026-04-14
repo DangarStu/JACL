@@ -155,15 +155,12 @@ write "<script>"
 write "var paper = Raphael(~jacl_map~, 1500, 1500, null);"
 execute "+map_body"
 
-# CENTRE THE VIEWPORT ON THE CURRENT LOCATION (inline = scroll #main).
-set map_x = here(x)
-set map_x * 100
-set map_x + 35
-set map_y = here(y)
-set map_y * 100
-set map_y + 35
+# SCROLL THE MAIN TEXT PANE TO THE BOTTOM so the freshly inserted map
+# is visible (the map itself is a 1500-px-tall SVG at the end of
+# #maintext, so without this the viewport stays wherever it was and
+# the user only sees prose above the map).
 write "var mapMain = document.getElementById(~main~);"
-write "if (mapMain) { mapMain.scrollLeft = " map_x " - mapMain.offsetWidth / 2; mapMain.scrollTop = " map_y " - mapMain.offsetHeight / 2; }"
+write "if (mapMain) { mapMain.scrollTop = mapMain.scrollHeight; }"
 write "</script>"
 
 set linebreaks = true
