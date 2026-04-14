@@ -149,7 +149,7 @@ print:
 
    function jaclEnsureMapPopup() {^
       if (jaclMapPopup && !jaclMapPopup.closed) return jaclMapPopup;^
-      jaclMapPopup = window.open('', 'jacl_map', 'width=1000,height=900,scrollbars=yes,resizable=yes');^
+      jaclMapPopup = window.open('', 'jacl_map', 'width=1400,height=1000,scrollbars=yes,resizable=yes');^
       if (!jaclMapPopup) return null;^
       var w = jaclMapPopup;^
       w.document.open();^
