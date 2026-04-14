@@ -57,13 +57,13 @@
 
 # Layout constants used below (inlined because JACL constants aren't
 # accepted inside arithmetic or write argument lists):
-#   grid size        = 90 pixels per unit of (x, y)
-#   node size        = 60x60 pixels (node half-width = 30 px used when
-#                      trimming line endpoints back to node edges).
+#   grid size        = 120 pixels per unit of (x, y)
+#   node size        = 80x80 pixels (node half-width = 40 px; enough to
+#                      hold two-line labels of realistic room names).
 #   line length      = full distance from source centre to destination
-#                      edge, scaling with actual grid distance. A
-#                      2-cell-away exit draws a line twice as long as a
-#                      1-cell one, matching the outboard-project style.
+#                      centre. The destination's node, drawn afterwards,
+#                      covers the inside-box portion so only the gap
+#                      between the two node edges is visually a line.
 #   padding          = 1 grid cell on each side of content
 #   label overhang   = 40 extra pixels of canvas on the right/bottom
 #                      so long labels that extend past their node
@@ -255,12 +255,12 @@ select LOCATION map_here
          # Source pixel (center of map_here's node).
          set map_x = map_here(x)
          set map_x + map_offset_x
-         set map_x * 90
-         set map_x + 45
+         set map_x * 120
+         set map_x + 60
          set map_y = map_here(y)
          set map_y + map_offset_y
-         set map_y * 90
-         set map_y + 45
+         set map_y * 120
+         set map_y + 60
 
          # Draw a line from the source node centre all the way to the
          # destination's edge, regardless of how many cells apart they
@@ -292,13 +292,13 @@ select LOCATION map_here
          # central portion that sits inside the box.
          set map_dest_x = map_target(x)
          set map_dest_x + map_offset_x
-         set map_dest_x * 90
-         set map_dest_x + 45
+         set map_dest_x * 120
+         set map_dest_x + 60
 
          set map_dest_y = map_target(y)
          set map_dest_y + map_offset_y
-         set map_dest_y * 90
-         set map_dest_y + 45
+         set map_dest_y * 120
+         set map_dest_y + 60
 
          write "paper.path(~M" map_x " " map_y "L" map_dest_x " " map_dest_y "~).attr(~stroke~, ~#888~);"
 
@@ -368,10 +368,10 @@ select LOCATION map_here
                set map_arm_base_x = map_line_dx
                set map_arm_base_y = map_line_dy
             endif
-            set map_arm_base_x * 6
+            set map_arm_base_x * 8
             set map_arm_base_x / map_cheby
             set map_arm_base_x + map_arrow_pos_x
-            set map_arm_base_y * 6
+            set map_arm_base_y * 8
             set map_arm_base_y / map_cheby
             set map_arm_base_y + map_arrow_pos_y
 
@@ -379,10 +379,10 @@ select LOCATION map_here
             # same 6 px so arm spread matches arm length.
             set map_perp_x = 0
             set map_perp_x - map_line_dy
-            set map_perp_x * 6
+            set map_perp_x * 8
             set map_perp_x / map_cheby
             set map_perp_y = map_line_dx
-            set map_perp_y * 6
+            set map_perp_y * 8
             set map_perp_y / map_cheby
 
             # Arm 1 = arm_base + perp
@@ -423,13 +423,13 @@ select LOCATION map_here
    # means offset (cell-node)/2 = 15 px into the cell, not cell/2.
    set map_x = map_here(x)
    set map_x + map_offset_x
-   set map_x * 90
-   set map_x + 15
+   set map_x * 120
+   set map_x + 20
    set map_y = map_here(y)
    set map_y + map_offset_y
-   set map_y * 90
-   set map_y + 15
-   write "var node = paper.rect(" map_x ", " map_y ", 60, 60, 10);"
+   set map_y * 120
+   set map_y + 20
+   write "var node = paper.rect(" map_x ", " map_y ", 80, 80, 12);"
    if map_here = here
       write "node.attr(~fill~, ~#BDD8D6~);"
    else
@@ -453,13 +453,13 @@ select LOCATION map_here
       write "~);"
    else
       set map_label_y = map_y
-      set map_label_y - 7
+      set map_label_y - 9
       write "paper.text(" map_x ", " map_label_y ", ~"
       set map_word_index = 0
       write map_label_parts[map_word_index]
       write "~);"
       set map_label_y = map_y
-      set map_label_y + 7
+      set map_label_y + 9
       write "paper.text(" map_x ", " map_label_y ", ~"
       set map_word_index = 1
       repeat
@@ -520,12 +520,12 @@ execute "+map_body"
 # Centre the popup's map container on `here`.
 set map_x = here(x)
 set map_x + map_offset_x
-set map_x * 90
-set map_x + 45
+set map_x * 120
+set map_x + 60
 set map_y = here(y)
 set map_y + map_offset_y
-set map_y * 90
-set map_y + 45
+set map_y * 120
+set map_y + 60
 write "var c = mapWindow.document.getElementById(~jacl_map~);"
 write "if (c) { c.scrollLeft = " map_x " - mapWindow.innerWidth / 2; c.scrollTop = " map_y " - mapWindow.innerHeight / 2; }"
 
@@ -553,12 +553,12 @@ execute "+map_body"
 # Centre the popup on the player's current location for orientation.
 set map_x = here(x)
 set map_x + map_offset_x
-set map_x * 90
-set map_x + 45
+set map_x * 120
+set map_x + 60
 set map_y = here(y)
 set map_y + map_offset_y
-set map_y * 90
-set map_y + 45
+set map_y * 120
+set map_y + 60
 write "var c = mapWindow.document.getElementById(~jacl_map~);"
 write "if (c) { c.scrollLeft = " map_x " - mapWindow.innerWidth / 2; c.scrollTop = " map_y " - mapWindow.innerHeight / 2; }"
 
@@ -600,12 +600,12 @@ if map_window_mode = 1
    execute "+map_body"
    set map_x = here(x)
    set map_x + map_offset_x
-   set map_x * 90
-   set map_x + 45
+   set map_x * 120
+   set map_x + 60
    set map_y = here(y)
    set map_y + map_offset_y
-   set map_y * 90
-   set map_y + 45
+   set map_y * 120
+   set map_y + 60
    write "var c = mapWindow.document.getElementById(~jacl_map~);"
    write "if (c) { c.scrollLeft = " map_x " - mapWindow.innerWidth / 2; c.scrollTop = " map_y " - mapWindow.innerHeight / 2; }"
    write "});"
