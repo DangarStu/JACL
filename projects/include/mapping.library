@@ -11,7 +11,7 @@
 # 2. Add raphael to the page head by overriding +local_header in your game:
 #        {+local_header
 #        print:
-#           <script src="/include/raphael.min.js"></script>
+#           <script src="/www/raphael.min.js"></script>
 #        .
 #        }
 #
@@ -54,6 +54,10 @@ grammar map >map
 grammar m >map
 
 {+map
+# JACL's default linebreaks mode converts every write-statement newline
+# into <br>. That would pepper the emitted JS with stray HTML tags and
+# syntax-error the <script> block, so turn it off for the duration.
+set linebreaks = false
 print:
    <div id="jacl_map"></div>
    <script>
@@ -140,5 +144,6 @@ print:
    </script>
 .
 
+set linebreaks = true
 set time = false
 }
