@@ -29,6 +29,8 @@ location control_centre : control centre
  has		KNOWN
  south		pool
  out		pool
+ x		8
+ y		0
 
 {eachturn
 ifall screen has ON : lisa has CUSTOM4 : lisa(parent) = control_centre
@@ -906,6 +908,8 @@ location your_quarters : my quarters
  has		KNOWN
  north		quarters
  out		quarters
+ x		16
+ y		8
 
 {movement
 if destination = nowhere
@@ -1030,6 +1034,8 @@ location lisas_quarters: lisas lisa's quarters
  has		KNOWN
  west		quarters
  out		quarters
+ x		24
+ y		4
 
 {look
 if here has VISITED
@@ -1114,6 +1120,8 @@ location quarters: quarters common area
  north		bathroom
  south		your_quarters
  east		lisas_quarters
+ x		16
+ y		4
 
 {movement
 if compass = north 
@@ -1706,6 +1714,8 @@ location bathroom : bathroom
  has		KNOWN
  south		quarters
  out		quarters
+ x		16
+ y		0
 
 {eachturn
 if WATER_LEVEL = 5
@@ -2111,6 +2121,8 @@ location storage : storage
  has		KNOWN
  west		nowhere
  east		pool
+ x		0
+ y		4
 
 {movement
 if compass = west
@@ -2521,6 +2533,8 @@ location lab : lab laboratory
  has		KNOWN
  north		pool
  out		pool
+ x		8
+ y		8
 
 {movement
 if destination = nowhere
@@ -3610,6 +3624,8 @@ location pool : pool
  south		lab
  west		storage
  down		surface
+ x		8
+ y		4
 
 {movement
 if compass = down
@@ -3727,6 +3743,8 @@ location surface : surface
  short		the "lagoon surface"
  down		beneath_outpost
  up		pool
+ x		4
+ y		12
 
 {movement
 if tank has WORN
@@ -3760,6 +3778,8 @@ location beneath_outpost : beneath outpost
  has		UNDER_WATER WITHOUT_AIR OUTDOORS KNOWN
  up		surface
  north		lagoon_bottom
+ x		4
+ y		16
 
 {movement
 if compass = down
@@ -3851,6 +3871,8 @@ location lagoon_bottom : lagoon bottom
  up			lagoon_surface
  north		mid_water
  south		beneath_outpost
+ x		8
+ y		16
 
 {movement
 if compass = east 
@@ -3888,6 +3910,8 @@ location lagoon_surface : lagoon surface
  north		ocean_surface
  west		beach
  southwest	beach
+ x		12
+ y		16
 
 {eachturn
 move lagoon_obj to here
@@ -3931,6 +3955,8 @@ location ocean_surface : ocean surface
  northwest	ocean_surface
  southeast	ocean_surface
  southwest	ocean_surface
+ x		12
+ y		12
 
 {movement
 if compass = in : compass = out
@@ -4009,6 +4035,8 @@ location ocean_bottom : ocean bottom
  northwest	ocean_bottom
  southeast	ocean_bottom
  southwest	ocean_bottom
+ x		16
+ y		20
 
 {movement
 if compass = in : compass = out
@@ -4082,6 +4110,8 @@ location mid_water : mid water
  southeast	mid_water
  southwest	mid_water
  down		mid_water
+ x		8
+ y		12
 
 {movement
 if compass = out : compass = in
@@ -4244,6 +4274,8 @@ location site : rock formation
  northwest	ocean_bottom
  southeast	ocean_bottom
  southwest	ocean_bottom
+ x		20
+ y		20
 
 {movement
 if compass = down
@@ -4702,6 +4734,8 @@ location walkway : floating walkway
  has		OUTDOORS KNOWN
  east		nowhere
  west		beach
+ x		20
+ y		24
 
 {eachturn
 move lagoon_obj to here
@@ -4787,6 +4821,8 @@ location beach : lagoon beach
  east		walkway
  northeast	lagoon_surface
  south		trail
+ x		16
+ y		24
 
 {eachturn
 move lagoon_obj to here
@@ -4853,6 +4889,8 @@ location trail : trail
  has		OUTDOORS KNOWN
  north		beach
  south		estuary
+ x		16
+ y		28
 
 {eachturn
 set JUNGLE_SCRIPT + 1
@@ -4907,6 +4945,8 @@ location estuary : estuary
  northwest	hill
  up		hill
  south		south_beach
+ x		16
+ y		32
 
 {look
 if here has VISITED
@@ -4934,6 +4974,8 @@ location behind_hangar : behind hangar
  has		OUTDOORS KNOWN
  southwest	south_beach
  up			on_crate
+ x		20
+ y		36
 
 {look
 if here has VISITED
@@ -5064,6 +5106,8 @@ location on_crate : on crate
  has		OUTDOORS
  down		behind_hangar
  up		nowhere
+ x		32
+ y		40
 
 {movement
 if compass = up
@@ -5135,6 +5179,8 @@ location roof_north : roof end of north
  has		OUTDOORS
  south		roof_south	
  down		hangar_north
+ x		28
+ y		36
 
 {movement
 if compass = down
@@ -5288,6 +5334,8 @@ location roof_south : roof south
  has		OUTDOORS
  north		roof_north
  down		on_crate
+ x		28
+ y		40
 
 {look
 if here has VISITED
@@ -5310,6 +5358,8 @@ location hangar_north : north end of hanger
  short		name "north end of hanger"
  south		hangar_south
  up			roof_north
+ x		24
+ y		36
 
 {eachturn
 move hangar_door to hangar_north
@@ -6036,6 +6086,8 @@ execute "show_to_stranger_diary"
 location hangar_south : south end of hangar
  short		name "south end of hanger"
  north		hangar_north
+ x		24
+ y		40
 
 {look
 if here has VISITED
@@ -6229,6 +6281,8 @@ location south_beach : south beach
  has		OUTDOORS KNOWN
  north		estuary
  northeast	behind_hangar
+ x		16
+ y		36
 
 {eachturn
 set BEACH_SCRIPT + 1
@@ -6285,6 +6339,8 @@ location hill : hill
  down		estuary
  north		shed
  in		shed
+ x		12
+ y		32
 
 {movement
 if destination = nowhere
@@ -6369,6 +6425,8 @@ location shed : disused shed
  short		the "shed"
  south		hill
  out		hill
+ x		12
+ y		28
 
 {look
 if here has VISITED
@@ -6555,6 +6613,8 @@ location compound : compound
  north		office
  east		base
  south		hangar_north
+ x		20
+ y		32
 
 {eachturn
 set MPS_SCRIPT + 1
@@ -6691,6 +6751,8 @@ location base : main base
  west		compound
  east		pad
  up			pad
+ x		24
+ y		32
 
 {movement
 if compass = down : compass = in : compass = out
@@ -6747,6 +6809,8 @@ location pad : helicopter pad
  has		OUTDOORS KNOWN
  west		base
  down		base
+ x		28
+ y		32
 
 {movement
 if destination = nowhere 
@@ -6781,6 +6845,8 @@ location office : colonel wises wise's office
  has		KNOWN
  south		compound
  out		compound
+ x		20
+ y		28
 
 {eachturn
 set WISES_SCRIPT + 1
@@ -7031,6 +7097,8 @@ location van : van
  has		KNOWN
  out		nowhere
  east		nowhere
+ x		36
+ y		12
 
 {eachturn
 move van_obj to van 
@@ -7339,6 +7407,8 @@ location street : street
  in			van
  west		van
  north		driveway
+ x		40
+ y		12
 
 {movement
 if destination = false
@@ -7441,6 +7511,8 @@ location driveway : driveway
  south		street
  southeast	street
  southwest	street
+ x		40
+ y		8
 
 {eachturn
 move guests to here
@@ -7522,6 +7594,8 @@ location lobby : lobby
  up		mezzanine
  east		concierge_desk
  west		bar
+ x		40
+ y		4
  
 {movement
 if compass = northeast : compass = northwest
@@ -7593,6 +7667,8 @@ location concierge_desk : concierge man desk
  has		KNOWN
  west		lobby
  out		lobby
+ x		44
+ y		4
 
 {movement
 if destination = false
@@ -7825,6 +7901,8 @@ location bar : bar
  short		the "bar"
  east		lobby
  south		lounge
+ x		36
+ y		4
 
 {eachturn
 set BARMANS_SCRIPT + 1
@@ -8111,6 +8189,8 @@ location lounge : lounge
  short		the "lounge"
  north		bar
  out		bar
+ x		36
+ y		8
 
 {eachturn
 execute "+waitress_actions"
@@ -8542,6 +8622,8 @@ location mezzanine : mezzanine level
  northeast	lobby
  northwest	lobby
  down		lobby
+ x		44
+ y		8
 
 {movement
 if compass = east : compass = west
@@ -8613,6 +8695,8 @@ location ground_floor : ground floor
  has		OUTSIDE_LIFT
  north		nowhere
  south		lobby
+ x		40
+ y		0
 
 {movement
 if +door_warning = true
@@ -8725,6 +8809,8 @@ location first_floor : first floor
  has		OUTSIDE_LIFT
  north		nowhere
  south		mezzanine
+ x		48
+ y		8
 
 {movement
 if +door_warning = true
@@ -8752,6 +8838,8 @@ location second_floor : second floor
  has		OUTSIDE_LIFT
  north		nowhere
  south		second_hallway
+ x		52
+ y		8
 
 {look
 if here has VISITED
@@ -8777,6 +8865,8 @@ object callbutton2: call button
 location second_hallway : second floor hallway
  short		the "second floor hallway"
  north		second_floor
+ x		52
+ y		12
 
 {movement
 if compass = east : compass = west
@@ -8817,6 +8907,8 @@ location third_floor : third floor
  has		OUTSIDE_LIFT
  north		nowhere
  south		conference_room
+ x		48
+ y		12
 
 {movement
 if +door_warning = true
@@ -8848,6 +8940,8 @@ location conference_room : conference room
  north		third_floor
  southwest	backstage
  west		backstage
+ x		48
+ y		16
 
 {movement
 if compass = southwest : compass = west
@@ -8941,6 +9035,8 @@ location backstage : backstage area
  east		conference_room
  northeast	conference_room
  south		nowhere
+ x		44
+ y		16
 
 {movement
 if compass = south 
@@ -9023,6 +9119,8 @@ location z_office : dr doctor zuckerman's zuckermans office
  short		name "Dr Zuckerman's office"
  out		backstage
  north		backstage
+ x		44
+ y		20
 
 {eachturn
 if HUGHES_SCRIPT = 0
@@ -10430,6 +10528,8 @@ integer FLOOR_MAPPING ground_floor first_floor second_floor third_floor
 
 location lift : lift
  short		the "elevator"
+ x		52
+ y		20
 
 {look
 if here has VISITED
