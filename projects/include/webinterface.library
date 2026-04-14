@@ -242,6 +242,10 @@ write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
 ifexecute "+local_header"
    # GAME MAY INJECT ADDITIONAL HEAD CONTENT (extra stylesheets, scripts).
 endif
+ifexecute "+library_header"
+   # LIBRARIES (e.g. mapping.library) MAY INJECT THEIR OWN HEAD CONTENT
+   # WITHOUT COLLIDING WITH THE GAME'S +local_header.
+endif
 write "</head>^"
 write "<body onLoad=~document.getElementById('JACLCommandPrompt').focus(); jaclOfferVoice();~>^"
 write "<div id=~header~>"

@@ -13,15 +13,13 @@
 # 1. In your game file:
 #        #include "mapping.library"
 #
-# 2. Add raphael to the page head by overriding +local_header in your game:
-#        {+local_header
-#        print:
-#           <script src="/include/raphael.min.js"></script>
-#        .
-#        }
+#    That's it for the page setup -- this library defines a
+#    +library_header hook which webinterface.library's <head> emission
+#    invokes automatically, so raphael loads without any game-side
+#    +local_header override.
 #
-#    Under cgijacl the web interpreter only serves files listed in the
-#    game's .media file, so also add this line to your <game>.media
+# 2. Under cgijacl, the web interpreter only serves files listed in the
+#    game's .media file, so add this line to your <game>.media
 #    (see mapping.media for the canonical entry):
 #        /include/raphael.min.js application/javascript www/raphael.min.js
 #
@@ -52,6 +50,10 @@
 # Window-mode auto-update is implemented by defining a global +after_look
 # hook. If your game already defines +after_look for something else,
 # you'll need to merge that logic with this library's emission block.
+#
+# The library also defines +library_header to inject the raphael
+# <script> tag -- webinterface.library invokes this separately from
+# the game's +local_header, so they don't collide.
 
 # Layout constants used below (inlined because JACL constants aren't
 # accepted inside arithmetic or write argument lists):
@@ -99,6 +101,19 @@ grammar m >map
 grammar map window >map_window_on
 grammar map open >map_window_on
 grammar map close >map_window_off
+
+# -------------------------------------------------------------------
+# +library_header -- called by webinterface.library's +header emission
+# so games don't need to override +local_header just to load raphael.
+# Any library can define this hook; webinterface invokes them
+# unconditionally.
+# -------------------------------------------------------------------
+
+{+library_header
+print:
+   <script src="/include/raphael.min.js"></script>
+.
+}
 
 # -------------------------------------------------------------------
 # +map_bounds -- sweep visited locations and their exit destinations to
