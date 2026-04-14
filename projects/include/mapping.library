@@ -1,7 +1,12 @@
 # MAPPING LIBRARY
 #
-# Provides a `map` command that renders an inline SVG map of the player's
-# explored territory using the Raphael JavaScript library.
+# Provides a `map` command that renders an SVG map of the player's explored
+# territory using the Raphael JavaScript library. Two display modes:
+#
+#   map              -- renders the map inline in the main text area (one-shot)
+#   map window       -- opens the map in a separate browser window and keeps
+#                       it updated every time the player looks or moves
+#   map close        -- closes the map window and disables auto-update
 #
 # USAGE
 # -----
@@ -38,6 +43,12 @@
 # exits whose destination has not yet been visited -- so the map shows
 # where the player can go, but not what is there until they arrive. The
 # current location (`here`) is highlighted.
+#
+# HOOK NOTE
+# ---------
+# Window-mode auto-update is implemented by defining a global +after_look
+# hook. If your game already defines +after_look for something else,
+# you'll need to merge that logic with this library's emission block.
 
 # Layout constants (inlined below because JACL constants aren't accepted
 # inside `set` arithmetic or `write` argument lists):
@@ -52,20 +63,22 @@ integer map_y
 integer map_dest_x
 integer map_dest_y
 integer map_loop
+integer map_window_mode 0
 
 grammar map >map
 grammar m >map
+grammar map window >map_window_on
+grammar map open >map_window_on
+grammar map close >map_window_off
 
-{+map
-# JACL's default linebreaks mode inserts <br> between every write, which
-# would corrupt the <script> body and produce invalid JS. Turn it off
-# for the duration. `write` is used instead of `print:` throughout
-# because print blocks don't always honour the linebreaks setting.
-set linebreaks = false
-write "<div id=~jacl_map~></div>"
-write "<script>"
-write "var paper = Raphael(~jacl_map~, 1500, 1500, null);"
+# -------------------------------------------------------------------
+# +map_body -- emits the paper.path(...) and paper.rect/text(...) calls
+# for the current game state. Caller is responsible for wrapping this in
+# <script>...</script> with `var paper = ...` defined beforehand and for
+# toggling `linebreaks` off/on around the emission.
+# -------------------------------------------------------------------
 
+{+map_body
 # DRAW EXIT LINES FROM EVERY VISITED LOCATION.
 # Iterates all 12 compass exits; any non-zero, non-NO_GO destination gets a
 # line drawn to its (x, y). Destinations that are themselves unvisited still
@@ -121,7 +134,7 @@ select VISITED map_here
       write "node.attr(~fill~, ~#eee~);"
    endif
 
-   # CENTRE THE LABEL; WRAP LONG NAMES ACROSS LINES.
+   # CENTRE THE LABEL.
    set map_x + 30
    set map_y + 30
    write "paper.text(" map_x ", " map_y ", ~"
@@ -129,19 +142,99 @@ select VISITED map_here
    write "~);"
    endif
 endselect
+}
 
-# CENTRE THE VIEWPORT ON THE CURRENT LOCATION.
+# -------------------------------------------------------------------
+# +map -- inline rendering in #maintext.
+# -------------------------------------------------------------------
+
+{+map
+set linebreaks = false
+write "<div id=~jacl_map~></div>"
+write "<script>"
+write "var paper = Raphael(~jacl_map~, 1500, 1500, null);"
+execute "+map_body"
+
+# CENTRE THE VIEWPORT ON THE CURRENT LOCATION (inline = scroll #main).
 set map_x = here(x)
 set map_x * 100
 set map_x + 35
 set map_y = here(y)
 set map_y * 100
 set map_y + 35
-
 write "var mapMain = document.getElementById(~main~);"
 write "if (mapMain) { mapMain.scrollLeft = " map_x " - mapMain.offsetWidth / 2; mapMain.scrollTop = " map_y " - mapMain.offsetHeight / 2; }"
 write "</script>"
 
 set linebreaks = true
 set time = false
+}
+
+# -------------------------------------------------------------------
+# +map_window_on -- open the popup and enable auto-update.
+# -------------------------------------------------------------------
+
+{+map_window_on
+set map_window_mode = 1
+set linebreaks = false
+write "<script>"
+write "window.jaclMapMode = 1;"
+write "jaclDrawMapInPopup(function(paper, mapWindow) {"
+execute "+map_body"
+
+# Centre the popup's map container on `here`.
+set map_x = here(x)
+set map_x * 100
+set map_x + 35
+set map_y = here(y)
+set map_y * 100
+set map_y + 35
+write "var c = mapWindow.document.getElementById(~jacl_map~);"
+write "if (c) { c.scrollLeft = " map_x " - mapWindow.innerWidth / 2; c.scrollTop = " map_y " - mapWindow.innerHeight / 2; }"
+
+write "});"
+write "</script>"
+set linebreaks = true
+write "Map window opened. It will update as you move.^"
+set time = false
+}
+
+# -------------------------------------------------------------------
+# +map_window_off -- close the popup and disable auto-update.
+# -------------------------------------------------------------------
+
+{+map_window_off
+set map_window_mode = 0
+set linebreaks = false
+write "<script>window.jaclMapMode = 0; jaclCloseMapPopup();</script>"
+set linebreaks = true
+write "Map window closed.^"
+set time = false
+}
+
+# -------------------------------------------------------------------
+# +after_look -- hook called by +display_location after every movement
+# or `look`. Redraws the popup if window mode is on.
+# -------------------------------------------------------------------
+
+{+after_look
+if map_window_mode = 1
+   set linebreaks = false
+   write "<script>"
+   write "if (window.jaclMapMode && typeof jaclDrawMapInPopup === ~function~) {"
+   write "jaclDrawMapInPopup(function(paper, mapWindow) {"
+   execute "+map_body"
+   set map_x = here(x)
+   set map_x * 100
+   set map_x + 35
+   set map_y = here(y)
+   set map_y * 100
+   set map_y + 35
+   write "var c = mapWindow.document.getElementById(~jacl_map~);"
+   write "if (c) { c.scrollLeft = " map_x " - mapWindow.innerWidth / 2; c.scrollTop = " map_y " - mapWindow.innerHeight / 2; }"
+   write "});"
+   write "}"
+   write "</script>"
+   set linebreaks = true
+endif
 }

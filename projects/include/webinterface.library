@@ -86,7 +86,7 @@ print:
                    'Amelie', 'Thomas', 'Audrey',^
                    'Anna', 'Markus', 'Petra',^
                    'Google español', 'Paulina', 'Jorge', 'Monica', 'Diego',^
-                   'Damayanti'];^
+                   'Google Bahasa Indonesia', 'Damayanti'];^
       for (var i = 0; i < prefs.length; i++) {^
          for (var j = 0; j < voices.length; j++) {^
             if (voices[j].name.indexOf(prefs[i]) !== -1) return voices[j];^
@@ -143,6 +143,43 @@ print:
 
    if (window.speechSynthesis && typeof speechSynthesis.onvoiceschanged !== 'undefined') {^
       speechSynthesis.onvoiceschanged = function() { /* voices now loaded */ };^
+   }^
+
+   var jaclMapPopup = null;^
+
+   function jaclEnsureMapPopup() {^
+      if (jaclMapPopup && !jaclMapPopup.closed) return jaclMapPopup;^
+      jaclMapPopup = window.open('', 'jacl_map', 'width=1000,height=900,scrollbars=yes,resizable=yes');^
+      if (!jaclMapPopup) return null;^
+      var w = jaclMapPopup;^
+      w.document.open();^
+      w.document.write("<!doctype html><html lang='en'><head><meta charset='utf-8'><title>Map</title><style>html,body{margin:0;padding:0;background:#eee;font-family:Georgia,Palatino,Times,serif;}#jacl_map{display:block;width:100vw;height:100vh;overflow:auto;}</style><script src='/include/raphael.min.js'><\/script></head><body><div id='jacl_map'></div></body></html>");^
+      w.document.close();^
+      return w;^
+   }^
+
+   function jaclDrawMapInPopup(drawFn) {^
+      var w = jaclEnsureMapPopup();^
+      if (!w) return;^
+      var tries = 0;^
+      var attempt = function() {^
+         if (w.closed) { jaclMapPopup = null; return; }^
+         if (!w.Raphael || !w.document.getElementById('jacl_map')) {^
+            if (++tries > 60) return;^
+            setTimeout(attempt, 50);^
+            return;^
+         }^
+         var container = w.document.getElementById('jacl_map');^
+         container.innerHTML = '';^
+         var paper = w.Raphael('jacl_map', 1500, 1500, null);^
+         try { drawFn(paper, w); } catch (e) { /* ignore draw errors */ }^
+      };^
+      attempt();^
+   }^
+
+   function jaclCloseMapPopup() {^
+      if (jaclMapPopup && !jaclMapPopup.closed) jaclMapPopup.close();^
+      jaclMapPopup = null;^
    }^
 
    function jaclAcceptVoice() {^
