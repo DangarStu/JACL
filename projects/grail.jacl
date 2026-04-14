@@ -29,7 +29,7 @@ location control_centre : control centre
  has		KNOWN
  south		pool
  out		pool
- x		2
+ x		1
  y		0
 
 {eachturn
@@ -908,7 +908,7 @@ location your_quarters : my quarters
  has		KNOWN
  north		quarters
  out		quarters
- x		4
+ x		2
  y		2
 
 {movement
@@ -1034,7 +1034,7 @@ location lisas_quarters: lisas lisa's quarters
  has		KNOWN
  west		quarters
  out		quarters
- x		6
+ x		3
  y		1
 
 {look
@@ -1120,7 +1120,7 @@ location quarters: quarters common area
  north		bathroom
  south		your_quarters
  east		lisas_quarters
- x		4
+ x		2
  y		1
 
 {movement
@@ -1714,7 +1714,7 @@ location bathroom : bathroom
  has		KNOWN
  south		quarters
  out		quarters
- x		4
+ x		2
  y		0
 
 {eachturn
@@ -2533,7 +2533,7 @@ location lab : lab laboratory
  has		KNOWN
  north		pool
  out		pool
- x		2
+ x		1
  y		2
 
 {movement
@@ -3624,7 +3624,7 @@ location pool : pool
  south		lab
  west		storage
  down		surface
- x		2
+ x		1
  y		1
 
 {movement
