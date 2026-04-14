@@ -145,6 +145,34 @@ print:
       speechSynthesis.onvoiceschanged = function() { /* voices now loaded */ };^
    }^
 
+   function jaclAcceptVoice() {^
+      enableSpeak();^
+      var banner = document.getElementById('jaclVoiceOffer');^
+      if (banner) banner.remove();^
+      var main = document.getElementById('maintext');^
+      if (main && main.textContent.trim().length > 0) speakText(main.innerHTML);^
+   }^
+
+   function jaclDeclineVoice() {^
+      localStorage.setItem('jaclSpeak', 'false');^
+      var banner = document.getElementById('jaclVoiceOffer');^
+      if (banner) banner.remove();^
+   }^
+
+   function jaclOfferVoice() {^
+      if (!window.speechSynthesis) return;^
+      if (localStorage.getItem('jaclSpeak') !== null) return;^
+      var main = document.getElementById('maintext');^
+      if (!main) return;^
+      var html = '<div id="jaclVoiceOffer" style="padding:0.5em 0.75em; margin:0 0 0.75em; border:1px solid #888; background:rgba(255,255,255,0.08);">' +^
+                 'Would you like the text read aloud? ' +^
+                 '<a href="javascript:jaclAcceptVoice()">Yes</a>' +^
+                 ' &nbsp; ' +^
+                 '<a href="javascript:jaclDeclineVoice()">No</a>' +^
+                 '</div>';^
+      main.insertAdjacentHTML('afterbegin', html);^
+   }^
+
    function changeInterface() {^
       document.JACLInterfaceForm.submit();
    }^
@@ -175,7 +203,7 @@ print:
 write "</script>^"
 write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
 write "</head>^"
-write "<body onLoad=~document.getElementById('JACLCommandPrompt').focus();~>^"
+write "<body onLoad=~document.getElementById('JACLCommandPrompt').focus(); jaclOfferVoice();~>^"
 write "<div id=~header~>"
 ifstring title_image = "none"
   write "<h1 name=~title~>" game_title "</h1>"
