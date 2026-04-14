@@ -162,13 +162,34 @@ location jalan_utama : jalan utama
   east		sawah
   north		warung
   south		banjar
+  northeast	gang
+  x		1
+  y		1
 
 {look
 print:
    Kamu berada di jalan utama desa. Jalan tanah ini
    menghubungkan seluruh desa. Di sebelah utara ada
    sebuah warung kecil. Sebuah jalan kecil menuju ke
-   selatan ke banjar. Ke timur, jalan mengarah ke sawah.^
+   selatan ke banjar. Ke timur, jalan mengarah ke sawah.
+   Sebuah gang sempit mengarah ke timur laut.^
+.
+}
+
+# -----------------------------------------------------------------------------
+
+location gang : gang lorong jalan_sempit
+  short		name "Gang sempit"
+  southwest	jalan_utama
+  x		2
+  y		0
+
+{look
+print:
+   Kamu berada di sebuah gang sempit di antara dua rumah
+   bambu. Dindingnya penuh dengan jemuran pakaian dan
+   beberapa pot tanaman. Jalan utama ada di sebelah
+   barat daya.^
 .
 }
 
