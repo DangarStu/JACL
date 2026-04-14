@@ -267,14 +267,15 @@ select VISITED map_here
          write "paper.path(~M" map_x " " map_y "L" map_dest_x " " map_dest_y "~).attr(~stroke~, ~#888~);"
 
          # Distinguish up/down exits from plain north/south ones by adding
-         # an arrowhead at the stub tip, pointing in the direction of
-         # travel. Up exits (index 8) get an up-pointing arrow; down
-         # exits (index 9) get a down-pointing arrow. When both rooms are
-         # visited, their two arrows converge in the middle of the line
-         # -- viewer reads "each tip is where that exit takes you."
-         if map_loop = 8
+         # a down-pointing arrowhead at the stub tip. Both up-exit and
+         # down-exit stubs get the SAME down-pointing arrow, so the arrow
+         # direction is absolute ("down the page = down the stairs")
+         # rather than relative to the player's current location. Viewer
+         # reads: wherever the arrows are, their arm-side is the higher
+         # room and their tip-side is the lower room.
+         ifall map_loop = 8
             set map_arm_y = map_dest_y
-            set map_arm_y + 5
+            set map_arm_y - 5
             set map_arm_x = map_dest_x
             set map_arm_x - 5
             write "paper.path(~M" map_dest_x " " map_dest_y "L" map_arm_x " " map_arm_y "~).attr(~stroke~, ~#888~);"
