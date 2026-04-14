@@ -197,33 +197,29 @@ select VISITED map_here
          set map_y * 80
          set map_y + 35
 
-         # Destination GRID coords: actual location if visited, else a
-         # 1-cell stub in the direction of the destination (clamped sign
-         # of the coord delta in each axis) so unvisited-exit lines are
-         # always the same length as adjacent visited-exit lines.
-         ifall map_target has VISITED : map_target has LOCATION
-            set map_dest_x = map_target(x)
-            set map_dest_y = map_target(y)
-         else
-            set map_stub_x = 0
-            if map_target(x) > map_here(x)
-               set map_stub_x = 1
-            endif
-            if map_target(x) < map_here(x)
-               set map_stub_x = -1
-            endif
-            set map_stub_y = 0
-            if map_target(y) > map_here(y)
-               set map_stub_y = 1
-            endif
-            if map_target(y) < map_here(y)
-               set map_stub_y = -1
-            endif
-            set map_dest_x = map_here(x)
-            set map_dest_x + map_stub_x
-            set map_dest_y = map_here(y)
-            set map_dest_y + map_stub_y
+         # Destination GRID coords: always a 1-cell stub in the direction
+         # of the destination (sign of delta on each axis). Adjacent
+         # destinations (the usual case) land exactly on the neighbour's
+         # node; distant destinations get a short stub that hints at
+         # direction without crossing intermediate visited rooms.
+         set map_stub_x = 0
+         if map_target(x) > map_here(x)
+            set map_stub_x = 1
          endif
+         if map_target(x) < map_here(x)
+            set map_stub_x = -1
+         endif
+         set map_stub_y = 0
+         if map_target(y) > map_here(y)
+            set map_stub_y = 1
+         endif
+         if map_target(y) < map_here(y)
+            set map_stub_y = -1
+         endif
+         set map_dest_x = map_here(x)
+         set map_dest_x + map_stub_x
+         set map_dest_y = map_here(y)
+         set map_dest_y + map_stub_y
 
          # Destination pixel (center of target cell).
          set map_dest_x + map_offset_x
