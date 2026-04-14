@@ -55,17 +55,17 @@
 
 # Layout constants used below (inlined because JACL constants aren't
 # accepted inside arithmetic or write argument lists):
-#   grid size        = 210 pixels per unit of (x, y)
-#   node size        = 60x60 pixels (kept small; cell is padded around
-#                      them). Adjacent room nodes are 150 px apart edge-
-#                      to-edge.
-#   stub lengths     = 40 px orthogonal, 57 px diagonal. These are the
-#                      "short whisker" lengths -- each room draws just
-#                      enough of a stub to hint at its exits, not enough
-#                      to span the 150-px gap to the next node. Visited
-#                      adjacent pairs show two whiskers pointing at each
-#                      other with empty space between them, rather than
-#                      a long connecting line.
+#   grid size        = 150 pixels per unit of (x, y)
+#   node size        = 60x60 pixels. Adjacent room centres are 150 px
+#                      apart, so node edges are 90 px apart.
+#   stub lengths     = 120 px orthogonal, 170 px diagonal. Tuned so each
+#                      stub endpoint lands at the far node's edge -- the
+#                      box "just overlaps" the line. Two visited adjacent
+#                      rooms each draw a stub and the stubs overlap
+#                      heavily in the middle, reading as one connecting
+#                      line. Unvisited exits show only the source's
+#                      whisker, ending where the neighbour's box would
+#                      sit if visited.
 #   padding          = 1 grid cell on each side of content
 #   label overhang   = 40 extra pixels of canvas on the right/bottom
 #                      so long labels that extend past their node
@@ -165,13 +165,13 @@ set map_offset_y - map_min_y
 set map_canvas_w = map_max_x
 set map_canvas_w - map_min_x
 set map_canvas_w + 2
-set map_canvas_w * 210
+set map_canvas_w * 150
 set map_canvas_w + 40
 
 set map_canvas_h = map_max_y
 set map_canvas_h - map_min_y
 set map_canvas_h + 2
-set map_canvas_h * 210
+set map_canvas_h * 150
 set map_canvas_h + 40
 }
 
@@ -202,12 +202,12 @@ select VISITED map_here
          # Source pixel (center of map_here's node).
          set map_x = map_here(x)
          set map_x + map_offset_x
-         set map_x * 210
-         set map_x + 105
+         set map_x * 150
+         set map_x + 75
          set map_y = map_here(y)
          set map_y + map_offset_y
-         set map_y * 210
-         set map_y + 105
+         set map_y * 150
+         set map_y + 75
 
          # Draw a short stub from the source node in the direction of the
          # destination. Two adjacent visited rooms each draw a stub toward
@@ -241,11 +241,11 @@ select VISITED map_here
          set map_dest_x = map_stub_x
          set map_dest_y = map_stub_y
          ifall map_stub_x != 0 : map_stub_y != 0
-            set map_dest_x * 57
-            set map_dest_y * 57
+            set map_dest_x * 170
+            set map_dest_y * 170
          else
-            set map_dest_x * 40
-            set map_dest_y * 40
+            set map_dest_x * 120
+            set map_dest_y * 120
          endif
          set map_dest_x + map_x
          set map_dest_y + map_y
@@ -264,11 +264,11 @@ select VISITED map_here
    else
    set map_x = map_here(x)
    set map_x + map_offset_x
-   set map_x * 210
+   set map_x * 150
    set map_x + 75
    set map_y = map_here(y)
    set map_y + map_offset_y
-   set map_y * 210
+   set map_y * 150
    set map_y + 75
    write "var node = paper.rect(" map_x ", " map_y ", 60, 60, 10);"
    if map_here = here
@@ -354,12 +354,12 @@ execute "+map_body"
 # Centre the popup's map container on `here`.
 set map_x = here(x)
 set map_x + map_offset_x
-set map_x * 210
-set map_x + 105
+set map_x * 150
+set map_x + 75
 set map_y = here(y)
 set map_y + map_offset_y
-set map_y * 210
-set map_y + 105
+set map_y * 150
+set map_y + 75
 write "var c = mapWindow.document.getElementById(~jacl_map~);"
 write "if (c) { c.scrollLeft = " map_x " - mapWindow.innerWidth / 2; c.scrollTop = " map_y " - mapWindow.innerHeight / 2; }"
 
@@ -398,12 +398,12 @@ if map_window_mode = 1
    execute "+map_body"
    set map_x = here(x)
    set map_x + map_offset_x
-   set map_x * 210
-   set map_x + 105
+   set map_x * 150
+   set map_x + 75
    set map_y = here(y)
    set map_y + map_offset_y
-   set map_y * 210
-   set map_y + 105
+   set map_y * 150
+   set map_y + 75
    write "var c = mapWindow.document.getElementById(~jacl_map~);"
    write "if (c) { c.scrollLeft = " map_x " - mapWindow.innerWidth / 2; c.scrollTop = " map_y " - mapWindow.innerHeight / 2; }"
    write "});"
