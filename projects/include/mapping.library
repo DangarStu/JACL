@@ -55,9 +55,15 @@
 
 # Layout constants used below (inlined because JACL constants aren't
 # accepted inside arithmetic or write argument lists):
-#   grid size        = 70 pixels per unit of (x, y)
-#   node size        = 60x60 pixels with 10-pixel rounded corners
-#                      (so gap between adjacent nodes is 10 px)
+#   grid size        = 210 pixels per unit of (x, y)
+#   node size        = 60x60 pixels (kept small; cell is padded around
+#                      them). Adjacent room nodes are 150 px apart edge-
+#                      to-edge.
+#   stub lengths     = 120 px orthogonal, 171 px diagonal. Chosen so two
+#                      visited adjacent rooms each drawing a stub toward
+#                      the other overlap in the middle by ~30 px and
+#                      read as a single connecting line. Unvisited exits
+#                      show just the source's whisker.
 #   padding          = 1 grid cell on each side of content
 #   label overhang   = 40 extra pixels of canvas on the right/bottom
 #                      so long labels that extend past their node
@@ -157,13 +163,13 @@ set map_offset_y - map_min_y
 set map_canvas_w = map_max_x
 set map_canvas_w - map_min_x
 set map_canvas_w + 2
-set map_canvas_w * 70
+set map_canvas_w * 210
 set map_canvas_w + 40
 
 set map_canvas_h = map_max_y
 set map_canvas_h - map_min_y
 set map_canvas_h + 2
-set map_canvas_h * 70
+set map_canvas_h * 210
 set map_canvas_h + 40
 }
 
@@ -194,12 +200,12 @@ select VISITED map_here
          # Source pixel (center of map_here's node).
          set map_x = map_here(x)
          set map_x + map_offset_x
-         set map_x * 70
-         set map_x + 35
+         set map_x * 210
+         set map_x + 105
          set map_y = map_here(y)
          set map_y + map_offset_y
-         set map_y * 70
-         set map_y + 35
+         set map_y * 210
+         set map_y + 105
 
          # Draw a short stub from the source node in the direction of the
          # destination. Two adjacent visited rooms each draw a stub toward
@@ -233,11 +239,11 @@ select VISITED map_here
          set map_dest_x = map_stub_x
          set map_dest_y = map_stub_y
          ifall map_stub_x != 0 : map_stub_y != 0
-            set map_dest_x * 57
-            set map_dest_y * 57
+            set map_dest_x * 171
+            set map_dest_y * 171
          else
-            set map_dest_x * 40
-            set map_dest_y * 40
+            set map_dest_x * 120
+            set map_dest_y * 120
          endif
          set map_dest_x + map_x
          set map_dest_y + map_y
@@ -256,12 +262,12 @@ select VISITED map_here
    else
    set map_x = map_here(x)
    set map_x + map_offset_x
-   set map_x * 70
-   set map_x + 5
+   set map_x * 210
+   set map_x + 75
    set map_y = map_here(y)
    set map_y + map_offset_y
-   set map_y * 70
-   set map_y + 5
+   set map_y * 210
+   set map_y + 75
    write "var node = paper.rect(" map_x ", " map_y ", 60, 60, 10);"
    if map_here = here
       write "node.attr(~fill~, ~#BDD8D6~);"
@@ -346,12 +352,12 @@ execute "+map_body"
 # Centre the popup's map container on `here`.
 set map_x = here(x)
 set map_x + map_offset_x
-set map_x * 70
-set map_x + 35
+set map_x * 210
+set map_x + 105
 set map_y = here(y)
 set map_y + map_offset_y
-set map_y * 70
-set map_y + 35
+set map_y * 210
+set map_y + 105
 write "var c = mapWindow.document.getElementById(~jacl_map~);"
 write "if (c) { c.scrollLeft = " map_x " - mapWindow.innerWidth / 2; c.scrollTop = " map_y " - mapWindow.innerHeight / 2; }"
 
@@ -390,12 +396,12 @@ if map_window_mode = 1
    execute "+map_body"
    set map_x = here(x)
    set map_x + map_offset_x
-   set map_x * 70
-   set map_x + 35
+   set map_x * 210
+   set map_x + 105
    set map_y = here(y)
    set map_y + map_offset_y
-   set map_y * 70
-   set map_y + 35
+   set map_y * 210
+   set map_y + 105
    write "var c = mapWindow.document.getElementById(~jacl_map~);"
    write "if (c) { c.scrollLeft = " map_x " - mapWindow.innerWidth / 2; c.scrollTop = " map_y " - mapWindow.innerHeight / 2; }"
    write "});"
