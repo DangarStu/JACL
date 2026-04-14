@@ -42,7 +42,10 @@
 # Exit lines are drawn for every exit from a visited location, including
 # exits whose destination has not yet been visited -- so the map shows
 # where the player can go, but not what is there until they arrive. The
-# current location (`here`) is highlighted.
+# current location (`here`) is highlighted. Before rendering, the library
+# measures the bounding box of the content and sizes the canvas tightly
+# around it (so early-game maps aren't lost in a huge empty 1500x1500
+# canvas).
 #
 # HOOK NOTE
 # ---------
@@ -50,11 +53,14 @@
 # hook. If your game already defines +after_look for something else,
 # you'll need to merge that logic with this library's emission block.
 
-# Layout constants (inlined below because JACL constants aren't accepted
-# inside `set` arithmetic or `write` argument lists):
-#   grid size   = 100 pixels per unit of (x, y)
-#   node size   = 60x60 pixels with 10-pixel rounded corners
-#   canvas size = 1500x1500 pixels
+# Layout constants used below (inlined because JACL constants aren't
+# accepted inside arithmetic or write argument lists):
+#   grid size        = 100 pixels per unit of (x, y)
+#   node size        = 60x60 pixels with 10-pixel rounded corners
+#   padding          = 1 grid cell on each side of content
+#   label overhang   = 40 extra pixels of canvas on the right/bottom
+#                      so long labels that extend past their node
+#                      aren't clipped
 
 integer map_here
 integer map_target
@@ -65,6 +71,17 @@ integer map_dest_y
 integer map_loop
 integer map_window_mode 0
 
+# Bounding-box globals populated by +map_bounds and consumed by +map_body.
+integer map_bounds_init
+integer map_min_x
+integer map_max_x
+integer map_min_y
+integer map_max_y
+integer map_offset_x
+integer map_offset_y
+integer map_canvas_w
+integer map_canvas_h
+
 grammar map >map
 grammar m >map
 grammar map window >map_window_on
@@ -72,17 +89,100 @@ grammar map open >map_window_on
 grammar map close >map_window_off
 
 # -------------------------------------------------------------------
+# +map_bounds -- sweep visited locations and their exit destinations to
+# compute the bounding box, then set map_offset_x/y and map_canvas_w/h.
+# No output; just sets globals.
+# -------------------------------------------------------------------
+
+{+map_bounds
+set map_bounds_init = 0
+set map_min_x = 0
+set map_max_x = 0
+set map_min_y = 0
+set map_max_y = 0
+
+select VISITED map_here
+   if map_here hasnt LOCATION
+      # Skip closed objects -- see note in +map_body.
+   else
+      # Expand bounds to include this visited location.
+      if map_bounds_init = 0
+         set map_min_x = map_here(x)
+         set map_max_x = map_here(x)
+         set map_min_y = map_here(y)
+         set map_max_y = map_here(y)
+         set map_bounds_init = 1
+      else
+         if map_here(x) < map_min_x
+            set map_min_x = map_here(x)
+         endif
+         if map_here(x) > map_max_x
+            set map_max_x = map_here(x)
+         endif
+         if map_here(y) < map_min_y
+            set map_min_y = map_here(y)
+         endif
+         if map_here(y) > map_max_y
+            set map_max_y = map_here(y)
+         endif
+      endif
+
+      # Also include each exit destination so lines to unvisited rooms
+      # don't run off the canvas.
+      set map_loop = 0
+      repeat
+         ifall map_here(map_loop) != nowhere : map_here(map_loop) != NO_GO
+            set map_target = map_here(map_loop)
+            if map_target(x) < map_min_x
+               set map_min_x = map_target(x)
+            endif
+            if map_target(x) > map_max_x
+               set map_max_x = map_target(x)
+            endif
+            if map_target(y) < map_min_y
+               set map_min_y = map_target(y)
+            endif
+            if map_target(y) > map_max_y
+               set map_max_y = map_target(y)
+            endif
+         endif
+         set map_loop + 1
+      until map_loop = 12
+   endif
+endselect
+
+# offset shifts content so the min coord maps to grid cell 1 (one cell
+# of padding on the left/top).
+set map_offset_x = 1
+set map_offset_x - map_min_x
+set map_offset_y = 1
+set map_offset_y - map_min_y
+
+# canvas = (content-span-in-cells + 2 cells padding) * 100 + label overhang
+set map_canvas_w = map_max_x
+set map_canvas_w - map_min_x
+set map_canvas_w + 2
+set map_canvas_w * 100
+set map_canvas_w + 40
+
+set map_canvas_h = map_max_y
+set map_canvas_h - map_min_y
+set map_canvas_h + 2
+set map_canvas_h * 100
+set map_canvas_h + 40
+}
+
+# -------------------------------------------------------------------
 # +map_body -- emits the paper.path(...) and paper.rect/text(...) calls
-# for the current game state. Caller is responsible for wrapping this in
-# <script>...</script> with `var paper = ...` defined beforehand and for
-# toggling `linebreaks` off/on around the emission.
+# for the current game state. Caller is responsible for:
+#   1. Calling +map_bounds first so offsets are valid
+#   2. Wrapping this in <script>...</script>
+#   3. Defining `var paper = Raphael(...)` with map_canvas_w x map_canvas_h
+#   4. Toggling `linebreaks` off/on around the emission
 # -------------------------------------------------------------------
 
 {+map_body
 # DRAW EXIT LINES FROM EVERY VISITED LOCATION.
-# Iterates all 12 compass exits; any non-zero, non-NO_GO destination gets a
-# line drawn to its (x, y). Destinations that are themselves unvisited still
-# get a line -- that's the "you can go this way, contents unknown" hint.
 # The LOCATION guard is load-bearing: `select VISITED` actually tests bit 1
 # of the attributes field, which means "VISITED" on a location but "CLOSED"
 # on an object -- so without the guard we'd also iterate every closed
@@ -95,17 +195,21 @@ select VISITED map_here
    repeat
       ifall map_here(map_loop) != nowhere : map_here(map_loop) != NO_GO
          set map_x = map_here(x)
+         set map_x + map_offset_x
          set map_x * 100
          set map_x + 35
          set map_y = map_here(y)
+         set map_y + map_offset_y
          set map_y * 100
          set map_y + 35
 
          set map_target = map_here(map_loop)
          set map_dest_x = map_target(x)
+         set map_dest_x + map_offset_x
          set map_dest_x * 100
          set map_dest_x + 35
          set map_dest_y = map_target(y)
+         set map_dest_y + map_offset_y
          set map_dest_y * 100
          set map_dest_y + 35
 
@@ -122,9 +226,11 @@ select VISITED map_here
       # Not a location -- skip, same reason as above.
    else
    set map_x = map_here(x)
+   set map_x + map_offset_x
    set map_x * 100
    set map_x + 5
    set map_y = map_here(y)
+   set map_y + map_offset_y
    set map_y * 100
    set map_y + 5
    write "var node = paper.rect(" map_x ", " map_y ", 60, 60, 10);"
@@ -149,16 +255,15 @@ endselect
 # -------------------------------------------------------------------
 
 {+map
+execute "+map_bounds"
 set linebreaks = false
 write "<div id=~jacl_map~></div>"
 write "<script>"
-write "var paper = Raphael(~jacl_map~, 1500, 1500, null);"
+write "var paper = Raphael(~jacl_map~, " map_canvas_w ", " map_canvas_h ", null);"
 execute "+map_body"
 
 # SCROLL THE MAIN TEXT PANE TO THE BOTTOM so the freshly inserted map
-# is visible (the map itself is a 1500-px-tall SVG at the end of
-# #maintext, so without this the viewport stays wherever it was and
-# the user only sees prose above the map).
+# is visible.
 write "var mapMain = document.getElementById(~main~);"
 write "if (mapMain) { mapMain.scrollTop = mapMain.scrollHeight; }"
 write "</script>"
@@ -172,18 +277,21 @@ set time = false
 # -------------------------------------------------------------------
 
 {+map_window_on
+execute "+map_bounds"
 set map_window_mode = 1
 set linebreaks = false
 write "<script>"
 write "window.jaclMapMode = 1;"
-write "jaclDrawMapInPopup(function(paper, mapWindow) {"
+write "jaclDrawMapInPopup(" map_canvas_w ", " map_canvas_h ", function(paper, mapWindow) {"
 execute "+map_body"
 
 # Centre the popup's map container on `here`.
 set map_x = here(x)
+set map_x + map_offset_x
 set map_x * 100
 set map_x + 35
 set map_y = here(y)
+set map_y + map_offset_y
 set map_y * 100
 set map_y + 35
 write "var c = mapWindow.document.getElementById(~jacl_map~);"
@@ -216,15 +324,18 @@ set time = false
 
 {+after_look
 if map_window_mode = 1
+   execute "+map_bounds"
    set linebreaks = false
    write "<script>"
    write "if (window.jaclMapMode && typeof jaclDrawMapInPopup === ~function~) {"
-   write "jaclDrawMapInPopup(function(paper, mapWindow) {"
+   write "jaclDrawMapInPopup(" map_canvas_w ", " map_canvas_h ", function(paper, mapWindow) {"
    execute "+map_body"
    set map_x = here(x)
+   set map_x + map_offset_x
    set map_x * 100
    set map_x + 35
    set map_y = here(y)
+   set map_y + map_offset_y
    set map_y * 100
    set map_y + 35
    write "var c = mapWindow.document.getElementById(~jacl_map~);"

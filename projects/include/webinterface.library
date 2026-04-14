@@ -158,21 +158,21 @@ print:
       return w;^
    }^
 
-   function jaclDrawMapInPopup(drawFn) {^
-      var w = jaclEnsureMapPopup();^
-      if (!w) return;^
+   function jaclDrawMapInPopup(canvasW, canvasH, drawFn) {^
+      var popup = jaclEnsureMapPopup();^
+      if (!popup) return;^
       var tries = 0;^
       var attempt = function() {^
-         if (w.closed) { jaclMapPopup = null; return; }^
-         if (!w.Raphael || !w.document.getElementById('jacl_map')) {^
+         if (popup.closed) { jaclMapPopup = null; return; }^
+         if (!popup.Raphael || !popup.document.getElementById('jacl_map')) {^
             if (++tries > 60) return;^
             setTimeout(attempt, 50);^
             return;^
          }^
-         var container = w.document.getElementById('jacl_map');^
+         var container = popup.document.getElementById('jacl_map');^
          container.innerHTML = '';^
-         var paper = w.Raphael('jacl_map', 1500, 1500, null);^
-         try { drawFn(paper, w); } catch (e) { /* ignore draw errors */ }^
+         var paper = popup.Raphael('jacl_map', canvasW, canvasH, null);^
+         try { drawFn(paper, popup); } catch (e) { /* ignore draw errors */ }^
       };^
       attempt();^
    }^
