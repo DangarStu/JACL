@@ -197,11 +197,13 @@ select VISITED map_here
          set map_y * 70
          set map_y + 35
 
-         # Destination GRID coords: always a 1-cell stub in the direction
-         # of the destination (sign of delta on each axis). Adjacent
-         # destinations (the usual case) land exactly on the neighbour's
-         # node; distant destinations get a short stub that hints at
-         # direction without crossing intermediate visited rooms.
+         # Draw a short stub from the source node in the direction of the
+         # destination: 40 px from source centre, i.e. 10 px past the node
+         # edge (nodes are 60 px). Two adjacent visited rooms each draw a
+         # stub toward each other; those stubs overlap in the middle and
+         # read as a single connecting line. A visited room with an
+         # unvisited exit shows just its own 10-px whisker -- a hint that
+         # an exit exists without pulling the eye across empty space.
          set map_stub_x = 0
          if map_target(x) > map_here(x)
             set map_stub_x = 1
@@ -216,18 +218,12 @@ select VISITED map_here
          if map_target(y) < map_here(y)
             set map_stub_y = -1
          endif
-         set map_dest_x = map_here(x)
-         set map_dest_x + map_stub_x
-         set map_dest_y = map_here(y)
-         set map_dest_y + map_stub_y
-
-         # Destination pixel (center of target cell).
-         set map_dest_x + map_offset_x
-         set map_dest_x * 70
-         set map_dest_x + 35
-         set map_dest_y + map_offset_y
-         set map_dest_y * 70
-         set map_dest_y + 35
+         set map_dest_x = map_stub_x
+         set map_dest_x * 40
+         set map_dest_x + map_x
+         set map_dest_y = map_stub_y
+         set map_dest_y * 40
+         set map_dest_y + map_y
 
          write "paper.path(~M" map_x " " map_y "L" map_dest_x " " map_dest_y "~).attr(~stroke~, ~#888~);"
       endif
