@@ -281,9 +281,9 @@ write "</div>"
       write "</div>"
    endif
 write "<div id=~footer~>^"
-write "<div class=~directions~>"
-execute "+exits"
-write "</div>"
+# Directions bar removed: the page-footer emission runs only on
+# initial page load, so the bar showed stale exits after every ajax
+# command. The +exits verb still works as an in-game command.
 write "<form id=~commandForm~ name=~JACLGameForm~ method=~get~ autocomplete=~off~ onsubmit=~return submitForm(event);~>"
 write "<div class=~command_prompt~>^"
 prompt "KeyPressed();"
