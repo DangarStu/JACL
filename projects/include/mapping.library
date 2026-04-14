@@ -270,53 +270,44 @@ select VISITED map_here
 
          # ARROWHEADS FOR UP/DOWN EXITS
          #
-         # The arrow is drawn at the LOWER room's edge on the line,
-         # pointing into the lower room. This way BOTH sides of a
-         # matched up/down pair (down from the higher room, up from the
-         # lower room) produce the same arrow at the same position --
-         # they coincide into a single visible arrowhead. For an
-         # unvisited destination only one side is drawn but the
-         # placement still reads correctly.
+         # The arrow sits at the midpoint of the connecting line,
+         # pointing toward the LOWER room. Midpoint is always exactly on
+         # the line regardless of the line's slope (an offset like
+         # dest - stub*30 only works for 45-degree diagonals), and both
+         # sides of a matched up/down pair compute the same midpoint --
+         # so the two sides' arrows coincide into a single visible one.
          #
-         # For a DOWN exit (map_loop = 9), lower room = destination.
-         # Arrow position = dest_centre - stub*30 (dest's edge facing
-         # source); arrow points along the stub.
-         #
-         # For an UP exit (map_loop = 8), lower room = source. Arrow
-         # position = source_centre + stub*30 (source's edge facing
-         # destination); arrow points opposite the stub (back into
-         # source).
+         # For DOWN exit (map_loop = 9): lower room = destination, arrow
+         # points along the stub.
+         # For UP exit (map_loop = 8): lower room = source, arrow points
+         # opposite the stub.
          set map_arrow_dx = 0
          set map_arrow_dy = 0
          set map_arrow_pos_x = 0
          set map_arrow_pos_y = 0
          if map_loop = 8
-            # UP exit
+            # UP: arrow direction = -stub (toward source)
             set map_arrow_dx = 0
             set map_arrow_dx - map_stub_x
             set map_arrow_dy = 0
             set map_arrow_dy - map_stub_y
-            set map_arm_x = map_stub_x
-            set map_arm_x * 30
             set map_arrow_pos_x = map_x
-            set map_arrow_pos_x + map_arm_x
-            set map_arm_y = map_stub_y
-            set map_arm_y * 30
+            set map_arrow_pos_x + map_dest_x
+            set map_arrow_pos_x / 2
             set map_arrow_pos_y = map_y
-            set map_arrow_pos_y + map_arm_y
+            set map_arrow_pos_y + map_dest_y
+            set map_arrow_pos_y / 2
          endif
          if map_loop = 9
-            # DOWN exit
+            # DOWN: arrow direction = stub (toward destination)
             set map_arrow_dx = map_stub_x
             set map_arrow_dy = map_stub_y
-            set map_arm_x = map_stub_x
-            set map_arm_x * 30
-            set map_arrow_pos_x = map_dest_x
-            set map_arrow_pos_x - map_arm_x
-            set map_arm_y = map_stub_y
-            set map_arm_y * 30
-            set map_arrow_pos_y = map_dest_y
-            set map_arrow_pos_y - map_arm_y
+            set map_arrow_pos_x = map_x
+            set map_arrow_pos_x + map_dest_x
+            set map_arrow_pos_x / 2
+            set map_arrow_pos_y = map_y
+            set map_arrow_pos_y + map_dest_y
+            set map_arrow_pos_y / 2
          endif
          ifall map_arrow_dx = 0 : map_arrow_dy = 0
             # Not an up/down exit, skip arrow.
