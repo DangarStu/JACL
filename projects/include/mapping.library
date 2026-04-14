@@ -73,6 +73,9 @@ integer map_stub_x
 integer map_stub_y
 integer map_loop
 integer map_window_mode 0
+integer map_word_count
+integer map_word_index
+string map_label_parts
 
 # Bounding-box globals populated by +map_bounds and consumed by +map_body.
 integer map_bounds_init
@@ -265,11 +268,28 @@ select VISITED map_here
       write "node.attr(~fill~, ~#eee~);"
    endif
 
-   # CENTRE THE LABEL.
+   # CENTRE THE LABEL. If the name has multiple words, put the first on
+   # the top line and the rest on the bottom line so the label stays
+   # inside the 60-px square node.
    set map_x + 30
    set map_y + 30
    write "paper.text(" map_x ", " map_y ", ~"
-   write map_here{The}
+   split map_word_count map_here{The} " " map_label_parts
+   if map_word_count = 0
+      # Single word / split returned nothing splittable.
+      write map_here{The}
+   else
+      write map_label_parts[0]
+      write "\n"
+      set map_word_index = 1
+      repeat
+         if map_word_index > 1
+            write " "
+         endif
+         write map_label_parts[map_word_index]
+         set map_word_index + 1
+      until map_word_index = map_word_count
+   endif
    write "~);"
    endif
 endselect
