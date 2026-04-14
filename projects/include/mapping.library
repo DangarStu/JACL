@@ -70,7 +70,14 @@ write "var paper = Raphael(~jacl_map~, 1500, 1500, null);"
 # Iterates all 12 compass exits; any non-zero, non-NO_GO destination gets a
 # line drawn to its (x, y). Destinations that are themselves unvisited still
 # get a line -- that's the "you can go this way, contents unknown" hint.
+# The LOCATION guard is load-bearing: `select VISITED` actually tests bit 1
+# of the attributes field, which means "VISITED" on a location but "CLOSED"
+# on an object -- so without the guard we'd also iterate every closed
+# container/drawer in the game (which have no x/y and stack at the origin).
 select VISITED map_here
+   if map_here hasnt LOCATION
+      # Not a location (a closed object matching bit 1). Skip.
+   else
    set map_loop = 0
    repeat
       ifall map_here(map_loop) != nowhere : map_here(map_loop) != NO_GO
@@ -93,10 +100,14 @@ select VISITED map_here
       endif
       set map_loop + 1
    until map_loop = 12
+   endif
 endselect
 
 # DRAW A LABELLED NODE FOR EACH VISITED LOCATION.
 select VISITED map_here
+   if map_here hasnt LOCATION
+      # Not a location -- skip, same reason as above.
+   else
    set map_x = map_here(x)
    set map_x * 100
    set map_x + 5
@@ -116,6 +127,7 @@ select VISITED map_here
    write "paper.text(" map_x ", " map_y ", ~"
    write map_here{The}
    write "~);"
+   endif
 endselect
 
 # CENTRE THE VIEWPORT ON THE CURRENT LOCATION.
