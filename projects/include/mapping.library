@@ -76,7 +76,7 @@ integer map_window_mode 0
 integer map_word_count
 integer map_word_index
 integer map_label_y
-string map_label_parts
+string_array map_label_parts 8
 
 # Bounding-box globals populated by +map_bounds and consumed by +map_body.
 integer map_bounds_init
