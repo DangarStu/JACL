@@ -104,7 +104,10 @@ def main():
     changed = []
     for path in iter_jacl_paths(args.paths):
         try:
-            original = path.read_text()
+            # surrogateescape lets us round-trip non-UTF-8 bytes (e.g.
+            # smart quotes from Windows-1252) without losing data.
+            with open(path, "r", encoding="utf-8", errors="surrogateescape") as f:
+                original = f.read()
         except OSError as e:
             print(f"warning: cannot read {path}: {e}", file=sys.stderr)
             continue
@@ -114,7 +117,8 @@ def main():
                 changed.append(path)
                 print(f"would reformat {path}")
             else:
-                path.write_text(formatted)
+                with open(path, "w", encoding="utf-8", errors="surrogateescape") as f:
+                    f.write(formatted)
                 changed.append(path)
                 print(f"reformatted {path}")
 
