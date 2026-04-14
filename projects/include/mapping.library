@@ -275,19 +275,21 @@ select VISITED map_here
    set map_y + 30
    write "paper.text(" map_x ", " map_y ", ~"
    split map_word_count map_here{The} " " map_label_parts
-   if map_word_count = 0
-      # Single word / split returned nothing splittable.
+   if map_word_count < 2
+      # Single word or unsplittable -- render the whole name on one line.
       write map_here{The}
    else
-      write map_label_parts[0]
+      # Multi-word: first word on top line, remaining joined on bottom.
+      set map_word_index = 0
+      write map_label_parts[map_word_index]
       write "\n"
       set map_word_index = 1
       repeat
-         if map_word_index > 1
-            write " "
-         endif
          write map_label_parts[map_word_index]
          set map_word_index + 1
+         if map_word_index < map_word_count
+            write " "
+         endif
       until map_word_index = map_word_count
    endif
    write "~);"
