@@ -94,14 +94,35 @@ synonym n               north
 synonym utara           north
 synonym ne              northeast
 synonym nw              northwest
-synonym u               up
 synonym atas            up
+synonym naik            up
 synonym d               down
 synonym bawah           down
+synonym turun           down
 synonym l               look
 synonym lihat           look
 synonym beneath         under
 synonym bawah           under
+
+# Indonesian single-letter direction shortcuts.
+# u=utara, s=selatan, t=timur, b=barat (each Indonesian word's first
+# letter; t and b are committed to the cardinal direction rather than
+# the diagonal/vertical variants, which use two-letter shortcuts below).
+synonym u               north
+synonym t               east
+synonym b               west
+
+# Two-letter Indonesian direction shortcuts for cases where the single
+# letter is already taken or ambiguous.
+synonym tl              northeast    # timurlaut
+synonym tg              southeast    # tenggara
+synonym bl              northwest    # baratlaut
+synonym bd              southwest    # baratdaya
+synonym tr              down         # turun (t is taken by timur)
+synonym nk              up           # naik (n is taken by north)
+synonym mk              in           # masuk
+synonym kl              out          # keluar
+synonym lh              look         # lihat (l alone is already 'look')
 
 # Indonesian equivalents of built-in commands are handled by the
 # constants in indonesian.library (RESTART_WORD, QUIT_WORD, etc.)
