@@ -25,12 +25,12 @@ constant image_unholygrail 1
 attribute CUSTOM1 CUSTOM2 CUSTOM3 CUSTOM4 CUSTOM5
 
 location control_centre : control centre
- short		the "control centre"
- has		KNOWN
- south		pool
- out		pool
- x		1
- y		0
+ short         the "control centre"
+ has           KNOWN
+ south         pool
+ out           pool
+ x             1
+ y             0
 
 {eachturn
 ifall screen has ON : lisa has CUSTOM4 : lisa(parent) = control_centre
@@ -117,8 +117,8 @@ proxy "sit in chair"
 
 object whale: humpback whale whales
  static
- short		a "whale"
- parent		nowhere
+ short         a "whale"
+ parent        nowhere
 
 {look_up_in_book
 write "whale^"
@@ -129,7 +129,7 @@ write "suborder Mysticeti, and the suborder Odontoceti.^"
 }
 
 object rec_window: wide rectangular window
- short		a "wide rectangular window"
+ short         a "wide rectangular window"
 
 {examine : look_through
 if blinds has CLOSED
@@ -141,7 +141,7 @@ write "ocean horizon spanning the heads of the lagoon.^"
 }
 
 object doorway: doorway door frame
- short		a "doorway frame"
+ short         a "doorway frame"
 
 {enter
 proxy "s"
@@ -156,8 +156,8 @@ write "There is a light switch attached to the door frame.^"
 }
 
 object blinds: blinds
- has		CLOSABLE DAMAGED PLURAL
- short		some "blinds"
+ has           CLOSABLE DAMAGED PLURAL
+ short         some "blinds"
 
 {close
 if blinds has CLOSED
@@ -207,7 +207,7 @@ ensure blinds hasnt DAMAGED
 }
 
 object rod: plastic rod
- short		a "plastic rod"
+ short         a "plastic rod"
 
 {examine : take
 write "The plastic rod is attached to the blinds and can be turned in order "
@@ -222,8 +222,8 @@ else
 }
 
 object light: main fluorescent light
- has		ON 
- short		a "main fluorescent light"
+ has           ON
+ short         a "main fluorescent light"
 
 {turn_on 
 proxy "turn on switch"
@@ -234,8 +234,8 @@ proxy "turn off switch"
 }
 
 object switch: main fluorescent light switch
- has		ON 
- short		a "light switch"
+ has           ON
+ short         a "light switch"
 
 {examine
 write "Simple, yet sturdy, the switch is in the "
@@ -280,7 +280,7 @@ look
 }
 
 object chair: red leather chair
- short		a "red leather chair"
+ short         a "red leather chair"
  
 {sit_on_override
 if player has SITTING
@@ -298,11 +298,11 @@ write "upon a single steel column directly in front of the control panel.^"
 }
 
 object c_pass: my civilian identification pass id card
- has		WEARABLE WORN
- long		"Your civilian identification pass is here.^"
- short		your "civilian pass"
- parent		kryten
- mass		2
+ has           WEARABLE WORN
+ long          "Your civilian identification pass is here.^"
+ short         your "civilian pass"
+ parent        kryten
+ mass          2
 
 {examine : read
 write "Your name, Dr Alex Meadows, and your authority level are printed "
@@ -328,16 +328,16 @@ write "this point.~^"
 }
 
 object signature: signature
- short		your "signature"
- parent		c_pass
+ short         your "signature"
+ parent        c_pass
 
 {examine : read
 write "A barely discernable squiggle.^"
 }
 
 object bar_code: bar code strip
- short		a "bar code"
- parent		c_pass
+ short         a "bar code"
+ parent        c_pass
 
 {examine
 write "The thought has often crossed your mind to swipe your card at the "
@@ -345,19 +345,19 @@ write "supermarket to find out what you're worth, but so far you've resisted.^"
 }
 
 object authority: authority level
- short		your "authority level"
- parent		c_pass
+ short         your "authority level"
+ parent        c_pass
 
 {read : examine
 write "Your pass clearly identifies you as a civilian.^"
 }
 
 object lisa: lisa
- has		ANIMATE FEMALE POSSESSIVE
- long		function
- short		name "Lisa"
- mass		heavy 
- quantity	20
+ has           ANIMATE FEMALE POSSESSIVE
+ long          function
+ short         name "Lisa"
+ mass          heavy
+ quantity      20
 
 {long
 if lisa(status) = 0 
@@ -732,21 +732,21 @@ execute "+game_over"
 }
 
 object research: research project work
- short		a "research project"
- parent		nowhere
+ short         a "research project"
+ parent        nowhere
  static
 
 object tests: human test subjects tests experiment experiments
- short		a "human tests"
- parent		nowhere
+ short         a "human tests"
+ parent        nowhere
  static
 
 object m_pass: lisas lisa's military identification pass id
- has		WEARABLE WORN
- long		"Lisa's military identification pass is here.^"
- short		a "military identification pass"
- mass		2
- parent		lisa 
+ has           WEARABLE WORN
+ long          "Lisa's military identification pass is here.^"
+ short         a "military identification pass"
+ mass          2
+ parent        lisa
 
 {take
 if lisa has CUSTOM2
@@ -787,10 +787,10 @@ write "asking questions,~ the stranger warns.^"
 }
 
 object pistol: lisas lisa's military gun issue pistol
- short		name "Lisa's pistol"
- long		"Lisa's pistol rests here.^"
- mass		8
- parent		lisa
+ short         name "Lisa's pistol"
+ long          "Lisa's pistol rests here.^"
+ mass          8
+ parent        lisa
 
 {take
 if pistol(parent) = lisa
@@ -801,7 +801,7 @@ return false
 }
 
 object panel: control panel instrument instruments
- short		a "long control panel"
+ short         a "long control panel"
  
 {examine
 write "A large circular radar screen dominates the long control panel. To its "
@@ -816,21 +816,21 @@ write "wouldn't know where to begin to bring it all back up online.^"
 }
 
 object speaker: small audio speaker under shiny grill
- short		an "small audio speaker"
+ short         an "small audio speaker"
 
 {examine
 write "The small audio speaker is covered by a shiny metal grill.^"
 }
 
 object grill: shiny metal grill
- short		a "shiny metal grill"
+ short         a "shiny metal grill"
 
 {examine
 write "The shiny metal grill is covering a small audio speaker.^"
 }
 
 object red_light: red dome shaped light dome-shaped
- short		a "red light"
+ short         a "red light"
 
 {examine
 if red_light hasnt ON
@@ -842,7 +842,7 @@ write "at a regular rate.^"
 }
 
 object screen: radar circular screen
- short		a "circular screen"
+ short         a "circular screen"
 
 {examine
 write "Two perpendicular fine white lines form a large cross hair on the "
@@ -875,15 +875,15 @@ write "wouldn't know where to begin to bring it all back up online.^"
 }
 
 object blob: large blob 
- short		a "large blob"
- parent		nowhere
+ short         a "large blob"
+ parent        nowhere
 
 {examine
 write "The blob is at -171deg14'02.15~ longitude and -23deg34'86.21~ latitude.^"
 }
 
 object dial: dial
- short		a "dial"
+ short         a "dial"
 
 {examine
 if dial(quantity) = 1
@@ -904,12 +904,12 @@ set dial(quantity) = 0
 }
 
 location your_quarters : my quarters
- short		name "your quarters"
- has		KNOWN
- north		quarters
- out		quarters
- x		2
- y		2
+ short         name "your quarters"
+ has           KNOWN
+ north         quarters
+ out           quarters
+ x             2
+ y             2
 
 {movement
 if destination = nowhere
@@ -930,9 +930,9 @@ write "green clothes trunk.^"
 }
 
 object your_bunk: your plain bunk bed
- has		SURFACE
- short		name "your bunk bed"
- quantity	50
+ has           SURFACE
+ short         name "your bunk bed"
+ quantity      50
 
 {jump_on
 write "You have to sleep in there don't forget.^"
@@ -958,7 +958,7 @@ write "But you like it messy.^"
 }
 
 object circus: flea circus
- short		the "flea circus"
+ short         the "flea circus"
 
 {examine
 write "There is a sign at the front gate that reads, ~ADMISSION PRICE: ONE "
@@ -975,7 +975,7 @@ set time = false
 }
 
 object your_window: your my small round window
- short		name "your round window"
+ short         name "your round window"
 
 {look_through : examine
 write "The window appears to be made from some sort of plastic. "
@@ -997,15 +997,15 @@ write "Control yourself, Dr Meadows!^"
 }
 
 object trunk: bright green trunk
- has		CONTAINER CLOSED CLOSABLE
- short		a "bright green trunk"
- quantity	15
+ has           CONTAINER CLOSED CLOSABLE
+ short         a "bright green trunk"
+ quantity      15
  
 object your_clothes: my clothes
- has		PLURAL
- short		your "clothes"
- parent 	trunk
- mass		heavy
+ has           PLURAL
+ short         your "clothes"
+ parent        trunk
+ mass          heavy
  
 {examine
 write "Just clothes.^"
@@ -1030,12 +1030,12 @@ write "The foot of your bunk is behind the trunk.^"
 }
 
 location lisas_quarters: lisas lisa's quarters
- short		name "Lisa's quarters"
- has		KNOWN
- west		quarters
- out		quarters
- x		3
- y		1
+ short         name "Lisa's quarters"
+ has           KNOWN
+ west          quarters
+ out           quarters
+ x             3
+ y             1
 
 {look
 if here has VISITED
@@ -1053,9 +1053,9 @@ write "The room smells vaguely of Lisa's perfume.^"
 }
 
 object lisas_bunk: lisas lisa's bunk bed
- has		SURFACE
- short		name "Lisa's bunk bed"
- quantity	50
+ has           SURFACE
+ short         name "Lisa's bunk bed"
+ quantity      50
 
 {lie_on : enter
 write "Lisa would be far from impressed to walk in and find you lounging "
@@ -1074,7 +1074,7 @@ write "Nothing but dust.^"
 }
 
 object lisas_window: lisas lisa's small round window
- short		name "Lisa's round window"
+ short         name "Lisa's round window"
 
 {look_through : examine
 write "Through the window you can see out across the lagoon to the hills "
@@ -1091,18 +1091,18 @@ write "Control yourself, Dr Meadows!^"
 }
 
 object wardrobe: lisas lisa's wardrobe
- has		CLOSABLE CLOSED CONTAINER
- short		name "Lisa's wardrobe"
- quantity	20
+ has           CLOSABLE CLOSED CONTAINER
+ short         name "Lisa's wardrobe"
+ quantity      20
 
 {look_behind
 write "Just a wall.^"
 }
 
 object lisas_clothes: lisas lisa's clothes
- has		PLURAL
- short		name "Lisa's clothes"
- parent 	wardrobe
+ has           PLURAL
+ short         name "Lisa's clothes"
+ parent        wardrobe
 
 {take
 write "I don't think Lisa would appreciate you walking off with her clothes.^"
@@ -1114,14 +1114,14 @@ write "You don't find anything that suits you.^"
 }
 
 location quarters: quarters common area
- short		the "common area"
- has		KNOWN
- west		pool
- north		bathroom
- south		your_quarters
- east		lisas_quarters
- x		2
- y		1
+ short         the "common area"
+ has           KNOWN
+ west          pool
+ north         bathroom
+ south         your_quarters
+ east          lisas_quarters
+ x             2
+ y             1
 
 {movement
 if compass = north 
@@ -1175,9 +1175,9 @@ set time = false
 }
 
 object wooden_chair: simple wooden chair
- short		a "simple wooden chair"
- long		function
- mass		25
+ short         a "simple wooden chair"
+ long          function
+ mass          25
 
 {long
 if wooden_chair hasnt TOUCHED
@@ -1201,7 +1201,7 @@ write "absolutely no aesthetic appeal whatsoever.^"
 }
 
 object sofa: comfortable-looking comfortable looking sofa lounge
- short		a "comfortable-looking sofa"
+ short         a "comfortable-looking sofa"
 
 {examine
 write "Although well padded, the sofa's drab grey fabric is positively "
@@ -1223,8 +1223,8 @@ ensure player has SITTING
 }
 
 object bathroom_door: bathroom door
- has		CLOSABLE LOCKABLE
- short		a "bathroom door"
+ has           CLOSABLE LOCKABLE
+ short         a "bathroom door"
  
 {enter
 if here = quarters
@@ -1329,7 +1329,7 @@ return false
 }
 
 object kitchenette: kitchenette recess kitchen
- short		a "kitchenette"
+ short         a "kitchenette"
 
 {enter
 write "The kitchenette is nothing more than a slight recess in the wall.^"
@@ -1341,7 +1341,7 @@ write "support your fledgling culinary skills.^"
 }
 
 object poster: lisas lisa's blue whale poster
- short		a "whale poster"
+ short         a "whale poster"
 
 {take
 write "The poster belongs to Lisa, so it would only be polite to "
@@ -1355,9 +1355,9 @@ write "daily.^"
 }
 
 object desk: writing desk
- has		SURFACE
- short		a "writing desk"
- quantity	30
+ has           SURFACE
+ short         a "writing desk"
+ quantity      30
  
 {look_under
 write "You stumble across that space where your knees go when you sit at it.^"
@@ -1388,15 +1388,15 @@ proxy "close drawer"
 }
 
 object drawer: writing desk drawer
- has		CONTAINER CLOSABLE CLOSED
- short		a "desk drawer"
- quantity	12
+ has           CONTAINER CLOSABLE CLOSED
+ short         a "desk drawer"
+ quantity      12
 
 object report: final report
- short		your "final report"
- long		"Your final report is here.^"
- parent 	drawer
- mass		2
+ short         your "final report"
+ long          "Your final report is here.^"
+ parent        drawer
+ mass          2
 
 {eat : break
 write "I can understand your want to, but don't.^"
@@ -1453,10 +1453,10 @@ ensure report has TOUCHED
 }
 
 object cassette: microcassette tape cassette
- short		a "microcassette"
- long		"A microcassette lies nearby.^"
- parent 	drawer
- mass		2
+ short         a "microcassette"
+ long          "A microcassette lies nearby.^"
+ parent        drawer
+ mass          2
 
 {hint
 write "To listen to the microcassette, insert it into the tape recorder and "
@@ -1500,10 +1500,10 @@ write "The words ~CASE NOTES~ are written on the tape's label.^"
 }
 
 object book: book science encyclopedia
- short		a "science encyclopedia"
- long		"Your science encyclodedia lies nearby.^"
- mass		6
- parent desk
+ short         a "science encyclopedia"
+ long          "Your science encyclodedia lies nearby.^"
+ mass          6
+ parent        desk
 
 {hint
 write "You can look up various things in the encyclopedia by typing ~look up "
@@ -1524,8 +1524,8 @@ write "away from your main library at home.^"
 }
 
 object rec_speaker: microcassette cassette tape recorder's recorders speaker
- short		a "microcassette recorder's speaker"
- parent 	recorder
+ short         a "microcassette recorder's speaker"
+ parent        recorder
 
 {examine
 write "The speaker on the back of the microcassette recorder is small yet "
@@ -1543,10 +1543,10 @@ write "At the moment, the microcassette recorder is silent.^"
 
 
 object recorder: microcassette cassette tape recorder
- short		a "microcassette recorder"
- long		"There is a microcassette recorder here.^"
- parent 	desk
- mass		4
+ short         a "microcassette recorder"
+ long          "There is a microcassette recorder here.^"
+ parent        desk
+ mass          4
 
 {examine
 write "You use the microcassette recorder to take notes whenever you are "
@@ -1592,8 +1592,8 @@ proxy "press stop button"
 }
 
 object play: play button
- short		a "play button"
- parent recorder
+ short         a "play button"
+ parent        recorder
 
 {press : move
 if cassette(parent) != recorder
@@ -1617,8 +1617,8 @@ ensure recorder has ON
 }
 
 object stop: stop button
- short		a "stop button"
- parent 	recorder
+ short         a "stop button"
+ parent        recorder
 
 {press : move
 if cassette(parent) != recorder
@@ -1636,8 +1636,8 @@ ensure recorder hasnt ON
 }
 
 object forward: fast forward button
- short		a "fast forward button"
- parent 	recorder
+ short         a "fast forward button"
+ parent        recorder
 
 {press : move
 if cassette(parent) != recorder
@@ -1666,8 +1666,8 @@ write "your skip the tape forward.^"
 }
 
 object rewind: rewind button
- short		a "rewind button"
- parent 	recorder
+ short         a "rewind button"
+ parent        recorder
 
 {press : move
 if cassette(parent) != recorder
@@ -1696,8 +1696,8 @@ write "your skip the tape backwards.^"
 }
 
 object record: record button
- short		a "record button"
- parent 	recorder
+ short         a "record button"
+ parent        recorder
 
 {press : move
 if cassette(parent) != recorder
@@ -1710,12 +1710,12 @@ write "removed the write-protect tab from the cassette.^"
 }
 
 location bathroom : bathroom
- short		the "bathroom"
- has		KNOWN
- south		quarters
- out		quarters
- x		2
- y		0
+ short         the "bathroom"
+ has           KNOWN
+ south         quarters
+ out           quarters
+ x             2
+ y             0
 
 {eachturn
 if WATER_LEVEL = 5
@@ -1748,7 +1748,7 @@ write "area.^"
 }
 
 object latch: bathroom door latch
- short		a "door latch"
+ short         a "door latch"
 
 {examine
 write "The door latch is "
@@ -1768,9 +1768,9 @@ proxy "unlock bathroom door"
 }
 
 object vanity: vanity cabinet mirror mirrored door
- has		CONTAINER CLOSABLE CLOSED
- short		a "vanity cabinet"
- quantity	20
+ has           CONTAINER CLOSABLE CLOSED
+ short         a "vanity cabinet"
+ quantity      20
 
 {examine : look_in
 if vanity hasnt CLOSED 
@@ -1785,10 +1785,10 @@ write "the closed mirrored door. You smile, then grimace.^"
 }
    
 object toothbrush: shaggy toothbrush brush
- short		a "shaggy toothbrush"
- long		"Lurking nearby is a shaggy toothbrush.^"
- mass		3
- parent		vanity
+ short         a "shaggy toothbrush"
+ long          "Lurking nearby is a shaggy toothbrush.^"
+ mass          3
+ parent        vanity
 
 {use
 write "You did that when you got up this morning.^"
@@ -1800,10 +1800,10 @@ write "Shaggy, but useable.^"
 }
 
 object soap: bar of soap
- short		a "bar of soap"
- long		"There is a bar of soap here.^"
- mass		5
- parent 	vanity
+ short         a "bar of soap"
+ long          "There is a bar of soap here.^"
+ mass          5
+ parent        vanity
 
 {examine
 if soap has DAMAGED
@@ -1815,10 +1815,10 @@ write "four layers of skin.^"
 }
 
 object q_r_water: small quantity of rain water
- has		LIQUID
- short		a "small quantity of rain water"
- parent		nowhere
- mass		2
+ has           LIQUID
+ short         a "small quantity of rain water"
+ parent        nowhere
+ mass          2
 
 {taste
 write "The rain water tastes wonderfully clean.^"
@@ -1852,9 +1852,9 @@ return false
 }
 
 object r_water: sink load of rain water
- has		LIQUID
- short		a "sink load of rain water"
- parent		nowhere
+ has           LIQUID
+ short         a "sink load of rain water"
+ parent        nowhere
 
 {taste
 write "The rain water tastes wonderfully clean.^"
@@ -1874,9 +1874,9 @@ ensure r_water has CUSTOM4
 }
 
 object sink: sink
- has		CONTAINER
- short		a "sink"
- quantity	20
+ has           CONTAINER
+ short         a "sink"
+ quantity      20
 
 {fill
 proxy "turn on tap"
@@ -1933,8 +1933,8 @@ endall
 }
 
 object sink_tap: plain sink tap
- has		CLOSABLE CLOSED
- short		a "tap"
+ has           CLOSABLE CLOSED
+ short         a "tap"
 
 {examine
 if sink_tap hasnt CLOSED 
@@ -1982,10 +1982,10 @@ ensure sink_tap has CLOSED
 }
 
 object plug: small rubber plug
- short		a "rubber plug"
- long		"A small rubber plug rests on the ground.^"
- parent 	vanity
- mass		2
+ short         a "rubber plug"
+ long          "A small rubber plug rests on the ground.^"
+ parent        vanity
+ mass          2
 
 {insert_in_hole : insert_in_sink
 if WATER_LEVEL = 0
@@ -2041,7 +2041,7 @@ set time = false
 }
 
 object hole: sink plug hole pvc piping
- short		a "plug hole"
+ short         a "plug hole"
 
 {examine
 if plug(parent) = hole
@@ -2054,7 +2054,7 @@ write "the floor, emptying into the lagoon.^"
 }
 
 object drain: floor drain
- short		a "floor drain"
+ short         a "floor drain"
 
 {examine : look_through : look_in
 write "The drain is nothing more than a small hole in the floor through "
@@ -2062,9 +2062,9 @@ write "which you can see down to the surface of the lagoon.^"
 }
 
 object toilet: toilet stainless steel
- has		CONTAINER
- short		a "toilet"
- quantity	5
+ has           CONTAINER
+ short         a "toilet"
+ quantity      5
 
 {flush
 select toilet
@@ -2090,7 +2090,7 @@ set time = false
 }
 
 object lever: small lever
- short		a "small lever"
+ short         a "small lever"
 
 {examine
 write "The small lever can be pulled in order to flush the toilet.^"
@@ -2101,7 +2101,7 @@ proxy "flush toilet"
 }
 
 object shower: shower cubicle 
- short		a "shower cubicle"
+ short         a "shower cubicle"
 
 {clean_with_toothbrush
 write "Well, you sure know how to party.^"
@@ -2117,12 +2117,12 @@ write "one a day, sorry.^"
 }
 
 location storage : storage
- short		the "storage area"
- has		KNOWN
- west		nowhere
- east		pool
- x		0
- y		1
+ short         the "storage area"
+ has           KNOWN
+ west          nowhere
+ east          pool
+ x             0
+ y             1
 
 {movement
 if compass = west
@@ -2156,7 +2156,7 @@ write "north wall.^"
 }
 
 object hose: air refill hose
- short		an "air refill hose"
+ short         an "air refill hose"
 
 {hint
 write "If you empty the scuba cylinder, simply type REFILL TANK while holding "
@@ -2179,8 +2179,8 @@ proxy "refill tank"
 }
 
 object steel_door: steel door
- has		CLOSABLE CLOSED
- short		a "steel door"
+ has           CLOSABLE CLOSED
+ short         a "steel door"
  
 {close_override
 ensure steel_door has CLOSED
@@ -2225,8 +2225,8 @@ proxy "e"
 }
 
 object crates: stack of wooden crate crates supplies
- has		PLURAL
- short		a "wooden crates"
+ has           PLURAL
+ short         a "wooden crates"
 
 {examine
 write "The wooden crates are filled with supplies - enough to sustain you "
@@ -2249,11 +2249,11 @@ write "There is no need to go unpacking the supplies right now.^"
 }
 
 object mask: mask goggles
- plural		scuba gear
- has		WEARABLE
- short		a "scuba mask"
- long		function
- mass		5
+ plural        scuba gear
+ has           WEARABLE
+ short         a "scuba mask"
+ long          function
+ mass          5
 
 {long
 if mask hasnt TOUCHED
@@ -2289,11 +2289,11 @@ write "The mask is made from black silicon with a clear perspex face plate.^"
 }
 
 object fins: set of fin fins flippers flipper
- plural		gear scuba
- has		WEARABLE PLURAL
- short		the "scuba fins"
- long		"A set of scuba fins lie nearby.^"
- mass		5
+ plural        gear scuba
+ has           WEARABLE PLURAL
+ short         the "scuba fins"
+ long          "A set of scuba fins lie nearby.^"
+ mass          5
 
 {examine
 write "The scuba fins are black with a piece of bright yellow tape wrapped "
@@ -2302,11 +2302,11 @@ write "other with the word ~OFF~.^"
 }
 
 object tank: cylinder tank 
- plural		gear scuba
- has		WEARABLE
- short		a "scuba cylinder"
- long		"Standing upright on the ground is a scuba cylinder.^"
- mass		25
+ plural        gear scuba
+ has           WEARABLE
+ short         a "scuba cylinder"
+ long          "Standing upright on the ground is a scuba cylinder.^"
+ mass          25
 
 {hint
 write "You use the scuba cylinder by wearing it. If the cylinder is either empty or "
@@ -2383,9 +2383,9 @@ proxy "refill " noun1{names}
 }
 
 object tap: scuba cylinder tank tap
- has		CLOSABLE CLOSED
- short		a "scuba cylinder tap"
- parent		tank 
+ has           CLOSABLE CLOSED
+ short         a "scuba cylinder tap"
+ parent        tank
  
 {examine
 if tap hasnt CLOSED 
@@ -2441,8 +2441,8 @@ write .^
 }
 
 object regulator: regulator
- short		a "regulator"
- parent tank 
+ short         a "regulator"
+ parent        tank
 
 {examine
 write "Attached by a low pressure hose to the tank, the regulator has a "
@@ -2451,8 +2451,8 @@ write "you to purge any water from within it.^"
 }
 
 object purge: purge button
- short		a "purge button"
- parent tank
+ short         a "purge button"
+ parent        tank
 
 {press : move
 if tank has WORN
@@ -2488,8 +2488,8 @@ set TANK_PRESSURE - 1
 }
 
 object spg: submersible pressure gauge gauges spg
- short		a "submersible pressure gauge"
- parent 	tank 
+ short         a "submersible pressure gauge"
+ parent        tank
 
 {examine : read
 write "Attached by a high pressure hose to the tank, the gauge indicates "
@@ -2516,8 +2516,8 @@ set time = false
 }
 
 object bulb: incandescent light bulb
- has		OUT_OF_REACH
- short		an "incandescent bulb"
+ has           OUT_OF_REACH
+ short         an "incandescent bulb"
 
 {examine
 write "A few moments of staring at the bulb leaves you with an annoying "
@@ -2525,16 +2525,16 @@ write "afterimage.^"
 }
 
 object cage: metal cage
- has		OUT_OF_REACH
- short		a "metal cage"
+ has           OUT_OF_REACH
+ short         a "metal cage"
 
 location lab : lab laboratory
- short		the "laboratory"
- has		KNOWN
- north		pool
- out		pool
- x		1
- y		2
+ short         the "laboratory"
+ has           KNOWN
+ north         pool
+ out           pool
+ x             1
+ y             2
 
 {movement
 if destination = nowhere
@@ -2589,16 +2589,16 @@ set time = false
 }
 
 object lab_equipment: equipment
- short		the "equipment"
+ short         the "equipment"
 
 {examine
 proxy "examine bench"
 }
 
 object bench: long bench table
- has		SURFACE
- short		a "long bench"
- quantity	50
+ has           SURFACE
+ short         a "long bench"
+ quantity      50
 
 {look_under
 write "Beneath the work bench there is about fifteen cubic metres of air.^"
@@ -2611,10 +2611,10 @@ write ^
 }
 
 object gps: gps unit
- short		a "GPS unit"
- long		"There is a GPS unit here.^"
- mass		5
- parent	 	bench
+ short         a "GPS unit"
+ long          "There is a GPS unit here.^"
+ mass          5
+ parent        bench
  
 {examine : read
 write "The GPS unit is a small, sealed plastic device. On its front there "
@@ -2642,11 +2642,11 @@ write "use when swimming in the ocean, though only on the surface.^"
 attribute BUBBLES
 
 object syringe: syringe
- short		a "syringe"
- quantity	2
- parent 	bench
- long		"A syringe rests at your feet.^"
- mass		2
+ short         a "syringe"
+ quantity      2
+ parent        bench
+ long          "A syringe rests at your feet.^"
+ mass          2
 
 {insert_in_fask
 execute "liquid?<noun1"
@@ -2785,10 +2785,10 @@ proxy "inject second dish with syringe"
 }
 
 object blue_slide: blue slide
- short		a "blue slide"
- long		"The blue slide rests nearby.^"
- mass		2
- parent		nowhere
+ short         a "blue slide"
+ long          "The blue slide rests nearby.^"
+ mass          2
+ parent        nowhere
 
 {look_at_through_magnifying_glass
 write "You are going to need a bit more magnification than that.^"
@@ -2819,10 +2819,10 @@ move blue_slide to slot
 }
 
 object purple_slide: purple slide
- long		"The purple slide rests nearby.^"
- short		a "purple slide"
- mass		2
- parent		nowhere
+ long          "The purple slide rests nearby.^"
+ short         a "purple slide"
+ mass          2
+ parent        nowhere
 
 {look_at_through_magnifying_glass
 write "You are going to need a bit more magnification than that.^"
@@ -2854,10 +2854,10 @@ move purple_slide to slot
 }
 
 object red_slide: red slide
- long		"The red slide rests nearby.^"
- short		a "red slide"
- mass		2
- parent		nowhere
+ long          "The red slide rests nearby.^"
+ short         a "red slide"
+ mass          2
+ parent        nowhere
 
 {look_at_through_magnifying_glass
 write "You are going to need a bit more magnification than that.^"
@@ -2888,10 +2888,10 @@ move red_slide to slot
 }
 
 object cyan_slide: cyan slide
- long		"The cyan slide rests nearby.^"
- short		a "cyan slide"
- mass		2
- parent		nowhere
+ long          "The cyan slide rests nearby.^"
+ short         a "cyan slide"
+ mass          2
+ parent        nowhere
 
 {look_at_through_magnifying_glass
 write "You are going to need a bit more magnification than that.^"
@@ -2922,10 +2922,10 @@ move cyan_slide to slot
 }
 
 object white_slide: white slide
- long		"The white slide rests nearby.^"
- short		a "white slide"
- mass		2
- parent		nowhere
+ long          "The white slide rests nearby.^"
+ short         a "white slide"
+ mass          2
+ parent        nowhere
 
 {examine
 write "The slide, made using the freeze fracture device, contains a pure "
@@ -2952,10 +2952,10 @@ move white_slide to slot
 }
 
 object green_slide: green slide
- long		"The green slide rests nearby.^"
- short		a "green slide"
- mass		2
- parent		nowhere
+ long          "The green slide rests nearby.^"
+ short         a "green slide"
+ mass          2
+ parent        nowhere
 
 {look_at_through_magnifying_glass
 write "You are going to need a bit more magnification than that.^"
@@ -3027,9 +3027,9 @@ move green_slide to slot
 }
 
 object fridge: specimen fridge refrigerator
- has		CONTAINER CLOSABLE CLOSED
- short		a "specimen fridge"
- quantity	40
+ has           CONTAINER CLOSABLE CLOSED
+ short         a "specimen fridge"
+ quantity      40
 
 {examine
 if fridge hasnt CLOSED
@@ -3054,8 +3054,8 @@ write "The specimen fridge is far too heavy to move.^"
 }
 
 object petri_dish: petri dish plate
- short		a "petri dish"
- parent		nowhere
+ short         a "petri dish"
+ parent        nowhere
 
 {look_up_in_book
 write "petri dish^"
@@ -3065,13 +3065,13 @@ write "biologist J. R. Petri, died 1921].^"
 }
 
 object dish_1: first petri dish plate
- has		CONTAINER
- plural		"dishes"
- short		the "first petri dish"
- mass		2 
- long		"The first petri dish is here.^"
- parent 	fridge
- capacity	0
+ has           CONTAINER
+ plural        "dishes"
+ short         the "first petri dish"
+ mass          2
+ long          "The first petri dish is here.^"
+ parent        fridge
+ capacity      0
 
 {open
 set time = false
@@ -3091,8 +3091,8 @@ execute "look_up_in_book_petri_dish"
 }
 
 object agar: solid gel quantity of agar agar-agar
- short		a "quantity of agar"
- parent		nowhere
+ short         a "quantity of agar"
+ parent        nowhere
 
 {look_up_in_book
 write "agar (agar-agar)^"
@@ -3101,8 +3101,8 @@ write "medium.^"
 }
 	
 object agar_1: solid gel quantity of brown agar agar-agar
- short		a "quantity of brown agar"
- parent dish_1
+ short         a "quantity of brown agar"
+ parent        dish_1
 
 {examine
 write "The agar has been poured into the petri dish and set into a solid "
@@ -3133,13 +3133,13 @@ execute "look_up_in_book_agar"
 }
 
 object dish_2: second petri dish  plate
- has		CONTAINER
- plural		"dishes"
- short		the "second petri dish"
- mass		2 
- capacity	0
- long		"The second petri dish is here.^"
- parent 	fridge
+ has           CONTAINER
+ plural        "dishes"
+ short         the "second petri dish"
+ mass          2
+ capacity      0
+ long          "The second petri dish is here.^"
+ parent        fridge
 
 {open
 set time = false
@@ -3159,8 +3159,8 @@ execute "look_up_in_book_petri_dish"
 }
 
 object agar_2: solid gel quantity of beige agar agar-agar
- short		a "quantity of beige agar"
- parent 	dish_2
+ short         a "quantity of beige agar"
+ parent        dish_2
 
 {examine
 write "The agar has been poured into the petri dish and set into a solid "
@@ -3194,9 +3194,9 @@ write "medium.^"
 }
 
 object flask_label: concial flask label 
- short		a "flask label"
- mass		scenery
- parent		flask
+ short         a "flask label"
+ mass          scenery
+ parent        flask
 
 {examine : read
 write "The label is a small white sticker with ~Salmonella Bacteria~ hand written in "
@@ -3208,12 +3208,12 @@ write "It is too well stuck on.^";
 }
 
 object flask: conical flask
- has		CONTAINER
- short		a "conical flask"
- long		"A conical flask stands on the ground.^"
- mass		4
- quantity	5	
- parent 	fridge
+ has           CONTAINER
+ short         a "conical flask"
+ long          "A conical flask stands on the ground.^"
+ mass          4
+ quantity      5
+ parent        fridge
 
 {fill_with_stream
 write "No.^"
@@ -3271,8 +3271,8 @@ proxy "pour yellow fluid"
 }
 
 object fracture: freeze fracture
- short		a "freeze fracture"
- parent		nowhere
+ short         a "freeze fracture"
+ parent        nowhere
 
 {look_up_in_book
 write "freeze fracture^"
@@ -3283,8 +3283,8 @@ write "high magnification.^"
 }
 
 object ames: ames test
- short		name "Ames test"
- parent		nowhere
+ short         name "Ames test"
+ parent        nowhere
 
 {look_up_in_book
 write "Ames test^"
@@ -3303,8 +3303,8 @@ write "carcinogenicity in more complex organisms.^"
 }
 
 object mutagen: mutagen mutagenic mutagenicity
- short		name "mutagen"
- parent		nowhere
+ short         name "mutagen"
+ parent        nowhere
 
 {look_up_in_book
 write "mutagen^"
@@ -3313,8 +3313,8 @@ write "Ames test).^"
 }
 
 object carcinogen: carcinogen carcinogenic carcinogenicity
- short		name "carcinogen"
- parent		nowhere
+ short         name "carcinogen"
+ parent        nowhere
 
 {look_up_in_book
 write "carcinogen^"
@@ -3322,8 +3322,8 @@ write "any substance which tends to produce cancer in an organism.^"
 }
 
 object histidine: histidine histamine
- short		name "histidine"
- parent		nowhere
+ short         name "histidine"
+ parent        nowhere
 
 {look_up_in_book
 write "histidine^"
@@ -3332,8 +3332,8 @@ write "histamine (an essential amino acid in man), in most cells.^"
 }
 
 object senescence: senescence senescent
- short		name "senescence"
- parent		nowhere
+ short         name "senescence"
+ parent        nowhere
 
 {look_up_in_book
 write "senescence^"
@@ -3344,10 +3344,10 @@ write "power of cell division and growth.^"
 attribute SAMPLE_ADDED
 
 object sample: pale yellow liquid salmonella bacterial sample
- has		LIQUID
- short		a "quantity of pale yellow liquid"
- mass		2
- parent 	flask
+ has           LIQUID
+ short         a "quantity of pale yellow liquid"
+ mass          2
+ parent        flask
 
 {sniff
 write "The pale yellow liquid smells sweet.^"
@@ -3446,7 +3446,7 @@ ensure sample has CUSTOM4
 }
 
 object microscope: zeiss phase contrast microscope scope
- short		a "phase-contrast microscope"
+ short         a "phase-contrast microscope"
  
 {hint
 write "Once you have made a slide using the freeze fracture device, you "
@@ -3513,8 +3513,8 @@ if green_slide(parent) = slot
 }
 
 object slot: zeiss phase contrast microscope slot scope
- short		a "microscope slot"
- parent 	microscope
+ short         a "microscope slot"
+ parent        microscope
 
 {examine
 if "+first_child<noun1" = false
@@ -3525,7 +3525,7 @@ write "The slot in the base of the microscope contains " CHILD{the} .^
 }
 
 object device: freeze fracture device machine
- short		a "freeze fracture device"
+ short         a "freeze fracture device"
 
 {hint
 write "Once you have put a substance in one of the petri dishes for testing, "
@@ -3552,7 +3552,7 @@ execute "look_up_in_book_fracture"
 }
 
 object button: square button
- short		a "square button"
+ short         a "square button"
  
 {press : move
 if compartment hasnt CLOSED
@@ -3604,10 +3604,10 @@ write "device.^"
 }
 
 object compartment: compartment drawer
- has		CLOSABLE CLOSED CONTAINER
- short		a "compartment"
- parent		device
- quantity	6
+ has           CLOSABLE CLOSED CONTAINER
+ short         a "compartment"
+ parent        device
+ quantity      6
 
 {examine
 write "The compartment is circular in shape, designed to receive a petri "
@@ -3617,15 +3617,15 @@ write ^
 }
 
 location pool : pool
- short		the "pool"
- has		KNOWN
- east		quarters
- north		control_centre
- south		lab
- west		storage
- down		surface
- x		1
- y		1
+ short         the "pool"
+ has           KNOWN
+ east          quarters
+ north         control_centre
+ south         lab
+ west          storage
+ down          surface
+ x             1
+ y             1
 
 {movement
 if compass = down
@@ -3654,7 +3654,7 @@ write "doorways allow passage in the four cardinal directions.^"
 }
 
 object dock: docking pool
- short		a "docking pool"
+ short         a "docking pool"
 
 {examine
 write "The docking pool is nothing more than a large circular opening in "
@@ -3667,7 +3667,7 @@ proxy "d"
 }
 
 object ladder: steel ladder
- short		a "steel ladder"
+ short         a "steel ladder"
 
 {climb_down
 if here = pool
@@ -3727,7 +3727,7 @@ endif
 }
 
 object opening: large circular opening
- short		a "large circular opening"
+ short         a "large circular opening"
 
 {examine
 execute "examine_dock"
@@ -3738,13 +3738,13 @@ proxy "go down"
 }
 
 location surface : surface
- short		the "surface"
- has		ON_WATER KNOWN
- short		the "lagoon surface"
- down		beneath_outpost
- up		pool
- x		1
- y		3
+ short         the "surface"
+ has           ON_WATER KNOWN
+ short         the "lagoon surface"
+ down          beneath_outpost
+ up            pool
+ x             1
+ y             3
 
 {movement
 if tank has WORN
@@ -3774,12 +3774,12 @@ write "The ladder descends further down, into the water.^"
 }
 
 location beneath_outpost : beneath outpost
- short		name "beneath the outpost"
- has		UNDER_WATER WITHOUT_AIR OUTDOORS KNOWN
- up		surface
- north		lagoon_bottom
- x		1
- y		4
+ short         name "beneath the outpost"
+ has           UNDER_WATER WITHOUT_AIR OUTDOORS KNOWN
+ up            surface
+ north         lagoon_bottom
+ x             1
+ y             4
 
 {movement
 if compass = down
@@ -3827,8 +3827,8 @@ set time = false
 }
 
 object s_water: surrounding sea water
- has 		LIQUID
- short		the "surrounding sea water"
+ has           LIQUID
+ short         the "surrounding sea water"
 
 {taste
 write "Salty, as you would expect.^"
@@ -3841,10 +3841,10 @@ set time = false
 }
 
 object q_s_water: quantity of sea water
- has		LIQUID
- short		a "quantity of sea water"
- parent		nowhere
- mass		2
+ has           LIQUID
+ short         a "quantity of sea water"
+ parent        nowhere
+ mass          2
 
 {taste
 write "Salty, as you would expect.^"
@@ -3866,13 +3866,13 @@ write "don't need it.^"
 }
 
 location lagoon_bottom : lagoon bottom
- short		the "lagoon bottom" 		
- has		UNDER_WATER WITHOUT_AIR OUTDOORS KNOWN
- up			lagoon_surface
- north		mid_water
- south		beneath_outpost
- x		2
- y		4
+ short         the "lagoon bottom"
+ has           UNDER_WATER WITHOUT_AIR OUTDOORS KNOWN
+ up            lagoon_surface
+ north         mid_water
+ south         beneath_outpost
+ x             2
+ y             4
 
 {movement
 if compass = east 
@@ -3904,14 +3904,14 @@ write "of the open ocean.^"
 }
 
 location lagoon_surface : lagoon surface
- short		the "lagoon surface"
- has		ON_WATER OUTDOORS KNOWN
- down		lagoon_bottom
- north		ocean_surface
- west		beach
- southwest	beach
- x		3
- y		4
+ short         the "lagoon surface"
+ has           ON_WATER OUTDOORS KNOWN
+ down          lagoon_bottom
+ north         ocean_surface
+ west          beach
+ southwest     beach
+ x             3
+ y             4
 
 {eachturn
 move lagoon_obj to here
@@ -3944,19 +3944,19 @@ write "south.^"
 }
 
 location ocean_surface : ocean surface
- short		the "ocean surface"
- has		ON_WATER CUSTOM5 OUTDOORS KNOWN
- down		mid_water	
- north		ocean_surface
- south		ocean_surface
- east		ocean_surface
- west		ocean_surface
- northeast	ocean_surface
- northwest	ocean_surface
- southeast	ocean_surface
- southwest	ocean_surface
- x		2
- y		5
+ short         the "ocean surface"
+ has           ON_WATER CUSTOM5 OUTDOORS KNOWN
+ down          mid_water
+ north         ocean_surface
+ south         ocean_surface
+ east          ocean_surface
+ west          ocean_surface
+ northeast     ocean_surface
+ northwest     ocean_surface
+ southeast     ocean_surface
+ southwest     ocean_surface
+ x             2
+ y             5
 
 {movement
 if compass = in : compass = out
@@ -4024,19 +4024,19 @@ write "There is no level " $integer " hint for this location.^"
 }
 
 location ocean_bottom : ocean bottom
- short		the "ocean bottom"
- has		UNDER_WATER WITHOUT_AIR CUSTOM5 OUTDOORS KNOWN
- up			mid_water
- north		ocean_bottom
- south		ocean_bottom
- east		ocean_bottom
- west		ocean_bottom
- northeast	ocean_bottom
- northwest	ocean_bottom
- southeast	ocean_bottom
- southwest	ocean_bottom
- x		4
- y		5
+ short         the "ocean bottom"
+ has           UNDER_WATER WITHOUT_AIR CUSTOM5 OUTDOORS KNOWN
+ up            mid_water
+ north         ocean_bottom
+ south         ocean_bottom
+ east          ocean_bottom
+ west          ocean_bottom
+ northeast     ocean_bottom
+ northwest     ocean_bottom
+ southeast     ocean_bottom
+ southwest     ocean_bottom
+ x             4
+ y             2
 
 {movement
 if compass = in : compass = out
@@ -4096,22 +4096,22 @@ set time = false
 }
 
 object debris: rock debris
- short		the "debris"
+ short         the "debris"
 
 location mid_water : mid water
- short		name "mid water"
- has		UNDER_WATER WITHOUT_AIR CUSTOM5 MID_WATER OUTDOORS KNOWN
- north		mid_water
- south		lagoon_bottom
- east		mid_water
- west		mid_water
- northeast	mid_water
- northwest	mid_water
- southeast	mid_water
- southwest	mid_water
- down		mid_water
- x		2
- y		3
+ short         name "mid water"
+ has           UNDER_WATER WITHOUT_AIR CUSTOM5 MID_WATER OUTDOORS KNOWN
+ north         mid_water
+ south         lagoon_bottom
+ east          mid_water
+ west          mid_water
+ northeast     mid_water
+ northwest     mid_water
+ southeast     mid_water
+ southwest     mid_water
+ down          mid_water
+ x             2
+ y             3
 
 {movement
 if compass = out : compass = in
@@ -4229,7 +4229,7 @@ set time = false
 }
 
 object sea_life: sea marine life fish
- short 		the "marine life"
+ short         the "marine life"
 
 {examine
 write "The marine life, mostly various species of fish, never fails to "
@@ -4245,7 +4245,7 @@ write "They dart elusively out of the way.^"
 }
 
 object wall: rock wall cliff cliffs
- short		a "rock wall"
+ short         a "rock wall"
 
 {examine
 write "Many nooks and crannies make the rock wall a haven for all types of "
@@ -4263,19 +4263,19 @@ proxy "up"
 }
 
 location site : rock formation
- short		the "rock formation"
- has		UNDER_WATER WITHOUT_AIR CUSTOM5 OUTDOORS
- up			mid_water
- north		ocean_bottom
- south		ocean_bottom
- east		ocean_bottom
- west		ocean_bottom
- northeast	ocean_bottom
- northwest	ocean_bottom
- southeast	ocean_bottom
- southwest	ocean_bottom
- x		5
- y		5
+ short         the "rock formation"
+ has           UNDER_WATER WITHOUT_AIR CUSTOM5 OUTDOORS
+ up            mid_water
+ north         ocean_bottom
+ south         ocean_bottom
+ east          ocean_bottom
+ west          ocean_bottom
+ northeast     ocean_bottom
+ northwest     ocean_bottom
+ southeast     ocean_bottom
+ southwest     ocean_bottom
+ x             5
+ y             2
 
 {movement
 if compass = down
@@ -4406,11 +4406,11 @@ return false
 }
 
 object submarine: small submarine sub
- has		OUT_OF_REACH
- short		a "small submarine"
- long		"A small submarine hovers just off the ocean floor beyond the rock formation.^"
- mass		heavy
- parent		nowhere
+ has           OUT_OF_REACH
+ short         a "small submarine"
+ long          "A small submarine hovers just off the ocean floor beyond the rock formation.^"
+ mass          heavy
+ parent        nowhere
 
 {hint
 write "There is nothing you can do with the submarine, just wait quietly "
@@ -4440,7 +4440,7 @@ set time = false
 }
 
 object rec_opening: rectangular opening
- short		a "rectangular opening"
+ short         a "rectangular opening"
 
 {examine
 write "The rectangular opening is where the divers enter and exit the "
@@ -4452,7 +4452,7 @@ proxy "in"
 }
 
 object aft_opening: aft opening
- short		the "aft opening"
+ short         the "aft opening"
 
 {examine
 write "The divers are loading the canisters into the submarine's interior "
@@ -4464,8 +4464,8 @@ proxy "in"
 }
 
 object canister: mysterious canister canisters
- has		OUT_OF_REACH
- short		a "mysterious canister"
+ has           OUT_OF_REACH
+ short         a "mysterious canister"
 
 {examine
 write "The canisters are cylindrical in shape and completely smooth except for "
@@ -4481,12 +4481,12 @@ write "guns).^"
 }
 
 object vial: small glass vial vials
- has		OUT_OF_REACH
- long		"There is a small glass vial here.^"
- short		a "small glass vial"
- mass		4
- quantity	2
- parent		nowhere
+ has           OUT_OF_REACH
+ long          "There is a small glass vial here.^"
+ short         a "small glass vial"
+ mass          4
+ quantity      2
+ parent        nowhere
 
 {take
 if divers(parent) = here
@@ -4583,8 +4583,8 @@ proxy "fill syringe using vial"
 }
 
 object membrane: rubber membrane
- short		a "rubber membrane"
- parent vial
+ short         a "rubber membrane"
+ parent        vial
 
 {examine
 write "The rubber membrane is stretched out inside a metal rim at one end "
@@ -4599,10 +4599,10 @@ write "It is neither necessary nor desirable to break the rubber membrane.^"
 attribute FUEL_ADDED
 
 object fuel: small quantity of perfectly clear liquid
- has		LIQUID OUT_OF_REACH
- short		a "small quantity of clear liquid"
- mass		2
- parent 	vial
+ has           LIQUID OUT_OF_REACH
+ short         a "small quantity of clear liquid"
+ mass          2
+ parent        vial
 
 {examine
 write "The liquid is perfectly clear."
@@ -4706,8 +4706,8 @@ move fuel to limbo
 }
 
 object divers: divers
- has		OUT_OF_REACH PLURAL ANIMATE
- short		the "divers"
+ has           OUT_OF_REACH PLURAL ANIMATE
+ short         the "divers"
 
 {wave_at : greet
 execute "wave_site"
@@ -4730,12 +4730,12 @@ write "up dead.^"
 }
 
 location walkway : floating walkway
- short		the "floating walkway"
- has		OUTDOORS KNOWN
- east		nowhere
- west		beach
- x		5
- y		6
+ short         the "floating walkway"
+ has           OUTDOORS KNOWN
+ east          nowhere
+ west          beach
+ x             5
+ y             6
 
 {eachturn
 move lagoon_obj to here
@@ -4788,7 +4788,7 @@ write "research outpost.^"
 }
 
 object outpost_obj: floating research outpost
- short		a "research outpost"
+ short         a "research outpost"
 
 {examine
 if here = beach
@@ -4805,7 +4805,7 @@ proxy "e"
 }
 
 object lagoon_obj: calm lagoon shore
- short		a "lagoon"
+ short         a "lagoon"
 
 {enter
 proxy "ne"
@@ -4816,13 +4816,13 @@ write "The lagoon is moderately calm and sheltered.^"
 }
 
 location beach : lagoon beach
- short		the "lagoon beach"
- has		OUTDOORS KNOWN
- east		walkway
- northeast	lagoon_surface
- south		trail
- x		4
- y		6
+ short         the "lagoon beach"
+ has           OUTDOORS KNOWN
+ east          walkway
+ northeast     lagoon_surface
+ south         trail
+ x             4
+ y             6
 
 {eachturn
 move lagoon_obj to here
@@ -4865,15 +4865,15 @@ write "the beach.^"
 }
 
 object hill_obj: steeply rising hill
- short		a "steeply rising hill"
+ short         a "steeply rising hill"
 
 {climb : enter
 write "The hill is far too steep for you to climb.^"
 }
 
 object palms: palm palms tree trees
- has		PLURAL
- short 		the "palms"
+ has           PLURAL
+ short         the "palms"
 
 {examine
 write "The afternoon sun filters through the wall of tall palms.^"
@@ -4885,12 +4885,12 @@ set time = false
 }
 
 location trail : trail
- short		the "trail"
- has		OUTDOORS KNOWN
- north		beach
- south		estuary
- x		4
- y		7
+ short         the "trail"
+ has           OUTDOORS KNOWN
+ north         beach
+ south         estuary
+ x             4
+ y             7
 
 {eachturn
 set JUNGLE_SCRIPT + 1
@@ -4935,18 +4935,18 @@ write "The sweet smell of tropical flowers hangs in the air.^"
 }
 
 object butteryfly: butterfly
- parent		nowhere
+ parent        nowhere
 
 location estuary : estuary
- short		the "estuary"
- has		OUTDOORS KNOWN
- north		trail
- east		compound
- northwest	hill
- up		hill
- south		south_beach
- x		4
- y		8
+ short         the "estuary"
+ has           OUTDOORS KNOWN
+ north         trail
+ east          compound
+ northwest     hill
+ up            hill
+ south         south_beach
+ x             4
+ y             8
 
 {look
 if here has VISITED
@@ -4961,7 +4961,7 @@ write "compound of the main military base.^"
 } 
 
 object estuary_obj: sandy estuary
- short		a "sandy estuary"
+ short         a "sandy estuary"
 
 {examine
 write "Sparkling water flows down the sandy estuary from the northwest, "
@@ -4970,12 +4970,12 @@ write "ocean.^"
 }
 
 location behind_hangar : behind hangar
- short		name "behind the hangar"
- has		OUTDOORS KNOWN
- southwest	south_beach
- up			on_crate
- x		5
- y		9
+ short         name "behind the hangar"
+ has           OUTDOORS KNOWN
+ southwest     south_beach
+ up            on_crate
+ x             5
+ y             9
 
 {look
 if here has VISITED
@@ -5015,8 +5015,8 @@ proxy "up"
 }
 
 object rect_crate: rectangular crate
- has		SURFACE
- short		a "rectangular crate"
+ has           SURFACE
+ short         a "rectangular crate"
 
 {open
 write "There is no obvious way to open the crate.^"
@@ -5095,19 +5095,19 @@ write "bare wall.^"
 }
 
 object hangar_obj1: hangar large building
- short		a "hangar"
+ short         a "hangar"
 
 {enter
 write "The entrance to the hangar is around the front at the north end.^"
 }
 
 location on_crate : on crate
- short		name "on the crate"
- has		OUTDOORS
- down		behind_hangar
- up		nowhere
- x		8
- y		10
+ short         name "on the crate"
+ has           OUTDOORS
+ down          behind_hangar
+ up            nowhere
+ x             8
+ y             10
 
 {movement
 if compass = up
@@ -5146,7 +5146,7 @@ proxy "up"
 }
 
 object hangar_obj3: large hangar building
- short		a "large hangar"
+ short         a "large hangar"
 
 {climb
 proxy "up"
@@ -5163,7 +5163,7 @@ write "top of the crate.^"
 }
 
 object rect_crate_2: rectangular crate crate
- short		a "rectangular crate"
+ short         a "rectangular crate"
 
 {climb
 proxy "down"
@@ -5175,12 +5175,12 @@ set time = false
 }
 
 location roof_north : roof end of north
- short		name "north end of roof"
- has		OUTDOORS
- south		roof_south	
- down		hangar_north
- x		7
- y		9
+ short         name "north end of roof"
+ has           OUTDOORS
+ south         roof_south
+ down          hangar_north
+ x             7
+ y             9
 
 {movement
 if compass = down
@@ -5233,7 +5233,7 @@ write "Are you mad? You would be spotted a mile away if you did that.^"
 }
 
 object vent: vent ventilation pipe
- short		a "ventilation pipe"
+ short         a "ventilation pipe"
 
 {examine
 write "The ventilation pipe protrudes about half a metre from the roof of "
@@ -5246,11 +5246,11 @@ endif
 }
 
 object rope: length of rope
- has		CUSTOM5
- short		a "length of rope"
- long		"There is a length of rope here.^"
- mass		scenery; When untied, set mass to 10, allowing it to be taken.
- parent		vent
+ has           CUSTOM5
+ short         a "length of rope"
+ long          "There is a length of rope here.^"
+ mass          scenery; When untied, set mass to 10, allowing it to be taken.
+ parent        vent
 
 {examine
 write "The length of rope is quite thick and sturdy and about ten metres long.^"
@@ -5314,7 +5314,7 @@ set time to false
 }
 
 object roof_opening: roof opening
- short		an "roof opening"
+ short         an "roof opening"
   
 {look_through
 if lisa has BURNING
@@ -5330,12 +5330,12 @@ proxy "d"
 }
 
 location roof_south : roof south
- short		name "south end of roof"
- has		OUTDOORS
- north		roof_north
- down		on_crate
- x		7
- y		10
+ short         name "south end of roof"
+ has           OUTDOORS
+ north         roof_north
+ down          on_crate
+ x             7
+ y             10
 
 {look
 if here has VISITED
@@ -5351,15 +5351,15 @@ write "Are you mad? You would be spotted a mile away if you did that.^"
 }
 
 object hangar_obj: hangar large
- short		a "hangar"
- parent		nowhere
+ short         a "hangar"
+ parent        nowhere
 
 location hangar_north : north end of hanger
- short		name "north end of hanger"
- south		hangar_south
- up			roof_north
- x		6
- y		9
+ short         name "north end of hanger"
+ south         hangar_south
+ up            roof_north
+ x             6
+ y             9
 
 {eachturn
 move hangar_door to hangar_north
@@ -5439,7 +5439,7 @@ set time = false
 }
 
 object tank_view: apparent fish tank
- short		a "fish tank"
+ short         a "fish tank"
 
 {shoot_override : shoot_with_gun : attack_with_gun
 write "You quickly take aim then pull the trigger.^"
@@ -5459,8 +5459,8 @@ write "metal frame.^"
 }
 
 object inside_opening: roof opening
- has		OUT_OF_REACH
- short		a "inside of the roof opening"
+ has           OUT_OF_REACH
+ short         a "inside of the roof opening"
 
 {look_through : examine
 write "Through the opening you can see nothing but blue sky.^"
@@ -5473,11 +5473,11 @@ proxy "u"
 attribute TRUSTING ENCOUNTERED
 
 object stranger: stranger tall middle-aged man
- has		ANIMATE
- short		the "stranger"
- long		function
- parent		nowhere
- mass		heavy
+ has           ANIMATE
+ short         the "stranger"
+ long          function
+ parent        nowhere
+ mass          heavy
 
 {long		
 if stranger(status) = 0
@@ -5717,10 +5717,10 @@ write "Are you out of your mind!^"
 }
 
 object gun: strangers stranger's gun plain black pistol his mans man's
- short		the "stranger's pistol"
- long		"The stranger's pistol is lying here.^"
- parent		stranger
- mass		5
+ short         the "stranger's pistol"
+ long          "The stranger's pistol is lying here.^"
+ parent        stranger
+ mass          5
 
 {take_override
 if gun(parent) = stranger
@@ -5744,8 +5744,8 @@ write "Never having been one for guns, you don't much like the look of it.^"
 }
 
 object rope_end: length of thick sturdy rope
- short		a "length of rope"
- mass		scenery
+ short         a "length of rope"
+ mass          scenery
  
 {examine
 write "The rope dangles down from above through the square opening in the "
@@ -5765,7 +5765,7 @@ write "You are already at the bottom of the rope.^"
 }
 
 object hangar_door: main door
- short		the  "main door"
+ short         the  "main door"
 
 {open
 write "The main door to the hangar can't be opened by hand.^"
@@ -5776,8 +5776,8 @@ write "The main door is about four metres tall and almost ten metres wide.^"
 }
 
 object access_door: access door
- has		CLOSABLE CLOSED LOCKED
- short		the "access door"
+ has           CLOSABLE CLOSED LOCKED
+ short         the "access door"
 
 {open : knock_on
 if here = compound
@@ -5806,9 +5806,9 @@ write "That is more than likely going to get you killed.^"
 }
 
 object filing: filing cabinet
- has		SURFACE
- short		a "filing cabinet"
- quantity	20
+ has           SURFACE
+ short         a "filing cabinet"
+ quantity      20
 
 {examine
 write "The filing cabinet is of a simple two drawer design. Its pale brown "
@@ -5836,9 +5836,9 @@ proxy "open drawer"
 }
 
 object desk_leif: sturdy desk
- has		SURFACE
- short		a "sturdy desk"
- quantity	30
+ has           SURFACE
+ short         a "sturdy desk"
+ quantity      30
  
 {examine
 write "The desk's stark, yet sturdy construction is reminiscent of the "
@@ -5878,7 +5878,7 @@ write "Nothing but a thin layer of grime.^"
 }
 
 object grime: grime
- short		the "grime"
+ short         the "grime"
 
 {clean : clean_with_toothbrush
 proxy "clean desk"
@@ -5897,15 +5897,15 @@ write "There really isn't much of it left.^"
 }
 
 object top_drawer_lock: top cabinet drawer lock keyhole
- short		the "top drawer lock"
+ short         the "top drawer lock"
 
 object top_drawer: top cabinet drawer
- has		CONTAINER CLOSABLE CLOSED
- short		a "top drawer"
- long		"The top drawer of the filing cabinet is here.^"
- mass		10
- quantity	15
- parent 	filing
+ has           CONTAINER CLOSABLE CLOSED
+ short         a "top drawer"
+ long          "The top drawer of the filing cabinet is here.^"
+ mass          10
+ quantity      15
+ parent        filing
 
 {examine
 write "In the centre of the top drawer there is a small keyhole. "
@@ -5938,9 +5938,9 @@ return false
 }
 
 object magazine: copy of cigar aficianado magazine
- short		a "copy of Cigar Aficionado magazine"
- mass		4
- parent		top_drawer
+ short         a "copy of Cigar Aficionado magazine"
+ mass          4
+ parent        top_drawer
 
 {examine : read : open
 if magazine has DAMAGED
@@ -5957,9 +5957,9 @@ write "you have no desire to read it all.^"
 }
 
 object magnifying_glass: magnifying glass
- short		a "magnifying glass"
- mass		2
- parent		top_drawer
+ short         a "magnifying glass"
+ mass          2
+ parent        top_drawer
 
 {examine
 write "The magnifying glass is unusually large.^"
@@ -5971,10 +5971,10 @@ write "glass.^"
 }
 
 object paper: piece of paper
- short		a "piece of paper"
- long		"There is a piece of paper nearby.^"
- mass		5
- parent		top_drawer
+ short         a "piece of paper"
+ long          "There is a piece of paper nearby.^"
+ mass          5
+ parent        top_drawer
 
 {give_to_stranger
 write "You hand the piece of paper to the stranger.^" 
@@ -6005,14 +6005,14 @@ write "from fish only being good for other fish.^"
 }
 
 object bottom_drawer_lock: bottom cabinet drawer lock keyhole
- short		the "bottom drawer lock"
+ short         the "bottom drawer lock"
 
 object bottom_drawer: bottom cabinet drawer
- has		CONTAINER CLOSED LOCKED
- short		a "bottom drawer"
- quantity	15
- parent 	filing
- mass		10
+ has           CONTAINER CLOSED LOCKED
+ short         a "bottom drawer"
+ quantity      15
+ parent        filing
+ mass          10
 
 {examine : look_in
 if top_drawer(parent) != filing
@@ -6031,10 +6031,10 @@ write "The bottom drawer is locked and therefore can't be taken.^"
 }
 
 object diary: diary small black
- short		a "diary"
- long		"A small black diary is here.^"
- mass		5
- parent		bottom_drawer
+ short         a "diary"
+ long          "A small black diary is here.^"
+ mass          5
+ parent        bottom_drawer
 
 {examine : read : look_in : open
 if diary has DAMAGED
@@ -6084,10 +6084,10 @@ execute "show_to_stranger_diary"
 }
 
 location hangar_south : south end of hangar
- short		name "south end of hanger"
- north		hangar_north
- x		6
- y		10
+ short         name "south end of hanger"
+ north         hangar_north
+ x             6
+ y             10
 
 {look
 if here has VISITED
@@ -6142,16 +6142,16 @@ write "tank.^"
 }
 
 object tank_liquid: tank full of clear liquid 
- has		OUT_OF_REACH
- short		the "tank full of clear liquid"
+ has           OUT_OF_REACH
+ short         the "tank full of clear liquid"
 
 {examine
 write "The liquid is perfectly clear, possibly just water.^"
 }
 
 object hangar_lights: row rows of powerful fluorescent lights light
- has		OUT_OF_REACH
- short		the "rows of fluorescent lights"
+ has           OUT_OF_REACH
+ short         the "rows of fluorescent lights"
  
 {turn_off
 write "There is no obvious way to switch the lights off.^"
@@ -6162,7 +6162,7 @@ write "The lights are already on.^"
 }
 
 object fish_tank: fish tank glass wall walls
- short		an "fish tank"
+ short         an "fish tank"
 
 {examine : look_in
 write "The fish tank is about three metres by six metres and divided evenly "
@@ -6199,8 +6199,8 @@ write "The glass walls of the fish tank sound inches thick.^"
 }
 
 object openings : openings in bottom of tank
- has		OUT_OF_REACH PLURAL
- short		the "openings in the bottom of the tank"
+ has           OUT_OF_REACH PLURAL
+ short         the "openings in the bottom of the tank"
 
 {examine
 print:
@@ -6210,8 +6210,8 @@ print:
 }
 
 object probes: probes probe
- has		OUT_OF_REACH PLURAL
- short		the "probes"
+ has           OUT_OF_REACH PLURAL
+ short         the "probes"
 
 {examine
 write "Like something out of a nineteen seventies sci-fi movie, the probes "
@@ -6220,16 +6220,16 @@ write "diameter towards the tip.^"
 }
 
 object discs: flat discs
- has		OUT_OF_REACH PLURAL
- short		the "flat discs"
+ has           OUT_OF_REACH PLURAL
+ short         the "flat discs"
 
 {examine
 write "The discs appear to be made from some sort of translucent plastic.^"
 }
 
 object wires: wires
- has		OUT_OF_REACH PLURAL
- short 		the "wires"
+ has           OUT_OF_REACH PLURAL
+ short         the "wires"
 
 {examine
 write "The wires run from the tops of the probes, along the ceiling, then "
@@ -6237,7 +6237,7 @@ write "down into the bank of instruments.^"
 }
 
 object frame: steel frame stand
- short		a "steel frame"
+ short         a "steel frame"
 
 {climb
 write "The steel frame leads nowhere.^"
@@ -6245,7 +6245,7 @@ set time = false
 }
 
 object instruments: tall bank of instruments dials knobs switches buttons
- short		a "bank of instruments"
+ short         a "bank of instruments"
 
 {examine
 write "The bank of instruments consists of many dials, switches, knobs and "
@@ -6261,7 +6261,7 @@ write "You can't even get the bank of instruments to budge an inch.^"
 }
 
 object compressor: electrical air compressor
- short		an "air compressor"
+ short         an "air compressor"
 
 {examine
 write "The compressor is powered by electricity and is pumping large "
@@ -6277,12 +6277,12 @@ write "The compressor is already on.^"
 }
 
 location south_beach : south beach
- short	 	the "south beach"
- has		OUTDOORS KNOWN
- north		estuary
- northeast	behind_hangar
- x		4
- y		9
+ short         the "south beach"
+ has           OUTDOORS KNOWN
+ north         estuary
+ northeast     behind_hangar
+ x             4
+ y             9
 
 {eachturn
 set BEACH_SCRIPT + 1
@@ -6321,26 +6321,26 @@ write "The sound of gently rolling waves fills you ears.^"
 }
 
 object bushes : sparse coastal bushes
- short		the "sparse coastal bushes"
+ short         the "sparse coastal bushes"
 
 {examine
 write "The bushes sparse from a life exposed to fierce tropical storms.^"
 }
 
 object dolphin: dolphin dolphins
- has		PLURAL
- short		the "dolphins"
- parent		nowhere
+ has           PLURAL
+ short         the "dolphins"
+ parent        nowhere
 
 location hill : hill
- short		the "hill"
- has		OUTDOORS
- southeast	estuary
- down		estuary
- north		shed
- in		shed
- x		3
- y		8
+ short         the "hill"
+ has           OUTDOORS
+ southeast     estuary
+ down          estuary
+ north         shed
+ in            shed
+ x             3
+ y             8
 
 {movement
 if destination = nowhere
@@ -6373,7 +6373,7 @@ write "crooked on the north bank of the stream.^"
 }
 
 object netting: camouflage netting
- short		the "camouflage netting"
+ short         the "camouflage netting"
 
 {examine
 write "The netting contains many strips of green and brown cloth. Although "
@@ -6387,7 +6387,7 @@ set time = false
 }
 
 object shed_obj: shed
- short		a "shed"
+ short         a "shed"
 
 {examine : look_in
 write "The wooden shed, enterable to the north, is in an obvious state of "
@@ -6399,7 +6399,7 @@ proxy "go north"
 }
 
 object stream: sparkling stream
- short		a "sparkling stream"
+ short         a "sparkling stream"
 
 {examine
 write "The stream flows from further up the hill, down past the front of "
@@ -6422,11 +6422,11 @@ set time = false
 }
 
 location shed : disused shed
- short		the "shed"
- south		hill
- out		hill
- x		3
- y		7
+ short         the "shed"
+ south         hill
+ out           hill
+ x             3
+ y             7
 
 {look
 if here has VISITED
@@ -6455,24 +6455,24 @@ set time = false
 }
 
 object boards: decaying floor boards
- has		SURFACE PLURAL
- short		the "decaying floor boards"
- quantity	100
+ has           SURFACE PLURAL
+ short         the "decaying floor boards"
+ quantity      100
 
 {examine
 write "The floor boards around the drum are stained a dark brown colour.^"
 }
 
 object gaps: gaps between decaying floor boards
- short		the "gaps between the floor boards"
+ short         the "gaps between the floor boards"
 
 {examine
 }
 
 object shelves: crooked shelves shelf
- has		SURFACE PLURAL
- short		the "crooked shelves"
- quantity	30
+ has           SURFACE PLURAL
+ short         the "crooked shelves"
+ quantity      30
 
 {examine
 write "The shelves are lined with a variety of metal and plastic "
@@ -6480,15 +6480,15 @@ write "containers, all bearing warnings as to their poisonous nature.^"
 }
 
 object containers: metal plastic containers
- has		PLURAL
- short		the "metal and plastic containers"
+ has           PLURAL
+ short         the "metal and plastic containers"
 
 {examine
 write "Most of the containers hold substances you have never heard of.^"
 }
 
 object bullet_hole: small bullet hole
- short		a "small hole"
+ short         a "small hole"
 
 {examine
 write "The hole is about the size of a five cent piece. The metal around "
@@ -6503,16 +6503,16 @@ write "another hole in the far side of the drum.^"
 }
 
 object bullet: bullet
- short		a "bullet"
+ short         a "bullet"
 
 {take
 write "Try as you might, the bullet is too firmly embedded to remove.^"
 }
 
 object drum: red metal drum
- has		SURFACE CLOSABLE CLOSED
- short		a "red drum"
- quantity	15
+ has           SURFACE CLOSABLE CLOSED
+ short         a "red drum"
+ quantity      15
 
 {examine
 write "The drum is painted red. A large label on its side reads:^^"
@@ -6548,14 +6548,14 @@ write "The drum is sealed tight.^"
 }
 
 object contents: drums drum's contents dark brown stain substance glue
- short		the "dark brown substance"
+ short         the "dark brown substance"
  
 {examine
 write "The dark brown substance was obviously once the contents of the drum.^"
 }
 
 object label: red metal drum label 
- short		the "drum label"
+ short         the "drum label"
 
 {take
 write "It would be impossible to peel the label off the drum without "
@@ -6567,9 +6567,9 @@ execute "examine_drum"
 }
 
 object rotenone: quantity of rotenone derris rotol
- short		a "quantity of rotenone"
- parent 	drum
- mass	 	2	
+ short         a "quantity of rotenone"
+ parent        drum
+ mass          2
 	
 {examine
 execute "examine_drum"
@@ -6587,7 +6587,7 @@ write "brown liquid extracted from the root.^"
 }
 
 object shed_door: shed door
- short		a "shed door"
+ short         a "shed door"
 
 {take
 write "Far too heavy and useless to consider lugging around.^"
@@ -6607,14 +6607,14 @@ write "Not without the aid of several power tools you won't.^"
 }
 
 location compound : compound
- short		the "compound"
- has		OUTDOORS KNOWN
- west		estuary
- north		office
- east		base
- south		hangar_north
- x		5
- y		8
+ short         the "compound"
+ has           OUTDOORS KNOWN
+ west          estuary
+ north         office
+ east          base
+ south         hangar_north
+ x             5
+ y             8
 
 {eachturn
 set MPS_SCRIPT + 1
@@ -6642,7 +6642,7 @@ write "the base lies further to the east.^"
 }
 
 object hangar_obj2: hangar large building
- short		a "hangar"
+ short         a "hangar"
 
 {examine
 write "The hangar is an enormous building guarded by an enormous MP. The "
@@ -6651,10 +6651,10 @@ write "door for people to come and go.^"
 }
 
 object guard: burly mp guard man
- has		ANIMATE POSSESSIVE
- short		the "MP"
- long		"A burly MP stands guard at the door to the hangar.^"
- mass		heavy
+ has           ANIMATE POSSESSIVE
+ short         the "MP"
+ long          "A burly MP stands guard at the door to the hangar.^"
+ mass          heavy
 
 {greet
 write "The MP continues to stare straight ahead.^"
@@ -6736,9 +6736,9 @@ return false
 }
 
 object machine_gun: guards guard's his machine rifle gun m16
- short		a "machine gun"
- parent guard
- mass		15
+ short         a "machine gun"
+ parent        guard
+ mass          15
 
 {examine
 write "About the only thing you know about the MP's M16 is that you don't "
@@ -6746,13 +6746,13 @@ write "like the look of it.^"
 }
 
 location base : main base
- short		the "main base"
- has		OUTDOORS KNOWN
- west		compound
- east		pad
- up			pad
- x		6
- y		8
+ short         the "main base"
+ has           OUTDOORS KNOWN
+ west          compound
+ east          pad
+ up            pad
+ x             6
+ y             8
 
 {movement
 if compass = down : compass = in : compass = out
@@ -6787,7 +6787,7 @@ write "Work is still going at the top of the tower.^"
 }
 
 object tower: meteorological tower
- short		a "meteorological tower"
+ short         a "meteorological tower"
 
 {examine
 write "The tower is about three quarters finished, its tall steel frame "
@@ -6805,12 +6805,12 @@ write "Try as you might, you just can't manage to push the tower over.^"
 }
 
 location pad : helicopter pad
- short		the "helicopter pad"
- has		OUTDOORS KNOWN
- west		base
- down		base
- x		7
- y		8
+ short         the "helicopter pad"
+ has           OUTDOORS KNOWN
+ west          base
+ down          base
+ x             7
+ y             8
 
 {movement
 if destination = nowhere 
@@ -6830,23 +6830,23 @@ write "barren, stripped of all vegetation over a metre tall.^"
 }
 
 object vegetation : vegetation
- short		the "vegetation"
+ short         the "vegetation"
 
 {examine
 write "Only a handfull of low-lying bushes remains.^"
 }
 
 object helicopter: helicopter
- short		a "helicopter"
- parent		nowhere
+ short         a "helicopter"
+ parent        nowhere
 
 location office : colonel wises wise's office
- short		name "Colonel Wise's office"
- has		KNOWN
- south		compound
- out		compound
- x		5
- y		7
+ short         name "Colonel Wise's office"
+ has           KNOWN
+ south         compound
+ out           compound
+ x             5
+ y             7
 
 {eachturn
 set WISES_SCRIPT + 1
@@ -6903,8 +6903,8 @@ set time = false
 }
 
 object photos: photos black-and-white photographs
- has		PLURAL
- short		the "photographs"
+ has           PLURAL
+ short         the "photographs"
 
 {examine
 write "The photographs are mostly action shots from training exercises.^"
@@ -6915,9 +6915,9 @@ write "There is, quite surprisingly, a wall there.^"
 }
 
 object cos_desk: colonel colonels colonel' wise wises wise's desk
- has		SURFACE
- short		a "desk"
- quantity	30
+ has           SURFACE
+ short         a "desk"
+ quantity      30
 
 {examine
 write "The desk is not exactly what would expect a colonel to be "
@@ -6927,8 +6927,8 @@ write ^
 }
 
 object telephone: colonel wises wise's telephone rap-rod phone
- short		name "Colonel Wise's telephone"
- parent 	cos_desk
+ short         name "Colonel Wise's telephone"
+ parent        cos_desk
 
 {take
 write "I don't think Colonel Wise would appreciate you walking off with his "
@@ -6936,9 +6936,9 @@ write "telephone.^"
 }
 
 object feet: colonel wises wise's feet smelly
- has		PLURAL
- short		name "Colonel Wise's feet"
- parent 	cos_desk
+ has           PLURAL
+ short         name "Colonel Wise's feet"
+ parent        cos_desk
 
 {take
 write "Give me a break.^"
@@ -6957,16 +6957,16 @@ write "Is passing out one of your favourite hobbies?^"
 }
 
 object fan: slow turning ceiling fan
- has		OUT_OF_REACH
- short		a "ceiling fan"
+ has           OUT_OF_REACH
+ short         a "ceiling fan"
  
 {examine
 write "The slowly turning ceiling fan is made from woven bamboo.^"
 }
 
 object wise: officer colonel wise man
- has		ANIMATE POSSESSIVE
- short		name "Colonel Wise"
+ has           ANIMATE POSSESSIVE
+ short         name "Colonel Wise"
 
 {ask_about_helicopter
 write "~When you give me that report of yours, I will call through to the "
@@ -7044,11 +7044,11 @@ return false
 }
 
 object jacket: formal jacket
- has		WEARABLE WORN
- short		a "formal jacket"
- long		"Your jacket is here.^"
- mass		10
- parent		nowhere
+ has           WEARABLE WORN
+ short         a "formal jacket"
+ long          "Your jacket is here.^"
+ mass          10
+ parent        nowhere
 
 {examine
 write "Although normal to look at, the jacket has a microphone and "
@@ -7056,8 +7056,8 @@ write "transmitter sewn into its lining.^"
 }
 
 object transmitter : hidden microphone transmitter
- short		a "hidden microphone"
- parent		jacket
+ short         a "hidden microphone"
+ parent        jacket
 
 {drop
 if here = van
@@ -7069,11 +7069,11 @@ return false
 }
 
 object ear_piece: ear piece
- has		WEARABLE WORN
- short		an "ear piece"
- long 		"The miniature ear piece is here.^"
- mass		1
- parent		nowhere
+ has           WEARABLE WORN
+ short         an "ear piece"
+ long          "The miniature ear piece is here.^"
+ mass          1
+ parent        nowhere
 
 {remove
 if here = van
@@ -7093,12 +7093,12 @@ return false
 }
 
 location van : van
- short		a "van"
- has		KNOWN
- out		nowhere
- east		nowhere
- x		9
- y		3
+ short         a "van"
+ has           KNOWN
+ out           nowhere
+ east          nowhere
+ x             9
+ y             3
 
 {eachturn
 move van_obj to van 
@@ -7150,7 +7150,7 @@ set time = false
 }
 
 object equipment: monitoring equipment
- short		the "monitoring equipment"
+ short         the "monitoring equipment"
 
 {turn_on : turn_off : use
 write "I don't think you should be touching the monitoring equipment.^"
@@ -7163,15 +7163,15 @@ write "recorder.^"
 }
 
 object microphone: microphone desktop mic
- short		a "desktop microphone"
+ short         a "desktop microphone"
 
 {turn_on : turn_off : use
 write "I don't think you should be touching the monitoring equipment.^"
 }
 
 object video_monitors: black-and-white black and white video monitors
- has		PLURAL
- short 		the "black-and-white video monitors"
+ has           PLURAL
+ short         the "black-and-white video monitors"
 	
 {turn_on : turn_off : use
 write "I don't think you should be touching the monitoring equipment.^"
@@ -7183,22 +7183,22 @@ write "except for one that is showing tonight's football.^"
 }
 
 object scanner: radio scanner
- short		a "radio scanner"
+ short         a "radio scanner"
 
 {turn_on : turn_off : use
 write "I don't think you should be touching the monitoring equipment.^"
 }
 
 object reel-to-reel: reel-to-reel reel to reel tape recorder
- short		a "reel-to-reel tape recorder"
+ short         a "reel-to-reel tape recorder"
 
 {turn_on : turn_off : use
 write "I don't think you should be touching the monitoring equipment.^"
 }
 
 object van_doors: sliding door
- has		CLOSED CLOSABLE
- short		the "sliding door"
+ has           CLOSED CLOSABLE
+ short         the "sliding door"
 
 {open_override
 write "You open the sliding door.^"
@@ -7219,10 +7219,10 @@ set street(west) = nowhere
 }
 
 object hughes: special agent hughes man
- has		ANIMATE POSSESSIVE
- short		name "Agent Hughes"
- long 		"Agent Hughes is sitting here, wearing a set of headphones.^"
- mass		heavy
+ has           ANIMATE POSSESSIVE
+ short         name "Agent Hughes"
+ long          "Agent Hughes is sitting here, wearing a set of headphones.^"
+ mass          heavy
 
 {attack
 write "Not a good idea.^"
@@ -7312,16 +7312,16 @@ write "~We don't really have time for this now, Alex,~ Agent hughes replies.^"
 }
 
 object headphones: headphones
- has		WORN
- short		the "headphones"
- parent 	hughes
- mass		5
+ has           WORN
+ short         the "headphones"
+ parent        hughes
+ mass          5
 
 object petrescu: special agent petrescu man
- has		ANIMATE POSSESSIVE
- short		name "Agent Petrescu"
- long		"Agent Petrescu is standing stooped in the van.^"
- mass		heavy
+ has           ANIMATE POSSESSIVE
+ short         name "Agent Petrescu"
+ long          "Agent Petrescu is standing stooped in the van.^"
+ mass          heavy
 
 {thank
 write "~No -- thank you, Dr Meadows,~ Agent Petrescu replies.^"
@@ -7402,13 +7402,13 @@ write "David Duchovny.^"
 }
 
 location street : street
- short		the "street"
- has		OUTDOORS KNOWN
- in			van
- west		van
- north		driveway
- x		10
- y		3
+ short         the "street"
+ has           OUTDOORS KNOWN
+ in            van
+ west          van
+ north         driveway
+ x             10
+ y             3
 
 {movement
 if destination = false
@@ -7445,8 +7445,8 @@ write "The light drizzle moistens your face.^"
 }
 
 object street_lamps: street lamps lamp
- has		OUT_OF_REACH
- short		the "street lamps"
+ has           OUT_OF_REACH
+ short         the "street lamps"
 
 {examine
 write "Light from the street lamps is softened by a dense fog that is "
@@ -7458,14 +7458,14 @@ write "The street lamps are too slippery to climb due to the light rain.^"
 }
 
 object fog: dense fog
- short		the "dense fog"
+ short         the "dense fog"
 
 {examine
 write "The dense fog is slowly rolling in from over the sea.^"
 }
 
 object hotel_obj: hotel les terrasses d'eze
- short		the "Hotel Les Terrasses d'Eze"
+ short         the "Hotel Les Terrasses d'Eze"
 
 {examine
 write "Only five stories tall, the Hotel Les Terrasses d'Eze is quite a grand "
@@ -7478,7 +7478,7 @@ proxy "north"
 }
 
 object van_obj: white mercedes van
- short		a "white Mercedes van"
+ short         a "white Mercedes van"
 
 {open
 proxy "open sliding door"
@@ -7505,14 +7505,14 @@ write "Just dirty water flowing along a shallow stone gutter.^"
 }
 
 location driveway : driveway
- short		the "driveway"
- has		OUTDOORS KNOWN
- north		lobby
- south		street
- southeast	street
- southwest	street
- x		10
- y		2
+ short         the "driveway"
+ has           OUTDOORS KNOWN
+ north         lobby
+ south         street
+ southeast     street
+ southwest     street
+ x             10
+ y             2
 
 {eachturn
 move guests to here
@@ -7568,12 +7568,12 @@ write "Cars exit to the street to the southeast.^"
 }
 
 object attendants: valet parking attendants
- has		ANIMATE PLURAL
- short		the "valet parking attendants"
+ has           ANIMATE PLURAL
+ short         the "valet parking attendants"
 
 object door_men: uniformed men doormen doorman
- has		ANIMATE PLURAL
- short		the "uniformed men"
+ has           ANIMATE PLURAL
+ short         the "uniformed men"
 
 {greet
 write "One of the uniformed men bows politely and bids you a good evening.^"
@@ -7585,17 +7585,17 @@ write "polished shoes and brass buttons, their presentation is impeccable.^"
 }
 
 location lobby : lobby
- short		the "lobby"
- has		KNOWN
- south		driveway
- north		ground_floor
- northeast	mezzanine
- northwest	mezzanine
- up		mezzanine
- east		concierge_desk
- west		bar
- x		10
- y		1
+ short         the "lobby"
+ has           KNOWN
+ south         driveway
+ north         ground_floor
+ northeast     mezzanine
+ northwest     mezzanine
+ up            mezzanine
+ east          concierge_desk
+ west          bar
+ x             10
+ y             1
  
 {movement
 if compass = northeast : compass = northwest
@@ -7621,9 +7621,9 @@ write "desk while a dimly lit piano bar can be entered to the west.^"
 }
 
 object sign: a-frame sign
- short		an "A-frame sign"
- long		"An A-frame sign stands to one side.^"
- mass		heavy
+ short         an "A-frame sign"
+ long          "An A-frame sign stands to one side.^"
+ mass          heavy
 
 {examine : read
 style preformatted
@@ -7637,8 +7637,8 @@ write "        Centre for Genetic Research^"
 }
 
 object stairs_bottom: wide stairs
- has		PLURAL
- short		the "wide stairs"
+ has           PLURAL
+ short         the "wide stairs"
 
 {examine
 write "The stairs are made from marble and covered with a thick, richly "
@@ -7655,20 +7655,20 @@ write "You are already at the bottom of the stairs.^"
 }
 
 object chandelier: elaborate chandelier
- has		OUT_OF_REACH
- short		an "elaborate chandelier"
+ has           OUT_OF_REACH
+ short         an "elaborate chandelier"
 	
 {examine
 write "You can't help but think the chandelier is a little bit over the top.^"
 }
 
 location concierge_desk : concierge man desk 
- short		the "concierge desk"
- has		KNOWN
- west		lobby
- out		lobby
- x		11
- y		1
+ short         the "concierge desk"
+ has           KNOWN
+ west          lobby
+ out           lobby
+ x             11
+ y             1
 
 {movement
 if destination = false
@@ -7713,12 +7713,12 @@ set time = false
 }
 
 object guests: hotel guest guests
- has		PLURAL ANIMATE
- short		the "hotel guests"
+ has           PLURAL ANIMATE
+ short         the "hotel guests"
 
 object luggage: hotel guests guest's luggage
- has		OUT_OF_REACH
- short		the "guest's luggage"
+ has           OUT_OF_REACH
+ short         the "guest's luggage"
 
 {take
 write "I don't think the hotel guests would appreciate that.^"
@@ -7726,9 +7726,9 @@ set time = false
 }
 
 object hotel_phone: hotel concierge's concierges telephone phone
- short		the "concierge's telephone"
- parent 	long_counter
- mass		heavy
+ short         the "concierge's telephone"
+ parent        long_counter
+ mass          heavy
 
 {take
 write "I think the concierge might having something to say about you "
@@ -7736,20 +7736,20 @@ write "walking off with his telephone.^"
 }
 
 object holes: pigeon holes
- has		PLURAL OUT_OF_REACH
- short		the "pigeon holes"
+ has           PLURAL OUT_OF_REACH
+ short         the "pigeon holes"
 
 {examine
 write "The pigeon holes contain a variety of keys and phone messages.^"
 }
 
 object keys: variety of keys key
- has		PLURAL OUT_OF_REACH
- short		the "variety of keys"
+ has           PLURAL OUT_OF_REACH
+ short         the "variety of keys"
 
 object messages: guests guest's phone messages notes message note letter
- has		PLURAL OUT_OF_REACH
- short		the "phone messages"
+ has           PLURAL OUT_OF_REACH
+ short         the "phone messages"
 
 {read : examine
 write "Only one of the messages is angled in such a way that allows you to "
@@ -7758,18 +7758,18 @@ write "it, a definite ten out of ten, Dave Lebling~.^"
 }
 
 object guest_list: conference hotel guest list
- has		OUT_OF_REACH
- short		the "guest list"
+ has           OUT_OF_REACH
+ short         the "guest list"
 
 {read : examine
 write "The writing on the guest list is too small to read from here.^"
 }
 
 object concierge: concierge man
- has		ANIMATE
- short		the "concierge"
- long		"A single concierge stands behind the counter.^"
- mass		heavy
+ has           ANIMATE
+ short         the "concierge"
+ long          "A single concierge stands behind the counter.^"
+ mass          heavy
 
 {ask_for_mil_key
 write "~I'm sorry. I am not authorised to issue you with a MIL key,~ the "
@@ -7845,7 +7845,7 @@ write "gold coloured name tag that reads, ~Frank Leboeuf~.^"
 }
 
 object knob: knob
- short		a "knob"
+ short         a "knob"
 
 {turn
 write "The bell is rung by tapping the knob.^"
@@ -7856,9 +7856,9 @@ proxy "ring bell"
 }
 
 object bell: small brass bell
- short		a "small brass bell"
- parent 	long_counter
- mass		heavy
+ short         a "small brass bell"
+ parent        long_counter
+ mass          heavy
 
 {examine
 write "The small bell is nothing more than a highly polished brass dome "
@@ -7893,16 +7893,16 @@ return false
 }
 
 object long_counter: long curved counter
- has		SURFACE
- short		a "long curved counter"
- quantity	50
+ has           SURFACE
+ short         a "long curved counter"
+ quantity      50
 
 location bar : bar
- short		the "bar"
- east		lobby
- south		lounge
- x		9
- y		1
+ short         the "bar"
+ east          lobby
+ south         lounge
+ x             9
+ y             1
 
 {eachturn
 set BARMANS_SCRIPT + 1
@@ -7954,8 +7954,8 @@ set time = false
 }
 
 object tables: several round tables
- has		PLURAL
- short		the "round tables"
+ has           PLURAL
+ short         the "round tables"
 
 {examine
 write "Each of the round tables has a candle on it and three or four "
@@ -7963,11 +7963,11 @@ write "chairs around it.^"
 }
 
 object tray: silver drinks tray
- has		SURFACE OUT_OF_REACH
- short		a "silver drinks tray"
- quantity	10
- parent waitress
- mass		10
+ has           SURFACE OUT_OF_REACH
+ short         a "silver drinks tray"
+ quantity      10
+ parent        waitress
+ mass          10
 
 {take
 write "Fighting the waitress for the drinks tray in the middle of the bar "
@@ -7978,9 +7978,9 @@ set time = false
 }
 
 object ordered_drinks: ordered guest's guests variety of drinks
- has		PLURAL OUT_OF_REACH
- short 		a "variety of drinks"
- parent		nowhere	
+ has           PLURAL OUT_OF_REACH
+ short         a "variety of drinks"
+ parent        nowhere
  
 {examine
 write "There are no useful clues in the hotel guest's drinks.^"
@@ -7992,10 +7992,10 @@ set time = false
 }
 
 object credit_card: credit card
- has		OUT_OF_REACH
- short		a "credit card"
- parent tray
- mass		2
+ has           OUT_OF_REACH
+ short         a "credit card"
+ parent        tray
+ mass          2
 
 {examine : read
 if self hasnt SCORED
@@ -8024,9 +8024,9 @@ write "You dare not clamber over the bar and attempt to steal the credit card.^"
 }
 
 object drink: drink beer martini lager and coke red white wine champagne scotch coniac port water ale rum malibu tequila gin cherry
- short		a "drink"
- parent 	landlord
- mass		10
+ short         a "drink"
+ parent        landlord
+ mass          10
 
 {order
 if here = bar
@@ -8038,10 +8038,10 @@ set time = false
 }
 
 object landlord: barman man cocktail waiter landlord
- has		ANIMATE OUT_OF_REACH
- short		the "cocktail waiter"
- long		"Behind the bar, wearing a neatly pressed dinner suit, is a cocktail waiter.^"
- mass		heavy
+ has           ANIMATE OUT_OF_REACH
+ short         the "cocktail waiter"
+ long          "Behind the bar, wearing a neatly pressed dinner suit, is a cocktail waiter.^"
+ mass          heavy
  
 {examine
 write "The cocktail waiter is wearing a neatly pressed dinner suit. He "
@@ -8080,8 +8080,8 @@ endall
 }
 
 object bar_shelves: narrow glass shelves shelf
- has		PLURAL OUT_OF_REACH
- short		the "narrow glass shelves"
+ has           PLURAL OUT_OF_REACH
+ short         the "narrow glass shelves"
 
 {examine
 write "Rows of bottles of all shapes and sizes line the narrow "
@@ -8094,13 +8094,13 @@ write ^
 }
 
 object bottles: bottles
- has		PLURAL OUT_OF_REACH
- short		the "bottles"
+ has           PLURAL OUT_OF_REACH
+ short         the "bottles"
 
 object long_bar: long bar
- has		SURFACE
- short		a "bar"
- quantity	100
+ has           SURFACE
+ short         a "bar"
+ quantity      100
 
 {examine
 write "The dark wood of the bar has been highly polished. "
@@ -8113,11 +8113,11 @@ write "I'm sure that will please the cocktail waiter.^"
 }
 
 object coaster: cardboard coaster
- has		WEARABLE
- short		a "cardboard coaster"
- long		"There is a cardboard coaster here.^"
- parent 	long_bar
- mass		1
+ has           WEARABLE
+ short         a "cardboard coaster"
+ long          "There is a cardboard coaster here.^"
+ parent        long_bar
+ mass          1
 
 {examine : read
 write "The coaster has the hotel name and emblem on it.^"
@@ -8137,30 +8137,30 @@ ensure coaster has CUSTOM2
 }
 
 object wooden_bowl: shallow wooden bowl
- has		CONTAINER
- short		a "shallow wooden bowl"
- long		"A shallow wooden bowl rests on the ground.^"
- quantity	1
- parent 	long_bar
- mass		4
+ has           CONTAINER
+ short         a "shallow wooden bowl"
+ long          "A shallow wooden bowl rests on the ground.^"
+ quantity      1
+ parent        long_bar
+ mass          4
 
 {examine
 write "The shallow wooden bowl contains the usual assortment of pretzels.^"
 }
 
 object bar_guests: bar guest guests patrons
- has		PLURAL ANIMATE
- short		the "bar guests"
+ has           PLURAL ANIMATE
+ short         the "bar guests"
 
 {examine
 write "The guests appear to be enjoying themselves.^"
 }
 
 object pretzels: pretzels
- has		PLURAL
- short		some "pretzels"
- parent	 wooden_bowl
- mass		1
+ has           PLURAL
+ short         some "pretzels"
+ parent        wooden_bowl
+ mass          1
 
 {examine
 write "They look edible.^"
@@ -8186,11 +8186,11 @@ write "and fail.^"
 }
 
 location lounge : lounge
- short		the "lounge"
- north		bar
- out		bar
- x		9
- y		2
+ short         the "lounge"
+ north         bar
+ out           bar
+ x             9
+ y             2
 
 {eachturn
 execute "+waitress_actions"
@@ -8264,11 +8264,11 @@ set time = false
 }
 
 object square_tables: low rectangular tables
- has		PLURAL 
- short		the "low rectangular tables"
+ has           PLURAL
+ short         the "low rectangular tables"
 
 object lounges: leather lounge chairs
- short		the "leather lounge chairs"
+ short         the "leather lounge chairs"
 
 {sit_on_override
 execute "sit_bar"
@@ -8279,7 +8279,7 @@ write "The leather lounge chairs are all occupied by guests.^"
 }
 
 object large_windows: large windows window
- short		the "large windows"
+ short         the "large windows"
 
 {examine : look_through
 write "Peering through the drizzle and fog you can see people hurrying "
@@ -8287,11 +8287,11 @@ write "along the cold and wet street outside.^"
 }
 
 object zola: gianfranco mr zola elderly man
- has		ANIMATE
- short		name "Mr Zola"
- long		"Mr Zola is still sitting at one of the tables.^"
- mass		heavy
- parent		nowhere
+ has           ANIMATE
+ short         name "Mr Zola"
+ long          "Mr Zola is still sitting at one of the tables.^"
+ mass          heavy
+ parent        nowhere
 
 {talk_to : greet
 execute "talk_to_elderly_man"
@@ -8311,10 +8311,10 @@ write "conversation.^"
 }
 
 object elderly_man: older elderly man elder
- has		ANIMATE
- short		the "elderly man"
- long		"Sitting at one of the tables is an elderly man.^"
- mass		heavy
+ has           ANIMATE
+ short         the "elderly man"
+ long          "Sitting at one of the tables is an elderly man.^"
+ mass          heavy
 
 {ask_about_ruud
 write "Mr Zola appears to resent you trying to get involved in the "
@@ -8382,10 +8382,10 @@ return false
 }
 
 object younger_man: lean younger man young
- has		ANIMATE
- long		function
- short		the "younger man"
- mass		heavy
+ has           ANIMATE
+ long          function
+ short         the "younger man"
+ mass          heavy
 
 {long
 if younger_man(status) = 0
@@ -8446,11 +8446,11 @@ write "F.A. Cup final.^"
 }
 
 object ruud: ruud gullit well dressed man god
- has		ANIMATE
- short		the "well dressed gentleman"
- long		function
- parent		nowhere
- mass		heavy
+ has           ANIMATE
+ short         the "well dressed gentleman"
+ long          function
+ parent        nowhere
+ mass          heavy
 
 {long
 if ruud(status) = 0
@@ -8500,7 +8500,7 @@ return false
 }
 
 object piano: black yamaha baby grand piano
- short		a "piano"
+ short         a "piano"
 
 {play
 write "A duet perhaps?^"
@@ -8527,11 +8527,11 @@ write "Strings and hammers.^"
 }
 
 object waitress: waitress bar lady women
- has		ANIMATE FEMALE
- short		the "waitress"
- long		function
- mass		heavy
- parent		lounge
+ has           ANIMATE FEMALE
+ short         the "waitress"
+ long          function
+ mass          heavy
+ parent        lounge
 
 {long
 if waitress(status) = 0
@@ -8578,7 +8578,7 @@ write "herself from engaging in a long conversation.^"
 }
  
 object plant: pot potted palm plant
- short		a "potted palm"
+ short         a "potted palm"
 
 {look_in
 write "Just a bit of dirt.^"
@@ -8594,8 +8594,8 @@ write "There is a baby grand piano there.^"
 }
 
 object piano_player: pianist piano player pretty women lady musician
- has		ANIMATE
- short		the "piano player"
+ has           ANIMATE
+ short         the "piano player"
  
 {examine
 write "Middle-aged and quite pretty, the lady is playing "
@@ -8609,7 +8609,7 @@ set time = false
 }
 
 object candles: candles candle
- has		PLURAL LUMINOUS
+ has           PLURAL LUMINOUS
 
 {examine
 write "The soft light from the candles creates a warm relaxing atmosphere "
@@ -8617,13 +8617,13 @@ write "here.^"
 }
 
 location mezzanine : mezzanine level
- short		the "mezzanine level" 
- north		first_floor
- northeast	lobby
- northwest	lobby
- down		lobby
- x		11
- y		2
+ short         the "mezzanine level"
+ north         first_floor
+ northeast     lobby
+ northwest     lobby
+ down          lobby
+ x             11
+ y             2
 
 {movement
 if compass = east : compass = west
@@ -8656,8 +8656,8 @@ write "Over the railing?^"
 }
 
 object stairs_top: wide stairs
- has		PLURAL
- short		the "wide stairs"
+ has           PLURAL
+ short         the "wide stairs"
 
 {examine
 execute "examine_stairs_bottom"
@@ -8672,7 +8672,7 @@ write "You are already at the top of the stairs.^"
 }
 
 object railing: waist high railing
- short		a "waist high railing"
+ short         a "waist high railing"
 
 {examine
 write "The railing matches the one on the stairs leading up here in both "
@@ -8691,12 +8691,12 @@ set time = false
 }
 
 location ground_floor : ground floor
- short		the "ground floor"
- has		OUTSIDE_LIFT
- north		nowhere
- south		lobby
- x		10
- y		0
+ short         the "ground floor"
+ has           OUTSIDE_LIFT
+ north         nowhere
+ south         lobby
+ x             10
+ y             0
 
 {movement
 if +door_warning = true
@@ -8718,8 +8718,8 @@ write "can be seen to the south.^"
 }
 
 object callbuttong: call button
- short		a "call button"
- floor		0
+ short         a "call button"
+ floor         0
 
 {examine : *examine_callbutton1 : *examine_callbutton2 : *examine_callbutton3 
 write "Pushing this button summons the elevator to this floor. It's "
@@ -8754,7 +8754,7 @@ write "The button lights up as you press it.^"
 }
 
 object mirror: large gold framed mirror
- short		a "large gold framed mirror"
+ short         a "large gold framed mirror"
  
 {examine : look_in
 write "It has been a long time since you have dressed up for a formal "
@@ -8766,18 +8766,18 @@ write "Not a sausage.^"
 }
 
 object vase: brass vase
- has		CONTAINER
- short		a "brass vase"
- long		"There is a brass vase resting on the ground.^"
- quantity	5
- mass		10
- parent 	side_table
+ has           CONTAINER
+ short         a "brass vase"
+ long          "There is a brass vase resting on the ground.^"
+ quantity      5
+ mass          10
+ parent        side_table
 
 object butt: cigarette butt
- long		"An old cigarette butt rests on the ground.^"
- short		a "cigarette butt"
- mass		2
- parent 	vase
+ long          "An old cigarette butt rests on the ground.^"
+ short         a "cigarette butt"
+ mass          2
+ parent        vase
  
 {examine : sniff
 write "Quite repugnant, really.^"
@@ -8789,28 +8789,28 @@ set time = false
 }
 
 object flowers: dried flowers
- has		PLURAL
- short		some "dried flowers"
- long		"A bunch of dried flowers rest here.^"
- mass		5
- parent 	vase
+ has           PLURAL
+ short         some "dried flowers"
+ long          "A bunch of dried flowers rest here.^"
+ mass          5
+ parent        vase
 
 {sniff
 write "The flowers are dried and therefore practically odourless.^"
 }
 
 object side_table: ornate side table
- has        SURFACE
- short      a "ornate side table"
- quantity   10
+ has           SURFACE
+ short         a "ornate side table"
+ quantity      10
  
 location first_floor : first floor
- short		the "first floor"
- has		OUTSIDE_LIFT
- north		nowhere
- south		mezzanine
- x		12
- y		2
+ short         the "first floor"
+ has           OUTSIDE_LIFT
+ north         nowhere
+ south         mezzanine
+ x             12
+ y             2
 
 {movement
 if +door_warning = true
@@ -8830,16 +8830,16 @@ write "level that overlooks the lobby. There is a call button on the wall.^"
 }
 
 object callbutton1: call button
- short		a "call button"
- floor		1
+ short         a "call button"
+ floor         1
 
 location second_floor : second floor
- short		the "second floor"
- has		OUTSIDE_LIFT
- north		nowhere
- south		second_hallway
- x		13
- y		2
+ short         the "second floor"
+ has           OUTSIDE_LIFT
+ north         nowhere
+ south         second_hallway
+ x             13
+ y             2
 
 {look
 if here has VISITED
@@ -8859,14 +8859,14 @@ return false
 }
 
 object callbutton2: call button
- short		a "call button"
- floor		2
+ short         a "call button"
+ floor         2
 
 location second_hallway : second floor hallway
- short		the "second floor hallway"
- north		second_floor
- x		13
- y		3
+ short         the "second floor hallway"
+ north         second_floor
+ x             13
+ y             3
 
 {movement
 if compass = east : compass = west
@@ -8887,7 +8887,7 @@ write "area.^"
 }
 
 object painting_1: seurat painting
- short		a "Seurat painting"
+ short         a "Seurat painting"
 
 {examine
 write "The painting is a print of George Seurat's ~Sunday Afternoon on the "
@@ -8895,20 +8895,20 @@ write "Island of la Grande Jatte~.^"
 }
 
 object doors_2: numbered second floor doors
- has		CLOSABLE CLOSED LOCKED PLURAL
- short		the "second floor doors"
+ has           CLOSABLE CLOSED LOCKED PLURAL
+ short         the "second floor doors"
 
 {open
 write "You try a few of the doors, but they are all locked.^"
 }
 
 location third_floor : third floor
- short		the "third floor"
- has		OUTSIDE_LIFT
- north		nowhere
- south		conference_room
- x		12
- y		3
+ short         the "third floor"
+ has           OUTSIDE_LIFT
+ north         nowhere
+ south         conference_room
+ x             12
+ y             3
 
 {movement
 if +door_warning = true
@@ -8932,16 +8932,16 @@ endif
 }
 
 object callbutton3: call button
- short		a "call button"
- floor		3
+ short         a "call button"
+ floor         3
 
 location conference_room : conference room
- short		the "conference room"
- north		third_floor
- southwest	backstage
- west		backstage
- x		12
- y		4
+ short         the "conference room"
+ north         third_floor
+ southwest     backstage
+ west          backstage
+ x             12
+ y             4
 
 {movement
 if compass = southwest : compass = west
@@ -8981,8 +8981,8 @@ write "in the southwest corner.^"
 }
 
 object mc: distinguished-looking distinguished gentleman man
- has		ANIMATE
- short		the "distinguished-looking gentleman"
+ has           ANIMATE
+ short         the "distinguished-looking gentleman"
 
 {examine
 write "The distinguished-looking gentleman is currently seated at a table "
@@ -8994,9 +8994,9 @@ write "The distinguished-looking gentleman looks up at you and smiles.^"
 }
 
 object lectern: lectern podium stand
- has		SURFACE
- short		a "lectern"
- quantity	20
+ has           SURFACE
+ short         a "lectern"
+ quantity      20
 
 {examine
 write "The lectern is reasonably plain.^"
@@ -9007,7 +9007,7 @@ write "There is nothing other than the dark maroon curtain.^"
 }
 
 object curtain: dark maroon curtain
- short		a "dark maroon curtain"
+ short         a "dark maroon curtain"
 
 {look_behind
 write "The curtain is obviously for decoration only, as behind it lies "
@@ -9023,20 +9023,20 @@ write "There is no apparent way (or need) to close the dark maroon curtain.^"
 }
 
 object conference_guests: conference guest guests patrons
- has		ANIMATE PLURAL
- short		the "conference guests"
+ has           ANIMATE PLURAL
+ short         the "conference guests"
 
 object conf_tables: conference tables table
- has		PLURAL
- short		the "tables"
+ has           PLURAL
+ short         the "tables"
 
 location backstage : backstage area
- short		the "backstage area"
- east		conference_room
- northeast	conference_room
- south		nowhere
- x		11
- y		4
+ short         the "backstage area"
+ east          conference_room
+ northeast     conference_room
+ south         nowhere
+ x             11
+ y             4
 
 {movement
 if compass = south 
@@ -9073,8 +9073,8 @@ write "other side of the doorway.^"
 }
 
 object south_door: south door
- has		CLOSABLE CLOSED
- short		the "south door"
+ has           CLOSABLE CLOSED
+ short         the "south door"
 	
 {knock_on
 if south_door hasnt CLOSED
@@ -9108,19 +9108,19 @@ write "You gently close the door.^"
 }
 
 object west_door: west door
- has		LOCKED CLOSABLE CLOSED
- short		the "west door"
+ has           LOCKED CLOSABLE CLOSED
+ short         the "west door"
 
 {knock_on
 write "There is no reply.^"
 }
 
 location z_office : dr doctor zuckerman's zuckermans office
- short		name "Dr Zuckerman's office"
- out		backstage
- north		backstage
- x		11
- y		5
+ short         name "Dr Zuckerman's office"
+ out           backstage
+ north         backstage
+ x             11
+ y             5
 
 {eachturn
 if HUGHES_SCRIPT = 0
@@ -9219,20 +9219,20 @@ proxy "sit in chair"
 }
 
 object jing: jing life force life-force energy prenatal congenital essence
- short		name "congenital jing"
- parent		nowhere
+ short         name "congenital jing"
+ parent        nowhere
 
 object bookcase: bookcase books bookshelf bookshelves book shelf shelves
- short		a "bookcase"
+ short         a "bookcase"
 
 {examine
 write "Literally thousands of books line the shelves of the bookcase.^"
 }
 
 object writing_desk: mahogany desk
- has		SURFACE
- short		a "mahogany desk"
- quantity	40
+ has           SURFACE
+ short         a "mahogany desk"
+ quantity      40
 
 {examine : look_behind
 write "Behind the desk is a fine leather chair, worthy of its place behind "
@@ -9240,7 +9240,7 @@ write "such an impressive piece of furniture.^"
 }
 
 object arm_chair: leather chair
- short		an "leather chair"
+ short         an "leather chair"
 
 {sit_on
 write "Sitting in a man's office chair is like sitting on his throne - not "
@@ -9248,8 +9248,8 @@ write "very polite.^"
 }
 
 object ornate_window: ornate_window
- has		CLOSED CLOSABLE
- short		an "ornate window"
+ has           CLOSED CLOSABLE
+ short         an "ornate window"
 
 {listen_to
 write "You hear the soothing sound of rain beating against the window.^"
@@ -9263,10 +9263,10 @@ write "on cold rainy nights such as this.^"
 attribute TALKED_ABOUT
 
 object zuckerman: dr doctor leif zuckerman man
- has		ANIMATE
- short		name "Dr Leif Zuckerman"
- long		function
- mass		heavy
+ has           ANIMATE
+ short         name "Dr Leif Zuckerman"
+ long          function
+ mass          heavy
 
 {long
 if zuckerman(status) = 0
@@ -10527,9 +10527,9 @@ attribute   OUTSIDE_LIFT
 integer FLOOR_MAPPING ground_floor first_floor second_floor third_floor
 
 location lift : lift
- short		the "elevator"
- x		13
- y		5
+ short         the "elevator"
+ x             13
+ y             5
 
 {look
 if here has VISITED
@@ -10561,7 +10561,7 @@ return false
 }
  
 object cbutton: close doors button
- short		a "close doors button"
+ short         a "close doors button"
 
 {press : move
 if lift_obj(turns_till_doors_close) = 0
@@ -10574,7 +10574,7 @@ execute "+lift_close"
 }
 
 object obutton: open doors button
- short		an "open doors button"
+ short         an "open doors button"
 
 {press : move
 if lift_obj(turns_till_doors_close) > 0
@@ -10591,32 +10591,32 @@ execute "+lift_open"
 }
 
 object gbutton: ground floor button
- short		a "ground floor button"
- floor		0
+ short         a "ground floor button"
+ floor         0
 
 {press : move
 execute +floorbuttonpress<self
 }
 
 object 1button: first floor button
- short		a "first floor button"
- floor		1
+ short         a "first floor button"
+ floor         1
 
 {press : move
 execute +floorbuttonpress<self
 }
 
 object 2button: second floor button
- short		a "second floor button"
- floor		2
+ short         a "second floor button"
+ floor         2
 
 {press : move
 execute +floorbuttonpress<self
 }
 
 object 3button: second floor button
- short		a "third floor button"
- floor		3
+ short         a "third floor button"
+ floor         3
 
 {press : move
 write "The button lights as you press it, only to go off again when you "
@@ -10625,28 +10625,28 @@ write "slot flash on and off momentarily.^"
 }
 
 object lift_red: small red light led
- short		a "small red light"
+ short         a "small red light"
 
 {examine
 write "The small red light is currently out.^"
 }
  
 object lift_green: small green light
- short		a "small green light"
+ short         a "small green light"
 
 {examine
 write "The small green light is currently out.^"
 }
  
 object slot_1: mil key slot
- short		a "MIL key slot"
+ short         a "MIL key slot"
 
 object mil_key: mil key
- short		a "MIL key"
- parent		nowhere
+ short         a "MIL key"
+ parent        nowhere
 
 object lift_panel : panel of buttons
- short		a "panel of buttons"
+ short         a "panel of buttons"
 
 {examine
 write "The panel consists of six buttons labelled ground, one, two, three, "
@@ -10668,7 +10668,7 @@ execute examine_display
 string led_display	G 1 2 3
 
 object display : led display
- short		an "LED display"
+ short         an "LED display"
 
 {examine
 write "Above the panel is an LED display with a large red '"
@@ -10683,8 +10683,8 @@ constant turns_till_doors_close 	7
 constant delta						8
 
 object lift_obj: lift door doors
- short		the "lift"
- moving_to	arrived
+ short         the "lift"
+ moving_to     arrived
 
 {examine
 if lift_obj(turns_till_doors_close) > 0;
@@ -12968,8 +12968,8 @@ look
 }
 
 object plunger: plunger
- short		a "plunger"
- parent syringe
+ short         a "plunger"
+ parent        syringe
 
 {press : move
 if +contains_liquid?<syringe = false
@@ -12997,10 +12997,10 @@ write "Filling the syringe with air is of no use.^"
 }
 
 object kryten: myself self me alex meadows
- has		ANIMATE
- short		name "yourself"
- capacity	42
- parent		quarters
+ has           ANIMATE
+ short         name "yourself"
+ capacity      42
+ parent        quarters
  player
 
 {rub_with_soap : clean_with_soap : clean
@@ -13028,8 +13028,8 @@ set time = false
 }
 
 object hair: my hair
- short		name "your hair"
- parent 	kryten
+ short         name "your hair"
+ parent        kryten
 
 {examine
 write "Your hair is dark brown"
@@ -13040,9 +13040,9 @@ write .^
 }
 
 object teeth: my teeth
- has		PLURAL
- short		name "your teeth"
- parent 	kryten
+ has           PLURAL
+ short         name "your teeth"
+ parent        kryten
 
 {clean
 execute "clean_with_toothbrush_teeth"
@@ -13067,24 +13067,24 @@ write "Smiling into the mirror, your teeth seem fine.^"
 }
 
 object north_wall: north north wall
- has			NO_TAB
- short          the "north wall"
+ has           NO_TAB
+ short         the "north wall"
 
 object south_wall: south southern wall
- has			NO_TAB
- short          the "south wall"
+ has           NO_TAB
+ short         the "south wall"
 
 object east_wall: east eastern wall
- has			NO_TAB
- short          the "east wall"
+ has           NO_TAB
+ short         the "east wall"
 
 object west_wall: west western wall
- has			NO_TAB
- short          the "west wall"
+ has           NO_TAB
+ short         the "west wall"
 
 object ground: ground floor
- has            SURFACE NO_TAB
- short          the "ground"
+ has           SURFACE NO_TAB
+ short         the "ground"
 
 {+bootstrap
 if interpreter = CGI
