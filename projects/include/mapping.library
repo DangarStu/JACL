@@ -85,6 +85,10 @@ integer map_word_index
 integer map_label_y
 integer map_arm_x
 integer map_arm_y
+integer map_arm_base_x
+integer map_arm_base_y
+integer map_arrow_dx
+integer map_arrow_dy
 string_array map_label_parts 8
 
 # Bounding-box globals populated by +map_bounds and consumed by +map_body.
@@ -266,31 +270,65 @@ select VISITED map_here
 
          write "paper.path(~M" map_x " " map_y "L" map_dest_x " " map_dest_y "~).attr(~stroke~, ~#888~);"
 
-         # Distinguish up/down exits from plain north/south ones by adding
-         # a down-pointing arrowhead at the stub tip. Both up-exit and
-         # down-exit stubs get the SAME down-pointing arrow, so the arrow
-         # direction is absolute ("down the page = down the stairs")
-         # rather than relative to the player's current location. Viewer
-         # reads: wherever the arrows are, their arm-side is the higher
-         # room and their tip-side is the lower room.
-         ifall map_loop = 8
-            set map_arm_y = map_dest_y
-            set map_arm_y - 5
-            set map_arm_x = map_dest_x
-            set map_arm_x - 5
-            write "paper.path(~M" map_dest_x " " map_dest_y "L" map_arm_x " " map_arm_y "~).attr(~stroke~, ~#888~);"
-            set map_arm_x = map_dest_x
-            set map_arm_x + 5
-            write "paper.path(~M" map_dest_x " " map_dest_y "L" map_arm_x " " map_arm_y "~).attr(~stroke~, ~#888~);"
+         # ARROWHEADS FOR UP/DOWN EXITS
+         #
+         # The arrow's tip always points at the LOWER (down) room of the
+         # up/down pair, using the in-game up/down semantics -- NOT the
+         # map's geometric north/south direction. That way a down-exit
+         # whose destination is drawn northeast of the source (because of
+         # layout constraints) still has its arrow tip pointing toward
+         # the NE room, correctly telling the reader "that room is down
+         # from here."
+         #
+         # For a DOWN exit the tip points along the stub direction
+         # (destination = lower room). For an UP exit it points opposite
+         # the stub (source = lower room); the arm-base is past the stub
+         # tip so the arrowhead visually sits at the stub endpoint with
+         # its point aimed back at the source.
+         set map_arrow_dx = 0
+         set map_arrow_dy = 0
+         if map_loop = 8
+            set map_arrow_dx = 0
+            set map_arrow_dx - map_stub_x
+            set map_arrow_dy = 0
+            set map_arrow_dy - map_stub_y
          endif
          if map_loop = 9
-            set map_arm_y = map_dest_y
-            set map_arm_y - 5
-            set map_arm_x = map_dest_x
-            set map_arm_x - 5
+            set map_arrow_dx = map_stub_x
+            set map_arrow_dy = map_stub_y
+         endif
+         ifall map_arrow_dx = 0 : map_arrow_dy = 0
+            # Not an up/down exit, skip arrow.
+         else
+            # Arm base = tip - arrow_dir * 5
+            set map_arm_x = map_arrow_dx
+            set map_arm_x * 5
+            set map_arm_base_x = map_dest_x
+            set map_arm_base_x - map_arm_x
+            set map_arm_y = map_arrow_dy
+            set map_arm_y * 5
+            set map_arm_base_y = map_dest_y
+            set map_arm_base_y - map_arm_y
+
+            # Perpendicular to arrow direction: (-dy, dx).
+            # Arm 1 = arm_base + perp * 5
+            set map_arm_x = 0
+            set map_arm_x - map_arrow_dy
+            set map_arm_x * 5
+            set map_arm_x + map_arm_base_x
+            set map_arm_y = map_arrow_dx
+            set map_arm_y * 5
+            set map_arm_y + map_arm_base_y
             write "paper.path(~M" map_dest_x " " map_dest_y "L" map_arm_x " " map_arm_y "~).attr(~stroke~, ~#888~);"
-            set map_arm_x = map_dest_x
-            set map_arm_x + 5
+
+            # Arm 2 = arm_base - perp * 5
+            set map_arm_x = map_arrow_dy
+            set map_arm_x * 5
+            set map_arm_x + map_arm_base_x
+            set map_arm_y = 0
+            set map_arm_y - map_arrow_dx
+            set map_arm_y * 5
+            set map_arm_y + map_arm_base_y
             write "paper.path(~M" map_dest_x " " map_dest_y "L" map_arm_x " " map_arm_y "~).attr(~stroke~, ~#888~);"
          endif
       endif
