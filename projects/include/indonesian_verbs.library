@@ -556,7 +556,6 @@ set time = false
 }
 
 grammar voices >voices_list
-grammar suaras >voices_list
 
 {+voices_list
 write "<script>jaclListVoices();</script>"
