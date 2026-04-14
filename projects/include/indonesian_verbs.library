@@ -129,12 +129,12 @@ grammar jalan_keluar >exits
 
 {+exits
 execute "+calculate_exits"
-write "Anda bisa pergi ke "
 if INDEX = 0
-   write "mana pun!^"
+   write "Tidak ada jalan keluar dari sini.^"
    set time = false
    return true
 endif
+write "Anda bisa pergi ke "
 set COUNTER = 0
 repeat
    if available_exits[COUNTER] != nowhere
