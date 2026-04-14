@@ -295,6 +295,22 @@ print:
 set linebreaks = true
 }
 
+# -------------------------------------------------------------------
+# +library_eachturn -- called by verbs.library's +system_eachturn after
+# every turn-consuming command. Emits the current exits list inside a
+# <jacl-directions> marker element; the ajax response handler detects
+# this marker and swaps its content into the footer's .directions bar
+# so the directions stay fresh after movements, door opens, etc.
+# -------------------------------------------------------------------
+
+{+library_eachturn
+set linebreaks = false
+write "<jacl-directions style=~display:none~>"
+execute "+exits"
+write "</jacl-directions>"
+set linebreaks = true
+}
+
 {+local_success
 print:
       var maintext = document.getElementById("maintext");^
@@ -320,6 +336,12 @@ print:
       var jaclscript = maintext.querySelector('script');^
       if (jaclscript != null) {^
          (new Function(jaclscript.text))();
+      }^
+      var jaclDirUpdate = maintext.querySelector('jacl-directions');^
+      if (jaclDirUpdate) {^
+         var dirBar = document.querySelector('.directions');^
+         if (dirBar) dirBar.innerHTML = jaclDirUpdate.innerHTML;^
+         jaclDirUpdate.remove();^
       }^
       if (isSpeakEnabled()) {^
          speakText(data);^

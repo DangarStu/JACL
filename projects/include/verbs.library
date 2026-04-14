@@ -4747,6 +4747,11 @@ set time = false
 
 {+system_eachturn
 setstring question "none"
+ifexecute "+library_eachturn"
+   # LIBRARIES (e.g. webinterface.library) MAY DEFINE +library_eachturn
+   # TO EMIT PER-TURN UPDATES (e.g. refreshed directions bar) WITHOUT
+   # COLLIDING WITH A GAME'S OWN +eachturn.
+endif
 }
 
 integer candidate
