@@ -198,12 +198,17 @@ select VISITED map_here
          set map_y + 35
 
          # Draw a short stub from the source node in the direction of the
-         # destination: 40 px from source centre, i.e. 10 px past the node
-         # edge (nodes are 60 px). Two adjacent visited rooms each draw a
-         # stub toward each other; those stubs overlap in the middle and
-         # read as a single connecting line. A visited room with an
-         # unvisited exit shows just its own 10-px whisker -- a hint that
-         # an exit exists without pulling the eye across empty space.
+         # destination. Two adjacent visited rooms each draw a stub toward
+         # each other; those stubs overlap in the middle and read as a
+         # single connecting line. A visited room with an unvisited exit
+         # shows just its own short whisker -- a hint that an exit exists
+         # without pulling the eye across empty space.
+         #
+         # Orthogonal stubs use 40 px per axis (10 past the 30-px node
+         # half-width). Diagonal stubs use 57 px per axis so the stub
+         # reaches along the hypotenuse of the adjacent cell rather than
+         # stopping short; without this, NE/NW/SE/SW exits fall noticeably
+         # short of their neighbour's node even when both are visited.
          set map_stub_x = 0
          if map_target(x) > map_here(x)
             set map_stub_x = 1
@@ -218,11 +223,19 @@ select VISITED map_here
          if map_target(y) < map_here(y)
             set map_stub_y = -1
          endif
+
+         # Per-axis stub length: 57 if diagonal (both signs nonzero),
+         # else 40. Multiplied by the sign to get the axis offset.
          set map_dest_x = map_stub_x
-         set map_dest_x * 40
-         set map_dest_x + map_x
          set map_dest_y = map_stub_y
-         set map_dest_y * 40
+         ifall map_stub_x != 0 : map_stub_y != 0
+            set map_dest_x * 57
+            set map_dest_y * 57
+         else
+            set map_dest_x * 40
+            set map_dest_y * 40
+         endif
+         set map_dest_x + map_x
          set map_dest_y + map_y
 
          write "paper.path(~M" map_x " " map_y "L" map_dest_x " " map_dest_y "~).attr(~stroke~, ~#888~);"
