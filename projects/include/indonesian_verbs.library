@@ -5177,6 +5177,9 @@ set time = false
 
 {+system_eachturn
 setstring question "none"
+ifexecute "+library_eachturn"
+   # LIBRARIES MAY DEFINE +library_eachturn FOR PER-TURN UPDATES.
+endif
 }
 
 integer candidate
