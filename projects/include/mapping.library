@@ -262,14 +262,16 @@ select VISITED map_here
    if map_here hasnt LOCATION
       # Not a location -- skip, same reason as above.
    else
+   # Rect takes top-left as the origin; for cell=150 and node=60 that
+   # means offset (cell-node)/2 = 45 px into the cell, not cell/2.
    set map_x = map_here(x)
    set map_x + map_offset_x
    set map_x * 150
-   set map_x + 75
+   set map_x + 45
    set map_y = map_here(y)
    set map_y + map_offset_y
    set map_y * 150
-   set map_y + 75
+   set map_y + 45
    write "var node = paper.rect(" map_x ", " map_y ", 60, 60, 10);"
    if map_here = here
       write "node.attr(~fill~, ~#BDD8D6~);"
