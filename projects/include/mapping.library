@@ -90,6 +90,13 @@ integer map_arrow_dx
 integer map_arrow_dy
 integer map_arrow_pos_x
 integer map_arrow_pos_y
+integer map_line_dx
+integer map_line_dy
+integer map_abs_dx
+integer map_abs_dy
+integer map_cheby
+integer map_perp_x
+integer map_perp_y
 string_array map_label_parts 8
 
 # Bounding-box globals populated by +map_bounds and consumed by +map_body.
@@ -270,77 +277,99 @@ select VISITED map_here
 
          # ARROWHEADS FOR UP/DOWN EXITS
          #
-         # The arrow sits at the midpoint of the connecting line,
-         # pointing toward the LOWER room. Midpoint is always exactly on
-         # the line regardless of the line's slope (an offset like
-         # dest - stub*30 only works for 45-degree diagonals), and both
-         # sides of a matched up/down pair compute the same midpoint --
-         # so the two sides' arrows coincide into a single visible one.
+         # Arrow sits at the midpoint of the connecting line with arms
+         # perpendicular to the line's actual direction -- so it stays
+         # "square to the line" regardless of the line's slope.
          #
-         # For DOWN exit (map_loop = 9): lower room = destination, arrow
-         # points along the stub.
-         # For UP exit (map_loop = 8): lower room = source, arrow points
-         # opposite the stub.
-         set map_arrow_dx = 0
-         set map_arrow_dy = 0
-         set map_arrow_pos_x = 0
-         set map_arrow_pos_y = 0
-         if map_loop = 8
-            # UP: arrow direction = -stub (toward source)
-            set map_arrow_dx = 0
-            set map_arrow_dx - map_stub_x
-            set map_arrow_dy = 0
-            set map_arrow_dy - map_stub_y
-            set map_arrow_pos_x = map_x
-            set map_arrow_pos_x + map_dest_x
-            set map_arrow_pos_x / 2
-            set map_arrow_pos_y = map_y
-            set map_arrow_pos_y + map_dest_y
-            set map_arrow_pos_y / 2
-         endif
-         if map_loop = 9
-            # DOWN: arrow direction = stub (toward destination)
-            set map_arrow_dx = map_stub_x
-            set map_arrow_dy = map_stub_y
-            set map_arrow_pos_x = map_x
-            set map_arrow_pos_x + map_dest_x
-            set map_arrow_pos_x / 2
-            set map_arrow_pos_y = map_y
-            set map_arrow_pos_y + map_dest_y
-            set map_arrow_pos_y / 2
-         endif
-         ifall map_arrow_dx = 0 : map_arrow_dy = 0
-            # Not an up/down exit, skip arrow.
+         # Uses the real pixel delta (dest - src) as the line direction
+         # vector, normalised by its Chebyshev distance (max of |dx|,
+         # |dy|) so the arrowhead is a consistent visual size regardless
+         # of line length. Arm direction is scaled to ~10 px per axis.
+         #
+         # For DOWN exit (map_loop = 9): arrow points toward destination
+         # (lower room), so arm_base is back toward source.
+         # For UP exit (map_loop = 8): arrow points toward source (lower
+         # room), so arm_base is toward destination.
+         ifall map_loop != 8 : map_loop != 9
+            # Not an up/down exit.
          else
-            # Arm base = tip - arrow_dir * 5
-            set map_arm_x = map_arrow_dx
-            set map_arm_x * 5
-            set map_arm_base_x = map_arrow_pos_x
-            set map_arm_base_x - map_arm_x
-            set map_arm_y = map_arrow_dy
-            set map_arm_y * 5
-            set map_arm_base_y = map_arrow_pos_y
-            set map_arm_base_y - map_arm_y
+            # Midpoint of the line = arrow tip.
+            set map_arrow_pos_x = map_x
+            set map_arrow_pos_x + map_dest_x
+            set map_arrow_pos_x / 2
+            set map_arrow_pos_y = map_y
+            set map_arrow_pos_y + map_dest_y
+            set map_arrow_pos_y / 2
 
-            # Perpendicular to arrow direction: (-dy, dx).
-            # Arm 1 = arm_base + perp * 5
-            set map_arm_x = 0
-            set map_arm_x - map_arrow_dy
-            set map_arm_x * 5
-            set map_arm_x + map_arm_base_x
-            set map_arm_y = map_arrow_dx
-            set map_arm_y * 5
-            set map_arm_y + map_arm_base_y
+            # Line direction delta in pixels.
+            set map_line_dx = map_dest_x
+            set map_line_dx - map_x
+            set map_line_dy = map_dest_y
+            set map_line_dy - map_y
+
+            # |dx| and |dy|
+            set map_abs_dx = map_line_dx
+            if map_abs_dx < 0
+               set map_abs_dx = 0
+               set map_abs_dx - map_line_dx
+            endif
+            set map_abs_dy = map_line_dy
+            if map_abs_dy < 0
+               set map_abs_dy = 0
+               set map_abs_dy - map_line_dy
+            endif
+
+            # Chebyshev (max of the two abs values) for normalisation.
+            set map_cheby = map_abs_dx
+            if map_abs_dy > map_cheby
+               set map_cheby = map_abs_dy
+            endif
+            if map_cheby = 0
+               set map_cheby = 1
+            endif
+
+            # arm_back vector: -line_dir * 10 / cheby for DOWN (back
+            # toward source); +line_dir * 10 / cheby for UP (back
+            # toward destination).
+            if map_loop = 9
+               set map_arm_base_x = 0
+               set map_arm_base_x - map_line_dx
+               set map_arm_base_y = 0
+               set map_arm_base_y - map_line_dy
+            endif
+            if map_loop = 8
+               set map_arm_base_x = map_line_dx
+               set map_arm_base_y = map_line_dy
+            endif
+            set map_arm_base_x * 10
+            set map_arm_base_x / map_cheby
+            set map_arm_base_x + map_arrow_pos_x
+            set map_arm_base_y * 10
+            set map_arm_base_y / map_cheby
+            set map_arm_base_y + map_arrow_pos_y
+
+            # Perpendicular to line: (-line_dy, line_dx), scaled the
+            # same way.
+            set map_perp_x = 0
+            set map_perp_x - map_line_dy
+            set map_perp_x * 10
+            set map_perp_x / map_cheby
+            set map_perp_y = map_line_dx
+            set map_perp_y * 10
+            set map_perp_y / map_cheby
+
+            # Arm 1 = arm_base + perp
+            set map_arm_x = map_arm_base_x
+            set map_arm_x + map_perp_x
+            set map_arm_y = map_arm_base_y
+            set map_arm_y + map_perp_y
             write "paper.path(~M" map_arrow_pos_x " " map_arrow_pos_y "L" map_arm_x " " map_arm_y "~).attr(~stroke~, ~#888~);"
 
-            # Arm 2 = arm_base - perp * 5
-            set map_arm_x = map_arrow_dy
-            set map_arm_x * 5
-            set map_arm_x + map_arm_base_x
-            set map_arm_y = 0
-            set map_arm_y - map_arrow_dx
-            set map_arm_y * 5
-            set map_arm_y + map_arm_base_y
+            # Arm 2 = arm_base - perp
+            set map_arm_x = map_arm_base_x
+            set map_arm_x - map_perp_x
+            set map_arm_y = map_arm_base_y
+            set map_arm_y - map_perp_y
             write "paper.path(~M" map_arrow_pos_x " " map_arrow_pos_y "L" map_arm_x " " map_arm_y "~).attr(~stroke~, ~#888~);"
          endif
       endif
