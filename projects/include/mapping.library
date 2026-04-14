@@ -448,6 +448,11 @@ execute "+map_bounds"
 set linebreaks = false
 write "<div id=~jacl_map~></div>"
 write "<script>"
+# Each `map` command appends its own <div id='jacl_map'> to #maintext.
+# Remove any divs from previous invocations before drawing so there's
+# only one element with that id and Raphael targets the new one.
+write "var _divs = document.querySelectorAll('#jacl_map');"
+write "for (var _i = 0; _i < _divs.length - 1; _i++) _divs[_i].remove();"
 write "var paper = Raphael(~jacl_map~, " map_canvas_w ", " map_canvas_h ", null);"
 execute "+map_body"
 
