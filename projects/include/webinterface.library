@@ -258,6 +258,8 @@ write "<div class=~links~>
 write " | "
 hyperlink "Instructions" "instructions" "header"
 write " | "
+hyperlink "Map" "map window" "header"
+write " | "
 hyperlink "About" "about" "header"
 write " | "
 hyperlink "Restart" "restart" "header"
