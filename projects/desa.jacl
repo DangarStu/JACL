@@ -17,7 +17,7 @@ constant maintext_colour "#f5f0e8"
 # -----------------------------------------------------------------------------
 
 location rumah : rumah pondok gubuk
-  short		name "Rumah"
+ short         name "Rumah"
 
 {look
 write "Kamu berada di dalam rumahmu yang kecil tapi nyaman. "
@@ -41,9 +41,9 @@ return false
 }
 
 object pintu : pintu
-  short		sebuah "pintu kayu"
-  has		CLOSABLE CLOSED
-  mass		scenery
+ short         sebuah "pintu kayu"
+ has           CLOSABLE CLOSED
+ mass          scenery
 
 {examine
 if pintu has CLOSED
@@ -68,8 +68,8 @@ set sawah(north) = nowhere
 }
 
 object tikar : tikar
-  short		sebuah "tikar"
-  mass		scenery
+ short         sebuah "tikar"
+ mass          scenery
 
 {examine
 write "Tikar ini terbuat dari anyaman pandan. Kamu tidur di atasnya setiap malam.^"
@@ -81,19 +81,19 @@ set time = false
 }
 
 object meja : meja kayu
-  short		sebuah "meja kayu"
-  has		SURFACE
-  mass		scenery
+ short         sebuah "meja kayu"
+ has           SURFACE
+ mass          scenery
 
 {examine
 write "Meja kayu kecil yang sederhana. Permukaannya halus karena sudah sering dipakai.^"
 }
 
 object cangkir : cangkir kopi
-  short		sebuah "cangkir kopi"
-  long		"Sebuah cangkir kopi ada di atas meja.^"
-  parent	meja
-  mass		5
+ short         sebuah "cangkir kopi"
+ long          "Sebuah cangkir kopi ada di atas meja.^"
+ parent        meja
+ mass          5
 
 {examine
 write "Cangkir keramik berisi kopi hitam yang masih hangat.^"
@@ -106,8 +106,8 @@ write "Kamu menyeruput kopi hitam. Pahit tapi enak.^"
 # -----------------------------------------------------------------------------
 
 location sawah : sawah padi
-  short		name "Sawah"
-  west		jalan_utama
+ short         name "Sawah"
+ west          jalan_utama
 
 {look
 print:
@@ -120,26 +120,26 @@ print:
 }
 
 object padi : padi tanaman
-  short		name "padi"
-  mass		scenery
+ short         name "padi"
+ mass          scenery
 
 {examine
 write "Tanaman padi tumbuh subur. Butirnya hampir siap dipanen.^"
 }
 
 object capung : capung
-  short		seekor "capung"
-  mass		scenery
+ short         seekor "capung"
+ mass          scenery
 
 {examine
 write "Capung berwarna biru terbang rendah di atas air sawah.^"
 }
 
 object kuntul : kuntul burung bangau putih
-  short		seekor "kuntul putih"
-  long		"Seekor kuntul putih berdiri diam di tepi sawah, mengawasi air.^"
-  has		ANIMATE
-  mass		scenery
+ short         seekor "kuntul putih"
+ long          "Seekor kuntul putih berdiri diam di tepi sawah, mengawasi air.^"
+ has           ANIMATE
+ mass          scenery
 
 {examine
 write "Burung kuntul putih dengan kaki panjang dan paruh kuning. "
@@ -158,13 +158,13 @@ write "Kuntul itu memiringkan kepalanya dan menatapmu sejenak, lalu kembali meng
 # -----------------------------------------------------------------------------
 
 location jalan_utama : jalan utama
-  short		name "Jalan Utama"
-  east		sawah
-  north		warung
-  south		banjar
-  northeast	gang
-  x		1
-  y		1
+ short         name "Jalan Utama"
+ east          sawah
+ north         warung
+ south         banjar
+ northeast     gang
+ x             1
+ y             1
 
 {look
 print:
@@ -179,10 +179,10 @@ print:
 # -----------------------------------------------------------------------------
 
 location gang : gang lorong jalan_sempit
-  short		name "Gang sempit"
-  southwest	jalan_utama
-  x		2
-  y		0
+ short         name "Gang sempit"
+ southwest     jalan_utama
+ x             2
+ y             0
 
 {look
 print:
@@ -194,17 +194,17 @@ print:
 }
 
 object pohon : pohon besar
-  short		sebuah "pohon besar"
-  mass		scenery
+ short         sebuah "pohon besar"
+ mass          scenery
 
 {examine
 write "Pohon beringin yang besar dan tua. Akarnya menjalar ke mana-mana.^"
 }
 
 object anjing : anjing
-  short		seekor "anjing"
-  long		"Seekor anjing tidur di bawah pohon.^"
-  mass		scenery
+ short         seekor "anjing"
+ long          "Seekor anjing tidur di bawah pohon.^"
+ mass          scenery
 
 {examine
 write "Anjing kampung yang kurus sedang tidur di bawah pohon. "
@@ -218,8 +218,8 @@ write "Anjing itu mengangkat kepalanya sebentar, lalu tidur lagi.^"
 # -----------------------------------------------------------------------------
 
 location warung : warung kedai toko
-  short		name "Warung"
-  south		jalan_utama
+ short         name "Warung"
+ south         jalan_utama
 
 {look
 print:
@@ -232,8 +232,8 @@ print:
 }
 
 object bangku : bangku
-  short		sebuah "bangku"
-  mass		scenery
+ short         sebuah "bangku"
+ mass          scenery
 
 {examine
 write "Bangku kayu panjang untuk duduk para pelanggan.^"
@@ -244,18 +244,18 @@ write "Kamu duduk di bangku. Enak untuk istirahat sebentar.^"
 }
 
 object rak : rak
-  short		sebuah "rak"
-  mass		scenery
+ short         sebuah "rak"
+ mass          scenery
 
 {examine
 write "Rak kayu berisi keripik, kacang, air mineral, dan beberapa botol kecap.^"
 }
 
 object ibu_warung : ibu wanita penjual
-  short		name "Ibu Warung"
-  long		"Ibu Warung berdiri di belakang meja, tersenyum ramah.^"
-  has		ANIMATE
-  mass		heavy
+ short         name "Ibu Warung"
+ long          "Ibu Warung berdiri di belakang meja, tersenyum ramah.^"
+ has           ANIMATE
+ mass          heavy
 
 {examine
 write "Ibu Warung adalah wanita paruh baya yang ramah. "
@@ -276,10 +276,10 @@ write "~Kehidupan di sini tenang dan damai.~^"
 }
 
 object kucing : kucing
-  short		seekor "kucing belang"
-  long		"Seekor kucing belang sedang tidur melingkar di bawah bangku.^"
-  has		ANIMATE
-  mass		scenery
+ short         seekor "kucing belang"
+ long          "Seekor kucing belang sedang tidur melingkar di bawah bangku.^"
+ has           ANIMATE
+ mass          scenery
 
 {examine
 write "Kucing belang yang gemuk dan tampak puas. "
@@ -307,8 +307,8 @@ write "Kucing itu membuka satu mata, menatapmu sebentar, lalu menutup matanya la
 # -----------------------------------------------------------------------------
 
 location banjar : banjar balai aula
-  short		name "Banjar"
-  north		jalan_utama
+ short         name "Banjar"
+ north         jalan_utama
 
 {look
 print:
@@ -321,8 +321,8 @@ print:
 }
 
 object tiang : tiang kayu
-  short		sebuah "tiang kayu"
-  mass		scenery
+ short         sebuah "tiang kayu"
+ mass          scenery
 
 {examine
 write "Tiang-tiang kayu yang kokoh menopang atap banjar. "
@@ -330,19 +330,19 @@ write "Ada ukiran sederhana di permukaannya.^"
 }
 
 object meja_besar : meja besar
-  short		sebuah "meja besar"
-  has		SURFACE
-  mass		scenery
+ short         sebuah "meja besar"
+ has           SURFACE
+ mass          scenery
 
 {examine
 write "Meja besar tempat warga desa berkumpul untuk rapat dan upacara.^"
 }
 
 object buku_tamu : buku tamu
-  short		sebuah "buku tamu"
-  long		"Sebuah buku tamu tergeletak di atas meja.^"
-  parent	meja_besar
-  mass		5
+ short         sebuah "buku tamu"
+ long          "Sebuah buku tamu tergeletak di atas meja.^"
+ parent        meja_besar
+ mass          5
 
 {examine : read
 write "Buku ini berisi nama-nama tamu yang pernah mengunjungi desa. "
@@ -354,11 +354,11 @@ write "Halaman terakhir masih kosong.^"
 # -----------------------------------------------------------------------------
 
 object kryten : aku diri sendiri saya
-  has		ANIMATE
-  short		name "kamu"
-  quantity	42
-  parent	rumah
-  player
+ has           ANIMATE
+ short         name "kamu"
+ quantity      42
+ parent        rumah
+ player
 
 {examine
 write "Kamu merasa sehat dan siap untuk memulai hari.^"
@@ -370,24 +370,24 @@ execute "+inventory"
 # -----------------------------------------------------------------------------
 
 object north_wall : utara dinding utara
-  has		NO_TAB
-  short		sebuah "dinding utara"
+ has           NO_TAB
+ short         sebuah "dinding utara"
 
 object south_wall : selatan dinding selatan
-  has		NO_TAB
-  short		sebuah "dinding selatan"
+ has           NO_TAB
+ short         sebuah "dinding selatan"
 
 object east_wall : timur dinding timur
-  has		NO_TAB
-  short		sebuah "dinding timur"
+ has           NO_TAB
+ short         sebuah "dinding timur"
 
 object west_wall : barat dinding barat
-  has		NO_TAB
-  short		sebuah "dinding barat"
+ has           NO_TAB
+ short         sebuah "dinding barat"
 
 object ground : tanah lantai
-  has		SURFACE NO_TAB
-  short		sebuah "lantai"
+ has           SURFACE NO_TAB
+ short         sebuah "lantai"
 
 # -----------------------------------------------------------------------------
 # GLOBAL FUNCTIONS
