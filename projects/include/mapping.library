@@ -11,9 +11,14 @@
 # 2. Add raphael to the page head by overriding +local_header in your game:
 #        {+local_header
 #        print:
-#           <script src="/www/raphael.min.js"></script>
+#           <script src="/include/raphael.min.js"></script>
 #        .
 #        }
+#
+#    Under cgijacl the web interpreter only serves files listed in the
+#    game's .media file, so also add this line to your <game>.media
+#    (see mapping.media for the canonical entry):
+#        /include/raphael.min.js application/javascript www/raphael.min.js
 #
 # 3. Give every mappable location integer `x` and `y` properties. These are
 #    grid coordinates; by convention the `north` exit should lead to a

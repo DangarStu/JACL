@@ -13108,6 +13108,6 @@ constant maintext_colour "#eeeeee"
 
 {+local_header
 print:
-   <script src="/www/raphael.min.js"></script>
+   <script src="/include/raphael.min.js"></script>
 .
 }
