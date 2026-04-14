@@ -83,6 +83,8 @@ integer map_window_mode 0
 integer map_word_count
 integer map_word_index
 integer map_label_y
+integer map_arm_x
+integer map_arm_y
 string_array map_label_parts 8
 
 # Bounding-box globals populated by +map_bounds and consumed by +map_body.
@@ -263,6 +265,33 @@ select VISITED map_here
          set map_dest_y + map_y
 
          write "paper.path(~M" map_x " " map_y "L" map_dest_x " " map_dest_y "~).attr(~stroke~, ~#888~);"
+
+         # Distinguish up/down exits from plain north/south ones by adding
+         # an arrowhead at the stub tip, pointing in the direction of
+         # travel. Up exits (index 8) get an up-pointing arrow; down
+         # exits (index 9) get a down-pointing arrow. When both rooms are
+         # visited, their two arrows converge in the middle of the line
+         # -- viewer reads "each tip is where that exit takes you."
+         if map_loop = 8
+            set map_arm_y = map_dest_y
+            set map_arm_y + 5
+            set map_arm_x = map_dest_x
+            set map_arm_x - 5
+            write "paper.path(~M" map_dest_x " " map_dest_y "L" map_arm_x " " map_arm_y "~).attr(~stroke~, ~#888~);"
+            set map_arm_x = map_dest_x
+            set map_arm_x + 5
+            write "paper.path(~M" map_dest_x " " map_dest_y "L" map_arm_x " " map_arm_y "~).attr(~stroke~, ~#888~);"
+         endif
+         if map_loop = 9
+            set map_arm_y = map_dest_y
+            set map_arm_y - 5
+            set map_arm_x = map_dest_x
+            set map_arm_x - 5
+            write "paper.path(~M" map_dest_x " " map_dest_y "L" map_arm_x " " map_arm_y "~).attr(~stroke~, ~#888~);"
+            set map_arm_x = map_dest_x
+            set map_arm_x + 5
+            write "paper.path(~M" map_dest_x " " map_dest_y "L" map_arm_x " " map_arm_y "~).attr(~stroke~, ~#888~);"
+         endif
       endif
       set map_loop + 1
    until map_loop = 12
