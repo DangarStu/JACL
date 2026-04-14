@@ -85,7 +85,7 @@ print:
                    'Samantha', 'Daniel', 'Karen', 'Moira', 'Tessa', 'Fiona', 'Serena',^
                    'Amelie', 'Thomas', 'Audrey',^
                    'Anna', 'Markus', 'Petra',^
-                   'Paulina', 'Jorge', 'Monica', 'Diego',^
+                   'Google español', 'Paulina', 'Jorge', 'Monica', 'Diego',^
                    'Damayanti'];^
       for (var i = 0; i < prefs.length; i++) {^
          for (var j = 0; j < voices.length; j++) {^
