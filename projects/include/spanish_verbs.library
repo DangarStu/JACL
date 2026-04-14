@@ -568,6 +568,22 @@ write "<script>disableSpeak();</script>"
 set time = false
 }
 
+grammar voices >voices_list
+grammar voces >voices_list
+
+{+voices_list
+write "<script>jaclListVoices();</script>"
+set time = false
+}
+
+grammar voice $integer >voice_select
+grammar voz $integer >voice_select
+
+{+voice_select
+write "<script>jaclPickVoice(" $integer ");</script>"
+set time = false
+}
+
 grammar ayuda *present           >help_other
 grammar help *present           >help_other
 

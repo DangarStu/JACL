@@ -43,8 +43,7 @@ print:
       }).filter(function(p) { return p.length > 0; });^
       if (paragraphs.length === 0) return;^
       var lang = document.documentElement.lang || 'en-US';^
-      var voices = speechSynthesis.getVoices();^
-      var voice = voices.find(function(v) { return v.lang === lang; });^
+      var voice = jaclPickedVoice();^
       function speakNext(i) {^
          if (i >= paragraphs.length) return;^
          var utterance = new SpeechSynthesisUtterance(paragraphs[i]);^
@@ -71,6 +70,79 @@ print:
 
    function isSpeakEnabled() {^
       return localStorage.getItem('jaclSpeak') === 'true';^
+   }^
+
+   function jaclGetVoicesForLang() {^
+      var lang = document.documentElement.lang || 'en-US';^
+      var langPrefix = lang.split('-')[0];^
+      return speechSynthesis.getVoices().filter(function(v) {^
+         return v.lang === lang || v.lang.indexOf(langPrefix + '-') === 0 || v.lang.indexOf(langPrefix + '_') === 0;^
+      });^
+   }^
+
+   function jaclDefaultVoice(voices) {^
+      var prefs = ['Samantha', 'Google US English', 'Google UK English Female', 'Google UK English Male',^
+                   'Daniel', 'Karen', 'Moira', 'Tessa', 'Fiona', 'Serena',^
+                   'Amelie', 'Thomas', 'Audrey',^
+                   'Anna', 'Markus', 'Petra',^
+                   'Paulina', 'Jorge', 'Monica', 'Diego',^
+                   'Damayanti'];^
+      for (var i = 0; i < prefs.length; i++) {^
+         for (var j = 0; j < voices.length; j++) {^
+            if (voices[j].name.indexOf(prefs[i]) !== -1) return voices[j];^
+         }^
+      }^
+      return voices[0] || null;^
+   }^
+
+   function jaclPickedVoice() {^
+      var voices = jaclGetVoicesForLang();^
+      var stored = localStorage.getItem('jaclVoiceName');^
+      if (stored) {^
+         for (var i = 0; i < voices.length; i++) {^
+            if (voices[i].name === stored) return voices[i];^
+         }^
+      }^
+      return jaclDefaultVoice(voices);^
+   }^
+
+   function jaclAppendMain(html) {^
+      var out = document.getElementById('maintext');^
+      if (out) out.insertAdjacentHTML('beforeend', html);^
+   }^
+
+   function jaclListVoices() {^
+      var voices = jaclGetVoicesForLang();^
+      if (voices.length === 0) {^
+         jaclAppendMain('<p>No voices available for this language yet. Try again in a moment.</p>');^
+         return;^
+      }^
+      var stored = localStorage.getItem('jaclVoiceName');^
+      var defaultVoice = jaclDefaultVoice(voices);^
+      var html = '<p>Available voices (type <b>voice N</b> to choose):</p><ol>';^
+      for (var i = 0; i < voices.length; i++) {^
+         var marker = '';^
+         if (stored && voices[i].name === stored) marker = ' &larr; selected';^
+         else if (!stored && voices[i] === defaultVoice) marker = ' &larr; default';^
+         html += '<li>' + voices[i].name + ' (' + voices[i].lang + ')' + marker + '</li>';^
+      }^
+      html += '</ol>';^
+      jaclAppendMain(html);^
+   }^
+
+   function jaclPickVoice(n) {^
+      var voices = jaclGetVoicesForLang();^
+      var idx = n - 1;^
+      if (idx < 0 || idx >= voices.length) {^
+         jaclAppendMain('<p>No such voice. Type <b>voices</b> to list available voices.</p>');^
+         return;^
+      }^
+      localStorage.setItem('jaclVoiceName', voices[idx].name);^
+      jaclAppendMain('<p>Voice set to ' + voices[idx].name + '.</p>');^
+   }^
+
+   if (window.speechSynthesis && typeof speechSynthesis.onvoiceschanged !== 'undefined') {^
+      speechSynthesis.onvoiceschanged = function() { /* voices now loaded */ };^
    }^
 
    function changeInterface() {^
