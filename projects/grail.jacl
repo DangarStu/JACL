@@ -3955,8 +3955,8 @@ location ocean_surface : ocean surface
  northwest	ocean_surface
  southeast	ocean_surface
  southwest	ocean_surface
- x		3
- y		3
+ x		2
+ y		5
 
 {movement
 if compass = in : compass = out
