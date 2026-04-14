@@ -625,7 +625,12 @@ main(int argc, char *argv[])
                                 answer_value = result;
                                 answer_valid = TRUE;
                             } else {
-                                write_text("Please answer yes or no.^");
+                                /* Use the language library's YES_OR_NO
+                                 * constant so the prompt is in the
+                                 * game's language (english, indonesian,
+                                 * french, german, spanish all define
+                                 * it). */
+                                write_text(cstring_resolve("YES_OR_NO")->value);
                             }
                         } else if (question_type == 2 || question_type == 3) {
                             /* GETNUMBER (2=insistent) OR ASKNUMBER (3=non-insistent) */
