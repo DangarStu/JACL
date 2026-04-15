@@ -81,6 +81,8 @@ integer map_loop
 integer map_window_mode 0
 integer map_show_all 0
 integer map_should_draw
+integer map_has_exit
+integer map_exit_loop
 integer map_word_count
 integer map_word_index
 integer map_label_y
@@ -238,7 +240,21 @@ select LOCATION map_here
    set map_should_draw = 0
    if map_show_all = 1
       ifall map_here(x) = 0 : map_here(y) = 0
-         # Skip library meta-locations (limbo etc. with unset coords).
+         # At the origin — could be a real room placed there, or a
+         # library meta-location (limbo, Permainan Selesai, etc.)
+         # whose x/y were never set. Distinguish by checking for any
+         # real exit: limbo has none, real rooms always do.
+         set map_has_exit = 0
+         set map_exit_loop = 0
+         repeat
+            ifall map_here(map_exit_loop) != nowhere : map_here(map_exit_loop) != NO_GO
+               set map_has_exit = 1
+            endif
+            set map_exit_loop + 1
+         until map_exit_loop = 12
+         if map_has_exit = 1
+            set map_should_draw = 1
+         endif
       else
          set map_should_draw = 1
       endif
