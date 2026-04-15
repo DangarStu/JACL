@@ -149,11 +149,13 @@ print:
 
    function jaclEnsureMapPopup() {^
       if (jaclMapPopup && !jaclMapPopup.closed) return jaclMapPopup;^
-      jaclMapPopup = window.open('', 'jacl_map', 'width=1400,height=1000,scrollbars=yes,resizable=yes');^
+      var sw = (window.screen && window.screen.availWidth) ? window.screen.availWidth : 1400;^
+      var sh = (window.screen && window.screen.availHeight) ? window.screen.availHeight : 1000;^
+      jaclMapPopup = window.open('', 'jacl_map', 'width=' + sw + ',height=' + sh + ',scrollbars=yes,resizable=yes');^
       if (!jaclMapPopup) return null;^
       var w = jaclMapPopup;^
       w.document.open();^
-      w.document.write("<!doctype html><html lang='en'><head><meta charset='utf-8'><title>Map</title><style>html,body{margin:0;padding:0;background:#eee;font-family:Georgia,Palatino,Times,serif;}#jacl_map{display:block;width:100vw;height:100vh;overflow:auto;}</style><script src='/include/raphael.min.js'><\/script></head><body><div id='jacl_map'></div></body></html>");^
+      w.document.write("<!doctype html><html lang='en'><head><meta charset='utf-8'><title>Map</title><style>html,body{margin:0;padding:0;background:#eee;font-family:Georgia,Palatino,Times,serif;}#jacl_map{display:inline-block;}</style><script src='/include/raphael.min.js'><\/script></head><body><div id='jacl_map'></div></body></html>");^
       w.document.close();^
       return w;^
    }^
