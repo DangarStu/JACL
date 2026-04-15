@@ -74,7 +74,7 @@ print:
          if (!jaclMapPopup) return null;^
          var w = jaclMapPopup;^
          w.document.open();^
-         w.document.write("<!doctype html><html lang='fr'><head><meta charset='utf-8'><title>Carte</title><style>html,body{margin:0;padding:0;background:#eee;font-family:Georgia,Palatino,Times,serif;}#jacl_map{display:inline-block;}</style><script src='/include/raphael.min.js'><\/script></head><body><div id='jacl_map'></div></body></html>");^
+         w.document.write("<!doctype html><html lang='fr'><head><meta charset='utf-8'><title>Carte</title><style>html,body{margin:0;padding:0;background:" + (window.jaclMapBg || '#eee') + ";font-family:Georgia,Palatino,Times,serif;}#jacl_map{display:inline-block;}</style><script src='/include/raphael.min.js'><\/script></head><body><div id='jacl_map'></div></body></html>");^
          w.document.close();^
          return w;^
       }^
@@ -102,6 +102,7 @@ print:
       }^
 .
 write "</script>^"
+write "<script>window.jaclMapBg = '" header_colour "';</script>"
 write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
 ifexecute "+library_header"
    # LIBRARIES (e.g. mapping.library) MAY INJECT THEIR OWN HEAD CONTENT.
