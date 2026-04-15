@@ -407,14 +407,14 @@ endselect
 select LOCATION map_here
    set map_should_draw = 0
    if map_show_all = 1
-      ifall map_here(x) = 0 : map_here(y) = 0
-         # Skip library meta-locations with unset coords.
-      else
+      if map_here hasnt DONT_MAP
          set map_should_draw = 1
       endif
    endif
    if map_here has VISITED
-      set map_should_draw = 1
+      if map_here hasnt DONT_MAP
+         set map_should_draw = 1
+      endif
    endif
    if map_should_draw = 1
    # Rect takes top-left as the origin; for cell=120 and node=80 that
