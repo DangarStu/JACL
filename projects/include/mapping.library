@@ -81,8 +81,6 @@ integer map_loop
 integer map_window_mode 0
 integer map_show_all 0
 integer map_should_draw
-integer map_has_exit
-integer map_exit_loop
 integer map_word_count
 integer map_word_index
 integer map_label_y
@@ -152,21 +150,19 @@ set map_max_y = 0
 # calculation if either map_show_all = 1 (draw everything with real
 # coords) or the location has VISITED set.
 #
-# In map_show_all mode we also require at least one of x/y to be
-# non-zero. Verbs libraries declare a hidden `limbo` location (plus
-# Indonesian has Permainan Selesai, etc.) that defaults to (0, 0);
-# without this guard those would show up on every map.
+# Verbs libraries tag hidden meta-locations (limbo, epilogue) with
+# DONT_MAP so they never show up on the map regardless of coords.
 select LOCATION map_here
    set map_should_draw = 0
    if map_show_all = 1
-      ifall map_here(x) = 0 : map_here(y) = 0
-         # Skip: no coords set, probably a library meta-location.
-      else
+      if map_here hasnt DONT_MAP
          set map_should_draw = 1
       endif
    endif
    if map_here has VISITED
-      set map_should_draw = 1
+      if map_here hasnt DONT_MAP
+         set map_should_draw = 1
+      endif
    endif
    if map_should_draw = 1
       if map_bounds_init = 0
@@ -239,28 +235,14 @@ set map_canvas_h + 40
 select LOCATION map_here
    set map_should_draw = 0
    if map_show_all = 1
-      ifall map_here(x) = 0 : map_here(y) = 0
-         # At the origin — could be a real room placed there, or a
-         # library meta-location (limbo, Permainan Selesai, etc.)
-         # whose x/y were never set. Distinguish by checking for any
-         # real exit: limbo has none, real rooms always do.
-         set map_has_exit = 0
-         set map_exit_loop = 0
-         repeat
-            ifall map_here(map_exit_loop) != nowhere : map_here(map_exit_loop) != NO_GO
-               set map_has_exit = 1
-            endif
-            set map_exit_loop + 1
-         until map_exit_loop = 12
-         if map_has_exit = 1
-            set map_should_draw = 1
-         endif
-      else
+      if map_here hasnt DONT_MAP
          set map_should_draw = 1
       endif
    endif
    if map_here has VISITED
-      set map_should_draw = 1
+      if map_here hasnt DONT_MAP
+         set map_should_draw = 1
+      endif
    endif
    if map_should_draw = 1
    set map_loop = 0

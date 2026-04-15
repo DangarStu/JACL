@@ -5,6 +5,8 @@
 
 constant	library_version		27
 
+attribute DONT_MAP
+
 filter the
 filter a
 filter yang
@@ -308,6 +310,7 @@ return false
 }
 
 location limbo : limbo
+ has           DONT_MAP
 
 grammar guncang >shake_only
 grammar shake >shake_only
@@ -5348,6 +5351,7 @@ execute "+look_around"
 
 location epilogue : epilogue
    short	name "Permainan Selesai"
+   has          DONT_MAP
 
 {look
 if interpreter = GLK

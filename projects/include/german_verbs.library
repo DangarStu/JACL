@@ -9,6 +9,8 @@ filter das
 filter den
 filter dem
 
+attribute DONT_MAP
+
 variable COUNTER
 variable INDEX
 variable TEMP
@@ -490,6 +492,7 @@ break false
 }
 
 location limbo : limbo
+ has           DONT_MAP
 
 object north_wall: north north wall
  short          the "north wall"

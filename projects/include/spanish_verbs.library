@@ -5,6 +5,8 @@
 
 constant	library_version		27
 
+attribute DONT_MAP
+
 filter the
 filter a
 filter el
@@ -297,6 +299,7 @@ return false
 }
 
 location limbo : limbo
+ has           DONT_MAP
 
 grammar sacudir >shake_only
 grammar agitar >shake_only
@@ -5261,6 +5264,7 @@ execute "+look_around"
 
 location epilogue : epilogue
    short	name "Fin del Juego"
+   has          DONT_MAP
 
 {look
 if interpreter = GLK

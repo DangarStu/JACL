@@ -5,6 +5,11 @@
 
 constant	library_version		27
 
+# Locations tagged DONT_MAP are excluded from mapping.library's
+# `map all` rendering -- used by library meta-locations (limbo,
+# epilogue) so they don't appear as stray nodes on the map.
+attribute DONT_MAP
+
 filter the
 filter a
 
@@ -241,6 +246,7 @@ return false
 }
 
 location limbo : limbo
+ has           DONT_MAP
 
 grammar shake >shake_only
 
@@ -4899,6 +4905,7 @@ execute "+look_around"
 
 location epilogue : epilogue
    short	name "Game Over"
+   has          DONT_MAP
 
 {look
 if interpreter = GLK

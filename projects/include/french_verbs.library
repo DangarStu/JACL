@@ -6,6 +6,8 @@
 
 constant	library_version		27
 
+attribute DONT_MAP
+
 filter the
 #filter a
 #filter à
@@ -365,6 +367,7 @@ return false
 }
 
 location limbo : limbo
+ has           DONT_MAP
 
 grammar shake >shake_only
 
@@ -5456,6 +5459,7 @@ execute "+look_around"
 
 location epilogue : epilogue
   short       name "Épilogue"
+  has         DONT_MAP
 
 {look
 if interpreter = GLK
