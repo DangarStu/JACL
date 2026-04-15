@@ -262,6 +262,8 @@ location mirador : mirador vista
  has           OUTDOORS
  north         sendero
  west          lago
+ south         rio
+ down          rio
  x             1
  y             1
 
@@ -404,6 +406,102 @@ write "Piedras lisas de río de diferentes colores: grises, blancas y algunas co
 }
 
 # -----------------------------------------------------------------------------
+
+location rio : rio río arroyo
+ short         name "Río"
+ has           OUTDOORS
+ north         mirador
+ up            mirador
+ in            superficie
+ down          superficie
+ x             1
+ y             2
+
+{look
+print:
+   Desciendes por un sendero empinado hasta llegar a la orilla
+   de un río de montaña. El agua corre clara y fría entre las
+   rocas, formando una poza profunda al pie de una pequeña
+   cascada. Guijarros multicolores cubren la orilla y helechos
+   verdes crecen entre las piedras. El mirador está arriba,
+   hacia el norte. Puedes nadar o entrar al agua.^
+.
+}
+
+object poza : poza piscina agua_poza
+ short         una "poza"
+ long          "La poza invita a nadar -- el agua es profunda y refrescante.^"
+ mass          scenery
+
+{examine
+write "Una poza natural formada por el río. El agua es tan clara que "
+write "puedes ver el fondo rocoso a varios metros de profundidad. "
+write "La superficie refleja el cielo azul y las ramas de los sauces.^"
+}
+
+object cascada : cascada salto
+ short         una "cascada"
+ mass          scenery
+
+{examine
+write "Una pequeña cascada de unos tres metros cae sobre la poza. "
+write "El agua espuma blanca al golpear la superficie y el ruido "
+write "del agua llena el ambiente.^"
+}
+
+object helechos : helechos
+ short         unos "helechos"
+ mass          scenery
+
+{examine
+write "Helechos verdes crecen entre las rocas húmedas, buscando la "
+write "humedad que deja el rocío de la cascada.^"
+}
+
+object corriente : corriente
+ short         name "corriente"
+ mass          scenery
+
+{examine
+write "La corriente es fuerte en el centro del río pero más tranquila "
+write "en la poza, perfecta para nadar.^"
+}
+
+# -----------------------------------------------------------------------------
+
+location superficie : superficie agua_superficie
+ short         name "En el agua"
+ has           OUTDOORS
+ out           rio
+ up            rio
+ x             1
+ y             3
+
+{look
+print:
+   Flotas en la superficie de la poza. El agua es sorprendentemente
+   refrescante -- fría pero no helada. A través del agua cristalina
+   puedes ver piedras redondeadas en el fondo y truchas pequeñas que
+   huyen al acercarte. Alrededor, los helechos y rocas forman un
+   refugio natural. Para salir del agua, sube a la orilla.^
+.
+}
+
+{swim
+write "Te impulsas con brazadas lentas, disfrutando la frescura del agua.^"
+}
+
+object truchas_rio : truchas peces
+ short         unas "truchas pequeñas"
+ has           ANIMATE
+ mass          scenery
+
+{examine
+write "Truchas jóvenes de apenas un palmo, con manchas rojas y negras. "
+write "Se alejan rápido con un destello plateado.^"
+}
+
+# -----------------------------------------------------------------------------
 # PLAYER
 # -----------------------------------------------------------------------------
 
@@ -477,6 +575,21 @@ write "Vida en la Montaña es un juego para aprender español. "
 write "Explora las montañas, el bosque y el lago. Habla con los animales "
 write "y descubre la naturaleza de Chile. Usa ~significado~ o ~lookup~ "
 write "para buscar el significado de una palabra.^"
+}
+
+{+swim_only
+if here = rio
+   write "Te sumerges en la poza y empiezas a nadar.^"
+   set player(parent) = superficie
+   execute "+display_location"
+   return true
+endif
+if here = superficie
+   write "Nadas tranquilamente en la superficie de la poza.^"
+   set time = false
+   return true
+endif
+return false
 }
 
 # -----------------------------------------------------------------------------
