@@ -102,7 +102,7 @@ print:
       }^
 .
 write "</script>^"
-write "<script>window.jaclMapBg = '" header_colour "';</script>"
+write "<script>window.jaclMapBg = '" maintext_colour "';</script>"
 write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
 ifexecute "+library_header"
    # LIBRARIES (e.g. mapping.library) MAY INJECT THEIR OWN HEAD CONTENT.

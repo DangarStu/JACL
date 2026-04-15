@@ -242,7 +242,7 @@ print:
    }^
 .
 write "</script>^"
-write "<script>window.jaclMapBg = '" header_colour "';</script>"
+write "<script>window.jaclMapBg = '" maintext_colour "';</script>"
 write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
 ifexecute "+local_header"
    # GAME MAY INJECT ADDITIONAL HEAD CONTENT (extra stylesheets, scripts).
