@@ -174,7 +174,8 @@ print:
          var container = popup.document.getElementById('jacl_map');^
          container.innerHTML = '';^
          var paper = popup.Raphael('jacl_map', canvasW, canvasH, null);^
-         try { drawFn(paper, popup); } catch (e) { /* ignore draw errors */ }^
+         console.log('jacl map: requested canvas ' + canvasW + 'x' + canvasH);^
+         try { drawFn(paper, popup); } catch (e) { console.warn('jacl map draw error', e); }^
       };^
       attempt();^
    }^
