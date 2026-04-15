@@ -829,24 +829,24 @@ execute "+deal_initial"
 }
 
 object dealer : dealer
-  static
-  short			name "dealer"
+ static
+ short         name "dealer"
 
 object dealers_hand : dealer_hand
  
 object kryten: myself self me james bond
-  has			ANIMATE
-  short			name "player one"
-  quantity		42
-  money			2000
-  parent		casino
-  player
+ has           ANIMATE
+ short         name "player one"
+ quantity      42
+ money         2000
+ parent        casino
+ player
 
 object hand_one : hand one
-  short			name "first hand"
+ short         name "first hand"
 
 object hand_two : hand two
-  short			name "second hand"
+ short         name "second hand"
 
 integer TEMP
 integer BACKUP

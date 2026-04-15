@@ -167,6 +167,23 @@ print:
 		float: left; }^
 	select {
 		width: 200px; }^
+	@media (max-width: 600px) {
+		#header { height: 60px; }^
+		h1 { font-size: 16pt; padding-left: 10px; }^
+		img.titleimage { height: 60px; }^
+		#main { top: 60px; margin-right: 0 !important; }^
+		div.maintext {
+			padding: 10px 15px;
+			font-size: 11pt; }^
+		div.picture { display: none; }^
+		img.main { width: 100%; height: auto; margin: 4px 0; padding: 0; }^
+		div.links { position: static; height: auto; opacity: 1;
+			padding: 4px; text-align: center; }^
+		div.command_prompt { padding: 8px; width: 100%; }^
+		div.prompt_text { display: none; }^
+		div.interface { padding: 4px; }^
+		select { width: 100%; }^
+	}^
      -->
    </style>
 .

@@ -18,9 +18,9 @@ execute "+lift_action"
 }
 
 location ground_floor : ground floor
- short		the "ground floor"
- has		OUTSIDE_LIFT
- up			first_floor
+ short         the "ground floor"
+ has           OUTSIDE_LIFT
+ up            first_floor
 
 {look
 write "You are on the ground floor. The "
@@ -39,7 +39,7 @@ return false
 }
 
 object stairs : stairs
- mass		scenery
+ mass          scenery
 
 {examine
 if here = ground_floor
@@ -86,8 +86,8 @@ write "You can't take " noun1{the} " down.^"
 }
 
 object callbuttong: call button
- short		a "call button"
- floor		0
+ short         a "call button"
+ floor         0
 
 {examine : *examine_callbutton1 : *examine_callbutton2
 write "Pushing this button summons the elevator to this floor. It's "
@@ -122,7 +122,7 @@ write "The button lights up as you press it.^"
 }
 
 location lift : lift
- short		the "elevator"
+ short         the "elevator"
 
 {look
 write "You are inside the elevator. The door to the south is "
@@ -148,7 +148,7 @@ return false
 }
  
 object cbutton: east eastern close door button control 1
- short		a "close doors button"
+ short         a "close doors button"
 
 {press : move
 if lift_obj(turns_till_doors_close) = 0
@@ -161,7 +161,7 @@ execute "+lift_close"
 }
 
 object obutton: east eastern open door button control 1
- short		an "open doors button"
+ short         an "open doors button"
 
 {press : move
 if lift_obj(turns_till_doors_close) > 0
@@ -178,31 +178,31 @@ execute "+lift_open"
 }
 
 object gbutton: ground floor button g
- short		a "ground floor button"
- floor		0
+ short         a "ground floor button"
+ floor         0
 
 {press : move
 execute +floorbuttonpress<self
 }
 
 object 1button: first floor button 1
- short		a "first floor button"
- floor		1
+ short         a "first floor button"
+ floor         1
 
 {press : move
 execute +floorbuttonpress<self
 }
 
 object 2button: second floor button 2
- short		a "second floor button"
- floor		2
+ short         a "second floor button"
+ floor         2
 
 {press : move
 execute +floorbuttonpress<self
 }
 
 object panel : panel of buttons
- short		a "panel of buttons"
+ short         a "panel of buttons"
 
 {examine
 write "The panel consists of five buttons labelled ground, one, two, "
@@ -223,7 +223,7 @@ execute examine_display
 string led_display	G 1 2
 
 object display : led display
- short		an "LED display"
+ short         an "LED display"
 
 {examine
 write "Above the panel is an LED display with a large red '"
@@ -238,8 +238,8 @@ constant turns_till_doors_close 	7
 constant delta						8
 
 object lift_obj: lift door doors
- short		name "east lift"
- moving_to	arrived
+ short         name "east lift"
+ moving_to     arrived
 
 {examine
 if lift_obj(turns_till_doors_close) > 0;
@@ -286,10 +286,10 @@ write "There is no way to close the lift doors from the outside.^"
 }
 
 location first_floor : first floor
- short		the "first floor"
- has		OUTSIDE_LIFT
- down		ground_floor
- up			second_floor
+ short         the "first floor"
+ has           OUTSIDE_LIFT
+ down          ground_floor
+ up            second_floor
 
 {look
 write "You are on the first floor. The "
@@ -309,13 +309,13 @@ return false
 }
 
 object callbutton1: call button
- short		a "call button"
- floor		1
+ short         a "call button"
+ floor         1
 
 location second_floor : second floor
- short		the "second floor"
- has		OUTSIDE_LIFT
- down		first_floor
+ short         the "second floor"
+ has           OUTSIDE_LIFT
+ down          first_floor
 
 {look
 write "You are on the second floor. The "
@@ -334,8 +334,8 @@ return false
 }
 
 object callbutton2: call button
- short		a "call button"
- floor		2
+ short         a "call button"
+ floor         2
 
 {+lift_close
 set lift_obj(turns_till_doors_close) = 0
@@ -454,10 +454,10 @@ return false
 }
 
 object kryten: myself self me
- has		ANIMATE
- short		name "yourself"
- quantity	50
- parent		ground_floor
+ has           ANIMATE
+ short         name "yourself"
+ quantity      50
+ parent        ground_floor
  player
 
 #include "verbs.library"

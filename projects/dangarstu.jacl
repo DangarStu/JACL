@@ -219,7 +219,7 @@ grammar blankjacl >blankjacl
 location studio
 
 object you
-  player
+ player
 
 constant title_image		"/images/BandPage.jpg"
 constant footer_image		"none"

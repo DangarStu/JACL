@@ -25,6 +25,7 @@ print:
 .
 write "<html lang=~fr~><head>"
 write "<meta charset=~UTF-8~>"
+write "<meta name=~viewport~ content=~width=device-width, initial-scale=1~>"
 write "<title>" game_title "</title>"
 execute "+styles"
 print:
@@ -63,8 +64,48 @@ print:
       return false; }^
    .
 endif
+print:
+      var jaclMapPopup = null;^
+      function jaclEnsureMapPopup() {^
+         if (jaclMapPopup && !jaclMapPopup.closed) return jaclMapPopup;^
+         var sw = (window.screen && window.screen.availWidth) ? window.screen.availWidth : 1400;^
+         var sh = (window.screen && window.screen.availHeight) ? window.screen.availHeight : 1000;^
+         jaclMapPopup = window.open('', 'jacl_map', 'width=' + sw + ',height=' + sh + ',scrollbars=yes,resizable=yes');^
+         if (!jaclMapPopup) return null;^
+         var w = jaclMapPopup;^
+         w.document.open();^
+         w.document.write("<!doctype html><html lang='fr'><head><meta charset='utf-8'><title>Carte</title><style>html,body{margin:0;padding:0;background:#eee;font-family:Georgia,Palatino,Times,serif;}#jacl_map{display:inline-block;}</style><script src='/include/raphael.min.js'><\/script></head><body><div id='jacl_map'></div></body></html>");^
+         w.document.close();^
+         return w;^
+      }^
+      function jaclDrawMapInPopup(canvasW, canvasH, drawFn) {^
+         var popup = jaclEnsureMapPopup();^
+         if (!popup) return;^
+         var tries = 0;^
+         var attempt = function() {^
+            if (popup.closed) { jaclMapPopup = null; return; }^
+            if (!popup.Raphael || !popup.document.getElementById('jacl_map')) {^
+               if (++tries > 60) return;^
+               setTimeout(attempt, 50);^
+               return;^
+            }^
+            var container = popup.document.getElementById('jacl_map');^
+            container.innerHTML = '';^
+            var paper = popup.Raphael('jacl_map', canvasW, canvasH, null);^
+            try { drawFn(paper, popup); } catch (e) { console.warn('jacl map draw error', e); }^
+         };^
+         attempt();^
+      }^
+      function jaclCloseMapPopup() {^
+         if (jaclMapPopup && !jaclMapPopup.closed) jaclMapPopup.close();^
+         jaclMapPopup = null;^
+      }^
+.
 write "</script>^"
 write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
+ifexecute "+library_header"
+   # LIBRARIES (e.g. mapping.library) MAY INJECT THEIR OWN HEAD CONTENT.
+endif
 write "</head>^"
 if gui_mode = MOBILE
    write "<body onLoad=~putFocus(0, 0);~>^"

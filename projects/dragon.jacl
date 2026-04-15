@@ -19,10 +19,12 @@ constant image_dragon 1
 
 attribute UP_POSITION CUSTOM2 CUSTOM3
 
-location tavern: tavern 
- short            the "Rusty Sword Tavern"    
- south          square
- out            square
+location tavern: tavern
+ short         the "Rusty Sword Tavern"
+ south         square
+ out           square
+ x             3
+ y             2
 
 {movement
 if destination != nowhere
@@ -146,12 +148,12 @@ endif
 }
 
 object bowl: wooden bowl
- has            CONTAINER
- short          a "wooden bowl"
- long           "There is a wooden bowl here.^"
- mass           5
- capacity       2
- parent         bar
+ has           CONTAINER
+ short         a "wooden bowl"
+ long          "There is a wooden bowl here.^"
+ mass          5
+ capacity      2
+ parent        bar
 
 {take
 if bowl(parent) != alcove : lever has UP_POSITION
@@ -178,11 +180,11 @@ return false
 }
 
 object grapes: bunch of grapes
-   short        a "bunch of grapes"
-   has            PLURAL
-   long            "There is a bunch of grapes here.^"
-   mass            5
-   parent        bowl
+ short         a "bunch of grapes"
+ has           PLURAL
+ long          "There is a bunch of grapes here.^"
+ mass          5
+ parent        bowl
 
 grammar juice *present        >break
 grammar squash *present        >break
@@ -271,9 +273,9 @@ print:
 }
 
 object juice: grape juice
- has            LIQUID
- mass           5
- parent         limbo
+ has           LIQUID
+ mass          5
+ parent        limbo
 
 {drink
 if trail(north) = antechamber
@@ -287,7 +289,7 @@ endif
 }
 
 object drink: drink beer ale lager pint
- short      a "drink"
+ short         a "drink"
 
 {order
 write "You don't have a single yorkquid to your name.^"
@@ -298,8 +300,8 @@ grammar chat up *present    >talk_to
 grammar flirt with *present    >talk_to
 
 object barmaid: busty barmaid maid
- short  a "barmaid"
- has            ANIMATE FEMALE
+ short         a "barmaid"
+ has           ANIMATE FEMALE
 
 {attack_with_sword
 if @ = 1
@@ -383,8 +385,8 @@ print:
 }
 
 object grubby_man: grubby looking grubby-looking man grubby
- has            ANIMATE
- short          a "grubby-looking man"
+ has           ANIMATE
+ short         a "grubby-looking man"
 
 {examine
 print:
@@ -441,8 +443,8 @@ write "SYSTEM ADMINISTRATOR^"
 }
 
 object extras : group of extras
-   short        the "extras"
-   has            PLURAL
+ short         the "extras"
+ has           PLURAL
 
 {examine
 print:
@@ -461,9 +463,9 @@ print:
 }
 
 object bar: bar counter
- has            SURFACE
- short          a "bar"
- quantity       50
+ has           SURFACE
+ short         a "bar"
+ quantity      50
 
 {look_behind
 if sword hasnt TOUCHED
@@ -478,8 +480,8 @@ print:
 }
 
 object stool : bar counter stool
-   short        a "bar stool"
-   has            NOT_IMPORTANT
+ short         a "bar stool"
+ has           NOT_IMPORTANT
 
 {take
 if dragon has DEAD
@@ -492,9 +494,9 @@ endif
 }
 
 object dragon: bleary-eyed dragon
- has            ANIMATE
- short          the "dragon"
- long            "Patrons walk around a dragon lying dead on the floor.^"
+ has           ANIMATE
+ short         the "dragon"
+ long          "Patrons walk around a dragon lying dead on the floor.^"
 
 {examine
 if dragon has DEAD
@@ -535,9 +537,9 @@ set time = false
 }
 
 object sword: rusty old broad sword
- short      a "sword"
- long       function
- mass       10
+ short         a "sword"
+ long          function
+ mass          10
 
 {long
 if sword hasnt TOUCHED 
@@ -568,10 +570,12 @@ write "The sword is rusty and chipped.^"
 }
 
 location square: square
- short            the "square"
- north          tavern
- in             tavern
- west           town
+ short         the "square"
+ north         tavern
+ in            tavern
+ west          town
+ x             3
+ y             3
 
 {movement
 if destination = nowhere
@@ -597,15 +601,17 @@ write "nowhere and not enjoying the journey.^"
 }
 
 object people : people villagers
- short        some "people"
- has        NOT_IMPORTANT PLURAL
+ short         some "people"
+ has           NOT_IMPORTANT PLURAL
 
 location town: town
- short            the "town"
- east           square
- south          club
- west           road
- north          studio
+ short         the "town"
+ east          square
+ south         club
+ west          road
+ north         studio
+ x             2
+ y             3
 
 {look
 if here has VISITED
@@ -619,9 +625,9 @@ print:
 }
 
 object sign: sign
-   short        a "sign"
-   long        "There is a sign hanging above the doorway of the building to the north.^"
-   mass        heavy
+ short         a "sign"
+ long          "There is a sign hanging above the doorway of the building to the north.^"
+ mass          heavy
 
 {read : examine
 write "IF Studios^^"
@@ -629,8 +635,10 @@ write "Now coding the cyber-psycho-techno-thriller QUARKAZOID VII^"
 }
 
 location club: club
- short            the "club"
- north          town
+ short         the "club"
+ north         town
+ x             2
+ y             4
 
 {look
 if here has VISITED
@@ -683,10 +691,10 @@ endif
 }
 
 object thief : fat satiated man thief seae chiffon
-   has            ANIMATE
-   short        name "Seae Chiffon"
-   long            "Seae Chiffon is sitting in the corner of the room.^"
-   mass            heavy
+ has           ANIMATE
+ short         name "Seae Chiffon"
+ long          "Seae Chiffon is sitting in the corner of the room.^"
+ mass          heavy
 
 {examine
 print:
@@ -738,14 +746,14 @@ endif
 }
 
 object job : support lead job role part in quarkazoid vii 7 seven 
- short        a "part in Quarkazoid VII"
+ short         a "part in Quarkazoid VII"
  parent        thief
 
 object bouncer : burly bouncer man guard heavy big
- has        ANIMATE POSSESSIVE
- short        the "bouncer"
- long        "There is a burly bouncer standing by the door.^"
- mass        heavy
+ has           ANIMATE POSSESSIVE
+ short         the "bouncer"
+ long          "There is a burly bouncer standing by the door.^"
+ mass          heavy
 
 {examine
 write "The bouncer is standing with his arms crossed and blank "
@@ -774,11 +782,13 @@ print:
 }
 
 location studio : studio if studios
-   short        name "IF Studios"        
-   south        town
-   out            town
-   west            office
-   in            office
+ short         name "IF Studios"
+ south         town
+ out           town
+ west          office
+ in            office
+ x             2
+ y             2
 
 {look
 if here has VISITED
@@ -807,9 +817,9 @@ return false
 }
 
 object script: audition script
-   short        an "audition script"
-   long            "An audition script rests on the ground.^"
-   mass            1
+ short         an "audition script"
+ long          "An audition script rests on the ground.^"
+ mass          1
 
 {read : examine
 if here = club
@@ -878,9 +888,11 @@ break false
 }
 
 location office: seae's office
-  short            name "Seae's Office"
-  east          studio
-  out            studio
+ short         name "Seae's Office"
+ east          studio
+ out           studio
+ x             1
+ y             2
 
 {look
 if here has VISITED
@@ -919,7 +931,7 @@ endif
 }
 
 object big_chair : big leather chair seat
-  short         a "big leather chair"
+ short         a "big leather chair"
 
 {examine
 print:
@@ -944,7 +956,7 @@ print:
 }
 
 object small_chair : small rickety chair
-  short         a "small rickety chair"
+ short         a "small rickety chair"
 
 {examine
 print:
@@ -968,10 +980,10 @@ endif
 }
 
 object clock : grandfather clock door
-  has           CONTAINER CLOSABLE CLOSED
-  short         a "grandfather clock"
-  status        true
-  quantity      40
+ has           CONTAINER CLOSABLE CLOSED
+ short         a "grandfather clock"
+ status        true
+ quantity      40
 
 {examine
 write "The grandfather clock is made from finely-crafted wood and stands "
@@ -995,14 +1007,14 @@ execute "+weights"
 }
 
 object pendulum : pendulum
-  short            a "pendulum"
-  has            NOT_IMPORTANT
-  parent        clock
+ short         a "pendulum"
+ has           NOT_IMPORTANT
+ parent        clock
 
 object chain : fine chain
-  short         a "fine chain"
-  parent        clock
-  mass          2
+ short         a "fine chain"
+ parent        clock
+ mass          2
 
 {examine
 write "The chain loops over a cog that has a tight-fitting guard "
@@ -1048,11 +1060,11 @@ set time = false
 }
 
 object brass_rod: brass cylinder rod weight loop
-  short         a "cylindrical brass weight"
-  plural        rods weights cylinders
-  parent        clock
-  status        1
-  mass          4
+ short         a "cylindrical brass weight"
+ plural        rods weights cylinders
+ parent        clock
+ status        1
+ mass          4
 
 {take_override
 if copper_rod(status) = true
@@ -1109,11 +1121,11 @@ endif
 }
 
 object copper_rod: copper cylinder rod weight loop
-  short         a "cylindrical copper weight"
-  plural        rods weights cylinders
-  parent        clock
-  status        true
-  mass          4
+ short         a "cylindrical copper weight"
+ plural        rods weights cylinders
+ parent        clock
+ status        true
+ mass          4
 
 {take_override
 if copper_rod(status) = true
@@ -1174,8 +1186,10 @@ write "I don't mean to be impolite, but it really doesn't look much better.^"
 }
 
 location road: road
- east           town
- out            pasture
+ east          town
+ out           pasture
+ x             1
+ y             3
 
 {movement
 if compass = west
@@ -1204,9 +1218,9 @@ print:
 }
 
 object road_sign: crooked road sign
- short      a "crooked road sign"
- long      "A crooked road sign stands nearby.^"
- mass           heavy
+ short         a "crooked road sign"
+ long          "A crooked road sign stands nearby.^"
+ mass          heavy
 
 {examine : read
 write "The sign reads:^^"
@@ -1216,8 +1230,10 @@ write "  OUT TO PASTURE^"
 }
 
 location pasture: pasture
- in          road
+ in            road
  north         trail
+ x             0
+ y             3
 
 {look
 if here has VISITED
@@ -1238,16 +1254,18 @@ write "relaxing surroundings.^"
 }
 
 object bushes : thick clump of bushes
-  short        a "thick clump of bushes"
+ short         a "thick clump of bushes"
 
 {examine
 write "They are a pretty ordinary clump of bushes.^"
 }
 
 location trail : trail
-   south        pasture
-   north        nowhere
-   in            nowhere
+ south         pasture
+ north         nowhere
+ in            nowhere
+ x             0
+ y             2
 
 {look
 if here has VISITED
@@ -1277,7 +1295,7 @@ return false
 }
 
 object cliff : rocky cliff face cliff-face
-  short            a "rocky cliff-face"
+ short         a "rocky cliff-face"
 
 {examine
 write "There is a small alcove set into the cliff-face just beside a "
@@ -1293,7 +1311,7 @@ print:
 }
 
 object light : red domed cover electric light
-  short            a "red light"
+ short         a "red light"
 
 {examine
 if stone_door has CLOSED
@@ -1304,8 +1322,8 @@ endif
 }
 
 object stone_door : large double stone door doors
-  has           CLOSED PLURAL CLOSABLE
-  short         a "large double doors"
+ has           CLOSED PLURAL CLOSABLE
+ short         a "large double doors"
 
 {examine
 if stone_door has CLOSED
@@ -1324,9 +1342,9 @@ write "You see no obvious way to close the large double doors.^"
 }
 
 object alcove : small alcove
-  has           CONTAINER
-  quantity      5
-  short         an "alcove"
+ has           CONTAINER
+ quantity      5
+ short         an "alcove"
 
 {examine
 write "The alcove is ten cubic centimetres in size. In the roof of the "
@@ -1466,11 +1484,11 @@ write "The alcove is only about a foot square.^"
 }
 
 object left_hole : left hole
-  has            CONTAINER
-  long            "There is a left hole here.^"
-  short            a "left hole"
-  plural        holes 
-  quantity        0
+ has           CONTAINER
+ long          "There is a left hole here.^"
+ short         a "left hole"
+ plural        holes
+ quantity      0
   
 {examine
 if lever has UP_POSITION
@@ -1507,11 +1525,11 @@ endif
 }
 
 object right_hole : right hole
-  has            CONTAINER
-  long            "There is a right hole here.^"
-  short            the "right hole"
-  plural        holes 
-  quantity        0
+ has           CONTAINER
+ long          "There is a right hole here.^"
+ short         the "right hole"
+ plural        holes
+ quantity      0
 
 {examine
 if lever has UP_POSITION
@@ -1548,9 +1566,9 @@ endif
 }
 
 object lever : long-handled lever
-  has        UP_POSITION
-  long        "There is a lever here."
-  short        a "lever"
+ has           UP_POSITION
+ long          "There is a lever here."
+ short         a "lever"
 
 {examine
 write "The lever is current in the "
@@ -1696,10 +1714,12 @@ endif
 }
 
 location antechamber : antechamber long dark passage
-   short        the "long dark passage"
-   south        trail
-   out            trail
-   north        show_room
+ short         the "long dark passage"
+ south         trail
+ out           trail
+ x             0
+ y             1
+ north         show_room
 
 {look
 if here has VISITED
@@ -1718,8 +1738,10 @@ return false
 }
 
 location show_room : show_room
-   short        the "show room"
-   south        antechamber
+ short         the "show room"
+ south         antechamber
+ x             0
+ y             0
 
 {look
 if here has VISITED
@@ -1733,11 +1755,11 @@ write "^"
 }
 
 object outfit : sparkling sequin outfit
-  has           WEARABLE
-  short         a "sparkling sequin outfit"
-  long            "There is a sparkling sequin outfit here.^"
-  mass            10
-  parent        rack
+ has           WEARABLE
+ short         a "sparkling sequin outfit"
+ long          "There is a sparkling sequin outfit here.^"
+ mass          10
+ parent        rack
 
 {wear_override
 if cloak has WORN
@@ -1771,20 +1793,20 @@ execute "+game_over"
 }
 
 object rack : rack
-   has        SURFACE
-   short      the "rack"
-   capacity   20 
+ has           SURFACE
+ short         the "rack"
+ capacity      20
  
 object spotlights : spotlights lights
-   has            OUT_OF_REACH PLURAL
-   short        the "spotlights"
+ has           OUT_OF_REACH PLURAL
+ short         the "spotlights"
 
 object kryten: myself self me
-   has          ANIMATE
-   short        name "yourself"
-   quantity     98
-   parent       tavern
-   player
+ has           ANIMATE
+ short         name "yourself"
+ quantity      98
+ parent        tavern
+ player
 
 {attack
 if kryten has UP_POSITION
@@ -1806,18 +1828,18 @@ set time = false
 }
 
 object boots: leather boots
-   has            WEARABLE WORN PLURAL
-   short        "a pair of" "leather boots"
-   long            "Your boots are here.^"
-   mass            5
-   parent        kryten
+ has           WEARABLE WORN PLURAL
+ short         "a pair of" "leather boots"
+ long          "Your boots are here.^"
+ mass          5
+ parent        kryten
 
 
 object codpiece: leather codpiece
-   has            WEARABLE WORN
-   short        a "leather codpiece"
-   mass            4
-   parent        kryten
+ has           WEARABLE WORN
+ short         a "leather codpiece"
+ mass          4
+ parent        kryten
 
 {remove
 print:
@@ -1832,11 +1854,11 @@ write "It looks a lot better since you stuffed those old rags in it.^"
 }
 
 object cloak: long cloak
-   has          WEARABLE WORN
-   short        a "long cloak"
-   long         "Your cloak is lying on the ground here.^"
-   mass         8
-   parent       kryten
+ has           WEARABLE WORN
+ short         a "long cloak"
+ long          "Your cloak is lying on the ground here.^"
+ mass          8
+ parent        kryten
 
 {examine
 print:
@@ -2094,3 +2116,4 @@ constant maintext_colour "#dddddd"
 #include "webinterface.library"
 #include "webinterface.css"
 #include "verbs.library"
+#include "mapping.library"

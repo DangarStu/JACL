@@ -5,9 +5,9 @@
 # -----------------------------------------------------------------------------
 
 location schlafzimmer : schlafzimmer
- definite       das "Schlafzimmer"
- west           badezimmer
- south		wohnzimmer
+ definite      das "Schlafzimmer"
+ west          badezimmer
+ south         wohnzimmer
 
 {look
 write "Du bist in Deinem schlafzimmer. In der Mitte des"
@@ -16,9 +16,9 @@ write "ein Flur ins badezimmer f&uuml;hrt.^"
 }
 
 object bett: bett
-  definite      das "Bett"
-  short		ein "Bett"
-  mass		scenery
+ definite      das "Bett"
+ short         ein "Bett"
+ mass          scenery
 
 {look_under
 if Programmheft(parent) = limbo
@@ -32,11 +32,11 @@ write "Du es gibt sonst nichts anderes hier.^"
 }
 
 object Programmheft:  programmheft heft 
-  definite      das "Programmheft"
-  short		ein "Programmheft"
-  long		"Hier befindet sich ein Programmheft."
-  parent	limbo
-  mass		5
+ definite      das "Programmheft"
+ short         ein "Programmheft"
+ long          "Hier befindet sich ein Programmheft."
+ parent        limbo
+ mass          5
 
 {examine : read
 write "Es enth&auml;lt das aktuelle Fernsehprogamm.^"
@@ -52,9 +52,9 @@ execute +game_over
 }
 
 location badezimmer : badezimmer
- definite       das "Badezimmer"
- short          ein "Badezimmer"
- east		schlafzimmer
+ definite      das "Badezimmer"
+ short         ein "Badezimmer"
+ east          schlafzimmer
 
 {look
 write "Du bist im badezimmer. Der einzige Weg von hier "
@@ -71,12 +71,12 @@ write "Von hier aus geht es nur nach Osten.^"
 }
 
 object Schachtel: schachtel
-  has		CONTAINER CLOSABLE CLOSED
-  definite      die
-  short		eine "kleine h&ouml;lzerne Schachtel"
-  long		"Hier ist eine kleine h&ouml;lzerne Schachtel."
-  mass		25
-  quantity	20
+ has           CONTAINER CLOSABLE CLOSED
+ definite      die
+ short         eine "kleine h&ouml;lzerne Schachtel"
+ long          "Hier ist eine kleine h&ouml;lzerne Schachtel."
+ mass          25
+ quantity      20
 
 {close_override
 write "Der Deckel quietscht, w&auml;hrend du ihn schliesst.^"
@@ -84,20 +84,20 @@ ensure Schachtel has CLOSED
 }
 
 object Notiz: Notizzettel notizzettel notiz
-  definite      der
-  short		ein "orangefarbener Notizzettel"
-  long		"Ein orangefarbener Notizzettel liegt auf dem Boden."
-  parent 	Schachtel
-  mass		5
+ definite      der
+ short         ein "orangefarbener Notizzettel"
+ long          "Ein orangefarbener Notizzettel liegt auf dem Boden."
+ parent        Schachtel
+ mass          5
 
 {read
 write "Auf dem Zettel steht: ~Welcome to Jamaica and have a nice day.~^"
 }
 
 location wohnzimmer: wohnzimmer
-  definite      das "Wohnzimmer"
-  short		ein "Wohnzimmer"
-  north		schlafzimmer
+ definite      das "Wohnzimmer"
+ short         ein "Wohnzimmer"
+ north         schlafzimmer
 
 {look
 if here has VISITED
@@ -117,9 +117,9 @@ endif
 }
 
 object Fernseher: fernseher
-  definite      der "Fernseher"
-  short		ein "Fernseher"
-  mass		scenery
+ definite      der "Fernseher"
+ short         ein "Fernseher"
+ mass          scenery
 
 {examine
 write "Zur Zeit läuft im Fernsehen ein Zeichentrickfilm."
@@ -136,10 +136,10 @@ execute +game_over
 }
 
 object rick: Sohn Junge Teenager Rick
-  has		ANIMATE
-  short		name "Rick"
-  long		"Rick ist hier, er guckt Fern."
-  mass		heavy
+ has           ANIMATE
+ short         name "Rick"
+ long          "Rick ist hier, er guckt Fern."
+ mass          heavy
 
 {examine
 write "Rick starrt regungslos auf den Bildschirm.^"
@@ -185,10 +185,10 @@ look
 }
 
 object kryten: ich selber mich
- has		ANIMATE
- short		name "Du"
- quantity	42
- parent		schlafzimmer
+ has           ANIMATE
+ short         name "Du"
+ quantity      42
+ parent        schlafzimmer
  player
 
 {examine

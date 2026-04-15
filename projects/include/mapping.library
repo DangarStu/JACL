@@ -210,13 +210,13 @@ set map_offset_y - map_min_y
 set map_canvas_w = map_max_x
 set map_canvas_w - map_min_x
 set map_canvas_w + 2
-set map_canvas_w * 90
+set map_canvas_w * 120
 set map_canvas_w + 40
 
 set map_canvas_h = map_max_y
 set map_canvas_h - map_min_y
 set map_canvas_h + 2
-set map_canvas_h * 90
+set map_canvas_h * 120
 set map_canvas_h + 40
 }
 

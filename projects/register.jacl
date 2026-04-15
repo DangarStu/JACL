@@ -59,9 +59,9 @@ append data last_id firstname_data surname_data email_data home_phone_data mobil
 }
 
 object wimps
-  has		EVENT
-  short		a "WIMP HPC Course"
-  long 		"Intersect ~HPC for W.I.M.P.s~ 2-day Course"
+ has           EVENT
+ short         a "WIMP HPC Course"
+ long          "Intersect ~HPC for W.I.M.P.s~ 2-day Course"
 
 {subscribe
 # STORE THE EVENT THE USER IS REGISTERING FOR
@@ -134,7 +134,7 @@ style normal
 location office
 
 object you
-  player
+ player
 
 constant title_image "none"
 constant footer_image "none"

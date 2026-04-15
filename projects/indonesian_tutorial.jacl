@@ -9,9 +9,11 @@ constant game_author		"Stuart Allen"
 constant game_version		1
 
 location kamar_tidur : kamar tidur
- short		name "Kamar Tidur"
- west		kamar_mandi
- south		ruang_tamu
+ short         name "Kamar Tidur"
+ west          kamar_mandi
+ south         ruang_tamu
+ x             1
+ y             0
 
 {look
 write "Kamu berada di kamar tidur. Ada sebuah tempat tidur "
@@ -20,8 +22,8 @@ write "sebuah pintu di sebelah barat menuju ke kamar mandi.^"
 }
 
 object tempat_tidur: tempat tidur
-  short		sebuah "tempat tidur"
-  mass		scenery
+ short         sebuah "tempat tidur"
+ mass          scenery
 
 {look_under
 if panduan_tv(parent) = limbo
@@ -35,10 +37,10 @@ write "Kamu tidak menemukan apa-apa lagi.^"
 }
 
 object panduan_tv: panduan acara televisi tv
-  short		sebuah "panduan TV"
-  long		"Panduan TV ada di sini.^"
-  parent	limbo
-  mass		5
+ short         sebuah "panduan TV"
+ long          "Panduan TV ada di sini.^"
+ parent        limbo
+ mass          5
 
 {examine : read
 write "Berisi daftar acara televisi minggu ini.^"
@@ -54,8 +56,10 @@ execute "+game_over"
 }
 
 location kamar_mandi : kamar mandi
- short		name "Kamar Mandi"
- east		kamar_tidur
+ short         name "Kamar Mandi"
+ east          kamar_tidur
+ x             0
+ y             0
 
 {look
 write "Kamu berada di kamar mandi. Satu-satunya jalan "
@@ -73,11 +77,11 @@ write "Satu-satunya jalan keluar dari sini adalah ke timur.^"
 }
 
 object kotak: kotak kayu kecil
-  has		CONTAINER CLOSABLE CLOSED
-  short		sebuah "kotak kayu kecil"
-  long		"Ada sebuah kotak kayu kecil di sini.^"
-  mass		25
-  quantity	20
+ has           CONTAINER CLOSABLE CLOSED
+ short         sebuah "kotak kayu kecil"
+ long          "Ada sebuah kotak kayu kecil di sini.^"
+ mass          25
+ quantity      20
 
 {close_override
 write "Tutupnya berderit saat kamu menutupnya.^"
@@ -85,18 +89,20 @@ ensure kotak has CLOSED
 }
 
 object catatan: catatan oranye
-  short		sebuah "catatan oranye"
-  long		"Sebuah catatan oranye tergeletak di lantai.^"
-  parent 	kotak
-  mass		5
+ short         sebuah "catatan oranye"
+ long          "Sebuah catatan oranye tergeletak di lantai.^"
+ parent        kotak
+ mass          5
 
 {read : examine
 write "Catatan itu bertuliskan, ~Selamat datang di Jamaika dan semoga harimu menyenangkan.~^"
 }
 
 location ruang_tamu : ruang tamu
-  short		name "Ruang Tamu"
-  north		kamar_tidur
+ short         name "Ruang Tamu"
+ north         kamar_tidur
+ x             1
+ y             1
 
 {look
 if here has VISITED
@@ -116,8 +122,8 @@ endif
 }
 
 object televisi: televisi tv tele
-  short		sebuah "televisi"
-  mass		scenery
+ short         sebuah "televisi"
+ mass          scenery
 
 {examine
 write "Saat ini sedang ada film kartun yang ditayangkan "
@@ -134,10 +140,10 @@ execute "+game_over"
 }
 
 object rick: anak laki remaja rick
-  has		ANIMATE
-  short		name "Rick"
-  long		"Rick ada di sini, menonton televisi.^"
-  mass		heavy
+ has           ANIMATE
+ short         name "Rick"
+ long          "Rick ada di sini, menonton televisi.^"
+ mass          heavy
 
 {examine
 write "Rick menatap kosong ke layar televisi.^"
@@ -187,10 +193,10 @@ look
 }
 
 object kryten: aku diri sendiri saya
- has		ANIMATE
- short		name "kamu"
- quantity	42
- parent		kamar_tidur
+ has           ANIMATE
+ short         name "kamu"
+ quantity      42
+ parent        kamar_tidur
  player
 
 {examine
@@ -206,26 +212,27 @@ write "Lihat lampiran untuk kode sumber lengkap program ini.^"
 }
 
 object north_wall: utara dinding utara
- has			NO_TAB
- short          sebuah "dinding utara"
+ has           NO_TAB
+ short         sebuah "dinding utara"
 
 object south_wall: selatan dinding selatan
- has			NO_TAB
- short          sebuah "dinding selatan"
+ has           NO_TAB
+ short         sebuah "dinding selatan"
 
 object east_wall: timur dinding timur
- has			NO_TAB
- short          sebuah "dinding timur"
+ has           NO_TAB
+ short         sebuah "dinding timur"
 
 object west_wall: barat dinding barat
- has			NO_TAB
- short          sebuah "dinding barat"
+ has           NO_TAB
+ short         sebuah "dinding barat"
 
 object ground: tanah lantai
- has            SURFACE NO_TAB
- short          sebuah "lantai"
+ has           SURFACE NO_TAB
+ short         sebuah "lantai"
 
 #include "indonesian.library"
 #include "indonesian_verbs.library"
 #include "webinterface.library"
 #include "webinterface.css"
+#include "mapping.library"

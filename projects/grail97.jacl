@@ -8,9 +8,9 @@
 ; -----------------------------------------------------------------------------
 
 location control_centre
- no_go		"The only exit from here is to the south."
- south		pool
- out		pool
+ no_go         "The only exit from here is to the south."
+ south         pool
+ out           pool
 
 {look
 if here has VISITED
@@ -71,8 +71,8 @@ proxy "sit in chair"
 }
 
 object whale: humpback whale whales
- inventory	a "whale"
- starts		limbo
+ inventory     a "whale"
+ starts        limbo
 
 {look_up_in_book
 write "whale" ^
@@ -83,7 +83,7 @@ write "suborder Mysticeti, and the suborder Odontoceti." ^
 }
 
 object rec_window: wide rectangular window
- inventory	a "wide rectangular window"
+ inventory     a "wide rectangular window"
 
 {examine : look_through
 if blinds has CLOSED
@@ -95,8 +95,8 @@ write "ocean horizon spanning the heads of the lagoon." ^
 }
 
 object blinds: blinds
- has		CLOSABLE DAMAGED PLURAL
- inventory	some "blinds"
+ has           CLOSABLE DAMAGED PLURAL
+ inventory     some "blinds"
 
 {close
 if blinds has CLOSED
@@ -146,7 +146,7 @@ ensure blinds hasnt DAMAGED
 }
 
 object rod: plastic rod
- inventory	a "plastic rod"
+ inventory     a "plastic rod"
 
 {examine : take
 write "The plastic rod is attached to the blinds and can be turned in order "
@@ -161,15 +161,15 @@ else
 }
 
 object light: main fluorescent light
- has		ON SWITCHABLE
- inventory	a "main fluorescent light"
+ has           ON SWITCHABLE
+ inventory     a "main fluorescent light"
 
 {turn_on_override : turn_off_override
 proxy "flick switch"
 }
 
 object doorway: doorway door frame
- inventory	a "doorway frame"
+ inventory     a "doorway frame"
 
 {enter
 proxy "s"
@@ -184,8 +184,8 @@ write "There is a light switch attached to the door frame." ^
 }
 
 object switch: main fluorescent light switch
- has		ON SWITCHABLE
- inventory	a "light switch"
+ has           ON SWITCHABLE
+ inventory     a "light switch"
 
 {examine
 write "Simple, yet sturdy, the switch is in the "
@@ -214,7 +214,7 @@ look
 }
 
 object chair: red leather chair
- inventory	a "red leather chair"
+ inventory     a "red leather chair"
  
 {sit_on_override
 if player has SITTING
@@ -232,11 +232,11 @@ write "upon a single steel column directly in front of the control panel." ^
 }
 
 object c_pass: my civilian identification pass id card
- has		WEARABLE WORN
- described	"Your civilian identification pass is here."
- inventory	your "civilian pass"
- starts childof kryten
- mass		2
+ has           WEARABLE WORN
+ described     "Your civilian identification pass is here."
+ inventory     your "civilian pass"
+ starts        childof kryten
+ mass          2
 
 {examine : read
 write "Your name, Dr Alex Meadows, and your authority level are printed "
@@ -262,16 +262,16 @@ write "this point.~" ^
 }
 
 object signature: signature
- inventory	your "signature"
- starts childof c_pass
+ inventory     your "signature"
+ starts        childof c_pass
 
 {examine : read
 write "A barely discernable squiggle." ^
 }
 
 object bar_code: bar code strip
- inventory	a "bar code"
- starts childof	c_pass
+ inventory     a "bar code"
+ starts        childof	c_pass
 
 {examine
 write "The thought has often crossed your mind to swipe your card at the "
@@ -279,20 +279,20 @@ write "supermarket to find out what you're worth, but so far you've resisted.^"
 }
 
 object authority: authority level
- inventory	your "authority level"
- starts childof c_pass
+ inventory     your "authority level"
+ starts        childof c_pass
 
 {read : examine
 write "Your pass clearly identifies you as a civilian." ^
 }
 
 object lisa: lisa
- has		ANIMATE FEMALE
- described	"Lisa is here, sitting in the chair."
- inventory	name "Lisa"
- starts		here
- mass		heavy 
- quantity	20
+ has           ANIMATE FEMALE
+ described     "Lisa is here, sitting in the chair."
+ inventory     name "Lisa"
+ starts        here
+ mass          heavy
+ quantity      20
 
 {ask_about_speaker
 write "~It's a speaker. You know, those things that sound comes out of.~"
@@ -636,19 +636,19 @@ execute "global_death"
 }
 
 object research: research project work his her experiment experiments
- inventory	a "research project"
- starts		limbo
+ inventory     a "research project"
+ starts        limbo
 
 object tests: human test subjects tests
- inventory	a "human tests"
- starts		limbo
+ inventory     a "human tests"
+ starts        limbo
 
 object m_pass: lisas lisa's military identification pass id
- has		WEARABLE WORN
- described	"Lisa's military identification pass is here."
- inventory	a "military identification pass"
- mass		2
- starts childof lisa 
+ has           WEARABLE WORN
+ described     "Lisa's military identification pass is here."
+ inventory     a "military identification pass"
+ mass          2
+ starts        childof lisa
 
 {take
 if lisa has CUSTOM2
@@ -689,10 +689,10 @@ write "questions,~ the stranger warns." ^
 }
 
 object pistol: lisas lisa's gun military issue pistol her woman's womans
- inventory	a "military issue pistol"
- described	"Lisa's pistol rests here."
- mass		8
- starts childof lisa
+ inventory     a "military issue pistol"
+ described     "Lisa's pistol rests here."
+ mass          8
+ starts        childof lisa
 
 {take_override
 if pistol childof lisa
@@ -703,7 +703,7 @@ break false
 }
 
 object panel: control panel instrument instruments
- inventory	a "long control panel"
+ inventory     a "long control panel"
  
 {examine
 write "A large circular radar screen dominates the long control panel. To its "
@@ -718,21 +718,21 @@ write "wouldn't know where to begin to bring it all back up online." ^
 }
 
 object speaker: small audio speaker under shiny grill
- inventory	an "small audio speaker"
+ inventory     an "small audio speaker"
 
 {examine
 write "The small audio speaker is covered by a shiny metal grill." ^
 }
 
 object grill: shiny metal grill
- inventory	a "shiny metal grill"
+ inventory     a "shiny metal grill"
 
 {examine
 write "The shiny metal grill is covering a small audio speaker." ^
 }
 
 object red_light: red dome shaped light dome-shaped
- inventory	a "red light"
+ inventory     a "red light"
 
 {examine
 if red_light hasnt ON
@@ -744,7 +744,7 @@ write "at a regular rate." ^
 }
 
 object screen: radar circular screen
- inventory	a "circular screen"
+ inventory     a "circular screen"
 
 {examine
 write "Two perpendicular fine white lines form a large cross hair on the "
@@ -777,8 +777,8 @@ write "wouldn't know where to begin to bring it all back up online." ^
 }
 
 object blob: large blob 
- inventory	a "large blob"
- starts		limbo
+ inventory     a "large blob"
+ starts        limbo
 
 {examine
 write "The blob is at -171deg14'02.15~ longitude and -23deg34'86.21~ latitude."
@@ -786,7 +786,7 @@ write ^
 }
 
 object dial: dial
- inventory	a "dial"
+ inventory     a "dial"
 
 {examine
 if dial(info) = 1
@@ -807,9 +807,9 @@ set dial(info) = 0
 }
 
 location your_quarters
- north		quarters
- out		quarters
- no_go		"The only exit from here is to the north, back into the common area."
+ north         quarters
+ out           quarters
+ no_go         "The only exit from here is to the north, back into the common area."
 
 {look
 if here has VISITED
@@ -823,9 +823,9 @@ write "green clothes trunk." ^
 }
 
 object your_bunk: your plain bunk bed
- has		SURFACE
- inventory	name "your bunk bed"
- quantity	50
+ has           SURFACE
+ inventory     name "your bunk bed"
+ quantity      50
 
 {jump_on
 write "You have to sleep in there don't forget." ^
@@ -851,7 +851,7 @@ write "But you like it messy." ^
 }
 
 object circus: flea circus
- inventory	the "flea circus"
+ inventory     the "flea circus"
 
 {examine
 write "There is a sign at the front gate that reads, ~ADMISSION PRICE: ONE "
@@ -868,7 +868,7 @@ set TURN_WORKED = false
 }
 
 object your_window: your my small round window
- inventory	name "your round window"
+ inventory     name "your round window"
 
 {look_through : examine
 write "The window appears to be made from some sort of plastic. "
@@ -890,14 +890,14 @@ write "Control yourself, Dr Meadows!" ^
 }
 
 object trunk: bright green trunk
- has		CONTAINER CLOSED CLOSABLE
- inventory	a "bright green trunk"
- quantity	15
+ has           CONTAINER CLOSED CLOSABLE
+ inventory     a "bright green trunk"
+ quantity      15
  
 object your_clothes: my clothes
- has		PLURAL
- inventory	your "clothes"
- starts childof trunk
+ has           PLURAL
+ inventory     your "clothes"
+ starts        childof trunk
  
 {examine
 write "Just clothes." ^
@@ -918,8 +918,8 @@ write "What you are wearing is just fine." ^
 }
 
 location lisas_quarters:
- west		quarters
- out		quarters
+ west          quarters
+ out           quarters
 
 {look
 if here has VISITED
@@ -937,9 +937,9 @@ write "The room smells vaguely of Lisa's perfume." ^
 }
 
 object lisas_bunk: lisas lisa's bunk bed
- has		SURFACE
- inventory	name "Lisa's bunk bed"
- quantity	50
+ has           SURFACE
+ inventory     name "Lisa's bunk bed"
+ quantity      50
 
 {lie_on : enter
 write "Lisa would be far from impressed to walk in and find you lounging "
@@ -958,7 +958,7 @@ write "Nothing but dust." ^
 }
 
 object lisas_window: lisas lisa's small round window
- inventory	name "Lisa's round window"
+ inventory     name "Lisa's round window"
 
 {look_through : examine
 write "Through the window you can see out across the lagoon to the hills "
@@ -975,18 +975,18 @@ write "Control yourself, Dr Meadows!" ^
 }
 
 object wardrobe: lisas lisa's wardrobe
- has		CLOSABLE CLOSED CONTAINER
- inventory	name "Lisa's wardrobe"
- quantity	20
+ has           CLOSABLE CLOSED CONTAINER
+ inventory     name "Lisa's wardrobe"
+ quantity      20
 
 {look_behind
 write "Just a wall." ^
 }
 
 object lisas_clothes: lisas lisa's clothes
- has		PLURAL
- inventory	name "Lisa's clothes"
- starts childof wardrobe
+ has           PLURAL
+ inventory     name "Lisa's clothes"
+ starts        childof wardrobe
 
 {take
 write "I don't think Lisa would appreciate you walking off with her clothes." ^
@@ -998,12 +998,12 @@ write "You don't find anything that suits you." ^
 }
 
 location quarters:
-west		pool
- north		bathroom
- south		your_quarters
- east		lisas_quarters
- no_north	"That will be a bit hard with the bathroom door closed."	
- no_go		"You can only go in one of the cardinal directions from here."
+ west          pool
+ north         bathroom
+ south         your_quarters
+ east          lisas_quarters
+ no_north      "That will be a bit hard with the bathroom door closed."
+ no_go         "You can only go in one of the cardinal directions from here."
 
 {look
 if here has VISITED
@@ -1044,10 +1044,10 @@ set TURN_WORKED = false
 }
 
 object wooden_chair: simple wooden chair
- inventory	a "simple wooden chair"
- described	"A simple wooden chair stands here."
- initial	"A simple wooden chair stands before the writing desk."
- mass		35
+ inventory     a "simple wooden chair"
+ described     "A simple wooden chair stands here."
+ initial       "A simple wooden chair stands before the writing desk."
+ mass          35
 
 {sit_on_override
 if player has SITTING
@@ -1064,7 +1064,7 @@ write "absolutely no aesthetic appeal whatsoever." ^
 }
 
 object sofa: comfortable-looking comfortable looking sofa lounge
- inventory	a "comfortable-looking sofa"
+ inventory     a "comfortable-looking sofa"
 
 {examine
 write "Although well padded, the sofa's drab grey fabric is positively "
@@ -1086,8 +1086,8 @@ ensure player has SITTING
 }
 
 object bathroom_door: bathroom door
- has		CLOSABLE LOCKABLE
- inventory	a "bathroom door"
+ has           CLOSABLE LOCKABLE
+ inventory     a "bathroom door"
  
 {unlock_override
 if here = quarters
@@ -1184,7 +1184,7 @@ break false
 }
 
 object kitchenette: kitchenette recess kitchen
- inventory	a "kitchenette"
+ inventory     a "kitchenette"
 
 
 {examine
@@ -1193,7 +1193,7 @@ write "support your fledgling culinary skills." ^
 }
 
 object poster: lisas lias's blue whale poster
- inventory	a "whale poster"
+ inventory     a "whale poster"
 
 {take
 write "The poster belongs to Lisa, actually, so it would only be polite to "
@@ -1207,9 +1207,9 @@ write "daily." ^
 }
 
 object desk: writing desk
- has		SURFACE
- inventory	a "writing desk"
- quantity	30
+ has           SURFACE
+ inventory     a "writing desk"
+ quantity      30
  
 {look_under
 write "You stumble across that space where your knees go when you sit at it." ^
@@ -1239,15 +1239,15 @@ proxy "close drawer"
 }
 
 object drawer: writing desk drawer
- has		CONTAINER CLOSABLE CLOSED
- inventory	a "desk drawer"
- quantity	12
+ has           CONTAINER CLOSABLE CLOSED
+ inventory     a "desk drawer"
+ quantity      12
 
 object report: final report
- inventory	your "final report"
- described	"Your final report is here."
- starts childof drawer
- mass		2
+ inventory     your "final report"
+ described     "Your final report is here."
+ starts        childof drawer
+ mass          2
 
 {eat : break
 write "I can understand your want to, but don't." ^
@@ -1293,10 +1293,10 @@ execute "global_report_submitted"
 }
 
 object cassette: microcassette tape cassette
- inventory	a "microcassette"
- described	"A microcassette lies nearby."
- starts childof drawer
- mass		2
+ inventory     a "microcassette"
+ described     "A microcassette lies nearby."
+ starts        childof drawer
+ mass          2
 
 {hint : play
 write "To listen to the microcassette, insert it into the tape recorder and "
@@ -1324,10 +1324,10 @@ write "The words ~CASE NOTES~ are written on the tape's label." ^
 }
 
 object book: book science encyclopedia
- inventory	a "science encyclopedia"
- described	"Your science encyclodedia lies nearby."
- mass		6
- starts childof desk
+ inventory     a "science encyclopedia"
+ described     "Your science encyclodedia lies nearby."
+ mass          6
+ starts        childof desk
 
 {hint
 write "You can look up various things in the encyclopedia by typing ~look up "
@@ -1348,8 +1348,8 @@ write "away from your main library at home." ^
 }
 
 object rec_speaker: microcassette cassette tape recorder's recorders speaker
- inventory	a "microcassette recorder's speaker"
- starts childof recorder
+ inventory     a "microcassette recorder's speaker"
+ starts        childof recorder
 
 {examine
 write "The speaker on the back of the microcassette recorder is small yet "
@@ -1367,10 +1367,10 @@ write "At the moment, the microcassette recorder is silent." ^
 
 
 object recorder: microcassette cassette tape recorder
- inventory	a "microcassette recorder"
- described	"There is a microcassette recorder here."
- starts childof desk
- mass		4
+ inventory     a "microcassette recorder"
+ described     "There is a microcassette recorder here."
+ starts        childof desk
+ mass          4
 
 {examine
 write "You use the microcassette recorder to take notes whenever you are "
@@ -1408,8 +1408,8 @@ write "matches the operation you require." ^
 }
 
 object play: play button
- inventory	a "play button"
- starts childof recorder
+ inventory     a "play button"
+ starts        childof recorder
 
 {press : move
 if cassette !childof recorder
@@ -1432,8 +1432,8 @@ ensure recorder has ON
 }
 
 object stop: stop button
- inventory	a "stop button"
- starts childof recorder
+ inventory     a "stop button"
+ starts        childof recorder
 
 {press : move
 if cassette !childof recorder
@@ -1451,8 +1451,8 @@ ensure recorder hasnt ON
 }
 
 object forward: fast forward button
- inventory	a "fast forward button"
- starts childof recorder
+ inventory     a "fast forward button"
+ starts        childof recorder
 
 {press : move
 if cassette !childof recorder
@@ -1481,8 +1481,8 @@ write "your skip the tape forward." ^
 }
 
 object rewind: rewind button
- inventory	a "rewind button"
- starts childof recorder
+ inventory     a "rewind button"
+ starts        childof recorder
 
 {press : move
 if cassette !childof recorder
@@ -1511,8 +1511,8 @@ write "your skip the tape backwards." ^
 }
 
 object record: record button
- inventory	a "record button"
- starts childof recorder
+ inventory     a "record button"
+ starts        childof recorder
 
 {press : move
 if cassette !childof recorder
@@ -1525,10 +1525,10 @@ write "removed the write-protect tab from the cassette." ^
 }
 
 location bathroom:
- south		quarters
- out		quarters
- no_go		"The only exit from here is back south into your quarters."
- no_south	"That will be a bit hard with the bathroom door closed."	
+ south         quarters
+ out           quarters
+ no_go         "The only exit from here is back south into your quarters."
+ no_south      "That will be a bit hard with the bathroom door closed."
 
 {look
 if here has VISITED
@@ -1542,7 +1542,7 @@ write "area." ^
 }
 
 object latch: bathroom door latch
- inventory	a "door latch"
+ inventory     a "door latch"
 
 {examine
 write "The door latch is "
@@ -1562,9 +1562,9 @@ proxy "unlock bathroom door"
 }
 
 object vanity: vanity cabinet mirror mirrored door
- has		CONTAINER CLOSABLE CLOSED
- inventory	a "vanity cabinet"
- quantity	20
+ has           CONTAINER CLOSABLE CLOSED
+ inventory     a "vanity cabinet"
+ quantity      20
 
 {examine : look_in
 if vanity hasnt CLOSED 
@@ -1578,10 +1578,10 @@ write "the closed mirrored door. You smile, then grimace." ^
 }
    
 object toothbrush: shaggy toothbrush brush
- inventory	a "shaggy toothbrush"
- described	"Lurking nearby is a shaggy toothbrush."
- mass		3
- starts childof vanity
+ inventory     a "shaggy toothbrush"
+ described     "Lurking nearby is a shaggy toothbrush."
+ mass          3
+ starts        childof vanity
 
 {use
 write "You did that when you got up this morning." ^
@@ -1593,10 +1593,10 @@ write "Shaggy, but useable." ^
 }
 
 object soap: bar of soap
- inventory	a "bar of soap"
- described	"There is a bar of soap here."
- mass		5
- starts childof vanity
+ inventory     a "bar of soap"
+ described     "There is a bar of soap here."
+ mass          5
+ starts        childof vanity
 
 {examine
 if soap has DAMAGED
@@ -1608,10 +1608,10 @@ write "four layers of skin." ^
 }
 
 object comb: plastic hair comb
- inventory	a "plastic hair comb"
- described	"On the ground there is a hair comb."
- mass		3
- starts childof vanity
+ inventory     a "plastic hair comb"
+ described     "On the ground there is a hair comb."
+ mass          3
+ starts        childof vanity
 
 {use
 if comb is *held
@@ -1623,20 +1623,20 @@ set TURN_WORKED = false
 }
 
 object pin: bobby hair pin
- inventory	a "bobby pin"
- described	"You can spot a bobby pin lying on the ground."
- mass		2
- starts childof vanity
+ inventory     a "bobby pin"
+ described     "You can spot a bobby pin lying on the ground."
+ mass          2
+ starts        childof vanity
 
 {look_at_through_magnifying_glass
 write "No fairy, unfortunately." ^
 }
 
 object q_r_water: small quantity of rain water
- has		LIQUID
- inventory	a "small quantity of rain water"
- starts		limbo
- mass		2
+ has           LIQUID
+ inventory     a "small quantity of rain water"
+ starts        limbo
+ mass          2
 
 {taste
 write "The rain water tastes wonderfully clean." ^
@@ -1670,9 +1670,9 @@ break false
 }
 
 object r_water: sink load of rain water
- has		LIQUID
- inventory	a "sink load of rain water"
- starts		limbo
+ has           LIQUID
+ inventory     a "sink load of rain water"
+ starts        limbo
 
 {taste
 write "The rain water tastes wonderfully clean." ^
@@ -1692,9 +1692,9 @@ ensure r_water has CUSTOM4
 }
 
 object sink: sink
- has		CONTAINER
- inventory	a "sink"
- quantity	20
+ has           CONTAINER
+ inventory     a "sink"
+ quantity      20
 
 {fill
 proxy "turn on tap"
@@ -1751,8 +1751,8 @@ endall
 }
 
 object sink_tap: plain sink tap
- has		CLOSABLE CLOSED
- inventory	a "tap"
+ has           CLOSABLE CLOSED
+ inventory     a "tap"
 
 {examine
 if sink_tap hasnt CLOSED 
@@ -1800,10 +1800,10 @@ ensure sink_tap has CLOSED
 }
 
 object plug: small rubber plug
- inventory	a "rubber plug"
- described	"A small rubber plug rests on the ground."
- starts childof vanity
- mass		2
+ inventory     a "rubber plug"
+ described     "A small rubber plug rests on the ground."
+ starts        childof vanity
+ mass          2
 
 {insert_in_hole : insert_in_sink
 if WATER_LEVEL = 0
@@ -1859,7 +1859,7 @@ set TURN_WORKED = false
 }
 
 object hole: sink plug hole pvc piping
- inventory	a "plug hole"
+ inventory     a "plug hole"
 
 {examine
 if plug childof hole
@@ -1872,7 +1872,7 @@ write "the floor, emptying into the lagoon." ^
 }
 
 object drain: floor drain
- inventory	a "floor drain"
+ inventory     a "floor drain"
 
 {examine : look_through : look_in
 write "The drain is nothing more than a small hole in the floor through "
@@ -1880,9 +1880,9 @@ write "which you can see down to the surface of the lagoon." ^
 }
 
 object toilet: toilet stainless steel
- has		CONTAINER
- inventory	a "toilet"
- quantity	5
+ has           CONTAINER
+ inventory     a "toilet"
+ quantity      5
 
 {flush
 loop
@@ -1908,7 +1908,7 @@ set TURN_WORKED = false
 }
 
 object lever: small lever
- inventory	a "small lever"
+ inventory     a "small lever"
 
 {examine
 write "The small lever can be pulled in order to flush the toilet." ^
@@ -1919,7 +1919,7 @@ proxy "flush toilet"
 }
 
 object shower: shower cubicle 
- inventory	a "shower cubicle"
+ inventory     a "shower cubicle"
 
 {clean_with_toothbrush
 write "Well... you sure know how to party." ^
@@ -1935,9 +1935,9 @@ write "one a day, sorry." ^
 }
 
 location storage:
- west     nowhere
- east     pool
- no_west  "You bang your head on the closed steel door."
+ west          nowhere
+ east          pool
+ no_west       "You bang your head on the closed steel door."
 
 {look
 if here has VISITED
@@ -1959,7 +1959,7 @@ write "north wall." ^
 }
 
 object hose: air refill hose
- inventory	an "air refill hose"
+ inventory     an "air refill hose"
 
 {hint
 write "If you empty the scuba tank, simply type REFILL TANK while holding it "
@@ -1982,8 +1982,8 @@ proxy "refill tank"
 }
 
 object steel_door: steel door
- has		CLOSABLE CLOSED
- inventory	a "steel door"
+ has           CLOSABLE CLOSED
+ inventory     a "steel door"
  
 {close_override
 ensure steel_door has CLOSED
@@ -2028,8 +2028,8 @@ proxy "e"
 }
 
 object crates: stack of wooden crate crates supplies
- has		PLURAL
- inventory	a "wooden crates"
+ has           PLURAL
+ inventory     a "wooden crates"
 
 {examine
 write "The wooden crates are filled with supplies - enough to sustain you and "
@@ -2052,12 +2052,12 @@ write "There is no need to go unpacking the supplies right now." ^
 }
 
 object mask: scuba mask goggles
- has		WEARABLE
- inventory	a "scuba mask"
- initial	"Perched on one of the stacked wooden crates is a scuba mask."
- described	"There is a scuba mask here."
- mass		5
- starts		here
+ has           WEARABLE
+ inventory     a "scuba mask"
+ initial       "Perched on one of the stacked wooden crates is a scuba mask."
+ described     "There is a scuba mask here."
+ mass          5
+ starts        here
 
 {wear
 if here has UNDER_WATER
@@ -2087,11 +2087,11 @@ write ^
 }
 
 object fins: set of scuba fin fins
- has		WEARABLE PLURAL
- inventory	the "scuba fins"
- initial	"A set of scuba fins are lying on the floor in front of the wooden crates."
- described	"A set of scuba fins lie nearby."
- mass		5
+ has           WEARABLE PLURAL
+ inventory     the "scuba fins"
+ initial       "A set of scuba fins are lying on the floor in front of the wooden crates."
+ described     "A set of scuba fins lie nearby."
+ mass          5
 
 {examine
 write "The scuba fins are black with a piece of bright yellow tape wrapped "
@@ -2100,10 +2100,10 @@ write "other with the word ~OFF~." ^
 }
 
 object tank: scuba tank 
- has		WEARABLE
- inventory	a "scuba tank"
- described	"Standing upright on the ground is a scuba tank."
- mass		25
+ has           WEARABLE
+ inventory     a "scuba tank"
+ described     "Standing upright on the ground is a scuba tank."
+ mass          25
 
 {hint
 write "You use the scuba tank by wearing it. If the tank is either empty or "
@@ -2178,9 +2178,9 @@ proxy "refill " noun1
 }
 
 object tap: scuba tank tap
- has		CLOSABLE CLOSED
- inventory	a "scuba tank tap"
- starts childof tank 
+ has           CLOSABLE CLOSED
+ inventory     a "scuba tank tap"
+ starts        childof tank
  
 {examine
 if tap hasnt CLOSED 
@@ -2236,8 +2236,8 @@ write .^
 }
 
 object regulator: regulator
- inventory	a "regulator"
- starts childof tank 
+ inventory     a "regulator"
+ starts        childof tank
 
 {examine
 write "Attached by a low pressure hose to the tank, the regulator has a "
@@ -2246,8 +2246,8 @@ write "you to purge any water from within it." ^
 }
 
 object purge: purge button
- inventory	a "purge button"
- starts childof tank
+ inventory     a "purge button"
+ starts        childof tank
 
 {press : move
 if tank has WORN
@@ -2287,8 +2287,8 @@ set TANK_PRESSURE - 1
 }
 
 object spg: submersible pressure gauge gauges spg
- inventory	a "submersible pressure gauge"
- starts childof tank 
+ inventory     a "submersible pressure gauge"
+ starts        childof tank
 
 {examine : read
 write "Attached by a high pressure hose to the tank, the gauge indicates "
@@ -2315,8 +2315,8 @@ set TURN_WORKED = false
 }
 
 object bulb: incandescent light bulb
- has		OUT_OF_REACH
- inventory	an "incandescent bulb"
+ has           OUT_OF_REACH
+ inventory     an "incandescent bulb"
 
 {examine
 write "A few moments of staring at the bulb leaves you with an annoying "
@@ -2324,13 +2324,13 @@ write "afterimage." ^
 }
 
 object cage: metal cage
- has		OUT_OF_REACH
- inventory	a "metal cage"
+ has           OUT_OF_REACH
+ inventory     a "metal cage"
 
 location lab:
- north		pool
- out		pool
- no_go		"The only exit from here is back out to the north."
+ north         pool
+ out           pool
+ no_go         "The only exit from here is back out to the north."
 
 {look
 if here has VISITED
@@ -2377,16 +2377,16 @@ set TURN_WORKED = false
 }
 
 object lab_equipment: equipment
- inventory	the "equipment"
+ inventory     the "equipment"
 
 {examine
 proxy "examine bench"
 }
 
 object bench: long bench table
- has		SURFACE
- inventory	a "long bench"
- quantity	50
+ has           SURFACE
+ inventory     a "long bench"
+ quantity      50
 
 {look_under
 write "Beneath the work bench there is about fifteen cubic metres of air." ^
@@ -2398,10 +2398,10 @@ execute "global_contents"
 }
 
 object gps: gps unit
- inventory	a "GPS unit"
- described	"There is a GPS unit here."
- mass		5
- starts childof bench
+ inventory     a "GPS unit"
+ described     "There is a GPS unit here."
+ mass          5
+ starts        childof bench
  
 {examine : read
 write "The GPS unit is a small, sealed plastic device. On its front there "
@@ -2426,11 +2426,11 @@ write "calculate your current longitude and latitude." ^
 }
 
 object syringe: syringe
- inventory	a "syringe"
- quantity	2
- starts childof bench
- described	"A syringe rests at your feet."
- mass		2
+ inventory     a "syringe"
+ quantity      2
+ starts        childof bench
+ described     "A syringe rests at your feet."
+ mass          2
 
 {insert_in_fask
 execute "global_noun1_liquid?"
@@ -2586,10 +2586,10 @@ proxy "inject second dish with syringe"
 }
 
 object scalpel: surgical scalpel
- inventory	a "surgical scalpel"
- starts childof bench
- described	"A surgical scalpel lies within reach."
- mass		2
+ inventory     a "surgical scalpel"
+ starts        childof bench
+ described     "A surgical scalpel lies within reach."
+ mass          2
 
 {examine
 write "Not the most sinister piece of surgical hardware you've every seen, "
@@ -2597,10 +2597,10 @@ write "but still frighteningly sharp." ^
 }
 
 object blue_slide: blue slide
- inventory	a "blue slide"
- described	"The blue slide rests nearby."
- mass		2
- starts		limbo
+ inventory     a "blue slide"
+ described     "The blue slide rests nearby."
+ mass          2
+ starts        limbo
 
 {look_at_through_magnifying_glass
 write "You are going to need a bit more magnification than that." ^
@@ -2632,10 +2632,10 @@ move blue_slide to slot
 }
 
 object purple_slide: purple slide
- described	"The purple slide rests nearby."
- inventory	a "purple slide"
- mass		2
- starts		limbo
+ described     "The purple slide rests nearby."
+ inventory     a "purple slide"
+ mass          2
+ starts        limbo
 
 {look_at_through_magnifying_glass
 write "You are going to need a bit more magnification than that." ^
@@ -2667,10 +2667,10 @@ move purple_slide to slot
 }
 
 object red_slide: red slide
- described	"The red slide rests nearby."
- inventory	a "red slide"
- mass		2
- starts		limbo
+ described     "The red slide rests nearby."
+ inventory     a "red slide"
+ mass          2
+ starts        limbo
 
 {look_at_through_magnifying_glass
 write "You are going to need a bit more magnification than that." ^
@@ -2702,10 +2702,10 @@ move red_slide to slot
 }
 
 object cyan_slide: cyan slide
- described	"The cyan slide rests nearby."
- inventory	a "cyan slide"
- mass		2
- starts		limbo
+ described     "The cyan slide rests nearby."
+ inventory     a "cyan slide"
+ mass          2
+ starts        limbo
 
 {look_at_through_magnifying_glass
 write "You are going to need a bit more magnification than that." ^
@@ -2737,10 +2737,10 @@ move cyan_slide to slot
 }
 
 object white_slide: white slide
- described	"The white slide rests nearby."
- inventory	a "white slide"
- mass		2
- starts		limbo
+ described     "The white slide rests nearby."
+ inventory     a "white slide"
+ mass          2
+ starts        limbo
 
 {examine
 write "The slide, made using the freeze fracture device, contains a pure "
@@ -2768,10 +2768,10 @@ move white_slide to slot
 }
 
 object green_slide: green slide
- described	"The green slide rests nearby."
- inventory	a "green slide"
- mass		2
- starts		limbo
+ described     "The green slide rests nearby."
+ inventory     a "green slide"
+ mass          2
+ starts        limbo
 
 {look_at_through_magnifying_glass
 write "You are going to need a bit more magnification than that." ^
@@ -2844,9 +2844,9 @@ move green_slide to slot
 }
 
 object fridge: specimen fridge refrigerator
- has		CONTAINER CLOSABLE CLOSED
- inventory	a "specimen fridge"
- quantity	40
+ has           CONTAINER CLOSABLE CLOSED
+ inventory     a "specimen fridge"
+ quantity      40
 
 {examine
 if fridge hasnt CLOSED
@@ -2870,8 +2870,8 @@ write "The specimen fridge is far too heavy to move." ^
 }
 
 object petri_dish: petri dish plate
- inventory	a "petri dish"
- starts		limbo
+ inventory     a "petri dish"
+ starts        limbo
 
 {look_up_in_book
 write "petri dish" ^ 
@@ -2881,10 +2881,10 @@ write "biologist J. R. Petri, died 1921." ^
 }
 
 object dish_1: first petri dish plate
- inventory	the "first petri dish"
- mass		2 
- described	"The first petri dish is here."
- starts childof fridge
+ inventory     the "first petri dish"
+ mass          2
+ described     "The first petri dish is here."
+ starts        childof fridge
 
 {open
 set TURN_WORKED = false
@@ -2904,8 +2904,8 @@ execute "look_up_in_book_petri_dish"
 }
 
 object agar: solid gel quantity of agar agar-agar
- inventory	a "quantity of agar"
- starts		limbo
+ inventory     a "quantity of agar"
+ starts        limbo
 
 {look_up_in_book
 write "agar (agar-agar)" ^
@@ -2914,8 +2914,8 @@ write "medium." ^
 }
 	
 object agar_1: solid gel quantity of brown agar agar-agar
- inventory	a "quantity of brown agar"
- starts childof dish_1
+ inventory     a "quantity of brown agar"
+ starts        childof dish_1
 
 {examine
 write "The agar has been poured into the petri dish and set into a solid "
@@ -2946,10 +2946,10 @@ execute "look_up_in_book_agar"
 }
 
 object dish_2: second petri dish  plate
- inventory	the "second petri dish"
- mass		2 
- described	"The second petri dish is here."
- starts childof fridge
+ inventory     the "second petri dish"
+ mass          2
+ described     "The second petri dish is here."
+ starts        childof fridge
 
 {open
 set TURN_WORKED = false
@@ -2969,8 +2969,8 @@ execute "look_up_in_book_petri_dish"
 }
 
 object agar_2: solid gel quantity of beige agar agar-agar
- inventory	a "quantity of beige agar"
- starts childof dish_2
+ inventory     a "quantity of beige agar"
+ starts        childof dish_2
 
 {examine
 write "The agar has been poured into the petri dish and set into a solid "
@@ -3004,12 +3004,12 @@ write "medium." ^
 }
 
 object flask: conical flask
- has		CONTAINER
- inventory	a "conical flask"
- described	"A conical flask stands on the ground."
- mass		4
- quantity	5	
- starts childof fridge
+ has           CONTAINER
+ inventory     a "conical flask"
+ described     "A conical flask stands on the ground."
+ mass          4
+ quantity      5
+ starts        childof fridge
 
 {fill_from_stream
 write "No." ^
@@ -3068,8 +3068,8 @@ proxy "pour yellow fluid"
 }
 
 object fracture: freeze fracture
- inventory	a "freeze fracture"
- starts		limbo
+ inventory     a "freeze fracture"
+ starts        limbo
 
 {look_up_in_book
 write "freeze fracture" ^
@@ -3080,8 +3080,8 @@ write "high magnification." ^
 }
 
 object ames: ames test
- inventory	name "Ames test"
- starts		limbo
+ inventory     name "Ames test"
+ starts        limbo
 
 {look_up_in_book
 write "Ames test" ^
@@ -3101,8 +3101,8 @@ write "carcinogenicity in more complex organisms." ^
 }
 
 object mutagen: mutagen mutagenic mutagenicity
- inventory	name "mutagen"
- starts		limbo
+ inventory     name "mutagen"
+ starts        limbo
 
 {look_up_in_book
 write mutagen ^
@@ -3111,8 +3111,8 @@ write "Ames test)." ^
 }
 
 object carcinogen: carcinogen carcinogenic carcinogenicity
- inventory	name "carcinogen"
- starts		limbo
+ inventory     name "carcinogen"
+ starts        limbo
 
 {look_up_in_book
 write carcinogen ^
@@ -3120,8 +3120,8 @@ write "any substance which tends to produce cancer in an organism." ^
 }
 
 object histidine: histidine histamine
- inventory	name "histidine"
- starts		limbo
+ inventory     name "histidine"
+ starts        limbo
 
 {look_up_in_book
 write histidine ^
@@ -3130,8 +3130,8 @@ write "histamine (an essential amino acid in man), in most cells." ^
 }
 
 object senescence: senescence senescent
- inventory	name "senescence"
- starts		limbo
+ inventory     name "senescence"
+ starts        limbo
 
 {look_up_in_book
 write senescence ^
@@ -3140,10 +3140,10 @@ write "power of cell division and growth." ^
 }
 
 object sample: pale yellow liquid salmonella bacterial sample
- has		LIQUID
- inventory	a "quantity of pale yellow liquid"
- mass		2
- starts childof flask
+ has           LIQUID
+ inventory     a "quantity of pale yellow liquid"
+ mass          2
+ starts        childof flask
 
 {sniff
 write "The pale yellow liquid smells sweet." ^
@@ -3241,7 +3241,7 @@ ensure sample has CUSTOM4
 }
 
 object microscope: zeiss phase contrast microscope scope
- inventory	a "phase-contrast microscope"
+ inventory     a "phase-contrast microscope"
  
 {hint
 write "Once you have made a slide using the freeze fracture device, you "
@@ -3310,8 +3310,8 @@ if green_slide childof slot
 }
 
 object slot: zeiss phase contrast microscope slot scope
- inventory	a "microscope slot"
- starts childof microscope
+ inventory     a "microscope slot"
+ starts        childof microscope
 
 {examine
 execute "global_noun1_contents"
@@ -3323,7 +3323,7 @@ write "The slot in the base of the microscope contains " noun3 .^
 }
 
 object device: freeze fracture device machine
- inventory	a "freeze fracture device"
+ inventory     a "freeze fracture device"
 
 {hint
 write "Once you have put a substance in one of the petri dishes for testing, "
@@ -3349,7 +3349,7 @@ execute "look_up_in_book_fracture"
 }
 
 object button: square button
- inventory	a "square button"
+ inventory     a "square button"
  
 {press : move
 set noun4 = compartment
@@ -3416,10 +3416,10 @@ write "device." ^
 }
 
 object compartment: compartment drawer
- has		CLOSABLE CLOSED CONTAINER
- inventory	a "compartment"
- starts	childof device
- quantity	6
+ has           CLOSABLE CLOSED CONTAINER
+ inventory     a "compartment"
+ starts        childof device
+ quantity      6
 
 {examine
 write "The compartment is circular in shape, designed to receive a petri dish "
@@ -3428,13 +3428,13 @@ execute "global_details"
 }
 
 location pool:
- east		quarters
- north		control_centre
- south		lab
- west		storage
- down		surface
- go_down	"You carefully descend the ladder into the water."
- no_go		"You can either go in one of the cardinal directions or down, into the pool."
+ east          quarters
+ north         control_centre
+ south         lab
+ west          storage
+ down          surface
+ go_down       "You carefully descend the ladder into the water."
+ no_go         "You can either go in one of the cardinal directions or down, into the pool."
 
 {look
 if here has VISITED
@@ -3449,7 +3449,7 @@ write "doorways allow passage in the four cardinal directions." ^
 }
 
 object dock: docking pool
- inventory	a "docking pool"
+ inventory     a "docking pool"
 
 {examine
 write "The docking pool is nothing more than a large circular opening in the "
@@ -3462,7 +3462,7 @@ proxy "d"
 }
 
 object ladder: steel ladder
- inventory	a "steel ladder"
+ inventory     a "steel ladder"
 
 {climb_down
 if here = pool
@@ -3522,7 +3522,7 @@ endif
 }
 
 object opening: large circular opening
- inventory	a "large circular opening"
+ inventory     a "large circular opening"
 
 {examine
 execute "examine_dock"
@@ -3533,11 +3533,11 @@ proxy "go down"
 }
 
 location surface:
- has		ON_WATER
- down		beneath_outpost
- up		pool
- go_up		"With great effort you heave yourself up the ladder."
- no_go		"Up and down are your only options from here."
+ has           ON_WATER
+ down          beneath_outpost
+ up            pool
+ go_up         "With great effort you heave yourself up the ladder."
+ no_go         "Up and down are your only options from here."
 
 {look
 if here has VISITED
@@ -3554,11 +3554,11 @@ write "The ladder descends further down, into the water." ^
 }
 
 location beneath_outpost:
- has		UNDER_WATER WITHOUT_AIR OUTDOORS
- up		surface
- north		lagoon_bottom
- no_down	"The lagoon is not that deep at this point."
- no_go		"The lagoon opens up to the north towards the open ocean."
+ has           UNDER_WATER WITHOUT_AIR OUTDOORS
+ up            surface
+ north         lagoon_bottom
+ no_down       "The lagoon is not that deep at this point."
+ no_go         "The lagoon opens up to the north towards the open ocean."
 
 {look
 if here has VISITED
@@ -3594,8 +3594,8 @@ set TURN_WORKED = false
 }
 
 object s_water: surrounding sea water
- has LIQUID
- inventory	the "surrounding sea water"
+ has           LIQUID
+ inventory     the "surrounding sea water"
 
 {taste
 write "Salty, as you would expect." ^
@@ -3608,10 +3608,10 @@ set TURN_WORKED = false
 }
 
 object q_s_water: quantity of sea water
- has		LIQUID
- inventory	a "quantity of sea water"
- starts		limbo
- mass		2
+ has           LIQUID
+ inventory     a "quantity of sea water"
+ starts        limbo
+ mass          2
 
 {taste
 write "Salty, as you would expect." ^
@@ -3633,13 +3633,13 @@ write "don't need it." ^
 }
 
 location lagoon_bottom:
- has		UNDER_WATER WITHOUT_AIR OUTDOORS
- up		lagoon_surface
- north		mid_water
- south		beneath_outpost
- no_east	"The base of the east head prevents your progress."
- no_west	"The base of the west head prevents your progress."
- no_down	"You are already on the bottom of the lagoon."
+ has           UNDER_WATER WITHOUT_AIR OUTDOORS
+ up            lagoon_surface
+ north         mid_water
+ south         beneath_outpost
+ no_east       "The base of the east head prevents your progress."
+ no_west       "The base of the west head prevents your progress."
+ no_down       "You are already on the bottom of the lagoon."
 
 {look
 if here has VISITED
@@ -3658,13 +3658,13 @@ write "of the open ocean." ^
 }
 
 location lagoon_surface:
- has		ON_WATER OUTDOORS
- down		lagoon_bottom
- north		ocean_surface
- west		beach
- southwest	beach
- no_south	"There is no way to enter the outpost from here."
- no_up		"Kicking as hard as you can, you can't manage to muster the strength required to achieve escape velocity and leave the water."
+ has           ON_WATER OUTDOORS
+ down          lagoon_bottom
+ north         ocean_surface
+ west          beach
+ southwest     beach
+ no_south      "There is no way to enter the outpost from here."
+ no_up         "Kicking as hard as you can, you can't manage to muster the strength required to achieve escape velocity and leave the water."
 
 {look
 if here has VISITED
@@ -3678,23 +3678,23 @@ write "south." ^
 }
 
 location ocean_surface:
- has		ON_WATER CUSTOM5 OUTDOORS
- down		mid_water	
- no_go		"Straying that far from the lagoon is not advisable."
- no_up		"Kicking as hard as you can, you can't manage to muster the strength required to achieve escape velocity and leave the water."
- no_south	"The rock wall is quite impenetrable."
- no_southwest	"The rock wall is quite impenetrable."
- no_southeast	"The rock wall is quite impenetrable."
- north		ocean_surface
- south		ocean_surface
- east		ocean_surface
- west		ocean_surface
- northeast	ocean_surface
- northwest	ocean_surface
- southeast	ocean_surface
- southwest	ocean_surface
- no_in		"You can't go that way."
- no_out		"You can't go that way."
+ has           ON_WATER CUSTOM5 OUTDOORS
+ down          mid_water
+ no_go         "Straying that far from the lagoon is not advisable."
+ no_up         "Kicking as hard as you can, you can't manage to muster the strength required to achieve escape velocity and leave the water."
+ no_south      "The rock wall is quite impenetrable."
+ no_southwest  "The rock wall is quite impenetrable."
+ no_southeast  "The rock wall is quite impenetrable."
+ north         ocean_surface
+ south         ocean_surface
+ east          ocean_surface
+ west          ocean_surface
+ northeast     ocean_surface
+ northwest     ocean_surface
+ southeast     ocean_surface
+ southwest     ocean_surface
+ no_in         "You can't go that way."
+ no_out        "You can't go that way."
 
 {look
 write "You are floating on the surface of the ocean. "
@@ -3737,23 +3737,23 @@ set TURN_WORKED = false
 }
 
 location ocean_bottom:
- has		UNDER_WATER WITHOUT_AIR CUSTOM5 OUTDOORS
- no_go		"Straying that far from the lagoon is not advisable."
- no_in		"You can't go that way."
- no_out		"You can't go that way."
- no_down	"You are already on the bottom."
- up		mid_water
- north		ocean_bottom
- south		ocean_bottom
- east		ocean_bottom
- west		ocean_bottom
- northeast	ocean_bottom
- northwest	ocean_bottom
- southeast	ocean_bottom
- southwest	ocean_bottom
- no_south	"The rock wall is quite impenetrable."
- no_southwest	"The rock wall is quite impenetrable."
- no_southeast	"The rock wall is quite impenetrable."
+ has           UNDER_WATER WITHOUT_AIR CUSTOM5 OUTDOORS
+ no_go         "Straying that far from the lagoon is not advisable."
+ no_in         "You can't go that way."
+ no_out        "You can't go that way."
+ no_down       "You are already on the bottom."
+ up            mid_water
+ north         ocean_bottom
+ south         ocean_bottom
+ east          ocean_bottom
+ west          ocean_bottom
+ northeast     ocean_bottom
+ northwest     ocean_bottom
+ southeast     ocean_bottom
+ southwest     ocean_bottom
+ no_south      "The rock wall is quite impenetrable."
+ no_southwest  "The rock wall is quite impenetrable."
+ no_southeast  "The rock wall is quite impenetrable."
 
 {look
 write "Hovering just above the ocean floor, you can see no sign of the surface "
@@ -3791,21 +3791,21 @@ set TURN_WORKED = false
 }
 
 object debris: rock debris
- inventory	the "debris"
+ inventory     the "debris"
 
 location mid_water:
- has		UNDER_WATER WITHOUT_AIR CUSTOM5 MID_WATER OUTDOORS
- north		mid_water
- south		lagoon_bottom
- east		mid_water
- west		mid_water
- northeast	mid_water
- northwest	mid_water
- southeast	mid_water
- southwest	mid_water
- down		mid_water
- no_out		"You can't go that way."
- no_go		"Straying that far from the lagoon is not advisable."
+ has           UNDER_WATER WITHOUT_AIR CUSTOM5 MID_WATER OUTDOORS
+ north         mid_water
+ south         lagoon_bottom
+ east          mid_water
+ west          mid_water
+ northeast     mid_water
+ northwest     mid_water
+ southeast     mid_water
+ southwest     mid_water
+ down          mid_water
+ no_out        "You can't go that way."
+ no_go         "Straying that far from the lagoon is not advisable."
 
 {look
 if tank has WORN
@@ -3910,7 +3910,7 @@ set TURN_WORKED = false
 }
 
 object sea_life: sea marine life fish
- inventory the "marine life"
+ inventory     the "marine life"
 
 {examine
 write "The marine life, mostly various species of fish, never fails to amaze "
@@ -3926,7 +3926,7 @@ write "They dart elusively out of the way." ^
 }
 
 object wall: rock wall cliff cliffs
- inventory	a "rock wall"
+ inventory     a "rock wall"
 
 {examine
 write "Many nooks and crannies make the rock wall a haven for all types of "
@@ -3944,18 +3944,18 @@ proxy "up"
 }
 
 location site:
- has		UNDER_WATER WITHOUT_AIR CUSTOM5 OUTDOORS
- no_down	"You are already on the bottom."
- no_in		"A suicide mission you decide not to accept, Jim."
- up		mid_water
- north		ocean_bottom
- south		ocean_bottom
- east		ocean_bottom
- west		ocean_bottom
- northeast	ocean_bottom
- northwest	ocean_bottom
- southeast	ocean_bottom
- southwest	ocean_bottom
+ has           UNDER_WATER WITHOUT_AIR CUSTOM5 OUTDOORS
+ no_down       "You are already on the bottom."
+ no_in         "A suicide mission you decide not to accept, Jim."
+ up            mid_water
+ north         ocean_bottom
+ south         ocean_bottom
+ east          ocean_bottom
+ west          ocean_bottom
+ northeast     ocean_bottom
+ northwest     ocean_bottom
+ southeast     ocean_bottom
+ southwest     ocean_bottom
 
 {look
 if here has VISITED
@@ -4000,7 +4000,7 @@ set TURN_WORKED = false
 }
 
 object rock: rock formation
- inventory	a "rock formation"
+ inventory     a "rock formation"
 
 {examine
 write "Standing upright on the ocean floor, the rock formation looks very "
@@ -4018,11 +4018,11 @@ endif
 }
 
 object submarine: small submarine sub
- has		OUT_OF_REACH
- inventory	a "small submarine"
- described	"A small submarine hovers just off the ocean floor beyond the rock formation."
- mass		heavy
- starts		limbo
+ has           OUT_OF_REACH
+ inventory     a "small submarine"
+ described     "A small submarine hovers just off the ocean floor beyond the rock formation."
+ mass          heavy
+ starts        limbo
 
 {hint
 write "There is nothing you can do with the submarine, just wait quietly for "
@@ -4052,7 +4052,7 @@ set TURN_WORKED = false
 }
 
 object rec_opening: rectangular opening
- inventory	a "rectangular opening"
+ inventory     a "rectangular opening"
 
 {examine
 write "The rectangular opening is where the divers enter and exit the "
@@ -4064,7 +4064,7 @@ proxy "in"
 }
 
 object aft_opening: aft opening
- inventory	the "aft opening"
+ inventory     the "aft opening"
 
 {examine
 write "The divers are loading the canisters into the submarine's interior "
@@ -4076,8 +4076,8 @@ proxy "in"
 }
 
 object canister: mysterious canister canisters
- has		OUT_OF_REACH
- inventory	a "mysterious canister"
+ has           OUT_OF_REACH
+ inventory     a "mysterious canister"
 
 {examine
 write "The canisters are cylindrical in shape and completely smooth except for "
@@ -4094,12 +4094,12 @@ write "guns)." ^
 }
 
 object vial: small glass vial vials
- has		OUT_OF_REACH
- described	"There is a small glass vial here."
- inventory	a "small glass vial"
- mass		4
- quantity	2
- starts		limbo
+ has           OUT_OF_REACH
+ described     "There is a small glass vial here."
+ inventory     a "small glass vial"
+ mass          4
+ quantity      2
+ starts        limbo
 
 {take
 if divers(location) = here
@@ -4197,8 +4197,8 @@ proxy "fill syringe from vial"
 }
 
 object membrane: rubber membrane
- inventory	a "rubber membrane"
- starts childof vial
+ inventory     a "rubber membrane"
+ starts        childof vial
 
 {examine
 write "The rubber membrane is stretched out inside a metal rim at one end "
@@ -4211,10 +4211,10 @@ write "It is neither necessary nor desirable to break the rubber membrane." ^
 }
 
 object fuel: small quantity of perfectly clear liquid
- has		LIQUID OUT_OF_REACH
- inventory	a "small quantity of clear liquid"
- mass		2
- starts childof vial
+ has           LIQUID OUT_OF_REACH
+ inventory     a "small quantity of clear liquid"
+ mass          2
+ starts        childof vial
 
 {examine
 write "The liquid is perfectly clear."
@@ -4317,8 +4317,8 @@ move fuel to limbo
 }
 
 object divers: divers
- has		OUT_OF_REACH PLURAL ANIMATE
- inventory	the "divers"
+ has           OUT_OF_REACH PLURAL ANIMATE
+ inventory     the "divers"
 
 {wave_at : greet
 execute "wave_site"
@@ -4341,11 +4341,11 @@ write "up dead." ^
 }
 
 location walkway:
- has		OUTDOORS
- east		nowhere
- west		beach
- no_east	"You bang your head on the closed steel door."
- no_go		"The walkway runs east-west."
+ has           OUTDOORS
+ east          nowhere
+ west          beach
+ no_east       "You bang your head on the closed steel door."
+ no_go         "The walkway runs east-west."
 
 {look
 if here has VISITED
@@ -4367,7 +4367,7 @@ write "It's hard enough to keep your balance without jumping up and down." ^
 }
 
 object walkway_obj: floating walkway
- inventory	a "floating walkway"
+ inventory     a "floating walkway"
 
 {examine
 write "The floating walkway leads from the west shore of the lagoon to the "
@@ -4375,7 +4375,7 @@ write "research outpost." ^
 }
 
 object outpost_obj: research outpost
- inventory	a "research outpost"
+ inventory     a "research outpost"
 
 {examine
 if here = beach
@@ -4392,7 +4392,7 @@ proxy "e"
 }
 
 object lagoon_obj: calm lagoon shore
- inventory	a "lagoon"
+ inventory     a "lagoon"
 
 {enter
 proxy "ne"
@@ -4403,13 +4403,13 @@ write "The lagoon is moderately calm and sheltered." ^
 }
 
 location beach:
- has		OUTDOORS
- east		walkway
- northeast	lagoon_surface
- south		trail
- no_north	"The west head of the lagoon bars your progress."
- no_west	"The bank is too steep and the palms too dense."
- no_go		"You can either walk south along the trail or east on to the walkway."
+ has           OUTDOORS
+ east          walkway
+ northeast     lagoon_surface
+ south         trail
+ no_north      "The west head of the lagoon bars your progress."
+ no_west       "The bank is too steep and the palms too dense."
+ no_go         "You can either walk south along the trail or east on to the walkway."
 
 {look
 if here has VISITED
@@ -4431,15 +4431,15 @@ write "beach." ^
 }
 
 object hill: steeply rising hill
- inventory	a "steeply rising hill"
+ inventory     a "steeply rising hill"
 
 {climb : enter
 write "The hill is far too steep for you to climb." ^
 }
 
 object palms: palm palms tree trees
- has		PLURAL
- inventory 	the "palms"
+ has           PLURAL
+ inventory     the "palms"
 
 {examine
 write "The afternoon sun filters through the wall of tall palms." ^
@@ -4451,12 +4451,12 @@ set TURN_WORKED = false
 }
 
 location trail:
- has		OUTDOORS
- north		beach
- go_north	"You follow the trail for several minutes over a gentle rise, finally arriving at the shore of the lagoon."
- go_south	"The trail winds its way through the jungle for several minutes before opening out at an estuary."
- south		estuary
- no_go		"Strange noises and rustlings convince you to stick to the trail."
+ has           OUTDOORS
+ north         beach
+ go_north      "You follow the trail for several minutes over a gentle rise, finally arriving at the shore of the lagoon."
+ go_south      "The trail winds its way through the jungle for several minutes before opening out at an estuary."
+ south         estuary
+ no_go         "Strange noises and rustlings convince you to stick to the trail."
 
 {look
 if here has VISITED
@@ -4478,15 +4478,15 @@ write "The sweet smell of tropical flowers hangs in the air." ^
 }
 
 object butteryfly: butterfly
- starts		limbo
+ starts        limbo
 
 location estuary:
- has		OUTDOORS
- north		trail
- east		compound
- northwest	hill
- up		hill
- south		south_beach
+ has           OUTDOORS
+ north         trail
+ east          compound
+ northwest     hill
+ up            hill
+ south         south_beach
 
 {look
 if here has VISITED
@@ -4501,7 +4501,7 @@ write "compound of the main military base." ^
 } 
 
 object estuary_obj: sandy estuary
- inventory	a "sandy estuary"
+ inventory     a "sandy estuary"
 
 {examine
 write "Sparkling water flows down the sandy estuary from the northwest, "
@@ -4510,9 +4510,9 @@ write "ocean." ^
 }
 
 location behind_hangar:
- has		OUTDOORS
- southwest	south_beach
- up		on_crate
+ has           OUTDOORS
+ southwest     south_beach
+ up            on_crate
 
 {look
 if here has VISITED
@@ -4548,8 +4548,8 @@ proxy "up"
 }
 
 object rect_crate: rectangular crate
- has		SURFACE
- inventory	a "rectangular crate"
+ has           SURFACE
+ inventory     a "rectangular crate"
 
 {open
 write "There is no obvious way to open the crate." ^
@@ -4631,18 +4631,18 @@ write "bare wall." ^
 }
 
 object hangar_obj1: hangar large building
- inventory	a "hangar"
+ inventory     a "hangar"
 
 {enter
 write "The entrance to the hangar is around the front at the north end." ^
 }
 
 location on_crate:
- has		OUTDOORS
- down		behind_hangar
- up		nowhere
- no_up		"The roof of the hangar, still another ten feet above the top of the crate, is out of your reach."
- go_up		"You jump up and hook your fingers over the edge of the guttering then pull yourself on to the roof."
+ has           OUTDOORS
+ down          behind_hangar
+ up            nowhere
+ no_up         "The roof of the hangar, still another ten feet above the top of the crate, is out of your reach."
+ go_up         "You jump up and hook your fingers over the edge of the guttering then pull yourself on to the roof."
 
 {look
 if here has VISITED
@@ -4665,7 +4665,7 @@ proxy "up"
 }
 
 object hangar_obj3: large hangar building
- inventory	a "large hangar"
+ inventory     a "large hangar"
 
 {climb
 proxy "up"
@@ -4682,7 +4682,7 @@ write "top of the crate." ^
 }
 
 object rect_crate_2: rectangular crate crate
- inventory	a "rectangular crate"
+ inventory     a "rectangular crate"
 
 {climb
 proxy "down"
@@ -4694,11 +4694,11 @@ set TURN_WORKED = false
 }
 
 location roof_north:
- has		OUTDOORS
- south		roof_south	
- down		hangar_north
- no_down	"Without the rope tied to the ventilation pipe, the drop down to the floor is too far."
- go_down	"Cautiously you lower yourself down the rope."
+ has           OUTDOORS
+ south         roof_south
+ down          hangar_north
+ no_down       "Without the rope tied to the ventilation pipe, the drop down to the floor is too far."
+ go_down       "Cautiously you lower yourself down the rope."
 
 {look
 if here has VISITED
@@ -4736,7 +4736,7 @@ write "Are you mad? You would be spotted a mile away if you did that." ^
 }
 
 object vent: vent ventilation pipe
- inventory	a "ventilation pipe"
+ inventory     a "ventilation pipe"
 
 {examine
 write "The ventilation pipe protrudes about half a metre from the roof of "
@@ -4750,11 +4750,11 @@ write ^
 }
 
 object rope: length of rope
- has		CUSTOM5
- inventory	a "length of rope"
- described	"There is a length of rope here."
- mass		scenery; When untied, set mass to 10, allowing it to be taken.
- starts	childof	vent
+ has           CUSTOM5
+ inventory     a "length of rope"
+ described     "There is a length of rope here."
+ mass          scenery; When untied, set mass to 10, allowing it to be taken.
+ starts        childof	vent
 
 {examine
 write "The length of rope is quite thick and sturdy and about ten metres long."
@@ -4825,7 +4825,7 @@ set TURN_WORKED = false
 }
 
 object roof_opening: roof opening
- inventory	an "roof opening"
+ inventory     an "roof opening"
 
 {look_through
 if lisa has BURNING
@@ -4841,9 +4841,9 @@ proxy "d"
 }
 
 location roof_south:
- has		OUTDOORS
- north		roof_north
- down		on_crate
+ has           OUTDOORS
+ north         roof_north
+ down          on_crate
 
 {look
 if here has VISITED
@@ -4859,13 +4859,13 @@ write "Are you mad? You would be spotted a mile away if you did that." ^
 }
 
 object hangar_obj: hangar large
- inventory	a "hangar"
- starts		limbo
+ inventory     a "hangar"
+ starts        limbo
 
 location hangar_north:
- south		hangar_south
- up		roof_north
- no_north	"The front door is closed."
+ south         hangar_south
+ up            roof_north
+ no_north      "The front door is closed."
 
 {look
 if here has VISITED
@@ -4912,7 +4912,7 @@ set TURN_WORKED = false
 }
 
 object tank_view: apparent fish tank
- inventory	a "fish tank"
+ inventory     a "fish tank"
 
 {shoot_override : shoot_with_gun : attack_with_gun
 write "You quickly take aim then pull the trigger." ^^
@@ -4932,8 +4932,8 @@ write "metal frame." ^
 }
 
 object inside_opening: roof opening
- has		OUT_OF_REACH
- inventory	a "roof opening"
+ has           OUT_OF_REACH
+ inventory     a "roof opening"
 
 {look_through : examine
 write "Through the opening you can see nothing but blue sky." ^
@@ -4944,11 +4944,11 @@ proxy "u"
 }
 
 object stranger: stranger tall middle-aged man
- has		ANIMATE
- inventory	the "stranger"
- described	"The stranger is here pointing his pistol at Lisa."
- starts 	limbo
- mass		heavy
+ has           ANIMATE
+ inventory     the "stranger"
+ described     "The stranger is here pointing his pistol at Lisa."
+ starts        limbo
+ mass          heavy
 
 {ask_about_fish_tank : ask_about_tank_view
 if here = hangar_south
@@ -5161,10 +5161,10 @@ write "Are you out of your mind!" ^
 }
 
 object gun: strangers stranger's gun plain black pistol his mans man's
- inventory	a "plain black pistol"
- described	"The stranger's pistol is lying here."
- starts childof	stranger
- mass		5
+ inventory     a "plain black pistol"
+ described     "The stranger's pistol is lying here."
+ starts        childof	stranger
+ mass          5
 
 {take_override
 if gun childof stranger
@@ -5188,8 +5188,8 @@ write "Never having been one for guns, you don't much like the look of it." ^
 }
 
 object rope_end: length of thick sturdy rope
- inventory	a "length of rope"
- mass		scenery
+ inventory     a "length of rope"
+ mass          scenery
  
 {examine
 write "The rope dangles down from above through the square opening in the "
@@ -5209,7 +5209,7 @@ write "You are already at the bottom of the rope." ^
 }
 
 object hangar_door: main door
- inventory	the  "main door"
+ inventory     the  "main door"
 
 {open
 write "The main door to the hangar can't be opened by hand." ^
@@ -5220,8 +5220,8 @@ write "The main door is about four metres tall and almost ten metres wide." ^
 }
 
 object access_door: access door
- has		CLOSABLE CLOSED LOCKED
- inventory	the "access door"
+ has           CLOSABLE CLOSED LOCKED
+ inventory     the "access door"
 
 {open : knock_on
 if here = compound
@@ -5250,9 +5250,9 @@ write "That is more than likely going to get you killed." ^
 }
 
 object filing: filing cabinet
- has		SURFACE
- inventory	a "filing cabinet"
- quantity	20
+ has           SURFACE
+ inventory     a "filing cabinet"
+ quantity      20
 
 {examine
 write "The filing cabinet is of a simple two drawer design. Its pale brown "
@@ -5281,9 +5281,9 @@ set TURN_WORKED = false
 }
 
 object desk_leif: sturdy desk
- has		SURFACE
- inventory	a "sturdy desk"
- quantity	30
+ has           SURFACE
+ inventory     a "sturdy desk"
+ quantity      30
  
 {examine
 write "The desk's stark, yet sturdy construction is reminiscent of the design "
@@ -5321,7 +5321,7 @@ write "Nothing but a thin layer of grime." ^
 }
 
 object grime: grime
- inventory	the "grime"
+ inventory     the "grime"
 
 {clean : clean_with_toothbrush
 proxy "clean desk"
@@ -5340,12 +5340,12 @@ write "There really isn't much of it left." ^
 }
 
 object top_drawer: top cabinet drawer
- has		CONTAINER CLOSABLE CLOSED
- inventory	a "top drawer"
- described	"The top drawer of the filing cabinet is here."
- mass		10
- quantity	15
- starts childof filing
+ has           CONTAINER CLOSABLE CLOSED
+ inventory     a "top drawer"
+ described     "The top drawer of the filing cabinet is here."
+ mass          10
+ quantity      15
+ starts        childof filing
 
 {insert_in_filing
 write "Carefully you guide the drawer back onto its railing and push it "
@@ -5370,9 +5370,9 @@ break false
 }
 
 object magazine: copy of cigar aficianado magazine
- inventory	a "copy of Cigar Aficionado magazine"
- mass		4
- starts	childof	top_drawer
+ inventory     a "copy of Cigar Aficionado magazine"
+ mass          4
+ starts        childof	top_drawer
 
 {examine : read : open
 if magazine has DAMAGED
@@ -5389,24 +5389,24 @@ write "you have no desire to read it all." ^
 }
 
 object eraser: white board eraser
- inventory	a "white board eraser"
- mass		2
- starts	childof	top_drawer
+ inventory     a "white board eraser"
+ mass          2
+ starts        childof	top_drawer
 
 object magnifying_glass: magnifying glass
- inventory	a "magnifying glass"
- mass		2
- starts	childof	top_drawer
+ inventory     a "magnifying glass"
+ mass          2
+ starts        childof	top_drawer
 
 {examine
 write "The magnifying glass is unusually large." ^
 }
 
 object paper: piece of paper
- inventory	a "piece of paper"
- described	"There is a piece of paper nearby."
- mass		5
- starts childof	top_drawer
+ inventory     a "piece of paper"
+ described     "There is a piece of paper nearby."
+ mass          5
+ starts        childof	top_drawer
 
 {give_to_stranger
 write "You hand the piece of paper to the stranger." ^^
@@ -5437,11 +5437,11 @@ write "from fish only being good for other fish." ^
 }
 
 object bottom_drawer: bottom cabinet drawer
- has		CONTAINER CLOSED LOCKED
- inventory	a "bottom drawer"
- quantity	15
- starts childof filing
- mass		10
+ has           CONTAINER CLOSED LOCKED
+ inventory     a "bottom drawer"
+ quantity      15
+ starts        childof filing
+ mass          10
 
 {examine : look_in
 if top_drawer !childof filing
@@ -5463,10 +5463,10 @@ set TURN_WORKED = false
 }
 
 object diary: diary small black
- inventory	a "diary"
- described	"A small black diary is here."
- mass		5
- starts childof	bottom_drawer
+ inventory     a "diary"
+ described     "A small black diary is here."
+ mass          5
+ starts        childof	bottom_drawer
 
 {examine : read : look_in : open
 if diary has DAMAGED
@@ -5513,8 +5513,8 @@ execute "show_to_stranger_diary"
 }
 
 location hangar_south:
- north		hangar_north
- no_up		"The walls of the tank are perfectly smooth, and therefore unclimbable."
+ north         hangar_north
+ no_up         "The walls of the tank are perfectly smooth, and therefore unclimbable."
 
 {look
 if here has VISITED
@@ -5557,16 +5557,16 @@ write "tank." ^
 }
 
 object tank_liquid: tank full of clear liquid 
- has		OUT_OF_REACH
- inventory	the "tank full of clear liquid"
+ has           OUT_OF_REACH
+ inventory     the "tank full of clear liquid"
 
 {examine
 write "The liquid is perfectly clear, possibly just water." ^
 }
 
 object hangar_lights: row rows of powerful fluorescent lights light
- has		OUT_OF_REACH
- inventory	the "rows of fluorescent lights"
+ has           OUT_OF_REACH
+ inventory     the "rows of fluorescent lights"
  
 {turn_off
 write "There is no obvious way to switch the lights off." ^
@@ -5577,7 +5577,7 @@ write "The lights are already on." ^
 }
 
 object fish_tank: fish tank
- inventory	an "fish tank"
+ inventory     an "fish tank"
 
 {examine : look_in
 write "The fish tank is about three metres by six metres and divided evenly "
@@ -5614,8 +5614,8 @@ write "The glass walls of the fish tank sound inches thick." ^
 }
 
 object probes: probes probe
- has		OUT_OF_REACH PLURAL
- inventory	the "probes"
+ has           OUT_OF_REACH PLURAL
+ inventory     the "probes"
 
 {examine
 write "Like something out of a nineteen seventies sci-fi movie, the probes "
@@ -5624,16 +5624,16 @@ write "diameter towards the tip." ^
 }
 
 object discs: flat discs
- has		OUT_OF_REACH PLURAL
- inventory	the "flat discs"
+ has           OUT_OF_REACH PLURAL
+ inventory     the "flat discs"
 
 {examine
 write "The discs appear to be made from some sort of translucent plastic." ^
 }
 
 object wires: wires
- has		OUT_OF_REACH PLURAL
- inventory 	the "wires"
+ has           OUT_OF_REACH PLURAL
+ inventory     the "wires"
 
 {examine
 write "The wires run from the tops of the probes, along the ceiling, then down "
@@ -5641,7 +5641,7 @@ write "into the bank of instruments." ^
 }
 
 object frame: steel frame
- inventory	a "steel frame"
+ inventory     a "steel frame"
 
 {climb
 write "The steel frame leads nowhere." ^
@@ -5649,7 +5649,7 @@ set TURN_WORKED = false
 }
 
 object instruments: tall bank of instruments dials knobs switches buttons
- inventory	a "bank of instruments"
+ inventory     a "bank of instruments"
 
 {examine
 write "The bank of instruments consists of many dials, switches, knobs and "
@@ -5665,7 +5665,7 @@ write "You can't even get it to budge" ^
 }
 
 object compressor: electrical air compressor
- inventory	an "air compressor"
+ inventory     an "air compressor"
 
 {examine
 write "The compressor is powered by electricity and is pumping large amounts "
@@ -5681,12 +5681,12 @@ write "The compressor is already on." ^
 }
 
 location south_beach:
- has		OUTDOORS
- north		estuary
- northeast	behind_hangar
- no_southeast	"There is no need to go swimming here."
- no_southwest	"There is no need to go swimming here."
- no_south	"There is no need to go swimming here."
+ has           OUTDOORS
+ north         estuary
+ northeast     behind_hangar
+ no_southeast  "There is no need to go swimming here."
+ no_southwest  "There is no need to go swimming here."
+ no_south      "There is no need to go swimming here."
 
 
 {look
@@ -5707,17 +5707,17 @@ write "The sound of gently rolling waves fills you ears." ^
 }
 
 object dolphin: dolphin dolphins
- has		PLURAL
- inventory	the "dolphins"
- starts		limbo
+ has           PLURAL
+ inventory     the "dolphins"
+ starts        limbo
 
 location hill:
- has		OUTDOORS
- southeast	estuary
- down		estuary
- north		shed
- in		shed
- no_go		"You can enter the shed to the north or follow the stream back down to the south-east."
+ has           OUTDOORS
+ southeast     estuary
+ down          estuary
+ north         shed
+ in            shed
+ no_go         "You can enter the shed to the north or follow the stream back down to the south-east."
 
 {look
 if here has VISITED
@@ -5741,7 +5741,7 @@ write "crooked on the north bank of the stream." ^
 }
 
 object netting: camouflage netting
- inventory	the "camouflage netting"
+ inventory     the "camouflage netting"
 
 {examine
 write "The netting contains many strips of green and brown cloth. Although "
@@ -5755,7 +5755,7 @@ set TURN_WORKED = false
 }
 
 object shed_obj: shed
- inventory	a "shed"
+ inventory     a "shed"
 
 {examine : look_in
 write "The wooden shed, enterable to the north, is in an obvious state of "
@@ -5767,7 +5767,7 @@ proxy "go north"
 }
 
 object stream: sparkling stream
- inventory	a "sparkling stream"
+ inventory     a "sparkling stream"
 
 {examine
 write "The stream flows from further up the hill, down past the front of the "
@@ -5790,8 +5790,8 @@ set TURN_WORKED = false
 }
 
 location shed:
- south		hill
- out		hill
+ south         hill
+ out           hill
 
 {look
 if here has VISITED
@@ -5820,18 +5820,18 @@ set TURN_WORKED = false
 }
 
 object boards: decaying floor boards
- has		SURFACE PLURAL
- inventory	the "decaying floor boards"
- quantity	100
+ has           SURFACE PLURAL
+ inventory     the "decaying floor boards"
+ quantity      100
 
 {examine
 write "The floor boards around the drum are stained a dark brown colour." ^
 }
 
 object shelves: crooked shelves shelf
- has		SURFACE PLURAL
- inventory	the "crooked shelves"
- quantity	30
+ has           SURFACE PLURAL
+ inventory     the "crooked shelves"
+ quantity      30
 
 {examine
 write "The shelves are lined with a variety of metal and plastic containers, "
@@ -5839,15 +5839,15 @@ write "all baring warnings as to their poisonous nature." ^
 }
 
 object containers: metal plastic containers
- has		PLURAL
- inventory	the "metal and plastic containers"
+ has           PLURAL
+ inventory     the "metal and plastic containers"
 
 {examine
 write "Most of the containers hold substances you have never heard of." ^
 }
 
 object bullet_hole: small bullet hole
- inventory	a "small hole"
+ inventory     a "small hole"
 
 {examine
 write "The hole is about the size of a five cent piece. The metal around "
@@ -5862,16 +5862,16 @@ write "another hole in the far side of the drum." ^
 }
 
 object bullet: bullet
- inventory	a "bullet"
+ inventory     a "bullet"
 
 {take
 write "Try as you might, the bullet is too firmly embedded to remove." ^
 }
 
 object drum: red metal drum
- has		SURFACE CLOSABLE CLOSED
- inventory	a "red drum"
- quantity	15
+ has           SURFACE CLOSABLE CLOSED
+ inventory     a "red drum"
+ quantity      15
 
 {examine
 write "The drum is painted red. A large label on its side reads:" ^^
@@ -5912,14 +5912,14 @@ write "dried substance around its base glueing it to the floor." ^
 }
 
 object contents: drums drum's contents dark brown stain substance glue
- inventory	the "dark brown substance"
+ inventory     the "dark brown substance"
  
 {examine
 write "The dark brown substance was obviously once the contents of the drum." ^
 }
 
 object label: label on red metal drum
- inventory	the "label on the drum"
+ inventory     the "label on the drum"
 
 {take
 write "It would be impossible to peel the label off the drum without tearing "
@@ -5931,9 +5931,9 @@ execute "examine_drum"
 }
 
 object rotenone: quantity of rotenone derris rotol
- inventory	a "quantity of rotenone"
- starts childof drum
- mass	 	2	
+ inventory     a "quantity of rotenone"
+ starts        childof drum
+ mass          2
 	
 {examine
 execute "examine_drum"
@@ -5951,7 +5951,7 @@ write "brown liquid extracted from the root." ^
 }
 
 object shed_door: shed door
- inventory	a "shed door"
+ inventory     a "shed door"
 
 {take
 write "Far too heavy and useless to consider lugging around." ^
@@ -5971,11 +5971,11 @@ write "Not without the aid of several power tools you won't." ^
 }
 
 location compound:
- has		OUTDOORS
- west		estuary
- north		office
- east		base
- south		hangar_north
+ has           OUTDOORS
+ west          estuary
+ north         office
+ east          base
+ south         hangar_north
 
 {look
 if here has VISITED
@@ -5989,7 +5989,7 @@ write "the base lies further to the east." ^
 }
 
 object hangar_obj2: hangar large building
- inventory	a "hangar"
+ inventory     a "hangar"
 
 {examine
 write "The hangar is an enormous building guarded by an enormous MP. The " ^
@@ -5998,10 +5998,10 @@ write "door for people to come and go." ^
 }
 
 object guard: burly mp guard man
- has		ANIMATE POSSESSIVE
- inventory	the "MP"
- described	"A burly MP stands guard at the door to the hangar."
- mass		heavy
+ has           ANIMATE POSSESSIVE
+ inventory     the "MP"
+ described     "A burly MP stands guard at the door to the hangar."
+ mass          heavy
 
 {greet
 write "The MP continues to stare straight ahead." ^
@@ -6083,9 +6083,9 @@ break false
 }
 
 object machine_gun: guards guard's his machine rifle gun m16
- inventory	a "machine gun"
- starts childof guard
- mass		15
+ inventory     a "machine gun"
+ starts        childof guard
+ mass          15
 
 {examine
 write "About the only thing you know about the MP's M16 is that you don't "
@@ -6093,14 +6093,14 @@ write "like the look of it." ^
 }
 
 location base:
- has		OUTDOORS
- west		compound
- east		pad
- up		pad
- no_go		"Most of the structures are either private or restricted."
- no_down	"You can't go that way."
- no_up		"You can't go that way."
- no_out		"You can't go that way."
+ has           OUTDOORS
+ west          compound
+ east          pad
+ up            pad
+ no_go         "Most of the structures are either private or restricted."
+ no_down       "You can't go that way."
+ no_up         "You can't go that way."
+ no_out        "You can't go that way."
 
 {look
 if here has VISITED
@@ -6123,7 +6123,7 @@ write "Work is still going at the top of the tower." ^
 }
 
 object tower: meteorological tower
- inventory	a "meteorological tower"
+ inventory     a "meteorological tower"
 
 {examine
 write "The tower is about three quarters finished, its tall steel frame "
@@ -6141,10 +6141,10 @@ write "Try as you might, you just can't manage to push the tower over." ^
 }
 
 location pad:
- has		OUTDOORS
- west		base
- down		base
- no_go		"Back down the steps is the only way from here."
+ has           OUTDOORS
+ west          base
+ down          base
+ no_go         "Back down the steps is the only way from here."
 
 {look
 if here has VISITED
@@ -6157,14 +6157,14 @@ write "barren, stripped of all vegetation over a metre tall." ^
 }
 
 object helicopter: helicopter
- inventory	a "helicopter"
- starts		limbo
+ inventory     a "helicopter"
+ starts        limbo
 
 location office:
- south		compound
- go_south	"Excusing yourself to Colonel Wise, you turn to leave." ^
- out		compound
- no_go		"The only exit is back out to the south."
+ south         compound
+ go_south      "Excusing yourself to Colonel Wise, you turn to leave." ^
+ out           compound
+ no_go         "The only exit is back out to the south."
 
 {look
 if here has VISITED
@@ -6199,8 +6199,8 @@ set TURN_WORKED = false
 }
 
 object photos: photos black-and-white photographs
- has		PLURAL
- inventory	the "photographs"
+ has           PLURAL
+ inventory     the "photographs"
 
 {examine
 write "The photographs are mostly action shots from training exercises." ^
@@ -6211,9 +6211,9 @@ write "There is, quite surprisingly, a wall there." ^
 }
 
 object cos_desk: desk
- has		SURFACE
- inventory	the "desk"
- quantity	30
+ has           SURFACE
+ inventory     the "desk"
+ quantity      30
 
 {examine
 write "The desk is not exactly what would expect a colonel to be "
@@ -6222,8 +6222,8 @@ execute "global_details"
 }
 
 object telephone: colonel wises wise's telephone rap-rod phone
- inventory	name "Colonel Wise's telephone"
- starts childof cos_desk
+ inventory     name "Colonel Wise's telephone"
+ starts        childof cos_desk
 
 {take
 write "I don't think Colonel Wise would appreciate you walking off with his "
@@ -6231,9 +6231,9 @@ write "telephone." ^
 }
 
 object feet: colonel wises wise's feet smelly
- has		PLURAL
- inventory	name "Colonel Wise's feet"
- starts childof cos_desk
+ has           PLURAL
+ inventory     name "Colonel Wise's feet"
+ starts        childof cos_desk
 
 {take
 write "Give me a break." ^
@@ -6252,16 +6252,16 @@ write "Is passing out one of your favourite hobbies?" ^
 }
 
 object fan: slow turning ceiling fan
- has		OUT_OF_REACH
- inventory	a "ceiling fan"
+ has           OUT_OF_REACH
+ inventory     a "ceiling fan"
  
 {examine
 write "The slowly turning ceiling fan is made from woven bamboo." ^
 }
 
 object wise: officer colonel wise man
- has		ANIMATE POSSESSIVE
- inventory	name "Colonel Wise"
+ has           ANIMATE POSSESSIVE
+ inventory     name "Colonel Wise"
 
 {ask_about_helicopter
 write "~When you give me that report of yours, I will call through to the "
@@ -6340,11 +6340,11 @@ break false
 }
 
 object jacket: formal jacket
- has		WEARABLE WORN
- inventory	a "formal jacket"
- described	"Your jacket is here."
- mass		10
- starts 	limbo
+ has           WEARABLE WORN
+ inventory     a "formal jacket"
+ described     "Your jacket is here."
+ mass          10
+ starts        limbo
 
 {drop
 if here = van
@@ -6356,11 +6356,11 @@ break false
 }
 
 object ear_piece: ear piece
- has		WEARABLE WORN
- inventory	an "ear piece"
- described 	"The miniature ear piece is here."
- mass		1
- starts		limbo
+ has           WEARABLE WORN
+ inventory     an "ear piece"
+ described     "The miniature ear piece is here."
+ mass          1
+ starts        limbo
 
 {remove
 if here = van
@@ -6380,10 +6380,10 @@ break false
 }
 
 location van:
- out		nowhere
- no_out		"The sliding door is closed."
- east		nowhere
- no_east	"The sliding door is closed."
+ out           nowhere
+ no_out        "The sliding door is closed."
+ east          nowhere
+ no_east       "The sliding door is closed."
 
 {look
 if here has VISITED
@@ -6408,7 +6408,7 @@ set TURN_WORKED = false
 }
 
 object equipment: monitoring equipment
- inventory	the "monitoring equipment"
+ inventory     the "monitoring equipment"
 
 {turn_on : turn_off : use
 write "I don't think you should be touching the monitoring equipment." ^
@@ -6421,15 +6421,15 @@ write "recorder." ^
 }
 
 object microphone: microphone
- inventory	a "microphone"
+ inventory     a "microphone"
 
 {turn_on : turn_off : use
 write "I don't think you should be touching the monitoring equipment." ^
 }
 
 object video_monitors: black-and-white black and white video monitors
- has		PLURAL
- inventory 	the "black-and-white video monitors"
+ has           PLURAL
+ inventory     the "black-and-white video monitors"
 	
 {turn_on : turn_off : use
 write "I don't think you should be touching the monitoring equipment." ^
@@ -6441,22 +6441,22 @@ write "except for one that is showing tonight's football." ^
 }
 
 object scanner: radio scanner
- inventory	a "radio scanner"
+ inventory     a "radio scanner"
 
 {turn_on : turn_off : use
 write "I don't think you should be touching the monitoring equipment." ^
 }
 
 object reel-to-reel: reel-to-reel reel to reel tape recorder
- inventory	a "reel-to-reel tape recorder"
+ inventory     a "reel-to-reel tape recorder"
 
 {turn_on : turn_off : use
 write "I don't think you should be touching the monitoring equipment." ^
 }
 
 object van_doors: sliding door
- has		CLOSED CLOSABLE
- inventory	the "sliding door"
+ has           CLOSED CLOSABLE
+ inventory     the "sliding door"
 
 {open_override
 write "You open the sliding door." ^
@@ -6477,10 +6477,10 @@ set street(west) = nowhere
 }
 
 object hughes: special agent hughes man
- has		ANIMATE POSSESSIVE
- inventory	name "Agent Hughes"
- described 	"Agent Hughes is sitting here, wearing a set of headphones."
- mass		heavy
+ has           ANIMATE POSSESSIVE
+ inventory     name "Agent Hughes"
+ described     "Agent Hughes is sitting here, wearing a set of headphones."
+ mass          heavy
 
 {attack
 write "Not a good idea." ^
@@ -6570,16 +6570,16 @@ write "~We don't really have time for this now, Alex,~ Agent hughes replies." ^
 }
 
 object headphones: headphones
- has		WORN
- inventory	the "headphones"
- starts childof hughes
- mass		5
+ has           WORN
+ inventory     the "headphones"
+ starts        childof hughes
+ mass          5
 
 object petrescu: special agent petrescu man
- has		ANIMATE POSSESSIVE
- inventory	name "Agent Petrescu"
- described	"Agent Petrescu is standing here."
- mass		heavy
+ has           ANIMATE POSSESSIVE
+ inventory     name "Agent Petrescu"
+ described     "Agent Petrescu is standing here."
+ mass          heavy
 
 {thank
 write "~No - thank you, Dr Meadows,~ Agent Petrescu replies." ^
@@ -6660,11 +6660,11 @@ write "Duchovny." ^
 }
 
 location street:
- has		OUTDOORS
- in		van
- west		van
- no_go		"You can either go north towards the hotel or back into the van."
- north		driveway
+ has           OUTDOORS
+ in            van
+ west          van
+ no_go         "You can either go north towards the hotel or back into the van."
+ north         driveway
 
 {look
 if here has VISITED
@@ -6694,8 +6694,8 @@ write "The light drizzle moistens your face." ^
 }
 
 object street_lamps: street lamps lamp
- has		OUT_OF_REACH
- inventory	the "street lamps"
+ has           OUT_OF_REACH
+ inventory     the "street lamps"
 
 {examine
 write "Light from the street lamps is softened by a dense fog that is slowly "
@@ -6707,14 +6707,14 @@ write "The street lamps are too slippery to climb due to the light rain." ^
 }
 
 object fog: dense fog
- inventory	the "dense fog"
+ inventory     the "dense fog"
 
 {examine
 write "The dense fog is slowly rolling in from over the sea." ^
 }
 
 object hotel_obj: hotel les terrasses d'eze
- inventory	the "Hotel Les Terrasses d'Eze"
+ inventory     the "Hotel Les Terrasses d'Eze"
 
 {examine
 write "Only five stories tall, the Hotel Les Terrasses d'Eze is quite a grand "
@@ -6727,7 +6727,7 @@ proxy "north"
 }
 
 object van_obj: white mercedes van
- inventory	a "white Mercedes van"
+ inventory     a "white Mercedes van"
 
 {open
 proxy "open sliding door"
@@ -6754,17 +6754,17 @@ write "Just dirty water flowing along a shallow stone gutter." ^
 }
 
 location driveway:
- has		OUTDOORS
- north		lobby
- south		street
- southeast	street
- southwest	street
- go_southwest	"Dodging cars, you make your way back out to the street."
- go_southeast	"Dodging cars, you make your way back out to the street."
- no_west	"There is no pedestrian access to the underground car park from here."
- no_east	"There is no pedestrian access to the underground car park from here."
- no_down	"There is no pedestrian access to the underground car park from here."
- go_north	"As you approach the front doors of the hotel, one of the uniformed men opens them and bids you a good evening."
+ has           OUTDOORS
+ north         lobby
+ south         street
+ southeast     street
+ southwest     street
+ go_southwest  "Dodging cars, you make your way back out to the street."
+ go_southeast  "Dodging cars, you make your way back out to the street."
+ no_west       "There is no pedestrian access to the underground car park from here."
+ no_east       "There is no pedestrian access to the underground car park from here."
+ no_down       "There is no pedestrian access to the underground car park from here."
+ go_north      "As you approach the front doors of the hotel, one of the uniformed men opens them and bids you a good evening."
 
 {look
 if here has VISITED
@@ -6798,12 +6798,12 @@ write "Cars exit to the street to the southeast." ^
 }
 
 object attendants: valet parking attendants
- has		ANIMATE PLURAL
- inventory	the "valet parking attendants"
+ has           ANIMATE PLURAL
+ inventory     the "valet parking attendants"
 
 object door_men: uniformed men doormen doorman
- has		ANIMATE PLURAL
- inventory	the "uniformed men"
+ has           ANIMATE PLURAL
+ inventory     the "uniformed men"
 
 {greet
 write "One of the uniformed men bows politely and bids you a good evening." ^
@@ -6815,8 +6815,8 @@ write "polished shoes and brass buttons, their presentation is impeccable." ^
 }
 
 object esprit: black lotus esprit car
- has		CLOSABLE CLOSED LOCKED
- inventory	a "black Lotus Esprit"
+ has           CLOSABLE CLOSED LOCKED
+ inventory     a "black Lotus Esprit"
 
 {examine
 write "The light rain beads on Lotus Esprit's highly waxed and polished duco. "
@@ -6833,15 +6833,15 @@ write "You surreptitiously try the handle, but it is locked." ^
 }
 
 location lobby: 
- south		driveway
- north		ground_floor
- northeast	mezzanine
- northwest	mezzanine
- go_northeast	"The stairs turn a half-circle as you ascend to the mezzanine level."
- go_northwest	"The stairs turn a half-circle as you ascend to the mezzanine level."
- up		mezzanine
- east		concierge_desk
- west		bar
+ south         driveway
+ north         ground_floor
+ northeast     mezzanine
+ northwest     mezzanine
+ go_northeast  "The stairs turn a half-circle as you ascend to the mezzanine level."
+ go_northwest  "The stairs turn a half-circle as you ascend to the mezzanine level."
+ up            mezzanine
+ east          concierge_desk
+ west          bar
  
 {look
 if here has VISITED
@@ -6860,9 +6860,9 @@ write "desk while a dimly lit piano bar can be entered to the west." ^
 }
 
 object sign: a-frame sign
- inventory	an "A-frame sign"
- described	"An A-frame sign stands to one side."
- mass		heavy
+ inventory     an "A-frame sign"
+ described     "An A-frame sign stands to one side."
+ mass          heavy
 
 {examine : read
 write "The sign reads..." ^^
@@ -6882,8 +6882,8 @@ centre "-----------------------------------------"
 }
 
 object stairs_bottom: wide stairs
- has		PLURAL
- inventory	the "wide stairs"
+ has           PLURAL
+ inventory     the "wide stairs"
 
 {examine
 write "The stairs are made from marble and covered with a thick, richly "
@@ -6900,17 +6900,17 @@ write "You are already at the bottom of the stairs." ^
 }
 
 object chandelier: elaborate chandelier
- has		OUT_OF_REACH
- inventory	an "elaborate chandelier"
+ has           OUT_OF_REACH
+ inventory     an "elaborate chandelier"
 	
 {examine
 write "You can't help but think the chandelier is a little bit over the top." ^
 }
 
 location concierge_desk:
- west		lobby
- out		lobby
- no_go		"The only exit from here is back west into the lobby."
+ west          lobby
+ out           lobby
+ no_go         "The only exit from here is back west into the lobby."
 
 {look
 if here has VISITED
@@ -6947,12 +6947,12 @@ set TURN_WORKED = false
 }
 
 object guests: hotel guest guests
- has		PLURAL ANIMATE
- inventory	the "hotel guests"
+ has           PLURAL ANIMATE
+ inventory     the "hotel guests"
 
 object luggage: hotel guests guest's luggage
- has		OUT_OF_REACH
- inventory	the "guest's luggage"
+ has           OUT_OF_REACH
+ inventory     the "guest's luggage"
 
 {take
 write "I don't think the hotel guests would appreciate that." ^
@@ -6960,9 +6960,9 @@ set TURN_WORKED = false
 }
 
 object hotel_phone: hotel concierge's concierges telephone franks frank's phone
- inventory	the "concierge's telephone"
- starts childof counter
- mass		heavy
+ inventory     the "concierge's telephone"
+ starts        childof counter
+ mass          heavy
 
 {take
 write "I think the concierge might having something to say about you "
@@ -6970,20 +6970,20 @@ write "walking off with his telephone." ^
 }
 
 object holes: pigeon holes
- has		PLURAL OUT_OF_REACH
- inventory	the "pigeon holes"
+ has           PLURAL OUT_OF_REACH
+ inventory     the "pigeon holes"
 
 {examine
 write "The pigeon holes contain a variety of keys and phone messages." ^
 }
 
 object keys: variety of keys key
- has		PLURAL OUT_OF_REACH
- inventory	the "variety of keys"
+ has           PLURAL OUT_OF_REACH
+ inventory     the "variety of keys"
 
 object messages: guests guest's phone messages notes message note letter
- has		PLURAL OUT_OF_REACH
- inventory	the "phone messages"
+ has           PLURAL OUT_OF_REACH
+ inventory     the "phone messages"
 
 {read : examine
 write "Only one of the messages is angled in such a way that allows you to "
@@ -6992,18 +6992,18 @@ write "it, a definite ten out of ten, Dave Lebling~." ^
 }
 
 object guest_list: conference hotel guest list
- has		OUT_OF_REACH
- inventory	the "guest list"
+ has           OUT_OF_REACH
+ inventory     the "guest list"
 
 {read : examine
 write "The writing on the guest list is too small to read from here." ^
 }
 
 object concierge: concierge man frank leboeuf 
- has		ANIMATE
- inventory	the "concierge"
- described	"A single concierge stands behind the counter."
- mass		heavy
+ has           ANIMATE
+ inventory     the "concierge"
+ described     "A single concierge stands behind the counter."
+ mass          heavy
 
 {ask_for_mil_key
 write "~I'm sorry. I am not authorised to issue you with a MIL key,~ the "
@@ -7102,7 +7102,7 @@ write "gold coloured name tag that reads, ~Frank Leboeuf~." ^
 }
 
 object knob: knob
- inventory	a "knob"
+ inventory     a "knob"
 
 {turn
 write "The bell is rung by tapping the knob." ^
@@ -7113,9 +7113,9 @@ proxy "ring bell"
 }
 
 object bell: small brass bell
- inventory	a "small brass bell"
- starts childof counter
- mass		heavy
+ inventory     a "small brass bell"
+ starts        childof counter
+ mass          heavy
 
 {examine
 write "The small bell is nothing more than a highly polished brass dome with "
@@ -7150,14 +7150,14 @@ break false
 }
 
 object counter: long curved counter
- has		SURFACE
- inventory	a "long curved counter"
- quantity	50
+ has           SURFACE
+ inventory     a "long curved counter"
+ quantity      50
 
 location bar:
- east		lobby
- south		lounge
- no_go		"You can either go south into the lounge area or east back into the lobby."
+ east          lobby
+ south         lounge
+ no_go         "You can either go south into the lounge area or east back into the lobby."
 
 {look
 if here has VISITED
@@ -7194,11 +7194,11 @@ set TURN_WORKED = false
 }
 
 object waitress: waitress bar lady women
- has		ANIMATE FEMALE
- inventory	the "waitress"
- described	"Standing by the table at which the men are seated is a waitress."
- mass		heavy
- starts		lounge
+ has           ANIMATE FEMALE
+ inventory     the "waitress"
+ described     "Standing by the table at which the men are seated is a waitress."
+ mass          heavy
+ starts        lounge
 
 {tell_about_lift_1_obj : tell_about_lift_1_light
 write "~The concierge will be able to help you with that,~ the waitress "
@@ -7230,11 +7230,11 @@ write "herself from engaging in a long conversation." ^
 }
  
 object tray: silver drinks tray
- has		SURFACE OUT_OF_REACH
- inventory	a "silver drinks tray"
- quantity	10
- starts childof waitress
- mass		10
+ has           SURFACE OUT_OF_REACH
+ inventory     a "silver drinks tray"
+ quantity      10
+ starts        childof waitress
+ mass          10
 
 {take
 write "Fighting the waitress for the drinks tray in the middle of the bar "
@@ -7245,9 +7245,9 @@ set TURN_WORKED = false
 }
 
 object ordered_drinks: ordered guest's guests variety of drinks
- has		PLURAL OUT_OF_REACH
- inventory 	a "variety of drinks"
- starts		limbo	
+ has           PLURAL OUT_OF_REACH
+ inventory     a "variety of drinks"
+ starts        limbo
  
 {examine
 write "There are no useful clues in the hotel guest's drinks." ^
@@ -7259,10 +7259,10 @@ set TURN_WORKED = false
 }
 
 object credit_card: credit card
- has		OUT_OF_REACH
- inventory	a "credit card"
- starts childof tray
- mass		2
+ has           OUT_OF_REACH
+ inventory     a "credit card"
+ starts        childof tray
+ mass          2
 
 {examine : read
 write "The credit card is an American Express Gold Card with the name "
@@ -7288,11 +7288,11 @@ write ^
 }
 
 object square_tables: low rectangular tables
- has		PLURAL 
- inventory	the "low rectangular tables"
+ has           PLURAL
+ inventory     the "low rectangular tables"
 
 object lounges: leather lounge chairs
- inventory	the "leather lounge chairs"
+ inventory     the "leather lounge chairs"
 
 {sit_on_override
 execute "sit_bar"
@@ -7303,9 +7303,9 @@ write "The leather lounge chairs are all occupied by guests." ^
 }
 
 object drink: drink beer martini lager and coke red white wine champagne scotch coniac port water ale rum malibu tequila gin cherry
- inventory	a "drink"
- starts childof landlord
- mass		10
+ inventory     a "drink"
+ starts        childof landlord
+ mass          10
 
 {order
 if here = bar
@@ -7317,10 +7317,10 @@ set TURN_WORKED = false
 }
 
 object landlord: barman man cocktail waiter landlord
- has		ANIMATE OUT_OF_REACH
- inventory	the "cocktail waiter"
- described	"Behind the bar, wearing a neatly pressed dinner suit, is a cocktail waiter."
- mass		heavy
+ has           ANIMATE OUT_OF_REACH
+ inventory     the "cocktail waiter"
+ described     "Behind the bar, wearing a neatly pressed dinner suit, is a cocktail waiter."
+ mass          heavy
  
 {examine
 write "The cocktail waiter is wearing a neatly pressed dinner suit. He "
@@ -7364,8 +7364,8 @@ endall
 }
 
 object bar_shelves: narrow glass shelves shelf
- has		PLURAL OUT_OF_REACH
- inventory	the "narrow glass shelves"
+ has           PLURAL OUT_OF_REACH
+ inventory     the "narrow glass shelves"
 
 {examine
 write "Rows of bottles of all shapes and sizes line the narrow glass shelves. "
@@ -7377,13 +7377,13 @@ write ^
 }
 
 object bottles: bottles
- has		PLURAL OUT_OF_REACH
- inventory	the "bottles"
+ has           PLURAL OUT_OF_REACH
+ inventory     the "bottles"
 
 object long_bar: long bar
- has		SURFACE
- inventory	a "bar"
- quantity	100
+ has           SURFACE
+ inventory     a "bar"
+ quantity      100
 
 {examine
 write "The dark wood of the bar has been highly polished. "
@@ -7395,11 +7395,11 @@ write "I'm sure that will please the cocktail waiter." ^
 }
 
 object coaster: cardboard coaster
- has		WEARABLE
- inventory	a "cardboard coaster"
- described	"There is a cardboard coaster here."
- starts childof long_bar
- mass		1
+ has           WEARABLE
+ inventory     a "cardboard coaster"
+ described     "There is a cardboard coaster here."
+ starts        childof long_bar
+ mass          1
 
 {examine : read
 write "The coaster has the hotel name and emblem on it." ^
@@ -7419,30 +7419,30 @@ ensure coaster has CUSTOM2
 }
 
 object wooden_bowl: shallow wooden bowl
- has		CONTAINER
- inventory	a "shallow wooden bowl"
- described	"A shallow wooden bowl rests on the ground."
- quantity	1
- starts childof long_bar
- mass		4
+ has           CONTAINER
+ inventory     a "shallow wooden bowl"
+ described     "A shallow wooden bowl rests on the ground."
+ quantity      1
+ starts        childof long_bar
+ mass          4
 
 {examine
 write "The shallow wooden bowl contains the usual assortment of pretzels." ^
 }
 
 object bar_guests: bar guest guests patrons
- has		PLURAL ANIMATE
- inventory	the "bar guests"
+ has           PLURAL ANIMATE
+ inventory     the "bar guests"
 
 {examine
 write "The guests appear to be enjoying themselves." ^
 }
 
 object pretzels: pretzels
- has		PLURAL
- inventory	some "pretzels"
- starts	childof wooden_bowl
- mass		1
+ has           PLURAL
+ inventory     some "pretzels"
+ starts        childof wooden_bowl
+ mass          1
 
 {examine
 write "They look edible." ^
@@ -7467,9 +7467,9 @@ write "You sift through the pretzels looking for an appealing one. You fail." ^
 }
 
 location lounge:
- north		bar
- out		bar
- no_go		"The only exit from here is back north."
+ north         bar
+ out           bar
+ no_go         "The only exit from here is back north."
 
 {look
 if here has VISITED
@@ -7518,7 +7518,7 @@ set TURN_WORKED = false
 }
 
 object large_windows: large windows window
- inventory	the "large windows"
+ inventory     the "large windows"
 
 {examine : look_through
 write "Peering through the drizzle and fog you can see people hurrying along "
@@ -7526,11 +7526,11 @@ write "the cold and wet street outside." ^
 }
 
 object zola: gianfranco mr zola elderly man
- has		ANIMATE
- inventory	name "Mr Zola"
- described	"Mr Zola is still sitting at one of the tables."
- mass		heavy
- starts		limbo
+ has           ANIMATE
+ inventory     name "Mr Zola"
+ described     "Mr Zola is still sitting at one of the tables."
+ mass          heavy
+ starts        limbo
 
 {talk_to : greet
 execute "talk_to_elderly_man"
@@ -7550,10 +7550,10 @@ write "conversation." ^
 }
 
 object elderly_man: elderly man elder
- has		ANIMATE
- inventory	the "elderly man"
- described	"Sitting at one of the tables is an elderly man."
- mass		heavy
+ has           ANIMATE
+ inventory     the "elderly man"
+ described     "Sitting at one of the tables is an elderly man."
+ mass          heavy
 
 {ask_about_ruud
 write "Mr Zola appears to resent you trying to get involved in the "
@@ -7603,10 +7603,10 @@ write "Cup final." ^
 }
 
 object younger_man: younger man young
- has		ANIMATE
- inventory	the "younger man"
- described	"A younger man is sitting with the elderly man, listening intently."
- mass		heavy
+ has           ANIMATE
+ inventory     the "younger man"
+ described     "A younger man is sitting with the elderly man, listening intently."
+ mass          heavy
 
 {examine
 write "The younger man is quite lean with short dark hair. He appears to be "
@@ -7651,11 +7651,11 @@ write "Cup final." ^
 }
 
 object ruud: ruud gullit well dressed man god
- has		ANIMATE
- inventory	the "well dressed gentleman"
- described	"Standing casually nearby is a well dressed gentleman."
- starts		limbo
- mass		heavy
+ has           ANIMATE
+ inventory     the "well dressed gentleman"
+ described     "Standing casually nearby is a well dressed gentleman."
+ starts        limbo
+ mass          heavy
 
 {talk_to : greet
 write "The well dressed gentleman smiles, but says nothing." ^
@@ -7694,7 +7694,7 @@ break false
 }
 
 object piano: black yamaha baby grand piano
- inventory	a "piano"
+ inventory     a "piano"
 
 {play
 write "A duet perhaps?" ^
@@ -7717,7 +7717,7 @@ execute "listen_lounge"
 }
 
 object plant: pot potted palm plant
- inventory	a "potted palm"
+ inventory     a "potted palm"
 
 {look_in
 write "Just a bit of dirt." ^
@@ -7733,8 +7733,8 @@ write "There is a baby grand piano there." ^
 }
 
 object piano_player: piano player pretty women lady musician
- has		ANIMATE
- inventory	the "piano player"
+ has           ANIMATE
+ inventory     the "piano player"
  
 {examine
 write "Young, and quite pretty, the lady is playing "
@@ -7748,8 +7748,8 @@ set TURN_WORKED = false
 }
 
 object tables: several round tables
- has		PLURAL
- inventory	the "round tables"
+ has           PLURAL
+ inventory     the "round tables"
 
 {examine
 write "Each of the round tables has a candle on it and three or four chairs "
@@ -7757,7 +7757,7 @@ write "around it." ^
 }
 
 object candles: candles candle
- has		PLURAL LUMINOUS
+ has           PLURAL LUMINOUS
 
 {examine
 write "The soft light from the candles creates a warm relaxing atmosphere "
@@ -7765,14 +7765,14 @@ write "here." ^
 }
 
 location mezzanine:
- north		first_floor
- no_east	"The hallway leads only to guest's private rooms."
- no_west	"The hallway leads only to guest's private rooms."
- northwest	lobby
- go_northwest	"The stairs turn a half-circle as you descend down into the lobby." ^
- go_southwest	"The stairs turn a half-circle as you descend down into the lobby." ^
- northeast	lobby
- down		lobby
+ north         first_floor
+ no_east       "The hallway leads only to guest's private rooms."
+ no_west       "The hallway leads only to guest's private rooms."
+ northwest     lobby
+ go_northwest  "The stairs turn a half-circle as you descend down into the lobby." ^
+ go_southwest  "The stairs turn a half-circle as you descend down into the lobby." ^
+ northeast     lobby
+ down          lobby
 
 {look
 if here has VISITED
@@ -7792,8 +7792,8 @@ write "Over the railing?" ^
 }
 
 object stairs_top: wide stairs
- has		PLURAL
- inventory	the "wide stairs"
+ has           PLURAL
+ inventory     the "wide stairs"
 
 {examine
 execute "examine_stairs_bottom"
@@ -7808,7 +7808,7 @@ write "You are already at the top of the stairs." ^
 }
 
 object railing: waist high railing
- inventory	a "waist high railing"
+ inventory     a "waist high railing"
 
 {examine
 write "The railing matches the one on the stairs leading up here in both "
@@ -7827,12 +7827,12 @@ set TURN_WORKED = false
 }
 
 location ground_floor:
- west		nowhere
- no_west	"The lift doors are closed." ^
- east		nowhere
- no_east	"The lift doors are closed." ^
- south		lobby
- no_in		"Did you want to go in the west lift or the east lift."
+ west          nowhere
+ no_west       "The lift doors are closed." ^
+ east          nowhere
+ no_east       "The lift doors are closed." ^
+ south         lobby
+ no_in         "Did you want to go in the west lift or the east lift."
 
 {look
 if here has VISITED
@@ -7847,7 +7847,7 @@ write "can be seen to the south." ^
 }
 
 object mirror: large gold framed mirror
- inventory	a "large gold framed mirror"
+ inventory     a "large gold framed mirror"
  
 {examine : look_in
 write "It has been a long time since you have dressed up for a formal "
@@ -7859,18 +7859,18 @@ write "Not a sausage." ^
 }
 
 object vase: brass vase
- has		CONTAINER
- inventory	a "brass vase"
- described	"There is a brass vase resting on the ground."
- quantity	5
- mass		10
- starts childof side_table
+ has           CONTAINER
+ inventory     a "brass vase"
+ described     "There is a brass vase resting on the ground."
+ quantity      5
+ mass          10
+ starts        childof side_table
 
 object butt: cigarette butt
- described	"An old cigarette butt rests on the ground." ^
- inventory	a "cigarette butt"
- mass		2
- starts childof vase
+ described     "An old cigarette butt rests on the ground." ^
+ inventory     a "cigarette butt"
+ mass          2
+ starts        childof vase
  
 {examine : sniff
 write "Quite repugnant really." ^
@@ -7882,23 +7882,23 @@ set TURN_WORKED = false
 }
 
 object flowers: dried flowers
- has		PLURAL
- inventory	some "dried flowers"
- described	"A bunch of dried flowers rest here."
- mass		5
- starts childof vase
+ has           PLURAL
+ inventory     some "dried flowers"
+ described     "A bunch of dried flowers rest here."
+ mass          5
+ starts        childof vase
 
 {sniff
 write "The flowers are dried and therefore practically odourless." ^
 }
 
 object side_table: ornate side table
- has		SURFACE
- inventory	a "ornate side table"
- quantity	10
+ has           SURFACE
+ inventory     a "ornate side table"
+ quantity      10
 
 object call_button_0: call button
- inventory	a "call button"
+ inventory     a "call button"
 
 {examine
 write "The call button is currently "
@@ -7946,10 +7946,10 @@ ensure call_button_0 has ON
 }
 
 location lift_1:
- out		nowhere
- west		nowhere
- no_west	"The lift doors are currently closed."
- no_go		"The only way out of the lift is to the west."
+ out           nowhere
+ west          nowhere
+ no_west       "The lift doors are currently closed."
+ no_go         "The only way out of the lift is to the west."
  
 {look
 if here has VISITED
@@ -7979,30 +7979,30 @@ set TURN_WORKED = false
 }
 
 object lift_1_red: small red light lift one led
- inventory	a "small red light in lift one"
+ inventory     a "small red light in lift one"
 
 {examine
 write "The small red light is currently out." ^
 }
  
 object lift_1_green: small green light lift one led
- inventory	a "small green light in lift one"
+ inventory     a "small green light in lift one"
 
 {examine
 write "The small green light is currently out." ^
 }
  
 object lift_1_light: flickering fluorescent light
- has		OUT_OF_REACH
- inventory	a "flickering fluorescent light"
+ has           OUT_OF_REACH
+ inventory     a "flickering fluorescent light"
 
 {examine
 write "The fluorescent light in the ceiling of the lift is flickering badly." ^
 }
 
 object lift_1_door: east eastern lift door one
- has		PLURAL
- inventory	the "east lift doors" 
+ has           PLURAL
+ inventory     the "east lift doors"
 
 {examine
 write "The lift doors are currently "
@@ -8023,14 +8023,14 @@ proxy "press close doors button"
 }
 
 object plaque_1: small metal plaque
- inventory	a "small metal plaque"
+ inventory     a "small metal plaque"
 
 {examine : read
 write "The plaque simply reads, ~LIFT 1~." ^
 }
 
 object c_button_1: east eastern close door button control one
- inventory	a "close doors button"
+ inventory     a "close doors button"
 
 {press : move
 if lift_1_obj(info) = 0
@@ -8043,7 +8043,7 @@ execute "global_lift_1_close"
 }
 
 object o_button_1: east eastern open door button control one
- inventory	a "open doors button"
+ inventory     a "open doors button"
 
 {press : move
 if lift_1_obj(info) > 0
@@ -8060,7 +8060,7 @@ write "The lift doors slide open." ^
 }
 
 object g_button_1: ground floor button g
- inventory	a "ground floor button"
+ inventory     a "ground floor button"
 
 {press : move
 if LIFT_1_TASK != 42
@@ -8084,7 +8084,7 @@ write "The button lights up as you press it." ^
 }
 
 object 1_button_1: first floor button one
- inventory	a "first floor button"
+ inventory     a "first floor button"
 
 {press : move
 if LIFT_1_TASK != 42
@@ -8108,7 +8108,7 @@ write "The button lights up as you press it." ^
 }
 
 object 2_button_1: second floor button two
- inventory	a "second floor button"
+ inventory     a "second floor button"
 
 {press : move
 if LIFT_1_TASK != 42
@@ -8132,7 +8132,7 @@ write "The button lights up as you press it." ^
 }
 
 object 3_button_1: third floor button three
- inventory	a "third floor button"
+ inventory     a "third floor button"
 
 {press : move
 if LIFT_1_TASK != 42
@@ -8156,7 +8156,7 @@ write "The button lights up as you press it." ^
 }
 
 object 4_button_1: fourth floor button four
- inventory	a "fourth floor button"
+ inventory     a "fourth floor button"
 
 {press : move
 write "The button lights as you press it, only to go off again when you "
@@ -8165,7 +8165,7 @@ write "slot flash on and off momentarily." ^
 }
 
 object panel_1: panel of buttons
- inventory 	a "panel of buttons"
+ inventory     a "panel of buttons"
 
 {examine
 write "The panel consists of seven buttons labelled ground, one, two, three, "
@@ -8191,14 +8191,14 @@ write ^
 }
 
 object slot_1: mil key slot
- inventory	a "MIL key slot"
+ inventory     a "MIL key slot"
 
 object mil_key: mil key
- inventory	a "MIL key"
- starts		limbo
+ inventory     a "MIL key"
+ starts        limbo
 
 object lift_1_obj: eastern east lift one
- inventory	name "east lift"
+ inventory     name "east lift"
 
 {enter
 if here = lift_1
@@ -8228,10 +8228,10 @@ write "There is no way to close the lift doors from the outside." ^
 }
 
 location lift_2:
- out		nowhere
- east		nowhere
- no_east	"The lift doors are currently closed."
- no_go		"The only way out of the lift is to the east."
+ out           nowhere
+ east          nowhere
+ no_east       "The lift doors are currently closed."
+ no_go         "The only way out of the lift is to the east."
 
 {look
 if here has VISITED
@@ -8269,26 +8269,26 @@ set TURN_WORKED = false
 }
 
 object lift_2_red: small red light lift one led
- inventory	a "small red light in lift one"
+ inventory     a "small red light in lift one"
 
 {examine
 write "The small red light is currently out." ^
 }
  
 object lift_2_green: small green light lift one led
- inventory	a "small green light in lift one"
+ inventory     a "small green light in lift one"
 
 {examine
 write "The small green light is currently out." ^
 }
  
 object lift_2_light: normal fluorescent light west lift one
- has		OUT_OF_REACH
- inventory	a "fluorescent light"
+ has           OUT_OF_REACH
+ inventory     a "fluorescent light"
 
 object lift_2_door: west western lift door two
- has		PLURAL
- inventory	the "west lift doors" 
+ has           PLURAL
+ inventory     the "west lift doors"
 
 {examine
 write "The lift doors are currently "
@@ -8309,14 +8309,14 @@ proxy "press close doors button"
 }
 
 object plaque_2: small metal plaque
- inventory	a "small metal plaque"
+ inventory     a "small metal plaque"
 
 {examine : read
 write "The plaque simply reads, ~LIFT 2~." ^
 }
 
 object c_button_2: west western close door button control two
- inventory	a "close doors button"
+ inventory     a "close doors button"
 
 {press : move
 if lift_2_obj(info) = 0
@@ -8329,7 +8329,7 @@ execute "global_lift_2_close"
 }
 
 object o_button_2: west western open door button control two
- inventory	a "open doors button"
+ inventory     a "open doors button"
 
 {press : move
 if lift_2_obj(info) > 0
@@ -8346,7 +8346,7 @@ execute "global_lift_2_open"
 }
 
 object g_button_2: ground floor button g
- inventory	a "ground floor button"
+ inventory     a "ground floor button"
 
 {press : move
 if LIFT_2_TASK != 42
@@ -8370,7 +8370,7 @@ write "The button lights up as you press it." ^
 }
 
 object 1_button_2: first floor button one
- inventory	a "first floor button"
+ inventory     a "first floor button"
 
 {press : move
 if LIFT_2_TASK != 42
@@ -8394,7 +8394,7 @@ write "The button lights up as you press it." ^
 }
 
 object 2_button_2: second floor button two
- inventory	a "second floor button"
+ inventory     a "second floor button"
 
 {press : move
 if LIFT_2_TASK != 42
@@ -8418,7 +8418,7 @@ write "The button lights up as you press it." ^
 }
 
 object 3_button_2: third floor button three
- inventory	a "third floor button"
+ inventory     a "third floor button"
 
 {press : move
 if LIFT_2_TASK != 42
@@ -8442,7 +8442,7 @@ write "The button lights up as you press it." ^
 }
 
 object 4_button_2: fourth floor button four
- inventory	a "fourth floor button"
+ inventory     a "fourth floor button"
 
 {press : move
 write "The button lights as you press it, only to go off again when you "
@@ -8451,7 +8451,7 @@ write "slot flash on and off momentarily." ^
 }
 
 object panel_2: panel of buttons
- inventory 	a "panel of buttons"
+ inventory     a "panel of buttons"
 
 {examine
 write "The panel consists of seven buttons labelled ground, one, two, three, "
@@ -8477,10 +8477,10 @@ write ^
 }
 
 object slot_2: mil key slot
- inventory	a "MIL key slot"
+ inventory     a "MIL key slot"
 
 object lift_2_obj: western west lift two
- inventory	name "west lift"
+ inventory     name "west lift"
 
 {enter
 if here = lift_2
@@ -8510,12 +8510,12 @@ write "There is no way to close the lift doors from the outside." ^
 }
 
 location first_floor:
- west		nowhere
- no_west	"The lift doors are closed." ^
- east		nowhere
- no_east	"The lift doors are closed." ^
- south		mezzanine
- no_in		"Did you want to go in the west lift or the east lift."
+ west          nowhere
+ no_west       "The lift doors are closed." ^
+ east          nowhere
+ no_east       "The lift doors are closed." ^
+ south         mezzanine
+ no_in         "Did you want to go in the west lift or the east lift."
 
 {look
 if here has VISITED
@@ -8528,7 +8528,7 @@ write "level that overlooks the lobby. There is a call button on the wall." ^
 }
 
 object call_button_1: call button
- inventory	a "call button"
+ inventory     a "call button"
 
 {examine
 write "The call button is currently "
@@ -8576,12 +8576,12 @@ ensure call_button_1 has ON
 }
 
 location second_floor:
- west		nowhere
- no_west	"The lift doors are closed." ^
- east		nowhere
- no_east	"The lift doors are closed." ^
- no_in		"Did you want to go in the west lift or the east lift."
- south		second_hallway
+ west          nowhere
+ no_west       "The lift doors are closed." ^
+ east          nowhere
+ no_east       "The lift doors are closed." ^
+ no_in         "Did you want to go in the west lift or the east lift."
+ south         second_hallway
 
 {look
 if here has VISITED
@@ -8594,7 +8594,7 @@ write "east-west hallway to the south." ^
 }
 
 object call_button_2: call button
- inventory	a "call button"
+ inventory     a "call button"
 
 {examine
 write "The call button is currently "
@@ -8635,9 +8635,9 @@ ensure call_button_2 has ON
 }
 
 location second_hallway:
- north		second_floor
- no_east	"The hallway leads only to guest's private rooms."
- no_west	"The hallway leads only to guest's private rooms."
+ north         second_floor
+ no_east       "The hallway leads only to guest's private rooms."
+ no_west       "The hallway leads only to guest's private rooms."
 
 {look
 if here has VISITED
@@ -8650,7 +8650,7 @@ write "area." ^
 }
 
 object painting_1: seurat painting
- inventory	a "Seurat painting"
+ inventory     a "Seurat painting"
 
 {examine
 write "The painting is a print of George Seurat's ~Sunday Afternoon on the "
@@ -8658,20 +8658,20 @@ write "Island of la Grande Jatte~." ^
 }
 
 object doors_2: numbered second floor doors
- has		CLOSABLE CLOSED LOCKED PLURAL
- inventory	the "second floor doors"
+ has           CLOSABLE CLOSED LOCKED PLURAL
+ inventory     the "second floor doors"
 
 {open
 write "You try a few of the doors, but they are all locked." ^
 }
 
 location third_floor:
- west		nowhere
- no_west	"The lift doors are closed." ^
- east		nowhere
- no_east	"The lift doors are closed." ^
- no_in		"Did you want to go in the west lift or the east lift."
- south		third_hallway
+ west          nowhere
+ no_west       "The lift doors are closed." ^
+ east          nowhere
+ no_east       "The lift doors are closed." ^
+ no_in         "Did you want to go in the west lift or the east lift."
+ south         third_hallway
 
 {look
 if here has VISITED
@@ -8684,7 +8684,7 @@ write "east-west hallway to the south." ^
 }
 
 object call_button_3: call button
- inventory	a "call button"
+ inventory     a "call button"
 
 {examine
 write "The call button is currently "
@@ -8725,9 +8725,9 @@ ensure call_button_3 has ON
 }
 
 location third_hallway:
- north		third_floor
- no_east	"The hallway leads only to guest's private rooms."
- no_west	"The hallway leads only to guest's private rooms."
+ north         third_floor
+ no_east       "The hallway leads only to guest's private rooms."
+ no_west       "The hallway leads only to guest's private rooms."
 
 {look
 if here has VISITED
@@ -8740,7 +8740,7 @@ write "area." ^
 }
 
 object painting_2: gauguin painting
- inventory	a "Gauguin painting"
+ inventory     a "Gauguin painting"
 
 {examine
 write "The painting is a print of Paul Gauguin's ~Spirit of the Dead "
@@ -8748,21 +8748,21 @@ write "Watching~." ^
 }
 
 object doors_3: numbered third floor doors
- has		CLOSABLE CLOSED LOCKED PLURAL
- inventory	the "third floor doors"
+ has           CLOSABLE CLOSED LOCKED PLURAL
+ inventory     the "third floor doors"
 
 {open
 write "You try a few of the doors, but they are all locked." ^
 }
 
 location fourth_floor:
- no_go		"You can either go east or west into a lift or south into the conference room."
- west		nowhere
- no_west	"The lift doors are closed." ^
- east		nowhere
- no_east	"The lift doors are closed." ^
- south		conference_room
- no_in		"Did you want to go in the west lift or the east lift."
+ no_go         "You can either go east or west into a lift or south into the conference room."
+ west          nowhere
+ no_west       "The lift doors are closed." ^
+ east          nowhere
+ no_east       "The lift doors are closed." ^
+ south         conference_room
+ no_in         "Did you want to go in the west lift or the east lift."
 
 {look
 if here has VISITED
@@ -8780,7 +8780,7 @@ endif
 }
 
 object call_button_4: call button
- inventory	a "call button"
+ inventory     a "call button"
 
 {examine
 write "The call button is currently "
@@ -8821,12 +8821,12 @@ ensure call_button_4 has ON
 }
 
 location conference_room: 
- north		fourth_floor
- southwest	backstage
- go_southwest	"Looking around to make sure no one is looking, you slip through the doorway."
- go_west	"Looking around to make sure no one is looking, you slip through the doorway."
- west		backstage
- no_go		"The only exits from here are either south to the lifts or southwest through the doorway."
+ north         fourth_floor
+ southwest     backstage
+ go_southwest  "Looking around to make sure no one is looking, you slip through the doorway."
+ go_west       "Looking around to make sure no one is looking, you slip through the doorway."
+ west          backstage
+ no_go         "The only exits from here are either south to the lifts or southwest through the doorway."
 
 {look
 if here has VISITED
@@ -8841,8 +8841,8 @@ write "in the southwest corner." ^
 }
 
 object mc: distinguished-looking distinguished gentleman man
- has		ANIMATE
- inventory	the "distinguished-looking gentleman"
+ has           ANIMATE
+ inventory     the "distinguished-looking gentleman"
 
 {examine
 write "The distinguished-looking gentleman is currently seated at a table "
@@ -8854,9 +8854,9 @@ write "The distinguished-looking gentleman looks up at you and smiles." ^
 }
 
 object lectern: lectern podium stand
- has		SURFACE
- inventory	a "lectern"
- quantity	20
+ has           SURFACE
+ inventory     a "lectern"
+ quantity      20
 
 {jump_on
 write "Attention deficiency syndrome can be cured you know?" ^
@@ -8872,7 +8872,7 @@ write "There is nothing other than the dark maroon curtain." ^
 }
 
 object curtain: dark maroon curtain
- inventory	a "dark maroon curtain"
+ inventory     a "dark maroon curtain"
 
 {look_behind
 write "The curtain is obviously for decoration only, as behind it lies "
@@ -8888,19 +8888,19 @@ write "There is no apparent way (or need) to close the dark maroon curtain." ^
 }
 
 object conference_guests: conference guest guests patrons
- has		ANIMATE PLURAL
- inventory	the "conference guests"
+ has           ANIMATE PLURAL
+ inventory     the "conference guests"
 
 object conf_tables: conference tables table
- has		PLURAL
- inventory	the "tables"
+ has           PLURAL
+ inventory     the "tables"
 
 location backstage:
- east		conference_room
- northeast	conference_room
- no_south	"The door to the south is closed."
- no_west	"The door to the west is closed."
- south		nowhere
+ east          conference_room
+ northeast     conference_room
+ no_south      "The door to the south is closed."
+ no_west       "The door to the west is closed."
+ south         nowhere
 
 {look
 if here has VISITED
@@ -8923,8 +8923,8 @@ write "other side of the doorway." ^
 }
 
 object south_door: south door
- has		CLOSABLE CLOSED
- inventory	the "south door"
+ has           CLOSABLE CLOSED
+ inventory     the "south door"
 	
 {knock_on
 if south_door hasnt CLOSED
@@ -8958,18 +8958,18 @@ write "You gently close the door." ^
 }
 
 object west_door: west door
- has		LOCKED CLOSABLE CLOSED
- inventory	the "west door"
+ has           LOCKED CLOSABLE CLOSED
+ inventory     the "west door"
 
 {knock_on
 write "There is no reply." ^
 }
 
 location z_office:
- out		backstage
- north		backstage
- no_south	"The door is currently closed."
- no_go		"The only exit from here north, back into the hallway."
+ out           backstage
+ north         backstage
+ no_south      "The door is currently closed."
+ no_go         "The only exit from here north, back into the hallway."
 
 {look
 if here has VISITED
@@ -9024,20 +9024,20 @@ proxy "sit in chair"
 }
 
 object jing: jing life force life-force energy prenatal congenital essence
- inventory	name "congenital jing"
- starts		limbo
+ inventory     name "congenital jing"
+ starts        limbo
 
 object bookcase: bookcase books bookshelf bookshelves book shelf shelves
- inventory	a "bookcase"
+ inventory     a "bookcase"
 
 {examine
 write "Literally thousands of books line the shelves of the bookcase." ^
 }
 
 object writing_desk: mahogany desk
- has		SURFACE
- inventory	a "mahogany desk"
- quantity	40
+ has           SURFACE
+ inventory     a "mahogany desk"
+ quantity      40
 
 {examine : look_behind
 write "Behind the desk is a fine leather chair, worthy of its place behind "
@@ -9045,7 +9045,7 @@ write "such an impressive piece of furniture." ^
 }
 
 object arm_chair: leather chair
- inventory	an "leather chair"
+ inventory     an "leather chair"
 
 {sit_on
 write "Sitting in a man's office chair is like sitting on his throne - not "
@@ -9053,8 +9053,8 @@ write "very polite." ^
 }
 
 object ornate_window: ornate_window
- has		CLOSED CLOSABLE
- inventory	an "ornate window"
+ has           CLOSED CLOSABLE
+ inventory     an "ornate window"
 
 {listen_to
 write "You hear the soothing sound of rain beating against the window." ^
@@ -9066,10 +9066,10 @@ write "on cold rainy nights such as this." ^
 }
 
 object zuckerman: dr doctor leif zuckerman man
- has		ANIMATE
- inventory	name "Dr Leif Zuckerman"
- described	"Standing with his back to you, staring out the window, is Dr Zuckerman."
- mass		heavy
+ has           ANIMATE
+ inventory     name "Dr Leif Zuckerman"
+ described     "Standing with his back to you, staring out the window, is Dr Zuckerman."
+ mass          heavy
 
 {examine
 if TOPICS_DISCUSSED < 4
@@ -13176,8 +13176,8 @@ look
 }
 
 object plunger: plunger
- inventory	a "plunger"
- starts childof syringe
+ inventory     a "plunger"
+ starts        childof syringe
 
 {press : move
 set noun4 = syringe
@@ -13207,9 +13207,9 @@ write "Filling the syringe with air is of no use." ^
 }
 
 object kryten: myself self me alex meadows
- has		ANIMATE
- inventory	name "yourself"
- quantity	42
+ has           ANIMATE
+ inventory     name "yourself"
+ quantity      42
 
 {rub_with_soap : clean_with_soap : clean
 write "Getting a little self conscious?" ^
@@ -13237,8 +13237,8 @@ set TURN_WORKED = false
 }
 
 object hair: my hair
- inventory	name "your hair"
- starts childof kryten
+ inventory     name "your hair"
+ starts        childof kryten
 
 {clean
 proxy "comb hair"
@@ -13267,9 +13267,9 @@ write .^
 }
 
 object teeth: my teeth
- has		PLURAL
- inventory	name "your teeth"
- starts childof kryten
+ has           PLURAL
+ inventory     name "your teeth"
+ starts        childof kryten
 
 {clean
 execute "clean_with_toothbrush_teeth"
@@ -13484,8 +13484,8 @@ endall
 }
 
 object north_wall: north north wall walls
- inventory	the "north wall"
- starts		limbo
+ inventory     the "north wall"
+ starts        limbo
 
 {examine
 if here = bar
@@ -13526,8 +13526,8 @@ break false
 }
 
 object south_wall: south southern wall walls
- inventory	the "south wall"
- starts		limbo
+ inventory     the "south wall"
+ starts        limbo
 
 {climb
 if here = on_crate
@@ -13562,8 +13562,8 @@ break false
 }
 
 object east_wall: east eastern wall walls
- inventory	the "east wall"
- starts		limbo
+ inventory     the "east wall"
+ starts        limbo
 
 {examine
 if here = van
@@ -13589,8 +13589,8 @@ break false
 }
 
 object west_wall: west western wall walls
- inventory	the "west wall"
- starts		limbo
+ inventory     the "west wall"
+ starts        limbo
 
 {examine
 if here = van
@@ -13610,10 +13610,10 @@ break false
 }
 
 object ground: ground floor
- has		SURFACE
- inventory	the "ground"
- starts		limbo
- quantity	1000
+ has           SURFACE
+ inventory     the "ground"
+ starts        limbo
+ quantity      1000
 
 grammar where is *anywhere	->where_is
 grammar where are *anywhere	->where_is

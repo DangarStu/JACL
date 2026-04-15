@@ -4274,7 +4274,7 @@ location site : rock formation
  northwest     ocean_bottom
  southeast     ocean_bottom
  southwest     ocean_bottom
- x             5
+ x             6
  y             2
 
 {movement

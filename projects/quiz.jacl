@@ -81,7 +81,7 @@ endwhile
 }
 
 location school 
-  short a "School Room"
+ short         a "School Room"
 
 object you
 

@@ -37,7 +37,7 @@ setstring game_title "Button has been pressed"
 }
 
 object you
-  player
+ player
 
 constant title_image "none"
 constant footer_image "none"

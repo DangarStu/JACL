@@ -171,13 +171,13 @@ constant player_paged	4
 constant after_raid		12
 
 location outfield : darwin cricket oval outfield
-has			OUTDOORS KNOWN
-short		name "Darwin Oval (outfield)"
-in			pitch
-east			pitch
-west			assembly_area
-southeast	south_of_oval
-south		south_of_oval
+ has           OUTDOORS KNOWN
+ short         name "Darwin Oval (outfield)"
+ in            pitch
+ east          pitch
+ west          assembly_area
+ southeast     south_of_oval
+ south         south_of_oval
 
 {look
 if here has VISITED
@@ -223,9 +223,9 @@ execute "eachturn_assembly_area"
 }
 
 object gunners : soldiers gunners players
-has			PLURAL
-short		the "gunners"
-mass			scenery
+ has           PLURAL
+ short         the "gunners"
+ mass          scenery
 
 {examine
 print
@@ -248,9 +248,9 @@ return false
 }
 
 object cricket_ball : cricket ball
-short		a "cricket ball"
-long			"There is a cricket ball resting at your feet.^"
-mass			3
+ short         a "cricket ball"
+ long          "There is a cricket ball resting at your feet.^"
+ mass          3
 
 {examine
 write "The red-brown leather of the cricket ball is well worn with age.^"
@@ -285,11 +285,11 @@ execute "+red_card"
 }
 
 object jenkins : soldier gunner jenkins
-has			ANIMATE
-short		name "Gunner Jenkins"
-long			function
-mass			heavy
-parent		outfield
+ has           ANIMATE
+ short         name "Gunner Jenkins"
+ long          function
+ mass          heavy
+ parent        outfield
 
 {long
 if here = gun_emplacement
@@ -343,11 +343,11 @@ execute "+fight"
 }
 
 object thompson : soldier sergeant thompson
-has			ANIMATE
-short		name "Sergeant Thompson"
-long			function
-mass			heavy
-parent		outfield
+ has           ANIMATE
+ short         name "Sergeant Thompson"
+ long          function
+ mass          heavy
+ parent        outfield
 
 {long
 if here = gun_emplacement
@@ -445,10 +445,10 @@ execute "+fight"
 }
 
 location pitch : darwin cricket oval pitch
-has			OUTDOORS KNOWN
-short		name "Darwin Oval (on the pitch)"
-west			outfield
-south		south_of_oval
+ has           OUTDOORS KNOWN
+ short         name "Darwin Oval (on the pitch)"
+ west          outfield
+ south         south_of_oval
 
 {look
 if here has VISITED
@@ -474,15 +474,15 @@ return false
 constant NO_GO 22000
 
 location assembly_area: assembly area
-has			OUTDOORS KNOWN
-short		the "assembly area"
-east			outfield
-southeast	gun_emplacement
-north		outside_command_post
-south		hut
-northwest	NO_GO
-northeast	NO_GO
-southwest	NO_GO
+ has           OUTDOORS KNOWN
+ short         the "assembly area"
+ east          outfield
+ southeast     gun_emplacement
+ north         outside_command_post
+ south         hut
+ northwest     NO_GO
+ northeast     NO_GO
+ southwest     NO_GO
 
 {look
 if here has VISITED
@@ -568,9 +568,9 @@ move thompson to gun_emplacement
 }
 
 object iron_bar : iron bar
-short		an "iron bar"
-long			function
-mass			5
+ short         an "iron bar"
+ long          function
+ mass          5
 
 {long
 if iron_bar hasnt TOUCHED
@@ -603,11 +603,11 @@ set time = false
 }
 
 object chain : chain
-has			NOT_IMPORTANT
-short		a "chain"
+ has           NOT_IMPORTANT
+ short         a "chain"
 
 object frame : crude wooden frame
-short		a "crude wooden frame"
+ short         a "crude wooden frame"
 
 {examine
 print
@@ -616,7 +616,7 @@ The timber frame is made from old scraps of hardwood.^
 }
 
 object cylinder : old oxygen cylinder
-short		an "old oxygen cylinder"
+ short         an "old oxygen cylinder"
 
 {examine
 print
@@ -671,8 +671,8 @@ set rifle(status) - 1
 }
 
 object banks : tall earth banks bank
-short		the "tall earth banks"
-has			PLURAL
+ short         the "tall earth banks"
+ has           PLURAL
 
 {climb
 print
@@ -689,12 +689,12 @@ an exploding bomb over the gun crew inside the emplacement.
 }
 
 location gun_emplacement : vickers 3.7 anti-aircraft bloody guns gun emplacement
-has			OUTDOORS KNOWN
-short		the "gun emplacement"
-northwest	assembly_area
-out			assembly_area
-in			armoury
-south		armoury
+ has           OUTDOORS KNOWN
+ short         the "gun emplacement"
+ northwest     assembly_area
+ out           assembly_area
+ in            armoury
+ south         armoury
 
 {look
 if here has VISITED
@@ -879,7 +879,7 @@ endif
 }
 
 object armoury_obj : armoury
-short		the "armoury"
+ short         the "armoury"
 
 {examine : look_in
 print
@@ -893,8 +893,8 @@ proxy "go south"
 }
 
 object harbour : ship ships darwin harbour
-short		the "ships in Darwin Harbour"
-has			PLURAL OUT_OF_REACH
+ short         the "ships in Darwin Harbour"
+ has           PLURAL OUT_OF_REACH
 
 {examine
 print
@@ -906,8 +906,8 @@ of the wharf.^
 }
 
 object aircraft : aircraft airplanes planes kittyhawks fighters val dive bombers
-short		the "aircraft"
-has			PLURAL OUT_OF_REACH
+ short         the "aircraft"
+ has           PLURAL OUT_OF_REACH
 
 {+default_look_up : *examine_aircraft
 if here hasnt OUTDOORS
@@ -1086,7 +1086,7 @@ meet you there.~^
 }
 
 object the_gun : vickers 3.7 anti-aircraft gun
-short		an "anti-aircraft gun"
+ short         an "anti-aircraft gun"
 
 {examine
 print
@@ -1138,8 +1138,8 @@ Sergeant Thompson will fire the gun.^
 }
 
 object wheels : metal wheel wheels
-has			PLURAL
-short		the "metal wheels"
+ has           PLURAL
+ short         the "metal wheels"
 
 {examine
 print
@@ -1160,8 +1160,8 @@ loading.^
 }
 
 object firing_lever : firing lever
-short		a "firing lever"
-has			OUT_OF_REACH
+ short         a "firing lever"
+ has           OUT_OF_REACH
 
 {examine
 print
@@ -1171,7 +1171,7 @@ Jenkins has finished loading the shell.^
 }
 
 object revetments : revetment revetments sandbag sandbags
-short		the "sandbag revetments"
+ short         the "sandbag revetments"
 
 {examine
 print
@@ -1186,8 +1186,8 @@ The camouflage netting blocks the tops of the revetments.^
 }
 
 object netting : fragments of camouflage netting
-short		some "fragments of camouflage netting"
-has			PLURAL OUT_OF_REACH
+ short         some "fragments of camouflage netting"
+ has           PLURAL OUT_OF_REACH
 
 {examine
 print
@@ -1197,12 +1197,12 @@ revetments leaving the minimum gap required to aim and fire the gun.^
 }
 
 object helmet : steel helmet
-short		a "steel helmet"
-long			"There is a wide-brimmed steel helmet on the ground.^"
-has			WEARABLE WORN CONTAINER
-parent		limbo
-mass			5
-capacity		5
+ short         a "steel helmet"
+ long          "There is a wide-brimmed steel helmet on the ground.^"
+ has           WEARABLE WORN CONTAINER
+ parent        limbo
+ mass          5
+ capacity      5
 
 {examine
 print
@@ -1221,20 +1221,20 @@ elasticated web chinstrap.^
 #}
 
 object chinstrap : elasticated web chinstrap
-short		a "chinstrap"
-has			NOT_IMPORTANT
-parent		helmet
+ short         a "chinstrap"
+ has           NOT_IMPORTANT
+ parent        helmet
 
 object skullpad : cruciform rubber skull pad
-short        a "skull pad"
-has			NOT_IMPORTANT
-parent       helmet
+ short         a "skull pad"
+ has           NOT_IMPORTANT
+ parent        helmet
 
 location armoury : armoury
-short		the "armoury"
-has			KNOWN
-out			gun_emplacement
-north		gun_emplacement
+ short         the "armoury"
+ has           KNOWN
+ out           gun_emplacement
+ north         gun_emplacement
 
 {look
 if here has VISITED
@@ -1247,8 +1247,8 @@ line the sand-bag walls.^
 }
 
 object crates : crates stacked shells
-short		the "crates of neatly stacked shells"
-has			PLURAL
+ short         the "crates of neatly stacked shells"
+ has           PLURAL
 
 {take
 print
@@ -1264,9 +1264,9 @@ anti-aircraft shells.^
 }
 
 object setting_tool : fuse setting tool short wooden handle steel ring setter
-short		a "setting tool"
-long			"A setting tool rests nearby.^"
-mass			4
+ short         a "setting tool"
+ long          "A setting tool rests nearby.^"
+ mass          4
 
 {examine
 print
@@ -1316,10 +1316,10 @@ execute "set_to_integer_cricket_ball"
 attribute TALKED_TO
 
 object smith : soldier gunner smith
-has			ANIMATE
-short		name "Gunner Smith"
-long			function
-mass			heavy
+ has           ANIMATE
+ short         name "Gunner Smith"
+ long          function
+ mass          heavy
 
 {long
 if script_stage = after_raid
@@ -1400,21 +1400,21 @@ execute "+fight"
 }
 
 object second_shell : smith's brass anti-aircraft shell
-short		name "Smith's anti-aircraft shell"
-long			"On the ground there is a brass anti-aircraft shell^"
-mass			10
-parent		limbo
+ short         name "Smith's anti-aircraft shell"
+ long          "On the ground there is a brass anti-aircraft shell^"
+ mass          10
+ parent        limbo
 
 object shell_casing : hot brass anti-aircraft shell casing
-short		a "hot shell casing"
-has			NOT_IMPORTANT
-parent		limbo
+ short         a "hot shell casing"
+ has           NOT_IMPORTANT
+ parent        limbo
 
 object shell : brass anti-aircraft shell
-short		a "brass anti-aircraft shell"
-long			"On the ground there is a brass anti-aircraft shell^"
-mass			10
-parent		smith
+ short         a "brass anti-aircraft shell"
+ long          "On the ground there is a brass anti-aircraft shell^"
+ mass          10
+ parent        smith
 
 {examine
 print
@@ -1576,8 +1576,8 @@ constant fired_not_set	4
 constant total_shots	5
 
 object fuse : fuse on shell ring rings holes felt gunpowder
-short		the "powder fuse"
-parent		shell
+ short         the "powder fuse"
+ parent        shell
 
 {examine
 if @ = 1
@@ -1643,11 +1643,11 @@ write "~.^"
 }
 
 location outside_command_post : outside command post
-has			OUTDOORS KNOWN
-short		name "outside the command post"
-north		command_post
-in			command_post
-south		assembly_area
+ has           OUTDOORS KNOWN
+ short         name "outside the command post"
+ north         command_post
+ in            command_post
+ south         assembly_area
 
 {enter
 proxy "in"
@@ -1664,10 +1664,10 @@ well-worn track through the grass leads south to the assembly area.^
 }
 
 location command_post : command post
-has			OUTDOORS KNOWN
-short		the "command post"
-south		outside_command_post
-out			outside_command_post
+ has           OUTDOORS KNOWN
+ short         the "command post"
+ south         outside_command_post
+ out           outside_command_post
 
 {look
 if here has VISITED
@@ -1755,10 +1755,10 @@ move map to player
 }
 
 object map : map of snake bay paper
-short	a "map of Snake Bay"
-long		"The map of Snake Bay is on the ground.^"
-mass		2
-parent   roberts
+ short         a "map of Snake Bay"
+ long          "The map of Snake Bay is on the ground.^"
+ mass          2
+ parent        roberts
 
 {examine
 print
@@ -1813,7 +1813,7 @@ print
 }
 
 object predictor : kerrison predictor
-short		the "Kerrison Predictor"
+ short         the "Kerrison Predictor"
 
 {examine
 print
@@ -1827,10 +1827,10 @@ the indicated angle.^
 }
 
 object roberts : lieutenant roberts
-short		name "Lieutenant Roberts"
-long			"Lieutenant Roberts is standing by the Kerrison Predictor.^"
-has			ANIMATE
-mass			heavy
+ short         name "Lieutenant Roberts"
+ long          "Lieutenant Roberts is standing by the Kerrison Predictor.^"
+ has           ANIMATE
+ mass          heavy
 
 {examine
 print
@@ -1910,10 +1910,10 @@ print
 }
 
 object witheridge : sergeant witheridge
-short		name "Sergeant Witheridge"
-long			function
-has			ANIMATE
-mass			heavy
+ short         name "Sergeant Witheridge"
+ long          function
+ has           ANIMATE
+ mass          heavy
 
 {examine
 print
@@ -1992,10 +1992,10 @@ execute "+game_over"
 }
 
 location hut : hut sleeping quarters
-short		the "hut"
-has			KNOWN
-north		assembly_area
-out			assembly_area
+ short         the "hut"
+ has           KNOWN
+ north         assembly_area
+ out           assembly_area
 
 {look
 if here has VISITED
@@ -2020,7 +2020,7 @@ return false
 }
 
 object bunk : my bunk
-short			name "your bunk"
+ short         name "your bunk"
 
 {look_under
 if kit_bag hasnt TOUCHED
@@ -2037,11 +2037,11 @@ You would never risk being caught napping on duty.^
 }
 
 object other_bunks: other bunk bunks
-short			the "other bunks"
-has			PLURAL NOT_IMPORTANT
+ short         the "other bunks"
+ has           PLURAL NOT_IMPORTANT
 
 object mosquito_netting : mosquito netting
-short		the "mosquito netting"
+ short         the "mosquito netting"
 
 {examine
 print
@@ -2058,11 +2058,11 @@ anyone.^
 }
 
 object kit_bag : kit bag gear
-short		name "your kit bag"
-long			function
-has			CONTAINER CLOSABLE CLOSED
-mass			10
-capacity		10
+ short         name "your kit bag"
+ long          function
+ has           CONTAINER CLOSABLE CLOSED
+ mass          10
+ capacity      10
 
 {long
 if kit_bag hasnt TOUCHED
@@ -2077,11 +2077,11 @@ endif
 }
 
 object shirt : khaki shirt
-short		your "khaki shirt"
-long			"Your khaki shirt is lying on the ground.^"
-has			WEARABLE
-parent		kit_bag
-mass			4
+ short         your "khaki shirt"
+ long          "Your khaki shirt is lying on the ground.^"
+ has           WEARABLE
+ parent        kit_bag
+ mass          4
 
 {examine
 print
@@ -2148,10 +2148,10 @@ proxy "shoot " noun1{names} " with rifle"
 }
 
 object rifle : lee enfield rifle gun
-short		name "your rifle"
-long			function
-status		10
-mass			20
+ short         name "your rifle"
+ long          function
+ status        10
+ mass          20
 
 {long
 if rifle hasnt TOUCHED
@@ -2219,13 +2219,13 @@ It is best to keep your rifle loaded.^
 }
 
 location south_of_oval : south of oval
-short		the "south of the oval"
-has			OUTDOORS KNOWN
-north		pitch
-in			pitch
-northwest	outfield
-south		beach
-down			beach
+ short         the "south of the oval"
+ has           OUTDOORS KNOWN
+ north         pitch
+ in            pitch
+ northwest     outfield
+ south         beach
+ down          beach
 
 {look
 if here has VISITED
@@ -2250,10 +2250,10 @@ return false
 }
 
 location beach : beach
-short		the "beach"
-has			OUTDOORS KNOWN
-north		south_of_oval
-up			south_of_oval
+ short         the "beach"
+ has           OUTDOORS KNOWN
+ north         south_of_oval
+ up            south_of_oval
 
 {look
 if here has VISITED
@@ -2291,9 +2291,9 @@ endif
 }
 
 object trenches : deep trenches scar scars
-short		the "trenches"
-has			PLURAL CONTAINER
-capacity		50
+ short         the "trenches"
+ has           PLURAL CONTAINER
+ capacity      50
 
 {examine
 print
@@ -2309,8 +2309,8 @@ There is no need to go climbing into the trenches.^
 }
 
 object mangroves : mangrove mangroves tree trees
-short		the "mangroves"
-has			PLURAL
+ short         the "mangroves"
+ has           PLURAL
 
 {examine
 print
@@ -2319,12 +2319,12 @@ The thick leaves of the mangroves shade the path up to the oval.^
 }
 
 object sand : sand
-short		the "sand"
-has			NOT_IMPORTANT
+ short         the "sand"
+ has           NOT_IMPORTANT
 
 object sea_water : ocean sea water
-short		the "sea water"
-has			NOT_IMPORTANT
+ short         the "sea water"
+ has           NOT_IMPORTANT
 
 {enter
 print
@@ -2333,11 +2333,11 @@ You don't have to swim, Miki will take you in the canoe.^
 }
 
 object miki : miki aboriginal man
-short		name "Miki"
-has			ANIMATE
-long			function
-mass			heavy
-parent		limbo
+ short         name "Miki"
+ has           ANIMATE
+ long          function
+ mass          heavy
+ parent        limbo
 
 {long
 if script_stage = after_raid
@@ -2389,9 +2389,9 @@ write " and save me the effort of explaining the error of your ways.^"
 }
 
 object miki_paddle : paddle miki's mikis
-short		name "Miki's paddle"
-mass			5
-parent		miki
+ short         name "Miki's paddle"
+ mass          5
+ parent        miki
 
 {examine
 print
@@ -2401,8 +2401,8 @@ engraved into the blade.^
 }
 
 object canoe : dugout canoe
-short		a "dugout canoe"
-parent		limbo
+ short         a "dugout canoe"
+ parent        limbo
 
 {examine
 print
@@ -2442,13 +2442,13 @@ grammar aft			>south
 grammar go aft		>south
 
 object boat : boat timber motor launch
-short		a "timber motor launch"
+ short         a "timber motor launch"
 
 location afterdeck : afterdeck deck decking
-short		the "afterdeck"
-has			OUTDOORS
-north		wheelhouse
-in			wheelhouse
+ short         the "afterdeck"
+ has           OUTDOORS
+ north         wheelhouse
+ in            wheelhouse
 
 {look
 if here has VISITED
@@ -2475,9 +2475,9 @@ Beside the post is a circular fuel cap.^
 }
 
 location forepeak : forepeak
-short		the "forepeak"
-south		wheelhouse
-up			nowhere
+ short         the "forepeak"
+ south         wheelhouse
+ up            nowhere
 
 {look
 if here has VISITED
@@ -2490,11 +2490,11 @@ cramped compartment.
 }
 
 object jerrycan : steel jerry can jerrycan
-short			a "steel jerrycan"
-long			function
-has			CONTAINER CLOSABLE CLOSED
-mass			15
-capacity		10
+ short         a "steel jerrycan"
+ long          function
+ has           CONTAINER CLOSABLE CLOSED
+ mass          15
+ capacity      10
 
 {long
 if jerrycan hasnt TOUCHED
@@ -2516,17 +2516,17 @@ write "^"
 }
 
 object diesel : diesel fuel oil
-short			some "diesel"
-has			LIQUID
-mass			10
-parent		jerrycan
+ short         some "diesel"
+ has           LIQUID
+ mass          10
+ parent        jerrycan
 
 location wheelhouse : wheelhouse
-short		the "wheelhouse"
-north		forepeak
-in			forepeak
-south		afterdeck
-out			afterdeck
+ short         the "wheelhouse"
+ north         forepeak
+ in            forepeak
+ south         afterdeck
+ out           afterdeck
 
 {look
 if here has VISITED
@@ -2553,7 +2553,7 @@ grammar turn *present right			>turn_clockwise
 grammar turn *present to right		>turn_clockwise
 
 object helm : helm wheel
-short		the "helm"
+ short         the "helm"
 
 {turn
 print
@@ -2562,17 +2562,17 @@ You must specify whether you wish to turn the helm to port or starboard.
 }
 
 object throttle : throttle lever
-short		the "throttle lever"
+ short         the "throttle lever"
 
 object start_button: start button
-short		the "start button"
+ short         the "start button"
 
 object stop_button: stop button
-short		the "stop button"
+ short         the "stop button"
 
 location foredeck : foredeck deck decking
-short		the "foredeck"
-down			nowhere
+ short         the "foredeck"
+ down          nowhere
 
 {look
 if here has VISITED
@@ -2607,8 +2607,8 @@ it against the rough seas of cyclone season.^
 }
 
 object forward_hatch : square hatch
-short		a "forward hatch"
-has			CLOSABLE CLOSED
+ short         a "forward hatch"
+ has           CLOSABLE CLOSED
 
 {open_override
 print
@@ -2629,7 +2629,7 @@ set foredeck(in) = nowhere
 attribute PRIMED
 
 object engine : diesel engine motor
-short		the "diesel motor"
+ short         the "diesel motor"
 
 {examine
 print
@@ -2647,7 +2647,7 @@ endif
 }
 
 object fuel_filter : fuel filter
-short		the "fuel filter"
+ short         the "fuel filter"
 
 {examine
 print
@@ -2662,17 +2662,17 @@ endif
 }
 
 object primer_lever : priming pump lever
-short		the "priming pump lever"
+ short         the "priming pump lever"
 
 object bleed_plug : air bleed plug
-short		the "air bleed plug"
-has			CLOSABLE CLOSED
+ short         the "air bleed plug"
+ has           CLOSABLE CLOSED
 
 object kryten: myself self me davis
-short		name "yourself"
-has			ANIMATE
-quantity		42
-parent		outfield
+ short         name "yourself"
+ has           ANIMATE
+ quantity      42
+ parent        outfield
 player
 
 {examine
@@ -2689,17 +2689,17 @@ write "With government rebates, therapy isn't as expensive as it seems.^"
 }
 
 object hat : wide brimmed hat
-short		the "wide brimmed hat"
-has			WORN WEARABLE
-mass			5
-parent		player
+ short         the "wide brimmed hat"
+ has           WORN WEARABLE
+ mass          5
+ parent        player
 
 object dog_tags : dog tags
-short		your "dog tags"
-long			"You dog tags are here.^"
-has			WORN WEARABLE PLURAL
-parent		kryten
-mass			1
+ short         your "dog tags"
+ long          "You dog tags are here.^"
+ has           WORN WEARABLE PLURAL
+ parent        kryten
+ mass          1
 
 {examine
 print
@@ -2917,44 +2917,44 @@ style normal
 }
 
 object mission : mission assignment
-short		the "mission"
-parent		limbo
+ short         the "mission"
+ parent        limbo
 
 object melville_obj : melville island observation post outpost snake bay
-short		name "Melville Island"
-parent		limbo
+ short         name "Melville Island"
+ parent        limbo
 
 object sky_obj : sky skies
-short		the "sky"
-has			OUT_OF_REACH NO_TAB
+ short         the "sky"
+ has           OUT_OF_REACH NO_TAB
 
 {examine
 proxy "look up"
 }
 
 object north_wall: north north wall
-short		the "north wall"
-has			NO_TAB
-plural		walls
+ short         the "north wall"
+ has           NO_TAB
+ plural        walls
 
 object south_wall: south southern wall
-short		the "south wall"
-has			NO_TAB
-plural		walls
+ short         the "south wall"
+ has           NO_TAB
+ plural        walls
 
 object east_wall: east eastern wall
-short		the "east wall"
-has			NO_TAB
-plural		walls
+ short         the "east wall"
+ has           NO_TAB
+ plural        walls
 
 object west_wall: west western wall
-short		the "west wall"
-has			NO_TAB
-plural		walls
+ short         the "west wall"
+ has           NO_TAB
+ plural        walls
 
 object ground: ground floor
-short		the "ground"
-has			SURFACE NO_TAB
+ short         the "ground"
+ has           SURFACE NO_TAB
 
 # MENU library
 

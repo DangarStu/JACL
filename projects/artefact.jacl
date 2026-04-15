@@ -258,7 +258,7 @@ enditerate
 }
 
 location renko
-  short    name "Renko"
+ short         name "Renko"
 
 object you
 

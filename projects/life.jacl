@@ -13,10 +13,10 @@ integer_array buffer TOTAL
 integer left_edge
 
 location universe
-  short		name "Conway's Game of Life"
+ short         name "Conway's Game of Life"
 
 object god 
-   player
+ player
 
 {+timer
 execute "+life_tick"

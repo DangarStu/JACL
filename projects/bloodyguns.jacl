@@ -222,13 +222,15 @@ constant alex_arrives	60
 constant day_two		61
 
 location outfield : darwin cricket oval outfield
-   has			OUTDOORS KNOWN
-   short		name "Darwin Oval (outfield)"
-   in			pitch
-   east			pitch
-   west			assembly_area
-   southeast	south_of_oval
-   south		south_of_oval
+ has           OUTDOORS KNOWN
+ short         name "Darwin Oval (outfield)"
+ in            pitch
+ east          pitch
+ west          assembly_area
+ southeast     south_of_oval
+ south         south_of_oval
+ x             4
+ y             2
 
 {look
 if here has VISITED
@@ -276,9 +278,9 @@ execute "+eachturn"
 }
 
 object gunners : soldiers gunners players
-	has		PLURAL
-	short	the "gunners"
-	mass		scenery
+ has           PLURAL
+ short         the "gunners"
+ mass          scenery
    
 {examine
 print:
@@ -301,9 +303,9 @@ return false
 }
 
 object cricket_ball : cricket ball
-   short		a "cricket ball"
-   long			"There is a cricket ball resting at your feet.^"
-   mass			3
+ short         a "cricket ball"
+ long          "There is a cricket ball resting at your feet.^"
+ mass          3
 
 {examine
 write "The redish brown leather of the cricket ball is well worn with age.^"
@@ -369,11 +371,11 @@ execute "+fight"
 }
 
 object jenkins : soldier gunner jenkins
-   has			ANIMATE
-   short		name "Gunner Jenkins"
-   long			function
-   mass			heavy
-   parent		outfield
+ has           ANIMATE
+ short         name "Gunner Jenkins"
+ long          function
+ mass          heavy
+ parent        outfield
 
 {long
 if here = gun_emplacement
@@ -433,11 +435,11 @@ execute "+fight"
 }
 
 object thompson : soldier sergeant thompson
-   has			ANIMATE
-   short		name "Sergeant Thompson"
-   long			function
-   mass			heavy
-   parent		outfield
+ has           ANIMATE
+ short         name "Sergeant Thompson"
+ long          function
+ mass          heavy
+ parent        outfield
 
 {long
 if here = gun_emplacement
@@ -543,10 +545,12 @@ execute "+fight"
 }
 
 location pitch : darwin cricket oval pitch
-   has			OUTDOORS KNOWN
-   short		name "Darwin Oval (on the pitch)"
-   west			outfield
-   south		south_of_oval
+ has           OUTDOORS KNOWN
+ short         name "Darwin Oval (on the pitch)"
+ west          outfield
+ south         south_of_oval
+ x             5
+ y             2
 
 {look
 if here has VISITED
@@ -571,15 +575,17 @@ return false
 }
 
 location assembly_area: assembly area
-   has			OUTDOORS KNOWN
-   short		the "assembly area"
-   east			outfield
-   southeast	gun_emplacement
-   north		outside_command_post
-   south		hut
-   northwest	NO_GO
-   northeast	NO_GO
-   southwest	NO_GO
+ has           OUTDOORS KNOWN
+ short         the "assembly area"
+ east          outfield
+ southeast     gun_emplacement
+ north         outside_command_post
+ south         hut
+ northwest     NO_GO
+ northeast     NO_GO
+ southwest     NO_GO
+ x             3
+ y             2
 
 {look
 if here has VISITED
@@ -666,14 +672,14 @@ move thompson to gun_emplacement
 }
 
 object pit : shallow pit
-   short		a "shallow pit"
-   has			NOT_IMPORTANT
-   static
+ short         a "shallow pit"
+ has           NOT_IMPORTANT
+ static
 
 object ironbar : iron bar rod
-   short		an "iron bar"
-   long			function
-   mass			5
+ short         an "iron bar"
+ long          function
+ mass          5
 
 {long
 if ironbar hasnt TOUCHED
@@ -711,13 +717,13 @@ set time = false
 }
 
 object chain : chain
-   has			NOT_IMPORTANT
-   short		a "chain"
-   static
+ has           NOT_IMPORTANT
+ short         a "chain"
+ static
 
 object frame : crude wooden frame
-   short		a "crude wooden frame"
-   static
+ short         a "crude wooden frame"
+ static
      
 {examine
 print:
@@ -726,8 +732,8 @@ print:
 }
 
 object cylinder : old oxygen cylinder
-   short		an "old oxygen cylinder"
-   static
+ short         an "old oxygen cylinder"
+ static
 
 {examine
 print:
@@ -797,9 +803,9 @@ set next_sound = sound_MetalicClang
 }
 
 object banks : tall earth banks bank
-   short		the "tall earth banks"
-   has			PLURAL
-   static
+ short         the "tall earth banks"
+ has           PLURAL
+ static
 
 {climb_up
 print:
@@ -816,12 +822,14 @@ print:
 }
 
 location gun_emplacement : vickers 3.7 anti-aircraft bloody guns gun emplacement
-   has			OUTDOORS KNOWN
-   short		the "gun emplacement"
-   northwest	assembly_area
-   out			assembly_area
-   in			armoury
-   south		armoury
+ has           OUTDOORS KNOWN
+ short         the "gun emplacement"
+ northwest     assembly_area
+ out           assembly_area
+ in            armoury
+ south         armoury
+ x             4
+ y             3
 
 {look
 if here has VISITED
@@ -1052,8 +1060,8 @@ endif
 }
 
 object armoury_obj : armoury
-   short		the "armoury"
-   static
+ short         the "armoury"
+ static
 
 {examine : look_in
 print:
@@ -1067,9 +1075,9 @@ proxy "go south"
 }
 
 object harbour : ship ships darwin harbour sea water ocean
-   short		the "ships in Darwin Harbour"
-   has			PLURAL OUT_OF_REACH
-   static
+ short         the "ships in Darwin Harbour"
+ has           PLURAL OUT_OF_REACH
+ static
 
 {examine
 print:
@@ -1081,9 +1089,9 @@ print:
 }
 
 object aircraft : aircraft airplanes plane planes kittyhawk kittyhawks fighter fighters val dive bombers bomber sky
-   short		the "aircraft"
-   has			PLURAL OUT_OF_REACH
-   static
+ short         the "aircraft"
+ has           PLURAL OUT_OF_REACH
+ static
 
 {+default_look_up : *examine_aircraft
 if here hasnt OUTDOORS
@@ -1297,7 +1305,7 @@ print:
 }
 
 object the_gun : vickers 3.7 anti-aircraft gun
-   short		an "anti-aircraft gun"
+ short         an "anti-aircraft gun"
 
 {examine
 print:
@@ -1349,9 +1357,9 @@ print:
 }
 
 object wheels : metal wheel wheels
-   has			PLURAL
-   short		the "metal wheels"
-   static
+ has           PLURAL
+ short         the "metal wheels"
+ static
  
 {examine
 print:
@@ -1372,9 +1380,9 @@ print:
 }
 
 object firing_lever : firing lever
-   short		a "firing lever"
-   has			OUT_OF_REACH
-   static
+ short         a "firing lever"
+ has           OUT_OF_REACH
+ static
 
 {examine
 print:
@@ -1384,8 +1392,8 @@ print:
 }
 
 object revetments : revetment revetments sandbag sandbags
-   short		the "sandbag revetments"
-   static
+ short         the "sandbag revetments"
+ static
 
 {examine
 print:
@@ -1400,9 +1408,9 @@ print:
 }
 
 object netting : fragments of camouflage netting
-   short		some "fragments of camouflage netting"
-   has			PLURAL OUT_OF_REACH
-   static
+ short         some "fragments of camouflage netting"
+ has           PLURAL OUT_OF_REACH
+ static
 
 {examine
 print:
@@ -1412,12 +1420,12 @@ print:
 }
 
 object helmet : steel helmet
-   short		a "steel helmet"
-   long			"There is a wide-brimmed steel helmet on the ground.^"
-   has			WEARABLE WORN CONTAINER
-   parent		limbo
-   mass			5
-   capacity		5
+ short         a "steel helmet"
+ long          "There is a wide-brimmed steel helmet on the ground.^"
+ has           WEARABLE WORN CONTAINER
+ parent        limbo
+ mass          5
+ capacity      5
 
 {examine
 print:
@@ -1444,22 +1452,24 @@ endif
 }
 
 object chinstrap : elasticated web chinstrap
-   short		a "chinstrap"
-   has			NOT_IMPORTANT
-   parent		helmet
-   static
+ short         a "chinstrap"
+ has           NOT_IMPORTANT
+ parent        helmet
+ static
 
 object skullpad : cruciform rubber skull pad
-   short        a "skull pad"
-   has			NOT_IMPORTANT
-   parent       helmet
-   static
+ short         a "skull pad"
+ has           NOT_IMPORTANT
+ parent        helmet
+ static
 
 location armoury : armoury
-   short		the "armoury"
-   has			KNOWN
-   out			gun_emplacement
-   north		gun_emplacement
+ short         the "armoury"
+ has           KNOWN
+ out           gun_emplacement
+ north         gun_emplacement
+ x             4
+ y             4
 
 {look
 if here has VISITED
@@ -1473,9 +1483,9 @@ print:
 }
 
 object shell_crates : crates stacked shells
-   short		the "crates of neatly stacked shells"
-   has			PLURAL
-   static
+ short         the "crates of neatly stacked shells"
+ has           PLURAL
+ static
 
 {take
 print:
@@ -1491,9 +1501,9 @@ print:
 }
 
 object settingtool : fuse setting tool short wooden handle steel ring setter
-   short		a "setting tool"
-   long			"A setting tool rests nearby.^"
-   mass			4
+ short         a "setting tool"
+ long          "A setting tool rests nearby.^"
+ mass          4
 
 {examine
 print:
@@ -1541,10 +1551,10 @@ execute "set_to_integer_cricket_ball"
 }
 
 object smith : soldier gunner smith
-   has			ANIMATE
-   short		name "Gunner Smith"
-   long			function
-   mass			heavy
+ has           ANIMATE
+ short         name "Gunner Smith"
+ long          function
+ mass          heavy
 
 {long
 if script_stage = after_raid
@@ -1630,21 +1640,21 @@ execute "+fight"
 }
 
 object second_shell : smith's brass anti-aircraft shell
-   short		name "Smith's anti-aircraft shell"
-   long			"On the ground there is a brass anti-aircraft shell^"
-   mass			10
-   parent		limbo
+ short         name "Smith's anti-aircraft shell"
+ long          "On the ground there is a brass anti-aircraft shell^"
+ mass          10
+ parent        limbo
 
 object shell_casing : hot brass anti-aircraft shell casing
-   short		a "hot shell casing"
-   has			NOT_IMPORTANT
-   parent		limbo
+ short         a "hot shell casing"
+ has           NOT_IMPORTANT
+ parent        limbo
 
 object shell : brass anti-aircraft shell
-   short		a "brass anti-aircraft shell"
-   long			"On the ground there is a brass anti-aircraft shell^"
-   mass			15
-   parent		smith
+ short         a "brass anti-aircraft shell"
+ long          "On the ground there is a brass anti-aircraft shell^"
+ mass          15
+ parent        smith
 
 {examine
 print:
@@ -1814,8 +1824,8 @@ constant fired_not_set	4
 constant total_shots		5
 
 object fuse : fuse on shell ring rings holes felt gunpowder
-   short			the "powder fuse"
-   parent		shell
+ short         the "powder fuse"
+ parent        shell
 
 {examine
 if @ = 1
@@ -1885,11 +1895,13 @@ proxy "set fuse to " INDEX
 }
 
 location outside_command_post : outside command post
-   has			OUTDOORS KNOWN
-   short		name "outside the command post"
-   north		command_post
-   in			command_post
-   south		assembly_area
+ has           OUTDOORS KNOWN
+ short         name "outside the command post"
+ north         command_post
+ in            command_post
+ south         assembly_area
+ x             3
+ y             1
 
 {enter
 proxy "in"
@@ -1907,10 +1919,12 @@ print:
 }
 
 location command_post : command post
-   has			OUTDOORS KNOWN
-   short		the "command post"
-   south		outside_command_post
-   out			outside_command_post
+ has           OUTDOORS KNOWN
+ short         the "command post"
+ south         outside_command_post
+ out           outside_command_post
+ x             3
+ y             0
 
 {look
 if here has VISITED
@@ -2006,10 +2020,10 @@ move map to player
 }
 
 object map : map of snake bay paper
-   short	a "map of Snake Bay"
-   long		"The map of Snake Bay is on the ground.^"
-   mass		2
-   parent   roberts
+ short         a "map of Snake Bay"
+ long          "The map of Snake Bay is on the ground.^"
+ mass          2
+ parent        roberts
 
 {examine
 if cut(status) = this
@@ -2088,8 +2102,8 @@ print:
 }
 
 object predictor : kerrison predictor computer tripod
-   short		the "Kerrison Predictor"
-   static
+ short         the "Kerrison Predictor"
+ static
 
 {examine
 print:
@@ -2103,10 +2117,10 @@ print:
 }
 
 object roberts : lieutenant roberts
-   short		name "Lieutenant Roberts"
-   long			"Lieutenant Roberts is standing by the Kerrison Predictor.^"
-   has			ANIMATE
-   mass			heavy
+ short         name "Lieutenant Roberts"
+ long          "Lieutenant Roberts is standing by the Kerrison Predictor.^"
+ has           ANIMATE
+ mass          heavy
 
 {examine
 print:
@@ -2192,10 +2206,10 @@ print:
 }
 
 object witheridge : sergeant witheridge
-   short		name "Sergeant Witheridge"
-   long			function
-   has			ANIMATE
-   mass			heavy
+ short         name "Sergeant Witheridge"
+ long          function
+ has           ANIMATE
+ mass          heavy
 
 {examine
 print:
@@ -2279,10 +2293,12 @@ execute "+game_over"
 }
 
 location hut : hut sleeping quarters
-   short		the "hut"
-   has			KNOWN
-   north		assembly_area
-   out			assembly_area
+ short         the "hut"
+ has           KNOWN
+ north         assembly_area
+ out           assembly_area
+ x             3
+ y             3
 
 {look
 if here has VISITED
@@ -2308,8 +2324,8 @@ return false
 }
 
 object bunk : my bunk
-   short			name "your bunk"
-   static
+ short         name "your bunk"
+ static
 
 {look_under
 if kit_bag hasnt TOUCHED
@@ -2326,13 +2342,13 @@ print:
 }
 
 object other_bunks: other bunk bunks
-   short		the "other bunks"
-   has			PLURAL NOT_IMPORTANT
-   static
+ short         the "other bunks"
+ has           PLURAL NOT_IMPORTANT
+ static
 
 object mosquito_netting : mosquito netting
-   short		the "mosquito netting"
-   static
+ short         the "mosquito netting"
+ static
 
 {examine
 print:
@@ -2349,11 +2365,11 @@ print:
 }
 
 object kit_bag : kit bag gear
-   short		name "your kit bag"
-   long			function
-   has			CONTAINER CLOSABLE CLOSED
-   mass			10
-   capacity		10
+ short         name "your kit bag"
+ long          function
+ has           CONTAINER CLOSABLE CLOSED
+ mass          10
+ capacity      10
 
 {long
 if kit_bag hasnt TOUCHED
@@ -2368,11 +2384,11 @@ endif
 }
 
 object shirt : khaki shirt
-   short		your "khaki shirt"
-   long			"Your khaki shirt is lying on the ground.^"
-   has			WEARABLE
-   parent		kit_bag
-   mass			4
+ short         your "khaki shirt"
+ long          "Your khaki shirt is lying on the ground.^"
+ has           WEARABLE
+ parent        kit_bag
+ mass          4
 
 {break
 if +worn<shirt = true
@@ -2473,10 +2489,10 @@ proxy "tear " noun1{names} " from " noun2{names}
 }
 
 object rightsleeve : right shirt sleeve
-   plural		sleeves
-   short		a "right shirt sleeve"
-   mass			scenery
-   parent		shirt
+ plural        sleeves
+ short         a "right shirt sleeve"
+ mass          scenery
+ parent        shirt
 
 {insert_in_cut : *insert_in_cut_leftsleeve
 if cut(status) = 0
@@ -2505,11 +2521,11 @@ endif
 }
 
 object leftsleeve : left shirt sleeve
-   plural		sleeves
-   short		a "left shirt sleeve"
-   mass			1
-   mass			scenery
-   parent		shirt
+ plural        sleeves
+ short         a "left shirt sleeve"
+ mass          1
+ mass          scenery
+ parent        shirt
 
 grammar shoot *present with *held >shoot_with
 
@@ -2569,10 +2585,10 @@ proxy "shoot " noun1{names} " with rifle"
 }
 
 object your_rifle : lee enfield rifle gun
-   short		name "your rifle"
-   long			function
-   status		10
-   mass			20
+ short         name "your rifle"
+ long          function
+ status        10
+ mass          20
 
 {long
 if your_rifle hasnt TOUCHED
@@ -2683,14 +2699,15 @@ print:
 }
 
 location south_of_oval : south side of oval
-   short		the "south side of the oval"
-   has			OUTDOORS KNOWN
-   north		pitch
-   in			pitch
-   northwest	outfield
-   south		beach
-   down			beach
- 
+ short         the "south side of the oval"
+ has           OUTDOORS KNOWN
+ north         pitch
+ in            pitch
+ northwest     outfield
+ south         beach
+ down          beach
+ x             5
+ y             3
 {look
 if here has VISITED
    write "You have returned to the south side of the oval.^"
@@ -2715,10 +2732,12 @@ return false
 }
 
 location beach : beach 
-   short		the "beach"
-   has			OUTDOORS KNOWN
-   north		south_of_oval
-   up			south_of_oval
+ short         the "beach"
+ has           OUTDOORS KNOWN
+ north         south_of_oval
+ up            south_of_oval
+ x             5
+ y             4
 
 {look
 if here has VISITED
@@ -2775,10 +2794,10 @@ execute "+command<get in the canoe"
 }
 
 object trenches : deep trenches scar scars
-   short		the "trenches"
-   has			PLURAL CONTAINER
-   capacity		50
-   static
+ short         the "trenches"
+ has           PLURAL CONTAINER
+ capacity      50
+ static
 
 {examine
 print:
@@ -2794,9 +2813,9 @@ print:
 }
 
 object mangroves : mangrove mangroves tree trees
-   short		the "mangroves"
-   has			PLURAL
-   static
+ short         the "mangroves"
+ has           PLURAL
+ static
 
 {examine
 print:
@@ -2805,9 +2824,9 @@ print:
 }
 
 object sand : sand
-   short		the "sand"
-   has			NOT_IMPORTANT
-   static
+ short         the "sand"
+ has           NOT_IMPORTANT
+ static
 
 {dig_in
 if here = snake_bay_east
@@ -2821,9 +2840,9 @@ write "You find nothing of interest.^"
 }
 
 object sea_water : salty ocean sea water 
-   short		the "sea water"
-   has		    NOT_IMPORTANT
-   static
+ short         the "sea water"
+ has           NOT_IMPORTANT
+ static
 
 {enter
 if here = wharf : here = snake_bay : here = snake_bay_east
@@ -2848,11 +2867,11 @@ print:
 }
 
 object miki : miki aboriginal man
-   short		name "Miki"
-   has			ANIMATE POSSESSIVE
-   long			function
-   mass			heavy
-   parent		limbo
+ short         name "Miki"
+ has           ANIMATE POSSESSIVE
+ long          function
+ mass          heavy
+ parent        limbo
 
 {long
 if script_stage = after_raid
@@ -2963,20 +2982,22 @@ print:
 }
 
 object spear : spear
-   short		a "long wooden spear"
-   mass			5
-   parent		miki
+ short         a "long wooden spear"
+ mass          5
+ parent        miki
 
 object woomera : woomera
-   short		a "woomera"
-   mass			2
-   parent		miki
+ short         a "woomera"
+ mass          2
+ parent        miki
 
 location in_canoe : inside dugout canoe
-   short		name "inside the canoe"
-   has			OUTDOORS
-   out			wharf
-   up			wharf
+ short         name "inside the canoe"
+ has           OUTDOORS
+ out           wharf
+ up            wharf
+ x             12
+ y             1
 
 {look
 if here has VISITED
@@ -3003,8 +3024,8 @@ write "A strong smell of fish fills the air.^"
 }
 
 object miki_paddle : paddle miki's mikis
-   short		name "Miki's paddle"
-   mass			5
+ short         name "Miki's paddle"
+ mass          5
 
 {examine
 print:
@@ -3014,8 +3035,8 @@ print:
 }
 
 object canoe : dugout canoe
-   short		a "dugout canoe"
-   parent		limbo
+ short         a "dugout canoe"
+ parent        limbo
 
 {untie
 proxy "untie painter"
@@ -3145,9 +3166,9 @@ set time = true
 }
 
 object painter : bow line painter rope
-   short		a "painter"
-   parent		canoe
-   static
+ short         a "painter"
+ parent        canoe
+ static
 
 {untie
 if here = wharf
@@ -3188,11 +3209,13 @@ print:
 }
 
 location wharf : timber wharf
-   short		a "timber wharf"
-   has			OUTDOORS
-   south		snake_bay
-   in			in_canoe
-   down			in_canoe
+ short         a "timber wharf"
+ has           OUTDOORS
+ south         snake_bay
+ in            in_canoe
+ down          in_canoe
+ x             12
+ y             2
 
 {look
 if here has VISITED
@@ -3252,8 +3275,8 @@ move sea_water to here
 }
 
 object pile : timber wharf pile piles
-   short		a "wharf pile"
-   static
+ short         a "wharf pile"
+ static
 
 {examine
 print:
@@ -3269,10 +3292,12 @@ write ^
 }
 
 location snake_bay : snake bay inner shore
-   short		the "shore of Snake Bay"
-   has			OUTDOORS
-   north		wharf
-   east			snake_bay_east
+ short         the "shore of Snake Bay"
+ has           OUTDOORS
+ north         wharf
+ east          snake_bay_east
+ x             12
+ y             3
 
 {look
 if here has VISITED
@@ -3345,9 +3370,9 @@ move sand to here
 }
 
 object boat_distant : distant boat timber motor launch
-   short		a "timber motor launch"
-   has			OUT_OF_REACH
-   static
+ short         a "timber motor launch"
+ has           OUT_OF_REACH
+ static
    
 {examine
 if snake_bay_east hasnt KNOWN
@@ -3363,13 +3388,15 @@ endif
 }
 
 location snake_bay_east : snake bay inner shore east
-   short		the "eastern shore of Snake Bay"
-   has			OUTDOORS
-   west			snake_bay
-   in			afterdeck
-   north		afterdeck
-   south		beach_trail
-   up			beach_trail
+ short         the "eastern shore of Snake Bay"
+ has           OUTDOORS
+ west          snake_bay
+ in            afterdeck
+ north         afterdeck
+ south         beach_trail
+ up            beach_trail
+ x             13
+ y             3
 
 {look
 if here has VISITED
@@ -3424,7 +3451,7 @@ proxy "dig in sand"
 }
 
 object boat : boat timber motor launch board
-   short		a "timber motor launch"
+ short         a "timber motor launch"
    
 {enter : climb_up
 proxy "in"
@@ -3452,8 +3479,8 @@ execute "+message_sent"
 }
 
 object stem : stem bow
-   short		the "launch's stem"
-   static
+ short         the "launch's stem"
+ static
 
 {examine
 print:
@@ -3464,8 +3491,8 @@ print:
 }
 
 object sponson : sponson
-   short		the "launch's sponson"
-   static
+ short         the "launch's sponson"
+ static
 
 {examine
 print:
@@ -3485,13 +3512,15 @@ grammar aft			>west
 grammar go aft		>west
 
 location afterdeck : afterdeck deck decking
-   short		the "afterdeck"
-   has			OUTDOORS
-   east			wheelhouse
-   in			wheelhouse
-   south		snake_bay_east
-   out			snake_bay_east
-   down			snake_bay_east
+ short         the "afterdeck"
+ has           OUTDOORS
+ east          wheelhouse
+ in            wheelhouse
+ south         snake_bay_east
+ out           snake_bay_east
+ down          snake_bay_east
+ x             13
+ y             2
 
 {look
 if here has VISITED
@@ -3535,8 +3564,8 @@ return false
 }
 
 object engine_cover : boat engine motor bilge battery batteries cover
-   short		an "engine cover"
-   has			CLOSABLE CLOSED
+ short         an "engine cover"
+ has           CLOSABLE CLOSED
 
 {open_override
 if miki isnt *present
@@ -3565,8 +3594,8 @@ move salt_water to limbo
 }
 
 object boat_engine : boat engine motor bilge battery batteries
-   short		a "boat engine"
-   static
+ short         a "boat engine"
+ static
 
 {examine
 print:
@@ -3584,14 +3613,16 @@ print:
 }
 
 object salt_water : salt water
-   short		some "salt water"
-   has			LIQUID NOT_IMPORTANT
-   static
+ short         some "salt water"
+ has           LIQUID NOT_IMPORTANT
+ static
 
 location forepeak : forepeak
-   short		the "forepeak"
-   west			wheelhouse
-   up			nowhere
+ short         the "forepeak"
+ west          wheelhouse
+ up            nowhere
+ x             15
+ y             2
 
 {look
 if here has VISITED
@@ -3629,11 +3660,13 @@ move hatch to here
 }
 
 location wheelhouse : wheelhouse
-   short		the "wheelhouse"
-   east			forepeak
-   in			forepeak
-   west			afterdeck
-   out			afterdeck
+ short         the "wheelhouse"
+ east          forepeak
+ in            forepeak
+ west          afterdeck
+ out           afterdeck
+ x             14
+ y             2
 
 {look
 if here has VISITED
@@ -3679,13 +3712,13 @@ grammar turn *present to right		>turn_clockwise
 integer BLOOD_DISCOVERED	false
 
 object windscreen : windscreen wind screen glass
-   short		a "windscreen"
-   has			NOT_IMPORTANT
-   static
+ short         a "windscreen"
+ has           NOT_IMPORTANT
+ static
 
 object bulkhead : bulkhead opening
-   short		a "bulkhead"
-   static
+ short         a "bulkhead"
+ static
 
 {examine
 print:
@@ -3699,7 +3732,7 @@ proxy "east"
 }
 
 object helm : helm wheel stainless steel wheel
-   short		a "helm"
+ short         a "helm"
 
 {clean : clean_with_shirt : clean_with_corner
 if blood(parent) = limbo
@@ -3743,7 +3776,7 @@ endif
 }
 
 object blood_on_helm : patch of dried blood on helm
-   short		a "patch of dried blood on the helm"
+ short         a "patch of dried blood on the helm"
 
 {examine
 print:
@@ -3764,10 +3797,10 @@ proxy "clean helm"
 }
 
 object hair : single black strand of hair
-   short		a "strand of black hair"
-   long			function
-   parent		limbo
-   mass			0
+ short         a "strand of black hair"
+ long          function
+ parent        limbo
+ mass          0
 
 {examine
 print:
@@ -3782,8 +3815,8 @@ print:
 }
 
 object throttle_lever : throttle lever
-   short		a "throttle lever"
-   plural		levers
+ short         a "throttle lever"
+ plural        levers
 
 {examine
 print:
@@ -3798,8 +3831,8 @@ print:
 }
 
 object gear_lever : gear lever
-   short		a "gear lever"
-   plural		levers
+ short         a "gear lever"
+ plural        levers
 
 {examine
 print:
@@ -3814,9 +3847,11 @@ print:
 }
 
 location foredeck : foredeck deck decking
-   short		the "foredeck"
-   has			OUTDOORS
-   down			nowhere
+ short         the "foredeck"
+ has           OUTDOORS
+ down          nowhere
+ x             17
+ y             2
 
 {look
 if here has VISITED
@@ -3868,8 +3903,8 @@ move hatch to here
 }
 
 object hatch : square hatch
-   short		a "hatch"
-   has			CLOSABLE CLOSED
+ short         a "hatch"
+ has           CLOSABLE CLOSED
 
 {open_override
 write "You swing open the hatch allowing access "
@@ -3907,9 +3942,9 @@ endif
 constant		tied_to		8
 
 object rope : length of rope
-   short		a "length of rope"
-   long			function
-   mass			45
+ short         a "length of rope"
+ long          function
+ mass          45
 
 {long
 if here = foredeck
@@ -4008,14 +4043,14 @@ set time = false;
 }
 
 object whipped : whipped end of rope
-   short		the "whipped end of the rope"
-   parent		rope
-   tied_to		nowhere
+ short         the "whipped end of the rope"
+ parent        rope
+ tied_to       nowhere
 
 object frayed : frayed end of rope
-   short		the "frayed end of the rope"
-   parent		rope
-   tied_to		nowhere
+ short         the "frayed end of the rope"
+ parent        rope
+ tied_to       nowhere
 
 {examine : *examine_whipped
 if this(tied_to) != nowhere
@@ -4115,12 +4150,14 @@ set back_of_house(west) = chapel
 }
 
 location beach_trail : narrow beach trail
-   short		a "narrow trail"
-   has			OUTDOORS
-   north		snake_bay_east
-   down			snake_bay_east
-   south		front_of_house
-   up			front_of_house
+ short         a "narrow trail"
+ has           OUTDOORS
+ north         snake_bay_east
+ down          snake_bay_east
+ south         front_of_house
+ up            front_of_house
+ x             13
+ y             4
 
 {look
 if here has VISITED
@@ -4156,13 +4193,13 @@ return false
 }
 
 object steps : standstone standstones root roots compacted dirt
-   short		the "steps"
-   has			NOT_IMPORTANT PLURAL
-   static
+ short         the "steps"
+ has           NOT_IMPORTANT PLURAL
+ static
 
 object houseobj : house
-   short		a "house"
-   static
+ short         a "house"
+ static
 
 {look_under
 proxy "examine crawlspace"
@@ -4188,12 +4225,14 @@ endif
 }
    
 location front_of_house : front of house
-   short		the "front of the house"
-   has			OUTDOORS
-   north		beach_trail
-   down			beach_trail
-   south		verandah
-   up			verandah
+ short         the "front of the house"
+ has           OUTDOORS
+ north         beach_trail
+ down          beach_trail
+ south         verandah
+ up            verandah
+ x             13
+ y             5
 
 {look
 if here has VISITED
@@ -4235,8 +4274,8 @@ move crawlspace to here
 }
 
 object crawlspace : clay brick clay-brick pier piers crawlspace under house
-   short		a "crawlspace"
-   static
+ short         a "crawlspace"
+ static
 
 {examine
 print:
@@ -4256,9 +4295,9 @@ endif
 }
 
 object front_steps : front steps
-   short		some "front steps"
-   has			PLURAL
-   static
+ short         some "front steps"
+ has           PLURAL
+ static
 
 {examine
 print:
@@ -4272,9 +4311,11 @@ execute "look_under_front_of_house"
 }
 
 location under_house : under house
-   short		name "under the house"
-   north		front_of_house
-   south		back_of_house
+ short         name "under the house"
+ north         front_of_house
+ south         back_of_house
+ x             11
+ y             7
 
 {look
 if here has VISITED
@@ -4300,9 +4341,9 @@ move crawlspace to here
 }
 
 object enfield_shell : lee enfield shell 303 casing
-   short		a "rifle shell casing"
-   long			function
-   mass			1
+ short         a "rifle shell casing"
+ long          function
+ mass          1
 
 {long
 if enfield_shell has TOUCHED
@@ -4321,11 +4362,13 @@ print:
 }
 
 location verandah : front verandah
-   short		the "front verandah"	
-   down			front_of_house
-   north		front_of_house
-   south		lounge_room
-   in			lounge_room
+ short         the "front verandah"
+ down          front_of_house
+ north         front_of_house
+ south         lounge_room
+ in            lounge_room
+ x             13
+ y             6
 
 {look
 if here has VISITED
@@ -4382,8 +4425,8 @@ move front_door to here
 }
 
 object front_door : front flyscreen screen door
-   short		a "front door"
-   static
+ short         a "front door"
+ static
 
 {enter
 if here = verandah
@@ -4408,17 +4451,19 @@ print:
 }
 
 object spring : front flyscreen screen door spring
-   short		a "door spring"
-   has			NOT_IMPORTANT
-   static
+ short         a "door spring"
+ has           NOT_IMPORTANT
+ static
 
 location lounge_room : bare sparsely furnished lounge room area
-   short		the "lounge room"
-   north		verandah
-   out			verandah
-   east			radio_room
-   west			kitchen
-   south		hallway
+ short         the "lounge room"
+ north         verandah
+ out           verandah
+ east          radio_room
+ west          kitchen
+ south         hallway
+ x             13
+ y             7
 
 {look
 if here has VISITED
@@ -4476,17 +4521,17 @@ proxy "sit on lounge"
 }
 
 object missing_furniture : vases vase lamp lamps painting paintings side table side tables
-   short		the "missing furniture"
-   has			OUT_OF_REACH
-   static
+ short         the "missing furniture"
+ has           OUT_OF_REACH
+ static
 
 {examine
 write "Gone long ago.^"
 }
 
 object wallpaper : wallpaper
-   short		some "wallpaper"
-   static
+ short         some "wallpaper"
+ static
 
 {pull : look_behind
 print:
@@ -4502,20 +4547,20 @@ print:
 }
  
 object buffet : french polished buffet
-   short		a "French-polished buffet"
-   has			SURFACE
-   capacity		30
+ short         a "French-polished buffet"
+ has           SURFACE
+ capacity      30
 
 object hutch : french polished hutch
-   short		a "French-polished hutch"
-   has			CONTAINER CLOSED CLOSABLE
-   capacity		15
+ short         a "French-polished hutch"
+ has           CONTAINER CLOSED CLOSABLE
+ capacity      15
 
 object junk : mountain of useless junk
-   short		a "mountain of useless junk"
-   parent		hutch
-   mass			heavy
-   static
+ short         a "mountain of useless junk"
+ parent        hutch
+ mass          heavy
+ static
 
 {examine
 print:
@@ -4542,15 +4587,15 @@ write "You don't find anything worthwhile.^"
 }
 
 object floor_boards : matt timber floor boards
-   short		some "timber floor boards"
-   has			PLURAL
-   static
+ short         some "timber floor boards"
+ has           PLURAL
+ static
 
 object lounge_chair : three-seater three seater lounge chair
-   short		a "lounge chair"
-   has			SURFACE
-   capacity		50
-   static
+ short         a "lounge chair"
+ has           SURFACE
+ capacity      50
+ static
 
 {examine
 print:
@@ -4574,15 +4619,17 @@ ensure player has SITTING
 }
 
 object coffee_table : coffee table
-   short		a "coffee table"
-   has			SURFACE
-   capacity		40
-   static
+ short         a "coffee table"
+ has           SURFACE
+ capacity      40
+ static
 
 location radio_room : radio transceiver transmitter room
-   short		the "radio room"
-   west			lounge_room
-   out			lounge_room
+ short         the "radio room"
+ west          lounge_room
+ out           lounge_room
+ x             14
+ y             7
 
 {look
 if here has VISITED
@@ -4611,8 +4658,8 @@ return false
 }
 
 object radio_window : flyscreen window in radio room timber beading
-   short		the "window in the radio room"
-   static
+ short         the "window in the radio room"
+ static
 
 {open : close
 print:
@@ -4640,7 +4687,7 @@ print:
 }
 
 object radio : radio transceiver transmitter
-   short		a "radio transceiver"
+ short         a "radio transceiver"
 
 {examine
 print:
@@ -4677,9 +4724,9 @@ return false
 }
 
 object handles : radio transceiver transmitter strong carry handles
-   short		the "strong carry handles"
-   has			PLURAL
-   static
+ short         the "strong carry handles"
+ has           PLURAL
+ static
 
 {examine
 print:
@@ -4694,7 +4741,7 @@ print:
 }
 
 object radio_switch : radio transceiver transmitter power switch
-   short		a "radio power switch"
+ short         a "radio power switch"
 
 {examine
 write "The switch is in the "
@@ -4755,7 +4802,7 @@ endif
 }
 
 object morse_key : morse key
-   short		a "morse key"
+ short         a "morse key"
 
 {examine
 if @clean_morse_key != 0
@@ -4874,8 +4921,8 @@ ensure noun1 has ASKED
 #  short		a "watch bill"
 
 object radio_equipment : radio transceiver transmitter equipment
-   short	the "radio equipment"
-   counter	0	# THIS IS THE COUNT OF HOW MANY MESSAGES HAVE BEEN SENT
+ short         the "radio equipment"
+ counter       0	# THIS IS THE COUNT OF HOW MANY MESSAGES HAVE BEEN SENT
 
 {examine
 print:
@@ -4884,8 +4931,8 @@ print:
 }
 
 object voltmeter : voltmeter meter needle stop
-   short	a "voltmeter"
-   static
+ short         a "voltmeter"
+ static
 
 {knock_on
 write "The needle doesn't budge.^"
@@ -4900,9 +4947,11 @@ endif
 }
 
 location kitchen : kitchen
-   short			the "kitchen"
-   east				lounge_room
-   out				lounge_room
+ short         the "kitchen"
+ east          lounge_room
+ out           lounge_room
+ x             12
+ y             7
 
 {look
 if here has VISITED
@@ -4927,12 +4976,14 @@ return false
 }
 
 location hallway : hallway
-   short		the "hallway"
-   north		lounge_room
-   east			east_sleeping
-   west			west_sleeping
-   south		back_of_house
-   out			back_of_house
+ short         the "hallway"
+ north         lounge_room
+ east          east_sleeping
+ west          west_sleeping
+ south         back_of_house
+ out           back_of_house
+ x             13
+ y             8
 
 {look
 if here has VISITED
@@ -4968,8 +5019,8 @@ move back_door to here
 }
 
 object back_door : back flyscreen screen door
-   short		a "back flyscreen door"
-   static
+ short         a "back flyscreen door"
+ static
 
 {enter
 if here = hallway
@@ -4994,8 +5045,10 @@ print:
 }
 
 location east_sleeping : small east eastern sleeping quarters
-   short		the "eastern sleeping quarters"
-   west			hallway
+ short         the "eastern sleeping quarters"
+ west          hallway
+ x             14
+ y             8
 
 {look
 if here has VISITED
@@ -5059,9 +5112,9 @@ write "There is no level " $integer " hint for this location.^"
 }
 
 object footlocker : footlocker locker
-   plural		footlockers lockers
-   short		a "footlocker"
-   has			CONTAINER CLOSED CLOSABLE LOCKED LOCKABLE
+ plural        footlockers lockers
+ short         a "footlocker"
+ has           CONTAINER CLOSED CLOSABLE LOCKED LOCKABLE
 
 {examine
 print:
@@ -5104,8 +5157,8 @@ endif
 }
 
 object steves_keyhole : steve's keyhole lock
-   plural		keyholes locks
-   short		a "keyhole"
+ plural        keyholes locks
+ short         a "keyhole"
 
 {examine
 if steves_keyhole has DAMAGED
@@ -5174,10 +5227,10 @@ endif
 }
 
 object steves_clothes : steve's steven's grubby clothes
-   short		some "grubby clothes"
-   has			PLURAL
-   parent		footlocker
-   mass			5
+ short         some "grubby clothes"
+ has           PLURAL
+ parent        footlocker
+ mass          5
 
 {insert_in_cut
 if cut(status) = 0
@@ -5228,11 +5281,11 @@ return false
 }
 
 object pouch : small leather pouch
-   short		a "small leather pouch"
-   has			CONTAINER CLOSABLE CLOSED
-   mass			5
-   capacity		1
-   parent		limbo
+ short         a "small leather pouch"
+ has           CONTAINER CLOSABLE CLOSED
+ mass          5
+ capacity      1
+ parent        limbo
 
 {after_open
 if pouch has SCORED
@@ -5243,10 +5296,10 @@ ensure pouch has SCORED
 }
 
 object pearls : small irregular-shaped irregular shaped pearls pearl
-   short		some "pearls"
-   has			PLURAL
-   mass			1
-   parent		pouch
+ short         some "pearls"
+ has           PLURAL
+ mass          1
+ parent        pouch
 
 {examine
 print:
@@ -5256,17 +5309,17 @@ print:
 }
 
 object steves_bunk : steve's bunk
-   short		the "bunk"
-   has			SURFACE
-   static
+ short         the "bunk"
+ has           SURFACE
+ static
 
 {look_under
 write "There is nothing under the bunk.^"
 }
 
 object east_sleeping_window : flyscreen window in east sleeping quarters timber beading
-   short		the "window in the east sleeping quarters"
-   static
+ short         the "window in the east sleeping quarters"
+ static
 
 {open : close
 print:
@@ -5294,8 +5347,10 @@ print:
 }
 
 location west_sleeping : large west western sleeping quarters
-   short		the "western sleeping quarters"
-   east			hallway
+ short         the "western sleeping quarters"
+ east          hallway
+ x             12
+ y             8
 
 {look
 if here has VISITED
@@ -5321,7 +5376,7 @@ return false
 }
 
 object sheet : sheet privacy screen
-   short		a "sheet"
+ short         a "sheet"
 
 {examine
 print:
@@ -5355,9 +5410,9 @@ endif
 }
 
 object corner : corner of sheet triangle
-   short		a "corner of the sheet"
-   mass			2
-   parent		limbo
+ short         a "corner of the sheet"
+ mass          2
+ parent        limbo
 
 {examine
 print:
@@ -5380,19 +5435,19 @@ endif
 }
 
 object left_bunk : left bunk
-   plural		bunks
-   short		the "left bunk"
-   static
+ plural        bunks
+ short         the "left bunk"
+ static
 
 {look_under
 write "There is nothing under the left bunk.^"
 }
 
 object left_footlocker : left footlocker locker
-   plural		footlockers lockers
-   short		the "left footlocker"
-   has			CONTAINER CLOSABLE CLOSED LOCKABLE
-   capacity		20
+ plural        footlockers lockers
+ short         the "left footlocker"
+ has           CONTAINER CLOSABLE CLOSED LOCKABLE
+ capacity      20
 
 {lock_with_brass_key : unlock_with_brass_key
 print:
@@ -5401,8 +5456,8 @@ print:
 }
 
 object left_keyhole : left footlocker's locker's footlocked locker lock lock's keyhole
-   plural       keyholes locks
-   short		a "left footlocker's keyhole"
+ plural        keyholes locks
+ short         a "left footlocker's keyhole"
 
 {lock_with_brass_key
 proxy "lock left footlocker with key"
@@ -5429,10 +5484,10 @@ endif
 }
 
 object folded_clothes : folded clothes
-   short		some "folded clothes"
-   has			PLURAL
-   parent		left_footlocker
-   mass			5
+ short         some "folded clothes"
+ has           PLURAL
+ parent        left_footlocker
+ mass          5
 
 {insert_in_cut
 if cut(status) = 0
@@ -5449,19 +5504,19 @@ endif
 }
 
 object right_bunk : right bunk
-   plural		bunks
-   short		the "right bunk"
-   static
+ plural        bunks
+ short         the "right bunk"
+ static
 
 {look_under
 write "There is nothing under the right bunk.^"
 }
 
 object right_footlocker : right footlocker locker
-   plural		footlockers lockers
-   short		the "right footlocker"
-   has			CONTAINER CLOSABLE CLOSED LOCKABLE
-   capacity		20
+ plural        footlockers lockers
+ short         the "right footlocker"
+ has           CONTAINER CLOSABLE CLOSED LOCKABLE
+ capacity      20
 
 {lock_with_brass_key : unlock_with_brass_key
 print:
@@ -5470,8 +5525,8 @@ print:
 }
 
 object right_keyhole : right footlocker's locker's footlocked locker lock lock's keyhole
-   plural       keyholes locks
-   short		a "right footlocker's keyhole"
+ plural        keyholes locks
+ short         a "right footlocker's keyhole"
 
 {lock_with_brass_key
 proxy "lock right footlocker with key"
@@ -5498,10 +5553,10 @@ endif
 }
 
 object crumpled_clothes : crumpled clothes
-   short		some "crumpled clothes"
-   has			PLURAL
-   parent		right_footlocker
-   mass			5
+ short         some "crumpled clothes"
+ has           PLURAL
+ parent        right_footlocker
+ mass          5
 
 {insert_in_cut
 if cut(status) = 0
@@ -5518,12 +5573,14 @@ endif
 }
 
 location back_of_house : back of house garden
-   short		the "back garden"
-   has			OUTDOORS
-   north		hallway
-   south		paddock
-   west			nowhere
-   up			windmill
+ short         the "back garden"
+ has           OUTDOORS
+ north         hallway
+ south         paddock
+ west          nowhere
+ up            windmill
+ x             13
+ y             9
 
 {look
 if here has VISITED
@@ -5681,8 +5738,8 @@ write "There is no level " $integer " hint for this location.^"
 }
 
 object basin_tap: plain wash basin sink tap
-   has			CLOSABLE CLOSED
-   short		a "tap"
+ has           CLOSABLE CLOSED
+ short         a "tap"
 
 {examine
 if basin_tap hasnt CLOSED 
@@ -5717,14 +5774,14 @@ ensure basin_tap has CLOSED
 }
 
 object basin : long wash basin sink
-   short		a "long wash basin"
-   has			CONTAINER
-   capacity		20
-   static
+ short         a "long wash basin"
+ has           CONTAINER
+ capacity      20
+ static
 
 object clothes_line : rotary clothes line 
-   short		a "rotary clothes line"
-   static
+ short         a "rotary clothes line"
+ static
 
 {turn : turn_anticlockwise : turn_clockwise
 print:
@@ -5734,8 +5791,8 @@ print:
 } 
 
 object water_tank : corrugated water tank
-   short		a "corrugated water tank"
-   static
+ short         a "corrugated water tank"
+ static
 
 {examine
 print:
@@ -5759,8 +5816,8 @@ print:
 }
 
 object chapel_door : timber chapel door 
-   short		a "chapel door"
-   has			CLOSABLE CLOSED LOCKED
+ short         a "chapel door"
+ has           CLOSABLE CLOSED LOCKED
 
 {break : attack
 print:
@@ -5832,7 +5889,7 @@ endif
 }
 
 object chapel_door_frame : timber chapel door frame
-   short		a "chapel door frame"
+ short         a "chapel door frame"
 
 {examine
 if chapel_door hasnt LOCKED
@@ -5872,7 +5929,7 @@ print:
 }
 
 object chapel_door_lock : timber chapel door lock keyhole large metal plate
-   short		the "chapel door keyhole"
+ short         the "chapel door keyhole"
 
 {look_through
 if chapel_door has CLOSED
@@ -5913,8 +5970,8 @@ print:
 }
 
 object chapel_door_handle : timber chapel door handle rivet rivets
-   short		the "chapel door handle"
-   parent		chapel_door
+ short         the "chapel door handle"
+ parent        chapel_door
 
 {examine
 print:
@@ -5930,8 +5987,8 @@ proxy "open chapel door"
 }
 
 object windmill_obj : windmill
-   short		a "windmill"
-   static
+ short         a "windmill"
+ static
 
 {climb_up : enter
 proxy "up"
@@ -5947,8 +6004,8 @@ print:
 }
 
 object machinery : windmill's machinery shaft driveshaft pipes
-   short		the "windmill's machinery"
-   static
+ short         the "windmill's machinery"
+ static
 
 {examine
 print:
@@ -5961,8 +6018,8 @@ print:
 }
 
 object gearbox : windmill's gearbox
-   short		a "gear box"
-   static
+ short         a "gear box"
+ static
 
 {examine
 print:
@@ -5974,7 +6031,7 @@ print:
 }
 
 object clutch : windmill's gearbox clutch round wheel
-   short		a "clutch wheel"
+ short         a "clutch wheel"
 
 {examine
 print:
@@ -6040,7 +6097,7 @@ ensure clutch hasnt ON
 }
 
 object windlass : windmill's windlass brass drum winch
-   short		a "windlass"
+ short         a "windlass"
 
 {examine
 print:
@@ -6057,8 +6114,8 @@ write "and deactivate the clutch.^"
 }
 
 object pump : windmill's water pump rust streaks seals
-   short		a "water pump"
-   static
+ short         a "water pump"
+ static
 
 {examine
 print:
@@ -6070,8 +6127,8 @@ print:
 }
 
 object chapel_obj : chapel
-   short		a "chapel"
-   static
+ short         a "chapel"
+ static
 
 {examine
 print:
@@ -6094,8 +6151,8 @@ print:
 }
 
 object weatherboards : weatherboards weather boards planks cladding
-   short	the "weatherboards"
-   static
+ short         the "weatherboards"
+ static
 
 {remove : pull
 print:
@@ -6110,10 +6167,12 @@ print:
 }
 
 location windmill : windmill lookout platform
-   short		the "windmill"
-   has			OUTDOORS
-   down			back_of_house
-   out			back_of_house
+ short         the "windmill"
+ has           OUTDOORS
+ down          back_of_house
+ out           back_of_house
+ x             15
+ y             9
 
 {movement
 if compass = up
@@ -6156,8 +6215,8 @@ endif
 }
 
 object platform : observation platform
-   short		an "observation platform"
-   static
+ short         an "observation platform"
+ static
 
 {examine
 print:
@@ -6167,9 +6226,11 @@ print:
 }
 
 location chapel : chapel
-   short		the "chapel"
-   east			back_of_house
-   out			back_of_house
+ short         the "chapel"
+ east          back_of_house
+ out           back_of_house
+ x             12
+ y             9
 
 {look
 if here has VISITED
@@ -6213,24 +6274,24 @@ move chapel_door to here
 }
 
 object pattern : elongated light pattern
-   short		a "pattern"
-   static
+ short         a "pattern"
+ static
 
 object stained_glass_window : circular stained glass window
-   short		a "stained glass window"
-   has			OUT_OF_REACH
-   static
+ short         a "stained glass window"
+ has           OUT_OF_REACH
+ static
 
 object crates : stack of crates
-   short		a "stack of crates"
-   static
+ short         a "stack of crates"
+ static
 
 object jerrycan : steel diesel jerry can jerrycan
-   short		a "steel jerrycan"
-   long			function
-   has			CONTAINER CLOSABLE CLOSED
-   mass			15
-   capacity		10
+ short         a "steel jerrycan"
+ long          function
+ has           CONTAINER CLOSABLE CLOSED
+ mass          15
+ capacity      10
 
 {long
 if jerrycan hasnt TOUCHED
@@ -6252,10 +6313,10 @@ write "^"
 }
 
 object diesel : diesel fuel oil
-   short		some "diesel"
-   has			LIQUID
-   mass			10
-   parent		jerrycan
+ short         some "diesel"
+ has           LIQUID
+ mass          10
+ parent        jerrycan
 
 {take
 write "You can't reach the diesel inside " diesel(parent){the} ".^"
@@ -6300,11 +6361,13 @@ write "A strong and familiar smell.^"
 }
 
 location paddock : paddock
-   short		the "paddock"
-   has			OUTDOORS
-   north		back_of_house
-   in			outhouse
-   west			churchyard
+ short         the "paddock"
+ has           OUTDOORS
+ north         back_of_house
+ in            outhouse
+ west          churchyard
+ x             13
+ y             10
 
 {look
 if here has VISITED
@@ -6521,8 +6584,8 @@ endif
 }
 
 object grasstree : grasstree tree
-   short		a "grasstree"
-   static
+ short         a "grasstree"
+ static
 
 {examine
 print:
@@ -6539,9 +6602,9 @@ print:
 }
 
 object japanese_shell : japanese small shell 255 casing
-   short		a "small shell casing"
-   mass			1
-   parent		limbo
+ short         a "small shell casing"
+ mass          1
+ parent        limbo
 
 {examine
 print:
@@ -6551,8 +6614,8 @@ print:
 }
 
 object blood_on_grass : patch of blood blood on grass
-   short		a "patch of blood on the grass"
-   static
+ short         a "patch of blood on the grass"
+ static
 
 {examine
 print:
@@ -6580,8 +6643,8 @@ write "The grass around the generator smells strongly of diesel.^"
 }
 
 object gen_roof : make-shift roof of corrugated iron suspended by unmilled branches over generator
-   short		a "roof over the generator"
-   static
+ short         a "roof over the generator"
+ static
    
 {examine
 print:
@@ -6591,8 +6654,8 @@ print:
 }
 
 object slab : concrete slab
-   short		a "concrete slab"
-   static
+ short         a "concrete slab"
+ static
 
 {examine
 print:
@@ -6602,7 +6665,7 @@ print:
 }
 
 object generator : diesel electrical generator engine motor genset
-   short		a "diesel generator"
+ short         a "diesel generator"
 
 {examine
 print:
@@ -6654,8 +6717,8 @@ execute "+message_sent"
 }
 
 object pull_cord : pull start starter starting cord blackened dowel handle
-   short		a "pull cord"
-   static
+ short         a "pull cord"
+ static
 
 {examine
 print:
@@ -6720,9 +6783,9 @@ endif
 }
 
 object fuel_line : fuel line
-   short		the "fuel line"
-   parent		generator
-   static
+ short         the "fuel line"
+ parent        generator
+ static
 
 {examine
 print:
@@ -6731,8 +6794,8 @@ print:
 }
 
 object fuel_filter : fuel filter
-   short		the "fuel filter"
-   static
+ short         the "fuel filter"
+ static
 
 {examine
 print:
@@ -6760,8 +6823,8 @@ return false
 }
 
 object primer_lever : priming pump lever 
-   short		a "priming pump lever"
-   static
+ short         a "priming pump lever"
+ static
 
 {pull : turn : move : pump
 ifall bleed_plug has CLOSED : generator hasnt PRIMED
@@ -6799,8 +6862,8 @@ endif
 }
 
 object bleed_plug : air bleed plug valve
-   short		an "air bleed plug"
-   has			CLOSABLE CLOSED
+ short         an "air bleed plug"
+ has           CLOSABLE CLOSED
 
 {open
 if generator has ON
@@ -6812,8 +6875,8 @@ return false
 }
 
 object fuel_tank : fuel tank
-   short		a "fuel tank"
-   has			CONTAINER CLOSED CLOSABLE
+ short         a "fuel tank"
+ has           CONTAINER CLOSED CLOSABLE
 
 {examine
 print:
@@ -6862,9 +6925,9 @@ proxy "pour jerrycan in tank"
 }
 
 object drips : drip dripping diesel fuel drips
-   short		the "dripping diesel"
-   has			LIQUID
-   static
+ short         the "dripping diesel"
+ has           LIQUID
+ static
 
 {examine
 print:
@@ -6880,7 +6943,7 @@ set time = false
 }
 
 object fuel_cap : fuel tank cap
-   short		a "fuel cap"
+ short         a "fuel cap"
 
 {take : pull
 print:
@@ -6905,9 +6968,9 @@ endif
 }
 
 object cut : hole cut in fuel tank
-   short		a "cut in the fuel tank"
-   has			CONTAINER
-   capacity		100
+ short         a "cut in the fuel tank"
+ has           CONTAINER
+ capacity      100
 
 {examine
 if cut(status) = false
@@ -6922,15 +6985,17 @@ endif
 }
 
 object outhouse_obj : outhouse dunny
-   short		the "outhouse"
+ short         the "outhouse"
 
 {enter
 proxy "in"
 }
 
 location outhouse : outhouse dunny
-   short		the "outhouse"
-   out			paddock
+ short         the "outhouse"
+ out           paddock
+ x             14
+ y             10
 
 {look
 if here has VISITED
@@ -6971,8 +7036,8 @@ return false
 }
 
 object plank : long plank
-   short		a "plank"
-   static
+ short         a "plank"
+ static
 
 {examine : look_through : *examine_holes : *look_through_holes
 print:
@@ -6988,13 +7053,15 @@ set time = false
 }
 
 object holes : holes
-   short		some "holes"
-   static
+ short         some "holes"
+ static
 
 location churchyard : churchyard cemetery graveyard
-   short		the "churchyard"
-   has			OUTDOORS
-   east			paddock
+ short         the "churchyard"
+ has           OUTDOORS
+ east          paddock
+ x             12
+ y             10
 
 {look
 if here has VISITED
@@ -7031,9 +7098,9 @@ endif
 }
 
 object graves : collection of graves
-   short		a "collection of graves"
-   has			PLURAL
-   static
+ short         a "collection of graves"
+ has           PLURAL
+ static
 
 {examine
 print:
@@ -7053,14 +7120,14 @@ endif
 }
 
 object crosses : modest timber crosses cross
-   short		the "timber crosses"
-   has			PLURAL
-   static
+ short         the "timber crosses"
+ has           PLURAL
+ static
 
 object tutini : tutini funerary poles
-   short		the "funerary poles"
-   has			PLURAL
-   static
+ short         the "funerary poles"
+ has           PLURAL
+ static
 
 {examine
 print:
@@ -7070,8 +7137,8 @@ print:
 }
 
 object fresh_grave : fresh shallow grave recently turned loose soil
-   short		a "fresh grave"
-   static
+ short         a "fresh grave"
+ static
 
 {examine
 if @dig_in_fresh_grave = 0
@@ -7139,11 +7206,11 @@ endif
 }
 
 object steves_dog_tags : steve steve's mcpherson's dog tags australian soldier dead body pale
-   short		your "Steve's dog tags"
-   long			"Steve's dog tags are here.^"
-   has			WEARABLE PLURAL
-   parent		limbo
-   mass			1
+ short         your "Steve's dog tags"
+ long          "Steve's dog tags are here.^"
+ has           WEARABLE PLURAL
+ parent        limbo
+ mass          1
 
 {examine
 print:
@@ -7154,9 +7221,9 @@ print:
 }
 
 object body : pale dead body australian soldier
-   has			ANIMATE DEAD
-   short		a "pale body"
-   parent		limbo
+ has           ANIMATE DEAD
+ short         a "pale body"
+ parent        limbo
 
 {examine : *examine_steve
 print:
@@ -7217,8 +7284,8 @@ print:
 }
 
 object wound : single bullet wound
-   short	name "bullet wound"
-   parent   body
+ short         name "bullet wound"
+ parent        body
 
 {examine : look_in
 if slug(parent) = wound
@@ -7235,9 +7302,9 @@ endif
 }
 
 object slug : slug
-  short		a "slug"
-  parent	wound
-  mass		1
+ short         a "slug"
+ parent        wound
+ mass          1
 
 {examine
 if slug(parent) = wound
@@ -7267,7 +7334,7 @@ return false
 }
 
 object bone : shoulder bone
-  short		a "bone"
+ short         a "bone"
 
 {examine
 print:
@@ -7276,8 +7343,8 @@ print:
 }
 
 object steves_shorts : soldiers soldier's steves steve's uniform shorts
-   short	name "soldier's shorts"
-   parent	body
+ short         name "soldier's shorts"
+ parent        body
  
 {remove
 write "No.^"
@@ -7297,9 +7364,9 @@ endif
 }
 
 object steve : steve mcpherson pale dead body australian soldier
-   has			ANIMATE DEAD
-   short		name "Steve"
-   parent		limbo
+ has           ANIMATE DEAD
+ short         name "Steve"
+ parent        limbo
 
 {send_message_override
 if steve(parent) = limbo
@@ -7314,9 +7381,9 @@ ensure steve has SCORED
 }
 
 object brass_key : small brass key
-   short		a "small brass key"
-   mass			5
-   parent		limbo
+ short         a "small brass key"
+ mass          5
+ parent        limbo
 
 {examine
 print:
@@ -7355,22 +7422,22 @@ print:
 }
 
 object dan : dan foster
-   short		name "Dan"
-   has			ANIMATE
-   long			function
-   mass			heavy
-   parent		limbo
+ short         name "Dan"
+ has           ANIMATE
+ long          function
+ mass          heavy
+ parent        limbo
 
 {long
 write "Dan is sitting tied to the chair.^"
 }
 
 object alex : alex green man soldier
-   short		name "Alex"
-   has			ANIMATE
-   long			function
-   mass			heavy
-   parent		limbo
+ short         name "Alex"
+ has           ANIMATE
+ long          function
+ mass          heavy
+ parent        limbo
 
 {long
 write "Alex is standing nearby, nervously clutching his rifle.^"
@@ -7408,6 +7475,8 @@ write "~You know him better than I do.~^"
 }
 
 location bush : bush
+ x             17
+ y             3
 
 {look
 }
@@ -7417,10 +7486,10 @@ location bush : bush
 # -----------------------------------------------------------------------------
 
 object kryten: myself self me davis
-   short		name "yourself"
-   has		ANIMATE
-   quantity	100
-   parent		outfield
+ short         name "yourself"
+ has           ANIMATE
+ quantity      100
+ parent        outfield
 
 {hint
 set time = false
@@ -7458,17 +7527,17 @@ write "With government rebates, therapy isn't as expensive as it seems.^"
 }
 
 object hat : wide brimmed hat
-   short		the "wide brimmed hat"
-   has		WORN WEARABLE
-   mass		5
-   parent		player
+ short         the "wide brimmed hat"
+ has           WORN WEARABLE
+ mass          5
+ parent        player
 
 object dog_tags : dog tags
-   short		your "dog tags"
-   long		"You dog tags are here.^"
-   has		WORN WEARABLE PLURAL
-   parent		kryten
-   mass		1
+ short         your "dog tags"
+ long          "You dog tags are here.^"
+ has           WORN WEARABLE PLURAL
+ parent        kryten
+ mass          1
 
 {examine : read
 print:
@@ -7479,10 +7548,10 @@ print:
 }
 
 object shorts : davis' davis davis's my uniform khaki shorts
-   short		name "your shorts"
-   has		WORN WEARABLE
-   parent		kryten
-   mass			1
+ short         name "your shorts"
+ has           WORN WEARABLE
+ parent        kryten
+ mass          1
 
 {remove
 write "Perhaps The Down Dragon would be more to your taste?^"
@@ -8195,16 +8264,16 @@ style normal
 }
 
 object mission : mission assignment
-   short		the "mission"
-   parent		limbo
+ short         the "mission"
+ parent        limbo
 
 object melville_obj : melville island observation post outpost snake bay
-   short		name "Melville Island"
-   parent		limbo
+ short         name "Melville Island"
+ parent        limbo
 
 object sky_obj : sky skies
-   short		the "sky"
-   has			OUT_OF_REACH NO_TAB
+ short         the "sky"
+ has           OUT_OF_REACH NO_TAB
    
 {examine
 proxy "look up"
@@ -8226,28 +8295,28 @@ execute "+look_around"
 }
 
 object north_wall: north north wall
-   short		the "north wall"
-   has			NO_TAB
-   plural		walls
+ short         the "north wall"
+ has           NO_TAB
+ plural        walls
 
 object south_wall: south southern wall
-   short		the "south wall"
-   has			NO_TAB
-   plural		walls
+ short         the "south wall"
+ has           NO_TAB
+ plural        walls
 
 object east_wall: east eastern wall
-   short		the "east wall"
-   has			NO_TAB
-   plural		walls
+ short         the "east wall"
+ has           NO_TAB
+ plural        walls
 
 object west_wall: west western wall
-   short		the "west wall"
-   has			NO_TAB
-   plural		walls
+ short         the "west wall"
+ has           NO_TAB
+ plural        walls
 
 object ground: ground floor
-   short		the "ground"
-   has			SURFACE NO_TAB
+ short         the "ground"
+ has           SURFACE NO_TAB
 
 {+bootstrap
 if interpreter = CGI
@@ -8269,3 +8338,4 @@ constant maintext_colour "#fdf1e5"
 #include "menu.library"
 #include "utils.library"
 #include "verbs.library"
+#include "mapping.library"

@@ -16,8 +16,8 @@ write "Status window set to " $integer .^
 }
 
 location bedroom : master bedroom
- west		bathroom
- south		nowhere
+ west          bathroom
+ south         nowhere
 
 {look
 print:
@@ -45,8 +45,8 @@ return false
 }
 
 object bed: bed
-  short		a "bed"
-  mass		scenery
+ short         a "bed"
+ mass          scenery
 
 {look_under
 write "VERB: " verb_function ^
@@ -61,10 +61,10 @@ write "You don't find anything else.^"
 }
 
 object guide: television tv tele guide
-  short		a "television guide"
-  long		"The television guide is here.^"
-  parent	limbo
-  mass		5
+ short         a "television guide"
+ long          "The television guide is here.^"
+ parent        limbo
+ mass          5
 
 {examine : read
 write "It contains a listing of this week's programmes.^"
@@ -82,8 +82,8 @@ execute "+game_over"
 }
 
 object door : bedroom door
- short		the "bedroom door"
- has		CLOSABLE CLOSED
+ short         the "bedroom door"
+ has           CLOSABLE CLOSED
 
 {open_override
 set bedroom(south) = living_room
@@ -98,7 +98,7 @@ return false
 }
 
 location bathroom : bathroom
- east		bedroom
+ east          bedroom
 
 {look
 print:
@@ -117,11 +117,11 @@ write "The only exit from here is to the east.^"
 }
 
 object box: small wooden box
-  has		CONTAINER CLOSABLE CLOSED
-  short		a "small wooden box"
-  long		"There is a small wooden box here.^"
-  mass		25
-  quantity	20
+ has           CONTAINER CLOSABLE CLOSED
+ short         a "small wooden box"
+ long          "There is a small wooden box here.^"
+ mass          25
+ quantity      20
 
 {close_override
 write "The lid creaks as you push it closed.^"
@@ -129,18 +129,18 @@ ensure box has CLOSED
 }
 
 object note: orange note
-  short		an "orange note"
-  long		"An orange note rests on the ground.^"
-  parent 	box
-  mass		5
+ short         an "orange note"
+ long          "An orange note rests on the ground.^"
+ parent        box
+ mass          5
 
 {read : examine
 write "The note reads, ~Welcome to Jamaica and have a nice day.~^"
 }
 
 location living_room: living room
-  short		the "living room"
-  north		nowhere
+ short         the "living room"
+ north         nowhere
 
 {look
 if here has VISITED
@@ -176,8 +176,8 @@ move door to here
 }
 
 object television: television tv tele
-  short		a "television"
-  mass		scenery
+ short         a "television"
+ mass          scenery
 
 {examine
 if self has EXAMINED
@@ -205,10 +205,10 @@ write "The television is already on."
 }
 
 object rick: son boy teenager rick
-  has		ANIMATE
-  short		name "Rick"
-  long		"Rick is here, watching television.^"
-  mass		heavy
+ has           ANIMATE
+ short         name "Rick"
+ long          "Rick is here, watching television.^"
+ mass          heavy
 
 {examine
 if @ = 1
@@ -275,8 +275,8 @@ print:
 }
 
 object sofa : sofa
-   short		a "sofa"
-   has			NOT_IMPORTANT
+ short         a "sofa"
+ has           NOT_IMPORTANT
 
 #-----------------------------------------------------------------------------
 # GLOBAL FUNCTIONS 
@@ -339,10 +339,10 @@ return false
 }
 
 object kryten: myself self me
- has		ANIMATE
- short		name "yourself"
- quantity	42
- parent		bedroom
+ has           ANIMATE
+ short         name "yourself"
+ quantity      42
+ parent        bedroom
  player
 
 {examine
@@ -415,24 +415,24 @@ write "Updating user file to now use ~" password "~.^"
 }
 
 object north_wall: north north wall
- has			NO_TAB
- short          the "north wall"
+ has           NO_TAB
+ short         the "north wall"
 
 object south_wall: south southern wall
- has			NO_TAB
- short          the "south wall"
+ has           NO_TAB
+ short         the "south wall"
 
 object east_wall: east eastern wall
- has			NO_TAB
- short          the "east wall"
+ has           NO_TAB
+ short         the "east wall"
 
 object west_wall: west western wall
- has			NO_TAB
- short          the "west wall"
+ has           NO_TAB
+ short         the "west wall"
 
 object ground: ground floor
- has            SURFACE NO_TAB
- short          the "ground"
+ has           SURFACE NO_TAB
+ short         the "ground"
 
 #include "utils.library"
 #include "menu.library"

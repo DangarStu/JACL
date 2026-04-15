@@ -95,7 +95,7 @@ print:
 location boardroom
 
 object you
-  player
+ player
 
 constant title_image "none"
 constant footer_image "none"

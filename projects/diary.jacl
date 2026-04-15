@@ -361,8 +361,8 @@ restoregame rc "jacldiary.sav"
 location diary : diary
 
 object user : me myself
-  short		name "yourself"
-  player
+ short         name "yourself"
+ player
 
 integer first_day
 integer first_date

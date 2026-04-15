@@ -256,10 +256,10 @@ return false
 }
 
 object kryten: myself self me
- has		ANIMATE
- short		name "yourself"
- capacity	42
- parent		loc1
+ has           ANIMATE
+ short         name "yourself"
+ capacity      42
+ parent        loc1
  player
 
 {examine
@@ -288,28 +288,28 @@ endif
 }
 
 object north_wall: north north wall
- has			NO_TAB
- plural			walls
- short          the "north wall"
+ has           NO_TAB
+ plural        walls
+ short         the "north wall"
 
 object south_wall: south southern wall
- has			NO_TAB
- plural			walls
- short          the "south wall"
+ has           NO_TAB
+ plural        walls
+ short         the "south wall"
 
 object east_wall: east eastern wall
- has			NO_TAB
- plural			walls
- short          the "east wall"
+ has           NO_TAB
+ plural        walls
+ short         the "east wall"
 
 object west_wall: west western wall
- has			NO_TAB
- plural			walls
- short          the "west wall"
+ has           NO_TAB
+ plural        walls
+ short         the "west wall"
 
 object ground: ground floor
- has            SURFACE NO_TAB
- short          the "ground"
+ has           SURFACE NO_TAB
+ short         the "ground"
 
 integer status_window 3
 integer OFFSET
@@ -341,112 +341,112 @@ location start_of_list
 # The locations, a bit ugly...
 
 location loc1 : one
-  short		name "Location one"
+ short         name "Location one"
 
 location loc2 : two
-  short		name "Location two"
+ short         name "Location two"
 
 location loc3 : three
-  short		name "Location three"
+ short         name "Location three"
 
 location loc4 : four
-  short		name "Location four"
+ short         name "Location four"
 
 location loc5 : five
-  short		name "Location five"
+ short         name "Location five"
 
 location loc6 : six
-  short		name "Location six"
+ short         name "Location six"
 
 location loc7 : seven
-  short		name "Location seven"
+ short         name "Location seven"
 
 location loc8 : eight
-  short		name "Location eight"
+ short         name "Location eight"
 
 location loc9 : nine
-  short		name "Location nine"
+ short         name "Location nine"
 
 location loc10 : ten
-  short		name "Location ten"
+ short         name "Location ten"
 
 location loc11 : eleven
-  short		name "Location eleven"
+ short         name "Location eleven"
 
 location loc12 : tweleve
-  short		name "Location twelve"
+ short         name "Location twelve"
 
 location loc13 : thirteen
-  short		name "Location thirteen"
+ short         name "Location thirteen"
 
 location loc14 : fourteen
-  short		name "Location fourteen"
+ short         name "Location fourteen"
 
 location loc15: fifteen
-  short		name "Location fifteen"
+ short         name "Location fifteen"
 
 location loc16 : sixteen
-  short		name "Location sixteen"
+ short         name "Location sixteen"
 
 location loc17 : seventeen
-  short		name "Location seventeen"
+ short         name "Location seventeen"
 
 location loc18 : eighteen
-  short		name "Location eighteen"
+ short         name "Location eighteen"
 
 location loc19 : nineteen
-  short		name "Location nineteen"
+ short         name "Location nineteen"
 
 location loc20 : twenty
-  short		name "Location twenty"
+ short         name "Location twenty"
 
 location loc21 : twenty one
-  short		name "Location twenty one"
+ short         name "Location twenty one"
 
 location loc22 : twenty two
-  short		name "Location twenty two"
+ short         name "Location twenty two"
 
 location loc23 : twenty three
-  short		name "Location twenty three"
+ short         name "Location twenty three"
 
 location loc24 : twenty four
-  short		name "Location twenty four"
+ short         name "Location twenty four"
 
 location loc25 : twenty five
-  short		name "Location twenty five"
+ short         name "Location twenty five"
 
 location loc26 : twenty six
-  short		name "Location twenty six"
+ short         name "Location twenty six"
 
 location loc27 : twenty seven
-  short		name "Location twenty seven"
+ short         name "Location twenty seven"
 
 location loc28 : twenty eight
-  short		name "Location twenty eight"
+ short         name "Location twenty eight"
 
 location loc29 : twenty nine
-  short		name "Location twenty nine"
+ short         name "Location twenty nine"
 
 location loc30 : thirty
-  short		name "Location thirty"
+ short         name "Location thirty"
 
 location loc31 : thirty one
-  short		name "Location thirty one"
+ short         name "Location thirty one"
 
 location loc32 : thirty two
-  short		name "Location thirty two"
+ short         name "Location thirty two"
 
 location loc33 : thirty three
-  short		name "Location thirty three"
+ short         name "Location thirty three"
 
 location loc34 : thirty four
-  short		name "Location thirty four"
+ short         name "Location thirty four"
 
 location loc35 : thirty five
-  short		name "Location thirty five"
+ short         name "Location thirty five"
 
 location loc36 : thirty six
-  short		name "Location thirty six"
+ short         name "Location thirty six"
 
 integer xaxis 
 integer yaxis

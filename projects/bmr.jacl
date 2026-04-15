@@ -11,52 +11,52 @@ constant ANANSI 3
 
 #monsters
 object corpse : corpse
- short	a "corpse"
- skill		5
- stamina	8
- damage		3
+ short         a "corpse"
+ skill         5
+ stamina       8
+ damage        3
 
 object spiderlings : spiderlings
-short the "spiderlings"
-skill 7
-stamina 5
-damage 2
+ short         the "spiderlings"
+ skill         7
+ stamina       5
+ damage        2
 
 object mummified_imp:mummified imp
-short a "mummified imp"
-skill 7
-stamina 5
-damage 2
+ short         a "mummified imp"
+ skill         7
+ stamina       5
+ damage        2
 
 object vladimir:vladimir chance
-short name "Vladimir Chance"
-skill 9
-stamina 15
-damage 2
+ short         name "Vladimir Chance"
+ skill         9
+ stamina       15
+ damage        2
 
 object imps:imp horde
-short the "imp horde"
-skill 5
-stamina 8
-damage 2
+ short         the "imp horde"
+ skill         5
+ stamina       8
+ damage        2
 
 #Objects
 object helmet:helmet
-short a "copper helmet"
+ short         a "copper helmet"
 
 object sword:sword
-short a "sword"
+ short         a "sword"
 
 object shield:shield
-short a "shield"
+ short         a "shield"
 
 object machete:machete
-short a "machete"
-parent kryten
+ short         a "machete"
+ parent        kryten
 
 object dagger:dagger
-short a "dagger"
-parent kryten
+ short         a "dagger"
+ parent        kryten
 
 {+intro
 clear
@@ -163,7 +163,7 @@ look
 
 
 location section1:1
-short name 1
+ short         name 1
 
 {look
 print
@@ -205,7 +205,7 @@ look
 
 
 location section2:2
-short name 2
+ short         name 2
 
 {look
 print
@@ -226,7 +226,7 @@ look
 
 
 location section3:3
-short name 3
+ short         name 3
 
 {look
 print
@@ -245,8 +245,8 @@ look
 
 
 location section4 : 4
-short name 4
-has CantChoose
+ short         name 4
+ has           CantChoose
 
 {look
 print
@@ -263,7 +263,7 @@ look
 
 
 location spiderlingsVictory
-short name 35
+ short         name 35
 
 {look
 print
@@ -284,7 +284,7 @@ look
 
 
 location spiderlingsFail
-short name 14
+ short         name 14
 
 {look
 print
@@ -306,8 +306,8 @@ look
 
 
 location section5 : 5
-short name 5
-has CantChoose
+ short         name 5
+ has           CantChoose
 
 {look
 print
@@ -321,7 +321,7 @@ execute +TestYourLuck
 
 
 location section6:6
-short name 6
+ short         name 6
 
 {look
 print
@@ -351,7 +351,7 @@ look
 }
 
 location section7:7
-short name 7
+ short         name 7
 
 {look
 print
@@ -389,7 +389,7 @@ look
 
 
 location section8:8
-short name 8
+ short         name 8
 
 {look
 print
@@ -413,7 +413,7 @@ look
 
 
 location section9:9
-short name 9
+ short         name 9
 
 {look
 print
@@ -436,7 +436,7 @@ look
 
 
 location section10:10
-short name 10
+ short         name 10
 
 {look
 print
@@ -471,7 +471,7 @@ look
 }
 
 location section11:11
-short name 11
+ short         name 11
 
 {look
 print
@@ -496,7 +496,7 @@ look
 
 
 location section12:12
-short name 12
+ short         name 12
 
 {look
 print
@@ -528,7 +528,7 @@ look
 }
 
 location section13:13
-short name 13
+ short         name 13
 
 {look
 print
@@ -544,7 +544,7 @@ look
 
 
 location section14:14
-short name 14
+ short         name 14
 
 {look
 print
@@ -570,7 +570,7 @@ look
 
 
 location section15:15
-short name 15
+ short         name 15
 
 {look
 print
@@ -597,7 +597,7 @@ look
 
 
 location section16:16
-short name 16
+ short         name 16
 
 {look
 print
@@ -624,7 +624,7 @@ look
 
 
 location section17:17
-short name 17
+ short         name 17
 
 {look
 print
@@ -651,7 +651,7 @@ look
 
 
 location section18:18
-short name 18
+ short         name 18
 
 {look
 print
@@ -672,7 +672,7 @@ look
 
 
 location section19:19
-short name 19
+ short         name 19
 
 {look
 print
@@ -698,7 +698,7 @@ endif
 
 
 location section20:20
-short name 20
+ short         name 20
 
 {look
 print
@@ -719,7 +719,7 @@ look
 
 
 location section21:21
-short name 21
+ short         name 21
 
 {look
 print
@@ -744,7 +744,7 @@ look
 
 
 location section22:22
-short name 22
+ short         name 22
 
 {look
 print
@@ -783,7 +783,7 @@ look
 
 
 location section23:23
-short name 23
+ short         name 23
 
 {look
 print
@@ -805,7 +805,7 @@ look
 
 
 location section24:24
-short name 24
+ short         name 24
 
 {look
 print
@@ -833,8 +833,8 @@ look
 
 
 location section25:25
-short name 25
-has CantChoose
+ short         name 25
+ has           CantChoose
 
 {look
 print
@@ -855,7 +855,7 @@ endgame
 
 
 location section26:26
-short name 26
+ short         name 26
 
 {look
 print
@@ -882,7 +882,7 @@ look
 
 
 location section27:27
-short name 27
+ short         name 27
 
 {look
 print
@@ -910,7 +910,7 @@ look
 
 
 location section28:28
-short name 28
+ short         name 28
 
 {look
 print
@@ -934,7 +934,7 @@ look
 
 
 location section29:29
-short name 29
+ short         name 29
 
 {look
 print
@@ -961,7 +961,7 @@ look
 
 
 location section30:30
-short name 30
+ short         name 30
 
 {look
 print
@@ -988,7 +988,7 @@ look
 
 
 location section31:31
-short name 31
+ short         name 31
 
 {look
 print
@@ -1013,7 +1013,7 @@ look
 
 
 location section32:32
-short name 32
+ short         name 32
 
 {look
 print
@@ -1046,7 +1046,7 @@ look
 
 
 location section33:33
-short name 33
+ short         name 33
 
 {look
 print
@@ -1073,7 +1073,7 @@ look
 
 
 location section34:34
-short name 34
+ short         name 34
 
 {look
 print
@@ -1096,7 +1096,7 @@ look
 
 
 location section35:35
-short name 35
+ short         name 35
 
 {look
 print
@@ -1123,7 +1123,7 @@ look
 
 
 location section36:36
-short name 36
+ short         name 36
 
 {look
 print
@@ -1150,7 +1150,7 @@ look
 
 
 location section37:37
-short name 37
+ short         name 37
 
 {look
 print
@@ -1171,7 +1171,7 @@ look
 
 
 location section38:38
-short name 38
+ short         name 38
 
 {look
 print
@@ -1204,8 +1204,8 @@ endif
 
 
 location section39:39
-short name 39
-has CantChoose
+ short         name 39
+ has           CantChoose
 
 {look
 print
@@ -1218,7 +1218,7 @@ execute +TestYourLuck
 
 
 location section40:40
-short name 40
+ short         name 40
 
 {look
 print
@@ -1245,7 +1245,7 @@ look
 
 
 location section41:41
-short name 41
+ short         name 41
 
 {look
 print
@@ -1275,7 +1275,7 @@ look
 
 
 location section42:42
-short name 42
+ short         name 42
 
 {look
 print
@@ -1299,8 +1299,8 @@ look
 
 
 location section44:44
-short name 44
-has CantChoose
+ short         name 44
+ has           CantChoose
 
 {look
 print
@@ -1313,8 +1313,8 @@ execute +TestYourSkill
 
 
 location section45:45
-short name 45
-has CantChoose
+ short         name 45
+ has           CantChoose
 
 {look
 print
@@ -1330,7 +1330,7 @@ execute +TestYourSkill
 
 
 location section46:46
-short name 46
+ short         name 46
 
 {look
 print
@@ -1359,7 +1359,7 @@ look
 
 
 location section47:47
-short name 47
+ short         name 47
 
 {look
 print
@@ -1376,7 +1376,7 @@ look
 
 
 location section48:48
-short name 48
+ short         name 48
 
 {look
 print
@@ -1427,7 +1427,7 @@ look
 
 
 location section49:49
-short name 49
+ short         name 49
 
 {look
 print
@@ -1448,8 +1448,8 @@ look
 
 
 location section50:50
-short name 50
-has CantChoose
+ short         name 50
+ has           CantChoose
 
 {look
 print
@@ -1464,7 +1464,7 @@ look
 
 
 location section52:52
-short name 52
+ short         name 52
 
 {look
 print
@@ -1487,7 +1487,7 @@ look
 
 
 location ImpsVictory:impsvictory
-short name 52
+ short         name 52
 
 {look
 print
@@ -1508,8 +1508,8 @@ look
 
 
 location ImpsFail:impsfail
-short name 52
-has CantChoose
+ short         name 52
+ has           CantChoose
 
 {look
 execute +ResetCombat
@@ -1519,8 +1519,8 @@ look
 
 
 location section58:58
-short name 58
-has CantChoose
+ short         name 58
+ has           CantChoose
 
 {look
 print
@@ -1531,7 +1531,7 @@ execute +game_over
 
 
 location section62:62
-short name 62
+ short         name 62
 
 {look
 print
@@ -1555,8 +1555,8 @@ look
 
 
 location section67:67
-short name 67
-has CantChoose
+ short         name 67
+ has           CantChoose
 
 {look
 print
@@ -1570,7 +1570,7 @@ execute +TestYourSkill
 
 
 location section70:70
-short name 70
+ short         name 70
 
 
 {look
@@ -1599,12 +1599,12 @@ look
 
 
 object kryten: kryten
- has		ANIMATE
- short		name "yourself"
- long		"Odly, you see yourself standing here."
- capacity	42
- parent 	section1
- damage		2
+ has           ANIMATE
+ short         name "yourself"
+ long          "Odly, you see yourself standing here."
+ capacity      42
+ parent        section1
+ damage        2
  player
 
 constant title_image "none"

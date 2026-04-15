@@ -41,8 +41,8 @@ look
 }
 
 location cell: cell
-short the "cell"
-region Cellars
+ short         the "cell"
+ region        Cellars
 
 {look
 write "This is a typical cell, with completely unmarked floor and ceiling, and the only piece of furniture is a bed in the northwestern corner. The door of the cell stands "
@@ -71,7 +71,7 @@ endif
 }
 
 object bed: bed
-mass 100
+ mass          100
 
 {examine
 if @bed.lie_on = 0
@@ -173,17 +173,17 @@ endif
 }
 
 object leg: leg of the bed
-short a "leg of the bed"
-long "A piece of metal, sharp on one end and wide on the other, lies on the ground. It used to be one of the legs of a bed.^"
+ short         a "leg of the bed"
+ long          "A piece of metal, sharp on one end and wide on the other, lies on the ground. It used to be one of the legs of a bed.^"
 
 {examine
 write "This is one of the legs of the bed that has been cleanly cut off the frame of the bed itself.^"
 }
 
 object drawing: picture drawing 
-has NOT_IMPORTANT
-short the "drawing"
-parent limbo
+ has           NOT_IMPORTANT
+ short         the "drawing"
+ parent        limbo
 
 {examine
 write "It's a perfectly drawn picture of a fully blossomed flower, with four petals surrounding it. Strangely, the flower is indicated with an open lock, and the petals each have the symbol of one of the main four elements; ~fire~, ~water~, ~air~ and ~earth~.^"
@@ -191,8 +191,8 @@ write "Below it is written, ~Patience, trial and error are the keys to find the 
 }
 
 object fire_symbol: symbol of fire
-short the "petal having the symbol of fire upon it"
-parent drawing
+ short         the "petal having the symbol of fire upon it"
+ parent        drawing
 
 {examine
 write "This is a petal, and the symbol of fire is drawn in it's center.^"
@@ -212,8 +212,8 @@ execute fire_symbol.push
 }
 
 object earth_symbol: symbol of earth
-short the "petal having the symbol of earth upon it"
-parent drawing
+ short         the "petal having the symbol of earth upon it"
+ parent        drawing
 
 {examine
 write "This is a petal, and the symbol of earth is drawn in it's center.^"
@@ -237,8 +237,8 @@ execute earth_symbol.push
 }
 
 object water_symbol: symbol of water
-short the "petal having the symbol of water upon it"
-parent drawing
+ short         the "petal having the symbol of water upon it"
+ parent        drawing
 
 {examine
 write "This is a petal, and the symbol of water is drawn in it's center.^"
@@ -267,8 +267,8 @@ execute water_symbol.push
 }
 
 object air_symbol: symbol of air
-short the "petal having the symbol of air upon it"
-parent drawing
+ short         the "petal having the symbol of air upon it"
+ parent        drawing
 
 {examine
 write "This is a petal, and the symbol of air is drawn in it's center.^"
@@ -303,8 +303,8 @@ execute air_symbol.push
 }
 
 object lock_symbol: symbol of lock flower
-short the "flower having an open lock upon it"
-parent drawing
+ short         the "flower having an open lock upon it"
+ parent        drawing
 
 {examine
 write "This is a flower, the center of the drawing, and an open lock is drawn on it.^"
@@ -342,19 +342,19 @@ execute lock_symbol.push
 }
 
 object box: box
-has CLOSED CLOSABLE CONTAINER
-mass heavy
-short a "box"
-long "A box, made of the same material you see everywhere lies on the ground.^"
-parent limbo
+ has           CLOSED CLOSABLE CONTAINER
+ mass          heavy
+ short         a "box"
+ long          "A box, made of the same material you see everywhere lies on the ground.^"
+ parent        limbo
 
 {examine
 write "It's a box, made of a transparent colorless material, like the rest of this place, although there is one tiny difference, which appears huge to your eyes that are so used to the oneness of the whole place: it is in a darker shade. It doesn't still have a color, exactly, but it still seems not to reflect the light as much as other things do."
 }
 
 object ball: mystical ball
-short a "round, glowing ball"
-parent box
+ short         a "round, glowing ball"
+ parent        box
 
 {examine
 write "Clouds of smoke seem to swirl beneath the surface, drawing you, mesmerizing you, pulling you within...^^"
@@ -374,11 +374,11 @@ end
 
 
 object girl : girl eria
-has ANIMATE FEMALE
-short the "girl"
-long function
-mass 99
-parent cell
+ has           ANIMATE FEMALE
+ short         the "girl"
+ long          function
+ mass          99
+ parent        cell
 
 {long
 if this(parent) = cell
@@ -462,21 +462,21 @@ execute +menu_prompt<talk_to_girl
 }
 
 object home : home
-parent limbo
+ parent        limbo
 
 object returning : returning
-parent limbo
+ parent        limbo
 
 location pit2: "open space under the bed"
-short the "open space under the bed"
-region Cellars
+ short         the "open space under the bed"
+ region        Cellars
 
 {look
 write "You are in a circular pit, about six feet tall and two feet across. Something seems to be written on the wall at the height of your chest, and it is the only feature of the colorless walls that surround you.^"
 }
 
 object writing2: writing inscription
-short the "writing"
+ short         the "writing"
 
 {examine
 write "Three numbers are written on the wall, each having a different color than the rest. In red is written the number ~8~, and the number ~4~ is in blue, while the last number, ~3~, is green.^"
@@ -487,10 +487,10 @@ execute this.examine
 }
 
 location chamber : Chamber
-short the "chamber"
-west empty_room
-north corridor
-region Cellars
+ short         the "chamber"
+ west          empty_room
+ north         corridor
+ region        Cellars
 
 {look
 print
@@ -569,9 +569,9 @@ endif
 
 
 location empty_room: big empty room
-short the "big empty room"
-east chamber
-region Cellars
+ short         the "big empty room"
+ east          chamber
+ region        Cellars
 
 
 {look
@@ -624,7 +624,7 @@ endif
 
 
 object EDoor: "east door" door
-short the "east door"
+ short         the "east door"
 
 
 {examine
@@ -637,7 +637,7 @@ endif
 
 
 object spot: higher portion spot floor section bump ground
-short the "higher portion of the floor"
+ short         the "higher portion of the floor"
 
 
 {examine
@@ -666,10 +666,10 @@ endif
 integer Shaped false
 
 object loose_point: loose point piece of floor
-short the "loose point of the floor"
-long function
-mass 10
-parent limbo
+ short         the "loose point of the floor"
+ long          function
+ mass          10
+ parent        limbo
 
 
 {examine
@@ -745,11 +745,11 @@ endif
 }
 
 object dagger: dagger knife
-short a "dagger"
-long function
-parent limbo
-mass 5
-has WEAPON
+ short         a "dagger"
+ long          function
+ parent        limbo
+ mass          5
+ has           WEAPON
 
 {examine
 write "So sharp, and so nicely-balanced piece of art."
@@ -788,7 +788,7 @@ endif
 }
 
 object hole: hole
-parent limbo
+ parent        limbo
 
 
 {examine
@@ -812,9 +812,9 @@ endif
 
 
 object scraps: scraps "scraps of metal" scrap
-short some "scraps of metal"
-parent hole
-has PLURAL
+ short         some "scraps of metal"
+ parent        hole
+ has           PLURAL
 
 {examine
 write "They are, as you guess, just some scraps of useless junk, which are "
@@ -835,10 +835,10 @@ write "The hole is completely filled up and you can't get a clear view of what i
 
 
 object clothes: clothes coat
-short your "clothes"
-has WEARABLE WORN PLURAL
-mass 1
-parent john
+ short         your "clothes"
+ has           WEARABLE WORN PLURAL
+ mass          1
+ parent        john
 
 {examine
 if loose_point has WORN
@@ -873,10 +873,10 @@ set cloth(parent) = player
 
 
 object cloth: small cloth of piece torn
-short a "piece of cloth"
-long "A piece of cloth lies on the ground.^"
-mass 0
-parent limbo
+ short         a "piece of cloth"
+ long          "A piece of cloth lies on the ground.^"
+ mass          0
+ parent        limbo
 
 
 {examine
@@ -884,10 +884,10 @@ write "It's a piece of cloth, torn from a coat that seems to be very expensive.^
 }
 
 location corridor : Corridor
-short the "Corridor"
-south chamber
-north midair
-region Cellars
+ short         the "Corridor"
+ south         chamber
+ north         midair
+ region        Cellars
 
 {look
 write "This corridor stretches to north and south, and you remember this room as the first room you saw when your sight started blurring. Yes. It all began from the chamber south of here. Other than that, the room is naked, empty, and bare, like the rest of the place."
@@ -937,17 +937,17 @@ return false
 }
 
 object pit : liquid fire pit flame flames
-has NOT_IMPORTANT
-short the "fire pit"
+ has           NOT_IMPORTANT
+ short         the "fire pit"
 
 {examine
 write "It's a circular opening in the floor, and liquid fire pours out of it with such intensity that you can see the tongues of flame licking the ceiling. It makes an almost thick wall of flame that blocks your way, extending from wall to wall, and floor to ceiling.^"
 }
 
 location midair: in midair
-short name "In mid air"
-has MID_AIR
-region Cellars
+ short         name "In mid air"
+ has           MID_AIR
+ region        Cellars
 
 {look
 write "You are"
@@ -1051,9 +1051,9 @@ endif
 }
 
 location guard_room: guard room
-short the "guard room"
-north cells
-region Cellars
+ short         the "guard room"
+ north         cells
+ region        Cellars
 
 {look
 write "The room consists of a wooden chair, a wooden table, and a lot of debris that seem to be thrown around in no particular order. The most out-of-place feature in this room is a doorframe to the north that leads to the cells north of you, seeming to be left in the middle of construction. This is the first room you have seen here that is not empty. Colorless, but not empty."
@@ -1088,7 +1088,7 @@ endif
 }
 
 object doorframe: "wooden door frame" door frame doorframe
-has NOT_IMPORTANT
+ has           NOT_IMPORTANT
 
 {examine
 write "Completely smooth, colorless, and seeming to be quickly built. The doorframe is completed, there are even three hinges set on the door,"
@@ -1189,7 +1189,7 @@ return false
 
 
 object table: wooden table
-has NOT_IMPORTANT
+ has           NOT_IMPORTANT
 
 {examine
 write "The table is plain and although it has no color, it's visible that no one has ever used it. There are no lines, no scratches, no handprints... nothing. It is so clean and strange that you don't even dare touch it yourself.^"
@@ -1216,8 +1216,8 @@ endif
 }
 
 object writing: writing
-short the "writing on the ground"
-parent limbo
+ short         the "writing on the ground"
+ parent        limbo
 
 {examine
 write "It is a writing, and strangely enough, it's written in English -- in an awful handwriting.^"
@@ -1236,9 +1236,9 @@ style normal
 }
 
 location cells: cells
-short the "cells"
-south nowhere
-region Cellars
+ short         the "cells"
+ south         nowhere
+ region        Cellars
 
 integer cx 0
 integer cy 0
@@ -1348,8 +1348,8 @@ write "It's simple: find the cell that you think has the correct word written be
 }
 
 object lock:lock
-short the "lock"
-parent cells
+ short         the "lock"
+ parent        cells
 
 {examine
 write "They are almost taller than you, and wider. You wonder how many people it would take to open one of these locks. Other than their heavy look and plain surface, they are completely featureless."
@@ -1408,10 +1408,10 @@ endif
 }
 
 object john: myself self me
-has		ANIMATE
-short		name "yourself"
-quantity	42
-parent cell
+ has           ANIMATE
+ short         name "yourself"
+ quantity      42
+ parent        cell
 player
 
 
@@ -1446,16 +1446,16 @@ endif
 }
 
 object north_wall: north north wall
-short          the "north wall"
-has NO_TAB PLURAL
+ short         the "north wall"
+ has           NO_TAB PLURAL
 
 object south_wall: south southern wall
-short          the "south wall"
-has NO_TAB PLURAL
+ short         the "south wall"
+ has           NO_TAB PLURAL
 
 object east_wall: east eastern wall
-short          the "east wall"
-has NO_TAB PLURAL
+ short         the "east wall"
+ has           NO_TAB PLURAL
 
 {examine
 ifall player(parent) = cell : girl(parent) != cell
@@ -1468,14 +1468,14 @@ endif
 
 
 object west_wall: west western wall
-short          the "west wall"
-has NO_TAB PLURAL
+ short         the "west wall"
+ has           NO_TAB PLURAL
 
 
 object ground: ground floor
-has            SURFACE
-short          the "ground"
-has NO_TAB
+ has           SURFACE
+ short         the "ground"
+ has           NO_TAB
 
 
 {examine
@@ -1489,7 +1489,7 @@ endif
 
 
 object ceiling: ceiling
-short the "ceiling"
+ short         the "ceiling"
 
 
 {examine

@@ -484,20 +484,20 @@ return false
 
 
 object sophiejeanne: sophie-jeanne sophie jeanne
- has          ANIMATE POSSESSIVE FEMALE 
- short        name "Sophie-Jeanne"  
- long       write "Sophie-Jeanne" 
- mass       heavy 
- quantity     20 
+ has           ANIMATE POSSESSIVE FEMALE
+ short         name "Sophie-Jeanne"
+ long          write "Sophie-Jeanne"
+ mass          heavy
+ quantity      20
 
 
 object kryten: kryten myself self me moi moi-même moi-meme joueur souliers terreux 
- has        ANIMATE
- short      name "moi"
+ has           ANIMATE
+ short         name "moi"
  capacity      42
- mass       scenery
- parent          magasin1
- player  
+ mass          scenery
+ parent        magasin1
+ player
 
 {examine
 write "Vous êtes comme d'habitude : habillé comme un commis, avec de gros souliers limite terreux et des habits trop grands pour vous. Une blouse terne vient compléter le tableau.^^"
@@ -528,12 +528,12 @@ endif
 
 
 object blouse: blouse grise terne graisse
- has        WEARABLE FEMALE WORN CONTAINER
- short       une "blouse"
- long       function
+ has           WEARABLE FEMALE WORN CONTAINER
+ short         une "blouse"
+ long          function
  definite      la
- parent       kryten
- mass       2
+ parent        kryten
+ mass          2
 
 {long
     proxy "examine blouse"
@@ -548,22 +548,22 @@ object blouse: blouse grise terne graisse
 
 
 object poche: petite poche mauve 
- has        FEMALE CONTAINER 
- short       une "poche" 
- long       "Une poche." 
- definite      la 
- parent      blouse 
- mass       2 
+ has           FEMALE CONTAINER
+ short         une "poche"
+ long          "Une poche."
+ definite      la
+ parent        blouse
+ mass          2
  
 
 
 object bonnet: petit bonnet rouge
- has        WEARABLE
- short      un "bonnet"
- long       long
+ has           WEARABLE
+ short         un "bonnet"
+ long          long
  definite      le
- parent       poche
- mass       1
+ parent        poche
+ mass          1
 
 {long
     proxy "examine bonnet"
@@ -590,10 +590,12 @@ object bonnet: petit bonnet rouge
 ## Grand Magasin ##
 
 location magasin1: grand magasin fond
-  short     name "Le Grand Magasin"
-  has         BOUTIQUE
-  east        magasin2
-  south        arriereboutique
+ short         name "Le Grand Magasin"
+ has           BOUTIQUE
+ east          magasin2
+ south         arriereboutique
+ x             1
+ y             1
 
 {look
 if here hasnt VISITED
@@ -619,10 +621,10 @@ endall
 
 
 object lucien: lucien homme garcon garçon collègue collegue ami lui lui-même lui-meme 
- has            ANIMATE POSSESSIVE
- long        function
- short       name "Lucien"
- mass       heavy 
+ has           ANIMATE POSSESSIVE
+ long          function
+ short         name "Lucien"
+ mass          heavy
  quantity      20
  
 #TODO : il faut utiliser 2 versions : avec accents et sans
@@ -862,11 +864,13 @@ endif
 
 
 location magasin2: grand magasin
-  short     name "Le Grand Magasin"
-  has         BOUTIQUE
-  west         magasin1
-  north     devantmagasin
-  out        devantmagasin
+ short         name "Le Grand Magasin"
+ has           BOUTIQUE
+ west          magasin1
+ north         devantmagasin
+ out           devantmagasin
+ x             2
+ y             1
 
 {look
 if here hasnt VISITED
@@ -887,10 +891,10 @@ endif
 # TODO : bug "sortir" ne fonctionne pas
 
 object frisoni: femme dame madame patronne harpie frisoni habits costume jupe velour dentelles
- has        ANIMATE FEMALE POSSESSIVE
- long        function
- short       name "Madame Frisoni"
- mass       heavy 
+ has           ANIMATE FEMALE POSSESSIVE
+ long          function
+ short         name "Madame Frisoni"
+ mass          heavy
  quantity      20
 
 
@@ -948,11 +952,11 @@ if self has OUT_OF_REACH
 
 
 object marchandises: produits marchandises cartons carton caisses caisse confiseries bijoux outils ustensiles ménager bonbons devanture
- has        FEMALE PLURAL 
- short        des "marchandises"
- long      "Diverses marchandises remplissent cette pièce.^"
+ has           FEMALE PLURAL
+ short         des "marchandises"
+ long          "Diverses marchandises remplissent cette pièce.^"
  definite      les
- mass      25
+ mass          25
  
 {show_to_lucien
   write "« Hé oui, un jour ou l'autre il faudra que l'on livre une de ces cochonneries... »^"
@@ -977,10 +981,12 @@ object marchandises: produits marchandises cartons carton caisses caisse confise
 # Arrière boutique
 
 location arriereboutique: arriere boutique remise depot entrepot entrepôt
-  short       name "L'arrière-boutique"
-  has         BOUTIQUE
-  north      magasin1 
-  south      quai
+ short         name "L'arrière-boutique"
+ has           BOUTIQUE
+ north         magasin1
+ south         quai
+ x             1
+ y             2
 
 {look
 if here hasnt VISITED
@@ -992,11 +998,11 @@ endif
 
 
 object demodulateur: appareil demodulateur démodulateur de rechange machine demod bourdonnement grésillement lumière lumiere bleue bleu
- short      un "démodulateur"
- long         function
- parent       arriereboutique
+ short         un "démodulateur"
+ long          function
+ parent        arriereboutique
  definite      le
- mass         75
+ mass          75
 
 {long:
     proxy "examine demodulateur"
@@ -1075,17 +1081,17 @@ endif
 # Le quai
 
 location quai: quai embarquement dechargement déchargement
-  short       name "Le quai de déchargement"
-  north        arriereboutique
-  
-  
+ short         name "Le quai de déchargement"
+ north         arriereboutique
+ x             1
+ y             3
 object camionnette: camion frigo frigorifique fourgonette camionnette vehicule véhicule couleurs chatoyantes
-  has CONTAINER CLOSABLE CLOSED SURFACE
-  capacity    400
-    mass        heavy
-   definite    le
- short        un "camion frigorifique"
- long        function
+ has           CONTAINER CLOSABLE CLOSED SURFACE
+ capacity      400
+ mass          heavy
+ definite      le
+ short         un "camion frigorifique"
+ long          function
  
 {long
 if here = quai
@@ -1140,23 +1146,23 @@ else
 
 
 object lettres: lettres lettre rouges oranges rouge orange 
- has        FEMALE PLURAL 
- short        des "lettres"
- long        "Des lettres pimpantes formant le logo de Frisoni & fils.^"
+ has           FEMALE PLURAL
+ short         des "lettres"
+ long          "Des lettres pimpantes formant le logo de Frisoni & fils.^"
  definite      les
- parent      quai
- mass        scenery
+ parent        quai
+ mass          scenery
 
 {read
   write "« Fr soni & fils - Merc rie, Dr  uerie et Quinc  lle. Les    duits   mme dans l  r clame ! »^"
 }
 
 object radio: radio tsf poste
- has            FEMALE
- short      une "radio"
- long        "Une vieille radio équipe la cabine de ce camion.^"  
- definite       la
- parent       camion
+ has           FEMALE
+ short         une "radio"
+ long          "Une vieille radio équipe la cabine de ce camion.^"
+ definite      la
+ parent        camion
  mass          scenery
 
 {turn_on : turn_off : use : listen
@@ -1167,16 +1173,19 @@ object radio: radio tsf poste
 # FAKE object 
 
 location camion: quai embarquement dechargement déchargement cabine volant sièges sieges siege vitre pare-brise
-  short       name "Le camion"
- 
+ short         name "Le camion"
+ x             2
+ y             3
 
   
 # Devant le magasin
 
 location devantmagasin: devant le grand magasin dehors out pancarte enseigne tele televiseur téléviseur télévision rue television tv enfants velocycles vélocycles piétons pietons navettes dalles granit
-  short       name "Devant le Grand Magasin"
-  south        magasin2 
-  in        magasin2
+ short         name "Devant le Grand Magasin"
+ south         magasin2
+ in            magasin2
+ x             2
+ y             0
 
 {look
 if here hasnt VISITED
@@ -1211,12 +1220,12 @@ return false
 
 
 object bille: bille, balle, boule, billes, balles, boules
-  has         FEMALE
-  mass         1
-  definite     la
-  parent    limbo
-  short        une "bille en métal"
-  long        "Une bille en métal brille sur le sol.^"
+ has           FEMALE
+ mass          1
+ definite      la
+ parent        limbo
+ short         une "bille en métal"
+ long          "Une bille en métal brille sur le sol.^"
  
 {throw_at_camion 
 if camion has BREAKED
@@ -1268,25 +1277,25 @@ else
 }
 
 object bague: cercle, cerceau, bague, arceau, rondelle
-  has         FEMALE
-  mass         1
-  definite     la
-  parent    limbo
-  short        une "bague en métal"
-  long        "Une bague en métal se trouve par terre.^"
+ has           FEMALE
+ mass          1
+ definite      la
+ parent        limbo
+ short         une "bague en métal"
+ long          "Une bague en métal se trouve par terre.^"
   
 {examine 
   write "C'est une grosse bague en acier qui retenait les billes du roulement de la planche à roulettes.^"
 }
 
 object planche: planche roulettes roulette roues roue roulement
-  has        SURFACE
-  capacity      12
-  mass       4
-   definite    la
-   parent    devantmagasin
- short        une "planche a roulettes"
- long        function
+ has           SURFACE
+ capacity      12
+ mass          4
+ definite      la
+ parent        devantmagasin
+ short         une "planche a roulettes"
+ long          function
  
  {long
  if planche(parent) = devantmagasin
@@ -1344,9 +1353,10 @@ if planche has BREAKED
 # La campagne
 
 location campagne: campagne dehors
-  short       name "La campagne."
-  east        arriereboutique
-  
+ short         name "La campagne."
+ east          arriereboutique
+ x             0
+ y             2
 {look
 write "Vous êtes en rase campagne. Quelques usines parsèment deci delà la route, en bordure des champs ou des bosquets."
 }
@@ -1355,8 +1365,10 @@ write "Vous êtes en rase campagne. Quelques usines parsèment deci delà la rou
 # La foret
 
 location foret: foret
-  short       name "Dans la forêt"
-  east        retour
+ short         name "Dans la forêt"
+ east          retour
+ x             4
+ y             1
 
 {look
 write "La forêt recouvre encore une partie du territoire, mais souvent il s'agit de quelques points de verdure clairsemée, qui donne l'impression que l'homme s'intéresse encore à la nature. Pourtant dans les faits, l'homme de ce siècle est entièrement tourné vers les sciences et le social. La ville et ses mystères modernes se trouvent vers l'est.^"
@@ -1366,8 +1378,10 @@ write "La forêt recouvre encore une partie du territoire, mais souvent il s'agi
 # La clairière
 
 location clairiere: clairiere
-  short       name "Dans la clairière"
-  east        retour
+ short         name "Dans la clairière"
+ east          retour
+ x             5
+ y             0
 
 {look
 write "C'est vraiment une clairière sinistre. Vous pouvez la quitter en allant vers l'est.^"
@@ -1380,8 +1394,10 @@ write "C'est vraiment une clairière sinistre. Vous pouvez la quitter en allant 
 # Le cottage
 
 location cottage: cottage
-  short       name "Près du cottage"
-  east        retour
+ short         name "Près du cottage"
+ east          retour
+ x             5
+ y             2
 
 {look
 write "Un fort beau cottage, à l'image des autres que l'on peut trouver dans ce village, embellit le paysage de sa présence rassurante.^"
@@ -1395,16 +1411,18 @@ write "Un fort beau cottage, à l'image des autres que l'on peut trouver dans ce
 
 
 object route: route chemin voie 
- has               SURFACE FEMALE
- short          une "route"
- definite       la
+ has           SURFACE FEMALE
+ short         une "route"
+ definite      la
 
 
 # Le retour
 
 location retour: retour    
-  short         name "Retour en ville"
-  west        foret
+ short         name "Retour en ville"
+ west          foret
+ x             6
+ y             1
 
 integer CONCLUSION
 
@@ -1419,9 +1437,9 @@ integer CONCLUSION
     
 
 object ground: ground sol carrelage
- has            SURFACE NO_TAB
- short          un "sol"
- definite        le
+ has           SURFACE NO_TAB
+ short         un "sol"
+ definite      le
 
 integer status_window 3
 integer OFFSET
@@ -1469,6 +1487,7 @@ constant maintext_colour "#dedede"
 #include "npc.library"
 #include "utils.library"
 #include "french_verbs.library"
+#include "mapping.library"
 
 
 # TODO : voir pour ^ à la fin de la description "long" en fct des objets

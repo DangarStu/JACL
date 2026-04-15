@@ -1,8 +1,8 @@
 location sea 
 
 object i
-  velocity	5
-  player
+ velocity      5
+ player
 
 {+west
 set i(bearing) - 15

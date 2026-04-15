@@ -6,19 +6,19 @@ constant game_version	1
 
 
 location street : street
-   has		OUTDOORS
-   short	the "street"
-   down		sewer
+ has           OUTDOORS
+ short         the "street"
+ down          sewer
 
 {look
 write "You are in the street. The sewer is below you.^"
 }
 
 object flowers : flowers
-   has		PLURAL
-   short	some "flowers"
-   long		"There are some flowers here.^"
-   mass		2
+ has           PLURAL
+ short         some "flowers"
+ long          "There are some flowers here.^"
+ mass          2
 
 {smell
 if here = sewer
@@ -30,23 +30,23 @@ write "They smell wonderful.^"
 }
 
 object spacesuit : spacesuit space suit 
-   has		WEARABLE
-   short	a "spacesuit"
-   long		"A spacesuit rests nearby.^"
-   mass		5
+ has           WEARABLE
+ short         a "spacesuit"
+ long          "A spacesuit rests nearby.^"
+ mass          5
 
 location sewer : sewer
-   short	the "sewer"
-   up		street
+ short         the "sewer"
+ up            street
 
 {look
 write "You are in the sewer. The street is above you.^"
 }
 
 object sewage : sewage
-   short	some "sewage"
-   long		"Sewage flows through here.^"
-   mass		heavy
+ short         some "sewage"
+ long          "Sewage flows through here.^"
+ mass          heavy
  
 {smell
 write "It reeks.^"
@@ -70,10 +70,10 @@ look
 }
 
 object kryten: myself self me
- has		ANIMATE
- short		name "yourself"
- quantity	42
- parent		street
+ has           ANIMATE
+ short         name "yourself"
+ quantity      42
+ parent        street
  player
 
 {examine

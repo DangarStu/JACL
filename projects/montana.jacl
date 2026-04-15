@@ -17,7 +17,9 @@ constant maintext_colour "#f0ece4"
 # -----------------------------------------------------------------------------
 
 location cabaña : cabaña casa refugio
-  short		name "Cabaña"
+ short         name "Cabaña"
+ x             2
+ y             0
 
 {look
 write "Estás dentro de una pequeña cabaña de madera en las montañas. "
@@ -41,9 +43,9 @@ return false
 }
 
 object puerta : puerta
-  short		una "puerta de madera"
-  has		CLOSABLE CLOSED
-  mass		scenery
+ short         una "puerta de madera"
+ has           CLOSABLE CLOSED
+ mass          scenery
 
 {examine
 if puerta has CLOSED
@@ -68,8 +70,8 @@ set sendero(north) = nowhere
 }
 
 object chimenea : chimenea fogón fuego
-  short		una "chimenea de piedra"
-  mass		scenery
+ short         una "chimenea de piedra"
+ mass          scenery
 
 {examine
 write "Una chimenea construida con piedras del río. "
@@ -77,17 +79,17 @@ write "Todavía hay brasas calientes de anoche. El calor se siente agradable.^"
 }
 
 object mesa_cabaña : mesa rústica
-  short		una "mesa rústica"
-  has		SURFACE
-  mass		scenery
+ short         una "mesa rústica"
+ has           SURFACE
+ mass          scenery
 
 {examine
 write "Una mesa hecha de tablones de madera sin pulir. Tiene marcas de uso y algunas quemaduras.^"
 }
 
 object ventana : ventana
-  short		una "ventana"
-  mass		scenery
+ short         una "ventana"
+ mass          scenery
 
 {examine
 write "A través de la ventana puedes ver el bosque de araucarias "
@@ -95,10 +97,10 @@ write "y, a lo lejos, la silueta de un volcán cubierto de nieve.^"
 }
 
 object taza : taza mate
-  short		una "taza de mate"
-  long		"Una taza de mate está sobre la mesa.^"
-  parent	mesa_cabaña
-  mass		5
+ short         una "taza de mate"
+ long          "Una taza de mate está sobre la mesa.^"
+ parent        mesa_cabaña
+ mass          5
 
 {examine
 write "Una taza de cerámica con mate caliente. El aroma de las hierbas es reconfortante.^"
@@ -111,10 +113,12 @@ write "Tomas un sorbo de mate. Está amargo pero te da energía para el día.^"
 # -----------------------------------------------------------------------------
 
 location sendero : sendero camino
-  short		name "Sendero"
-  has		OUTDOORS
-  west		bosque
-  south		mirador
+ short         name "Sendero"
+ has           OUTDOORS
+ west          bosque
+ south         mirador
+ x             1
+ y             0
 
 {look
 print:
@@ -128,16 +132,16 @@ print:
 }
 
 object arbustos : arbustos plantas
-  short		name "arbustos"
-  mass		scenery
+ short         name "arbustos"
+ mass          scenery
 
 {examine
 write "Arbustos nativos con pequeñas bayas rojas. Algunos tienen flores amarillas.^"
 }
 
 object flores : flores silvestres
-  short		unas "flores silvestres"
-  mass		scenery
+ short         unas "flores silvestres"
+ mass          scenery
 
 {examine
 write "Flores silvestres de colores vivos: rojas, amarillas y violetas. "
@@ -154,9 +158,9 @@ write "Las flores tienen un perfume dulce y delicado.^"
 }
 
 object mariposas : mariposas
-  short		unas "mariposas"
-  has		ANIMATE
-  mass		scenery
+ short         unas "mariposas"
+ has           ANIMATE
+ mass          scenery
 
 {examine
 write "Mariposas de colores brillantes vuelan entre las flores. "
@@ -171,9 +175,11 @@ set time = false
 # -----------------------------------------------------------------------------
 
 location bosque : bosque araucarias
-  short		name "Bosque"
-  has		OUTDOORS
-  east		sendero
+ short         name "Bosque"
+ has           OUTDOORS
+ east          sendero
+ x             0
+ y             0
 
 {look
 print:
@@ -187,8 +193,8 @@ print:
 }
 
 object araucarias : araucarias árboles
-  short		unas "araucarias"
-  mass		scenery
+ short         unas "araucarias"
+ mass          scenery
 
 {examine
 write "Las araucarias son árboles milenarios con troncos gruesos y rectos. "
@@ -197,9 +203,9 @@ write "Son árboles sagrados para el pueblo mapuche.^"
 }
 
 object piñones : piñones
-  short		unos "piñones"
-  long		"Hay varios piñones caídos en el suelo.^"
-  mass		5
+ short         unos "piñones"
+ long          "Hay varios piñones caídos en el suelo.^"
+ mass          5
 
 {examine
 write "Los piñones son las semillas de la araucaria. Son grandes y tienen forma ovalada. "
@@ -211,10 +217,10 @@ write "Muerdes un piñón. Tiene un sabor suave y ligeramente dulce, parecido a 
 }
 
 object carpintero : carpintero pájaro ave
-  short		un "carpintero"
-  long		"Un pájaro carpintero golpea rítmicamente un tronco.^"
-  has		ANIMATE
-  mass		scenery
+ short         un "carpintero"
+ long          "Un pájaro carpintero golpea rítmicamente un tronco.^"
+ has           ANIMATE
+ mass          scenery
 
 {examine
 write "Un pájaro carpintero de plumaje negro con una cresta roja brillante. "
@@ -231,9 +237,9 @@ write "El golpeteo rítmico del carpintero resuena por todo el bosque.^"
 }
 
 object zorro : zorro
-  short		un "zorro"
-  has		ANIMATE
-  mass		scenery
+ short         un "zorro"
+ has           ANIMATE
+ mass          scenery
 
 {examine
 write "Un pequeño zorro chilote de pelaje gris rojizo. "
@@ -252,10 +258,12 @@ set time = false
 # -----------------------------------------------------------------------------
 
 location mirador : mirador vista
-  short		name "Mirador"
-  has		OUTDOORS
-  north		sendero
-  west		lago
+ short         name "Mirador"
+ has           OUTDOORS
+ north         sendero
+ west          lago
+ x             1
+ y             1
 
 {look
 print:
@@ -270,8 +278,8 @@ print:
 }
 
 object volcanes : volcanes montañas
-  short		name "volcanes"
-  mass		scenery
+ short         name "volcanes"
+ mass          scenery
 
 {examine
 write "Dos volcanes dominan el horizonte. El más grande tiene "
@@ -281,8 +289,8 @@ write "La vista es majestuosa y un poco intimidante.^"
 }
 
 object valle : valle río
-  short		un "valle"
-  mass		scenery
+ short         un "valle"
+ mass          scenery
 
 {examine
 write "Un valle extenso cubierto de pastos verdes. Un río plateado "
@@ -291,8 +299,8 @@ write "a lo lejos, probablemente un pueblo.^"
 }
 
 object banco_piedra : banco piedra roca
-  short		un "banco de piedra"
-  mass		scenery
+ short         un "banco de piedra"
+ mass          scenery
 
 {examine
 write "Un banco natural formado por una roca plana. Es un buen lugar para sentarse y contemplar el paisaje.^"
@@ -306,9 +314,11 @@ write "Sientes una profunda paz.^"
 # -----------------------------------------------------------------------------
 
 location lago : lago orilla
-  short		name "Lago"
-  has		OUTDOORS
-  east		mirador
+ short         name "Lago"
+ has           OUTDOORS
+ east          mirador
+ x             0
+ y             1
 
 {look
 print:
@@ -323,8 +333,8 @@ print:
 }
 
 object agua_lago : agua lago
-  short		name "agua"
-  mass		scenery
+ short         name "agua"
+ mass          scenery
 
 {examine
 write "El agua del lago es increíblemente clara. Puedes ver el fondo "
@@ -342,9 +352,9 @@ set time = false
 }
 
 object truchas : truchas peces
-  short		unas "truchas"
-  has		ANIMATE
-  mass		scenery
+ short         unas "truchas"
+ has           ANIMATE
+ mass          scenery
 
 {examine
 write "Truchas de colores brillantes nadan cerca de la superficie. "
@@ -357,9 +367,9 @@ set time = false
 }
 
 object bote : bote lancha barca
-  short		un "bote de madera"
-  long		"Un viejo bote de madera descansa en la orilla del lago.^"
-  mass		scenery
+ short         un "bote de madera"
+ long          "Un viejo bote de madera descansa en la orilla del lago.^"
+ mass          scenery
 
 {examine
 write "Un bote de madera viejo pero sólido. La pintura azul está descascarada "
@@ -373,8 +383,8 @@ set time = false
 }
 
 object remos : remos
-  short		unos "remos"
-  mass		scenery
+ short         unos "remos"
+ mass          scenery
 
 {examine
 write "Dos remos de madera gastados por el uso. Están dentro del bote.^"
@@ -386,8 +396,8 @@ set time = false
 }
 
 object piedras : piedras guijarros
-  short		unas "piedras lisas"
-  mass		scenery
+ short         unas "piedras lisas"
+ mass          scenery
 
 {examine
 write "Piedras lisas de río de diferentes colores: grises, blancas y algunas con vetas rojizas.^"
@@ -398,11 +408,11 @@ write "Piedras lisas de río de diferentes colores: grises, blancas y algunas co
 # -----------------------------------------------------------------------------
 
 object jugador : yo mismo mi
-  has		ANIMATE
-  short		name "tú"
-  quantity	42
-  parent	cabaña
-  player
+ has           ANIMATE
+ short         name "tú"
+ quantity      42
+ parent        cabaña
+ player
 
 {examine
 write "Te sientes bien, respirando el aire puro de la montaña. "
@@ -477,3 +487,4 @@ write "para buscar el significado de una palabra.^"
 #include "spanish_verbs.library"
 #include "webinterface.library"
 #include "webinterface.css"
+#include "mapping.library"

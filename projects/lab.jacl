@@ -40,16 +40,16 @@ execute "+spaced_contents<east_bench"
 }
 
 object east_bench : long east eastern bench
- plural			benches
- short			the "east bench"
- has			SURFACE
- capacity		50
+ plural        benches
+ short         the "east bench"
+ has           SURFACE
+ capacity      50
 
 object west_bench : long west western bench
- plural			benches
- short			the "west bench"
- has			SURFACE
- capacity		50
+ plural        benches
+ short         the "west bench"
+ has           SURFACE
+ capacity      50
 
 {enter
 move player to west_bench
@@ -57,11 +57,11 @@ write "Done.^"
 }
 
 object ball : ball
- plural			balls
- short			a "ball"
- long			"There is a ball on the floor.^"
- mass			10
- parent			west_bench
+ plural        balls
+ short         a "ball"
+ long          "There is a ball on the floor.^"
+ mass          10
+ parent        west_bench
 
 #object red_ball : red ball
  plural			balls
@@ -83,24 +83,24 @@ return false
 }
 
 object big_red_ball : big red ball
- plural			balls
- short			a "big red ball"
- long			"There is a big red ball on the floor.^"
- mass			10
- parent			east_bench
+ plural        balls
+ short         a "big red ball"
+ long          "There is a big red ball on the floor.^"
+ mass          10
+ parent        east_bench
 
 object small_red_ball : small red ball
- plural			balls
- short			a "small red ball"
- long			"There is a small red ball on the floor.^"
- mass			10
- parent			east_bench
+ plural        balls
+ short         a "small red ball"
+ long          "There is a small red ball on the floor.^"
+ mass          10
+ parent        east_bench
 
 object book : red book 
- short			a "red book"
- long			"There is a red book here.^"
- mass			5
- parent			east_bench
+ short         a "red book"
+ long          "There is a red book here.^"
+ mass          5
+ parent        east_bench
 
 {disambiguate
 if arg = 0
@@ -118,10 +118,10 @@ return false
 }
 
 object can : red can
- short			a "can of red bull"
- long			"A can of Red Bull stands on the ground.^"
- mass			3
- parent			west_bench
+ short         a "can of red bull"
+ long          "A can of Red Bull stands on the ground.^"
+ mass          3
+ parent        west_bench
 
 {disambiguate
 if arg = 0
@@ -139,11 +139,11 @@ return false
 }
 
 object silver_ring : shiny silver ring
- plural			rings
- short			a "silver ring"
- long			"A shiny silver ring rests nearby.^"
- mass			2
- parent			west_bench
+ plural        rings
+ short         a "silver ring"
+ long          "A shiny silver ring rests nearby.^"
+ mass          2
+ parent        west_bench
 
 {disambiguate
 ifstring verb_function = "take"
@@ -154,11 +154,11 @@ endif
 }
 
 object gold_ring : shiny gold ring
- plural			rings
- short			a "gold ring"
- long			"A shiny gold ring is on the ground.^"
- mass			2
- parent			east_bench
+ plural        rings
+ short         a "gold ring"
+ long          "A shiny gold ring is on the ground.^"
+ mass          2
+ parent        east_bench
 	
 {before_insert_in_mug
 write "YOU CAN'T DO THAT!^"
@@ -166,32 +166,32 @@ return false
 }
 
 object pin : bobby pin
- short			a "bobby pin"
- long			"You notice a bobby pin on the floor.^"
- mass			1
- parent			lab
+ short         a "bobby pin"
+ long          "You notice a bobby pin on the floor.^"
+ mass          1
+ parent        lab
 
 object mug : coffee mug
- has			CONTAINER
- short			a "coffee mug"
- long			"A coffee mug rests on the floor.^"
- mass			10
- capacity		4
- parent			lab
+ has           CONTAINER
+ short         a "coffee mug"
+ long          "A coffee mug rests on the floor.^"
+ mass          10
+ capacity      4
+ parent        lab
 
 {search
 write "You don't find anything special.^"
 }
 
 object clock : clock
- has			OUT_OF_REACH
- short			the "clock"
+ has           OUT_OF_REACH
+ short         the "clock"
  
 object kryten: myself self me
- has		ANIMATE
- short		name "yourself"
- capacity	100
- parent		lab
+ has           ANIMATE
+ short         name "yourself"
+ capacity      100
+ parent        lab
  player
 
 {examine
@@ -205,18 +205,18 @@ set time = false
 }
 
 object coat : white lab coat
- short		your "white lab coat"
- long		"Your lab coat lies on the ground."
- has		WEARABLE WORN
- parent		kryten
- mass		10
+ short         your "white lab coat"
+ long          "Your lab coat lies on the ground."
+ has           WEARABLE WORN
+ parent        kryten
+ mass          10
 
 object glasses : safety glasses goggles
- short		your "safety glasses"
- long		"Your safety glasses are nearby.^"
- has		WEARABLE WORN
- parent		kryten
- mass		5
+ short         your "safety glasses"
+ long          "Your safety glasses are nearby.^"
+ has           WEARABLE WORN
+ parent        kryten
+ mass          5
 
 {+no_light
 write "It is too dark to see.^"
@@ -230,27 +230,27 @@ endif
 }
 
 object north_wall: north north wall
- has			NO_TAB
- plural			walls
- short          the "north wall"
+ has           NO_TAB
+ plural        walls
+ short         the "north wall"
 
 object south_wall: south southern wall
- has			NO_TAB
- plural			walls
- short          the "south wall"
+ has           NO_TAB
+ plural        walls
+ short         the "south wall"
 
 object east_wall: east eastern wall
- has			NO_TAB
- plural			walls
- short          the "east wall"
+ has           NO_TAB
+ plural        walls
+ short         the "east wall"
 
 object west_wall: west western wall
- has			NO_TAB
- plural			walls
- short          the "west wall"
+ has           NO_TAB
+ plural        walls
+ short         the "west wall"
 
 object ground: ground floor
- has            SURFACE NO_TAB
- short          the "ground"
+ has           SURFACE NO_TAB
+ short         the "ground"
 
 #include "verbs.library"

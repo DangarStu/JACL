@@ -26,10 +26,10 @@ execute "+look_around"
 }
 
 location foyer : foyer
- short		the "foyer of the Opera House"
- north		outside
- south		bar
- west		cloak_room
+ short         the "foyer of the Opera House"
+ north         outside
+ south         bar
+ west          cloak_room
 
 {look
 print:
@@ -51,11 +51,11 @@ return false
 }
 
 location outside : street outside
- short		the "street outside"
+ short         the "street outside"
 
 location cloak_room : small cloak room storage closet
- short		the "cloak room"
- east		foyer
+ short         the "cloak room"
+ east          foyer
 
 {look
 print:
@@ -65,9 +65,9 @@ print:
 }
 
 object hook : small brass hook peg
- short		a "small brass hook"
- has		SURFACE
- capacity	25
+ short         a "small brass hook"
+ has           SURFACE
+ capacity      25
 
 {examine
 write "It's just a small brass hook, "
@@ -79,9 +79,9 @@ endif
 }
 
 location bar : bar
- short		the "foyer bar"
- has		DARK
- north		foyer
+ short         the "foyer bar"
+ has           DARK
+ north         foyer
 
 {look
 print:
@@ -103,7 +103,7 @@ return false
 }
 
 object message : message sawdust floor
- short		a "scrawled message"
+ short         a "scrawled message"
 
 {read : examine
 if bar(blundered_in) < 2
@@ -133,10 +133,10 @@ endall
 }
 
 object kryten: myself self me
- has		ANIMATE
- short		name "yourself"
- quantity	42
- parent		foyer
+ has           ANIMATE
+ short         name "yourself"
+ quantity      42
+ parent        foyer
  player
 
 {examine_override
@@ -144,11 +144,11 @@ execute "+inventory"
 }
 
 object cloak : dark black velvet cloak
- short		a "velvet cloak"
- long		"Lying on the ground is a handsome velvet coat."
- has		WEARABLE WORN
- parent		kryten
- mass		5
+ short         a "velvet cloak"
+ long          "Lying on the ground is a handsome velvet coat."
+ has           WEARABLE WORN
+ parent        kryten
+ mass          5
 
 {examine_override
 print:
@@ -200,23 +200,23 @@ endif
 }
 
 object north_wall: north north wall
- has			NO_TAB
- short          the "north wall"
+ has           NO_TAB
+ short         the "north wall"
 
 object south_wall: south southern wall
- has			NO_TAB
- short          the "south wall"
+ has           NO_TAB
+ short         the "south wall"
 
 object east_wall: east eastern wall
- has			NO_TAB
- short          the "east wall"
+ has           NO_TAB
+ short         the "east wall"
 
 object west_wall: west western wall
- has			NO_TAB
- short          the "west wall"
+ has           NO_TAB
+ short         the "west wall"
 
 object ground: ground floor
- has            SURFACE NO_TAB
- short          the "ground"
+ has           SURFACE NO_TAB
+ short         the "ground"
 
 #include "verbs.library"

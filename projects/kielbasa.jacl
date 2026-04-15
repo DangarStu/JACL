@@ -539,10 +539,10 @@ return false
 }
 
 object kryten: myself self me
- has		ANIMATE
- short		name "yourself"
- capacity	42
- parent		studio
+ has           ANIMATE
+ short         name "yourself"
+ capacity      42
+ parent        studio
  player
 
 {examine

@@ -67,14 +67,14 @@ execute "+give_range<garage<cave<VISITED<DAMAGED"
 
 location garage
 object tom
-  short name "Tom"
+ short         name "Tom"
 object dick
-  short name "Dick"
+ short         name "Dick"
 
 location bus_stop
 
 object harry
-  short name "Harry"
+ short         name "Harry"
 
 string forward_to
 integer junction
@@ -237,7 +237,7 @@ location cave
 object fred
 player
 object girl
-  has	ANIMATE FEMALE
+ has           ANIMATE FEMALE
 
 #include "verbs.library"
 #include "utils.library"

@@ -75,10 +75,10 @@ return false
 }
 
 object kryten: kryten myself self me moi moi-même moi-meme joueur
- has		ANIMATE
- short		name "moi"
- capacity	42
- parent		couloir1
+ has           ANIMATE
+ short         name "moi"
+ capacity      42
+ parent        couloir1
  player
 
 {examine
@@ -110,12 +110,12 @@ endif
 
 
 object tablier: tablier mauve
- has		WEARABLE WORN
- short		un "tablier"
- long		function
- definite	le
- parent 	kryten
- mass		1
+ has           WEARABLE WORN
+ short         un "tablier"
+ long          function
+ definite      le
+ parent        kryten
+ mass          1
  
 {give_to_reine
 write "Vous détachez votre tablier pour le présenter à la Reine, mais maladroit comme vous l'êtes, vous détachez en même temps votre pantalon qui tombe à vos pied. La Reine n'a pas l'air intéressé. Le Roi, malgré sa bonhommie légendaire, s'en offusque (ou est vaguement jaloux), et il vous fait jeter dans les cachots sombres de Fihnargaia.^Six mois plus tard, vous revoilà devant lui.^"
@@ -137,20 +137,22 @@ ensure roi hasnt TALKED_TO
 }
 
 object poche: petite poche bleue
- has		FEMALE CONTAINER
- short		une "poche"
- long		"Une poche."
- definite	la
- parent 	tablier
- mass		2
+ has           FEMALE CONTAINER
+ short         une "poche"
+ long          "Une poche."
+ definite      la
+ parent        tablier
+ mass          2
 
  
 
 ## Grand Hall ##
 
 location hall1: grand hall de Fihnargaia fihnargaia
-  short       name "Grand Hall de Fihnargaia"
-  south        couloir1
+ short         name "Grand Hall de Fihnargaia"
+ south         couloir1
+ x             1
+ y             0
 
 {look
 if here hasnt VISITED
@@ -167,11 +169,11 @@ endif
 ### MURS ###
 
 object murs: murs mur pierres pierre
- has        PLURAL
- short      des "murs"
- definite	les
- long       "Des murs.^"
- mass       scenery
+ has           PLURAL
+ short         des "murs"
+ definite      les
+ long          "Des murs.^"
+ mass          scenery
 
 {examine
 write "Il serait inconvenant de tourner ainsi votre dos aux monarques.^"
@@ -180,11 +182,11 @@ write "Il serait inconvenant de tourner ainsi votre dos aux monarques.^"
 ### Meubles ###
 
 object meubles: meubles luxueux meuble trone trones estrade
- has        PLURAL
- short      des "meubles"
- definite	les
- long       "Des meubles.^"
- mass       scenery
+ has           PLURAL
+ short         des "meubles"
+ definite      les
+ long          "Des meubles.^"
+ mass          scenery
 
 {open
 write "Vous n'êtes pas chez vous ici, et vous ne pouvez pas non plus vous permettre de faire comme chez vous devant la famille royale et ses nombreux gardes.^"
@@ -194,11 +196,11 @@ write "Vous n'êtes pas chez vous ici, et vous ne pouvez pas non plus vous perme
 ### ROI ###
 
 object roi: roi homme barbe monarque monarques
- has		ANIMATE POSSESSIVE
- long		function
- short		name "le roi de Fihnargaia"
- mass		heavy 
- quantity	20
+ has           ANIMATE POSSESSIVE
+ long          function
+ short         name "le roi de Fihnargaia"
+ mass          heavy
+ quantity      20
  
 {long
    write "Le Roi de Fihnargaia est assis là."
@@ -281,11 +283,11 @@ move tablier to kryten
 ### REINE ###
 
 object reine: reine femme
- has		ANIMATE FEMALE POSSESSIVE
- long		function
- short		name "la reine de Fihnargaia"
- mass		heavy 
- quantity	20
+ has           ANIMATE FEMALE POSSESSIVE
+ long          function
+ short         name "la reine de Fihnargaia"
+ mass          heavy
+ quantity      20
  
 {long
    write "La Reine de Fihnargaia est à ses côtés."
@@ -319,12 +321,12 @@ object reine: reine femme
 ### GARDES ###
 
 object gardes: gardes garde habits
- has		ANIMATE PLURAL POSSESSIVE 
- long		function
- short		des "gardes"
- definite 	les
- mass		heavy 
- quantity	20
+ has           ANIMATE PLURAL POSSESSIVE
+ long          function
+ short         des "gardes"
+ definite      les
+ mass          heavy
+ quantity      20
  
 {long
    write "Des gardes en habits chamarrés se tiennent près des monarques.^"
@@ -337,16 +339,16 @@ object gardes: gardes garde habits
 ## Void ##
 
 location void: void
-  short       name "void"
+ short         name "void"
 
 object hydromel: hydromel l'hydromel boisson
- has		FEMALE LIQUID
- short		une "hydromel"
- definite	de l'
- long		"De l'hydromel.^"
- quantity	1	
- parent 	void
- mass		2 
+ has           FEMALE LIQUID
+ short         une "hydromel"
+ definite      de l'
+ long          "De l'hydromel.^"
+ quantity      1
+ parent        void
+ mass          2
  
 
 {smell
@@ -359,21 +361,22 @@ object hydromel: hydromel l'hydromel boisson
 }
 
 object hydromel2: hydromel2
- has		 FEMALE 
- long		"" #hydromel.^
- short		la "hydromel"
- definite	la
- mass		1 
- quantity	4
+ has           FEMALE
+ long          "" #hydromel.^
+ short         la "hydromel"
+ definite      la
+ mass          1
+ quantity      4
   
 ## Petit Couloir ##
 
 location couloir1: petit couloir
-  short       name "Petit couloir"
-  north        hall1 
-  east        cuisines1 
-  south		couloir2
-  
+ short         name "Petit couloir"
+ north         hall1
+ east          cuisines1
+ south         couloir2
+ x             1
+ y             1
 {look
 ifall here has VISITED : roi has TALKED_TO
    print:
@@ -389,11 +392,11 @@ endif
 ### Lampes ###
 
 object lampes: lampes lampe
- has        PLURAL FEMALE ON BURNING FLAMMABLE
- short      des "lampes"
- definite	les
- long       "Des lampes.^"
- mass       scenery
+ has           PLURAL FEMALE ON BURNING FLAMMABLE
+ short         des "lampes"
+ definite      les
+ long          "Des lampes.^"
+ mass          scenery
 
 #TODO light ?
 {turn_off_override
@@ -417,10 +420,11 @@ endif
 ## Couloir 2 ## 
 
 location couloir2: petit couloir
-  short       name "Petit couloir"
-  north        couloir1 
-  southwest        couloir3 
-  
+ short         name "Petit couloir"
+ north         couloir1
+ southwest     couloir3
+ x             1
+ y             2
 {look
 if here has VISITED
    print:
@@ -439,9 +443,10 @@ endif
 ## Couloir 3 ## 
 
 location couloir3: petit couloir dehors sortie château chateau
-  short       name "Sortie du château"
-  northeast        couloir2 
-  
+ short         name "Sortie du château"
+ northeast     couloir2
+ x             0
+ y             3
 {look
 if here has VISITED
    print:
@@ -466,18 +471,19 @@ return false
 ### Montagnes au loin ###
 
 object montagnes: montagnes montagne monts mont collines colline loin
- has        PLURAL FEMALE 
- short      des "montagnes"
- definite	les
- long       "Des montagnes.^"
- mass       scenery
+ has           PLURAL FEMALE
+ short         des "montagnes"
+ definite      les
+ long          "Des montagnes.^"
+ mass          scenery
  
 ## Cuisines ##
 
 location cuisines1: cuisines cuisine
-  short       name "Cuisines"
-  west        couloir1 
-  
+ short         name "Cuisines"
+ west          couloir1
+ x             2
+ y             1
 {look
 if here has VISITED
    print:
@@ -493,11 +499,11 @@ endif
 ### COMMIS ### 
 
 object commis: commis hommes gens
- has		ANIMATE POSSESSIVE PLURAL
- long		"Les commis s'activent dans la cuisine."
- short		name "commis"
- mass		heavy 
- quantity	20
+ has           ANIMATE POSSESSIVE PLURAL
+ long          "Les commis s'activent dans la cuisine."
+ short         name "commis"
+ mass          heavy
+ quantity      20
 
 {listen_to
 	write "Ils chantonnent tout en travaillant, et parfois certains disent du mal de vous. Sans doute ne vous ont-il pas entendu arriver.^"
@@ -514,13 +520,13 @@ object commis: commis hommes gens
 ### PÂTISSERIES ###
 
 object patisseries: patisseries patisserie pâtisserie gateau gâteau gateaux gâteaux
- has		 PLURAL FEMALE #INVISIBLE
- long		"Il y a là des pâtisseries qui semblent succulentes.^"
- short		des "pâtisseries"
- definite	les
- parent 	shelves
- mass		1 
- quantity	4
+ has           PLURAL FEMALE #INVISIBLE
+ long          "Il y a là des pâtisseries qui semblent succulentes.^"
+ short         des "pâtisseries"
+ definite      les
+ parent        shelves
+ mass          1
+ quantity      4
 
 
 {smell
@@ -536,22 +542,22 @@ object patisseries: patisseries patisserie pâtisserie gateau gâteau gateaux g�
 ### ÉTAGÈRES ### 
 
 object shelves: shelves étagères etageres etagere étagère
- has		SURFACE PLURAL FEMALE
- short		des "étagères"
-  long		"Des étagères supportent divers objets et accessoires."
- definite	les
- quantity	30
- mass	heavy
+ has           SURFACE PLURAL FEMALE
+ short         des "étagères"
+ long          "Des étagères supportent divers objets et accessoires."
+ definite      les
+ quantity      30
+ mass          heavy
 
 
 ## Bidule ##
 
 object bidule : truc machin petit bidule symbole
- short		un "petit bidule amusant qui ne sert à rien.^"
- long		"Il y a un petit bidule ici."
- parent		shelves
- definite	le
- mass 5
+ short         un "petit bidule amusant qui ne sert à rien.^"
+ long          "Il y a un petit bidule ici."
+ parent        shelves
+ definite      le
+ mass          5
 
 {examine
 	write "C'est un petit bidule inutile avec un symbole étrange marqué dessus."
@@ -567,13 +573,13 @@ points 10
 ### Boite ###
 
 object box: box petite boite en bois boîte
- has        CLOSABLE CONTAINER CLOSED FEMALE
- short      une "petite boîte en bois"
- definite	la
- long       "Il y a une petite boîte en bois ici.^"
- parent		shelves
- mass       25
- capacity   20
+ has           CLOSABLE CONTAINER CLOSED FEMALE
+ short         une "petite boîte en bois"
+ definite      la
+ long          "Il y a une petite boîte en bois ici.^"
+ parent        shelves
+ mass          25
+ capacity      20
  
 # TODO : in the case the name of the noun is not in the synonyms, a reference to noun1 won't work (only to noun1{the} )
 
@@ -588,13 +594,13 @@ object box: box petite boite en bois boîte
 ### GRIMOIRE ###
 
 object grimoire: livre grimoire bouquin
- has		FLAMMABLE
- long		"Un grimoire est posé dans un coin.^" 
- short		un "grimoire"
- definite	le
- parent		shelves
- mass		1 
- quantity	4
+ has           FLAMMABLE
+ long          "Un grimoire est posé dans un coin.^"
+ short         un "grimoire"
+ definite      le
+ parent        shelves
+ mass          1
+ quantity      4
 
 
 {consult_hydromel
@@ -619,11 +625,11 @@ object grimoire: livre grimoire bouquin
 ### CHAISE ###
 
 object chaise: simple chaise en bois
- has		FEMALE
- short		une "simple chaise en bois"
- definite	la
- long		function
- mass		25
+ has           FEMALE
+ short         une "simple chaise en bois"
+ definite      la
+ long          function
+ mass          25
 
 {long
 if chaise hasnt TOUCHED
@@ -652,13 +658,13 @@ write "Vous connaissiez un gnome qui faisait tourner de petites tables, mais les
 ### TONNEAU ###
 
 object tonneau: tonneau
- has		CONTAINER
- short		un "tonneau"
- definite	le
- long		"Un tonneau.^"
- quantity	20
+ has           CONTAINER
+ short         un "tonneau"
+ definite      le
+ long          "Un tonneau.^"
+ quantity      20
 # parent 	long_bar
- mass		scenery
+ mass          scenery
  
 {examine
 write "Un gros tonneau grand deux fois comme vous, qui vous sert à brasser de la bière ou de l'hydromel. Il y a un petit robinet à son extrémité.^"
@@ -692,13 +698,13 @@ endif
 #### ROBINET ####
 
 object robinet: robinet
- has		CONTAINER
- short		un "robinet"
- definite	le
- long		"Un robinet.^"
- quantity	1
- parent 	tonneau
- mass		2
+ has           CONTAINER
+ short         un "robinet"
+ definite      le
+ long          "Un robinet.^"
+ quantity      1
+ parent        tonneau
+ mass          2
 
 #TODO prendre robinet
 
@@ -715,13 +721,13 @@ else
 ### EAU ###
 
 object eau: eau eaux
- has		FEMALE LIQUID 
- short		une "eau"
- definite	de l'
- long		"De l'eau.^"
- quantity	1	
- parent 	tonneau
- mass		2 
+ has           FEMALE LIQUID
+ short         une "eau"
+ definite      de l'
+ long          "De l'eau.^"
+ quantity      1
+ parent        tonneau
+ mass          2
  
 
 {smell
@@ -739,13 +745,13 @@ object eau: eau eaux
 ### ARMOIRE ###
 
 object armoire: armoire
- has		CONTAINER FEMALE LOCKED CLOSED CLOSABLE #LOCKABLE ?
- short		une "armoire"
- definite	l'
- long		"Une armoire se trouve contre le mur opposé à l'entrée de la cuisine.^"
- quantity	1	
-    capacity		20
- mass		22
+ has           CONTAINER FEMALE LOCKED CLOSED CLOSABLE #LOCKABLE ?
+ short         une "armoire"
+ definite      l'
+ long          "Une armoire se trouve contre le mur opposé à l'entrée de la cuisine.^"
+ quantity      1
+ capacity      20
+ mass          22
  
 {unlock_with_clef
 write "Vous déverrouillez l'armoire avec votre clef.^"
@@ -762,23 +768,23 @@ ensure armoire has CLOSED
 ### CLEF ###
 
 object clef: clef cle clé
- has		FEMALE
- short		une "clef"
- definite	la
- long		"Une clef.^"
- parent		poche
- quantity	1	
- mass		1
+ has           FEMALE
+ short         une "clef"
+ definite      la
+ long          "Une clef.^"
+ parent        poche
+ quantity      1
+ mass          1
 
 ### MIEL ###
 
 object miel: pot de miel
- short		un "pot de miel"
- definite	le
- long		"Un pot de miel.^"
- quantity	1	
- parent 	armoire
- mass		2
+ short         un "pot de miel"
+ definite      le
+ long          "Un pot de miel.^"
+ quantity      1
+ parent        armoire
+ mass          2
 
 {eat_miel
 	write "Cela ne serait pas de refus, mais cela pourrait servir pour l'hydromel, alors cela serait du gâchis de ne plus en avoir assez ensuite.^"
@@ -787,23 +793,23 @@ object miel: pot de miel
 ### LEVURE ###
 
 object levure: pot de levure levures
- short		un "pot de levure"
- definite	le
- long		"Un pot de levure.^"
- quantity	1	
- parent 	armoire
- mass		2 
+ short         un "pot de levure"
+ definite      le
+ long          "Un pot de levure.^"
+ quantity      1
+ parent        armoire
+ mass          2
 
 ### CHOPE ###
 
 object chope: chope verre
- has        CONTAINER FEMALE
- short      une "chope"
- definite	la
- long       "Il y a une petite chope ici.^"
- parent 	armoire
- mass       5
- capacity   5
+ has           CONTAINER FEMALE
+ short         une "chope"
+ definite      la
+ long          "Il y a une petite chope ici.^"
+ parent        armoire
+ mass          5
+ capacity      5
  
 {examine
    if graphics_supported = false
@@ -840,9 +846,9 @@ endif
 	
 
 object ground: ground sol carrelage
- has            SURFACE NO_TAB
- short          un "sol"
- definite		le
+ has           SURFACE NO_TAB
+ short         un "sol"
+ definite      le
 
 integer status_window 3
 integer OFFSET
@@ -889,6 +895,7 @@ constant maintext_colour "#D2DDD0"
 #include "webinterface.css"
 #include "npc.library"
 #include "utils.library"
+#include "mapping.library"
 #--include "verbs.library"
 #include "french_verbs.library"
 
