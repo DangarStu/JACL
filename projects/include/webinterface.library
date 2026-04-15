@@ -218,7 +218,6 @@ print:
       document.JACLInterfaceForm.submit();
    }^
 .
-write "<script>window.jaclMapBg = '" header_colour "';</script>"
 #include "ajax.library"
 print:
    function submitForm(e) {^
@@ -243,6 +242,7 @@ print:
    }^
 .
 write "</script>^"
+write "<script>window.jaclMapBg = '" header_colour "';</script>"
 write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
 ifexecute "+local_header"
    # GAME MAY INJECT ADDITIONAL HEAD CONTENT (extra stylesheets, scripts).
