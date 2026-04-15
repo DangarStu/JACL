@@ -18,7 +18,7 @@ constant maintext_colour "#f5f0e8"
 
 location rumah : rumah pondok gubuk
  short         name "Rumah"
- x             2
+ x             3
  y             1
 
 {look
@@ -109,8 +109,9 @@ write "Kamu menyeruput kopi hitam. Pahit tapi enak.^"
 
 location sawah : sawah padi
  short         name "Sawah"
+ has           OUTDOORS
  west          jalan_utama
- x             2
+ x             3
  y             2
 
 {look
@@ -121,6 +122,31 @@ print:
    terletak di sebelah utara. Jalan menuju desa ada di
    sebelah barat.^
 .
+execute "+weather_line"
+}
+
+object segehan : segehan sesajen_tanah persembahan
+ short         sebuah "segehan"
+ long          "Sebuah segehan diletakkan di tanah dekat pintu rumahmu.^"
+ mass          scenery
+
+{examine
+print:
+   Segehan adalah sesajen kecil untuk para bhuta kala,
+   roh-roh rendah yang menjaga keseimbangan alam. Terbuat
+   dari potongan daun pisang berisi nasi warna-warni,
+   garam kasar, sekerat jahe, bawang merah, dan beberapa
+   kelopak bunga. Di sebelahnya tersulut sebatang dupa
+   yang asapnya mengepul pelan. Ibumu meletakkannya
+   setiap pagi dan sore di depan pintu, di persimpangan,
+   dan di sudut halaman, agar rumah tetap damai dan
+   terhindar dari gangguan.^
+.
+}
+
+{take
+write "Segehan itu sedang dipersembahkan. Sebaiknya jangan diganggu.^"
+set time = false
 }
 
 object padi : padi tanaman
@@ -163,10 +189,13 @@ write "Kuntul itu memiringkan kepalanya dan menatapmu sejenak, lalu kembali meng
 
 location jalan_utama : jalan utama
  short         name "Jalan Utama"
+ has           OUTDOORS
  east          sawah
  north         warung
  south         banjar
  northeast     gang
+ west          pura
+ southwest     pasar
  x             1
  y             2
 
@@ -176,17 +205,60 @@ print:
    menghubungkan seluruh desa. Di sebelah utara ada
    sebuah warung kecil. Sebuah jalan kecil menuju ke
    selatan ke banjar. Ke timur, jalan mengarah ke sawah.
-   Sebuah gang sempit mengarah ke timur laut.^
+   Sebuah gang sempit mengarah ke timur laut. Ke barat
+   terlihat gerbang pura desa, dan ke barat daya ada
+   pasar yang ramai.^
 .
+execute "+weather_line"
+}
+
+object anak : anak made
+ short         name "Made"
+ long          "Seorang anak kecil bernama Made sedang bermain di jalan.^"
+ has           ANIMATE
+ mass          heavy
+ parent        jalan_utama
+
+{examine
+write "Anak kecil berumur sekitar tujuh tahun. Dia memakai kaus oranye "
+write "dan celana pendek. Matanya berbinar penuh rasa ingin tahu.^"
+}
+
+{talk_to
+write "~Halo, Kakak!~ kata Made sambil melambai. ~Mau main?~^"
+}
+
+{ask_about_nama
+write "~Nama saya Made,~ katanya. ~Saya tinggal di sebelah warung.~^"
+}
+
+{ask_about_sekolah
+write "~Saya kelas dua SD,~ kata Made bangga. ~Guru saya baik sekali.~^"
+}
+
+{ask_about_permainan
+write "~Saya suka main bola dan layang-layang,~ kata Made. "
+write "~Tapi kalau hujan, saya main di rumah saja.~^"
+}
+
+{ask_about_hujan
+write "~Saya tidak takut hujan!~ kata Made sambil tertawa. "
+write "~Tapi Ibu marah kalau saya basah.~^"
+}
+
+{ask_about_ibu
+write "~Ibu saya tinggal dekat sini,~ kata Made. "
+write "~Dia sedang memasak nasi untuk makan siang.~^"
 }
 
 # -----------------------------------------------------------------------------
 
 location gang : gang lorong jalan_sempit
  short         name "Gang sempit"
+ has           OUTDOORS
  southwest     jalan_utama
  x             2
- y             0
+ y             1
 
 {look
 print:
@@ -195,6 +267,7 @@ print:
    beberapa pot tanaman. Jalan utama ada di sebelah
    barat daya.^
 .
+execute "+weather_line"
 }
 
 object pohon : pohon besar
@@ -273,12 +346,156 @@ write "~Selamat datang!~ kata Ibu Warung. ~Mau pesan apa hari ini?~^"
 }
 
 {ask_about_makanan
-write "~Hari ini ada nasi goreng dan mie goreng,~ kata Ibu Warung.^"
+write "~Hari ini ada nasi goreng dan mie goreng,~ kata Ibu Warung. "
+write "~Saya juga jual pisang, mangga, dan kerupuk.~^"
 }
 
 {ask_about_desa
 write "~Desa ini sudah ada sejak lama,~ kata Ibu Warung. "
 write "~Kehidupan di sini tenang dan damai.~^"
+}
+
+{ask_about_cuaca
+if weather_state = 0
+   write "~Hari ini panas sekali,~ kata Ibu Warung. ~Tapi langit cerah.~^"
+   return
+endif
+if weather_state = 1
+   write "~Awan mulai berkumpul,~ kata Ibu Warung. ~Mungkin akan hujan nanti.~^"
+   return
+endif
+if weather_state = 2
+   write "~Sudah mulai gerimis,~ kata Ibu Warung. ~Bawa payung kalau keluar.~^"
+   return
+endif
+write "~Hujan deras sekali hari ini,~ kata Ibu Warung. ~Mampir saja sebentar.~^"
+}
+
+{ask_about_keluarga
+write "~Saya punya dua anak dan seorang suami,~ kata Ibu Warung. "
+write "~Suami saya bekerja di sawah. Anak-anak sudah besar dan merantau ke kota.~^"
+}
+
+{ask_about_nama
+write "~Nama saya Ibu Wayan,~ katanya sambil tersenyum. ~Siapa namamu?~^"
+}
+
+{ask_about_hari
+write "~Hari ini hari Selasa,~ kata Ibu Warung. ~Hari pasar di desa sebelah.~^"
+}
+
+{ask_about_harga
+write "~Pisang tiga ribu rupiah, mangga lima ribu rupiah, kerupuk dua ribu rupiah,~ "
+write "kata Ibu Warung. ~Tanya ~harga~ ke saya kapan saja.~^"
+}
+
+{ask_about_anak
+write "~Anak kecil itu tetangga saya,~ kata Ibu Warung. ~Namanya Made. Dia suka main di jalan.~^"
+}
+
+object pisang : pisang buah_pisang
+ short         sebuah "pisang"
+ long          "Setandan pisang kuning tergantung di atas meja.^"
+ parent        warung
+ mass          2
+
+{examine
+write "Pisang kuning yang matang. Harganya tiga ribu rupiah.^"
+}
+
+{take
+if pisang(parent) = warung
+   write "~Silakan bayar dulu,~ kata Ibu Warung. ~Tiga ribu rupiah.~^"
+   set time = false
+   return
+endif
+return false
+}
+
+{order
+if pisang(parent) = kryten
+   write "Kamu sudah punya pisang.^"
+   set time = false
+   return
+endif
+if uang(quantity) < 3000
+   write "Kamu tidak punya cukup uang.^"
+   set time = false
+   return
+endif
+set uang(quantity) - 3000
+move pisang to kryten
+write "~Tiga ribu rupiah,~ kata Ibu Warung. Kamu membeli sebuah pisang.^"
+}
+
+object mangga : mangga buah_mangga
+ short         sebuah "mangga"
+ long          "Beberapa mangga harum tersusun di rak.^"
+ parent        warung
+ mass          3
+
+{examine
+write "Mangga harum dan matang. Harganya lima ribu rupiah.^"
+}
+
+{take
+if mangga(parent) = warung
+   write "~Silakan bayar dulu,~ kata Ibu Warung. ~Lima ribu rupiah.~^"
+   set time = false
+   return
+endif
+return false
+}
+
+{order
+if mangga(parent) = kryten
+   write "Kamu sudah punya mangga.^"
+   set time = false
+   return
+endif
+if uang(quantity) < 5000
+   write "Kamu tidak punya cukup uang.^"
+   set time = false
+   return
+endif
+set uang(quantity) - 5000
+move mangga to kryten
+write "~Lima ribu rupiah,~ kata Ibu Warung. Kamu membeli sebuah mangga.^"
+}
+
+object kerupuk : kerupuk
+ short         sebungkus "kerupuk"
+ long          "Sebungkus kerupuk renyah tergantung di rak.^"
+ parent        warung
+ mass          1
+
+{examine
+write "Kerupuk udang yang renyah. Harganya dua ribu rupiah.^"
+}
+
+{take
+if kerupuk(parent) = warung
+   write "~Silakan bayar dulu,~ kata Ibu Warung. ~Dua ribu rupiah.~^"
+   set time = false
+   return
+endif
+return false
+}
+
+{order
+if kerupuk(parent) = kryten
+   write "Kamu sudah punya kerupuk.^"
+   set time = false
+   return
+endif
+if uang(quantity) < 2000
+   write "Kamu tidak punya cukup uang.^"
+   set time = false
+   return
+endif
+set uang(quantity) - 2000
+move kerupuk to kryten
+write "~Dua ribu rupiah,~ kata Ibu Warung. Kamu membeli sebungkus kerupuk.^"
 }
 
 object kucing : kucing
@@ -358,6 +575,184 @@ write "Halaman terakhir masih kosong.^"
 }
 
 # -----------------------------------------------------------------------------
+
+location pura : pura kuil tempat_ibadah
+ short         name "Pura Desa"
+ has           OUTDOORS
+ east          jalan_utama
+ x             0
+ y             2
+
+{look
+print:
+   Kamu berada di halaman pura desa. Gerbang bercandi
+   bentar menjulang tinggi di belakangmu, dan di tengah
+   halaman berdiri sebuah padmasana dari batu hitam.
+   Bau harum dupa memenuhi udara. Jalan utama ada di
+   sebelah timur.^
+.
+execute "+weather_line"
+}
+
+object padmasana : padmasana singgasana batu
+ short         sebuah "padmasana"
+ mass          scenery
+
+{examine
+write "Padmasana adalah singgasana batu untuk dewa tertinggi. "
+write "Ukirannya rumit, menggambarkan naga dan bunga teratai.^"
+}
+
+object canang : canang sari bunga sesajen
+ short         sebuah "canang sari"
+ long          "Sebuah canang sari diletakkan di atas padmasana.^"
+ mass          1
+ parent        pura
+
+{examine
+write "Canang sari adalah sesajen kecil dari daun kelapa muda, "
+write "diisi dengan bunga warna-warni sebagai persembahan harian.^"
+}
+
+object dupa : dupa
+ short         sebatang "dupa"
+ long          "Sebatang dupa menyala perlahan di dekat padmasana.^"
+ mass          scenery
+ parent        pura
+
+{examine
+write "Asap dupa mengepul tipis, harum mengiringi doa.^"
+}
+
+object pemangku : pemangku pendeta
+ short         name "Pak Pemangku"
+ long          "Pak Pemangku berdiri tenang di dekat padmasana.^"
+ has           ANIMATE
+ mass          heavy
+ parent        pura
+
+{examine
+write "Pemangku mengenakan pakaian serba putih dengan udeng di kepala. "
+write "Wajahnya tenang dan penuh kebijaksanaan.^"
+}
+
+{talk_to
+write "~Om Swastiastu,~ sapa Pak Pemangku dengan lembut. "
+write "~Datanglah untuk berdoa, anakku.~^"
+}
+
+{ask_about_pura
+write "~Pura ini adalah Pura Desa,~ kata Pak Pemangku. "
+write "~Di sini kami memuja Brahma, pencipta alam.~^"
+}
+
+{ask_about_sesajen
+write "~Sesajen adalah ucapan syukur,~ jelas Pak Pemangku. "
+write "~Kami membuatnya setiap pagi dan sore.~^"
+}
+
+{ask_about_upacara
+write "~Upacara odalan diadakan setiap enam bulan sekali,~ "
+write "kata Pak Pemangku. ~Seluruh warga desa datang bersama.~^"
+}
+
+{ask_about_doa
+write "~Berdoalah dengan hati yang tenang,~ kata Pak Pemangku. "
+write "~Tuhan mendengar semua yang tulus.~^"
+}
+
+# -----------------------------------------------------------------------------
+
+location pasar : pasar pasar_desa
+ short         name "Pasar Desa"
+ has           OUTDOORS
+ northeast     jalan_utama
+ x             0
+ y             3
+
+{look
+print:
+   Kamu berada di pasar desa yang ramai. Pedagang-pedagang
+   duduk di bawah terpal biru dengan berbagai dagangan
+   mereka: sayur-sayuran segar, ikan, bumbu dapur, dan
+   buah-buahan tropis. Suara tawar-menawar terdengar di
+   mana-mana. Jalan utama ada di sebelah timur laut.^
+.
+execute "+weather_line"
+}
+
+object terpal : terpal
+ short         sebuah "terpal biru"
+ mass          scenery
+
+{examine
+write "Terpal biru tua yang digunakan sebagai atap sementara. "
+write "Melindungi pedagang dari matahari dan hujan.^"
+}
+
+object sayur : sayur sayuran kangkung bayam
+ short         name "sayur-sayuran"
+ long          "Keranjang-keranjang sayur hijau tersusun rapi.^"
+ mass          scenery
+
+{examine
+write "Ada kangkung, bayam, dan daun singkong yang masih segar. "
+write "Semua dipetik pagi ini dari kebun warga.^"
+}
+
+object ikan : ikan
+ short         seekor "ikan"
+ long          "Ikan-ikan segar berbaring di atas es.^"
+ mass          scenery
+
+{examine
+write "Ikan mujair dan nila dari tambak sebelah. "
+write "Sisiknya masih mengkilat.^"
+}
+
+object bawang : bawang bumbu bawang_merah bawang_putih
+ short         name "bawang"
+ long          "Bawang merah dan putih tergantung berikat-ikat.^"
+ mass          scenery
+
+{examine
+write "Bumbu dapur lengkap: bawang merah, bawang putih, cabai, "
+write "kunyit, dan jahe. Wanginya tajam.^"
+}
+
+object pedagang : pedagang penjual ibu_pasar
+ short         name "Ibu Pedagang"
+ long          "Seorang pedagang sedang menata dagangannya.^"
+ has           ANIMATE
+ mass          heavy
+ parent        pasar
+
+{examine
+write "Ibu Pedagang memakai kebaya sederhana dengan selendang "
+write "di pinggang. Tangannya cekatan menata sayur.^"
+}
+
+{talk_to
+write "~Silakan mampir, Kak!~ sapa Ibu Pedagang. "
+write "~Sayur segar, harga miring!~^"
+}
+
+{ask_about_harga
+write "~Sayur dua ribu, ikan lima ribu, bumbu tiga ribu,~ "
+write "kata Ibu Pedagang. ~Bisa nego sedikit.~^"
+}
+
+{ask_about_pasar
+write "~Pasar ini buka setiap pagi,~ kata Ibu Pedagang. "
+write "~Hari pasar besar hari Rabu dan Sabtu.~^"
+}
+
+{ask_about_desa
+write "~Desa kami kecil tapi rukun,~ kata Ibu Pedagang. "
+write "~Semua orang saling kenal.~^"
+}
+
+# -----------------------------------------------------------------------------
 # PLAYER
 # -----------------------------------------------------------------------------
 
@@ -367,6 +762,28 @@ object kryten : aku diri sendiri saya
  quantity      42
  parent        rumah
  player
+
+object uang : uang rupiah duit
+ short         name "uang"
+ long          "Ada uang di sakumu.^"
+ quantity      20000
+ parent        kryten
+ mass          1
+
+{examine
+write "Kamu punya " uang(quantity) " rupiah.^"
+}
+
+object payung : payung
+ short         sebuah "payung"
+ long          "Sebuah payung bersandar di dekat pintu.^"
+ has           WEARABLE
+ parent        rumah
+ mass          8
+
+{examine
+write "Payung hitam sederhana. Berguna kalau hujan turun.^"
+}
 
 {examine
 write "Kamu merasa sehat dan siap untuk memulai hari.^"
@@ -402,6 +819,8 @@ object ground : tanah lantai
 # -----------------------------------------------------------------------------
 
 integer speech_choice
+integer weather_state 0
+integer weather_announced 0
 
 {+intro
 style bold
@@ -447,6 +866,56 @@ look
 if total_moves = 0
    execute "+start_game"
 endif
+execute "+advance_weather"
+}
+
+{+advance_weather
+# Progress weather state from 0=cerah -> 1=berawan -> 2=gerimis -> 3=hujan
+# over ~50 moves. Transitions at 12, 25, 37.
+if weather_state < 1
+   if total_moves > 12
+      set weather_state = 1
+      write "^Awan mulai berkumpul di langit. Matahari tertutup sebagian.^"
+   endif
+endif
+if weather_state < 2
+   if total_moves > 25
+      set weather_state = 2
+      write "^Rintik-rintik hujan mulai turun. Gerimis lembut membasahi tanah.^"
+   endif
+endif
+if weather_state < 3
+   if total_moves > 37
+      set weather_state = 3
+      write "^Hujan turun dengan deras. Petir berkilat di kejauhan.^"
+   endif
+endif
+# If it's raining and player is outdoors without payung equipped, get wet.
+if weather_state > 1
+   ifall here has OUTDOORS : payung hasnt WORN
+      if weather_state = 2
+         write "Gerimis membasahi bajumu.^"
+      else
+         write "Kamu basah kuyup karena hujan!^"
+      endif
+   endif
+endif
+}
+
+{+weather_line
+if weather_state = 0
+   write "Langit cerah biru. Matahari bersinar terang.^"
+   return
+endif
+if weather_state = 1
+   write "Langit mulai berawan. Angin berhembus lembut.^"
+   return
+endif
+if weather_state = 2
+   write "Gerimis turun perlahan. Tanah basah dan licin.^"
+   return
+endif
+write "Hujan deras mengguyur desa. Suara petir terdengar sesekali.^"
 }
 
 {+movement
