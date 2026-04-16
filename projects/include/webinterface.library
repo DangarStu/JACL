@@ -351,7 +351,8 @@ print:
          jaclDirUpdate.remove();^
       }^
       if (isSpeakEnabled()) {^
-         speakText(data);^
+         var speakData = data.replace(/<jacl-directions[\s\S]*?<\/jacl-directions>/gi, '');^
+         speakText(speakData);^
       }^
       document.getElementById('JACLCommandPrompt').focus();
       return false;
