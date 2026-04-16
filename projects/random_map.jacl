@@ -3,6 +3,7 @@
 constant 	game_version	1
 constant	game_title		"Random Map"
 constant	game_author		"Stuart Allen"
+constant game_publish true
 constant	ifid			"JACL-008"
 
 constant	MAX_DEPTH		7

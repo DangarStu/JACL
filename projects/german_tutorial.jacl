@@ -4,6 +4,7 @@
 # Copyright (C) Stuart Allen 1999-2000. All rights resevered.
 # -----------------------------------------------------------------------------
 
+constant game_publish true
 location schlafzimmer : schlafzimmer
  definite      das "Schlafzimmer"
  west          badezimmer

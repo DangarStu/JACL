@@ -3,6 +3,7 @@
 constant game_version 1
 constant game_title "BAD MOON RISING"
 constant game_author "Davy Stedham."
+constant game_publish true
 constant portinfo "JACL port by Rob."
 integer curword 0
 constant SOAHC 1

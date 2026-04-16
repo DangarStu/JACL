@@ -5,6 +5,7 @@
 constant game_title     "Cloak of Darkness"
 constant game_author    "Stuart Allen"
 constant game_version   1
+constant game_publish true
 
 integer blundered_in	1
 

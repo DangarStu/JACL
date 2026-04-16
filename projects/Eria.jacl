@@ -10,6 +10,7 @@ constant game_release 1
 constant game_build 1
 constant game_title "Eria"
 constant game_author "Parham Doustdar and Robert Osztolykan"
+constant game_publish true
 
 #Region stuff
 constant region 13

@@ -3,6 +3,7 @@
 constant game_title		"Coffee disambiguation"
 constant game_author	"I.F. Author"
 constant game_version	2
+constant game_publish true
 
 location kitchen : test kitchen
  short         the "test kitchen"

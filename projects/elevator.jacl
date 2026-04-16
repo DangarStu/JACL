@@ -3,6 +3,7 @@
 constant game_title		"Elevator and stairs"
 constant game_author	"Stuart Allen"
 constant game_version	2
+constant game_publish true
 
 attribute	OUTSIDE_LIFT
 

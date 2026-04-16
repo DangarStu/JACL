@@ -6,6 +6,7 @@
 # -----------------------------------------------------------------------------
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE
+constant game_publish true
 constant IMAGE_blackjack 1
 
 integer INDEX

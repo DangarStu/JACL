@@ -3,6 +3,7 @@
 constant 	game_version	1
 constant	game_title		"Le Roi de Fihnargaia"
 constant	game_author		"Eric Forgeot"
+constant game_publish true
 constant	ifid			"JACL-000"
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE

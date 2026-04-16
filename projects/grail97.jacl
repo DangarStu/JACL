@@ -1,4 +1,5 @@
 ;                                                              THE UNHOLY GRAIL 
+constant game_publish true
 ; -----------------------------------------------------------------------------
 ; Copyright (C) Stuart Allen 1996, 1997. All rights resevered.
 ; email sallen@one.net.au

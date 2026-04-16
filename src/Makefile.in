@@ -143,6 +143,7 @@ apache: install
 	  for game in /usr/local/jacl/projects/*.jacl; do \
 	    [ -e "$$game" ] || continue; \
 	    name=$$(basename "$$game" .jacl); \
+	    grep -q '^constant[[:space:]]\+game_publish[[:space:]]\+true' "$$game" 2>/dev/null || continue; \
 	    title=$$(grep '^constant game_title' "$$game" 2>/dev/null | head -1 | sed -E 's/.*"([^"]+)".*/\1/'); \
 	    if [ -z "$$title" ] || [ "$$title" = "$$(grep '^constant game_title' "$$game" | head -1)" ]; then \
 	      continue; \

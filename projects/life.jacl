@@ -1,5 +1,6 @@
 #!../bin/jacl
 
+constant game_publish true
 integer status_window 21
 
 constant MAX_X 24

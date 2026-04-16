@@ -3,6 +3,7 @@
 constant     game_version    1
 constant    game_title        "Le camion frigorifique"
 constant    game_author        "Barnabé Froleneau"
+constant game_publish true
 constant    ifid            "JACL-000"
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE

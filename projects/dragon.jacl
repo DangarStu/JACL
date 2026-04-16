@@ -10,6 +10,7 @@ constant game_title     "The Down Dragon"
 constant game_author    "Stuart Allen"
 constant game_release    1
 constant game_build      1
+constant game_publish true
 constant ifid           "JACL-003"
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE
