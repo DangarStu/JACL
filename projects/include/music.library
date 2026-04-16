@@ -86,6 +86,7 @@ integer note_naming FLATS SHARPS FLATS SHARPS SHARPS FLATS
 constant CHORD           1
 constant SCALE           2
 constant NOTE            3
+constant INSTRUCTIONS    4
 
 {+bootstrap
 set MUSIC_chord_type_count = @chord_intervals / 7

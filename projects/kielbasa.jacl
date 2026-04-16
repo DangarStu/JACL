@@ -6,7 +6,7 @@ integer     selected_key	-1
 constant 	game_version	1
 constant	game_title		"Kielbasa"
 constant	game_author		"Stuart Allen"
-constant game_publish false
+constant game_publish true
 constant	ifid			"JACL-009"
 
 parameter   mode			MUSIC_mode
@@ -30,6 +30,13 @@ grammar scale mode >scale_mode
 set MUSIC_mode = SCALE
 }
 
+grammar instructions mode >instructions_mode
+
+{+instructions_mode
+set MUSIC_mode = INSTRUCTIONS
+execute "+instructions"
+}
+
 grammar about >about
 
 {+about
@@ -47,8 +54,8 @@ endif
 set time = false
 }
 
-grammar help >instructions
-grammar instructions >instructions
+grammar help >instructions_mode
+grammar instructions >instructions_mode
 
 {+instructions
 if interpreter != CGI
