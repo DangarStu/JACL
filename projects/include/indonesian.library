@@ -2,7 +2,7 @@
 
 string game_language "id-ID"
 
-constant DEFAULT_DEFINITE "none"
+constant DEFAULT_DEFINITE "-nya"
 constant COMMENT_IGNORED "Tidak ada transkrip yang berjalan, komentar diabaikan.^"
 constant COMMENT_RECORDED "Komentar tercatat.^"
 constant YES_WORD "ya"
