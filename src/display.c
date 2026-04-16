@@ -30,16 +30,29 @@ check_light(int where)
 char *
 sentence_output(int index, int capital)
 {
+	const char *def = object[index]->definite;
+	struct string_type *override;
+
+	/* If the object still has the loader default "the" and the game
+	 * has set a DEFAULT_DEFINITE constant (e.g. "none" in Indonesian),
+	 * use the game's value instead. This lets a single compiled
+	 * interpreter serve games in any language. */
+	if (!strcmp(def, "the")) {
+		override = cstring_resolve("DEFAULT_DEFINITE");
+		if (override != NULL) {
+			def = override->value;
+		}
+	}
+
 	if (!strcmp(object[index]->article, "name")) {
 		strcpy(temp_buffer, object[index]->inventory);
-	} else if (object[index]->definite[0] == '\0'
-	        || !strcmp(object[index]->definite, "none")) {
+	} else if (def[0] == '\0' || !strcmp(def, "none")) {
 		strcpy(temp_buffer, object[index]->inventory);
-	} else if (object[index]->definite[0] == '-') {
+	} else if (def[0] == '-') {
 		strcpy(temp_buffer, object[index]->inventory);
-		strcat(temp_buffer, &object[index]->definite[1]);
+		strcat(temp_buffer, &def[1]);
 	} else {
-		strcpy(temp_buffer, object[index]->definite);
+		strcpy(temp_buffer, def);
 		strcat(temp_buffer, " ");
 		strcat(temp_buffer, object[index]->inventory);
 	}

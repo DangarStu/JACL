@@ -202,7 +202,6 @@
 	#define CANT_OPEN_PROCESSED "Unable to open output file \"%s\" for writing, can't continue."
 	#define CANT_OPEN_OR "Unable to open source file \"%s\" or \"%s\", can't continue."
 	#define CANT_OPEN_SOURCE "Unable to open source file \"%s\", can't continue."
-	#define DEFAULT_DEFINITE "the"
 #endif
 
 #if NATIVE_LANGUAGE==INDONESIAN
@@ -376,7 +375,6 @@
 	#define CANT_OPEN_PROCESSED "Unable to open output file \"%s\" for writing, can't continue."
 	#define CANT_OPEN_OR "Unable to open source file \"%s\" or \"%s\", can't continue."
 	#define CANT_OPEN_SOURCE "Unable to open source file \"%s\", can't continue."
-	#define DEFAULT_DEFINITE "none"
 #endif
 
 #if NATIVE_LANGUAGE==FRENCH
@@ -550,7 +548,6 @@
 	#define CANT_OPEN_PROCESSED "Unable to open output file \"%s\" for writing, can't continue."
 	#define CANT_OPEN_OR "Unable to open source file \"%s\" or \"%s\", can't continue."
 	#define CANT_OPEN_SOURCE "Unable to open source file \"%s\", can't continue."
-	#define DEFAULT_DEFINITE "the"
 #endif
 
 #if NATIVE_LANGUAGE==SPANISH
@@ -724,7 +721,6 @@
 	#define CANT_OPEN_PROCESSED "No se puede abrir el archivo de salida \"%s\" para escritura, no se puede continuar."
 	#define CANT_OPEN_OR "No se puede abrir el archivo fuente \"%s\" o \"%s\", no se puede continuar."
 	#define CANT_OPEN_SOURCE "No se puede abrir el archivo fuente \"%s\", no se puede continuar."
-	#define DEFAULT_DEFINITE "the"
 #endif
 
 #if NATIVE_LANGUAGE==GERMAN
@@ -900,6 +896,5 @@
 	#define CANT_OPEN_PROCESSED "Unable to open output file \"%s\" for writing, can't continue."
 	#define CANT_OPEN_OR "Unable to open source file \"%s\" or \"%s\", can't continue."
 	#define CANT_OPEN_SOURCE "Unable to open source file \"%s\", can't continue."
-	#define DEFAULT_DEFINITE "the"
 #endif
 
