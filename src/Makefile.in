@@ -144,9 +144,10 @@ apache: install
 	    [ -e "$$game" ] || continue; \
 	    name=$$(basename "$$game" .jacl); \
 	    grep -q '^constant[[:space:]]\+game_publish[[:space:]]\+true' "$$game" 2>/dev/null || continue; \
-	    title=$$(grep '^constant game_title' "$$game" 2>/dev/null | head -1 | sed -E 's/.*"([^"]+)".*/\1/'); \
-	    if [ -z "$$title" ] || [ "$$title" = "$$(grep '^constant game_title' "$$game" | head -1)" ]; then \
-	      continue; \
+	    title_line=$$(grep -E '^constant[[:space:]]+game_title[[:space:]]' "$$game" 2>/dev/null | head -1); \
+	    title=$$(echo "$$title_line" | sed -E 's/.*"([^"]+)".*/\1/'); \
+	    if [ -z "$$title" ] || [ "$$title" = "$$title_line" ]; then \
+	      title="$$name"; \
 	    fi; \
 	    if grep -q '^#include "indonesian_verbs.library"' "$$game"; then lang="Indonesian"; \
 	    elif grep -q '^#include "spanish_verbs.library"' "$$game"; then lang="Spanish"; \
