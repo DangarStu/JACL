@@ -32,8 +32,8 @@ print:
 		right: 0;
 		display: inline;
         overflow: hidden;
-		font-family: Verdana, Arial, Sanserif; 
-		height: 160px;
+		font-family: Verdana, Arial, Sanserif;
+		height: 190px;
 		background-color: #40392e; }^
       div.mode {
 		display: inline;
@@ -72,7 +72,7 @@ print:
 		top: 117px;
 		right: 0px;
 		overflow: auto;
-		bottom: 160px;
+		bottom: 190px;
 .
 write " background-color: " maintext_colour "; }^"
 print:
@@ -159,7 +159,7 @@ print:
 		top: 87px;
 		width: 500px;
 		float: right;
-		bottom: 160px;
+		bottom: 190px;
 .
 write " background-color: " maintext_colour "; }^"
 print:
@@ -234,7 +234,8 @@ print:
 		padding-right: 0px;
 		padding-bottom: 0px; }^
 	div.interface {
-		height: 160px;
+		height: 190px;
+		box-sizing: border-box;
         float: left;
 		font-family: Verdana, Arial, Sanserif;
 		padding-top: 10px;
