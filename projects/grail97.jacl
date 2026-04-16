@@ -4485,8 +4485,8 @@ location estuary:
  has           OUTDOORS
  north         trail
  east          compound
- northwest     hill
- up            hill
+ northwest     hill2
+ up            hill2
  south         south_beach
 
 {look
@@ -5712,7 +5712,7 @@ object dolphin: dolphin dolphins
  inventory     the "dolphins"
  starts        limbo
 
-location hill:
+location hill2: hill
  has           OUTDOORS
  southeast     estuary
  down          estuary
@@ -5791,8 +5791,8 @@ set TURN_WORKED = false
 }
 
 location shed:
- south         hill
- out           hill
+ south         hill2
+ out           hill2
 
 {look
 if here has VISITED
@@ -6962,7 +6962,7 @@ set TURN_WORKED = false
 
 object hotel_phone: hotel concierge's concierges telephone franks frank's phone
  inventory     the "concierge's telephone"
- starts        childof counter
+ starts        childof lobby_counter
  mass          heavy
 
 {take
@@ -7115,7 +7115,7 @@ proxy "ring bell"
 
 object bell: small brass bell
  inventory     a "small brass bell"
- starts        childof counter
+ starts        childof lobby_counter
  mass          heavy
 
 {examine
@@ -7150,7 +7150,7 @@ endif
 break false
 }
 
-object counter: long curved counter
+object lobby_counter: long curved counter
  has           SURFACE
  inventory     a "long curved counter"
  quantity      50
@@ -11220,7 +11220,7 @@ if DIRECTION_TRAVELLED = UP
       set LONGITUDE + 1
 endall
 if DIRECTION_TRAVELLED = DOWN
-   if here = hill
+   if here = hill2
       set LONGITUDE + 1
       set LATITUDE + 1
    endif
@@ -11234,7 +11234,7 @@ if DIRECTION_TRAVELLED = DOWN
       set CURRENT_DEPTH + 5
 endall
 if DIRECTION_TRAVELLED = IN
-   if here = hill
+   if here = hill2
       set LATITUDE - 1
 endall
 if DIRECTION_TRAVELLED = OUT

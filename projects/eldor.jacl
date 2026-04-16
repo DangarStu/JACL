@@ -1,5 +1,5 @@
 #!../bin/jacl
-constant game_publish true
+constant game_publish false
 ;                                                            THE CURSE OF ELDOR
 ; -----------------------------------------------------------------------------
 ; Release 3, by Stuart Allen Copyright (C) 1995, 1996.
@@ -1440,7 +1440,7 @@ write "the ground without sliding back down on the slippery surface." return
 
 location ben_bridge "Beneath Wooden Bridge"
  has           ON_WATER
- south         drain
+ south         drain2
  east          river
  west          ford
 
@@ -1734,7 +1734,7 @@ if angel hasnt CUSTOM
    ensure angel has CUSTOM
 }
 
-object counter a marble counter
+object marble_counter a marble counter
  inventory     "marble counter"
  mass          scenery
 
@@ -1856,7 +1856,7 @@ object railing a sturdy railing
 write "The sturdy railing prevents you from falling into the river below."
 }
 
-location drain "Drain"
+location drain2 "Drain"
  north         ben_bridge
  south         ben_village
 
@@ -1868,7 +1868,7 @@ write "gratings high above your head." return
 }
 
 location ben_village "Beneath Village"
- north         drain
+ north         drain2
 
 {look
 write "You are standing in a large cavern directly beneath the village "
@@ -2194,14 +2194,14 @@ write "smaller tracks head off to the east and west." return
 
 location track_west "Track (West)"
  east          junction
- west          field
+ west          grassy_field
 
 {look
 write "You are on a track running east-west through the forest. To the west "
 write "the track opens out into a large grassy field." return
 }
 
-location field "Grassy Field"
+location grassy_field "Grassy Field"
  east          track_west
  west          log_cabin
  in            log_cabin
@@ -2213,8 +2213,8 @@ write "Standing in the centre of the field is simple log cabin." return
 }
 
 location log_cabin "Log Cabin"
- east          field
- out           field
+ east          grassy_field
+ out           grassy_field
  go_up         "You climb up the narrow ladder."
  up            loft
 
@@ -2725,7 +2725,7 @@ write "while the rooms only furnishing, a hard wooden bench, rests stained "
 write "and scratched on the cold, uneven floor." return
 }
 
-object bench a wooden bench
+object bench2 a wooden bench
  inventory     "wooden bench"
  mass          scenery
 
@@ -2853,7 +2853,7 @@ proxy "u"
 write "You are already at the bottom of the stairs." return
 }
 
-object sign a wooden sign
+object sign2 a wooden sign
  inventory     "wooden sign"
  mass          scenery
 
@@ -2861,7 +2861,7 @@ object sign a wooden sign
 execute "examine_sign"
 }
 
-object bird a mystical bird 
+object bird a mystical bird
  inventory     "mystical bird"
  mass          scenery
 
@@ -3259,7 +3259,7 @@ ensure uniform has WORN
 location inn "The Angler's Rest"
  north         bar
  south         main_street
- west          fire
+ west          fireside
 
 {look
 write "This is the Angler's Rest, undoubtedly the most famous inn in the "
@@ -3271,7 +3271,7 @@ write "time gone by. To the north you can make out a bar through the crowd, "
 write "while a large open fire can be seen roaring to the west." return
 }
 
-location fire "By the Fire"
+location fireside "By the Fire"
  east          inn
 
 {look
@@ -3377,14 +3377,14 @@ write "on the west side of the bar while an old and beaten poker machine "
 write "stands against the wall." return
 }
 
-object men a gruff men
+object men2 a gruff men
  inventory     "group of gruff looking men"
 
 {talk
-if men hasnt CUSTOM
+if men2 hasnt CUSTOM
    write "The men turn around, look at you, then turn back to their drinks "
    write "without saying a word." return
-   ensure men has CUSTOM
+   ensure men2 has CUSTOM
    break
 endif
 write "The men don't respond." return
@@ -3906,7 +3906,7 @@ write "desk stands in the corner. Round windows afford a view of the "
 write "ocean outside." return
 }
 
-object desk a writting desk
+object desk2 a writting desk
  inventory     "writting desk"
 
 {examine

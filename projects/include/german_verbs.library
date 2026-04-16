@@ -11,18 +11,18 @@ filter dem
 
 attribute DONT_MAP
 
-variable COUNTER
-variable INDEX
-variable TEMP
-variable RETURN_VALUE
-variable OB1
-variable OB2
-variable OB3
-variable OB4
-variable OXYGEN_LEFT
-variable WAY
-variable DIRECTION
-variable DESTINATION
+integer COUNTER
+integer INDEX
+integer TEMP
+integer RETURN_VALUE
+integer OB1
+integer OB2
+integer OB3
+integer OB4
+integer OXYGEN_LEFT
+integer WAY
+integer DIRECTION
+integer DESTINATION
 
 constant NORTH          0
 constant SOUTH          1
@@ -271,7 +271,7 @@ if DIRECTION = DOWN
 
 object previous_exits : previous exits
 
-variable EXITS_AVAILABLE
+integer EXITS_AVAILABLE
 
 {+exits
 set COUNTER = 0
@@ -453,17 +453,17 @@ break false
 {+can_talk
 if here has UNDER_WATER
   write "Es ist nicht leicht, unter Wasser zu reden.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun4 hasnt ANIMATE
   write "Ich glaube, es nutzt nichts, mit " noun4{the} " zu reden.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun4 has DEAD
   write  noun4{The} " " noun4{is} " ist etwas zu tot, um noch zu antworten.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun4 = player
@@ -476,7 +476,7 @@ break false
 {+reach
 if noun4 has OUT_OF_REACH
   write  noun4{The} " " noun4{is} " nicht zu erreichen.^"
-  set TIME = false
+  set time = false
   break
 endif
 break false
@@ -485,7 +485,7 @@ break false
 {+worn
 if noun4 has WORN
    write "" noun4{the} " sollte zuerst entfernt werden.^"
-   set TIME = false
+   set time = false
    break
 endif
 break false
@@ -517,7 +517,7 @@ grammar wave *held    >shake
 write "Kein Thema.^"
 }
 
-variable XYZZY	false
+integer XYZZY	false
 
 grammar sage xyzzy >xyzzy
 grammar xyzzy     >xyzzy
@@ -634,7 +634,7 @@ grammar hint *present >hint
 
 {+hint
 write "F&uuml;hr " noun1{the} " gibt es keine Hilfe.^"
-set TIME = false
+set time = false
 }
 
 grammar hilfe          >first_hint
@@ -642,28 +642,28 @@ grammar hilfe eins      >first_hint
 
 {+first_hint
 write "Es gibt zu diesem Raum keine spezielle Hilfe.^"
-set TIME = false
+set time = false
 }
 
 grammar hilfe zwei      >second_hint
 
 {+second_hint
 write "Es gibt keine weitere Hilfe zu diesen Raum.^"
-set TIME = false
+set time = false
 }
 
 grammar hilfe drei    >third_hint
 
 {+third_hint
 write "Auch eine dritte Hilfe gibt es nicht.^"
-set TIME = false
+set time = false
 }
 
 grammar hilfe vier     >fourth_hint
 
 {+fourth_hint
 write "Es gibt ein Maximum an Hilfem&ouml;glichkeiten. Dieses Maximum betr&auml;gt drei.^"
-set TIME = false
+set time = false
 }
 
 grammar hilfe spiel >help_games
@@ -764,14 +764,14 @@ grammar schnipple *present >cut
 
 {+cut
 write "Womit willst Du " noun1{the} " schneiden?^"
-set TIME = false
+set time = false
 }
 
 grammar steche *present >steche
 
 {+steche
 write "Womit willst Du " noun1{the} " stechen?^"
-set TIME = false
+set time = false
 }
 
 grammar schneide *present mit *held       >cut_with
@@ -786,7 +786,7 @@ if noun1 has ANIMATE
   break
 endif
 write "Vandale!^"
-set TIME = false
+set time = false
 }
 
 grammar steche *present mit *held      >steche_mit
@@ -800,7 +800,7 @@ if noun1 has ANIMATE
   break
 endif
 write "Vandale!^"
-set TIME = false
+set time = false
 }
 
 
@@ -817,7 +817,7 @@ break +darkness
 break +reach noun1
 override
 write "Sei doch nicht so destruktiv.^"
-set TIME = false
+set time = false
 }
 
 grammar s�ubere *present        >clean
@@ -832,7 +832,7 @@ break +reach noun1
 override
 if noun1 has LIQUID
   write "Wie willst Du eine Fl&uuml;ssigkeit s&auml;ubern?^"
-  set TIME = false
+  set time = false
   break
 endif
 override
@@ -850,12 +850,12 @@ break +reach noun1
 override
 if noun1 has LIQUID
   write "Wie willst Du eine Fl&uuml;ssigkeit s&auml;ubern?^"
-  set TIME = false
+  set time = false
   break
 endif
 override
 write "Du kannst " noun1{the} " nicht mit " noun2{the} "s&aumln;ubern.^"
-set TIME = false
+set time = false
 }
 
 grammar schreie *present an     >yell_at
@@ -901,7 +901,7 @@ break +darkness
 break +reach noun1
 override
 write "Du kannst " noun1{the} " nicht rauchen.^"
-set TIME = false
+set time = false
 }
 
 grammar spiele *present >play
@@ -912,7 +912,7 @@ break +darkness
 break +reach noun1
 override
 write "Du kannst " noun1{the} " nicht spielen.^"
-set TIME = false
+set time = false
 }
 
 grammar pumpe *present >pump
@@ -922,7 +922,7 @@ break +darkness
 break +reach noun1
 override
 write "Du kannst " noun1{the} " nicht pumpen.^"
-set TIME = false
+set time = false
 }
 
 grammar entnehme *here mit *held      >take_with
@@ -946,7 +946,7 @@ execute +liquid noun2
 if INDEX = false
   write  noun2{The} " " noun2{doesnt} " genug Fl&uuml;ssigkeit, um " noun1{the}
   write " zu f&uuml;llen.^"
-  set TIME = false
+  set time = false
   break
 endif
 proxy "f�lle " noun1 " mit " noun3
@@ -966,12 +966,12 @@ if noun1 has CLOSED
   write "Du kannst " noun1{the} " nicht f&uuml;llen solange "
   if noun1 has PLURAL
     write "sie geschlossen sind."
-    set TIME = false
+    set time = false
     break
   else
     write "er/sie/es"
     write " geschlossen ist.^"
-    set TIME = false
+    set time = false
     break
   endif
 endif
@@ -983,13 +983,13 @@ execute +liquidwrite noun1
 if INDEX = true
   write  noun1{The} " ist bereits mit " noun3{the} " gef&uuml;llt. W&uuml;rdest Du "
   write "nun " noun2{the} " hinzuf&uuml;gen w&uuml;rden sie sich vermischen.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun1(quantity) < noun2(mass)
   write  noun1{The} " " noun1{isnt} " ist nicht gross genug um " 
   write noun2{the} " aufzunehmen.^"
-  set TIME = false
+  set time = false
   break
 endif
 override
@@ -1015,7 +1015,7 @@ grammar f�lle *present >fill
 break +darkness
 override
 write "Womit willst Du " noun1{the} " f&uuml;llen?^"
-set TIME = false
+set time = false
 }
 
 grammar stehe         >stand
@@ -1036,7 +1036,7 @@ grammar penne           >sleep
 
 {+sleep
 write "Dazu hast Du sp&auml;ter noch genug Zeit...^"
-set TIME = false
+set time = false
 }
 
 grammar liege auf *present       >lie_on
@@ -1059,7 +1059,7 @@ grammar hinsetzen	>sit
 grammar setzen          >sit
 
 {+sit
-set TIME = false
+set time = false
 if player has SITTING
   write "Du sitzt bereits.^"
   break
@@ -1097,7 +1097,7 @@ grammar verliere alles              >drop_all
 grammar verliere alle gegenst�nde   >drop_all
 
 {+drop_all
-set TIME = false
+set time = false
 if here has MID_WATER : here has ON_WATER
   write "Alles, was Du mit Dir tr&auml;gst ins Wasser zu werfen scheint"
   write "mir keine gute Idee zu sein.^"
@@ -1108,17 +1108,17 @@ loop
 if noun3(parent) = player
   if noun3 hasnt WORN
     if noun3(mass) < heavy
-      if TIME = true
-	set TOTAL_MOVES + 1
+      if time = true
+	set total_moves + 1
       endif
       write "Du legst " noun3{the} " hin.^"
       move noun3 to here
-      set TIME = true
+      set time = true
       set INDEX + 1
     endif
   else
     write "Du musst erst " noun3{the} " ablegen.^"
-    set TIME = false
+    set time = false
     set INDEX + 1
   endif
 endif
@@ -1138,7 +1138,7 @@ grammar schmeisse *held	>throw
 if noun1 has WEARABLE
   if noun1 has WORN
     write "Du musst erst " noun1{the} " ablegen.^"
-    set TIME = false
+    set time = false
     break
   endif
 endif
@@ -1165,7 +1165,7 @@ grammar lege *held ab	>drop
 if noun1 has WEARABLE
   if noun1 has WORN
     write "Du musst erst " noun1{the} " ablegen.^"
-    set TIME = false
+    set time = false
     break
   endif
 endif
@@ -1196,7 +1196,7 @@ grammar nimm alles im *present               >take_all_from
 grammar nehme alles im *present              >take_all_from
 
 {+take_all_from
-set TIME = false
+set time = false
 break +darkness
 break +reach noun1
 override
@@ -1222,8 +1222,8 @@ loop
       if noun3(mass) < heavy
          if noun3 hasnt LIQUID
             if noun3(mass) <= player(quantity)
-	       if TIME = true
-	          set TOTAL_MOVES + 1
+	       if time = true
+	          set total_moves + 1
 	       endif
 	       execute +take_routine
 	       set INDEX + 1
@@ -1250,14 +1250,14 @@ grammar nehme alles auf       >take_all
 
 {+take_all
 break +darkness
-set TIME = false
+set time = false
 set INDEX = 0
 loop
 if noun3(parent) = here
   if noun3(mass) < heavy
     if noun3 hasnt LIQUID
-      if TIME = true
-	set TOTAL_MOVES + 1
+      if time = true
+	set total_moves + 1
       endif
       execute +take_routine
       set INDEX + 1
@@ -1277,13 +1277,13 @@ break +reach noun3
 if noun3(mass) > player(quantity)
    write "Du tr&auml;gst bereits zu viele Gegenst&auml;nde mit Dir herum.^"
    write noun3{the} " w&auml;re nun wirklich zu viel.^"
-   set TIME = false
+   set time = false
    break
 endif
 break noun3.take
 override
 write "Du nimmst " noun3{the} ".^"
-set TIME = true
+set time = true
 move noun3 to player
 ensure noun3 has TOUCHED
 }
@@ -1298,7 +1298,7 @@ break +darkness
 break +reach noun1
 if player has SITTING
   write "Du solltest zun&auml;chst mal aufstehen.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun1(mass) >= heavy : noun1 has LOCATION
@@ -1308,7 +1308,7 @@ endif
 if noun1(mass) > player(quantity)
    write "Du tr&auml;gst bereits zu viele Gegenst&auml;nde mit Dir herum.^"
    write noun3{the} " w&auml;re nun wirklich zu viel.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun1 has LIQUID
@@ -1322,7 +1322,7 @@ ensure noun1 has TOUCHED
 }
 
 {+move_scenery
-set TIME = false
+set time = false
 if noun1 has LOCATION
    write "Das w&uuml;rde von beeindruckender Kraft zeugen.^"
    break
@@ -1350,12 +1350,12 @@ if noun2 = noun1
     write "sich selber legen?"
   endif
   write " Ich glaube kaum.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun2(parent) = noun1
   write "Ich f&uuml;rchte, das ist nicht m&ouml;glich.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun1(mass) >= heavy : noun1 has LOCATION
@@ -1365,12 +1365,12 @@ endif
 break +worn noun1
 if noun2 hasnt SURFACE
   write "" noun2{the} " besitzt keine geeignete Fl&auml;che daf&uuml;r.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun2(quantity) < noun1(mass)
   write "" noun2{the} " hat nicht genug Platz f&uuml;r " noun1{the} ".^"
-  set TIME = false
+  set time = false
   break
 endif
 override
@@ -1396,34 +1396,34 @@ if noun2 = noun1
     write "sich selber packen?"
   endif
   write "Ich glaube nicht.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun2(parent) = noun1
   write "'Ich bef&uuml;rchte, das wird nicht m&ouml;glich sein.^"
-  set TIME = false
+  set time = false
   break
 endif
 break +worn noun1
 if noun2 = player
   write "Mich w&uuml;rde interessieren, wie Du das bewerkstelligen willst, aber etwas"
   write "sagt mir, das ich das besser nicht fragen sollte.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun2 hasnt CONTAINER
   write  noun2{The} " " noun2{isnt} " ist nicht in der Lage " noun1{the} " aufzunehmen.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun2 has CLOSED
   write  noun2{The} " " noun2{is} " geschlossen.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun2(quantity) < noun1(mass)
   write noun2{the} "hat nicht genug Platz um " noun1{the} " aufzunehmen.^"
-  set TIME = false
+  set time = false
   break
 endif
 override
@@ -1438,13 +1438,13 @@ grammar lege alles in *present    >insert_all_in
 break +darkness
 if noun1 hasnt CONTAINER
   write  noun1{The} " " noun1{isnt} " dazu beschaffen.^"
-  set TIME = false
+  set time = false
   break
 endif
 break +reach noun1
 if noun1 has CLOSED
   write  noun1{The} " " noun1{is} " geschlossen.^"
-  set TIME = false
+  set time = false
   break
 endif
 set INDEX = 0
@@ -1477,7 +1477,7 @@ grammar lege alles aufs *present    >insert_all_on
 break +darkness
 if noun1 hasnt SURFACE
    write "" noun1{The} " bietet daf&uuml;r keine geeignete Fl&auml;che.^"
-   set TIME = false
+   set time = false
    break
 endif
 break +reach noun1
@@ -1516,13 +1516,13 @@ grammar bitte *present mir *carried zu geben     >ask_for
 break +can_talk noun1
 if noun1 !grandof noun2
   write  noun1{The} " " noun1{doesnt} " seem to have " noun2{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 if noun2(mass) > player(quantity)
   write "With your current load you would be unable to accept"
   write noun2{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 override
@@ -1584,7 +1584,7 @@ grammar give *held to *present      >give_to
 {+give_to
 if noun2 hasnt ANIMATE
   write "You can't give " noun1{the} " to " noun2 .^
-  set TIME = false
+  set time = false
   break
 endif
 if noun2 = player
@@ -1610,7 +1610,7 @@ break +darkness
 break +reach noun1
 if player has SITTING
    write "You will have to stand up first.^"
-   set TIME = false
+   set time = false
    break
 endif
 if noun1(mass) >= heavy : noun1 has LOCATION
@@ -1991,11 +1991,11 @@ execute "+score"
 }
 
 {+score
-set TIME = false
-if TOTAL_MOVES = 1
-  write "Punktzahl: " SCORE "% in einem Spielzug.^"
+set time = false
+if total_moves = 1
+  write "Punktzahl: " score "% in einem Spielzug.^"
 else
-  write "Punktzahl: " SCORE "% in " TOTAL_MOVES " Spielz&uuml;gen.^"
+  write "Punktzahl: " score "% in " total_moves " Spielz&uuml;gen.^"
 }
 
 grammar open *present >open
@@ -2005,17 +2005,17 @@ break +darkness
 break +reach noun1
 if noun1 has LOCKED
   write  noun1{The} " " noun1{is} " verschlossen.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun1 hasnt CLOSABLE
   write "" noun1{the} "kannst Du nicht &ouml;ffnen.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun1 hasnt CLOSED
   write  noun1{The} " " noun1{is} " bereits offen.^"
-  set TIME = false
+  set time = false
   break
 endif
 override
@@ -2062,13 +2062,13 @@ break +darkness
 break +reach noun1
 if noun1 hasnt CLOSABLE
   write "You can't close " noun1{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 break +reach noun1
 if noun1 has CLOSED
   write  noun1{The} " " noun1{is} " already closed.^"
-  set TIME = false
+  set time = false
   break
 endif
 override
@@ -2096,7 +2096,7 @@ if noun1 has CLOSABLE
       write "it is"
     endif
     write " open.^"
-    set TIME = false
+    set time = false
     break
   endif
 endif
@@ -2114,7 +2114,7 @@ grammar lock *present with *held >lock_with
 break +darkness
 if noun1 hasnt LOCKABLE
   write "You can't lock " noun1{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 break +reach noun1
@@ -2131,12 +2131,12 @@ if noun1 has CLOSABLE
       write "it is"
     endif
     write " open.^"
-    set TIME = false
+    set time = false
     break
 endif
 override
 write "You can't lock " noun1{the} " with " noun2{the} .^
-set TIME = false
+set time = false
 }
 
 grammar unlock *present >unlock
@@ -2145,13 +2145,13 @@ grammar unlock *present >unlock
 break +darkness
 if noun1 hasnt LOCKABLE
   write "You can't unlock " noun1{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 break +reach noun1
 if noun1 hasnt LOCKED
   write  noun1{The} " " noun1{is} " already unlocked.^"
-  set TIME = false
+  set time = false
   break
 endif
 override
@@ -2164,7 +2164,7 @@ grammar open *present with *held      >unlock_with
 {+unlock_with
 if noun1 hasnt LOCKABLE
   write "You can't unlock " noun1{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 break +reach noun1
@@ -2174,7 +2174,7 @@ if noun1 hasnt LOCKED
 endif
 override
 write "You can't unlock " noun1{the} " with " noun2{the} .^
-set TIME = false
+set time = false
 }
 
 grammar show *held to *present        >show_to
@@ -2188,7 +2188,7 @@ if noun1 = noun2
   else
       write "itself.^"
   endif
-  set TIME = false
+  set time = false
   break
 endif
 override
@@ -2202,7 +2202,7 @@ grammar undo *present         >untie
 {+untie
 break +darkness
 write  noun1{The} " " noun1{is} " not tied to anything.^"
-set TIME = false
+set time = false
 }
 
 grammar tie *held     >tie
@@ -2211,7 +2211,7 @@ grammar attach *held  >tie
 {+tie
 break +darkness
 write "What do you want to tie " noun1{the} " to?^"
-set TIME to false
+set time to false
 }
 
 grammar tie *held to *present         >tie_to
@@ -2223,7 +2223,7 @@ break +darkness
 break +reach noun2
 override
 write "You can't tie " noun1{the} " to " noun2{the} .^
-set TIME = false
+set time = false
 }
 
 grammar attack *present       >attack
@@ -2239,13 +2239,13 @@ break +reach noun1
 if noun1 has ANIMATE
   if noun1 has DEAD
     write  noun1{The} " " noun1{is} " already dead.^"
-    set TIME = false
+    set time = false
     break
   endif
 endif
 override
 write "Attacking " noun1{the} " with your hands would have little effect.^"
-set TIME = false
+set time = false
 }
 
 grammar attack *present with *held    >attack_with
@@ -2268,14 +2268,14 @@ break +worn noun1
 if noun1 has ANIMATE
   if noun1 has DEAD
     write  noun1{The} " " noun1{is} " already dead.^"
-    set TIME = false
+    set time = false
     break
   endif
 endif
 override
 write "Attacking " noun1{the} " with " noun2{the} " would have little "
 write "effect.^"
-set TIME = false
+set time = false
 }
 
 grammar wave  >wave
@@ -2302,7 +2302,7 @@ grammar stand on *here   >jump_on
 
 {+jump_on
 break +darkness
-set TIME = false
+set time = false
 if noun1 hasnt SURFACE
   write "You can't jump on " noun1{the} .^
   break
@@ -2315,7 +2315,7 @@ grammar jump over *here       >jump_over
 {+jump_over
 break +darkness
 write "You can't jump over " noun1{the} .^
-set TIME = false
+set time = false
 }
 
 grammar jump             >jump
@@ -2347,14 +2347,14 @@ grammar yeah  >yes
 
 {+yes
 write "That was a rhetorical question.^"
-set TIME = false
+set time = false
 }
 
 grammar no >no
 
 {+no
 write "That was a rhetorical question.^"
-set TIME = false
+set time = false
 }
 
 grammar why   >why
@@ -2362,7 +2362,7 @@ grammar why?  >why
 
 {+why
 write "Because.^"
-set TIME = false
+set time = false
 }
 
 grammar blow *held at *here   >blow_at
@@ -2371,7 +2371,7 @@ grammar blow *held to *here   >blow_at
 {+blow_at
 break +darkness
 write "You can't blow " noun1{the} " at " noun2{the} .^
-set TIME = false
+set time = false
 }
 
 grammar throw *held in *here	>throw_at
@@ -2403,7 +2403,7 @@ if noun2 has ANIMATE
   else
     write "him.^"
   endif
-  set TIME = false
+  set time = false
   break
 endif
 break +worn noun1
@@ -2415,7 +2415,7 @@ if noun2(parent) hasnt LOCATION
     write "it is"
   endif
   write " in something else.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun1(mass) >= heavy : noun1 has LOCATION
@@ -2431,12 +2431,12 @@ if noun1(mass) => 20
     write " is "
   endif
   write "a bit too heavy to go throwing around.^"
-  set TIME = false
+  set time = false
   break
 endif
 if here has UNDER_WATER
   write "Throwing things underwater is never as easy as you might think.^"
-  set TIME = false
+  set time = false
   break
 endif
 if here has ON_WATER
@@ -2473,7 +2473,7 @@ grammar get *present on *present              >remove_from
 break +darkness
 if noun1(parent) <> noun2
   write  noun1{The} " " noun1{is} " not in " noun2{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 proxy "take" noun1
@@ -2487,7 +2487,7 @@ grammar doff *present         >remove
 if noun1 hasnt WORN
   if noun1(parent) = player
     write "You are not wearing " noun1{the} .^
-    set TIME = false
+    set time = false
     break
   endif
 endif
@@ -2497,7 +2497,7 @@ if noun1 hasnt WORN
 endif
 if noun1(mass) > player(quantity)
   write "You are carrying too much to remove " noun1{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 override
@@ -2514,12 +2514,12 @@ grammar don *held     >wear
 {+wear
 if noun1 hasnt WEARABLE
   write "You can't wear " noun1{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 if noun1 has WORN
   write "You are already wearing " noun1{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 override
@@ -2543,7 +2543,7 @@ grammar eat *present          >eat
 {+eat
 break +darkness
 write "You can't eat " noun1{the} .^
-set TIME = false
+set time = false
 }
 
 grammar drink from *present   >drink_from
@@ -2554,11 +2554,11 @@ break +darkness
 execute +liquidwrite noun1
 if INDEX = true
   proxy "drink " noun3
-  set TIME = false
+  set time = false
   break
 endif
 write "There is nothing to drink in " noun1{the} .^
-set TIME = false
+set time = false
 }
 
 grammar drink *present        >drink
@@ -2569,7 +2569,7 @@ break +darkness
 break +reach noun1
 if noun1 hasnt LIQUID
   write "You can't drink " noun1{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 override
@@ -2613,18 +2613,18 @@ grammar set fire to *present with *held >light_with
 {+light_with
 if here has UNDER_WATER
   write "I don't think you are going to be lighting anything under water.^"
-  set TIME = false
+  set time = false
   break
 endif
 break +reach noun1
 if noun1 hasnt FLAMMABLE
   write  noun1{The} " " noun1{is} " not at all flammable.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun2 hasnt IGNITABLE
   write "I don't see how you can light " noun1{the} " using " noun2 .^
-  set TIME = false
+  set time = false
   break
 endif
 if noun1(quantity) = 0
@@ -2633,7 +2633,7 @@ if noun1(quantity) = 0
 endif
 if noun1 has BURNING
   write  noun1{The} " " noun1{is} " already lit.^"
-  set TIME = false
+  set time = false
   break
 endif
 override
@@ -2650,7 +2650,7 @@ grammar set fire to *present  >light
 {+light
 if here has UNDER_WATER
   write "I don't think you are going to be lighting anything under water.^"
-  set TIME = false
+  set time = false
   break
 endif
 break +reach noun1
@@ -2661,16 +2661,16 @@ if noun1 has IGNITABLE
 endif
 if noun1 hasnt FLAMMABLE
   write  noun1{The} " " noun1{is} " not at all flammable.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun1 has BURNING
   write  noun1{The} " " noun1{is} " already alight.^"
-  set TIME = false
+  set time = false
   break
 endif
 write "What did you intent to light " noun1{the} " with?^"
-set TIME = false
+set time = false
 }
 
 grammar extinguish *present   >extinguish
@@ -2680,7 +2680,7 @@ grammar put *present out      >extinguish
 {+extinguish
 if noun1 hasnt BURNING
   write  noun1{The} " " noun1{is} " not lit.^"
-  set TIME = false
+  set time = false
   break
 endif
 break +reach noun1
@@ -2705,7 +2705,7 @@ if here has ON_WATER
    break
 endif
 write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
-set TIME = false
+set time = false
 }
 
 grammar westen             >west
@@ -2732,7 +2732,7 @@ if here has ON_WATER
   break
 endif
 write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
-set TIME = false
+set time = false
 }
 
 grammar osten            >east
@@ -2759,7 +2759,7 @@ if here has ON_WATER
   break
 endif
 write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
-set TIME = false
+set time = false
 }
 
 grammar s�den             >south
@@ -2785,7 +2785,7 @@ if here has ON_WATER
   break
 endif
 write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
-set TIME = false
+set time = false
 }
 
 grammar s�dosten              >southeast
@@ -2811,7 +2811,7 @@ if here has ON_WATER
   break
 endif
 write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
-set TIME = false
+set time = false
 }
 
 grammar s�dwest               >southwest
@@ -2838,7 +2838,7 @@ if here has ON_WATER
   break
 endif
 write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
-set TIME = false
+set time = false
 }
 
 grammar norden              >north
@@ -2865,7 +2865,7 @@ if here has ON_WATER
   break
 endif
 write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
-set TIME = false
+set time = false
 }
 
 grammar nordosten                    >northeast
@@ -2892,7 +2892,7 @@ if here has ON_WATER
   break
 endif
 write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
-set TIME = false
+set time = false
 }
 
 grammar nordwesten                    >northwest
@@ -2910,7 +2910,7 @@ grammar go up *here           >climb_up
 
 {+climb_up
 write "" noun1{the} " kannst Du nicht hinaufklettern.^"
-set TIME = false
+set time = false
 }
 
 grammar climb down *here      >climb_down
@@ -2919,7 +2919,7 @@ grammar go down *here         >climb_down
 
 {+climb_down
 write "" noun1{the} " kannst Du nicht herabklettern.^"
-set TIME = false
+set time = false
 }
 
 grammar enter *here		>enter
@@ -2935,7 +2935,7 @@ grammar jump in *here		>enter
 {+enter
 break +reach noun1
 write "" noun1{the} " kannst Du nicht betreten.^"
-set TIME = false
+set time = false
 }
 
 
@@ -2961,7 +2961,7 @@ repeat
    set INDEX + 1
 until INDEX = 12
 write "" noun1{the} " ist von hier nicht erreichbar.^"
-set TIME = false
+set time = false
 }
 
 {+go_direction
@@ -3010,7 +3010,7 @@ grammar scale *here >climb
 
 {+climb
 write "You can not climb up " noun1{the} .^
-set TIME = false
+set time = false
 }
 
 grammar swim in >swim_in
@@ -3027,7 +3027,7 @@ if here has ON_WATER
   break
 endif
 write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
-set TIME = false
+set time = false
 }
 
 grammar get in        >in
@@ -3055,7 +3055,7 @@ if here has ON_WATER
   break
 endif
 write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
-set TIME = false
+set time = false
 }
 
 grammar get out       >out
@@ -3086,7 +3086,7 @@ if here has ON_WATER
   break
 endif
 write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
-set TIME = false
+set time = false
 }
 
 grammar up            >up
@@ -3117,7 +3117,7 @@ if here has ON_WATER
   break
 endif
 write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
-set TIME = false
+set time = false
 }
 
 grammar down          >down
@@ -3145,7 +3145,7 @@ grammar schaue unter *present >look_under
 break +darkness
 if noun1(mass) >= heavy : noun1 has LOCATION
   write "You can't see under " noun1{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 write "There is nothing unusual under " noun1{the} .^
@@ -3157,7 +3157,7 @@ grammar look behind *present >look_behind
 break +darkness
 if noun1(mass) >= heavy : noun1 has LOCATION
   write "You can't see behind " noun1{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 write "There is nothing unusual behind " noun1{the} .^
@@ -3169,7 +3169,7 @@ grammar look out *present     >look_through
 {+look_through
 break +darkness
 write "You can't look through " noun1{the} .^
-set TIME = false
+set time = false
 }
 
 grammar look through *held at *present        >look_through_at
@@ -3190,12 +3190,12 @@ if noun1 = noun2
     write "themselves.^"
   else
     write "itself.^"
-  set TIME = false
+  set time = false
   break
 endif
 override
 write "You can't look at " noun1{the} " through " noun2{the} .^
-set TIME = false
+set time = false
 }
 
 grammar wait  >wait
@@ -3227,7 +3227,7 @@ break +darkness
 if noun1 has ANIMATE
   write "I acknoweledge that I probably don't want to know the answer to "
   write "this question, but in what way did you want to use " noun1{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 write "I'm afraid you are going to have to be a bit more specific.^"
@@ -3242,7 +3242,7 @@ grammar spin *present                 >turn
 break +darkness
 break +reach noun1
 write "You can't turn " noun1{the} .^
-set TIME = false
+set time = false
 }
 
 grammar schalte *present an     >turn_on
@@ -3253,13 +3253,13 @@ grammar switch *present on    >turn_on
 {+turn_on
 if noun1 hasnt SWITCHABLE
   write "You can't turn " noun1{the} " on.^"
-  set TIME = false
+  set time = false
   break
 endif
 break +reach noun1
 if noun1 has ON
   write  noun1{The} " " noun1{is} " already on.^"
-  set TIME = false
+  set time = false
   break
 endif
 override
@@ -3275,13 +3275,13 @@ grammar switch *present off >turn_off
 {+turn_off
 if noun1 hasnt SWITCHABLE
   write "You can't turn " noun1{the} " off.^"
-  set TIME = false
+  set time = false
   break
 endif
 break +reach noun1
 if noun1 hasnt ON
   write  noun1{The} " " noun1{is} " already off.^"
-  set TIME = false
+  set time = false
   break
 endif
 override
@@ -3295,18 +3295,18 @@ grammar pour *present         >pour
 break +darkness
 if noun1 hasnt LIQUID
    write "You can't pour " noun1{the} .^
-   set TIME = false
+   set time = false
    break
 endif
 set noun3 = noun1(parent)
 if noun3 = false : noun3(parent) <> player
   write "You don't have " noun1{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 if noun3 has CLOSED
   write "I don't see " noun1{the} " here.^"
-  set TIME = false
+  set time = false
   break
 endif
 break +reach noun1
@@ -3360,19 +3360,19 @@ grammar pour *present over *present   >pour_on
 break +darkness
 if noun1 hasnt LIQUID
   write "You can't pour " noun1{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 break +reach noun1
 set noun3 = noun1(parent)
 if noun3 = false : noun3(parent) <> player
   write "You do not have " noun1{the} .^
-  set TIME = false
+  set time = false
   break
 endif
 if noun3 has CLOSED
   write "I can't see " noun1{the} " here.^"
-  set TIME = false
+  set time = false
   break
 endif
 break +reach noun2
@@ -3381,7 +3381,7 @@ execute +liquidwrite noun2
 if INDEX = true
   write  noun2{The} " already contain" noun2{s} " " noun3{the} ". If you "
   write "were to also add " noun1{the} " they would mix together.^"
-  set TIME = false
+  set time = false
   break
 endif
 if noun2 has CONTAINER
@@ -3592,7 +3592,7 @@ write "part carefully as vital clues may be hidden in the descriptions of the "
 write "locations and objects you come across. Examining every object you can "
 write "refer to is a good idea, as is saving your position often. Well, good "
 write "luck, and above all have fun!^"
-set TIME = false
+set time = false
 }
 
 ;                                                    SPEAKING TO OTHER OBJECTS
@@ -3667,17 +3667,17 @@ grammar *present hi			>greet
 {+greet
 if here has UNDER_WATER
    write "Talking under water isn't very easy.^"
-   set TIME = false
+   set time = false
    break
 endall
 if noun1 hasnt ANIMATE
    write "I don't think talking to " noun1{the} " is going to help somehow.^"
-   set TIME = false
+   set time = false
    break
 endall
 if noun1 has DEAD 
    write  noun1{The} " " noun1{is} " a bit too dead to respond.^"
-   set TIME = false
+   set time = false
    break
 endall
 if noun1 = player
@@ -3718,9 +3718,9 @@ grammar *anywhere >noun_only
 {+noun_only
 if noun1 isnt *present
    write "You don't see any such thing.^"
-   set TIME = false
+   set time = false
    break
 endif
 write "There is no verb in that sentence.^"
-set TIME = false
+set time = false
 }
