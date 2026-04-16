@@ -1,0 +1,66 @@
+JACL Adventure Creation Language v4.6
+
+JACL is an interactive fiction authoring system with console and web-based
+interpreters. Games are plain-text source files; no compilation step is
+needed.
+
+Building from source
+--------------------
+
+    cd src
+    ./configure
+    make install
+
+If the configure script does not exist, generate it with:
+
+    autoconf
+
+The configure script will detect your platform and available libraries,
+then build the appropriate interpreters. Binaries are placed in the bin/
+directory.
+
+Options:
+  --with-language=LANG  Set the interpreter language. Supported values:
+                        english (default), french, german, indonesian
+
+  Example: ./configure --with-language=french
+
+Optional dependencies:
+  ncurses  - Required for 'jacl' (GlkTerm console interpreter)
+  libfcgi  - Required for 'fcgijacl' (FastCGI web interpreter)
+
+If these libraries are not found, the corresponding interpreters will be
+skipped. The remaining interpreters (bjorb, cjacl, cgijacl) have no
+external dependencies beyond a C compiler.
+
+Interpreters:
+  jacl      - console interpreter (GlkTerm + ncurses)
+  cjacl     - console interpreter (CheapGlk, no dependencies)
+  cgijacl   - standalone web server interpreter
+  fcgijacl  - FastCGI web interpreter (for use behind Apache/nginx)
+  bjorb     - utility for packaging game resources
+
+Quick start
+-----------
+
+    bin/jacl projects/grail.jacl
+
+For the full language reference see the Author's Guide:
+
+    guide/index.html
+
+Deploying to Apache
+-------------------
+
+    cd src
+    sudo make apache
+
+This installs fcgijacl behind Apache with mod_fcgid, copies all games
+and static assets, deploys the Author's Guide to /guide/, and generates
+a landing page at /var/www/html/index.html listing every game that has
+`constant game_publish true` in its source.
+
+VS Code syntax highlighting
+----------------------------
+
+    code --install-extension editors/vscode-jacl/jacl-0.1.0.vsix
