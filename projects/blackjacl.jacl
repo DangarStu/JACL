@@ -267,12 +267,12 @@ set hand_one(aces_as_one) = 0
 set hand_one(cards) = 1
 set hand_two(aces_as_one) = 0
 set hand_two(cards) = 1
-set FIRST = false
+set BJ_FIRST = false
 set INDEX = FIRST_CARD
 repeat
    if INDEX(parent) = current_hand
-      if FIRST = false
-         set FIRST = INDEX
+      if BJ_FIRST = false
+         set BJ_FIRST = INDEX
       else
          set SECOND = INDEX
       endif
@@ -283,7 +283,7 @@ set SECOND(parent) = hand_two
 if SECOND(value) = 11
    set hand_two(aces) = 1
    set hand_one(aces) - 1
-   if FIRST(value) = 11
+   if BJ_FIRST(value) = 11
 	  ; Splitting aces...
       set hand_one(total) = 11
       set hand_two(total) = 11
@@ -449,16 +449,16 @@ if noun4(aces) > noun4(aces_as_one)
 endif
 }
 
-integer FIRST
+integer BJ_FIRST
 integer SECOND
 
 {+is_pair
-set FIRST = 0
+set BJ_FIRST = 0
 set INDEX = FIRST_CARD
 repeat
    if INDEX(parent) = current_hand
-      if FIRST = 0
-         set FIRST = INDEX(value)
+      if BJ_FIRST = 0
+         set BJ_FIRST = INDEX(value)
       else
          set SECOND = INDEX(value)
          return
@@ -896,17 +896,17 @@ write "^"
 {+basic_strategy_code
 execute "+is_pair"
 if current_hand(cards) = 2
-   if FIRST = SECOND
+   if BJ_FIRST = SECOND
       # CURRENT HAND IS A PAIR
-      if FIRST = 11
+      if BJ_FIRST = 11
          set best_move = split
          return
       endif
-      if FIRST = 10
+      if BJ_FIRST = 10
          set best_move = stay
          return
       endif
-      if FIRST = 9
+      if BJ_FIRST = 9
          if dealers_hand(total) = 7 : dealers_hand(total) > 9
             set best_move = stay
          else 
@@ -914,11 +914,11 @@ if current_hand(cards) = 2
          endif
          return
       endif
-      if FIRST = 8
+      if BJ_FIRST = 8
          set best_move = split
          return
       endif
-      if FIRST = 7
+      if BJ_FIRST = 7
          if dealers_hand(total) > 7
             set best_move = hit
          else 
@@ -926,7 +926,7 @@ if current_hand(cards) = 2
          endif
          return
       endif
-      if FIRST = 6
+      if BJ_FIRST = 6
          if dealers_hand(total) = 2 : dealers_hand(total) > 6
             set best_move = hit
          else
@@ -934,7 +934,7 @@ if current_hand(cards) = 2
          endif
          return
       endif
-      if FIRST = 5
+      if BJ_FIRST = 5
          if dealers_hand(total) > 9
             set best_move = hit
          else
@@ -942,7 +942,7 @@ if current_hand(cards) = 2
          endif
          return
       endif
-      if FIRST = 4
+      if BJ_FIRST = 4
          if dealers_hand(total) = 5 : dealers_hand(total) = 6
             set best_move = split
          else
@@ -1091,7 +1091,7 @@ if GAME_PHASE = players_turn
    if current_hand(cards) = 2
       if current_player(hands) = 1
          execute "+is_pair" 
-         if FIRST = SECOND
+         if BJ_FIRST = SECOND
             write " split"
          endif
       endif
@@ -1148,7 +1148,7 @@ if GAME_PHASE = players_turn
    if current_hand(cards) = 2
       if current_player(hands) = 1
          execute "+is_pair" 
-         if FIRST = SECOND
+         if BJ_FIRST = SECOND
             hyperlink "SPLIT" "split"
             write " | "
          endif
