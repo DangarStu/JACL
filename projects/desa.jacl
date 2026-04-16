@@ -45,6 +45,7 @@ return false
 
 object pintu : pintu
  short         sebuah "pintu kayu"
+ definite      sebuah
  has           CLOSABLE CLOSED
  mass          scenery
 
@@ -72,6 +73,7 @@ set sawah(north) = nowhere
 
 object tikar : tikar
  short         sebuah "tikar"
+ definite      sebuah
  mass          scenery
 
 {examine
@@ -85,6 +87,7 @@ set time = false
 
 object meja : meja kayu
  short         sebuah "meja kayu"
+ definite      sebuah
  has           SURFACE
  mass          scenery
 
@@ -94,6 +97,7 @@ write "Meja kayu kecil yang sederhana. Permukaannya halus karena sudah sering di
 
 object cangkir : cangkir kopi
  short         sebuah "cangkir kopi"
+ definite      sebuah
  long          "Sebuah cangkir kopi ada di atas meja.^"
  parent        meja
  mass          5
@@ -128,6 +132,7 @@ execute "+weather_line"
 
 object segehan : segehan sesajen_tanah persembahan
  short         sebuah "segehan"
+ definite      sebuah
  long          "Sebuah segehan diletakkan di tanah dekat pintu rumahmu.^"
  mass          scenery
 
@@ -160,6 +165,7 @@ write "Tanaman padi tumbuh subur. Butirnya hampir siap dipanen.^"
 
 object capung : capung
  short         seekor "capung"
+ definite      seekor
  mass          scenery
 
 {examine
@@ -168,6 +174,7 @@ write "Capung berwarna biru terbang rendah di atas air sawah.^"
 
 object kuntul : kuntul burung bangau putih
  short         seekor "kuntul putih"
+ definite      seekor
  long          "Seekor kuntul putih berdiri diam di tepi sawah, mengawasi air.^"
  has           ANIMATE
  mass          scenery
@@ -273,6 +280,7 @@ execute "+weather_line"
 
 object pohon : pohon besar
  short         sebuah "pohon besar"
+ definite      sebuah
  mass          scenery
 
 {examine
@@ -281,6 +289,7 @@ write "Pohon beringin yang besar dan tua. Akarnya menjalar ke mana-mana.^"
 
 object anjing : anjing
  short         seekor "anjing"
+ definite      seekor
  long          "Seekor anjing tidur di bawah pohon.^"
  mass          scenery
 
@@ -313,6 +322,7 @@ print:
 
 object bangku : bangku
  short         sebuah "bangku"
+ definite      sebuah
  mass          scenery
 
 {examine
@@ -325,6 +335,7 @@ write "Kamu duduk di bangku. Enak untuk istirahat sebentar.^"
 
 object rak : rak
  short         sebuah "rak"
+ definite      sebuah
  mass          scenery
 
 {examine
@@ -396,6 +407,7 @@ write "~Anak kecil itu tetangga saya,~ kata Ibu Warung. ~Namanya Made. Dia suka 
 
 object pisang : pisang buah_pisang
  short         sebuah "pisang"
+ definite      sebuah
  long          "Setandan pisang kuning tergantung di atas meja.^"
  parent        warung
  mass          2
@@ -431,6 +443,7 @@ write "~Tiga ribu rupiah,~ kata Ibu Warung. Kamu membeli sebuah pisang.^"
 
 object mangga : mangga buah_mangga
  short         sebuah "mangga"
+ definite      sebuah
  long          "Beberapa mangga harum tersusun di rak.^"
  parent        warung
  mass          3
@@ -466,6 +479,7 @@ write "~Lima ribu rupiah,~ kata Ibu Warung. Kamu membeli sebuah mangga.^"
 
 object kerupuk : kerupuk
  short         sebungkus "kerupuk"
+ definite      sebungkus
  long          "Sebungkus kerupuk renyah tergantung di rak.^"
  parent        warung
  mass          1
@@ -501,6 +515,7 @@ write "~Dua ribu rupiah,~ kata Ibu Warung. Kamu membeli sebungkus kerupuk.^"
 
 object kucing : kucing
  short         seekor "kucing belang"
+ definite      seekor
  long          "Seekor kucing belang sedang tidur melingkar di bawah bangku.^"
  has           ANIMATE
  mass          scenery
@@ -548,6 +563,7 @@ print:
 
 object tiang : tiang kayu
  short         sebuah "tiang kayu"
+ definite      sebuah
  mass          scenery
 
 {examine
@@ -557,6 +573,7 @@ write "Ada ukiran sederhana di permukaannya.^"
 
 object meja_besar : meja besar
  short         sebuah "meja besar"
+ definite      sebuah
  has           SURFACE
  mass          scenery
 
@@ -566,6 +583,7 @@ write "Meja besar tempat warga desa berkumpul untuk rapat dan upacara.^"
 
 object buku_tamu : buku tamu
  short         sebuah "buku tamu"
+ definite      sebuah
  long          "Sebuah buku tamu tergeletak di atas meja.^"
  parent        meja_besar
  mass          5
@@ -597,6 +615,7 @@ execute "+weather_line"
 
 object padmasana : padmasana singgasana batu
  short         sebuah "padmasana"
+ definite      sebuah
  mass          scenery
 
 {examine
@@ -606,6 +625,7 @@ write "Ukirannya rumit, menggambarkan naga dan bunga teratai.^"
 
 object canang : canang sari bunga sesajen
  short         sebuah "canang sari"
+ definite      sebuah
  long          "Sebuah canang sari diletakkan di atas padmasana.^"
  mass          1
  parent        pura
@@ -617,6 +637,7 @@ write "diisi dengan bunga warna-warni sebagai persembahan harian.^"
 
 object dupa : dupa
  short         sebatang "dupa"
+ definite      sebatang
  long          "Sebatang dupa menyala perlahan di dekat padmasana.^"
  mass          scenery
  parent        pura
@@ -684,6 +705,7 @@ execute "+weather_line"
 
 object terpal : terpal
  short         sebuah "terpal biru"
+ definite      sebuah
  mass          scenery
 
 {examine
@@ -703,6 +725,7 @@ write "Semua dipetik pagi ini dari kebun warga.^"
 
 object ikan : ikan
  short         seekor "ikan"
+ definite      seekor
  long          "Ikan-ikan segar berbaring di atas es.^"
  mass          scenery
 
@@ -777,6 +800,7 @@ write "Kamu punya " uang(quantity) " rupiah.^"
 
 object payung : payung
  short         sebuah "payung"
+ definite      sebuah
  long          "Sebuah payung bersandar di dekat pintu.^"
  has           WEARABLE
  parent        rumah
@@ -798,22 +822,27 @@ execute "+inventory"
 object north_wall : utara dinding utara
  has           NO_TAB
  short         sebuah "dinding utara"
+ definite      sebuah
 
 object south_wall : selatan dinding selatan
  has           NO_TAB
  short         sebuah "dinding selatan"
+ definite      sebuah
 
 object east_wall : timur dinding timur
  has           NO_TAB
  short         sebuah "dinding timur"
+ definite      sebuah
 
 object west_wall : barat dinding barat
  has           NO_TAB
  short         sebuah "dinding barat"
+ definite      sebuah
 
 object ground : tanah lantai
  has           SURFACE NO_TAB
  short         sebuah "lantai"
+ definite      sebuah
 
 # -----------------------------------------------------------------------------
 # GLOBAL FUNCTIONS
