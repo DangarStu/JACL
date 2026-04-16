@@ -41,7 +41,6 @@ write "Kielbasa is written using the JACL Adventure Creation Language.^"
 if interpreter = CGI
    write "Visit <a class=~main~ href=~http://code.google.com/p/jacl~>http://code.google.com/p/jacl</a> "
    write "for more information.^"
-   write "Visit my blog at <a class=~main~ href=~http://dangarstu.com/fastcgi-bin/dangarstu.jacl~>http://dangarstu.com</a>."
 else
    write "Visit http://code.google.com/p/jacl for more information.^"
 endif

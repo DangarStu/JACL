@@ -88,7 +88,6 @@ if MUSIC_mode = SCALE
 endif
    write "</div>"
    write "<div class=~interface~>"
-   write "<a class=~logo~ href=~http://dangarstu.com/fastcgi-bin/dangarstu.jacl~><img src=~/images/Tumblr.png~></a>"
    write "</div>"
    write "<div class=~keyboard~>"
       button "" "/images/PianoKeyboard.png"
