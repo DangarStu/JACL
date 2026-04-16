@@ -81,6 +81,7 @@ arti,meaning
 asa,hope
 asam,sour
 asap,smoke
+asapnya,its smoke
 asin,salty
 asli,"original, genuine"
 asosiasi,association
@@ -204,6 +205,7 @@ bela,"defend, champion"
 belah,"split, half"
 belajar,learn
 belakang,behind
+belakangmu,behind you
 belanja,shopping
 beli,buy
 belok,turn (direction)
@@ -237,6 +239,7 @@ berbeda,different
 berbelanja,go shopping
 berbicara,speak
 bercakap,to converse
+bercandi,"with a split gate (Balinese)"
 bercerai,divorce
 berdebat,debate
 berdiri,stand
@@ -280,6 +283,7 @@ bernilai,valuable
 berpakaian,dressed
 bersabar,be patient
 bersama,"together, with"
+bersandar,to lean against
 bersatu,unite
 bersedia,willing
 bersih,clean
@@ -592,6 +596,7 @@ gambar,"picture, drawing"
 gampang,easy
 ganda,double
 gandum,wheat
+gang,"narrow alley, lane"
 gangguan,disturbance
 ganja,marijuana
 ganteng,handsome
@@ -818,6 +823,7 @@ jelas,clear
 jelek,ugly
 jembatan,bridge
 jemput,"pick up, fetch"
+jemuran,clothesline
 jendela,window
 jenis,"type, kind"
 jentik,flick
@@ -1236,6 +1242,7 @@ malu,shy
 mampir,to drop in
 mampu,able
 mana,where
+mana-mana,everywhere
 manajer,manager
 manfaat,benefit
 mangga,mango
@@ -1282,6 +1289,7 @@ melempar,to throw
 melepas,"to release, remove"
 melepaskan,"to release, untie"
 meletakkan,put
+meletakkannya,to place it
 melihat,see
 melodi,melody
 melompat,to jump
@@ -1313,6 +1321,7 @@ membuat,make
 membuka,to open
 memecahkan,"to break, shatter"
 memeluk,"to hug, embrace"
+memenuhi,to fill
 memeriksa,"to examine, check"
 memesan,to order
 memetik,"to pick, pluck"
@@ -1408,6 +1417,7 @@ menilai,"judge, evaluate"
 menit,minute
 meniup,to blow
 menjadi,become
+menjaga,"to guard, to protect"
 menjalar,to spread/creep
 menjatuhkan,to drop
 menjawab,answer
@@ -1551,6 +1561,7 @@ pahit,bitter
 pajak,tax
 pak,"sir, Mr."
 pakai,"wear, use"
+pakaian,clothing
 paket,package
 paksa,"force, compel"
 paling,most (superlative)
@@ -1584,6 +1595,7 @@ payung,umbrella
 pe,(prefix: doer/noun)
 pecahkan,"break, shatter"
 pedagang,merchant
+pedagang-pedagang,merchants
 pedas,spicy
 pedesaan,rural
 pegawai,staff
@@ -1595,6 +1607,7 @@ pelabuhan,"port, harbor"
 pelacur,prostitute
 pelajaran,lesson
 pelajari,"to study, learn"
+pelan,slowly
 pelanggan,customer
 pelanggannya,its customers
 pelatihan,training
@@ -1739,8 +1752,10 @@ pompa bensin,gas station
 pompa,pump
 pondok,"hut, cottage"
 pos,post
+pot,pot
 potensi,potential
 potong,"cut, piece"
+potongan,"piece, slice"
 prajurit,soldier
 prakarsa,initiative
 praktik,practice
@@ -1811,6 +1826,7 @@ rintik,droplet
 riwayat,"history, record"
 rob,tidal flood
 robek,torn
+roh-roh,spirits
 rohani,"spiritual, soul"
 roma,pore
 romantis,romantic
@@ -1876,10 +1892,12 @@ saya,"I, me (formal)"
 sayang,"dear, love, pity"
 sayangnya,unfortunately
 sayur,vegetable
+sayur-sayuran,vegetables (various)
 sayuran,vegetables
 se,one/each
 sebatang,a (long object classifier)
 sebelah,"beside, next to"
+sebelahnya,beside it
 sebelum,before
 sebentar,"a moment, briefly"
 sebuah,"a, an (object classifier)"
@@ -2058,6 +2076,7 @@ taruh,"put, place"
 tas,bag
 tata,"order, arrangement"
 tawar,to bargain
+tawar-menawar,bargaining
 tawaran,offer
 tebal,thick
 tegar,"firm, strong"
@@ -2098,6 +2117,7 @@ teratai,lotus
 terbang,fly (verb)
 terbuat,made of
 terbuka,open
+terdengar,to be heard
 tergantung,hanging
 tergeletak,lying (on a surface)
 terhadap,"toward, against"
@@ -2113,6 +2133,7 @@ terkini,latest
 terlalu,too (excessive)
 terlambat,late
 terletak,"located, situated"
+terlihat,to be visible
 termasuk,including
 ternyata,"it turns out, apparently"
 terong,eggplant
@@ -2230,6 +2251,7 @@ wanita,"woman, female"
 warga,"citizen, resident"
 warisan,"inheritance, heritage"
 warna,color
+warna-warni,multicoloured
 wartawan,journalist
 warung,"food stall, eatery"
 waspada,alert
