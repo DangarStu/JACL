@@ -81,7 +81,6 @@ arti,meaning
 asa,hope
 asam,sour
 asap,smoke
-asapnya,its smoke
 asin,salty
 asli,"original, genuine"
 asosiasi,association
@@ -155,7 +154,7 @@ bangun,"wake up, build"
 bangunan,building
 banjar,community hall (Balinese)
 bantal,pillow
-banten,"ceremonial offering (Balinese)"
+banten,ceremonial offering (Balinese)
 banteng,bull
 bantu,"help, assist"
 bantuan,"help, assistance"
@@ -205,7 +204,6 @@ bela,"defend, champion"
 belah,"split, half"
 belajar,learn
 belakang,behind
-belakangmu,behind you
 belanja,shopping
 beli,buy
 belok,turn (direction)
@@ -221,7 +219,7 @@ bendungan,dam
 bengkel,workshop
 bengkok,bent
 bensin,gasoline
-bentar,"split gate (Balinese)"
+bentar,split gate (Balinese)
 benteng,fort
 bentuk,"shape, form"
 ber,(prefix: intransitive verb)
@@ -304,7 +302,7 @@ besaran,magnitude
 besi,iron
 besok,tomorrow
 betul,"correct, true"
-bhuta,"spirit of the lower realm (Balinese)"
+bhuta,spirit of the lower realm (Balinese)
 biasanya,usually
 biaya,"cost, fee"
 bibi,aunt
@@ -335,7 +333,7 @@ bos,boss
 bosan,bored
 botol,bottle
 boyong,move (relocate)
-brahma,"Brahma (Hindu creator god)"
+brahma,Brahma (Hindu creator god)
 bu,"ma'am, Mrs."
 buah,fruit
 buah-buahan,fruits
@@ -378,8 +376,7 @@ calun,candidate
 cambuk,whip
 campur,mix
 campuran,mixture
-canang,"small offering (Balinese)"
-candi bentar,"split gate (Balinese temple entrance)"
+canang,small offering (Balinese)
 candi,ancient temple
 candu,"opium, addiction"
 canggih,sophisticated
@@ -596,7 +593,6 @@ gambar,"picture, drawing"
 gampang,easy
 ganda,double
 gandum,wheat
-gang,"narrow alley, lane"
 gangguan,disturbance
 ganja,marijuana
 ganteng,handsome
@@ -823,7 +819,6 @@ jelas,clear
 jelek,ugly
 jembatan,bridge
 jemput,"pick up, fetch"
-jemuran,clothesline
 jendela,window
 jenis,"type, kind"
 jentik,flick
@@ -862,7 +857,7 @@ kakak,older sibling
 kakek,grandfather
 kaki,"foot, leg"
 kaku,"stiff, rigid"
-kala,"time; underworld spirit"
+kala,time; underworld spirit
 kalah,lose
 kalender,calendar
 kali,time (occurrence); river
@@ -1052,7 +1047,7 @@ kokoh,"sturdy, solid"
 kolam,"pool, pond"
 koleksi,collection
 koma,comma; coma
-komang,"Komang (Balinese name for third-born child)"
+komang,Komang (Balinese name for third-born child)
 komentar,comment
 komisi,commission
 komitmen,commitment
@@ -1223,7 +1218,7 @@ lurus,straight
 lutut,knee
 maaf,sorry
 macam,"kind, type, sort"
-made,"Made (Balinese name for second-born child)"
+made,Made (Balinese name for second-born child)
 magang,internship
 mahal,expensive
 mahasiswa,university student
@@ -1242,7 +1237,6 @@ malu,shy
 mampir,to drop in
 mampu,able
 mana,where
-mana-mana,everywhere
 manajer,manager
 manfaat,benefit
 mangga,mango
@@ -1289,7 +1283,6 @@ melempar,to throw
 melepas,"to release, remove"
 melepaskan,"to release, untie"
 meletakkan,put
-meletakkannya,to place it
 melihat,see
 melodi,melody
 melompat,to jump
@@ -1321,7 +1314,6 @@ membuat,make
 membuka,to open
 memecahkan,"to break, shatter"
 memeluk,"to hug, embrace"
-memenuhi,to fill
 memeriksa,"to examine, check"
 memesan,to order
 memetik,"to pick, pluck"
@@ -1406,6 +1398,7 @@ mengkilat,shiny
 mengobati,treat (medical)
 mengosongkan,to empty
 mengubah,change
+mengumpulkan,to collect things
 mengunci,to lock
 mengunjungi,visit
 mengupas,to peel
@@ -1417,7 +1410,6 @@ menilai,"judge, evaluate"
 menit,minute
 meniup,to blow
 menjadi,become
-menjaga,"to guard, to protect"
 menjalar,to spread/creep
 menjatuhkan,to drop
 menjawab,answer
@@ -1517,7 +1509,7 @@ nggak,no (informal)
 niaga,"commerce, trade"
 nih,(this here)
 nikmat,pleasure
-nila,"nile tilapia"
+nila,nile tilapia
 nilai,"value, grade"
 niscaya,certainly
 noda,stain
@@ -1538,7 +1530,7 @@ nyeri,pain
 nyonya,"Mrs., madam"
 obat,"medicine, drug"
 objek,object
-odalan,"Balinese temple anniversary"
+odalan,Balinese temple anniversary
 ogah,reluctant
 olahraga,sport
 oleh,by
@@ -1561,7 +1553,6 @@ pahit,bitter
 pajak,tax
 pak,"sir, Mr."
 pakai,"wear, use"
-pakaian,clothing
 paket,package
 paksa,"force, compel"
 paling,most (superlative)
@@ -1595,7 +1586,6 @@ payung,umbrella
 pe,(prefix: doer/noun)
 pecahkan,"break, shatter"
 pedagang,merchant
-pedagang-pedagang,merchants
 pedas,spicy
 pedesaan,rural
 pegawai,staff
@@ -1607,7 +1597,6 @@ pelabuhan,"port, harbor"
 pelacur,prostitute
 pelajaran,lesson
 pelajari,"to study, learn"
-pelan,slowly
 pelanggan,customer
 pelanggannya,its customers
 pelatihan,training
@@ -1752,10 +1741,8 @@ pompa bensin,gas station
 pompa,pump
 pondok,"hut, cottage"
 pos,post
-pot,pot
 potensi,potential
 potong,"cut, piece"
-potongan,"piece, slice"
 prajurit,soldier
 prakarsa,initiative
 praktik,practice
@@ -1826,7 +1813,6 @@ rintik,droplet
 riwayat,"history, record"
 rob,tidal flood
 robek,torn
-roh-roh,spirits
 rohani,"spiritual, soul"
 roma,pore
 romantis,romantic
@@ -1841,7 +1827,7 @@ rumah sakit,hospital
 rumah,house
 rumahmu,your house
 runtuh,collapse
-rupiah,"rupiah (Indonesian currency)"
+rupiah,rupiah (Indonesian currency)
 rusak,"broken, damaged"
 rutin,routine
 saat,"moment, when"
@@ -1892,12 +1878,10 @@ saya,"I, me (formal)"
 sayang,"dear, love, pity"
 sayangnya,unfortunately
 sayur,vegetable
-sayur-sayuran,vegetables (various)
 sayuran,vegetables
 se,one/each
 sebatang,a (long object classifier)
 sebelah,"beside, next to"
-sebelahnya,beside it
 sebelum,before
 sebentar,"a moment, briefly"
 sebuah,"a, an (object classifier)"
@@ -2039,7 +2023,7 @@ susah,"difficult, troubled"
 susu,milk
 susunan,"arrangement, structure"
 sutra,silk
-swastiastu,"Om Swastiastu (Balinese greeting)"
+swastiastu,Om Swastiastu (Balinese greeting)
 syarat,"condition, requirement"
 tabung,"tube, savings"
 tadi,"earlier, just now"
@@ -2076,7 +2060,6 @@ taruh,"put, place"
 tas,bag
 tata,"order, arrangement"
 tawar,to bargain
-tawar-menawar,bargaining
 tawaran,offer
 tebal,thick
 tegar,"firm, strong"
@@ -2117,7 +2100,6 @@ teratai,lotus
 terbang,fly (verb)
 terbuat,made of
 terbuka,open
-terdengar,to be heard
 tergantung,hanging
 tergeletak,lying (on a surface)
 terhadap,"toward, against"
@@ -2133,7 +2115,6 @@ terkini,latest
 terlalu,too (excessive)
 terlambat,late
 terletak,"located, situated"
-terlihat,to be visible
 termasuk,including
 ternyata,"it turns out, apparently"
 terong,eggplant
@@ -2251,7 +2232,6 @@ wanita,"woman, female"
 warga,"citizen, resident"
 warisan,"inheritance, heritage"
 warna,color
-warna-warni,multicoloured
 wartawan,journalist
 warung,"food stall, eatery"
 waspada,alert
