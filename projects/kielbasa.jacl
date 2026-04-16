@@ -6,7 +6,7 @@ integer     selected_key	-1
 constant 	game_version	1
 constant	game_title		"Kielbasa"
 constant	game_author		"Stuart Allen"
-constant game_publish true
+constant game_publish false
 constant	ifid			"JACL-009"
 
 parameter   mode			MUSIC_mode
