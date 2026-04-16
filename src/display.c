@@ -32,6 +32,12 @@ sentence_output(int index, int capital)
 {
 	if (!strcmp(object[index]->article, "name")) {
 		strcpy(temp_buffer, object[index]->inventory);
+	} else if (object[index]->definite[0] == '\0'
+	        || !strcmp(object[index]->definite, "none")) {
+		strcpy(temp_buffer, object[index]->inventory);
+	} else if (object[index]->definite[0] == '-') {
+		strcpy(temp_buffer, object[index]->inventory);
+		strcat(temp_buffer, &object[index]->definite[1]);
 	} else {
 		strcpy(temp_buffer, object[index]->definite);
 		strcat(temp_buffer, " ");

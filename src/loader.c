@@ -350,7 +350,7 @@ read_gamefile()
                         strcpy(object[objects]->described, object[objects]->label);
                         strcpy(object[objects]->inventory, object[objects]->label);
                         strcpy(object[objects]->article, "the");
-                        strcpy(object[objects]->definite, "the");
+                        strcpy(object[objects]->definite, DEFAULT_DEFINITE);
                         object[objects]->attributes = FALSE;
                         object[objects]->user_attributes = FALSE;
 
