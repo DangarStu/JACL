@@ -3,7 +3,7 @@
 constant 	game_version	1
 constant	game_title		"Dungeon 80"
 constant	game_author		"Stuart Allen"
-constant game_publish true
+constant game_publish false
 constant	ifid			"JACL-009"
 
 constant	MAX_DEPTH		7

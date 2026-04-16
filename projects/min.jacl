@@ -1,6 +1,6 @@
 #!../bin/jacl
 
-constant game_publish true
+constant game_publish false
 string teststring "fred"
 
 integer INDEX

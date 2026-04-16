@@ -2,7 +2,7 @@
 
 string game_title       "JavaScript Example"
 constant game_author    "Stuart Allen"
-constant game_publish true
+constant game_publish false
 constant ifid           "JACL-011"
 
 string environment

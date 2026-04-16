@@ -7,7 +7,7 @@ constant game_title		"Quizafier "
 constant game_author	"Stuart Allen"
 constant game_release    1
 constant game_build      1
-constant game_publish true
+constant game_publish false
 constant ifid			"JACL-002"
 
 # -----------------------------------------------------------------------------

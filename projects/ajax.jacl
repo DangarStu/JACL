@@ -1,5 +1,5 @@
 #!/usr/local/jacl/bin/cgijacl
-constant game_publish true
+constant game_publish false
 {+header
 set linebreaks = false
 print:

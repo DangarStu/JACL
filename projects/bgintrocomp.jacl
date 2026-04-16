@@ -9,7 +9,7 @@ constant 	game_release	1
 constant 	game_build		6
 constant	game_title		"The Bloody Guns"
 constant	game_author		"Stuart Allen"
-constant game_publish true
+constant game_publish false
 constant	ifid			"JACL-004"
 
 # -----------------------------------------------------------------------------

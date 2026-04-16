@@ -1,5 +1,5 @@
 location sea 
-constant game_publish true
+constant game_publish false
 
 object i
  velocity      5

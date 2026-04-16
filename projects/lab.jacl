@@ -3,7 +3,7 @@
 constant game_title		"Parser Lab"
 constant game_author	"Stuart Allen"
 constant game_version	1
-constant game_publish true
+constant game_publish false
 
 integer testint
 
