@@ -164,6 +164,8 @@ apache: install
 	@echo "Installing Apache configuration..."
 	cp ../etc/jacl-apache.conf /etc/apache2/conf-available/jacl.conf
 	a2enconf jacl
+	@echo "Clearing stale save files..."
+	rm -f /usr/local/jacl/projects/temp/*
 	@echo "Setting permissions..."
 	chown -R www-data:www-data /usr/local/jacl/projects/temp
 	chown -R www-data:www-data /usr/local/jacl/logs
