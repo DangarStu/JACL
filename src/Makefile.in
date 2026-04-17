@@ -164,15 +164,17 @@ apache: install
 	@echo "Installing Apache configuration..."
 	cp ../etc/jacl-apache.conf /etc/apache2/conf-available/jacl.conf
 	a2enconf jacl
-	@echo "Clearing stale save files..."
-	rm -f /usr/local/jacl/projects/temp/*
+	$(eval JACL_TEMP := $(shell grep '^\s*temp\b' /etc/cgijacl.conf 2>/dev/null | sed -E 's/.*"([^"]+)".*/\1/' || echo /usr/local/jacl/projects/temp/))
+	$(eval JACL_LOGS := $(shell grep '^\s*error_log\b' /etc/cgijacl.conf 2>/dev/null | sed -E 's/.*"([^"]+)".*/\1/' | xargs dirname || echo /usr/local/jacl/logs))
+	@echo "Clearing stale save files from $(JACL_TEMP)..."
+	rm -f $(JACL_TEMP)/*
 	@echo "Setting permissions..."
-	chown -R www-data:www-data /usr/local/jacl/projects/temp
-	chown -R www-data:www-data /usr/local/jacl/logs
+	chown -R www-data:www-data $(JACL_TEMP)
+	chown -R www-data:www-data $(JACL_LOGS)
 	chmod 755 /usr/local/jacl/projects
-	chmod 775 /usr/local/jacl/projects/temp
+	chmod 775 $(JACL_TEMP)
 	chmod 775 /usr/local/jacl/projects/data
-	chmod 775 /usr/local/jacl/logs
+	chmod 775 $(JACL_LOGS)
 	@echo "Restarting Apache..."
 	apache2ctl graceful
 	@echo ""
