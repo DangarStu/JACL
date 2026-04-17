@@ -20,8 +20,10 @@ constant Cellars 1
 attribute WEAPON WIELDED
 
 {+intro
-volume 20
-sound sound_intro
+if interpreter = GLK
+   volume 20
+   sound sound_intro
+endif
 clear
 write game_title ^
 write "By " game_author ^
