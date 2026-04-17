@@ -61,6 +61,9 @@ install: all
 	cp ../projects/data/*.csv /usr/local/jacl/projects/data/
 	cp ../etc/cgijacl.conf /usr/local/jacl/
 	cp ../etc/cgijacl.conf /etc/cgijacl.conf 2>/dev/null || true
+	@JACL_TEMP=$$(grep '^\s*temp\b' /etc/cgijacl.conf 2>/dev/null | sed -E 's/.*"([^"]+)".*/\1/' || echo /usr/local/jacl/projects/temp/); \
+	echo "Clearing stale save files from $$JACL_TEMP..."; \
+	rm -f "$$JACL_TEMP"/*
 
 # Apache2 + mod_fcgid setup (Ubuntu/Debian)
 apache: install
