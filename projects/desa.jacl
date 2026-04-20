@@ -777,13 +777,35 @@ write "Kamu punya " uang(quantity) " rupiah.^"
 
 object payung : payung
  short         sebuah "payung"
- long          "Sebuah payung bersandar di dekat pintu.^"
- has           WEARABLE
+ long          function
+ has           CLOSABLE CLOSED WEARABLE
  parent        rumah
  mass          8
 
+{long
+if payung has CLOSED
+   write "Sebuah payung hitam terlipat rapi tergeletak di sini.^"
+else
+   write "Sebuah payung hitam terbuka lebar tergeletak di sini.^"
+endif
+}
+
 {examine
-write "Payung hitam sederhana. Berguna kalau hujan turun.^"
+if payung has CLOSED
+   write "Payung hitam sederhana, terlipat rapi. Berguna kalau hujan turun. Kamu bisa membukanya dengan ~buka payung~.^"
+else
+   write "Payung hitam sederhana, terbuka lebar. Siap melindungi dari hujan. Kamu bisa menutupnya dengan ~tutup payung~.^"
+endif
+}
+
+{open_override
+ensure payung hasnt CLOSED
+write "Kamu membuka payung.^"
+}
+
+{close_override
+ensure payung has CLOSED
+write "Kamu menutup payung.^"
 }
 
 {examine

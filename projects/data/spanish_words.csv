@@ -260,6 +260,7 @@ bigote,mustache
 billete,"ticket, bill"
 bisabuelo,great-grandfather
 bisagras,hinges
+blanca,white (feminine)
 blancas,white (feminine plural)
 blanco,white
 blando,soft
@@ -316,6 +317,7 @@ cabra,goat
 cada,each
 cadena,chain
 cadera,hip
+cae,falls
 caer,fall
 café,"coffee, brown"
 caja,box
@@ -571,6 +573,7 @@ corbata,tie
 cordero,lamb
 cordón,cord
 corona,crown
+corre,runs
 correcto,correct
 corregir,correct
 correo,mail
@@ -599,6 +602,7 @@ criada,maid
 criar,raise
 crimen,crime
 cristal,"glass, crystal"
+cristalina,crystalline (feminine singular)
 cristalinas,crystalline
 criticar,criticize
 crudo,raw
@@ -617,6 +621,7 @@ cuatro,four
 cubierta,covered (feminine)
 cubiertas,covered (feminine plural)
 cubierto,covered
+cubren,they cover
 cubrir,cover
 cuchara,spoon
 cucharada,tablespoon
@@ -672,6 +677,7 @@ decorar,decorate
 dedo,finger
 defender,defend
 definitivo,definitive
+deja,"leaves, lets"
 dejando,leaving
 dejar,"leave, let"
 dejarlas,to leave them
@@ -712,6 +718,7 @@ descansar,rest
 descanso,rest
 descascarada,peeling
 desciende,descends
+desciendes,you descend
 desconocido,unknown
 describir,describe
 descubre,discover
@@ -767,6 +774,7 @@ discutir,discuss
 diseñar,design
 diseño,design
 disfraz,costume
+disfrutando,enjoying
 disfrutar,enjoy
 disgustado,upset
 disminuir,decrease
@@ -843,6 +851,7 @@ emocionante,exciting
 emoción,emotion
 empacar,pack
 empezar,start
+empiezas,you start
 empinado,steep
 empleado,employee
 empleo,employment
@@ -931,6 +940,7 @@ espina,thorn
 esposa,wife
 esposo,husband
 espíritu,spirit
+espuma,foam
 esquina,corner
 esta,this
 establecer,establish
@@ -1024,10 +1034,13 @@ flor,flower
 florero,vase
 flores,flowers
 flotar,float
+flotas,you float
 fondo,bottom
 forma,"form, shape"
+formada,formed (feminine)
 formado,formed
 formal,formal
+forman,they form
 formando,forming
 formar,form
 fortuna,fortune
@@ -1042,6 +1055,7 @@ frente,"front, forehead"
 fresa,strawberry
 fresco,"fresh, cool"
 freír,fry
+frescura,freshness
 frito,fried
 frontera,border
 fruta,fruit
@@ -1139,6 +1153,7 @@ hasta,until
 hay,there is
 hecha,made (feminine)
 hecho,"fact, done"
+helada,frozen (feminine)
 helado,"ice cream, frozen"
 helechos,ferns
 hembra,female
@@ -1189,6 +1204,7 @@ huevo,egg
 huir,flee
 humano,human
 humedad,humidity
+húmedas,humid (feminine plural)
 humilde,humble
 humo,smoke
 humor,humor
@@ -1219,6 +1235,7 @@ impresora,printer
 imprimir,print
 impuesto,tax
 impulsar,drive
+impulsas,you push
 incendio,fire
 inclina,tilts
 incluir,include
@@ -1282,6 +1299,7 @@ jarra,jug
 jaula,cage
 jefe,boss
 joven,young
+jóvenes,young (plural)
 joya,jewel
 joyería,jewelry store
 jubilación,retirement
@@ -1330,6 +1348,7 @@ legumbre,vegetable
 lejano,far
 lejos,far
 lengua,"tongue, language"
+lentas,slow (feminine plural)
 lento,slow
 les,them
 lesión,injury
@@ -1363,6 +1382,7 @@ llamarse,be called
 llave,key
 llegada,arrival
 llegar,arrive
+llena,full (feminine)
 llenar,fill
 lleno,full
 llevar,"carry, wear"
@@ -1480,6 +1500,7 @@ mesero,waiter
 meta,goal
 meter,put in
 metro,"meter, subway"
+metros,meters
 mezclar,mix
 mi,my
 miedo,fear
@@ -1571,6 +1592,7 @@ nada,nothing
 nadan,swim
 nadando,swimming
 nadar,swim
+nadas,you swim
 nadie,nobody
 naranja,orange
 nariz,nose
@@ -1588,6 +1610,7 @@ necesitarías,you would need
 negar,deny
 negativo,negative
 negocio,business
+negras,black (feminine plural)
 negro,black
 nervioso,nervous
 nevadas,snow-covered
@@ -1787,6 +1810,7 @@ perder,lose
 perdonar,forgive
 perdón,pardon
 perezoso,lazy
+perfecta,perfect (feminine)
 perfecto,perfect
 perfume,perfume
 periodista,journalist
@@ -1923,6 +1947,7 @@ producto,product
 profesión,profession
 profesor,teacher
 profunda,deep (feminine)
+profundidad,depth
 profundo,deep
 programa,program
 progreso,progress
@@ -1988,6 +2013,7 @@ querer,"want, love"
 querido,dear
 queso,cheese
 quien,who
+quieres,you want
 quieto,still
 quince,fifteen
 quinientos,five hundred
@@ -2116,6 +2142,8 @@ riñón,kidney
 robar,steal
 robusta,robust (feminine)
 roca,rock
+rocas,rocks
+rocío,dew
 rocoso,rocky
 rodear,surround
 rodilla,knee
@@ -2281,6 +2309,7 @@ soplar,blow
 soportar,bear
 sorbo,sip
 sordo,deaf
+sorprendentemente,surprisingly
 sorprender,surprise
 sorpresa,surprise
 sospechar,suspect
@@ -2428,6 +2457,8 @@ traer,bring
 tragar,swallow
 traje,"suit, dress"
 trampa,trap
+tranquila,calm (feminine)
+tranquilamente,calmly
 tranquilo,"calm, quiet"
 transformar,transform
 transporte,transport
@@ -2578,6 +2609,7 @@ vuelo,flight
 vuelta,"turn, return"
 vuestro,your
 víctima,victim
+y,and
 ya,already
 yerno,son-in-law
 yo,I
