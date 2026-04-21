@@ -258,6 +258,7 @@ location gang : gang lorong jalan_sempit
  short         name "Gang sempit"
  has           OUTDOORS
  southwest     jalan_utama
+ northeast     rumah_teman
  x             2
  y             1
 
@@ -266,7 +267,9 @@ print:
    Kamu berada di sebuah gang sempit di antara dua rumah
    bambu. Dindingnya penuh dengan jemuran pakaian dan
    beberapa pot tanaman. Jalan utama ada di sebelah
-   barat daya.^
+   barat daya. Rumah sahabatmu, Ketut, terlihat di
+   ujung timur laut; pintu depannya sedang terbuka
+   lebar menyambut tamu.^
 .
 execute "+weather_line"
 }
@@ -292,6 +295,395 @@ write "Telinganya bergerak-gerak mengusir lalat.^"
 {talk_to
 write "Anjing itu mengangkat kepalanya sebentar, lalu tidur lagi.^"
 }
+
+# -----------------------------------------------------------------------------
+
+location rumah_teman : rumah_teman rumah_ketut pondok_ketut
+ short         name "Rumah Ketut"
+ southwest     gang
+ x             3
+ y             0
+
+{look
+print:
+   Kamu berada di ruang tamu rumah sahabatmu, Ketut.
+   Ruangan ini kecil tapi hangat dan nyaman — khas rumah
+   desa yang selalu siap menerima tamu. Dua kursi kayu
+   mengapit sebuah meja rendah di tengah, di atasnya
+   tersaji teh hangat dan sepiring kue manis. Dinding
+   bambu dihiasi foto keluarga, dan jendela terbuka
+   menghadap halaman kecil dengan pohon kamboja. Pintu
+   depan mengarah ke barat daya, kembali ke gang.^
+.
+}
+
+object pintu_depan : pintu_depan pintu pintu_kayu
+ short         sebuah "pintu depan"
+ mass          scenery
+
+{examine
+write "Pintu kayu sederhana yang menjadi batas antara rumah dan gang. "
+write "Pagi ini sengaja dibuka lebar agar tamu merasa dipersilakan masuk.^"
+}
+
+{knock_on
+write "Kamu mengetuk pintu pelan sebagai tanda sopan. "
+write "~Silakan, jangan sungkan, pintu sudah terbuka!~ sahut Ketut sambil tertawa.^"
+}
+
+object ketut : ketut pemuda
+ short         name "Ketut"
+ long          "Ketut, sahabatmu, duduk santai di kursi sambil menyambutmu dengan hangat.^"
+ has           ANIMATE
+ mass          heavy
+
+{examine
+write "Ketut adalah sahabat lamamu sejak kecil. Pemuda ramah yang "
+write "selalu senang menerima tamu. Dia mengenakan kain sarung dan "
+write "kaus putih sederhana. Senyumnya hangat dan sopan.^"
+}
+
+{talk_to
+write "~Selamat datang di rumah saya, sahabatku!~ kata Ketut sambil "
+write "berdiri menyambutmu. ~Terima kasih sudah berkunjung. Silakan "
+write "duduk dulu, kita ngobrol sebentar. Tehnya masih hangat.~^"
+}
+
+{ask_about_kunjungan
+write "~Kunjunganmu hari ini membuat saya senang,~ kata Ketut. "
+write "~Di desa kami, berkunjung ke rumah teman adalah cara menjaga "
+write "persahabatan.~^"
+}
+
+{ask_about_silaturahmi
+write "~Silaturahmi artinya merawat hubungan baik antar saudara, "
+write "kawan, dan tetangga,~ jelas Ketut. ~Dengan bertamu dan "
+write "menerima tamu, kita tetap akrab walaupun sibuk.~^"
+}
+
+{ask_about_buku_tamu
+write "~Tamu adalah raja, kata orang tua dulu,~ ujar Ketut tersenyum. "
+write "~Seorang tuan rumah yang baik wajib menyambut tamunya dengan "
+write "ramah dan menghidangkan minuman.~^"
+}
+
+{ask_about_berkunjung : ask_about_bertamu : ask_about_mampir : ask_about_bertandang
+write "~Berkunjung, bertamu, mampir, atau bertandang — semuanya berarti "
+write "datang ke rumah orang lain,~ kata Ketut. ~Yang penting tuan rumah "
+write "merasa dihormati dan tamu merasa diterima.~^"
+}
+
+{ask_about_teman : ask_about_sahabat : ask_about_kawan
+write "~Kita sudah berteman sejak kecil,~ kenang Ketut. "
+write "~Sahabat sejati itu seperti saudara. Kawan lama memang paling "
+write "enak diajak ngobrol berjam-jam tanpa bosan.~^"
+}
+
+{ask_about_rumah
+write "~Rumah sederhana ini milik keluarga saya,~ kata Ketut. "
+write "~Tidak besar, tapi cukup untuk menjamu teman. Anggap saja "
+write "rumah sendiri kalau mampir ke sini.~^"
+}
+
+{ask_about_teh : ask_about_minuman
+write "~Silakan minum tehnya selagi hangat,~ kata Ketut mempersilakan. "
+write "~Teh manis adalah sajian wajib untuk tamu di desa kami.~^"
+}
+
+{ask_about_kue : ask_about_hidangan : ask_about_sajian
+write "~Kue ini buatan ibu saya pagi tadi,~ kata Ketut bangga. "
+write "~Onde-onde, klepon, dan pisang goreng — hidangan kecil untuk "
+write "menemani obrolan kita.~^"
+}
+
+{ask_about_keluarga
+write "~Ayah saya bekerja di sawah, ibu saya menjual kue di pasar,~ "
+write "kata Ketut. ~Adik saya sekolah di kota. Keluarga kami sederhana "
+write "tapi rukun.~^"
+}
+
+{ask_about_desa
+write "~Desa kita ramah dan tenang,~ kata Ketut. ~Tetangga saling "
+write "kenal, dan pintu rumah selalu terbuka untuk tamu. Itulah "
+write "silaturahmi.~^"
+}
+
+{ask_about_undangan : ask_about_mengundang
+write "~Kapan-kapan kamu harus datang lagi,~ kata Ketut. ~Anggap "
+write "ini undangan tetap — mampirlah kapan saja kamu lewat gang. "
+write "Saya akan selalu mengundangmu untuk ngobrol.~^"
+}
+
+{ask_about_pamit
+write "~Tidak perlu buru-buru pamit,~ kata Ketut sambil tertawa. "
+write "~Tapi kalau harus pulang, cukup bilang ~selamat tinggal~. "
+write "Jangan lupa salam untuk keluargamu di rumah.~^"
+}
+
+{ask_about_sopan : ask_about_hormat : ask_about_menghormati
+write "~Tamu yang sopan selalu memberi salam dulu sebelum masuk,~ "
+write "kata Ketut. ~Dan tuan rumah yang baik menghormati tamu dengan "
+write "menyajikan yang terbaik.~^"
+}
+
+{ask_about_salam : ask_about_sambutan : ask_about_menyambut
+write "~Kalau datang, ucapkan salam: ~Permisi!~ atau ~Kulanuwun!~ ~ "
+write "kata Ketut. ~Saya akan menjawab, ~Selamat datang, silakan "
+write "masuk!~ Itu tanda tamu diterima dengan hati terbuka.~^"
+}
+
+{ask_about_ngobrol : ask_about_obrolan : ask_about_percakapan
+write "~Ngobrol santai dengan kawan itu obat hati,~ kata Ketut. "
+write "~Percakapan yang hangat sambil minum teh membuat hari menjadi "
+write "lebih ringan.~^"
+}
+
+{ask_about_ramah : ask_about_tuan_rumah
+write "~Tuan rumah yang ramah adalah kebanggaan keluarga,~ kata Ketut. "
+write "~Kita menyambut tamu dengan senyum dan hati terbuka — itulah "
+write "adat desa kami.~^"
+}
+
+object kursi : kursi kursi_kayu kursi_tamu
+ short         sebuah "kursi kayu"
+ long          "Dua kursi kayu mengapit meja rendah di tengah ruangan.^"
+ mass          scenery
+
+{examine
+write "Kursi kayu sederhana yang nyaman untuk duduk berlama-lama "
+write "sambil ngobrol dengan tuan rumah.^"
+}
+
+{sit_on
+write "Kamu duduk di kursi kayu. Ketut tersenyum lebar. "
+write "~Nah begitu, anggap rumah sendiri. Mari kita ngobrol.~^"
+}
+
+object meja_rendah : meja_rendah meja_tamu
+ short         sebuah "meja rendah"
+ has           SURFACE
+ mass          scenery
+
+{examine
+write "Meja kayu rendah di tengah ruang tamu. Di atasnya tersaji "
+write "teh hangat dan sepiring kue — sajian khas untuk menyambut tamu.^"
+}
+
+object teh : teh teh_hangat teh_manis
+ short         secangkir "teh hangat"
+ long          "Secangkir teh hangat mengepul di atas meja — sajian untuk tamu.^"
+ parent        meja_rendah
+ mass          2
+
+{examine
+write "Teh manis yang masih mengepul. Wanginya melati. "
+write "Hangat sekali dipegang di tangan.^"
+}
+
+{drink
+write "Kamu menyeruput teh hangatnya pelan-pelan. "
+write "~Terima kasih sudah menikmati sajian saya,~ kata Ketut senang. "
+write "~Tamu harus menghabiskan hidangan tuan rumah.~^"
+}
+
+{take
+write "Sebaiknya teh itu dinikmati di tempat, sebagai tamu yang sopan.^"
+set time = false
+}
+
+object kue : kue kue_manis gorengan onde klepon
+ short         sepiring "kue manis"
+ long          "Sepiring kue manis disajikan di atas meja untuk tamu.^"
+ parent        meja_rendah
+ mass          1
+
+{examine
+write "Berbagai kue kecil: onde-onde berbalut wijen, klepon hijau "
+write "berisi gula merah, dan pisang goreng yang masih hangat. "
+write "Hidangan khas untuk menyambut tamu.^"
+}
+
+{eat
+write "Kamu mencicipi satu kue. Manis dan gurih sekaligus. "
+write "~Nikmati saja, masih banyak,~ kata Ketut ramah. "
+write "~Tuan rumah senang kalau tamunya makan dengan lahap.~^"
+}
+
+{take
+write "Sebaiknya kue itu dinikmati di tempat bersama tuan rumah.^"
+set time = false
+}
+
+object foto_keluarga : foto foto_keluarga gambar
+ short         sebuah "foto keluarga"
+ mass          scenery
+
+{examine
+write "Foto hitam putih keluarga Ketut. Orang tuanya berdiri tegak, "
+write "adik kecilnya tersenyum lebar. Foto ini digantung dengan "
+write "bangga di dinding ruang tamu.^"
+}
+
+object jendela_teman : jendela
+ short         sebuah "jendela"
+ mass          scenery
+
+{examine
+write "Jendela kayu terbuka lebar. Angin sejuk masuk dari halaman, "
+write "membawa wangi bunga kamboja.^"
+}
+
+object kamboja : kamboja pohon_kamboja bunga_kamboja
+ short         sebuah "pohon kamboja"
+ mass          scenery
+
+{examine
+write "Pohon kamboja tumbuh di halaman, bunganya putih dengan "
+write "tengah kuning. Aromanya lembut dan harum.^"
+}
+
+# Abstract topic objects for ask_about dispatch — visiting/hospitality vocabulary.
+# Scenery + NO_TAB keeps them out of room listings and tab completion.
+
+object kunjungan : kunjungan kedatangan
+ has           NO_TAB
+ short         name "kunjungan"
+ mass          scenery
+
+object silaturahmi : silaturahmi
+ has           NO_TAB
+ short         name "silaturahmi"
+ mass          scenery
+
+object berkunjung : berkunjung
+ has           NO_TAB
+ short         name "berkunjung"
+ mass          scenery
+
+object bertamu : bertamu
+ has           NO_TAB
+ short         name "bertamu"
+ mass          scenery
+
+object mampir : mampir
+ has           NO_TAB
+ short         name "mampir"
+ mass          scenery
+
+object bertandang : bertandang
+ has           NO_TAB
+ short         name "bertandang"
+ mass          scenery
+
+object teman : teman
+ has           NO_TAB
+ short         name "teman"
+ mass          scenery
+
+object sahabat : sahabat
+ has           NO_TAB
+ short         name "sahabat"
+ mass          scenery
+
+object kawan : kawan
+ has           NO_TAB
+ short         name "kawan"
+ mass          scenery
+
+object keluarga : keluarga
+ has           NO_TAB
+ short         name "keluarga"
+ mass          scenery
+
+object desa : desa desa_kita
+ has           NO_TAB
+ short         name "desa"
+ mass          scenery
+
+object undangan : undangan
+ has           NO_TAB
+ short         name "undangan"
+ mass          scenery
+
+object mengundang : mengundang
+ has           NO_TAB
+ short         name "mengundang"
+ mass          scenery
+
+object pamit : pamit
+ has           NO_TAB
+ short         name "pamit"
+ mass          scenery
+
+object sopan : sopan
+ has           NO_TAB
+ short         name "sopan"
+ mass          scenery
+
+object hormat : hormat
+ has           NO_TAB
+ short         name "hormat"
+ mass          scenery
+
+object menghormati : menghormati
+ has           NO_TAB
+ short         name "menghormati"
+ mass          scenery
+
+object salam : salam
+ has           NO_TAB
+ short         name "salam"
+ mass          scenery
+
+object sambutan : sambutan
+ has           NO_TAB
+ short         name "sambutan"
+ mass          scenery
+
+object menyambut : menyambut
+ has           NO_TAB
+ short         name "menyambut"
+ mass          scenery
+
+object ngobrol : ngobrol
+ has           NO_TAB
+ short         name "ngobrol"
+ mass          scenery
+
+object obrolan : obrolan
+ has           NO_TAB
+ short         name "obrolan"
+ mass          scenery
+
+object percakapan : percakapan
+ has           NO_TAB
+ short         name "percakapan"
+ mass          scenery
+
+object hidangan : hidangan menghidangkan
+ has           NO_TAB
+ short         name "hidangan"
+ mass          scenery
+
+object sajian : sajian menyajikan
+ has           NO_TAB
+ short         name "sajian"
+ mass          scenery
+
+object minuman : minuman
+ has           NO_TAB
+ short         name "minuman"
+ mass          scenery
+
+object ramah : ramah keramahan
+ has           NO_TAB
+ short         name "ramah"
+ mass          scenery
+
+object tuan_rumah : tuan_rumah tuan
+ has           NO_TAB
+ short         name "tuan rumah"
+ mass          scenery
 
 # -----------------------------------------------------------------------------
 
