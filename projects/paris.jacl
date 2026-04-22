@@ -935,6 +935,16 @@ object menu : menu carte
  short         name "menu"
  mass          scenery
 
+object cinema : cinema cinéma
+ has           NO_TAB
+ short         name "cinéma"
+ mass          scenery
+
+object patisserie : patisserie pâtisserie patisseries pâtisseries
+ has           NO_TAB
+ short         name "pâtisserie"
+ mass          scenery
+
 # -----------------------------------------------------------------------------
 # PLAYER
 # -----------------------------------------------------------------------------
