@@ -3,6 +3,7 @@
 constant game_title			"Tutorial Game"
 constant game_author		"Stuart Allen"
 constant game_version		1
+constant ifid            "JACL-132"
 constant game_publish false
 
 constant turns_since_last_sip		5

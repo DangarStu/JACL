@@ -1,6 +1,7 @@
 #!../bin/jacl
 
 constant game_version 1
+constant ifid            "JACL-108"
 constant game_title "BAD MOON RISING"
 constant game_author "Davy Stedham."
 constant game_publish false

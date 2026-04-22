@@ -7,6 +7,7 @@
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE
 constant game_publish false
+constant ifid            "JACL-105"
 constant IMAGE_blackjack 1
 
 integer INDEX

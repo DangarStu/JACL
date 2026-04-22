@@ -3,6 +3,7 @@
 constant game_title		"Coffee disambiguation"
 constant game_author	"I.F. Author"
 constant game_version	2
+constant ifid            "JACL-111"
 constant game_publish false
 
 location kitchen : test kitchen

@@ -1,6 +1,7 @@
 #!../bin/jacl
 
 constant game_publish false
+constant ifid            "JACL-124"
 {+intro
   write "Hello world!^"
   terminate

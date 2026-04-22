@@ -7,7 +7,7 @@ constant 	game_version	1
 constant	game_title		"Kielbasa"
 constant	game_author		"Stuart Allen"
 constant game_publish true
-constant	ifid			"JACL-009"
+constant	ifid			"JACL-126"
 
 parameter   mode			MUSIC_mode
 

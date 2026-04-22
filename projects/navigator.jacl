@@ -1,5 +1,6 @@
 location sea 
 constant game_publish false
+constant ifid            "JACL-131"
 
 object i
  velocity      5

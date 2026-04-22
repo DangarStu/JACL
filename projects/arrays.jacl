@@ -1,6 +1,7 @@
 #!../bin/jacl
 
 constant game_publish false
+constant ifid            "JACL-102"
 integer multi
 integer argument
 

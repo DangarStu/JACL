@@ -7,6 +7,7 @@
 constant game_title		"Kehidupan Desa"
 constant game_author	"Stuart Allen"
 constant game_version	1
+constant ifid            "JACL-114"
 constant game_publish true
 
 constant header_colour "#5a7a3a"

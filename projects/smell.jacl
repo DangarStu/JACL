@@ -3,6 +3,7 @@
 constant game_title		"Smell Restrictions"
 constant game_author	"Stuart Allen"
 constant game_version	1
+constant ifid            "JACL-138"
 constant game_publish false
 
 

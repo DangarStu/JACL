@@ -3,6 +3,7 @@
 constant game_title		"Elevator and stairs"
 constant game_author	"Stuart Allen"
 constant game_version	2
+constant ifid            "JACL-118"
 constant game_publish false
 
 attribute	OUTSIDE_LIFT

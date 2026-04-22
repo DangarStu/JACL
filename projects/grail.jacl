@@ -14,7 +14,7 @@ constant game_author	"Stuart Allen"
 constant game_release    2
 constant game_build      3
 constant game_publish true
-constant ifid			"JACL-002"
+constant ifid			"JACL-122"
 # -----------------------------------------------------------------------------
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE

@@ -1,5 +1,6 @@
 ;                                                              THE UNHOLY GRAIL 
 constant game_publish false
+constant ifid            "JACL-123"
 ; -----------------------------------------------------------------------------
 ; Copyright (C) Stuart Allen 1996, 1997. All rights resevered.
 ; email sallen@one.net.au

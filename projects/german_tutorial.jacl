@@ -5,6 +5,7 @@
 # -----------------------------------------------------------------------------
 
 constant game_publish true
+constant ifid            "JACL-121"
 location schlafzimmer : schlafzimmer
  definite      das "Schlafzimmer"
  west          badezimmer

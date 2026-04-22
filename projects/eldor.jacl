@@ -1,5 +1,6 @@
 #!../bin/jacl
 constant game_publish false
+constant ifid            "JACL-117"
 ;                                                            THE CURSE OF ELDOR
 ; -----------------------------------------------------------------------------
 ; Release 3, by Stuart Allen Copyright (C) 1995, 1996.

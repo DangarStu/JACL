@@ -4,7 +4,7 @@ constant     game_version    1
 constant    game_title        "Le camion frigorifique"
 constant    game_author        "Barnabé Froleneau"
 constant game_publish true
-constant    ifid            "JACL-000"
+constant    ifid            "JACL-109"
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE
 constant image_camion_frigo 1
@@ -233,31 +233,50 @@ write "Camion frigo cover: http://mariohistoire.unblog.fr/2009/07/21/livreur-de-
 set time = false
 }
 
+integer speech_choice
+
 {+intro
+style bold
+write "^" game_title
+style normal
+write " par " game_author "^^"
+
+write "Voulez-vous que le jeu parle à voix haute ? (oui/non)^"
+getyesorno speech_choice
+if interpreter = GLK
+   execute "+start_game"
+endif
+}
+
+{+start_game
+if speech_choice = true
+   write "Synthèse vocale activée.^^"
+   write "<script>enableSpeak();</script>"
+else
+   write "Synthèse vocale désactivée.^^"
+   write "<script>disableSpeak();</script>"
+endif
+
 clear
            style italic
            write "^Elle vous cherche encore. « Lucien ! François ! » De sa voix stridente, elle vous appelle. Pas question de la faire attendre. « Lucien ! François ! »"
-           more "^^" 
+           more "^^"
 clear
            style normal
            style bold
         write "^"game_author "^"
         write "présente ^"
-           if interpreter = GLK 
+           if interpreter = GLK
         if graphics_supported = false
               style bold
                   write ^ game_title
                   style normal
-                 # write " par " game_author "^^"
         else
             volume 80
             volume 50 AUDIO_CHANNEL02
             image image_camion_frigo center
             sound music_camion_frigo01
             style bold
-        #          write ^ game_title
-        #          style normal
-        #         # write " par " game_author "^^"
           endif
         endif
         if interpreter = CGI
@@ -267,9 +286,8 @@ clear
            style normal
            more ""
 clear
-if interpreter = GLK 
+if interpreter = GLK
 if sound_supported = true
-  #timer 500
   volume 80
   volume 75
   volume 70
@@ -315,6 +333,9 @@ endall
 string demod_article = "Un"
 
 {+eachturn
+if total_moves = 0
+   execute "+start_game"
+endif
 set kryten(mass) = 100
 if here has BOUTIQUE
     move marchandises to here
@@ -1483,7 +1504,7 @@ constant maintext_colour "#dedede"
 
 
 #debug "debug.library"
-#include "french_webinterface.library"
+#include "webinterface.library"
 #include "webinterface.css"
 #include "npc.library"
 #include "utils.library"

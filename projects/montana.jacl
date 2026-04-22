@@ -7,6 +7,7 @@
 constant game_title		"Vida en la Montaña"
 constant game_author	"Stuart Allen"
 constant game_version	1
+constant ifid            "JACL-130"
 constant game_publish true
 
 constant header_colour "#4a6741"

@@ -8,7 +8,7 @@ constant game_author	"Stuart Allen"
 constant game_release    1
 constant game_build      1
 constant game_publish false
-constant ifid			"JACL-012"
+constant ifid			"JACL-137"
 
 # -----------------------------------------------------------------------------
 

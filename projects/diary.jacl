@@ -1,6 +1,7 @@
 #!../bin/jacl
 
 constant game_publish false
+constant ifid            "JACL-115"
 synonym january					1
 synonym jan						1
 synonym february				2

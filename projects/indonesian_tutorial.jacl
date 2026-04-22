@@ -7,6 +7,7 @@
 constant game_title		"Permainan Tutorial"
 constant game_author		"Stuart Allen"
 constant game_version		1
+constant ifid            "JACL-125"
 constant game_publish true
 
 location kamar_tidur : kamar tidur

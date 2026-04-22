@@ -6,6 +6,7 @@
 # -----------------------------------------------------------------------------
 
 constant game_publish false
+constant ifid            "JACL-104"
 integer INDEX
 integer COUNTER
 integer NODE1

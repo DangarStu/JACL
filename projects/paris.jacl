@@ -7,6 +7,7 @@
 constant game_title     "Une Journée à Paris"
 constant game_author    "Stuart Allen"
 constant game_version   1
+constant ifid            "JACL-134"
 constant game_publish   true
 
 constant header_colour  "#2a3f5f"

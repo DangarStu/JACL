@@ -4,7 +4,7 @@ constant 	game_version	1
 constant	game_title		"Le Roi de Fihnargaia"
 constant	game_author		"Eric Forgeot"
 constant game_publish true
-constant	ifid			"JACL-000"
+constant	ifid			"JACL-119"
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE
 constant image_fihnargaia 1
@@ -46,9 +46,11 @@ write "Stuart Allen, for making JACL available.^"
 set time = false
 }
 
+integer speech_choice
+
 {+intro
 clear
-if interpreter = GLK 
+if interpreter = GLK
    if graphics_supported = false
         style bold
    		write ^ game_title
@@ -62,10 +64,33 @@ if interpreter = GLK
    		write " par " game_author "^^"
    endif
 endif
+
+write "Voulez-vous que le jeu parle à voix haute ? (oui/non)^"
+getyesorno speech_choice
+if interpreter = GLK
+   execute "+start_game"
+endif
+}
+
+{+start_game
+if speech_choice = true
+   write "Synthèse vocale activée.^^"
+   write "<script>enableSpeak();</script>"
+else
+   write "Synthèse vocale désactivée.^^"
+   write "<script>disableSpeak();</script>"
+endif
+
 if here hasnt OUTDOORS
 endall
 move ground to here
 look
+}
+
+{+eachturn
+if total_moves = 0
+   execute "+start_game"
+endif
 }
 
 {+movement
@@ -340,6 +365,7 @@ object gardes: gardes garde habits
 ## Void ##
 
 location void: void
+ has           DONT_MAP
  short         name "void"
 
 object hydromel: hydromel l'hydromel boisson
