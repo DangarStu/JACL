@@ -167,6 +167,10 @@ apache: install
 	@echo "Installing Apache configuration..."
 	cp ../etc/jacl-apache.conf /etc/apache2/conf-available/jacl.conf
 	a2enconf jacl
+	@echo "Installing logrotate config..."
+	cp ../etc/jacl-logrotate.conf /etc/logrotate.d/jacl
+	chown root:root /etc/logrotate.d/jacl
+	chmod 644 /etc/logrotate.d/jacl
 	$(eval JACL_TEMP := $(shell grep '^\s*temp\b' /etc/cgijacl.conf 2>/dev/null | sed -E 's/.*"([^"]+)".*/\1/' || echo /usr/local/jacl/projects/temp/))
 	$(eval JACL_LOGS := $(shell grep '^\s*error_log\b' /etc/cgijacl.conf 2>/dev/null | sed -E 's/.*"([^"]+)".*/\1/' | xargs dirname || echo /usr/local/jacl/logs))
 	@echo "Clearing stale save files from $(JACL_TEMP)..."
@@ -186,7 +190,7 @@ apache: install
 	@echo "Configuration: /etc/apache2/conf-available/jacl.conf"
 	@echo "Wrapper scripts: /usr/local/jacl/fcgi-bin/"
 	@echo "Game files: /usr/local/jacl/projects/"
-	@echo "Logs: /usr/local/jacl/logs/"
+	@echo "Logs: /usr/local/jacl/logs/ (rotated at 10M, 7 gzipped archives kept)"
 	@echo ""
 	@echo "Landing page: http://localhost/"
 	@echo "Games are available at: http://localhost/jacl/<gamename>.fcgi"
