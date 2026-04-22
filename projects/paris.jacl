@@ -1,0 +1,1157 @@
+#!../bin/jacl
+#                                                                UNE JOURNÉE À PARIS
+# -----------------------------------------------------------------------------
+# A French language learning game set in a Paris neighbourhood.
+# -----------------------------------------------------------------------------
+
+constant game_title     "Une Journée à Paris"
+constant game_author    "Stuart Allen"
+constant game_version   1
+constant game_publish   true
+
+constant header_colour  "#2a3f5f"
+constant linkbar_colour "#4b6a92"
+constant maintext_colour "#f6f2ec"
+
+# -----------------------------------------------------------------------------
+# LOCATIONS
+# -----------------------------------------------------------------------------
+
+location appartement : appartement studio chambre
+ short         name "Appartement"
+ x             3
+ y             1
+
+{look
+write "Vous êtes dans votre petit studio parisien, au cinquième étage. "
+write "La pièce est simple mais confortable : un lit, un bureau près de "
+write "la fenêtre, une lampe, une étagère avec quelques livres. "
+if porte has CLOSED
+   write "La porte d'entrée à l'ouest est fermée.^"
+else
+   write "La porte d'entrée à l'ouest est ouverte, donnant sur la rue.^"
+endif
+}
+
+{movement
+if compass = west
+   if destination = nowhere
+      write "La porte est fermée. Il faut l'ouvrir d'abord.^"
+      return
+   endall
+return false
+}
+
+object porte : porte
+ short         une "porte"
+ has           CLOSABLE CLOSED
+ mass          scenery
+
+{examine
+if porte has CLOSED
+   write "Une porte en bois fermée. Elle donne sur la rue à l'ouest.^"
+else
+   write "Une porte en bois ouverte. À travers, vous voyez la rue.^"
+endif
+}
+
+{open_override
+ensure porte hasnt CLOSED
+write "Vous ouvrez la porte.^"
+set appartement(west) = rue
+set rue(east) = appartement
+}
+
+{close_override
+ensure porte has CLOSED
+write "Vous fermez la porte.^"
+set appartement(west) = nowhere
+set rue(east) = nowhere
+}
+
+object lit : lit
+ short         un "lit"
+ mass          scenery
+
+{examine
+write "Un lit simple recouvert d'une couverture en laine. "
+write "Pas luxueux, mais confortable après une longue journée.^"
+}
+
+{sit_on
+write "Vous vous asseyez sur le lit. Agréable, mais pas le moment de faire la sieste.^"
+}
+
+object bureau : bureau
+ short         un "bureau"
+ has           SURFACE
+ mass          scenery
+
+{examine
+write "Un petit bureau en bois près de la fenêtre. "
+write "Quelques livres et un cahier y sont posés.^"
+}
+
+object lampe : lampe
+ short         une "lampe"
+ mass          scenery
+
+{examine
+write "Une lampe de bureau en laiton, élégante et simple.^"
+}
+
+object livre_perso : livre livres
+ short         un "livre"
+ long          "Quelques livres sont posés sur le bureau.^"
+ parent        bureau
+ mass          3
+
+{examine : read
+write "Un vieux roman de poche : <i>Le Petit Prince</i> de Saint-Exupéry. "
+write "Votre livre préféré.^"
+}
+
+object fenetre_app : fenetre fenêtre
+ short         une "fenêtre"
+ mass          scenery
+
+{examine
+write "Une fenêtre donnant sur les toits parisiens. "
+write "Au loin, vous apercevez la Tour Eiffel qui scintille.^"
+}
+
+object tour_eiffel : tour eiffel
+ short         la "Tour Eiffel"
+ mass          scenery
+
+{examine
+write "La Tour Eiffel, symbole de Paris, se dresse au loin. "
+write "Ses lumières dorées scintillent dans la brume du matin.^"
+}
+
+object toits : toits
+ short         les "toits"
+ mass          scenery
+
+{examine
+write "Les toits gris de zinc de Paris s'étendent à perte de vue, "
+write "parsemés de cheminées et d'antennes.^"
+}
+
+object etagere : etagere étagère
+ short         une "étagère"
+ has           SURFACE
+ mass          scenery
+
+{examine
+write "Une étagère en bois avec quelques livres, des photos, et une petite plante verte.^"
+}
+
+object piece : piece pièce
+ short         la "pièce"
+ mass          scenery
+
+{examine
+write "Un studio modeste de vingt mètres carrés. Suffisant pour une vie tranquille de Parisien.^"
+}
+
+# -----------------------------------------------------------------------------
+
+location rue : rue
+ short         name "Rue de la Rose"
+ has           OUTDOORS
+ east          nowhere
+ north         boulangerie
+ northeast     cafe
+ west          parc
+ x             2
+ y             1
+
+{look
+print:
+   Vous êtes dans la Rue de la Rose, une petite rue
+   tranquille du quartier. Le trottoir est pavé et
+   ombragé par quelques arbres. Au nord, l'enseigne
+   d'une boulangerie attire vos narines. Au nord-est,
+   un café avec sa terrasse anime le coin. À l'ouest,
+   un parc verdoyant vous invite à flâner. Votre
+   appartement est juste à l'est, derrière la porte.^
+.
+execute "+meteo_ligne"
+}
+
+object trottoir : trottoir
+ short         le "trottoir"
+ mass          scenery
+
+{examine
+write "Un trottoir en pavés usés par les pas des générations de Parisiens.^"
+}
+
+object pave : pave paves pavé pavés
+ short         les "pavés"
+ mass          scenery
+
+{examine
+write "Pavés de granit gris, mouillés de rosée. Caractéristiques des vieilles rues parisiennes.^"
+}
+
+object arbre_rue : arbre arbres platane
+ short         un "arbre"
+ mass          scenery
+
+{examine
+write "Un platane majestueux borde la rue, offrant son ombre aux passants.^"
+}
+
+object lampadaire : lampadaire
+ short         un "lampadaire"
+ mass          scenery
+
+{examine
+write "Un vieux lampadaire en fonte, style Haussmann. Il éclaire la rue le soir.^"
+}
+
+object enseigne : enseigne
+ short         une "enseigne"
+ mass          scenery
+
+{examine
+write "L'enseigne de la boulangerie se balance doucement au vent, "
+write "avec le mot ~BOULANGERIE~ peint en lettres dorées.^"
+}
+
+object quartier : quartier
+ short         le "quartier"
+ mass          scenery
+
+{examine
+write "Un quartier typiquement parisien : petites boutiques, cafés, "
+write "balcons fleuris, et l'odeur du pain frais qui flotte dans l'air.^"
+}
+
+object passant : passant passants
+ short         un "passant"
+ has           ANIMATE
+ mass          scenery
+
+{examine
+write "Quelques passants se hâtent sur le trottoir : une dame avec un caddie, "
+write "un monsieur lisant son journal en marchant, une étudiante pressée.^"
+}
+
+{talk_to
+write "Le passant vous fait un petit signe de la tête sans s'arrêter. "
+write "Parisiens pressés, toujours.^"
+}
+
+# -----------------------------------------------------------------------------
+
+location boulangerie : boulangerie boutique
+ short         name "Boulangerie"
+ south         rue
+ east          cafe
+ x             2
+ y             0
+
+{look
+print:
+   Vous entrez dans une petite boulangerie chaleureuse.
+   L'odeur du pain frais et du beurre vous enveloppe
+   aussitôt. Derrière le comptoir, la boulangère sourit
+   en rangeant les baguettes dans des paniers en osier.
+   La vitrine déborde de pâtisseries : croissants,
+   pains au chocolat, éclairs, tartes aux fruits. La
+   rue est au sud, le café à l'est.^
+.
+}
+
+object comptoir : comptoir
+ short         le "comptoir"
+ has           SURFACE
+ mass          scenery
+
+{examine
+write "Un comptoir en marbre usé par les années et des milliers de transactions.^"
+}
+
+object vitrine : vitrine
+ short         la "vitrine"
+ has           SURFACE
+ mass          scenery
+
+{examine
+write "Une vitrine en verre remplie de pâtisseries multicolores, "
+write "toutes plus tentantes les unes que les autres.^"
+}
+
+object panier_pain : panier paniers osier
+ short         un "panier"
+ mass          scenery
+
+{examine
+write "Des paniers en osier tressé, chacun contenant une variété différente de pain.^"
+}
+
+object boulangere : boulangere boulangère madame blanc dame
+ short         name "Madame Blanc"
+ long          "La boulangère, Madame Blanc, se tient derrière le comptoir en souriant.^"
+ has           ANIMATE FEMALE
+ mass          heavy
+
+{examine
+write "Madame Blanc a les cheveux gris et un tablier blanc impeccable. "
+write "Son sourire est chaleureux et ses mains savent manier la pâte depuis trente ans.^"
+}
+
+{talk_to
+write "~Bonjour, monsieur ! Qu'est-ce que je vous sers aujourd'hui ?~ "
+write "vous demande Madame Blanc avec son sourire habituel.^"
+}
+
+{ask_about_pain
+write "~Le pain, c'est notre fierté nationale,~ dit Madame Blanc. "
+write "~Nous avons la baguette tradition, le pain de campagne, "
+write "et le pain aux céréales. Tous faits ce matin.~^"
+}
+
+{ask_about_baguette
+write "~Une baguette bien croustillante, voilà ce qui fait une bonne journée !~ "
+write "dit Madame Blanc en tapotant une baguette pour montrer le son.^"
+}
+
+{ask_about_croissant
+write "~Les croissants sont sortis du four il y a une heure,~ dit la boulangère. "
+write "~Feuilletés, dorés, et au bon beurre. Un délice.~^"
+}
+
+{ask_about_pâtisserie : ask_about_patisserie
+write "~Toutes nos pâtisseries sont faites maison,~ dit Madame Blanc. "
+write "~Pains au chocolat, éclairs au café, tartes aux fraises...~^"
+}
+
+{ask_about_quartier
+write "~C'est un bon quartier, calme et convivial,~ dit Madame Blanc. "
+write "~Les voisins se connaissent. On se dit bonjour, on papote, on vit bien.~^"
+}
+
+{ask_about_famille
+write "~Mon mari est le boulanger, il travaille dès quatre heures du matin,~ "
+write "dit Madame Blanc. ~Nos enfants sont grands maintenant.~^"
+}
+
+object baguette : baguette pain
+ short         une "baguette"
+ long          "Des baguettes fraîches sont empilées dans un panier.^"
+ parent        boulangerie
+ mass          2
+
+{examine
+write "Une baguette tradition, croustillante à l'extérieur et moelleuse à l'intérieur. "
+write "Un euro vingt.^"
+}
+
+{take
+if baguette(parent) = boulangerie
+   write "~Il faut payer d'abord,~ dit Madame Blanc. ~Un euro vingt, s'il vous plaît.~^"
+   set time = false
+   return
+endif
+return false
+}
+
+{order
+if baguette(parent) = kryten
+   write "Vous avez déjà une baguette.^"
+   set time = false
+   return
+endif
+if euros(quantity) < 120
+   write "Vous n'avez pas assez d'argent.^"
+   set time = false
+   return
+endif
+set euros(quantity) - 120
+move baguette to kryten
+write "~Un euro vingt, merci bien,~ dit Madame Blanc. Vous achetez une baguette fraîche.^"
+}
+
+object croissant : croissant
+ short         un "croissant"
+ long          "Des croissants dorés sont exposés dans la vitrine.^"
+ parent        boulangerie
+ mass          1
+
+{examine
+write "Un croissant feuilleté, doré et brillant de beurre. Un euro dix.^"
+}
+
+{take
+if croissant(parent) = boulangerie
+   write "~Il faut payer d'abord,~ dit Madame Blanc. ~Un euro dix.~^"
+   set time = false
+   return
+endif
+return false
+}
+
+{order
+if croissant(parent) = kryten
+   write "Vous avez déjà un croissant.^"
+   set time = false
+   return
+endif
+if euros(quantity) < 110
+   write "Vous n'avez pas assez d'argent.^"
+   set time = false
+   return
+endif
+set euros(quantity) - 110
+move croissant to kryten
+write "~Un euro dix, voilà pour vous,~ dit Madame Blanc. Vous emportez un croissant chaud.^"
+}
+
+object eclair : eclair éclair
+ short         un "éclair"
+ long          "Des éclairs au café brillent dans la vitrine.^"
+ parent        boulangerie
+ mass          1
+
+{examine
+write "Un éclair au café glacé de chocolat brun. Deux euros cinquante.^"
+}
+
+{order
+if eclair(parent) = kryten
+   write "Vous avez déjà un éclair.^"
+   set time = false
+   return
+endif
+if euros(quantity) < 250
+   write "Vous n'avez pas assez d'argent.^"
+   set time = false
+   return
+endif
+set euros(quantity) - 250
+move eclair to kryten
+write "~Deux euros cinquante, merci,~ dit Madame Blanc. Vous prenez un éclair au café.^"
+}
+
+# -----------------------------------------------------------------------------
+
+location cafe : cafe café bistrot bar
+ short         name "Café de la Rose"
+ has           OUTDOORS
+ west          boulangerie
+ southwest     rue
+ east          maison_pierre
+ x             3
+ y             0
+
+{look
+print:
+   Vous êtes à la terrasse du Café de la Rose. Quelques
+   tables rondes en métal, avec leurs chaises en osier,
+   sont occupées par des Parisiens qui sirotent leur
+   café ou lisent le journal. Un serveur en tablier noir
+   va et vient. L'appartement de votre ami Pierre est
+   juste à l'est, au-dessus du café. La rue revient au
+   sud-ouest, et la boulangerie est à l'ouest.^
+.
+execute "+meteo_ligne"
+}
+
+object table_cafe : table tables
+ short         une "table"
+ has           SURFACE
+ mass          scenery
+
+{examine
+write "De petites tables rondes en métal, typiques des terrasses parisiennes.^"
+}
+
+object chaise_cafe : chaise chaises
+ short         une "chaise"
+ mass          scenery
+
+{examine
+write "Des chaises en osier tressé, confortables pour passer une heure à observer les passants.^"
+}
+
+object serveur : serveur garcon garçon
+ short         name "le serveur"
+ long          "Un serveur en tablier noir circule entre les tables.^"
+ has           ANIMATE
+ mass          heavy
+
+{examine
+write "Un serveur jeune et efficace, avec son tablier noir et son torchon blanc. "
+write "Il connaît tous les habitués par leur prénom.^"
+}
+
+{talk_to
+write "~Bonjour ! Qu'est-ce que je vous sers ?~ demande le serveur en souriant. "
+write "~Un café, un thé, un chocolat chaud ?~^"
+}
+
+{ask_about_cafe : ask_about_café
+write "~Le café ici est excellent,~ dit le serveur avec fierté. "
+write "~Torréfié à Paris, servi bien noir et bien chaud.~^"
+}
+
+{ask_about_menu : ask_about_carte
+write "~Café, thé, chocolat, croissants et tartines,~ récite le serveur. "
+write "~Le midi, nous servons aussi des sandwichs et des salades.~^"
+}
+
+{ask_about_pierre
+write "~Pierre ? Un habitué ! Il prend son café tous les matins, toujours à "
+write "la même table,~ dit le serveur. ~Un bon gars.~^"
+}
+
+object tartine : tartine tartines
+ short         une "tartine"
+ long          "Une tartine beurrée attend sur une assiette voisine.^"
+ mass          scenery
+
+{examine
+write "Une tranche de pain frais tartinée de beurre salé. "
+write "Le petit-déjeuner classique des Parisiens.^"
+}
+
+object journal : journal journaux
+ short         un "journal"
+ mass          scenery
+
+{examine : read
+write "Un client lit <i>Le Monde</i> à côté. Les gros titres parlent des grèves et du temps qu'il fait.^"
+}
+
+object terrasse : terrasse
+ short         la "terrasse"
+ mass          scenery
+
+{examine
+write "Une terrasse abritée par un auvent rouge, avec vue sur la rue animée. "
+write "L'endroit idéal pour voir et être vu.^"
+}
+
+# -----------------------------------------------------------------------------
+
+location parc : parc square jardin
+ short         name "Square des Lilas"
+ has           OUTDOORS
+ east          rue
+ x             1
+ y             1
+
+{look
+print:
+   Vous êtes au Square des Lilas, un petit parc de
+   quartier. Des bancs en bois entourent une fontaine
+   en pierre où quelques pigeons se désaltèrent. Des
+   enfants jouent près du bac à sable sous l'œil
+   attentif de leurs parents. Des massifs de fleurs
+   colorées bordent les allées de gravier. La rue
+   revient à l'est.^
+.
+execute "+meteo_ligne"
+}
+
+object banc : banc bancs
+ short         un "banc"
+ mass          scenery
+
+{examine
+write "Un banc en bois vert, usé par mille conversations et livres lus au soleil.^"
+}
+
+{sit_on
+write "Vous vous asseyez sur le banc. Le bois est tiédi par le soleil. Agréable moment de pause.^"
+}
+
+object fontaine : fontaine
+ short         une "fontaine"
+ mass          scenery
+
+{examine
+write "Une vieille fontaine en pierre avec un petit jet d'eau. "
+write "Les pigeons s'y abreuvent en roucoulant.^"
+}
+
+object pigeon : pigeon pigeons oiseau oiseaux
+ short         un "pigeon"
+ has           ANIMATE
+ mass          scenery
+
+{examine
+write "Quelques pigeons gris et blanc, tout à fait à l'aise parmi les humains. "
+write "Ils picorent les miettes que les promeneurs laissent tomber.^"
+}
+
+object fleur : fleur fleurs massif
+ short         une "fleur"
+ mass          scenery
+
+{examine
+write "Des massifs de tulipes rouges, de jonquilles jaunes, et de lilas violets. "
+write "Les couleurs du printemps parisien.^"
+}
+
+object allee : allee allees allée allées gravier
+ short         une "allée"
+ mass          scenery
+
+{examine
+write "Des allées de gravier blanc crissent sous les pas des promeneurs.^"
+}
+
+object bac : bac sable
+ short         un "bac à sable"
+ mass          scenery
+
+{examine
+write "Un bac à sable où deux enfants construisent un château avec des seaux colorés.^"
+}
+
+object enfant : enfant enfants gosse
+ short         un "enfant"
+ has           ANIMATE
+ mass          scenery
+
+{examine
+write "Des enfants jouent avec insouciance, leurs rires éclatent comme une mélodie.^"
+}
+
+{talk_to
+write "L'enfant vous regarde timidement, puis court retrouver ses parents.^"
+}
+
+object parent_parc : parent parents
+ short         un "parent"
+ has           ANIMATE
+ mass          scenery
+
+{examine
+write "Des parents surveillent discrètement leurs enfants, un livre ouvert sur les genoux.^"
+}
+
+# -----------------------------------------------------------------------------
+
+location maison_pierre : appartement studio logement
+ short         name "Chez Pierre"
+ west          cafe
+ x             4
+ y             0
+
+{look
+print:
+   Vous êtes dans le salon de votre ami Pierre. C'est
+   un appartement chaleureux et douillet, typique d'un
+   jeune Parisien. Un canapé en velours bleu fait face
+   à une table basse en bois. Sur la table : un plateau
+   avec du café fumant et quelques biscuits. Les murs
+   sont tapissés de livres, de photos, et d'une grande
+   affiche de cinéma. Une fenêtre donne sur les toits
+   parisiens. La porte mène au café, à l'ouest.^
+.
+}
+
+object canape : canape canapé sofa
+ short         un "canapé"
+ long          "Un canapé en velours bleu occupe tout un mur du salon.^"
+ mass          scenery
+
+{examine
+write "Un canapé en velours bleu profond, moelleux et accueillant. "
+write "Parfait pour bavarder pendant des heures.^"
+}
+
+{sit_on
+write "Vous vous installez sur le canapé. ~Voilà, mets-toi à l'aise,~ "
+write "dit Pierre avec un grand sourire. ~Comme à la maison.~^"
+}
+
+object table_basse : table basse
+ short         une "table basse"
+ has           SURFACE
+ mass          scenery
+
+{examine
+write "Une table basse en chêne massif. Dessus, un plateau avec du café chaud et des biscuits.^"
+}
+
+object plateau : plateau
+ short         un "plateau"
+ has           SURFACE
+ parent        table_basse
+ mass          scenery
+
+{examine
+write "Un plateau en bois clair, avec deux tasses de café et une assiette de biscuits.^"
+}
+
+object cafe_pierre : cafe café
+ short         une "tasse de café"
+ long          "Une tasse de café fumant vous attend sur la table basse.^"
+ parent        plateau
+ mass          2
+
+{examine
+write "Un café noir bien corsé, servi dans une tasse en porcelaine blanche. "
+write "L'arôme emplit la pièce.^"
+}
+
+{drink
+write "Vous savourez le café chaud. ~Il est bon, hein ?~ dit Pierre, content. "
+write "~Un invité doit profiter de l'hospitalité de son hôte.~^"
+}
+
+{take
+write "Mieux vaut savourer le café ici, en bon invité.^"
+set time = false
+}
+
+object biscuit : biscuit biscuits gateau gâteau
+ short         un "biscuit"
+ long          "Des biscuits dorés attendent sur l'assiette.^"
+ parent        plateau
+ mass          1
+
+{examine
+write "Des petits sablés au beurre, dorés et craquants. "
+write "~Ma mère les a faits,~ dit Pierre fièrement.^"
+}
+
+{eat
+write "Vous croquez un biscuit. Croustillant, beurré, délicieux. "
+write "~Sers-toi, il y en a plein,~ insiste Pierre.^"
+}
+
+{take
+write "Mieux vaut les savourer ici, comme il se doit entre amis.^"
+set time = false
+}
+
+object assiette : assiette
+ short         une "assiette"
+ has           SURFACE
+ parent        plateau
+ mass          scenery
+
+{examine
+write "Une assiette en porcelaine blanche, décorée d'un motif floral bleu.^"
+}
+
+object mur : mur murs
+ short         un "mur"
+ mass          scenery
+
+{examine
+write "Les murs sont couverts d'étagères, de photos encadrées, et d'une grande affiche de cinéma.^"
+}
+
+object bibliotheque : bibliotheque bibliothèque etagere étagère
+ short         une "bibliothèque"
+ mass          scenery
+
+{examine
+write "Des étagères du sol au plafond, bondées de romans, d'essais, "
+write "et de bandes dessinées. Pierre est un grand lecteur.^"
+}
+
+object affiche : affiche poster
+ short         une "affiche"
+ mass          scenery
+
+{examine
+write "Une grande affiche de cinéma : <i>Les Quatre Cents Coups</i> de Truffaut. "
+write "Un classique du cinéma français.^"
+}
+
+object photo_pierre : photo photos
+ short         une "photo"
+ mass          scenery
+
+{examine
+write "Des photos encadrées de la famille et des amis de Pierre, "
+write "prises lors de voyages et de fêtes.^"
+}
+
+object fenetre_pierre : fenetre fenêtre
+ short         une "fenêtre"
+ mass          scenery
+
+{examine
+write "La fenêtre donne sur les toits parisiens. Au loin, on devine le Sacré-Cœur.^"
+}
+
+object pierre : pierre ami copain
+ short         name "Pierre"
+ long          "Pierre, votre ami, est installé sur le canapé et vous accueille chaleureusement.^"
+ has           ANIMATE
+ mass          heavy
+
+{examine
+write "Pierre est votre meilleur ami depuis l'université. Il a les cheveux bruns, "
+write "un sourire facile, et cette gentillesse qui fait qu'on se sent toujours bien chez lui.^"
+}
+
+{talk_to
+write "~Salut, mon ami ! Bienvenue chez moi !~ dit Pierre en se levant "
+write "pour vous accueillir. ~Merci d'être venu. Installe-toi sur le canapé, "
+write "le café est encore chaud. On a plein de choses à se raconter.~^"
+}
+
+{ask_about_visite
+write "~Ta visite me fait vraiment plaisir,~ dit Pierre. ~À Paris, entre amis, "
+write "on se voit moins qu'on voudrait. Alors chaque visite compte.~^"
+}
+
+{ask_about_ami : ask_about_amitie : ask_about_amitié
+write "~L'amitié, c'est précieux,~ dit Pierre. ~On se connaît depuis la fac. "
+write "Un vrai ami, ça se garde pour la vie. Rien ne remplace une longue conversation "
+write "avec un bon copain.~^"
+}
+
+{ask_about_invitation : ask_about_inviter
+write "~Tu es toujours invité chez moi,~ dit Pierre. ~Pas besoin de prévenir, "
+write "passe quand tu veux. La porte est toujours ouverte pour les amis.~^"
+}
+
+{ask_about_bienvenue : ask_about_accueillir
+write "~Accueillir un ami chez soi, c'est un petit bonheur,~ dit Pierre. "
+write "~On offre un café, on propose un siège, on écoute, on partage. C'est ça, la politesse parisienne.~^"
+}
+
+{ask_about_politesse
+write "~La politesse française, c'est pas compliqué,~ dit Pierre. "
+write "~On dit bonjour en entrant, merci quand on reçoit, et au revoir en partant. "
+write "Un sourire en plus, et tout se passe bien.~^"
+}
+
+{ask_about_cafe : ask_about_café
+write "~Sers-toi,~ dit Pierre en poussant la tasse vers vous. "
+write "~Un bon café, une bonne conversation, c'est le secret d'un après-midi réussi.~^"
+}
+
+{ask_about_biscuit : ask_about_gateau : ask_about_gâteau
+write "~Ce sont les sablés de ma mère,~ dit Pierre fièrement. "
+write "~Recette de famille. Elle m'en envoie tous les mois.~^"
+}
+
+{ask_about_famille
+write "~Ma mère habite en Bretagne, mon père est à la retraite dans le Sud,~ "
+write "dit Pierre. ~Ma sœur travaille à Londres. Famille un peu dispersée, mais soudée.~^"
+}
+
+{ask_about_paris
+write "~Paris, c'est ma ville,~ dit Pierre avec un sourire. "
+write "~Ses défauts, ses charmes, ses embouteillages et ses terrasses... "
+write "On râle souvent, mais on l'aime.~^"
+}
+
+{ask_about_quartier
+write "~C'est un bon quartier, vivant mais pas bruyant,~ dit Pierre. "
+write "~La boulangère connaît mon nom, le serveur du café me prépare mon expresso "
+write "sans que je demande. Voilà le vrai Paris.~^"
+}
+
+{ask_about_cinema : ask_about_cinéma
+write "~Le cinéma français, c'est ma passion,~ dit Pierre en désignant l'affiche. "
+write "~Truffaut, Godard, Varda... Les grands classiques.~^"
+}
+
+{ask_about_hospitalite : ask_about_hospitalité
+write "~Un hôte doit faire sentir à son invité qu'il est chez lui,~ dit Pierre. "
+write "~Un bon café, un biscuit, du temps à partager. Rien de plus, rien de moins.~^"
+}
+
+{ask_about_conversation : ask_about_bavarder
+write "~Bavarder avec un ami, c'est le plus grand luxe,~ dit Pierre. "
+write "~À Paris on court, on s'agite, mais une vraie conversation tranquille, ça n'a pas de prix.~^"
+}
+
+{ask_about_adieu : ask_about_partir : ask_about_revoir
+write "~Ne pars pas trop vite,~ dit Pierre en riant. ~Mais quand tu partiras, "
+write "on dira ~au revoir~ comme il se doit, avec la bise et la promesse de se revoir bientôt.~^"
+}
+
+# Topic objects for abstract concepts — NO_TAB scenery so they resolve for ask_about
+# without showing up in tab completion or room listings.
+
+object visite : visite
+ has           NO_TAB
+ short         name "visite"
+ mass          scenery
+
+object amitie : amitie amitié
+ has           NO_TAB
+ short         name "amitié"
+ mass          scenery
+
+object invitation : invitation inviter
+ has           NO_TAB
+ short         name "invitation"
+ mass          scenery
+
+object bienvenue : bienvenue accueillir
+ has           NO_TAB
+ short         name "bienvenue"
+ mass          scenery
+
+object politesse : politesse
+ has           NO_TAB
+ short         name "politesse"
+ mass          scenery
+
+object hospitalite : hospitalite hospitalité
+ has           NO_TAB
+ short         name "hospitalité"
+ mass          scenery
+
+object bavarder : bavarder conversation
+ has           NO_TAB
+ short         name "bavarder"
+ mass          scenery
+
+object adieu : adieu partir revoir
+ has           NO_TAB
+ short         name "adieu"
+ mass          scenery
+
+object famille : famille
+ has           NO_TAB
+ short         name "famille"
+ mass          scenery
+
+object paris_topic : paris ville
+ has           NO_TAB
+ short         name "Paris"
+ mass          scenery
+
+object menu : menu carte
+ has           NO_TAB
+ short         name "menu"
+ mass          scenery
+
+# -----------------------------------------------------------------------------
+# PLAYER
+# -----------------------------------------------------------------------------
+
+object kryten : moi toi soi-même joueur
+ has           ANIMATE
+ short         name "vous"
+ quantity      42
+ parent        appartement
+ player
+
+object euros : euros argent monnaie
+ short         name "euros"
+ long          "Vous avez un peu d'argent dans votre poche.^"
+ quantity      1500
+ parent        kryten
+ mass          1
+
+{examine
+write "Vous avez " euros(quantity) " centimes d'euro en poche.^"
+}
+
+object parapluie : parapluie
+ short         un "parapluie"
+ long          function
+ has           CLOSABLE CLOSED WEARABLE
+ parent        appartement
+ mass          5
+
+{long
+if parapluie has CLOSED
+   write "Un parapluie noir plié est posé ici.^"
+else
+   write "Un parapluie noir grand ouvert est posé ici.^"
+endif
+}
+
+{examine
+if parapluie has CLOSED
+   write "Un simple parapluie noir, plié. Utile en cas de pluie. Ouvrez-le avec ~ouvrir parapluie~.^"
+else
+   write "Un parapluie noir grand ouvert. Prêt à vous protéger de la pluie.^"
+endif
+}
+
+{open_override
+ensure parapluie hasnt CLOSED
+write "Vous ouvrez le parapluie.^"
+}
+
+{close_override
+ensure parapluie has CLOSED
+write "Vous fermez le parapluie.^"
+}
+
+object cle : cle clef cles clé clés
+ short         une "clé"
+ long          "Votre clé d'appartement est ici.^"
+ parent        kryten
+ mass          1
+
+{examine
+write "Une petite clé en laiton, celle de votre appartement.^"
+}
+
+# -----------------------------------------------------------------------------
+# SCENERY WALLS (MOVED TO INDOOR LOCATIONS AS NEEDED)
+# -----------------------------------------------------------------------------
+
+object north_wall : nord mur
+ has           NO_TAB
+ short         le "mur nord"
+
+object south_wall : sud mur
+ has           NO_TAB
+ short         le "mur sud"
+
+object east_wall : est mur
+ has           NO_TAB
+ short         le "mur est"
+
+object west_wall : ouest mur
+ has           NO_TAB
+ short         le "mur ouest"
+
+object ground : sol plancher
+ has           SURFACE NO_TAB
+ short         le "sol"
+
+# -----------------------------------------------------------------------------
+# GLOBAL FUNCTIONS
+# -----------------------------------------------------------------------------
+
+integer speech_choice
+integer meteo_etat 0
+
+{+intro
+style bold
+write "^^" game_title
+style normal
+write " par " game_author "^^"
+
+write "Voulez-vous que le jeu parle à voix haute ? (oui/non)^"
+getyesorno speech_choice
+if interpreter = GLK
+   execute "+start_game"
+endif
+}
+
+{+start_game
+if speech_choice = true
+   write "Synthèse vocale activée.^^"
+   write "<script>enableSpeak();</script>"
+else
+   write "Synthèse vocale désactivée.^^"
+   write "<script>disableSpeak();</script>"
+endif
+
+print:
+   Le soleil du matin baigne les toits parisiens
+   d'une lumière dorée. Les cloches d'une église
+   sonnent au loin et l'odeur du pain frais monte
+   de la rue. C'est une belle journée pour flâner
+   dans le quartier et rendre visite à un ami.^^
+.
+
+if here hasnt OUTDOORS
+   move north_wall to here
+   move south_wall to here
+   move east_wall to here
+   move west_wall to here
+endif
+
+set ground(parent) = here
+look
+}
+
+{+eachturn
+if total_moves = 0
+   execute "+start_game"
+endif
+execute "+avancer_meteo"
+}
+
+{+avancer_meteo
+# 0=ensoleillé, 1=nuageux, 2=bruine, 3=pluie
+if meteo_etat < 1
+   if total_moves > 12
+      set meteo_etat = 1
+      write "^Des nuages commencent à s'accumuler. Le soleil se voile.^"
+   endif
+endif
+if meteo_etat < 2
+   if total_moves > 25
+      set meteo_etat = 2
+      write "^Une petite bruine commence à tomber. Le pavé se fait brillant.^"
+   endif
+endif
+if meteo_etat < 3
+   if total_moves > 37
+      set meteo_etat = 3
+      write "^La pluie tombe dru maintenant. Il faudrait sortir son parapluie.^"
+   endif
+endif
+if meteo_etat > 1
+   ifall here has OUTDOORS : parapluie hasnt WORN
+      if meteo_etat = 2
+         write "La bruine mouille vos vêtements.^"
+      else
+         write "Vous êtes trempé par la pluie !^"
+      endif
+   endif
+endif
+}
+
+{+meteo_ligne
+if meteo_etat = 0
+   write "Le ciel est bleu et le soleil brille gentiment.^"
+   return
+endif
+if meteo_etat = 1
+   write "Le ciel se couvre de nuages. Un petit vent frais se lève.^"
+   return
+endif
+if meteo_etat = 2
+   write "Une bruine fine tombe. Le sol est glissant.^"
+   return
+endif
+write "Une pluie battante fouette les pavés. Le tonnerre gronde au loin.^"
+}
+
+{+movement
+ifall destination != nowhere : destination hasnt OUTDOORS
+   move north_wall to destination
+   move south_wall to destination
+   move east_wall to destination
+   move west_wall to destination
+endif
+return false
+}
+
+grammar a propos >about
+grammar à propos >about
+
+{+about
+write "Une Journée à Paris est un jeu d'apprentissage du français. "
+write "Promenez-vous dans le quartier, parlez avec les voisins, "
+write "et apprenez du nouveau vocabulaire. Double-cliquez sur un mot "
+write "pour le traduire, ou tapez ~dictionnaire <mot>~.^"
+}
+
+# -----------------------------------------------------------------------------
+# INCLUDES
+# -----------------------------------------------------------------------------
+
+#include "french.library"
+#include "french_verbs.library"
+#include "webinterface.library"
+#include "webinterface.css"
+#include "mapping.library"

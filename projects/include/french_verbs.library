@@ -711,11 +711,26 @@ write "`GAMES' REFERS TO MODELS, SIMULATIONS AND GAMES WHICH HAVE TACTICAL "
 write "AND STRATEGIC APPLICATIONS.^"
 }
 
+integer mot_trouve
+
 grammar lookup $string >lookup_word
 grammar dict $string >lookup_word
+grammar dictionnaire $string >lookup_word
+grammar traduire $string >lookup_word
+grammar definir $string >lookup_word
+grammar signification $string >lookup_word
 
 {+lookup_word
-write "Aucun dictionnaire n'est disponible pour ce jeu.^"
+set mot_trouve = false
+iterate "french_words.csv" skip_header
+   ifstring field[0] = $string
+      write "Le mot " $string " veut dire " field[1] ".^"
+      set mot_trouve = true
+   endif
+enditerate
+if mot_trouve = false
+   write "Le mot ~" $string "~ n'est pas trouvé.^"
+endif
 set time = false
 }
 
