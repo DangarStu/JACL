@@ -892,7 +892,7 @@ constant maintext_colour "#D2DDD0"
 
 
 #debug "debug.library"
-#include "french_webinterface.library"
+#include "webinterface.library"
 #include "webinterface.css"
 #include "npc.library"
 #include "utils.library"
