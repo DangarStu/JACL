@@ -296,6 +296,31 @@ write "Telinganya bergerak-gerak mengusir lalat.^"
 write "Anjing itu mengangkat kepalanya sebentar, lalu tidur lagi.^"
 }
 
+object rumah_bambu : rumah bambu
+ short         dua "rumah bambu"
+ mass          scenery
+
+{examine
+write "Dua rumah bambu tradisional berdiri di kiri dan kanan gang. "
+write "Dindingnya terbuat dari anyaman bambu yang rapat, atapnya dari daun kelapa.^"
+}
+
+object jemuran : jemuran pakaian baju
+ short         sebuah "jemuran pakaian"
+ mass          scenery
+
+{examine
+write "Pakaian warna-warni tergantung di tali bambu, dijemur di bawah sinar matahari pagi.^"
+}
+
+object pot_tanaman : pot tanaman
+ short         beberapa "pot tanaman"
+ mass          scenery
+
+{examine
+write "Beberapa pot tanah liat berisi tanaman hias kecil. Daunnya hijau segar.^"
+}
+
 # -----------------------------------------------------------------------------
 
 location rumah_teman : pondok
