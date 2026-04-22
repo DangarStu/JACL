@@ -298,7 +298,7 @@ write "Anjing itu mengangkat kepalanya sebentar, lalu tidur lagi.^"
 
 # -----------------------------------------------------------------------------
 
-location rumah_teman : rumah_teman rumah_ketut pondok_ketut
+location rumah_teman : pondok
  short         name "Rumah Ketut"
  southwest     gang
  x             3
@@ -317,7 +317,7 @@ print:
 .
 }
 
-object pintu_depan : pintu_depan pintu pintu_kayu
+object pintu_depan : pintu depan
  short         sebuah "pintu depan"
  mass          scenery
 
@@ -444,7 +444,7 @@ write "~Kita menyambut tamu dengan senyum dan hati terbuka — itulah "
 write "adat desa kami.~^"
 }
 
-object kursi : kursi kursi_kayu kursi_tamu
+object kursi : kursi kayu
  short         sebuah "kursi kayu"
  long          "Dua kursi kayu mengapit meja rendah di tengah ruangan.^"
  mass          scenery
@@ -459,7 +459,7 @@ write "Kamu duduk di kursi kayu. Ketut tersenyum lebar. "
 write "~Nah begitu, anggap rumah sendiri. Mari kita ngobrol.~^"
 }
 
-object meja_rendah : meja_rendah meja_tamu
+object meja_rendah : meja rendah
  short         sebuah "meja rendah"
  has           SURFACE
  mass          scenery
@@ -469,7 +469,7 @@ write "Meja kayu rendah di tengah ruang tamu. Di atasnya tersaji "
 write "teh hangat dan sepiring kue — sajian khas untuk menyambut tamu.^"
 }
 
-object teh : teh teh_hangat teh_manis
+object teh : teh hangat
  short         secangkir "teh hangat"
  long          "Secangkir teh hangat mengepul di atas meja — sajian untuk tamu.^"
  parent        meja_rendah
@@ -491,7 +491,7 @@ write "Sebaiknya teh itu dinikmati di tempat, sebagai tamu yang sopan.^"
 set time = false
 }
 
-object kue : kue kue_manis gorengan onde klepon
+object kue : kue gorengan onde klepon
  short         sepiring "kue manis"
  long          "Sepiring kue manis disajikan di atas meja untuk tamu.^"
  parent        meja_rendah
@@ -514,7 +514,7 @@ write "Sebaiknya kue itu dinikmati di tempat bersama tuan rumah.^"
 set time = false
 }
 
-object foto_keluarga : foto foto_keluarga gambar
+object foto_keluarga : foto keluarga gambar
  short         sebuah "foto keluarga"
  mass          scenery
 
@@ -533,7 +533,7 @@ write "Jendela kayu terbuka lebar. Angin sejuk masuk dari halaman, "
 write "membawa wangi bunga kamboja.^"
 }
 
-object kamboja : kamboja pohon_kamboja bunga_kamboja
+object kamboja : pohon kamboja
  short         sebuah "pohon kamboja"
  mass          scenery
 
@@ -595,7 +595,7 @@ object keluarga : keluarga
  short         name "keluarga"
  mass          scenery
 
-object desa : desa desa_kita
+object desa : desa
  has           NO_TAB
  short         name "desa"
  mass          scenery
@@ -680,7 +680,7 @@ object ramah : ramah keramahan
  short         name "ramah"
  mass          scenery
 
-object tuan_rumah : tuan_rumah tuan
+object tuan_rumah : tuan rumah
  has           NO_TAB
  short         name "tuan rumah"
  mass          scenery
