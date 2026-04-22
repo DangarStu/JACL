@@ -106,6 +106,31 @@ write "Cangkir keramik berisi kopi hitam yang masih hangat.^"
 write "Kamu menyeruput kopi hitam. Pahit tapi enak.^"
 }
 
+object atap_rumah : atap
+ short         sebuah "atap"
+ mass          scenery
+
+{examine
+write "Atap rumahmu terbuat dari daun kelapa kering yang diikat rapat. "
+write "Melindungi dari hujan dan panas.^"
+}
+
+object daun_kelapa : daun kelapa
+ short         name "daun kelapa"
+ mass          scenery
+
+{examine
+write "Daun kelapa kering yang dianyam dan digunakan sebagai bahan atap rumah tradisional.^"
+}
+
+object sudut : sudut pojok
+ short         sebuah "sudut"
+ mass          scenery
+
+{examine
+write "Sudut ruangan tempat meja kayu kecilmu diletakkan.^"
+}
+
 # -----------------------------------------------------------------------------
 
 location sawah : sawah padi
@@ -186,6 +211,32 @@ set time = false
 write "Kuntul itu memiringkan kepalanya dan menatapmu sejenak, lalu kembali mengawasi air.^"
 }
 
+object gunung : gunung
+ short         sebuah "gunung"
+ mass          scenery
+
+{examine
+write "Gunung biru menjulang tinggi di kejauhan. "
+write "Puncaknya kadang tertutup awan.^"
+}
+
+object angin : angin
+ short         name "angin"
+ mass          scenery
+
+{examine
+write "Angin sejuk berhembus dari arah gunung, menggoyangkan tanaman padi dengan lembut.^"
+}
+
+object tepi_sawah : tepi
+ short         name "tepi sawah"
+ mass          scenery
+
+{examine
+write "Tanah pematang yang membatasi petak-petak sawah. "
+write "Cukup lebar untuk dilewati satu orang.^"
+}
+
 # -----------------------------------------------------------------------------
 
 location jalan_utama : jalan utama
@@ -250,6 +301,15 @@ write "~Tapi Ibu marah kalau saya basah.~^"
 {ask_about_ibu
 write "~Ibu saya tinggal dekat sini,~ kata Made. "
 write "~Dia sedang memasak nasi untuk makan siang.~^"
+}
+
+object jalan_tanah : jalan tanah
+ short         name "jalan tanah"
+ mass          scenery
+
+{examine
+write "Jalan tanah yang dipadatkan oleh kaki-kaki warga desa. "
+write "Menghubungkan seluruh sudut desa.^"
 }
 
 # -----------------------------------------------------------------------------
@@ -710,6 +770,32 @@ object tuan_rumah : tuan rumah
  short         name "tuan rumah"
  mass          scenery
 
+object ruang_tamu : ruang tamu
+ short         name "ruang tamu"
+ mass          scenery
+
+{examine
+write "Ruang tamu sederhana — tempat Ketut biasa menerima teman dan tetangga yang berkunjung.^"
+}
+
+object dinding_bambu : dinding bambu
+ short         name "dinding bambu"
+ mass          scenery
+
+{examine
+write "Dinding rumah Ketut terbuat dari anyaman bambu yang rapi, "
+write "dihiasi beberapa foto keluarga.^"
+}
+
+object halaman_teman : halaman kecil
+ short         name "halaman kecil"
+ mass          scenery
+
+{examine
+write "Halaman kecil di luar jendela dengan pohon kamboja yang sedang berbunga. "
+write "Angin membawa wanginya ke dalam ruangan.^"
+}
+
 # -----------------------------------------------------------------------------
 
 location warung : warung kedai toko
@@ -945,6 +1031,33 @@ write "Kamu mengelus kucing itu. Dia mendengkur dengan senang.^"
 write "Kucing itu membuka satu mata, menatapmu sebentar, lalu menutup matanya lagi.^"
 }
 
+object meja_panjang : meja panjang
+ short         sebuah "meja panjang"
+ has           SURFACE
+ mass          scenery
+
+{examine
+write "Meja kayu panjang tempat Ibu Warung melayani pelanggannya. "
+write "Di atasnya ada beberapa piring dan gelas kosong.^"
+}
+
+object makanan : makanan ringan
+ short         name "makanan ringan"
+ mass          scenery
+
+{examine
+write "Berbagai makanan ringan tertata di rak: keripik, kacang, dan kerupuk. "
+write "Tanya Ibu Warung untuk memesan.^"
+}
+
+object pinggir_jalan : pinggir jalan
+ short         name "pinggir jalan"
+ mass          scenery
+
+{examine
+write "Warung ini terletak tepat di pinggir jalan utama desa, posisi strategis untuk menarik pelanggan yang lewat.^"
+}
+
 # -----------------------------------------------------------------------------
 
 location banjar : banjar balai aula
@@ -990,6 +1103,30 @@ object buku_tamu : buku tamu
 {examine : read
 write "Buku ini berisi nama-nama tamu yang pernah mengunjungi desa. "
 write "Halaman terakhir masih kosong.^"
+}
+
+object atap_banjar : atap tinggi
+ short         name "atap tinggi"
+ mass          scenery
+
+{examine
+write "Atap tinggi banjar terbuat dari ijuk yang tebal, ditopang oleh tiang-tiang kayu jati.^"
+}
+
+object kursi_banjar : kursi
+ short         name "beberapa kursi"
+ mass          scenery
+
+{examine
+write "Kursi-kursi kayu sederhana mengelilingi meja besar, tempat warga duduk rapat.^"
+}
+
+object bangunan : bangunan
+ short         name "bangunan banjar"
+ mass          scenery
+
+{examine
+write "Banjar adalah bangunan terbuka yang menjadi tempat rapat, latihan gamelan, dan upacara desa.^"
 }
 
 # -----------------------------------------------------------------------------
@@ -1077,6 +1214,32 @@ write "kata Pak Pemangku. ~Seluruh warga desa datang bersama.~^"
 {ask_about_doa
 write "~Berdoalah dengan hati yang tenang,~ kata Pak Pemangku. "
 write "~Tuhan mendengar semua yang tulus.~^"
+}
+
+object halaman_pura : halaman pura
+ short         name "halaman pura"
+ mass          scenery
+
+{examine
+write "Halaman pura luas dan bersih, dipagari tembok batu rendah. "
+write "Tempat warga berkumpul saat upacara.^"
+}
+
+object gerbang_candi : gerbang candi bentar
+ short         sebuah "gerbang candi bentar"
+ mass          scenery
+
+{examine
+write "Gerbang candi bentar menjulang tinggi, terbagi menjadi dua bagian "
+write "simetris seolah terbelah. Melambangkan keseimbangan alam.^"
+}
+
+object batu_hitam : batu hitam
+ short         name "batu hitam"
+ mass          scenery
+
+{examine
+write "Batu hitam vulkanik yang kokoh, bahan utama padmasana dan tembok pura.^"
 }
 
 # -----------------------------------------------------------------------------
@@ -1168,6 +1331,33 @@ write "~Hari pasar besar hari Rabu dan Sabtu.~^"
 {ask_about_desa
 write "~Desa kami kecil tapi rukun,~ kata Ibu Pedagang. "
 write "~Semua orang saling kenal.~^"
+}
+
+object buah_tropis : buah tropis
+ short         name "buah-buahan tropis"
+ mass          scenery
+
+{examine
+write "Pisang, mangga, rambutan, salak, dan pepaya tersusun rapi di keranjang-keranjang bambu. "
+write "Semuanya matang dan segar.^"
+}
+
+object dagangan : dagangan
+ short         name "dagangan"
+ mass          scenery
+
+{examine
+write "Beragam dagangan tertata rapi: sayur, ikan, bumbu, dan buah. "
+write "Setiap pedagang punya sudut masing-masing.^"
+}
+
+object suara_pasar : suara
+ short         name "suara tawar-menawar"
+ mass          scenery
+
+{examine
+write "Suara tawar-menawar antara pedagang dan pembeli terdengar riuh di mana-mana — "
+write "khas suasana pasar desa pagi hari.^"
 }
 
 # -----------------------------------------------------------------------------

@@ -253,6 +253,7 @@ benteng,fort
 bentuk,"shape, form"
 ber,(prefix: intransitive verb)
 berada,to be located
+beragam,"various, assorted"
 berakhir,end
 berani,brave
 berapa,how much/many
@@ -268,6 +269,7 @@ berbeda,different
 berbelanja,go shopping
 berbicara,speak
 berbinar,"to sparkle, twinkle"
+berbunga,to bloom
 bercakap,to converse
 bercerai,divorce
 berdebat,debate
@@ -562,6 +564,7 @@ diajak,"invited, asked to join (passive)"
 diaktifkan,activated
 dialog,dialogue
 diam,"silent, still"
+dianyam,woven (passive)
 diatur,"arranged, set up"
 dibaca,to be read
 dibawa,"carried, brought (passive)"
@@ -574,6 +577,7 @@ digantung,hung (passive)
 digunakan,used (passive)
 dihiasi,decorated (passive)
 dihormati,"respected, honoured (passive)"
+diikat,tied (passive)
 diikuti,to be followed
 diisi,to be filled
 dijemur,being dried in the sun (passive)
@@ -581,6 +585,7 @@ dikit,a little (informal)
 dilakukan,to be done
 dilarang,forbidden
 diletakkan,"placed, put (passive)"
+dilewati,passed through (passive)
 dimana,where
 dimatikan,turned off
 dimensi,dimension
@@ -592,6 +597,8 @@ dini,early
 dinikmati,enjoyed (passive)
 dinonaktifkan,deactivated
 dinyalakan,turned on
+dipadatkan,compacted (passive)
+dipagari,fenced (passive)
 dipakai,to be used
 dipanen,to be harvested
 dipegang,held (passive)
@@ -692,6 +699,7 @@ galak,fierce
 galeri,gallery
 gali,dig
 gambar,"picture, drawing"
+gamelan,gamelan (Indonesian orchestra)
 gampang,easy
 ganda,double
 gandum,wheat
@@ -865,6 +873,7 @@ identitas,identity
 ideologi,ideology
 ijazah,diploma
 ijin,"permission, permit"
+ijuk,palm fibre
 ikan,fish
 ikan-ikan,fish (plural)
 ikat,"tie, bind"
@@ -940,6 +949,7 @@ jaringan,network
 jarum,needle
 jasa,"service, merit"
 jatah,ration
+jati,teak (wood)
 jatuh,fall
 jatuhkan,drop
 jauh,far
@@ -995,6 +1005,7 @@ kak,older sibling (address)
 kakak,older sibling
 kakek,grandfather
 kaki,"foot, leg"
+kaki-kaki,feet (plural)
 kaku,"stiff, rigid"
 kala,time; underworld spirit
 kalah,lose
@@ -1069,6 +1080,7 @@ kecap,soy sauce
 kecelakaan,accident
 kecewa,disappointed
 kecil,small
+kecilmu,your little (one)
 kecilnya,"his/her little one, smallness"
 kecuali,except
 kecup,kiss
@@ -1280,6 +1292,7 @@ kupu kupu,butterfly
 kurang,less
 kurikulum,curriculum
 kursi,chair
+kursi-kursi,chairs (plural)
 kursus,course
 kurus,"thin, skinny"
 kurva,curve
@@ -1326,6 +1339,7 @@ larang,forbid
 lari,run
 latar,"background, setting"
 latih,train
+latihan,"practice, rehearsal"
 laut,sea
 lawan,opponent
 layak,"worthy, decent"
@@ -1471,8 +1485,10 @@ melakukan,to do
 melalui,through
 melambai,to wave
 melambaikan,to wave
+melambangkan,to symbolise
 melampaui,to exceed
 melati,jasmine
+melayani,to serve (a customer)
 melempar,to throw
 melepas,"to release, remove"
 melepaskan,"to release, untie"
@@ -1501,6 +1517,7 @@ membaca,read
 membakar,"to burn, grill"
 membantu,help
 membasahi,to wet
+membatasi,"to limit, border"
 membawa,bring
 membayar,pay
 membeli,buy
@@ -1594,6 +1611,7 @@ mengatur,"to set, arrange"
 mengawasi,to watch over
 mengecup,to kiss
 mengejutkan,surprising
+mengelilingi,to surround
 mengeluh,complain
 mengelus,"to stroke, caress"
 mengenakan,"to wear, put on"
@@ -1609,6 +1627,7 @@ menggambarkan,to depict
 menggeledah,"to search, frisk"
 menggeser,to shift
 menggosok,"to rub, scrub"
+menggoyangkan,"to sway, shake"
 menggunakan,to use
 mengguncang,to shake
 mengguyur,"to pour down, to drench"
@@ -1892,9 +1911,11 @@ peluk,"hug, embrace"
 pemain,player
 pemandangan,view
 pemangku,Balinese temple priest
+pematang,rice-field embankment
 pembangunan,development
 pembantu,assistant
 pembayaran,payment
+pembeli,buyer
 pembelian,purchase
 pemberian,gift
 pembicaraan,conversation
@@ -2005,6 +2026,7 @@ pesanan,order (purchase)
 pesawat,airplane
 peserta,participant
 peta,map
+petak-petak,plots (plural)
 petani,farmer
 petik,"pick, pluck"
 petir,lightening
@@ -2037,6 +2059,7 @@ pompa bensin,gas station
 pompa,pump
 pondok,"hut, cottage"
 pos,post
+posisi,position
 pot,pot
 potensi,potential
 potong,"cut, piece"
@@ -2062,6 +2085,7 @@ pulihkan,restore
 puluh,tens (multiplier)
 pun,also
 puncak,"peak, summit"
+puncaknya,its peak
 punggung,back (body)
 punya,"have, own"
 pura,Balinese Hindu temple
@@ -2123,6 +2147,7 @@ rindu,"miss, longing"
 ringan,light (weight)
 rintik,droplet
 rintik-rintik,drizzle
+riuh,"noisy, bustling"
 riwayat,"history, record"
 rob,tidal flood
 robek,torn
@@ -2165,6 +2190,7 @@ sakit,sick
 saksi,witness
 sakumu,your pocket
 salah,"wrong, mistake"
+salak,salak fruit (snakefruit)
 salam,"greeting, peace"
 saldo,balance (account)
 saling,"mutual, each other"
@@ -2297,6 +2323,7 @@ sentuh,touch
 sentuhan,touch
 senyum,smile
 senyumnya,his/her smile
+seolah,as if
 seorang,a single person
 sepak bola,football
 sepasang,a pair of
@@ -2341,6 +2368,7 @@ siksa,torture
 silakan,"please, go ahead"
 silaturahmi,maintaining good relations
 silau,glare
+simetris,symmetrical
 simpan,"save, store, keep"
 simpang,intersection
 sinar,"ray, shine"
@@ -2365,9 +2393,11 @@ sore,late afternoon
 spesifik,specific
 stan,"stand, booth"
 stasiun,station
+strategis,strategic
 suami,husband
 suara,"voice, sound"
 suaranya,its sound
+suasana,"atmosphere, mood"
 suatu,"a, some"
 subur,fertile
 sudah,already
@@ -2469,6 +2499,7 @@ telur,egg
 teman sejawat,colleague
 teman,friend
 tembaga,copper
+tembok,wall (masonry)
 tempat,"place, seat"
 tempe,tempeh
 temu,to meet
@@ -2492,8 +2523,10 @@ terang,bright
 terapi,therapy
 terasa,"feels, is felt"
 teratai,lotus
+terbagi,divided
 terbaik,the best
 terbang,fly (verb)
+terbelah,split
 terbuat,made of
 terbuka,open
 tercampur,mixed
@@ -2647,6 +2680,7 @@ vaksin,vaccine
 variasi,variation
 versi,version
 visi,vision
+vulkanik,volcanic
 wacana,discourse
 wadah,container
 wah,wow
