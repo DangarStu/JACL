@@ -1013,11 +1013,15 @@ word_check()
     } else if (!strcmp(word[wp], cstring_resolve("UNDO_WORD")->value)) {
         write_text("Undo not currently supported under web interface.^");
         TIME->value = FALSE;
-#ifdef WEBJACL
-    } else if (!strcmp(word[wp], cstring_resolve("QUIT_WORD")->value)
-                || !strcmp(word[wp], "quit")) {
-        terminate(0);
-#endif
+    /*
+     * Quit is intentionally NOT intercepted here. Under cgijacl it used to
+     * call terminate(0), which exits the request mid-response and the
+     * browser sees a broken/blank page. Under fcgijacl it was never
+     * intercepted at all -- the word falls through to the parser and the
+     * game's grammar decides what to do (e.g. `keluar` -> +out in the
+     * Indonesian library). Passing through keeps cgijacl and fcgijacl
+     * consistent and avoids the crash.
+     */
     } else if (!strcmp(word[wp], cstring_resolve("INFO_WORD")->value)
                || !strcmp(word[wp], "version")) {
         version_info();
