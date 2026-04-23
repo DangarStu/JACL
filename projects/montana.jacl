@@ -36,7 +36,7 @@ endif
 }
 
 {movement
-if compass = south
+if compass = south : compass = out
    if destination = nowhere
       write "La puerta está cerrada. Tienes que abrirla primero.^"
       return
@@ -61,14 +61,18 @@ endif
 ensure puerta hasnt CLOSED
 write "Abres la puerta de madera. El aire frío de la montaña entra en la cabaña.^"
 set cabaña(south) = sendero
+set cabaña(out) = sendero
 set sendero(north) = cabaña
+set sendero(in) = cabaña
 }
 
 {close_override
 ensure puerta has CLOSED
 write "Cierras la puerta de madera.^"
 set cabaña(south) = nowhere
+set cabaña(out) = nowhere
 set sendero(north) = nowhere
+set sendero(in) = nowhere
 }
 
 object chimenea : chimenea fogón fuego
@@ -131,6 +135,15 @@ print:
    oscuro de araucarias. Hacia el sur, el camino sube hasta
    un mirador. Tu cabaña está al norte.^
 .
+}
+
+{movement
+if compass = north : compass = in
+   if destination = nowhere
+      write "La puerta de la cabaña está cerrada. Tienes que abrirla primero para entrar.^"
+      return
+   endall
+return false
 }
 
 object arbustos : arbustos plantas

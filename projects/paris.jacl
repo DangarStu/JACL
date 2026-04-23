@@ -35,7 +35,7 @@ endif
 }
 
 {movement
-if compass = west
+if compass = west : compass = out
    if destination = nowhere
       write "La porte est fermée. Il faut l'ouvrir d'abord.^"
       return
@@ -60,14 +60,18 @@ endif
 ensure porte hasnt CLOSED
 write "Vous ouvrez la porte.^"
 set appartement(west) = rue
+set appartement(out) = rue
 set rue(east) = appartement
+set rue(in) = appartement
 }
 
 {close_override
 ensure porte has CLOSED
 write "Vous fermez la porte.^"
 set appartement(west) = nowhere
+set appartement(out) = nowhere
 set rue(east) = nowhere
+set rue(in) = nowhere
 }
 
 object lit : lit
@@ -179,6 +183,15 @@ print:
    appartement est juste à l'est, derrière la porte.^
 .
 execute "+meteo_ligne"
+}
+
+{movement
+if compass = east : compass = in
+   if destination = nowhere
+      write "La porte de votre appartement est fermée. Ouvrez-la d'abord pour rentrer.^"
+      return
+   endall
+return false
 }
 
 object trottoir : trottoir

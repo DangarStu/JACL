@@ -63,6 +63,7 @@ write "Kamu membuka pintu kayu.^"
 set rumah(south) = sawah
 set rumah(out) = sawah
 set sawah(north) = rumah
+set sawah(in) = rumah
 }
 
 {close_override
@@ -71,6 +72,7 @@ write "Kamu menutup pintu kayu.^"
 set rumah(south) = nowhere
 set rumah(out) = nowhere
 set sawah(north) = nowhere
+set sawah(in) = nowhere
 }
 
 object tikar : tikar
@@ -152,6 +154,15 @@ print:
    sebelah barat.^
 .
 execute "+weather_line"
+}
+
+{movement
+if compass = north : compass = in
+   if destination = nowhere
+      write "Pintu rumahmu tertutup. Kamu bisa membukanya untuk masuk kembali.^"
+      return
+   endall
+return false
 }
 
 object segehan : segehan sesajen_tanah persembahan
