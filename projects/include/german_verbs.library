@@ -45,7 +45,7 @@ synonym eins       1
 synonym zwei       2
 synonym drei       3
 synonym vier       4
-synonym f�nf       5
+synonym fünf       5
 synonym sechs      6
 synonym sieben     7
 synonym acht       8
@@ -74,7 +74,7 @@ if arg[0] = 4
    break
 endif
 if arg[0] = 5
-   write "F�nf"
+   write "Fünf"
    break
 endif
 if arg[0] = 6
@@ -122,7 +122,7 @@ if arg[0] = 4
    break
 endif
 if arg[0] = 5
-   write "f�nf"
+   write "fünf"
    break
 endif
 if arg[0] = 6
@@ -174,7 +174,7 @@ if player(parent) = noun4(parent)
       write  noun4{The}
       execute +to_direction
    else
-      write "Du h&ouml;rst schritte in der N&auml;he.^"
+      write "Du hörst schritte in der Nähe.^"
 endif
 set noun4(parent) = DESTINATION
 if player(parent) = noun4(parent)
@@ -182,59 +182,59 @@ if player(parent) = noun4(parent)
       write  noun4{The}
       execute +from_direction
    else
-      write "Du h&ouml;rst schritte in der N&auml;he.^"
+      write "Du hörst schritte in der Nähe.^"
    endif
 endif
 }
 
 {+to_direction
 if DIRECTION = NORTH
-   write " f&uuml;hrt nach Norden.^"
+   write " führt nach Norden.^"
    break
 endif
 if DIRECTION = NORTHEAST
-   write " f&uuml;hrt nach Nordosten.^"
+   write " führt nach Nordosten.^"
    break
 endif
 if DIRECTION = EAST
-   write " f&uuml;hrt nach Osten.^"
+   write " führt nach Osten.^"
    break
 endif
 if DIRECTION = SOUTHEAST
-   write " f&uuml;hrt nach S&uuml;dosten.^"
+   write " führt nach Südosten.^"
    break
 endif
 if DIRECTION = SOUTH
-   write " f&uuml;hrt nach S&uuml;den.^"
+   write " führt nach Süden.^"
    break
 endif
 if DIRECTION = SOUTHWEST
-   write " f&uuml;hrt nach S&uuml;dwesten.^"
+   write " führt nach Südwesten.^"
    break
 endif
 if DIRECTION = WEST
-   write " f&uuml;hrt nach Westen.^"
+   write " führt nach Westen.^"
    break
 endif
 if DIRECTION = NORTHWEST
-   write " f&uuml;hrt nach Nordwesten.^"
+   write " führt nach Nordwesten.^"
    break
 endif
 if DIRECTION = UP
-   write " f&uuml;hrt nach oben.^"
+   write " führt nach oben.^"
    break
 endif
 if DIRECTION = DOWN
-   write " f&uuml;hrt nach unten.^"
+   write " führt nach unten.^"
 }
 
 {+from_direction
 if DIRECTION = NORTH
-   write " ist s&uuml;dlich von hier.^"
+   write " ist südlich von hier.^"
    break
 endif
 if DIRECTION = NORTHEAST
-   write " ist s&uuml;dwestlich von hier.^"
+   write " ist südwestlich von hier.^"
    break
 endif
 if DIRECTION = EAST
@@ -246,19 +246,19 @@ if DIRECTION = SOUTHEAST
    break
 endif
 if DIRECTION = SOUTH
-   write "  ist n&ouml;rdlich von hier.^"
+   write "  ist nördlich von hier.^"
    break
 endif
 if DIRECTION = SOUTHWEST
-   write " ist nord&ouml;stlich von hier.^"
+   write " ist nordöstlich von hier.^"
    break
 endif
 if DIRECTION = WEST
-   write " ist &ouml;stlich von hier.^"
+   write " ist östlich von hier.^"
    break
 endif
 if DIRECTION = NORTHWEST
-   write " ist s&uuml;d&ouml;stlich von hier.^"
+   write " ist südöstlich von hier.^"
    break
 endif
 if DIRECTION = UP
@@ -266,7 +266,7 @@ if DIRECTION = UP
    break
 endif
 if DIRECTION = DOWN
-   write " ist &uuml;ber Dir.^"
+   write " ist über Dir.^"
 }
 
 object previous_exits : previous exits
@@ -348,7 +348,7 @@ if COUNTER = 0
    break
 endif
 if COUNTER = 1
-   hyperlink noun4{the} "gehe+s�d"
+   hyperlink noun4{the} "gehe+süd"
    break
 endif
 if COUNTER = 2
@@ -368,11 +368,11 @@ if COUNTER = 5
    break
 endif
 if COUNTER = 6
-   hyperlink noun4{the} "gehe+s�dost"
+   hyperlink noun4{the} "gehe+südost"
    break
 endif
 if COUNTER = 7
-   hyperlink noun4{the} "gehe+s�dwest"
+   hyperlink noun4{the} "gehe+südwest"
    break
 endif
 if COUNTER = 8
@@ -467,7 +467,7 @@ if noun4 has DEAD
   break
 endif
 if noun4 = player
-  write "&auml;hm, k&ouml;nnte dies ein erstes Anzeichen von Wahnsinn sein?^"
+  write "ähm, könnte dies ein erstes Anzeichen von Wahnsinn sein?^"
   break
 endif
 break false
@@ -527,29 +527,29 @@ if XYZZY = true
    write "~Schau, dass Du Land gewinnst.~^"
    break
 endif
-write "~Das ist das Passwort um die geheime T&uuml;r zu &ouml;ffnen!!"
+write "~Das ist das Passwort um die geheime Tür zu öffnen!!"
 write "~Bist Du sicher?! Die Stimme klingt mir aber fremd.~^^"
-write "~Das liegt sicherlich an der T&uuml;re. Die d&auml;mmt den Schall.~^^"
-write "Eine bisher unsichtbare T&uuml;re schwingt auf. Durch sie kannst Du "
+write "~Das liegt sicherlich an der Türe. Die dämmt den Schall.~^^"
+write "Eine bisher unsichtbare Türe schwingt auf. Durch sie kannst Du "
 write "etwas sehen, dass man nur noch als ~Gottes Heimwerkerkeller~ bezeichnen kann...^^" 
 write "print ~Scheisse! Ich hab' Dir ja gleich gesagt, das ist nicht *ER*!!~;^"
 write "set bouncer_1(panic) + 5;^"
-write "print ~Schnell! Schliesst die T&uuml;r.~;^"
+write "print ~Schnell! Schliesst die Tür.~;^"
 write "set poo(parent) = bouncer_2s_trousers;^"
 write "ensure magic_door has CLOSED;^"
-write "^Die T&uuml;re schlisst sich und verschwindet wieder. Du hast das Ge&uuml;hl es k&ouml;nnte "
+write "^Die Türe schlisst sich und verschwindet wieder. Du hast das Geühl es könnte "
 write "~einer von diesen Tagen~ werden.^"
 set XYZZY = true
 }
 
-grammar ausf�hrlich     >verbose
+grammar ausführlich     >verbose
 
 {+verbose
 if DISPLAY_MODE = 1
-  write "Anzeigemodus bereits auf 'ausf&uuml;hrlich' gesetzt.^"
+  write "Anzeigemodus bereits auf 'ausführlich' gesetzt.^"
   break
 endif
-write "Anzeigemodus auf 'ausf&uuml;hrlich' gesetzt.^"
+write "Anzeigemodus auf 'ausführlich' gesetzt.^"
 set DISPLAY_MODE = 1
 look
 }
@@ -627,13 +627,13 @@ set time = false
 grammar help *present     >help_other
 
 {+help_other
-write "Und inwiefern m&ouml;chtest Du " noun1{the} "helfen?^"
+write "Und inwiefern möchtest Du " noun1{the} "helfen?^"
 }
 
 grammar hint *present     >hint
 
 {+hint
-write "F&uuml;hr " noun1{the} " gibt es keine Hilfe.^"
+write "Führ " noun1{the} " gibt es keine Hilfe.^"
 set time = false
 }
 
@@ -662,7 +662,7 @@ set time = false
 grammar hilfe vier     >fourth_hint
 
 {+fourth_hint
-write "Es gibt ein Maximum an Hilfem&ouml;glichkeiten. Dieses Maximum betr&auml;gt drei.^"
+write "Es gibt ein Maximum an Hilfemöglichkeiten. Dieses Maximum beträgt drei.^"
 set time = false
 }
 
@@ -682,7 +682,7 @@ set time = false
 }
 
 grammar knuddel *present     >hug
-grammar dr�cke *present      >hug
+grammar drücke *present      >hug
 
 {+hug
 break +darkness
@@ -692,10 +692,10 @@ if noun1 hasnt ANIMATE
   write "Komisch.^"
   break
 endif
-write "Ich bin sicher, " noun1{the} " f&uuml;hlt " noun1{s} " jetzt viel besser.^"
+write "Ich bin sicher, " noun1{the} " fühlt " noun1{s} " jetzt viel besser.^"
 }
 
-grammar k�sse *present     >kiss
+grammar küsse *present     >kiss
 
 {+kiss
 break +darkness
@@ -720,7 +720,7 @@ grammar klopfe *present     >rub
 break +darkness 
 break +reach noun1
 override
-write "Ich bin sicher " noun1{the} " f&uuml;hlt " noun1{is} " jetzt viel besser.^"
+write "Ich bin sicher " noun1{the} " fühlt " noun1{is} " jetzt viel besser.^"
 }
 
 grammar reibe *held an *present     >rub_on
@@ -737,7 +737,7 @@ grammar reibe *present mit *held     >rub_with
 break +darkness
 break +reach noun1
 override
-write "Es entsteht ein bischen Reibungsw&auml;rne.^"
+write "Es entsteht ein bischen Reibungswärne.^"
 }
 
 grammar lecke *present        >lick
@@ -747,7 +747,7 @@ grammar schmecke *present     >lick
 break +darkness
 break +reach noun1
 override
-write "W&uuml;rg!^"
+write "Würg!^"
 }
 
 grammar ziehe *present     >pull
@@ -807,8 +807,8 @@ set time = false
 grammar breche *present         >break
 grammar trete *present          >break
 grammar schlage *present        >break
-grammar zertr�mmer *present     >break
-grammar zerst�re *present       >break
+grammar zertrümmer *present     >break
+grammar zerstöre *present       >break
 grammar zerbreche *present      >break
 grammar zerreisse*present       >break
 
@@ -820,7 +820,7 @@ write "Sei doch nicht so destruktiv.^"
 set time = false
 }
 
-grammar s�ubere *present      >clean
+grammar säubere *present      >clean
 grammar putze *present        >clean
 grammar wische *present       >clean
 grammar schrubbe *present     >clean
@@ -831,7 +831,7 @@ break +darkness
 break +reach noun1
 override
 if noun1 has LIQUID
-  write "Wie willst Du eine Fl&uuml;ssigkeit s&auml;ubern?^"
+  write "Wie willst Du eine Flüssigkeit säubern?^"
   set time = false
   break
 endif
@@ -839,30 +839,30 @@ override
 write "Das ist sehr nett von Dir.^"
 }
 
-grammar s�ubere *present mit *held      >clean_with
+grammar säubere *present mit *held      >clean_with
 grammar wische *present mit *held       >clean_with
 grammar schrubbe *present mit *held     >clean_with
-grammar b�rste *present mit *held       >clean_with
+grammar bürste *present mit *held       >clean_with
 
 {+clean_with
 break +darkness
 break +reach noun1
 override
 if noun1 has LIQUID
-  write "Wie willst Du eine Fl&uuml;ssigkeit s&auml;ubern?^"
+  write "Wie willst Du eine Flüssigkeit säubern?^"
   set time = false
   break
 endif
 override
-write "Du kannst " noun1{the} " nicht mit " noun2{the} "s&aumln;ubern.^"
+write "Du kannst " noun1{the} " nicht mit " noun2{the} "sänubern.^"
 set time = false
 }
 
 grammar schreie *present an     >yell_at
-grammar br�lle *present an      >yell_at
+grammar brülle *present an      >yell_at
 
 {+yell_at
-write "Ooohh, gef&auml;hrlich...^"
+write "Ooohh, gefährlich...^"
 }
 
 grammar bezahle *present     >pay
@@ -933,37 +933,37 @@ grammar entferne *present mit *held     >take_with
 grammar leere *present mit *held        >take_with
 
 {+take_with
-proxy "f�lle " noun2 " mit " noun1
+proxy "fülle " noun2 " mit " noun1
 }
 
-grammar f�lle *held von *present     >fill_from
-grammar f�lle *held vom *present     >fill_from
-grammar f�lle *held an *present      >fill_from
+grammar fülle *held von *present     >fill_from
+grammar fülle *held vom *present     >fill_from
+grammar fülle *held an *present      >fill_from
 
 {+fill_from
 break +darkness
 execute +liquid noun2
 if INDEX = false
-  write  noun2{The} " " noun2{doesnt} " genug Fl&uuml;ssigkeit, um " noun1{the}
-  write " zu f&uuml;llen.^"
+  write  noun2{The} " " noun2{doesnt} " genug Flüssigkeit, um " noun1{the}
+  write " zu füllen.^"
   set time = false
   break
 endif
-proxy "f�lle " noun1 " mit " noun3
+proxy "fülle " noun1 " mit " noun3
 }
 
-grammar f�lle *held mit *present     >fill_with
+grammar fülle *held mit *present     >fill_with
 
 {+fill_with
 break +darkness
 break +reach noun2
 if noun1 hasnt CONTAINER
-  write  noun1{The} " " noun1{isnt} " f&uuml;r solche Zwecke konzipiert und kann somit "
-  write "nicht gef&uuml;llt werden.^"
+  write  noun1{The} " " noun1{isnt} " für solche Zwecke konzipiert und kann somit "
+  write "nicht gefüllt werden.^"
   break
 endif
 if noun1 has CLOSED
-  write "Du kannst " noun1{the} " nicht f&uuml;llen solange "
+  write "Du kannst " noun1{the} " nicht füllen solange "
   if noun1 has PLURAL
     write "sie geschlossen sind."
     set time = false
@@ -976,13 +976,13 @@ if noun1 has CLOSED
   endif
 endif
 if noun2 hasnt LIQUID
-  write "Du kannst " noun1{the} " nur mit Fl&uuml;ssigkeit f&uuml;llen.^"
+  write "Du kannst " noun1{the} " nur mit Flüssigkeit füllen.^"
   break
 endif
 execute +liquidwrite noun1
 if INDEX = true
-  write  noun1{The} " ist bereits mit " noun3{the} " gef&uuml;llt. W&uuml;rdest Du "
-  write "nun " noun2{the} " hinzuf&uuml;gen w&uuml;rden sie sich vermischen.^"
+  write  noun1{The} " ist bereits mit " noun3{the} " gefüllt. Würdest Du "
+  write "nun " noun2{the} " hinzufügen würden sie sich vermischen.^"
   set time = false
   break
 endif
@@ -993,7 +993,7 @@ if noun1(quantity) < noun2(mass)
   break
 endif
 override
-write "Du f&uuml;llst " noun1{the} " mit " noun2{the} ".^"
+write "Du füllst " noun1{the} " mit " noun2{the} ".^"
 move noun2 to noun1
 }
 
@@ -1009,12 +1009,12 @@ loop
 endloop
 }
 
-grammar f�lle *present     >fill
+grammar fülle *present     >fill
 
 {+fill
 break +darkness
 override
-write "Womit willst Du " noun1{the} " f&uuml;llen?^"
+write "Womit willst Du " noun1{the} " füllen?^"
 set time = false
 }
 
@@ -1024,7 +1024,7 @@ grammar aufstehen     >stand
 
 {+stand
 if player has SITTING
-  write "Du st&ouml;sst Dich mit Deinen Armen ab und stehst.^"
+  write "Du stösst Dich mit Deinen Armen ab und stehst.^"
   ensure player hasnt SITTING
   break
 endif
@@ -1035,7 +1035,7 @@ grammar schlafe     >sleep
 grammar penne       >sleep
 
 {+sleep
-write "Dazu hast Du sp&auml;ter noch genug Zeit...^"
+write "Dazu hast Du später noch genug Zeit...^"
 set time = false
 }
 
@@ -1049,7 +1049,7 @@ grammar schlafe im *present       >lie_on
 break +darkness
 break +reach noun1
 override
-write  noun1{The} " " noun1{doesnt} " sieht nicht gerade wie ein gem&uuml;tliches Pl&auml;tzchen zum "
+write  noun1{The} " " noun1{doesnt} " sieht nicht gerade wie ein gemütliches Plätzchen zum "
 write "schlafen aus.^"
 }
 
@@ -1065,14 +1065,14 @@ if player has SITTING
   break
 endif
 if here has UNDER_WATER
-  write "W&auml;hrend du unterwasser bist?!?^"
+  write "Während du unterwasser bist?!?^"
   break
 endif
 if here has ON_WATER
-  write "W&auml;hrend Du im Wasser bist?^"
+  write "Während Du im Wasser bist?^"
   break
 endif
-write "Du setzt Dich f�r einen kurzen Moment nieder.^"
+write "Du setzt Dich für einen kurzen Moment nieder.^"
 ensure player has SITTING
 }
 
@@ -1087,19 +1087,19 @@ grammar sitze im *here      >sit_on
 break +darkness
 break +reach noun1
 override
-write  noun1{The} " " noun1{doesnt} " gerade einen gem&uuml;tlichen Eindruck.^"
+write  noun1{The} " " noun1{doesnt} " gerade einen gemütlichen Eindruck.^"
 }
 
 grammar lege alles                    >drop_all
 grammar lege alles hin                >drop_all
 grammar lege alles ab                 >drop_all
 grammar verliere alles                >drop_all
-grammar verliere alle gegenst�nde     >drop_all
+grammar verliere alle gegenstände     >drop_all
 
 {+drop_all
 set time = false
 if here has MID_WATER : here has ON_WATER
-  write "Alles, was Du mit Dir tr&auml;gst ins Wasser zu werfen scheint"
+  write "Alles, was Du mit Dir trägst ins Wasser zu werfen scheint"
   write "mir keine gute Idee zu sein.^"
   break
 endif
@@ -1124,7 +1124,7 @@ if noun3(parent) = player
 endif
 endloop
 if INDEX = 0
-  write "Du tr&auml;gst keine Gegenst&auml;nde mit Dir.^"
+  write "Du trägst keine Gegenstände mit Dir.^"
   break
 }
 
@@ -1149,7 +1149,7 @@ endif
 override
 if here has MID_WATER : here has ON_WATER
   write noun1{the} " versinkt rapide im Wasser." 
-  write " Und ist damit f&uuml; immer verschwunden.^"
+  write " Und ist damit fü immer verschwunden.^"
   move noun1 to limbo
   break
 endif
@@ -1176,7 +1176,7 @@ endif
 override
 if here has MID_WATER : here has ON_WATER
   write noun1{the} " versinkt rapide im Wasser." 
-  write " Und ist somit f&uuml;r immer verschwunden.^"
+  write " Und ist somit für immer verschwunden.^"
   move noun1 to limbo
   break
 endif
@@ -1212,7 +1212,7 @@ if noun1 hasnt CONTAINER
    endif
 endif
 if noun1 has CLOSED
-   write "Das d&uuml;rft etwas schwierig sein,"
+   write "Das dürft etwas schwierig sein,"
    write " solange " noun1{the} " " noun1{is} " geschlossen ist.^"
    break
 endif
@@ -1228,8 +1228,8 @@ loop
 	       execute +take_routine
 	       set INDEX + 1
             else
-	       write "Du tr&auml;gst bereits zu viele Gegenst&auml;nde mit Dir herum. " 
-	       write noun3{the} " w&auml;re nun wirklich zu viel.^"
+	       write "Du trägst bereits zu viele Gegenstände mit Dir herum. " 
+	       write noun3{the} " wäre nun wirklich zu viel.^"
 	       set INDEX + 1
             endif
          else
@@ -1275,8 +1275,8 @@ if INDEX = 0
 {+take_routine
 break +reach noun3
 if noun3(mass) > player(quantity)
-   write "Du tr&auml;gst bereits zu viele Gegenst&auml;nde mit Dir herum.^"
-   write noun3{the} " w&auml;re nun wirklich zu viel.^"
+   write "Du trägst bereits zu viele Gegenstände mit Dir herum.^"
+   write noun3{the} " wäre nun wirklich zu viel.^"
    set time = false
    break
 endif
@@ -1297,7 +1297,7 @@ grammar nehme *here auf     >take
 break +darkness
 break +reach noun1
 if player has SITTING
-  write "Du solltest zun&auml;chst mal aufstehen.^"
+  write "Du solltest zunächst mal aufstehen.^"
   set time = false
   break
 endif
@@ -1306,8 +1306,8 @@ if noun1(mass) >= heavy : noun1 has LOCATION
   break
 endif
 if noun1(mass) > player(quantity)
-   write "Du tr&auml;gst bereits zu viele Gegenst&auml;nde mit Dir herum.^"
-   write noun3{the} " w&auml;re nun wirklich zu viel.^"
+   write "Du trägst bereits zu viele Gegenstände mit Dir herum.^"
+   write noun3{the} " wäre nun wirklich zu viel.^"
   set time = false
   break
 endif
@@ -1324,7 +1324,7 @@ ensure noun1 has TOUCHED
 {+move_scenery
 set time = false
 if noun1 has LOCATION
-   write "Das w&uuml;rde von beeindruckender Kraft zeugen.^"
+   write "Das würde von beeindruckender Kraft zeugen.^"
    break
 endif
 set noun3 = noun1(parent)
@@ -1354,7 +1354,7 @@ if noun2 = noun1
   break
 endif
 if noun2(parent) = noun1
-  write "Ich f&uuml;rchte, das ist nicht m&ouml;glich.^"
+  write "Ich fürchte, das ist nicht möglich.^"
   set time = false
   break
 endif
@@ -1364,12 +1364,12 @@ if noun1(mass) >= heavy : noun1 has LOCATION
 endif
 break +worn noun1
 if noun2 hasnt SURFACE
-  write "" noun2{the} " besitzt keine geeignete Fl&auml;che daf&uuml;r.^"
+  write "" noun2{the} " besitzt keine geeignete Fläche dafür.^"
   set time = false
   break
 endif
 if noun2(quantity) < noun1(mass)
-  write "" noun2{the} " hat nicht genug Platz f&uuml;r " noun1{the} ".^"
+  write "" noun2{the} " hat nicht genug Platz für " noun1{the} ".^"
   set time = false
   break
 endif
@@ -1378,7 +1378,7 @@ write "Du legst " noun1{the} " auf " noun2{the} ".^"
 move noun1 to noun2
 }
 
-grammar f�ge *held in *present ein     >insert_in
+grammar füge *held in *present ein     >insert_in
 grammar lege *held in *present         >insert_in
 
 {+insert_in
@@ -1400,13 +1400,13 @@ if noun2 = noun1
   break
 endif
 if noun2(parent) = noun1
-  write "'Ich bef&uuml;rchte, das wird nicht m&ouml;glich sein.^"
+  write "'Ich befürchte, das wird nicht möglich sein.^"
   set time = false
   break
 endif
 break +worn noun1
 if noun2 = player
-  write "Mich w&uuml;rde interessieren, wie Du das bewerkstelligen willst, aber etwas"
+  write "Mich würde interessieren, wie Du das bewerkstelligen willst, aber etwas"
   write "sagt mir, das ich das besser nicht fragen sollte.^"
   set time = false
   break
@@ -1431,7 +1431,7 @@ write "Du packst" noun1{the} " in " noun2{the} ".^"
 move noun1 to noun2
 }
 
-grammar f�ge alles in *present ein     >insert_all_in
+grammar füge alles in *present ein     >insert_all_in
 grammar lege alles in *present         >insert_all_in
 
 {+insert_all_in
@@ -1476,7 +1476,7 @@ grammar lege alles aufs *present     >insert_all_on
 {+insert_all_on
 break +darkness
 if noun1 hasnt SURFACE
-   write "" noun1{The} " bietet daf&uuml;r keine geeignete Fl&auml;che.^"
+   write "" noun1{The} " bietet dafür keine geeignete Fläche.^"
    set time = false
    break
 endif
@@ -1505,7 +1505,7 @@ endloop
 
 {+encumbered
 if INDEX = 0
-   write "Du tr&auml;gst nichts mit Dir.^"
+   write "Du trägst nichts mit Dir.^"
 }
 
 grammar frage *present nach *carried             >ask_for
@@ -1995,7 +1995,7 @@ set time = false
 if total_moves = 1
   write "Punktzahl: " score "% in einem Spielzug.^"
 else
-  write "Punktzahl: " score "% in " total_moves " Spielz&uuml;gen.^"
+  write "Punktzahl: " score "% in " total_moves " Spielzügen.^"
 }
 
 grammar open *present     >open
@@ -2009,7 +2009,7 @@ if noun1 has LOCKED
   break
 endif
 if noun1 hasnt CLOSABLE
-  write "" noun1{the} "kannst Du nicht &ouml;ffnen.^"
+  write "" noun1{the} "kannst Du nicht öffnen.^"
   set time = false
   break
 endif
@@ -2024,7 +2024,7 @@ if noun1 has CONTAINER
   execute +revealing
   break
 endif
-write "Du &ouml;ffnest " noun1{the} ".^"
+write "Du öffnest " noun1{the} ".^"
 }
 
 {+revealing
@@ -2744,8 +2744,8 @@ set WAY = EAST
 travel east
 }
 
-grammar schwimme nach s�den     >swim_south
-grammar schwimme s�d            >swim_south
+grammar schwimme nach süden     >swim_south
+grammar schwimme süd            >swim_south
 
 {+swim_south
 if here has UNDER_WATER
@@ -2762,9 +2762,9 @@ write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
 set time = false
 }
 
-grammar s�den               >south
-grammar gehe nach s�den     >south
-grammar gehe s�d            >south
+grammar süden               >south
+grammar gehe nach süden     >south
+grammar gehe süd            >south
 
 {+south
 set WAY = SOUTH
@@ -2788,9 +2788,9 @@ write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
 set time = false
 }
 
-grammar s�dosten               >southeast
-grammar gehe nach s�dosten     >southeast
-grammar gehe s�dosten          >southeast
+grammar südosten               >southeast
+grammar gehe nach südosten     >southeast
+grammar gehe südosten          >southeast
 
 {+southeast
 set WAY = SOUTHEAST
@@ -2814,9 +2814,9 @@ write "Wie willst Du schwimmen, wenn Du nicht im Wasser bist?^"
 set time = false
 }
 
-grammar s�dwest                 >southwest
-grammar gehe nach s�dwesten     >southwest
-grammar gehe s�dwesten          >southwest
+grammar südwest                 >southwest
+grammar gehe nach südwesten     >southwest
+grammar gehe südwesten          >southwest
 
 {+southwest
 set WAY = SOUTHWEST
