@@ -1544,7 +1544,6 @@ grammar take         >take_only
 grammar take out     >take_only
 grammar hold         >take_only
 grammar pick         >take_only
-grammar pick         >take_only
 grammar get          >take_only
 grammar ambil        >take_only
 
@@ -1930,17 +1929,8 @@ grammar memberikan *held ke *present     >give_to
 grammar memberikan *held                 >give_only
 grammar offer *held                      >give_only
 grammar give *held                       >give_only
-grammar give *held                       >give_only
-grammar pass *held                       >give_only
-grammar pass *held                       >give_only
-grammar pass *held                       >give_only
 grammar pass *held                       >give_only
 grammar hand *held                       >give_only
-grammar hand *held                       >give_only
-grammar hand *held                       >give_only
-grammar hand *held                       >give_only
-grammar heave *held                      >give_only
-grammar heave *held                      >give_only
 grammar heave *held                      >give_only
 
 {+give_only
@@ -2705,6 +2695,7 @@ if +reach<noun1 = true
 endif
 ifall noun1 has LOCKABLE : noun1 has LOCKED
    write  noun1{The} " " noun1{is} " sudah terkunci.^"
+   set time = false
    return true
 endif
 ifall noun1 has CLOSABLE : noun1 hasnt CLOSED
@@ -2714,11 +2705,12 @@ ifall noun1 has CLOSABLE : noun1 hasnt CLOSED
 endif
 if noun1 hasnt LOCKABLE
    write "Anda tidak bisa mengunci " noun1{the} .^
+   set time = false
    return true
 endif
 override
 write "Dengan apa Anda ingin mengunci " noun1{the} "?^"
-setstring "lock " noun1{names} " with " 
+setstring question "lock " noun1{names} " with "
 set time = false
 }
 
@@ -4040,7 +4032,7 @@ grammar menaiki *here      >climb_up
 
 {+climb_up
 if noun1 is *held
-   write "Sulit untuk memanjat " noun{2}{the} " sementara Anda "
+   write "Sulit untuk memanjat " noun1{the} " sementara Anda "
    write "memegangnya.^"
    set time = false
    return
@@ -4057,7 +4049,7 @@ grammar turun dari *here     >climb_down
 
 {+climb_down
 if noun1 is *held
-   write "Sulit untuk menuruni " noun{2}{the} " sementara Anda "
+   write "Sulit untuk menuruni " noun1{the} " sementara Anda "
    write "memegangnya.^"
    set time = false
    return

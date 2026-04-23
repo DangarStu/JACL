@@ -2651,6 +2651,7 @@ if +reach<noun1 = true
 endif
 ifall noun1 has LOCKABLE : noun1 has LOCKED
    write  noun1{The} " ya esta cerrado con llave.^"
+   set time = false
    return true
 endif
 ifall noun1 has CLOSABLE : noun1 hasnt CLOSED
@@ -2666,11 +2667,12 @@ ifall noun1 has CLOSABLE : noun1 hasnt CLOSED
 endif
 if noun1 hasnt LOCKABLE
    write "No puedes cerrar con llave " noun1{the} .^
+   set time = false
    return true
 endif
 override
 write "Con que querias cerrar con llave " noun1{the} "?^"
-setstring "lock " noun1{names} " with "
+setstring question "lock " noun1{names} " with "
 set time = false
 }
 
@@ -3981,7 +3983,7 @@ grammar go up *here        >climb_up
 
 {+climb_up
 if noun1 is *held
-   write "Es dificil subir " noun{2}{the} " mientras lo "
+   write "Es dificil subir " noun1{the} " mientras lo "
    write "sostienes.^"
    set time = false
    return
@@ -3998,7 +4000,7 @@ grammar go down *here        >climb_down
 
 {+climb_down
 if noun1 is *held
-   write "Es dificil bajar " noun{2}{the} " mientras lo "
+   write "Es dificil bajar " noun1{the} " mientras lo "
    write "sostienes.^"
    set time = false
    return

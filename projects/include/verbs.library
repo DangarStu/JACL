@@ -1256,7 +1256,7 @@ if +important<noun1 = true
    return true
 endif
 if noun1 is *held
-   write "Is is hard to sit on something while you are holding it.^"
+   write "It is hard to sit on something while you are holding it.^"
    set time = false
    return
 endif
@@ -1365,7 +1365,6 @@ move noun1 to here
 grammar take         >take_only
 grammar take out     >take_only
 grammar hold         >take_only
-grammar pick         >take_only
 grammar pick         >take_only
 grammar get          >take_only
 
@@ -1733,17 +1732,8 @@ write "You give " noun1{the} " to " noun2{the} .^
 
 grammar offer *held     >give_only
 grammar give *held      >give_only
-grammar give *held      >give_only
-grammar pass *held      >give_only
-grammar pass *held      >give_only
-grammar pass *held      >give_only
 grammar pass *held      >give_only
 grammar hand *held      >give_only
-grammar hand *held      >give_only
-grammar hand *held      >give_only
-grammar hand *held      >give_only
-grammar heave *held     >give_only
-grammar heave *held     >give_only
 grammar heave *held     >give_only
 
 {+give_only
@@ -2461,6 +2451,7 @@ if +reach<noun1 = true
 endif
 ifall noun1 has LOCKABLE : noun1 has LOCKED
    write  noun1{The} " " noun1{is} " already locked.^"
+   set time = false
    return true
 endif
 ifall noun1 has CLOSABLE : noun1 hasnt CLOSED
@@ -2476,11 +2467,12 @@ ifall noun1 has CLOSABLE : noun1 hasnt CLOSED
 endif
 if noun1 hasnt LOCKABLE
    write "You can't lock " noun1{the} .^
+   set time = false
    return true
 endif
 override
 write "What did you want to lock " noun1{the} " with?^"
-setstring "lock " noun1{names} " with " 
+setstring question "lock " noun1{names} " with "
 set time = false
 }
 
@@ -2837,7 +2829,7 @@ if +darkness = true
    return true
 endif
 if noun1 is *held
-   write "Is is hard to jump on something while you are holding it.^"
+   write "It is hard to jump on something while you are holding it.^"
    set time = false
    return
 endif
@@ -2859,7 +2851,7 @@ if +darkness = true
    return true
 endif
 if noun1 is *held
-   write "Is is hard to jump over something while you are holding it.^"
+   write "It is hard to jump over something while you are holding it.^"
    set time = false
    return
 endif
@@ -3049,7 +3041,7 @@ if noun2 has LOCATION
    return
 endif
 if noun2 is *held
-   write "Is is hard to throw anything at " noun2{the} " while you are "
+   write "It is hard to throw anything at " noun2{the} " while you are "
    write "holding " noun2{obj} ".^"
    set time = false
    return
@@ -3698,7 +3690,7 @@ grammar go up *here        >climb_up
 
 {+climb_up
 if noun1 is *held
-   write "Is is hard to climb up " noun{2}{the} " while you are "
+   write "It is hard to climb up " noun1{the} " while you are "
    write "holding it.^"
    set time = false
    return
@@ -3714,7 +3706,7 @@ grammar go down *here        >climb_down
 
 {+climb_down
 if noun1 is *held
-   write "Is is hard to climb down " noun{2}{the} " while you are "
+   write "It is hard to climb down " noun1{the} " while you are "
    write "holding it.^"
    set time = false
    return

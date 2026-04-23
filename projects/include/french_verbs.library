@@ -1732,7 +1732,6 @@ grammar take         >take_only
 grammar take out     >take_only
 grammar hold         >take_only
 grammar pick         >take_only
-grammar pick         >take_only
 grammar get          >take_only
 
 grammar prendre      >take_only
@@ -2962,6 +2961,7 @@ if +reach<noun1 = true
 endif
 ifall noun1 has LOCKABLE : noun1 has LOCKED
    write  noun1{The} " " noun1{is} " déjà verrouillé.^"
+   set time = false
    return true
 endif
 ifall noun1 has CLOSABLE : noun1 hasnt CLOSED
@@ -2978,11 +2978,12 @@ ifall noun1 has CLOSABLE : noun1 hasnt CLOSED
 endif
 if noun1 hasnt LOCKABLE
    write "Vous ne pouvez verrouiller " noun1{the} .^
+   set time = false
    return true
 endif
 override
 write "Avec quoi vouliez-vous verrouiller " noun1{the} " ?^"
-setstring "lock " noun1{names} " with " 
+setstring question "lock " noun1{names} " with "
 set time = false
 }
 
@@ -4352,7 +4353,7 @@ grammar grimper on *here     >climb_up
 
 {+climb_up
 if noun1 is *held
-   write "Il est difficile d'escalader " noun{2}{the} " tant que vous portez quelque chose."
+   write "Il est difficile d'escalader " noun1{the} " tant que vous portez quelque chose."
    write ".^"
 # Is is hard to climb up ... while you are ... holding it
    set time = false
@@ -4372,7 +4373,7 @@ grammar descendre de *here     >climb_down
 
 {+climb_down
 if noun1 is *held
-   write "C'est difficile de descendre de " noun{2}{the} " alors que vous le "
+   write "C'est difficile de descendre de " noun1{the} " alors que vous le "
    write "portez.^"
    set time = false
    return
