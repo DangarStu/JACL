@@ -52,6 +52,26 @@ synonym acht       8
 synonym neun       9
 synonym zehn       10
 
+# ASCII aliases: players who can't type umlauts can use ue/oe/ae/ss and still match.
+synonym fuenf            fünf
+synonym ausfuehrlich     ausführlich
+synonym druecke          drücke
+synonym kuesse           küsse
+synonym zertruemmer      zertrümmer
+synonym zerstoere        zerstöre
+synonym saeubere         säubere
+synonym buerste          bürste
+synonym bruelle          brülle
+synonym fuelle           fülle
+synonym gegenstaende     gegenstände
+synonym fuege            füge
+synonym sued             süd
+synonym sueden           süden
+synonym suedost          südost
+synonym suedosten        südosten
+synonym suedwest         südwest
+synonym suedwesten       südwesten
+
 {+number_upper
 if arg[0] = 0
    write "Null"
@@ -1568,14 +1588,13 @@ override
 if noun2 = noun1
   write noun1(The}
   if noun1 has PLURAL
-    write " are too shy to say much.^"
+    write " sind zu schüchtern, um viel zu sagen.^"
   else
-    write " is too shy to say much.^"
+    write " ist zu schüchtern, um viel zu sagen.^"
   endif
   break
 endif
-write  noun1{The} " reluctantly admit" noun1{s} " to knowing little about "
-write noun2{the} .^
+write  noun1{The} " gib" noun1{t} " widerwillig zu, wenig über " noun2{the} " zu wissen.^"
 }
 
 grammar offer *held to *present     >give_to
@@ -1583,12 +1602,12 @@ grammar give *held to *present      >give_to
 
 {+give_to
 if noun2 hasnt ANIMATE
-  write "You can't give " noun1{the} " to " noun2 .^
+  write "Du kannst " noun1{the} " nicht an " noun2 " geben.^"
   set time = false
   break
 endif
 if noun2 = player
-  write "I think it might be time to take a break and get a cup of tea.^"
+  write "Ich glaube, es ist Zeit für eine Pause und einen Tee.^"
   break
 endif
 break +reach noun2
@@ -1599,7 +1618,7 @@ endif
 break +worn noun1
 override
 move noun1 to noun2
-write "You give " noun1{the} " to " noun2{the} .^
+write "Du gibst " noun1{the} " an " noun2{the} ".^"
 }
 
 grammar move *present     >move
@@ -1609,7 +1628,7 @@ grammar push *present     >move
 break +darkness
 break +reach noun1
 if player has SITTING
-   write "You will have to stand up first.^"
+   write "Du musst erst aufstehen.^"
    set time = false
    break
 endif
@@ -1618,17 +1637,17 @@ if noun1(mass) >= heavy : noun1 has LOCATION
   break
 endif
 if noun1 has LIQUID
-  write  noun1{The} " run" noun1{s} " through your fingers.^"
+  write  noun1{The} " rinn" noun1{t} " Dir durch die Finger.^"
   break
 endif
 break +worn noun1
 if noun1(parent) = player
    override
-   write "You juggle " noun1{the} " in your hands.^"
+   write "Du jonglierst " noun1{the} " in Deinen Händen.^"
    break
 endif
 override
-write "You move " noun1{the} " a short distance to one side.^"
+write "Du bewegst " noun1{the} " ein Stück zur Seite.^"
 ensure noun1 has TOUCHED
 }
 
@@ -1636,7 +1655,7 @@ grammar read *present     >read
 
 {+read
 break +darkness
-write "There is nothing on " noun1{the} " to read.^"
+write "Auf " noun1{the} " gibt es nichts zu lesen.^"
 }
 
 grammar look down     >look_down
@@ -1644,14 +1663,14 @@ grammar look down     >look_down
 {+look_down
 break +darkness
 if here has TIGHT_ROPE : here has MID_AIR
-  write "You see the ground far below.^"
+  write "Du siehst den Boden tief unter Dir.^"
   break
 endif
 if here has ON_WATER
-  write "You can't see beyond the surface of the water.^"
+  write "Du kannst nicht unter die Wasseroberfläche sehen.^"
   break
 endif
-write "You take a moment to admire your investigating feet.^"
+write "Du bewunderst kurz Deine eifrigen Füße.^"
 }
 
 grammar look up *anywhere in *present      >look_up_in
@@ -1659,7 +1678,7 @@ grammar look for *anywhere in *present     >look_up_in
 
 {+look_up_in
 break +darkness
-write "You don't find any reference to " noun1{the} " in " noun2{the} .^
+write "Du findest keinen Hinweis auf " noun1{the} " in " noun2{the} ".^"
 }
 
 grammar consult *present about *anywhere     >consult
@@ -1677,17 +1696,17 @@ grammar touch *present     >feel
 {+feel
 break +reach noun1
 if noun1 has ANIMATE
-  write "I'm not so sure that would be polite.^"
+  write "Ich bin mir nicht sicher, ob das höflich wäre.^"
   break
 endif
-write "Feels just like " noun1{list} .^
+write "Fühlt sich genau so an wie " noun1{list} ".^"
 }
 
 grammar smell     >smell
 grammar sniff     >smell
 
 {+smell
-write "Nothing strikes you as out of the ordinary.^"
+write "Nichts kommt Dir ungewöhnlich vor.^"
 }
 
 grammar smell *present     >sniff
@@ -1695,10 +1714,10 @@ grammar sniff *present     >sniff
 
 {+sniff
 if noun1 has ANIMATE
-  write "I'm not so sure that would be polite.^"
+  write "Ich bin mir nicht sicher, ob das höflich wäre.^"
   break
 endif
-write "Smells an awful lot like " noun1{list} .^
+write "Riecht erstaunlich nach " noun1{list} ".^"
 }
 
 grammar taste *present     >taste
@@ -1707,10 +1726,10 @@ grammar lick *present      >taste
 {+taste
 break +reach noun1
 if noun1 has ANIMATE
-  write "You are one sick puppy.^"
+  write "Du bist wirklich ein komischer Vogel.^"
   break
 endif
-write "Tastes just like you would expect " noun1{list} " to taste.^"
+write "Schmeckt genau so, wie Du es von " noun1{list} " erwartet hättest.^"
 }
 
 grammar look in *present     >look_in
@@ -1718,7 +1737,7 @@ grammar look in *present     >look_in
 {+look_in
 break +darkness
 if noun1 hasnt CONTAINER
-  write "There is nothing in " noun1{the} .^
+  write "In " noun1{the} " ist nichts.^"
   break
 endif
 if noun1 has CLOSED
@@ -1732,7 +1751,7 @@ loop
   endif
 endloop
 if INDEX = 0
-   write "There is nothing in " noun1{the} .^
+   write "In " noun1{the} " ist nichts.^"
    break
 endif
 execute +details
@@ -1753,7 +1772,7 @@ override
 if noun1 hasnt CLOSABLE
   if noun1 hasnt CONTAINER
     if noun1 hasnt SURFACE
-      write "There is nothing special about " noun1{the} .^
+      write "An " noun1{the} " ist nichts Besonderes.^"
       break
 endall
 if noun1 has CLOSABLE
@@ -1770,7 +1789,7 @@ loop
   endif
 endloop
 if INDEX = 0
-  write "There is nothing special about " noun1{the} .^
+  write "An " noun1{the} " ist nichts Besonderes.^"
   break
 endif
 execute +details
@@ -1873,10 +1892,10 @@ loop
   endif
 endloop
 if INDEX = 0
-  write "You are empty-handed.^"
+  write "Du hast leere Hände.^"
   break
 endif
-write "You are carrying:^"
+write "Du trägst:^"
 loop
   if noun3(parent) = player
     if noun3(mass) != scenery
@@ -1918,10 +1937,10 @@ loop
   endif
 endloop
 if INDEX = 0
-   write "You are empty handed.^"
+   write "Du hast leere Hände.^"
    break
 endif
-write "You are carrying "
+write "Du trägst "
 loop
   if noun3(parent) = player
     if noun3(mass) != scenery
@@ -1956,30 +1975,30 @@ if INDEX = 1
 
 {+object_info
 if noun3 has WORN
-  write " (being worn)"
+  write " (wird getragen)"
 endif
 if noun3 has LUMINOUS
-  write " (providing light)"
+  write " (spendet Licht)"
 endif
 if noun3 has ON
-  write " (on)"
+  write " (an)"
 endif
 if noun3 has CLOSABLE
   if noun3 hasnt CLOSED
-    write " (open)"
+    write " (offen)"
 }
 
 grammar sorry     >sorry
 
 {+sorry
-write "That's quite all right.^"
+write "Das ist schon in Ordnung.^"
 }
 
 grammar thanks        >thankyou
 grammar thank you     >thankyou
 
 {+thankyou
-write "You're welcome.^"
+write "Gern geschehen.^"
 }
 
 grammar score      >score_command
@@ -2034,12 +2053,12 @@ loop
     set INDEX + 1
   endif
 endloop
-write "You open " noun1{the}
+write "Du öffnest " noun1{the}
 if INDEX = 0
-   write ", which" noun1{is} " empty.^"
+   write ", aber " noun1{is} " leer.^"
    break
 endif
-write " revealing "
+write " und siehst "
 loop
   if noun3(parent) = noun1
     set INDEX - 1
@@ -2061,7 +2080,7 @@ grammar shut *present      >close
 break +darkness
 break +reach noun1
 if noun1 hasnt CLOSABLE
-  write "You can't close " noun1{the} .^
+  write "Du kannst " noun1{the} " nicht schließen.^"
   set time = false
   break
 endif
@@ -2072,7 +2091,7 @@ if noun1 has CLOSED
   break
 endif
 override
-write "You close " noun1{the} .^
+write "Du schließt " noun1{the} ".^"
 ensure noun1 has CLOSED
 }
 
@@ -2083,29 +2102,31 @@ break +darkness
 break +reach noun1
 if noun1 has LOCKABLE
   if noun1 has LOCKED
-    write  noun1{The} " " noun1{is} " already locked.^"
+    write  noun1{The} " " noun1{is} " bereits abgeschlossen.^"
+    set time = false
     break
   endif
 endif
 if noun1 has CLOSABLE
   if noun1 hasnt CLOSED
-    write "You can't lock " noun1{the} " while "
+    write "Du kannst " noun1{the} " nicht abschließen, solange "
     if noun1 has PLURAL
-      write "they are"
+      write "sie offen sind"
     else
-      write "it is"
+      write "es offen ist"
     endif
-    write " open.^"
+    write ".^"
     set time = false
     break
   endif
 endif
 if noun1 hasnt LOCKABLE
-  write "You can't lock " noun1{the} .^
+  write "Du kannst " noun1{the} " nicht abschließen.^"
+  set time = false
   break
 endif
 override
-write "What did you want to lock " noun1{the} " with?^"
+write "Womit willst Du " noun1{the} " abschließen?^"
 }
 
 grammar lock *present with *held     >lock_with
@@ -2113,29 +2134,30 @@ grammar lock *present with *held     >lock_with
 {+lock_with
 break +darkness
 if noun1 hasnt LOCKABLE
-  write "You can't lock " noun1{the} .^
+  write "Du kannst " noun1{the} " nicht abschließen.^"
   set time = false
   break
 endif
 break +reach noun1
 if noun1 has LOCKED
-  write  noun1{The} " " noun1{is} " already locked.^"
+  write  noun1{The} " " noun1{is} " bereits abgeschlossen.^"
+  set time = false
   break
 endif
 if noun1 has CLOSABLE
   if noun1 hasnt CLOSED
-    write "You can't lock " noun1{the} " while "
+    write "Du kannst " noun1{the} " nicht abschließen, solange "
     if noun1 has PLURAL
-      write "they are"
+      write "sie offen sind"
     else
-      write "it is"
+      write "es offen ist"
     endif
-    write " open.^"
+    write ".^"
     set time = false
     break
 endif
 override
-write "You can't lock " noun1{the} " with " noun2{the} .^
+write "Du kannst " noun1{the} " nicht mit " noun2{the} " abschließen.^"
 set time = false
 }
 
@@ -2144,18 +2166,18 @@ grammar unlock *present     >unlock
 {+unlock
 break +darkness
 if noun1 hasnt LOCKABLE
-  write "You can't unlock " noun1{the} .^
+  write "Du kannst " noun1{the} " nicht aufschließen.^"
   set time = false
   break
 endif
 break +reach noun1
 if noun1 hasnt LOCKED
-  write  noun1{The} " " noun1{is} " already unlocked.^"
+  write  noun1{The} " " noun1{is} " bereits aufgeschlossen.^"
   set time = false
   break
 endif
 override
-write "What did you want to unlock " noun1{the} " with?^"
+write "Womit willst Du " noun1{the} " aufschließen?^"
 }
 
 grammar unlock *present with *held     >unlock_with
@@ -2163,17 +2185,17 @@ grammar open *present with *held       >unlock_with
 
 {+unlock_with
 if noun1 hasnt LOCKABLE
-  write "You can't unlock " noun1{the} .^
+  write "Du kannst " noun1{the} " nicht aufschließen.^"
   set time = false
   break
 endif
 break +reach noun1
 if noun1 hasnt LOCKED
-  write  noun1{The} " " noun1{is} " already unlocked.^"
+  write  noun1{The} " " noun1{is} " bereits aufgeschlossen.^"
   break
 endif
 override
-write "You can't unlock " noun1{the} " with " noun2{the} .^
+write "Du kannst " noun1{the} " nicht mit " noun2{the} " aufschließen.^"
 set time = false
 }
 
@@ -2182,17 +2204,18 @@ grammar show *held to *present     >show_to
 {+show_to
 break +darkness
 if noun1 = noun2
-  write "You can't show " noun1{the} " to "
+  write "Du kannst " noun1{the} " nicht "
   if noun1 has PLURAL
-    write "themselves."
+    write "sich selbst"
   else
-      write "itself.^"
+      write "sich selbst"
   endif
+  write " zeigen.^"
   set time = false
   break
 endif
 override
-write  noun2{The} " " noun2{doesnt} " seem overly impressed by " noun1{the} .^
+write  noun2{The} " " noun2{doesnt} " von " noun1{the} " sonderlich beeindruckt.^"
 }
 
 grammar untie *present     >untie
@@ -2201,7 +2224,7 @@ grammar undo *present      >untie
 
 {+untie
 break +darkness
-write  noun1{The} " " noun1{is} " not tied to anything.^"
+write  noun1{The} " " noun1{is} " an nichts befestigt.^"
 set time = false
 }
 
@@ -2210,7 +2233,7 @@ grammar attach *held     >tie
 
 {+tie
 break +darkness
-write "What do you want to tie " noun1{the} " to?^"
+write "Woran willst Du " noun1{the} " befestigen?^"
 set time to false
 }
 
@@ -2222,7 +2245,7 @@ grammar attach *held to *present     >tie_to
 break +darkness
 break +reach noun2
 override
-write "You can't tie " noun1{the} " to " noun2{the} .^
+write "Du kannst " noun1{the} " nicht an " noun2{the} " befestigen.^"
 set time = false
 }
 
@@ -2238,13 +2261,13 @@ break +darkness
 break +reach noun1
 if noun1 has ANIMATE
   if noun1 has DEAD
-    write  noun1{The} " " noun1{is} " already dead.^"
+    write  noun1{The} " " noun1{is} " bereits tot.^"
     set time = false
     break
   endif
 endif
 override
-write "Attacking " noun1{the} " with your hands would have little effect.^"
+write "Mit bloßen Händen " noun1{the} " anzugreifen hätte wenig Wirkung.^"
 set time = false
 }
 
@@ -2267,21 +2290,21 @@ endif
 break +worn noun1
 if noun1 has ANIMATE
   if noun1 has DEAD
-    write  noun1{The} " " noun1{is} " already dead.^"
+    write  noun1{The} " " noun1{is} " bereits tot.^"
     set time = false
     break
   endif
 endif
 override
-write "Attacking " noun1{the} " with " noun2{the} " would have little "
-write "effect.^"
+write "Mit " noun2{the} " " noun1{the} " anzugreifen hätte wenig "
+write "Wirkung.^"
 set time = false
 }
 
 grammar wave     >wave
 
 {+wave
-write "You wave your arms around a bit.^"
+write "Du wedelst ein wenig mit den Armen.^"
 }
 
 grammar wave to *present     >wave_to
@@ -2289,10 +2312,10 @@ grammar wave to *present     >wave_to
 {+wave_to
 break +darkness
 if noun1 hasnt ANIMATE
-  write "Not surpisingly, you get no response.^"
+  write "Wenig überraschend erhältst Du keine Antwort.^"
   break
 endif
-write  noun1{The} " barely raises an eye brow.^"
+write  noun1{The} " zieht kaum eine Augenbraue hoch.^"
 }
 
 grammar jump on to *here     >jump_on
@@ -2304,17 +2327,17 @@ grammar stand on *here       >jump_on
 break +darkness
 set time = false
 if noun1 hasnt SURFACE
-  write "You can't jump on " noun1{the} .^
+  write "Du kannst nicht auf " noun1{the} " springen.^"
   break
 endif
-write "This would achieve little.^"
+write "Das würde wenig bringen.^"
 }
 
 grammar jump over *here     >jump_over
 
 {+jump_over
 break +darkness
-write "You can't jump over " noun1{the} .^
+write "Du kannst nicht über " noun1{the} " springen.^"
 set time = false
 }
 
@@ -2322,23 +2345,23 @@ grammar jump     >jump
 
 {+jump
 if here has MID_AIR
-  write "Not likely."
+  write "Eher nicht."
   break
 endif
 if here has TIGHT_ROPE
-  write "Something tells me that might be a bit too dangerous, not to "
-  write "mention totally unnecessary.^"
+  write "Etwas sagt mir, das wäre ein bisschen zu gefährlich, von "
+  write "völlig unnötig ganz zu schweigen.^"
   break
 endif
 if here has UNDER_WATER : here has ON_WATER
-  write "While underwater?^"
+  write "Unter Wasser?^"
   break
 endif
 if player has SITTING
-  write "You would have to get up first.^"
+  write "Du müsstest erst aufstehen.^"
   break
 endif
-write "Consider it done.^"
+write "Erledigt.^"
 }
 
 grammar yes      >yes
@@ -2346,14 +2369,14 @@ grammar okay     >yes
 grammar yeah     >yes
 
 {+yes
-write "That was a rhetorical question.^"
+write "Das war eine rhetorische Frage.^"
 set time = false
 }
 
 grammar no     >no
 
 {+no
-write "That was a rhetorical question.^"
+write "Das war eine rhetorische Frage.^"
 set time = false
 }
 
@@ -2361,7 +2384,7 @@ grammar why      >why
 grammar why?     >why
 
 {+why
-write "Because.^"
+write "Darum.^"
 set time = false
 }
 
@@ -2370,7 +2393,7 @@ grammar blow *held to *here     >blow_at
 
 {+blow_at
 break +darkness
-write "You can't blow " noun1{the} " at " noun2{the} .^
+write "Du kannst " noun1{the} " nicht auf " noun2{the} " blasen.^"
 set time = false
 }
 
@@ -2396,25 +2419,25 @@ grammar hurl *held at *here      >throw_at
 {+throw_at
 break +darkness
 if noun2 has ANIMATE
-  write "I don't think " noun2{the} " would really appreciate you throwing "
-  write noun1{the} " at "
+  write "Ich glaube nicht, dass " noun2{the} " es zu schätzen wüsste, wenn Du "
+  write noun1{the} " nach "
   if noun2 has FEMALE
-    write "her.^"
+    write "ihr wirfst.^"
   else
-    write "him.^"
+    write "ihm wirfst.^"
   endif
   set time = false
   break
 endif
 break +worn noun1
 if noun2(parent) hasnt LOCATION
-  write "You can't throw " noun1{the} " at " noun2{the} " while "
+  write "Du kannst " noun1{the} " nicht nach " noun2{the} " werfen, solange "
   if noun2 has PLURAL
-    write "they are"
+    write "sie in etwas anderem sind"
   else
-    write "it is"
+    write "es in etwas anderem ist"
   endif
-  write " in something else.^"
+  write ".^"
   set time = false
   break
 endif
@@ -2426,38 +2449,38 @@ override
 if noun1(mass) => 20
   write  noun1{The}
   if noun1 has PLURAL
-    write " are "
+    write " sind "
   else
-    write " is "
+    write " ist "
   endif
-  write "a bit too heavy to go throwing around.^"
+  write "ein bisschen zu schwer, um damit zu werfen.^"
   set time = false
   break
 endif
 if here has UNDER_WATER
-  write "Throwing things underwater is never as easy as you might think.^"
+  write "Unter Wasser zu werfen ist nie so einfach wie man denkt.^"
   set time = false
   break
 endif
 if here has ON_WATER
-  write "You throw " noun1{the} " at " noun2{the} " which "
+  write "Du wirfst " noun1{the} " nach " noun2{the} ", worauf "
   if noun1 has PLURAL
-    write "they bounce"
+    write "sie abprallen"
   else
-    write "it bounces"
+    write "es abprallt"
   endif
-  write " off, landing in the water where "
+  write " und ins Wasser fällt, wo "
   if noun1 has PLURAL
-    write "they"
+    write "sie"
   else
-    write "it"
+    write "es"
   endif
-  write " rapidly sink" noun1{s} ", disappearing from sight.^"
+  write " rasch versink" noun1{t} " und aus dem Blickfeld verschwind" noun1{t} ".^"
   move noun1 to limbo
   break
 endif
-write  noun1{The} " bounce" noun1{s} " off " noun2{the} " and land" noun1{s}
-write " on the ground.^"
+write  noun1{The} " prall" noun1{t} " von " noun2{the} " ab und land" noun1{t}
+write " am Boden.^"
 move noun1 to here
 }
 
@@ -2472,7 +2495,7 @@ grammar get *present on *present          >remove_from
 {+remove_from
 break +darkness
 if noun1(parent) <> noun2
-  write  noun1{The} " " noun1{is} " not in " noun2{the} .^
+  write  noun1{The} " " noun1{is} " nicht in " noun2{the} ".^"
   set time = false
   break
 endif
@@ -2486,7 +2509,7 @@ grammar doff *present         >remove
 {+remove
 if noun1 hasnt WORN
   if noun1(parent) = player
-    write "You are not wearing " noun1{the} .^
+    write "Du trägst " noun1{the} " nicht.^"
     set time = false
     break
   endif
@@ -2496,14 +2519,14 @@ if noun1 hasnt WORN
   break
 endif
 if noun1(mass) > player(quantity)
-  write "You are carrying too much to remove " noun1{the} .^
+  write "Du trägst zu viel, um " noun1{the} " auszuziehen.^"
   set time = false
   break
 endif
 override
 set player(quantity) - noun1(mass)
 ensure noun1 hasnt WORN
-write "You remove " noun1{the} .^
+write "Du ziehst " noun1{the} " aus.^"
 }
 
 grammar wear *held       >wear
@@ -2513,19 +2536,19 @@ grammar don *held        >wear
 
 {+wear
 if noun1 hasnt WEARABLE
-  write "You can't wear " noun1{the} .^
+  write "Du kannst " noun1{the} " nicht anziehen.^"
   set time = false
   break
 endif
 if noun1 has WORN
-  write "You are already wearing " noun1{the} .^
+  write "Du trägst " noun1{the} " bereits.^"
   set time = false
   break
 endif
 override
 set player(quantity) + noun1(mass)
 ensure noun1 has WORN
-write "You put " noun1{the} " on.^"
+write "Du ziehst " noun1{the} " an.^"
 }
 
 grammar talk to *present       >talk_to
@@ -2534,15 +2557,15 @@ grammar talk with *present     >talk_to
 {+talk_to
 break +can_talk noun1
 override
-write  noun1{The} " " noun1{doesnt} " appear very interested in a "
-write "conversation.^"
+write  noun1{The} " " noun1{doesnt} " sonderlich an einem Gespräch "
+write "interessiert.^"
 }
 
 grammar eat *present     >eat
 
 {+eat
 break +darkness
-write "You can't eat " noun1{the} .^
+write "Du kannst " noun1{the} " nicht essen.^"
 set time = false
 }
 
@@ -2557,7 +2580,7 @@ if INDEX = true
   set time = false
   break
 endif
-write "There is nothing to drink in " noun1{the} .^
+write "In " noun1{the} " gibt es nichts zu trinken.^"
 set time = false
 }
 
@@ -2568,12 +2591,12 @@ grammar sip *present       >drink
 break +darkness
 break +reach noun1
 if noun1 hasnt LIQUID
-  write "You can't drink " noun1{the} .^
+  write "Du kannst " noun1{the} " nicht trinken.^"
   set time = false
   break
 endif
 override
-write "You drink " noun1{the} .^
+write "Du trinkst " noun1{the} ".^"
 move noun1 to limbo
 }
 
@@ -2583,12 +2606,12 @@ grammar flick *present     >flick
 break +darkness
 break +reach noun1
 if noun1 has LIQUID
-  write "A wet hand is your only reward.^"
+  write "Eine nasse Hand ist Dein einziger Lohn.^"
   break
 endif
 override
-write "Flicking " noun1{the} " achieves nothing more than causing a sharp "
-write "pain in your index finger.^"
+write "Gegen " noun1{the} " zu schnipsen bringt nichts außer einem stechenden "
+write "Schmerz im Zeigefinger.^"
 }
 
 grammar press *present     >press
@@ -2598,11 +2621,11 @@ grammar poke *present      >press
 break +darkness
 break +reach noun1
 if noun1 has LIQUID
-  write "A wet hand is your only reward.^"
+  write "Eine nasse Hand ist Dein einziger Lohn.^"
   break
 endif
 override
-write "Pressing " noun1{the} " has no discernible effect.^"
+write "Auf " noun1{the} " zu drücken hat keine erkennbare Wirkung.^"
 }
 
 grammar light *present with *held           >light_with
@@ -2612,32 +2635,32 @@ grammar set fire to *present with *held     >light_with
 
 {+light_with
 if here has UNDER_WATER
-  write "I don't think you are going to be lighting anything under water.^"
+  write "Ich glaube nicht, dass Du unter Wasser etwas anzünden wirst.^"
   set time = false
   break
 endif
 break +reach noun1
 if noun1 hasnt FLAMMABLE
-  write  noun1{The} " " noun1{is} " not at all flammable.^"
+  write  noun1{The} " " noun1{is} " überhaupt nicht brennbar.^"
   set time = false
   break
 endif
 if noun2 hasnt IGNITABLE
-  write "I don't see how you can light " noun1{the} " using " noun2 .^
+  write "Ich sehe nicht, wie Du " noun1{the} " mit " noun2 " anzünden könntest.^"
   set time = false
   break
 endif
 if noun1(quantity) = 0
-  write  noun1{The} " has run out.^"
+  write  noun1{The} " ist aufgebraucht.^"
   break
 endif
 if noun1 has BURNING
-  write  noun1{The} " " noun1{is} " already lit.^"
+  write  noun1{The} " " noun1{is} " bereits angezündet.^"
   set time = false
   break
 endif
 override
-write "You light " noun1{the} " using " noun2 .^
+write "Du zündest " noun1{the} " mit " noun2 " an.^"
 ensure noun1 has BURNING
 ensure noun1 has LUMINOUS
 }
@@ -2649,27 +2672,27 @@ grammar set fire to *present     >light
 
 {+light
 if here has UNDER_WATER
-  write "I don't think you are going to be lighting anything under water.^"
+  write "Ich glaube nicht, dass Du unter Wasser etwas anzünden wirst.^"
   set time = false
   break
 endif
 break +reach noun1
 if noun1 has IGNITABLE
    override
-   write "You produce a brief flame.^"
+   write "Du erzeugst kurz eine Flamme.^"
    break
 endif
 if noun1 hasnt FLAMMABLE
-  write  noun1{The} " " noun1{is} " not at all flammable.^"
+  write  noun1{The} " " noun1{is} " überhaupt nicht brennbar.^"
   set time = false
   break
 endif
 if noun1 has BURNING
-  write  noun1{The} " " noun1{is} " already alight.^"
+  write  noun1{The} " " noun1{is} " bereits entzündet.^"
   set time = false
   break
 endif
-write "What did you intent to light " noun1{the} " with?^"
+write "Womit wolltest Du " noun1{the} " anzünden?^"
 set time = false
 }
 
@@ -2679,13 +2702,13 @@ grammar put *present out        >extinguish
 
 {+extinguish
 if noun1 hasnt BURNING
-  write  noun1{The} " " noun1{is} " not lit.^"
+  write  noun1{The} " " noun1{is} " nicht entzündet.^"
   set time = false
   break
 endif
 break +reach noun1
 override
-write "You put out " noun1{the} .^
+write "Du löschst " noun1{the} ".^"
 ensure noun1 hasnt BURNING
 ensure noun1 hasnt LUMINOUS
 }
@@ -3009,7 +3032,7 @@ grammar climb *here     >climb
 grammar scale *here     >climb
 
 {+climb
-write "You can not climb up " noun1{the} .^
+write "Du kannst " noun1{the} " nicht hinaufklettern.^"
 set time = false
 }
 
@@ -3144,11 +3167,11 @@ grammar schaue unter *present     >look_under
 {+look_under
 break +darkness
 if noun1(mass) >= heavy : noun1 has LOCATION
-  write "You can't see under " noun1{the} .^
+  write "Du kannst nicht unter " noun1{the} " sehen.^"
   set time = false
   break
 endif
-write "There is nothing unusual under " noun1{the} .^
+write "Unter " noun1{the} " ist nichts Ungewöhnliches.^"
 }
 
 grammar look behind *present     >look_behind
@@ -3156,11 +3179,11 @@ grammar look behind *present     >look_behind
 {+look_behind
 break +darkness
 if noun1(mass) >= heavy : noun1 has LOCATION
-  write "You can't see behind " noun1{the} .^
+  write "Du kannst nicht hinter " noun1{the} " sehen.^"
   set time = false
   break
 endif
-write "There is nothing unusual behind " noun1{the} .^
+write "Hinter " noun1{the} " ist nichts Ungewöhnliches.^"
 }
 
 grammar look through *present     >look_through
@@ -3168,7 +3191,7 @@ grammar look out *present         >look_through
 
 {+look_through
 break +darkness
-write "You can't look through " noun1{the} .^
+write "Du kannst nicht durch " noun1{the} " sehen.^"
 set time = false
 }
 
@@ -3185,16 +3208,16 @@ grammar look at *present with *held        >look_at_through
 {+look_at_through
 break +darkness
 if noun1 = noun2
-  write "You can't look at " noun1{the} " through "
+  write "Du kannst " noun1{the} " nicht durch "
   if noun1 has PLURAL
-    write "themselves.^"
+    write "sich selbst betrachten.^"
   else
-    write "itself.^"
+    write "sich selbst betrachten.^"
   set time = false
   break
 endif
 override
-write "You can't look at " noun1{the} " through " noun2{the} .^
+write "Du kannst " noun1{the} " nicht durch " noun2{the} " betrachten.^"
 set time = false
 }
 
@@ -3202,20 +3225,20 @@ grammar wait     >wait
 grammar z        >wait
 
 {+wait
-write "Time passes...^"
+write "Die Zeit vergeht...^"
 }
 
 grammar listen     >listen
 
 {+listen
-write "You don't hear anything out of the ordinary.^"
+write "Du hörst nichts Ungewöhnliches.^"
 }
 
 grammar listen to *present     >listen_to
 grammar listen at *present     >listen_to
 
 {+listen_to
-write "You don't hear anything out of the ordinary.^"
+write "Du hörst nichts Ungewöhnliches.^"
 }
 
 grammar use *present         >use
@@ -3225,12 +3248,12 @@ grammar operate *present     >use
 {+use
 break +darkness
 if noun1 has ANIMATE
-  write "I acknoweledge that I probably don't want to know the answer to "
-  write "this question, but in what way did you want to use " noun1{the} .^
+  write "Ich will die Antwort darauf wahrscheinlich nicht wissen, aber auf "
+  write "welche Weise wolltest Du " noun1{the} " benutzen?^"
   set time = false
   break
 endif
-write "I'm afraid you are going to have to be a bit more specific.^"
+write "Du musst etwas genauer werden.^"
 }
 
 grammar rotate *present     >turn
@@ -3241,7 +3264,7 @@ grammar spin *present       >turn
 {+turn
 break +darkness
 break +reach noun1
-write "You can't turn " noun1{the} .^
+write "Du kannst " noun1{the} " nicht drehen.^"
 set time = false
 }
 
@@ -3252,18 +3275,18 @@ grammar switch *present on      >turn_on
 
 {+turn_on
 if noun1 hasnt SWITCHABLE
-  write "You can't turn " noun1{the} " on.^"
+  write "Du kannst " noun1{the} " nicht einschalten.^"
   set time = false
   break
 endif
 break +reach noun1
 if noun1 has ON
-  write  noun1{The} " " noun1{is} " already on.^"
+  write  noun1{The} " " noun1{is} " bereits eingeschaltet.^"
   set time = false
   break
 endif
 override
-write "You switch on " noun1{the} .^
+write "Du schaltest " noun1{the} " ein.^"
 ensure noun1 has ON
 }
 
@@ -3274,18 +3297,18 @@ grammar switch *present off     >turn_off
 
 {+turn_off
 if noun1 hasnt SWITCHABLE
-  write "You can't turn " noun1{the} " off.^"
+  write "Du kannst " noun1{the} " nicht ausschalten.^"
   set time = false
   break
 endif
 break +reach noun1
 if noun1 hasnt ON
-  write  noun1{The} " " noun1{is} " already off.^"
+  write  noun1{The} " " noun1{is} " bereits ausgeschaltet.^"
   set time = false
   break
 endif
 override
-write "You switch off " noun1{the} .^
+write "Du schaltest " noun1{the} " aus.^"
 ensure noun1 hasnt ON
 }
 
@@ -3294,24 +3317,24 @@ grammar pour *present     >pour
 {+pour
 break +darkness
 if noun1 hasnt LIQUID
-   write "You can't pour " noun1{the} .^
+   write "Du kannst " noun1{the} " nicht gießen.^"
    set time = false
    break
 endif
 set noun3 = noun1(parent)
 if noun3 = false : noun3(parent) <> player
-  write "You don't have " noun1{the} .^
+  write "Du hast " noun1{the} " nicht.^"
   set time = false
   break
 endif
 if noun3 has CLOSED
-  write "I don't see " noun1{the} " here.^"
+  write "Ich sehe " noun1{the} " hier nicht.^"
   set time = false
   break
 endif
 break +reach noun1
 override
-write "You pour " noun1{the} " all over the ground.^"
+write "Du gießt " noun1{the} " über den Boden.^"
 move noun1 to limbo
 }
 
@@ -3359,19 +3382,19 @@ grammar pour *present over *present     >pour_on
 {+pour_on
 break +darkness
 if noun1 hasnt LIQUID
-  write "You can't pour " noun1{the} .^
+  write "Du kannst " noun1{the} " nicht gießen.^"
   set time = false
   break
 endif
 break +reach noun1
 set noun3 = noun1(parent)
 if noun3 = false : noun3(parent) <> player
-  write "You do not have " noun1{the} .^
+  write "Du hast " noun1{the} " nicht.^"
   set time = false
   break
 endif
 if noun3 has CLOSED
-  write "I can't see " noun1{the} " here.^"
+  write "Ich sehe " noun1{the} " hier nicht.^"
   set time = false
   break
 endif
@@ -3379,15 +3402,15 @@ break +reach noun2
 override
 execute +liquidwrite noun2
 if INDEX = true
-  write  noun2{The} " already contain" noun2{s} " " noun3{the} ". If you "
-  write "were to also add " noun1{the} " they would mix together.^"
+  write  noun2{The} " enthält bereits " noun3{the} ". Würdest Du "
+  write "auch noch " noun1{the} " hinzugeben, würden sie sich vermischen.^"
   set time = false
   break
 endif
 if noun2 has CONTAINER
   if noun2 hasnt CLOSED
     override
-    write "You pour " noun1{the} " into " noun2{the} .^
+    write "Du gießt " noun1{the} " in " noun2{the} ".^"
     move noun1 to noun2
     break
   endif
@@ -3396,14 +3419,14 @@ if noun2(parent) > max_objects
   set noun3 = noun2(parent)
   if noun3 has CONTAINER
     if noun3 hasnt CLOSED
-      write  noun1{the} " run" noun1{s} " off " noun2{the} " and goes into "
+      write  noun1{the} " läuf" noun1{t} " von " noun2{the} " herunter und in "
       write noun3 .^
       move noun1 to noun3
       break
     endif
   endif
 endif
-write  noun1{The} " runs off " noun2{the} " and goes all over the ground.^"
+write  noun1{The} " läuft von " noun2{the} " auf den Boden.^"
 move noun1 to limbo
 }
 
@@ -3418,180 +3441,180 @@ grammar instructions     >instructions
 grammar help             >instructions
 
 {+instructions
-write "Interactive fiction involves the reader in a way that static stories "
-write "do not. Rather than reading sequentially from beginning to end, you "
-write "control the actions of the main character by typing commands in the "
-write "form of simple English sentences. Before setting out on your adventure "
-write "there are a few concepts that must be explained in order for you to "
-write "interact successfully with the virtual world created by the author."
-write "The physical space that you will be exploring is divided up into "
-write "discrete units called locations. Locations may be travelled between "
-write "using the "You can go:" hyperlinks or the following commands...^"
+write "Interaktive Fiktion bindet den Leser auf eine Weise ein, wie es "
+write "statische Geschichten nicht tun. Anstatt der Reihe nach von Anfang bis "
+write "Ende zu lesen, steuerst Du die Handlungen der Hauptfigur, indem Du "
+write "Befehle in Form einfacher deutscher Sätze eingibst. Bevor Du Dich auf "
+write "Dein Abenteuer begibst, sind einige Grundbegriffe zu erklären, damit Du "
+write "erfolgreich mit der vom Autor geschaffenen Welt interagieren kannst."
+write "Der Raum, den Du erkundest, ist in einzelne Einheiten unterteilt, die "
+write "Orte genannt werden. Zwischen Orten bewegst Du Dich über die "
+write "~Du kannst gehen:~-Verknüpfungen oder die folgenden Befehle...^"
 write ""
-write "CommandTo travelCommandTo travel
-write ""
-
-write "NNorthSSouth"
+write "BefehlRichtungBefehlRichtung
 write ""
 
-write "EEastWWest"
+write "NNordenSSüden"
 write ""
 
-write "NENortheastNWNorthwest"
+write "OOstenWWesten"
 write ""
 
-write "SESoutheastSWSouthwest"
+write "NONordostenNWNordwesten"
 write ""
 
-write "UUpDDown"
+write "SOSüdostenSWSüdwesten"
 write ""
 
-write "INInOUTOut"
+write "OOben (up)UUnten (down)"
 write ""
 
-write "The description of each location will tell you which way you can "
-write "travel from it. Be aware however that some exits may only be "
-write "available under certain circumstances such as while a door is open "
-write "or a bridge lowered.^"
+write "REINHineinRAUSHinaus"
+write ""
 
-write "Within these locations you will find many objects that you may "
-write "manipulate. These objects may be referred to by as few "
-write "or as many of their names as is required to uniquely identify it."
-write "For example, if the story informs you that ~There is a silver key "
-write "resting here.~ Then it may be referred to as either ~silver~, ~key~ or "
-write "~silver key~. If your reference is ambiguous, such as using ~key~ "
-write "when there is both a silver and a gold key in the current location "
-write "then you will be prompted to be more specific.^"
+write "Die Beschreibung jedes Ortes sagt Dir, in welche Richtungen Du ihn "
+write "verlassen kannst. Beachte jedoch, dass manche Ausgänge nur unter "
+write "bestimmten Umständen verfügbar sind, z. B. solange eine Tür offen "
+write "oder eine Brücke heruntergelassen ist.^"
+
+write "An diesen Orten findest Du viele Gegenstände, mit denen Du "
+write "interagieren kannst. Auf diese Gegenstände kannst Du mit so wenigen "
+write "oder so vielen ihrer Namen verweisen, wie nötig sind, um sie eindeutig zu bestimmen."
+write "Wenn die Geschichte Dir zum Beispiel mitteilt ~Hier liegt ein "
+write "silberner Schlüssel.~, kannst Du ihn mit ~silbern~, ~schlüssel~ oder "
+write "~silberner schlüssel~ meinen. Ist Deine Eingabe mehrdeutig, etwa "
+write "~schlüssel~ wenn ein silberner und ein goldener Schlüssel am gleichen "
+write "Ort liegen, wirst Du gebeten, genauer zu sein.^"
 
 write "
-write "The next major concept of interactive fiction to understand is the "
-write "way in which you interact with these objects within "
-write "the locations. The main aspect of the command interface "
-write "to come to grips with is the scale, in other words, how much can be "
-write "achieved with a single command. As you have seen earlier, moving from "
-write "one location to another requires a single command. Commands such as "
-write "~find dave~ or ~go to the library~ are not valid. You must manually "
-write "move around the available world to achieve these tasks yourself. For "
-write "this reason, making a map as you go is highly recommended.^"
+write "Das nächste wichtige Konzept der interaktiven Fiktion ist die Art, wie "
+write "Du mit den Gegenständen an den Orten umgehst. Der entscheidende "
+write "Punkt bei der Befehlseingabe ist der Umfang, also wie viel sich mit "
+write "einem einzigen Befehl erreichen lässt. Wie Du oben gesehen hast, "
+write "reicht ein einzelner Befehl, um von einem Ort zum nächsten zu gehen. "
+write "Befehle wie ~finde dave~ oder ~geh zur bibliothek~ sind nicht "
+write "zulässig. Du musst die Welt selbst Schritt für Schritt durchqueren. "
+write "Deshalb empfiehlt es sich sehr, unterwegs eine Karte zu zeichnen.^"
 
-write "The basic sentence structures understood by the game are...^"
+write "Die grundlegenden Satzmuster, die das Spiel versteht, sind...^"
 write ""
-write "actioneg. scream"
+write "Verbz.B. schrei"
 write ""
-write "action objecteg. take book"
+write "Verb Objektz.B. nimm buch"
 write ""
-write "action object preposition objecteg. unlock door with key"
+write "Verb Objekt Präposition Objektz.B. schließe tür mit schlüssel auf"
 write ""
 write ""
 
-write "An action does not necessarily have to be a single word. For instance, "
-write "~examine rock through magnifying glass~, an example of the last "
-write "syntax, may also be expressed as ~look at rock through magnifying "
-write "glass~.^"
-write "To further illustrate how much can be achieved in a single turn, "
-write "consider the following list (being just some of the valid actions)...^"
+write "Ein Verb muss nicht unbedingt ein einzelnes Wort sein. So kann "
+write "zum Beispiel ~untersuche stein durch lupe~ (ein Beispiel für das "
+write "letzte Muster) auch als ~schaue stein durch lupe an~ geschrieben "
+write "werden.^"
+write "Um zu verdeutlichen, wie viel mit einem einzigen Zug erreicht werden "
+write "kann, hier einige gültige Verben...^"
 write ""
-write "turnreadpullpusheatcut"
+write "drehelesezieheschiebeessschneide"
 write ""
-write "lockunlockrubattacktastedrink"
+write "schließeöffnereibegreif anschmeckeetrinke"
 write ""
-write "breaksmelllistenpourmovelight"
+write "zerbrichriechehörgießebewegezünde"
 write ""
-write "attackblowthrowwearopenclose"
+write "greif anblasewirftragöffneschließe"
 write ""
-write "takedropinsertremove"
+write "nimmlegelegeinentferne"
 write ""
-write "The words ~it,~ ~them,~ ~him~ and ~her~ may be used to indicate the "
-write "last appropriate object referred to in one of your commands. "
-write "The words ~itself,~ ~themselves,~ ~himself~ and ~herself~ may be used "
-write "to refer to the subject of the current command such as, ~ask dan about "
-write "himself~.^"
-write "The word ~all~ or ~everything~ may be used in place of an object "
-write "when using one of the verbs in the bottom row of the table above.^"
+write "Die Wörter ~es,~ ~sie (Plural),~ ~ihn~ und ~sie~ können benutzt werden, "
+write "um auf das zuletzt passende Objekt zu verweisen, das in einem Deiner "
+write "Befehle vorkam. "
+write "Die Wörter ~sich,~ ~sich selbst~ und ähnliche können benutzt werden, "
+write "um auf das Subjekt des aktuellen Befehls zu verweisen, z. B. ~frag dan "
+write "nach sich selbst~.^"
+write "Das Wort ~alles~ kann anstelle eines Objekts benutzt werden, wenn "
+write "eines der Verben aus der untersten Zeile der Tabelle oben benutzt wird.^"
 
 write ""
-write "However, a task such as defusing a bomb would generally not be achieved by "
-write "typing ~defuse bomb~. The following is a sample transcript to give "
-write "you a better idea of how this task such as this might be achieved.^"
+write "Eine Aufgabe wie das Entschärfen einer Bombe lässt sich allerdings "
+write "nicht einfach mit ~entschärfe bombe~ lösen. Das folgende Protokoll "
+write "zeigt, wie so etwas gelingen könnte.^"
 write "&gt;examine bomb"
-write "The bomb is about a foot square and has a small panel in its upper "
-write "surface. The panel is currently closed.^"
+write "Die Bombe ist etwa dreißig Zentimeter groß und hat an der Oberseite "
+write "eine kleine Klappe. Die Klappe ist gerade geschlossen.^"
 write "&gt;listen to bomb" 
-write "The bomb is making an ominous ticking sound.^"
+write "Die Bombe gibt ein bedrohliches Ticken von sich.^"
 write "&gt;open panel"
-write "You open the panel to reveal a red wire, a green wire, a blue wire, "
-write "a clock and some dynamite.^"
+write "Du öffnest die Klappe und siehst ein rotes, ein grünes und ein blaues "
+write "Kabel, eine Uhr und etwas Dynamit.^"
 write "&gt;i"
-write "You are carrying a bomb manual, an insurance policy and some wire "
-write "cutters.^"
+write "Du trägst ein Bombenhandbuch, eine Versicherungspolice und einen "
+write "Seitenschneider.^"
 write "&gt;read manual"
-write "Leafing through the book you come to the page on diffusing. Seems "
-write "straight forward enough, just cut the blue wire then the red one.^"
+write "Beim Blättern durch das Buch stößt Du auf die Seite zum Entschärfen. "
+write "Sieht einfach aus: erst das blaue Kabel durchtrennen, dann das rote.^"
 write "&gt;cut blue wire with cutters"
-write "Reaching carefully in to the bomb's casing you cut the blue wire. So "
-write "far so good.^"
+write "Du greifst vorsichtig in das Gehäuse der Bombe und durchtrennst das "
+write "blaue Kabel. So weit, so gut.^"
 write "&gt;cut red wire with cutters" 
-write "Holding you breath you snip the red wire." ^
+write "Mit angehaltenem Atem durchtrennst Du das rote Kabel." ^
 write "&gt;listen to bomb" 
-write "The bomb, thankfully, is now silent." ^
-write "As you can see, each task you wish to achieve must be broken down "
-write "into its component actions.^"
+write "Die Bombe ist, zum Glück, jetzt still." ^
+write "Wie Du siehst, muss jede Aufgabe, die Du lösen willst, in ihre "
+write "Einzelhandlungen zerlegt werden.^"
 
 write ""
-write "During the course of the story you may encounter other computer "
-write "controlled characters. These characters may be interacted with using "
-write "the following commands...^"
-write "TALK TO &lt;character&gt;" 
-write "GIVE &lt;object&gt; TO &lt;character&gt;" 
-write "SHOW &lt;object&gt; TO &lt;character&gt;" 
-write "ASK &lt;character&gt; FOR &lt;object&gt;" 
-write "ASK &lt;character&gt; ABOUT &lt;object&gt;" 
-write "TELL &lt;character&gt; ABOUT &lt;object&gt;" ^
+write "Im Laufe der Geschichte triffst Du möglicherweise auf andere, "
+write "computergesteuerte Figuren. Mit diesen kannst Du über die folgenden "
+write "Befehle interagieren...^"
+write "REDE MIT &lt;figur&gt;" 
+write "GIB &lt;objekt&gt; AN &lt;figur&gt;" 
+write "ZEIGE &lt;objekt&gt; AN &lt;figur&gt;" 
+write "FRAG &lt;figur&gt; NACH &lt;objekt&gt;" 
+write "FRAG &lt;figur&gt; ÜBER &lt;objekt&gt;" 
+write "ERZÄHLE &lt;figur&gt; VON &lt;objekt&gt;" ^
 
-write "There are also some special commands for interacting with the "
-write "program rather than the world it simulates...^"
+write "Es gibt zudem einige Sonderbefehle, um mit dem Programm selbst und "
+write "nicht mit der simulierten Welt zu interagieren...^"
 write "
-write "CommandAction"
+write "BefehlWirkung"
 write ""
-write "VERBOSEalways describe locations"
+write "VERBOSEimmer ausführliche Ortsbeschreibungen"
 write ""
-write "BRIEFonly describe new locations"
+write "BRIEFnur neue Orte ausführlich beschreiben"
 write ""
-write "RESTARTstart from the beginning"
+write "RESTARTvon vorn anfangen"
 write ""
-write "SCOREdisplay your score and rank"
+write "SCOREPunktzahl und Rang anzeigen"
 write ""
-write "LOOKdescribe the current location"
+write "LOOKden aktuellen Ort beschreiben"
 write ""
-write "SAVEsave the current position"
+write "SAVEaktuellen Spielstand speichern"
 write ""
-write "RESTORErestore a saved position"
+write "RESTOREgespeicherten Spielstand laden"
 write ""
-write "Ihorizontal list of possessions"
+write "Iwaagrechte Liste des Inventars"
 write ""
-write "INVvertical list of possessions"
+write "INVsenkrechte Liste des Inventars"
 write ""
-write "UNDOtake back last command"
+write "UNDOletzten Befehl rückgängig machen"
 write ""
-write "AGAINrepeat the last command"
+write "AGAINletzten Befehl wiederholen"
 write ""
-write "INFOdisplay version information"
+write "INFOVersionsinformationen anzeigen"
 write ""
-write "ABOUTdisplay game information"
+write "ABOUTSpielinformationen anzeigen"
 write ""
-write "NOTE: If you are looking for a clue relevant to a specific location, "
-write "type ~hint~, ~first hint~ or ~hint one~ in that location. The first "
-write "hint will be a subtle clue with ~hint two~ being more blatant and "
-write "~hint three~ being exact commands to type.^"
+write "HINWEIS: Wenn Du nach einem Tipp für einen bestimmten Ort suchst, "
+write "gib an diesem Ort ~hint~, ~first hint~ oder ~hint one~ ein. Der erste "
+write "Tipp ist ein subtiler Hinweis; ~hint two~ ist deutlicher und "
+write "~hint three~ nennt die genauen Befehle.^"
 
 write ""
-write "You are now ready to embark on your first adventure into the "
-write "world of interactive fiction."
-write " Remember to make a map as you go and read each "
-write "part carefully as vital clues may be hidden in the descriptions of the "
-write "locations and objects you come across. Examining every object you can "
-write "refer to is a good idea, as is saving your position often. Well, good "
-write "luck, and above all have fun!^"
+write "Du bist nun bereit, Dich auf Dein erstes Abenteuer in der Welt der "
+write "interaktiven Fiktion zu begeben."
+write " Denk daran, unterwegs eine Karte zu zeichnen, und lies jeden Teil "
+write "sorgfältig durch, denn wichtige Hinweise können sich in den "
+write "Beschreibungen der Orte und Objekte verbergen. Jedes Objekt zu "
+write "untersuchen, auf das Du Dich beziehen kannst, ist eine gute Idee, "
+write "ebenso wie häufiges Speichern. Also, viel Glück und vor allem viel Spaß!^"
 set time = false
 }
 
@@ -3637,10 +3660,10 @@ grammar apologise to *present     >apologise
 
 {+apologise
 if noun1 hasnt ANIMATE
-   write "Kooky.^"
+   write "Seltsam.^"
    break
 endall
-write  noun1{the} " assure" noun1{s} " you that no apology is necessary.^"
+write  noun1{the} " versicher" noun1{t} " Dir, dass keine Entschuldigung nötig ist.^"
 }
 
 grammar *present thanks        >thank
@@ -3649,10 +3672,10 @@ grammar thank *present         >thank
 
 {+thank
 if noun1 hasnt ANIMATE
-   write "Kooky.^"
+   write "Seltsam.^"
    break
 endall
-write "~Don't mention it,~ "  noun1{the} " replies.^"
+write "~Keine Ursache,~ " noun1{the} " antwortet.^"
 }
 
 grammar hi *present           >greet
@@ -3666,30 +3689,30 @@ grammar *present hi           >greet
 
 {+greet
 if here has UNDER_WATER
-   write "Talking under water isn't very easy.^"
+   write "Unter Wasser zu sprechen ist nicht einfach.^"
    set time = false
    break
 endall
 if noun1 hasnt ANIMATE
-   write "I don't think talking to " noun1{the} " is going to help somehow.^"
+   write "Ich glaube nicht, dass Dir hilft, mit " noun1{the} " zu reden.^"
    set time = false
    break
 endall
 if noun1 has DEAD 
-   write  noun1{The} " " noun1{is} " a bit too dead to respond.^"
+   write  noun1{The} " " noun1{is} " ein bisschen zu tot, um zu antworten.^"
    set time = false
    break
 endall
 if noun1 = player
-   write "It's the first sign of madness you know...^"
+   write "Das ist bekanntlich das erste Anzeichen von Verrücktheit...^"
    break
 endall
 override
 write  noun1{The}
 if noun1 has PLURAL
-   write " nod.^"
+   write " nicken.^"
 else
-   write " nods.^"
+   write " nickt.^"
 }
  
 grammar *present yes      >say_yes
@@ -3697,13 +3720,13 @@ grammar *present okay     >say_yes
 grammar *present yeah     >say_yes
 
 {+say_yes
-write  noun1{The} " appear" noun1{s} " to pay no attention.^"
+write  noun1{The} " scheint keine Notiz zu nehmen.^"
 }
 
 grammar *present no     >say_no
 
 {+say_no
-write  noun1{The} " appears to pay no attention.^"
+write  noun1{The} " scheint keine Notiz zu nehmen.^"
 }
 
 grammar *present *carried      >say_object
@@ -3717,10 +3740,10 @@ grammar *anywhere     >noun_only
 
 {+noun_only
 if noun1 isnt *present
-   write "You don't see any such thing.^"
+   write "Du siehst so etwas hier nicht.^"
    set time = false
    break
 endif
-write "There is no verb in that sentence.^"
+write "In diesem Satz fehlt ein Verb.^"
 set time = false
 }
