@@ -36,7 +36,7 @@ endif
 }
 
 {movement
-if compass = south
+if compass = south : compass = out
    if destination = nowhere
       write "Pintu tertutup. Kamu harus membukanya terlebih dahulu.^"
       return
@@ -61,6 +61,7 @@ endif
 ensure pintu hasnt CLOSED
 write "Kamu membuka pintu kayu.^"
 set rumah(south) = sawah
+set rumah(out) = sawah
 set sawah(north) = rumah
 }
 
@@ -68,6 +69,7 @@ set sawah(north) = rumah
 ensure pintu has CLOSED
 write "Kamu menutup pintu kayu.^"
 set rumah(south) = nowhere
+set rumah(out) = nowhere
 set sawah(north) = nowhere
 }
 
