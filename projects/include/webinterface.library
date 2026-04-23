@@ -230,7 +230,20 @@ print:
         return false;^
    }^
 
+   var focusInputTimer = null;^
+
+   function focusInput(e) {^
+        if (focusInputTimer) clearTimeout(focusInputTimer);^
+        focusInputTimer = setTimeout(function() {^
+             focusInputTimer = null;^
+             if (window.getSelection().toString().length > 0) return;^
+             var input = document.getElementById('JACLCommandPrompt');^
+             if (input) input.focus();^
+        }, 250);^
+   }^
+
    function lookupWord(e) {^
+        if (focusInputTimer) { clearTimeout(focusInputTimer); focusInputTimer = null; }^
         var sel = window.getSelection().toString().trim();^
         if (sel.length > 0 && sel.indexOf(' ') === -1) {^
            ajaxForm({^
@@ -274,7 +287,7 @@ write " |"
 write "</div>^"
 write "</div>^"
 write "<div id=~main~>^"
-write "<div id=~maintext~ class=~maintext~ ondblclick=~lookupWord(event);~>^"
+write "<div id=~maintext~ class=~maintext~ onclick=~focusInput(event);~ ondblclick=~lookupWord(event);~>^"
 set linebreaks = true
 }
 
