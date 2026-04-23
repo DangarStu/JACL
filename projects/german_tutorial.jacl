@@ -1,72 +1,81 @@
 #!../bin/jacl
 #                                                           JACL TUTORIAL GAME
 # -----------------------------------------------------------------------------
-# Copyright (C) Stuart Allen 1999-2000. All rights resevered.
+# German translation of the JACL tutorial game.
 # -----------------------------------------------------------------------------
 
-constant game_publish     true
+constant game_title       "JACL Tutorium"
+constant game_author      "Stuart Allen"
+constant game_version     1
 constant ifid             "JACL-121"
+constant game_publish     true
+
+constant header_colour       "#3a3a5a"
+constant linkbar_colour      "#5a5a7c"
+constant maintext_colour     "#f4f1e8"
+
 location schlafzimmer : schlafzimmer
- definite      das "Schlafzimmer"
+ short         name "Schlafzimmer"
  west          badezimmer
  south         wohnzimmer
+ x             1
+ y             0
 
 {look
-write "Du bist in Deinem schlafzimmer. In der Mitte des"
-write "Zimmers steht ein grosses Bett, w&auml;hrend westlich"
-write "ein Flur ins badezimmer f&uuml;hrt.^"
+write "Du bist in Deinem Schlafzimmer. In der Mitte des "
+write "Zimmers steht ein großes Bett, während westlich "
+write "ein Flur ins Badezimmer führt.^"
 }
 
 object bett: bett
- definite      das "Bett"
- short         ein "Bett"
+ short         das "Bett"
  mass          scenery
 
 {look_under
 if Programmheft(parent) = limbo
    write "Gut versteckt unter dem Bett findest "
-   write "Du das diesw&ouml;chige Programmheft.^"
+   write "Du das Programmheft dieser Woche.^"
    set Programmheft(parent) = here
    points 50
    return
 endif
-write "Du es gibt sonst nichts anderes hier.^"
+write "Sonst ist dort nichts zu finden.^"
 }
 
-object Programmheft:  programmheft heft 
- definite      das "Programmheft"
+object Programmheft: programmheft heft
  short         ein "Programmheft"
- long          "Hier befindet sich ein Programmheft."
+ long          "Hier befindet sich ein Programmheft.^"
  parent        limbo
  mass          5
 
 {examine : read
-write "Es enth&auml;lt das aktuelle Fernsehprogamm.^"
+write "Es enthält das aktuelle Fernsehprogramm.^"
 }
 
 {give_to_rick : show_to_rick
-write "~Cool!~ Rick grunzt zufrieden, als er dir das Heft "
-write "aus den H&auml;nden reisst.^"
-write "Zufrienden damit, heute wenigstens eine Sache "
+write "~Cool!~ Rick grunzt zufrieden, als er Dir das Heft "
+write "aus den Händen reißt.^^"
+write "Zufrieden damit, heute wenigstens eine Sache "
 write "auf die Kette bekommen zu haben, legst Du Dich wieder hin.^"
 points 50
-execute +game_over
+execute "+game_over"
 }
 
 location badezimmer : badezimmer
- definite      das "Badezimmer"
- short         ein "Badezimmer"
+ short         name "Badezimmer"
  east          schlafzimmer
+ x             0
+ y             0
 
 {look
-write "Du bist im badezimmer. Der einzige Weg von hier "
-write "f&uuml;hrt zur&uuml;ck ins schlafzimmer.^"
+write "Du bist im Badezimmer. Der einzige Weg von hier "
+write "führt zurück ins Schlafzimmer.^"
 }
 
 {movement
-if COMPASS = east : COMPASS = out
-   write "Du st&ouml;sst Dir den Kopf, als "
-   write "Du durch die T&uuml;r gehst.^"
+if compass = east : compass = out
+   write "Du stößt Dir den Kopf, als "
+   write "Du durch die Tür gehst.^^"
    return false
 endif
 write "Von hier aus geht es nur nach Osten.^"
@@ -74,38 +83,37 @@ write "Von hier aus geht es nur nach Osten.^"
 
 object Schachtel: schachtel
  has           CONTAINER CLOSABLE CLOSED
- definite      die
- short         eine "kleine h&ouml;lzerne Schachtel"
- long          "Hier ist eine kleine h&ouml;lzerne Schachtel."
+ short         eine "kleine hölzerne Schachtel"
+ long          "Hier ist eine kleine hölzerne Schachtel.^"
  mass          25
  quantity      20
 
 {close_override
-write "Der Deckel quietscht, w&auml;hrend du ihn schliesst.^"
+write "Der Deckel quietscht, während Du ihn schließt.^"
 ensure Schachtel has CLOSED
 }
 
 object Notiz: Notizzettel notizzettel notiz
- definite      der
  short         ein "orangefarbener Notizzettel"
- long          "Ein orangefarbener Notizzettel liegt auf dem Boden."
+ long          "Ein orangefarbener Notizzettel liegt auf dem Boden.^"
  parent        Schachtel
  mass          5
 
-{read
+{read : examine
 write "Auf dem Zettel steht: ~Welcome to Jamaica and have a nice day.~^"
 }
 
-location wohnzimmer: wohnzimmer
- definite      das "Wohnzimmer"
- short         ein "Wohnzimmer"
+location wohnzimmer : wohnzimmer
+ short         name "Wohnzimmer"
  north         schlafzimmer
+ x             1
+ y             1
 
 {look
 if here has VISITED
-   write "Du befindest Dich wieder im wohnzimmer.^"
+   write "Du bist wieder im Wohnzimmer.^"
 else
-   write "Du befindest dich im wohnzimmer. Auf einem niedrigen "
+   write "Du befindest Dich im Wohnzimmer. Auf einem niedrigen "
    write "Tischchen vor dem Sofa steht ein Fernseher.^"
 endif
 }
@@ -119,28 +127,27 @@ endif
 }
 
 object Fernseher: fernseher
- definite      der "Fernseher"
- short         ein "Fernseher"
+ short         der "Fernseher"
  mass          scenery
 
 {examine
-write "Zur Zeit l�uft im Fernsehen ein Zeichentrickfilm."
+write "Zur Zeit läuft im Fernsehen ein Zeichentrickfilm.^"
 }
 
 {turn_off
-write "Als Du den Fernseher ausgestellt hast, siehst Du "
-write "voller Schock zu, wie Rick beginnt sich zu ver&auml;ndern. "
-write "Es w&auml;chst ihm ein Fell und er bekommt Schaum vor dem "
+write "Als Du den Fernseher ausgeschaltet hast, siehst Du "
+write "voller Schock zu, wie Rick beginnt sich zu verändern. "
+write "Es wächst ihm ein Fell und er bekommt Schaum vor dem "
 write "Mund. Diese Beobachtung wird jedoch vorzeitig beendet, da "
-write "Rick Dir seine gerade neu erworbenen F&auml;nge in den "
+write "Rick Dir seine gerade neu erworbenen Fänge in den "
 write "Hals rammt.^"
-execute +game_over
+execute "+game_over"
 }
 
 object rick: Sohn Junge Teenager Rick
  has           ANIMATE
  short         name "Rick"
- long          "Rick ist hier, er guckt Fern."
+ long          "Rick ist hier, er guckt fern.^"
  mass          heavy
 
 {examine
@@ -148,34 +155,38 @@ write "Rick starrt regungslos auf den Bildschirm.^"
 }
 
 {talk_to
-write "~&auml;hm, ja... klar - mach ich sofort.~ murmelt Rick "
-write "ohne aufzuschauen. Du hast den starken Verdacht, das er Dir "
-write "nicht im Entferntesten zugeh&ouml;hrt hat.^"
+write "~Ähm, ja... klar — mach ich sofort.~ murmelt Rick "
+write "ohne aufzuschauen. Du hast den starken Verdacht, dass er Dir "
+write "nicht im Entferntesten zugehört hat.^"
 }
 
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # GLOBAL FUNCTIONS
+# -----------------------------------------------------------------------------
 
 {+default_ask_about
 if noun1 = rick
-   write "Rick zwinkert ein paar mal und schiebt dann seine "
-   write "Unterlippe hervor. Soweit Du das &uuml;ber die Jahre "
-   write "herausbekommen hast, kann man diese Geste mit ~Keinen Schimmer~"
-   write "&uuml;bersetzen.^"
+   write "Rick zwinkert ein paar Mal und schiebt dann seine "
+   write "Unterlippe vor. Soweit Du das über die Jahre "
+   write "herausbekommen hast, lässt sich diese Geste mit ~Keinen Schimmer~ "
+   write "übersetzen.^"
    return
 endif
 return false
 }
 
 {+intro
-write ""
-write "BEISPIEL-PROGRAMM"
-write "by I.F. Autor"
-write ""
-write "Dein Wecker klingelt und Du steigst aus dem Bett. "
-write "Es ist wieder einmal Montag. Naja, immerhin hat Dein "
-write "Haus keine Haust&uuml;r, was wiederum eine gute Entschuldigung "
-write "ist, nicht zur Arbeit zur gehen.^^"
+style bold
+write "^^" game_title
+style normal
+write " von " game_author "^^"
+
+print:
+   Dein Wecker klingelt und Du steigst aus dem Bett.
+   Es ist wieder einmal Montag. Naja, immerhin hat Dein
+   Haus keine Haustür, was ja eine gute Entschuldigung
+   ist, nicht zur Arbeit zu gehen.^^
+.
 if here hasnt OUTDOORS
   set north_wall(parent) = here
   set south_wall(parent) = here
@@ -194,17 +205,21 @@ object kryten: ich selber mich
  player
 
 {examine
-write "Sch&ouml;n wie immer.^"
+write "Schön wie immer.^"
 execute "+inventory"
 }
 
 grammar about     >about
+grammar ueber     >about
+grammar über      >about
 
 {+about
-write "Dies ist das Spiel aus der ~Tutorial Section~ des JACL Author's Guide. "
-write "Der Quelltext zu diesem Spiel ist in dem Kapitel ~Appendix~ "
-write "enthalten.^"
+write "Dies ist das Spiel aus dem Tutorium des JACL Author's Guide. "
+write "Der Quelltext findet sich im Anhang dieses Handbuchs.^"
 }
 
+#include "german.library"
 #include "german_verbs.library"
-
+#include "webinterface.library"
+#include "webinterface.css"
+#include "mapping.library"

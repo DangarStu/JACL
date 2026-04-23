@@ -514,21 +514,25 @@ break false
 location limbo : limbo
  has           DONT_MAP
 
-object north_wall: north north wall
- short         the "north wall"
+object north_wall: norden nord wand
+ has           NO_TAB
+ short         die "Nordwand"
 
-object south_wall: south southern wall
- short         the "south wall"
+object south_wall: sueden süden sued süd wand
+ has           NO_TAB
+ short         die "Südwand"
 
-object east_wall: east eastern wall
- short         the "east wall"
+object east_wall: osten ost wand
+ has           NO_TAB
+ short         die "Ostwand"
 
-object west_wall: west western wall
- short         the "west wall"
+object west_wall: westen west wand
+ has           NO_TAB
+ short         die "Westwand"
 
-object ground: ground floor
- has           SURFACE
- short         the "ground"
+object ground: boden
+ has           SURFACE NO_TAB
+ short         der "Boden"
 
 grammar shake *held     >shake
 grammar wave *held      >shake
@@ -3746,4 +3750,44 @@ if noun1 isnt *present
 endif
 write "In diesem Satz fehlt ein Verb.^"
 set time = false
+}
+
+{+game_over
+write "^"
+execute "+score"
+select player
+   set noun3(parent) = limbo
+endselect
+set player(parent) = epilogue
+write "^"
+execute "+look_around"
+}
+
+location epilogue : epilogue
+ short         name "Ende"
+ has           DONT_MAP
+
+{look
+if interpreter = GLK
+   write "Das Spiel ist vorbei. Gib "
+   style input
+   write "undo"
+   style normal
+   write ", "
+   style input
+   write "neustart"
+   style normal
+   write " oder "
+   style input
+   write "restore"
+   style normal
+   write " gefolgt vom Dateinamen ein, oder "
+   style input
+   write "beenden"
+   style normal
+   write ".^"
+else
+   write "Das Spiel ist vorbei. Gib <b>undo</b>, <b>neustart</b> oder <b>restore</b> "
+   write "gefolgt vom Dateinamen ein.^"
+endif
 }
