@@ -750,7 +750,7 @@ grammar signification $string     >lookup_word
 set mot_trouve = false
 iterate "french_words.csv" skip_header
    ifstring field[0] = $string
-      write "Le mot " $string " veut dire " field[1] ".^"
+      write "The word " $string " means " field[1] ".^"
       set mot_trouve = true
    endif
 enditerate

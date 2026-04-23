@@ -734,7 +734,7 @@ grammar bedeutung $string      >lookup_word
 set wort_gefunden = false
 iterate "german_words.csv" skip_header
    ifstring field[0] = $string
-      write "Das Wort " $string " bedeutet " field[1] ".^"
+      write "The word " $string " means " field[1] ".^"
       set wort_gefunden = true
    endif
 enditerate
