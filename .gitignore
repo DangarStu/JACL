@@ -20,3 +20,19 @@ src/glkterm/Makefile
 
 # compiled binaries
 bin/
+src/bjorb
+src/cgijacl
+src/cjacl
+src/fcgijacl
+src/jacl
+
+# editor / tool local config
+.claude/
+.vscode/
+
+# python cache
+__pycache__/
+
+# local data / misc
+map montana.png
+projects/data/
