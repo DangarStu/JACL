@@ -1055,6 +1055,15 @@ object ground : sol plancher
 integer speech_choice
 integer meteo_etat        0
 
+# Fallback when a player asks a character about a topic the character has
+# no specific line for. Gives the learner a nudge toward vocabulary that
+# usually works, rather than a flat "they have nothing to say".
+{+default_ask_about
+write noun1{The} " sourit poliment et hausse les épaules. Essayez un autre "
+write "sujet, par exemple ~pain~, ~quartier~, ~famille~, ~café~, ou quelque "
+write "chose que vous voyez autour de vous.^"
+}
+
 {+intro
 style bold
 write "^^" game_title
@@ -1087,6 +1096,18 @@ print:
    de la rue. C'est une belle journée pour flâner
    dans le quartier et rendre visite à un ami.^^
 .
+
+style note
+write "Astuce : tapez "
+style input
+write "aide"
+style note
+if interpreter = CGI
+   write " à tout moment pour voir les commandes, ou double-cliquez sur un mot français pour en voir la traduction.^^"
+else
+   write " à tout moment pour voir la liste des commandes disponibles.^^"
+endif
+style normal
 
 if here hasnt OUTDOORS
    move north_wall to here

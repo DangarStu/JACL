@@ -1466,6 +1466,15 @@ integer speech_choice
 integer weather_state         0
 integer weather_announced     0
 
+# Fallback when a player asks a character about a topic the character has
+# no specific line for. Gives the learner a nudge toward vocabulary that
+# usually works, rather than a flat "they have nothing to say".
+{+default_ask_about
+write noun1{The} " tersenyum sopan dan mengangkat bahu. Coba tanyakan tentang "
+write "hal lain, misalnya ~keluarga~, ~rumah~, ~desa~, ~cuaca~, atau sesuatu "
+write "yang kamu lihat di sekitar sini.^"
+}
+
 {+intro
 style bold
 write "^^" game_title
@@ -1497,6 +1506,18 @@ print:
    ini adalah hari yang baik untuk menjelajahi desa
    dan bertemu dengan tetangga.^^
 .
+
+style note
+write "Petunjuk: ketik "
+style input
+write "bantuan"
+style note
+if interpreter = CGI
+   write " kapan saja untuk melihat perintah, atau klik ganda pada kata bahasa Indonesia mana pun untuk melihat terjemahannya.^^"
+else
+   write " kapan saja untuk melihat daftar perintah yang tersedia.^^"
+endif
+style normal
 
 if here hasnt OUTDOORS
    move north_wall to here

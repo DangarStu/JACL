@@ -539,6 +539,16 @@ execute "+inventory"
 
 integer speech_choice
 
+# Fallback when a player asks a character about a topic the character has
+# no specific line for. The NPCs here are mostly animals, so the tone is
+# curiosity rather than conversation — but the learner still gets a nudge
+# toward vocabulary that tends to work.
+{+default_ask_about
+write noun1{The} " te mira con curiosidad pero no responde. Prueba otro "
+write "tema, por ejemplo ~montaña~, ~bosque~, ~río~, ~clima~ o algo que "
+write "veas a tu alrededor.^"
+}
+
 {+intro
 style bold
 write "^^" game_title
@@ -571,6 +581,18 @@ print:
    Es un día perfecto para explorar las montañas de Chile
    y descubrir sus secretos.^^
 .
+
+style note
+write "Consejo: escribe "
+style input
+write "ayuda"
+style note
+if interpreter = CGI
+   write " en cualquier momento para ver los comandos, o haz doble clic en una palabra en español para ver su traducción.^^"
+else
+   write " en cualquier momento para ver la lista de comandos disponibles.^^"
+endif
+style normal
 
 look
 }
