@@ -1661,13 +1661,13 @@ endif
 return false
 }
 
-grammar insert **held on *present       >insert_on
-grammar put **held on *present          >insert_on
-grammar place **held on *present        >insert_on
-grammar taruh **held di *present        >insert_on
-grammar menaruh **held di *present      >insert_on
-grammar letakkan **held di *present     >insert_on
-grammar meletakkan **held di *present   >insert_on
+grammar insert **held on *present         >insert_on
+grammar put **held on *present            >insert_on
+grammar place **held on *present          >insert_on
+grammar taruh **held di *present          >insert_on
+grammar menaruh **held di *present        >insert_on
+grammar letakkan **held di *present       >insert_on
+grammar meletakkan **held di *present     >insert_on
 
 {+insert_on
 if +important<noun2 = true
