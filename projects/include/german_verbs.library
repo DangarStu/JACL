@@ -664,6 +664,16 @@ endif
 set time = false
 }
 
+# Unter jacl (Konsole) fängt die C-Laufzeit QUIT_WORD vor dem Parser ab —
+# diese Grammatik greift also nur unter cgijacl/fcgijacl.
+grammar beenden     >quit_info
+grammar quit        >quit_info
+
+{+quit_info
+write "Das Spiel wird automatisch gespeichert. Schließe den Browser-Tab oder verlasse die Seite, wenn Du fertig bist.^"
+set time = false
+}
+
 grammar help *present     >help_other
 
 {+help_other

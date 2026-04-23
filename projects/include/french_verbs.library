@@ -677,6 +677,16 @@ endif
 set time = false
 }
 
+# Sous jacl (console) le runtime C attrape QUIT_WORD avant le parseur ; cette
+# grammaire n'est donc active que dans cgijacl/fcgijacl.
+grammar quitter     >quit_info
+grammar quit        >quit_info
+
+{+quit_info
+write "La partie est enregistrée automatiquement. Fermez l'onglet du navigateur ou quittez la page pour arrêter de jouer.^"
+set time = false
+}
+
 grammar help *present     >help_other
 
 grammar aider *held     >aider

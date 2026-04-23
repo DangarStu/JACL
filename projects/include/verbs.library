@@ -527,6 +527,17 @@ endif
 set time = false
 }
 
+# In the console interpreter the C runtime intercepts QUIT_WORD before the
+# parser runs (see jacl.c), so the grammar below only fires under cgijacl
+# and fcgijacl — where there's no OS-level "quit" that makes sense.
+grammar quit     >quit_info
+grammar q        >quit_info
+
+{+quit_info
+write "The game saves automatically. To stop playing, close the browser tab or navigate away.^"
+set time = false
+}
+
 grammar help *present     >help_other
 
 {+help_other
