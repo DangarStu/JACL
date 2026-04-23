@@ -1,92 +1,92 @@
 # MUSIC.library
 
-integer       MUSIC_temp
-integer       MUSIC_mode            SCALE
+integer MUSIC_temp
+integer MUSIC_mode     SCALE
 
 # ADDING CHORDS TO A SONG WILL ADD THE NOTES OF THAT CHORD TO THIS ARRAY
 # INDIVIDUAL NOTES CAN ALSO BE ADDED TO THE SONG MANUALLY
 # SET OF NOTES CONTAINED IN THE SCALE, WOULD NORMALLY NOT EXCEED 7
-integer_array MUSIC_scale			28
-integer       MUSIC_scale_index
+integer_array MUSIC_scale     28
+integer MUSIC_scale_index
 
-integer_array MUSIC_song			28
-integer       MUSIC_song_index
+integer_array MUSIC_song     28
+integer MUSIC_song_index
 
-integer       MUSIC_scale_key		UNKNOWN
-integer       MUSIC_scale_type		UNKNOWN
+integer MUSIC_scale_key      UNKNOWN
+integer MUSIC_scale_type     UNKNOWN
 
 # THIS IS AN ARRAY OF THE KEYS THE SONG COULD POSSIBLY BE IN.
 # A SONG WITH NO NOTES COULD BE IN ANY KEY SO THAT IS THE INITIAL STATE
-integer       MUSIC_keys        	0 1 2 3 4 5 6 7 8 9 10 11
-integer       MUSIC_keys_index  	12
+integer MUSIC_keys           0 1 2 3 4 5 6 7 8 9 10 11
+integer MUSIC_keys_index     12
 
 # THESE ARE THE NOTES OF THE CHORD TO BE ANALYSED
-integer_array MUSIC_key_chord       4
-integer       MUSIC_key_chord_index
+integer_array MUSIC_key_chord     4
+integer MUSIC_key_chord_index
 
 # THESE ARE THE NOTES OF THE CHORD TO BE ANALYSED
-integer_array MUSIC_chord       	28
-integer       MUSIC_chord_index
+integer_array MUSIC_chord     28
+integer MUSIC_chord_index
 
 # THESE ARE THE INTERVALS OF THE CHORD TO BE ANALYSED
-integer_array MUSIC_intervals      	28
-integer       MUSIC_intervals_index
+integer_array MUSIC_intervals     28
+integer MUSIC_intervals_index
 
-integer_array MUSIC_chord_bass		7
-integer       MUSIC_chord_bass_index
+integer_array MUSIC_chord_bass     7
+integer MUSIC_chord_bass_index
 
-integer_array MUSIC_chord_roots		7
-integer       MUSIC_chord_roots_index
+integer_array MUSIC_chord_roots     7
+integer MUSIC_chord_roots_index
 
-integer_array MUSIC_chord_types		7
-integer       MUSIC_chord_types_index
+integer_array MUSIC_chord_types     7
+integer MUSIC_chord_types_index
 
-integer_array MUSIC_chord_add		5
-integer       MUSIC_chord_add_index	
+integer_array MUSIC_chord_add     5
+integer MUSIC_chord_add_index
 
-integer_array MUSIC_notes       	13
-integer       MUSIC_notes_index
+integer_array MUSIC_notes     13
+integer MUSIC_notes_index
 
-integer_array MUSIC_array			26
-integer       MUSIC_array_index
-integer       MUSIC_array_offset
+integer_array MUSIC_array     26
+integer MUSIC_array_index
+integer MUSIC_array_offset
 
-integer       MUSIC_counter
-integer       MUSIC_index
-integer       MUSIC_note
+integer MUSIC_counter
+integer MUSIC_index
+integer MUSIC_note
 
-constant interval_names "Root" "Minor second" "Major second" "Minor third" "Major third"
-constant interval_names "Perfect fourth" "Diminished fifth" "Perfect fifth" "Augmented fifth"
-constant interval_names "Major sixth" "Minor seventh" Major seventh" "Octave"
-constant interval_names "Minor ninth" "Major ninth" "Minor tenth" "Major tenth" "Perfect eleventh"
-constant interval_names "Diminished twelfth" "Perfect twelfth"
-constant interval_names "Minor thirteenth" "Major thirteenth" "Minor fourteenth" "Major fourteenth"
+constant interval_names     "Root" "Minor second" "Major second" "Minor third" "Major third"
+constant interval_names     "Perfect fourth" "Diminished fifth" "Perfect fifth" "Augmented fifth"
+constant interval_names     "Major sixth" "Minor seventh" Major seventh" "Octave"
+constant interval_names     "Minor ninth" "Major ninth" "Minor tenth" "Major tenth" "Perfect eleventh"
+constant interval_names     "Diminished twelfth" "Perfect twelfth"
+constant interval_names     "Minor thirteenth" "Major thirteenth" "Minor fourteenth" "Major fourteenth"
 
 # AN ARRAY OF THE NOTE NAMES
-constant note_names "A" "A#" "B" "C" "C#" "D" "D#" "E" "F" "F#" "G" "G#"
-constant note_names "A" "Bb" "B" "C" "Db" "D" "Eb" "E" "F" "Gb" "G" "Ab"
+constant note_names     "A" "A#" "B" "C" "C#" "D" "D#" "E" "F" "F#" "G" "G#"
+constant note_names     "A" "Bb" "B" "C" "Db" "D" "Eb" "E" "F" "Gb" "G" "Ab"
 
-constant SHARP           1
-constant NATURAL         0
-constant FLAT           -1
+constant SHARP       1
+constant NATURAL     0
+constant FLAT        -1
 
 # THESE ARE THE OFFSETS INTO THE note_names ARRAY. IF FLATS ARE TO BE USED
 # THEN START AT 12 and ADD THE NOTE
-constant SHARPS          0
-constant NATURALS        0
-constant FLATS           12
+constant SHARPS       0
+constant NATURALS     0
+constant FLATS        12
 
 # INFORMATION USED FOR NAMING THE KEY AND THE NOTES WITHIN IT. 
 # IN THE KEY OF 'A' (0) ALL NON-NATURAL NOTES ARE NOTATED AS SHARPS
-integer note_naming SHARPS FLATS SHARPS NATURALS FLATS SHARPS
-integer note_naming FLATS SHARPS FLATS SHARPS SHARPS FLATS
+integer note_naming     SHARPS FLATS SHARPS NATURALS FLATS SHARPS
+integer note_naming     FLATS SHARPS FLATS SHARPS SHARPS FLATS
 
 # OBJECT TYPES
 
-constant CHORD           1
-constant SCALE           2
-constant NOTE            3
-constant INSTRUCTIONS    4
+constant CHORD            1
+constant SCALE            2
+constant NOTE             3
+constant INSTRUCTIONS     4
 
 {+bootstrap
 set MUSIC_chord_type_count = @chord_intervals / 7
@@ -94,88 +94,88 @@ set MUSIC_chord_type_count = @chord_intervals / 7
 
 # ARRAY OF INTERVALS
 
-integer MUSIC_chord_type_count 0
+integer MUSIC_chord_type_count     0
 
-constant MAJOR           0
-integer chord_intervals  0 4 7 -1 -1 -1 -1
-string chord_names       "Major"
-string chord_short_names ""
-integer chord_position   0
+constant MAJOR     0
+integer chord_intervals     0 4 7 -1 -1 -1 -1
+string chord_names           "Major"
+string chord_short_names     ""
+integer chord_position     0
 
-constant MINOR           1
-integer chord_intervals  0 3 7 -1 -1 -1 -1
-string chord_names       "Minor"
-string chord_short_names "m"
-integer chord_position   0
+constant MINOR     1
+integer chord_intervals     0 3 7 -1 -1 -1 -1
+string chord_names           "Minor"
+string chord_short_names     "m"
+integer chord_position     0
 
-constant AUGMENTED       2
-integer chord_intervals  0 4 8 -1 -1 -1 -1
-string chord_names       "Aug"
-string chord_short_names "aug"
-integer chord_position   0
+constant AUGMENTED     2
+integer chord_intervals     0 4 8 -1 -1 -1 -1
+string chord_names           "Aug"
+string chord_short_names     "aug"
+integer chord_position     0
 
-constant DIMINISHED      3
-integer chord_intervals  0 3 6 -1 -1 -1 -1
-string chord_names       "Dim"
-string chord_short_names "dim"
-integer chord_position   0
+constant DIMINISHED     3
+integer chord_intervals     0 3 6 -1 -1 -1 -1
+string chord_names           "Dim"
+string chord_short_names     "dim"
+integer chord_position     0
 
-constant MAJOR6TH        4
-integer chord_intervals  0 4 7 9  -1 -1 -1
-string chord_names       "Major6th"
-string chord_short_names "Maj6"       
-integer chord_position   0
+constant MAJOR6TH     4
+integer chord_intervals     0 4 7 9 -1 -1 -1
+string chord_names           "Major6th"
+string chord_short_names     "Maj6"
+integer chord_position     0
 
-constant 7TH             5
-integer chord_intervals  0 4 7 10 -1 -1 -1
-string chord_names       "7th"
-string chord_short_names "7"
-integer chord_position   0
+constant 7TH     5
+integer chord_intervals     0 4 7 10 -1 -1 -1
+string chord_names           "7th"
+string chord_short_names     "7"
+integer chord_position     0
 
-constant MAJOR7TH        6
-integer chord_intervals  0 4 7 11 -1 -1 -1
-string chord_names       "Major7th"
-string chord_short_names "Maj7"
-integer chord_position   0
+constant MAJOR7TH     6
+integer chord_intervals     0 4 7 11 -1 -1 -1
+string chord_names           "Major7th"
+string chord_short_names     "Maj7"
+integer chord_position     0
 
-constant MINOR7TH        7
-integer chord_intervals  0 3 7 10 -1 -1 -1
-string chord_names       "Minor7th"
-string chord_short_names "m7"
-integer chord_position   0
+constant MINOR7TH     7
+integer chord_intervals     0 3 7 10 -1 -1 -1
+string chord_names           "Minor7th"
+string chord_short_names     "m7"
+integer chord_position     0
 
-constant MAJOR9TH        8
-integer chord_intervals  0 4 7 11 15 -1 -1
-string chord_names       "Major9th"
-string chord_short_names "Maj9"
-integer chord_position   0
+constant MAJOR9TH     8
+integer chord_intervals     0 4 7 11 15 -1 -1
+string chord_names           "Major9th"
+string chord_short_names     "Maj9"
+integer chord_position     0
 
 constant MAJOR1STINV     9
-integer chord_intervals  0 5 9 -1 -1 -1 -1
-string chord_names       "Major"
-string chord_short_names ""
-integer chord_position   1
+integer chord_intervals     0 5 9 -1 -1 -1 -1
+string chord_names           "Major"
+string chord_short_names     ""
+integer chord_position     1
 
 constant MAJOR2STINV     9
-integer chord_intervals  0 3 8 -1 -1 -1 -1
-string chord_names       "Major"
-string chord_short_names ""
-integer chord_position   2
+integer chord_intervals     0 3 8 -1 -1 -1 -1
+string chord_names           "Major"
+string chord_short_names     ""
+integer chord_position     2
 
-constant ADD4            10 
-integer chord_intervals  0 4 5 7 -1 -1 -1
-string chord_names       "add4"
-string chord_short_names "add4"       
-integer chord_position   0
+constant ADD4     10
+integer chord_intervals     0 4 5 7 -1 -1 -1
+string chord_names           "add4"
+string chord_short_names     "add4"
+integer chord_position     0
 
-constant UNKNOWN        -1
+constant UNKNOWN     -1
 
 # CHORD ATTRIBUTES
-constant rootnote        9
-constant chordtype       10
+constant rootnote      9
+constant chordtype     10
 
 # TWO OCTAVES OF INTERVALS FOR THE MAJOR SCALE
-integer major_intervals  0 2 4 5 7 9 11 12 14 16 17 19 21 23
+integer major_intervals     0 2 4 5 7 9 11 12 14 16 17 19 21 23
 
 # -----------------------------------------------------------------------------
 # ALL SCALE TYPES ARE NOW DETERMINED RELATIVE TO THE ABOVE MAJOR SCALE
@@ -185,23 +185,23 @@ integer major_intervals  0 2 4 5 7 9 11 12 14 16 17 19 21 23
 # INFORMATION USED FOR NAMING THE KEY AND THE NOTES WITHIN IT. 
 # FIRST INDEX IS 'A'. 
 # IN THE KEY OF 'A' ALL NON-NATURAL NOTES ARE NOTATED AS SHARPS
-integer note_naming SHARPS FLATS SHARPS NATURALS FLATS SHARPS
-integer note_naming FLATS SHARPS FLATS SHARPS SHARPS FLATS
+integer note_naming     SHARPS FLATS SHARPS NATURALS FLATS SHARPS
+integer note_naming     FLATS SHARPS FLATS SHARPS SHARPS FLATS
 
 # THE OFFSETS RELATIVE TO THE BASELINE OF major_intervals
-integer scale_offsets NATURAL NATURAL NATURAL NATURAL NATURAL NATURAL NATURAL
-integer scale_offsets NATURAL NATURAL NATURAL NATURAL NATURAL NATURAL NATURAL
+integer scale_offsets     NATURAL NATURAL NATURAL NATURAL NATURAL NATURAL NATURAL
+integer scale_offsets     NATURAL NATURAL NATURAL NATURAL NATURAL NATURAL NATURAL
 
 # --- MINOR SCALE
 # INFORMATION USED FOR NAMING THE KEY AND THE NOTES WITHIN IT
 # FIRST INDEX IS 'A'. 
 # IN THE KEY OF 'A Minor' ALL NOTES ARE NATURAL
-integer note_naming NATURALS FLATS SHARPS FLATS SHARPS FLATS 
-integer note_naming SHARPS SHARPS FLATS SHARPS FLATS SHARPS
+integer note_naming     NATURALS FLATS SHARPS FLATS SHARPS FLATS
+integer note_naming     SHARPS SHARPS FLATS SHARPS FLATS SHARPS
 
 # THE OFFSETS RELATIVE TO THE BASELINE OF major_intervals
-integer scale_offsets NATURAL NATURAL FLAT NATURAL NATURAL FLAT FLAT
-integer scale_offsets NATURAL NATURAL FLAT NATURAL NATURAL FLAT FLAT
+integer scale_offsets     NATURAL NATURAL FLAT NATURAL NATURAL FLAT FLAT
+integer scale_offsets     NATURAL NATURAL FLAT NATURAL NATURAL FLAT FLAT
 
 integer MUSIC_macro
 
@@ -531,8 +531,8 @@ until MUSIC_index = 7
 integer MUSIC_length
 integer MUSIC_base
 integer MUSIC_loop
-string  MUSIC_array_name
-string  MUSIC_string
+string MUSIC_array_name
+string MUSIC_string
 
 {+reduce_intervals
 # string_arg[0] = array to be reduced into MUSIC_intervals
@@ -724,238 +724,238 @@ write "^"
 # -----------------------------------------------------------------------------
 
 object a : "a" note
-  class			NOTE
-  rootnote		0
+ class         NOTE
+ rootnote      0
 
 object as : "a#" "bb" note
-  class			NOTE
-  rootnote		1
+ class         NOTE
+ rootnote      1
 
 object b : "b" note
-  class			NOTE
-  rootnote		2
+ class         NOTE
+ rootnote      2
 
 object c : "c" note
-  class			NOTE
-  rootnote		3
+ class         NOTE
+ rootnote      3
 
 object cs : "c#" "db" note
-  class			NOTE
-  rootnote		4
+ class         NOTE
+ rootnote      4
 
 object d : "d" note
-  class			NOTE
-  rootnote		5
+ class         NOTE
+ rootnote      5
 
 object ds : "d#" "eb" note
-  class			NOTE
-  rootnote		6
+ class         NOTE
+ rootnote      6
 
 object e : "e" note
-  class			NOTE
-  rootnote		7
+ class         NOTE
+ rootnote      7
 
 object f : "f" note
-  class			NOTE
-  rootnote		8
+ class         NOTE
+ rootnote      8
 
 object fs : "f#" "gb" note
-  class			NOTE
-  rootnote		9
+ class         NOTE
+ rootnote      9
 
 object g : "g" note
-  class			NOTE
-  rootnote		10
+ class         NOTE
+ rootnote      10
 
 object gs : "g#" "ab" note
-  class			NOTE
-  rootnote		11
+ class         NOTE
+ rootnote      11
 
 # -----------------------------------------------------------------------------
 # OBJECTS FOR ALL THE CHORDS
 # -----------------------------------------------------------------------------
 
 object amajor : a major amaj amajor
-  class           CHORD
-  rootnote        0
-  chordtype       MAJOR
+ class         CHORD
+ rootnote      0
+ chordtype     MAJOR
 
 object asmajor : "a#" "bb" major "bbmaj" "a#maj" "bbmajor" "a#major"
-  class           CHORD
-  rootnote        1
-  chordtype       MAJOR
+ class         CHORD
+ rootnote      1
+ chordtype     MAJOR
 
 object bmajor : b major bmaj amajor
-  class           CHORD
-  rootnote        2
-  chordtype       MAJOR
+ class         CHORD
+ rootnote      2
+ chordtype     MAJOR
 
 object cmajor : c major cmaj amajor
-  class           CHORD
-  rootnote        3
-  chordtype       MAJOR
+ class         CHORD
+ rootnote      3
+ chordtype     MAJOR
 
 object csmajor : "c#" "db" major "dbmaj" "c#maj" "dbmajor" "c#major"
-  class           CHORD
-  rootnote        4
-  chordtype       MAJOR
+ class         CHORD
+ rootnote      4
+ chordtype     MAJOR
 
 object dmajor : "d" major "dmaj" "dmajor"
-  class           CHORD
-  rootnote        5
-  chordtype       MAJOR
+ class         CHORD
+ rootnote      5
+ chordtype     MAJOR
 
 object dsmajor : "d#" "eb" major "d#maj" "ebmaj" "d#major" "ebmajor"
-  class           CHORD
-  rootnote        6
-  chordtype       MAJOR
+ class         CHORD
+ rootnote      6
+ chordtype     MAJOR
 
 object emajor : "e" major "emaj" "emajor"
-  class           CHORD
-  rootnote        7
-  chordtype       MAJOR
+ class         CHORD
+ rootnote      7
+ chordtype     MAJOR
 
 object fmajor : "f" major "fmaj" "fmajor"
-  class           CHORD
-  rootnote        8
-  chordtype       MAJOR
+ class         CHORD
+ rootnote      8
+ chordtype     MAJOR
 
 object fsmajor : "f#" "gb" major "f#maj" "gbmaj" "f#major" "gbmajor"
-  class           CHORD
-  rootnote        9
-  chordtype       MAJOR
+ class         CHORD
+ rootnote      9
+ chordtype     MAJOR
 
 object gmajor : "g" major "gmaj" "gmajor"
-  class           CHORD
-  rootnote        10
-  chordtype       MAJOR
+ class         CHORD
+ rootnote      10
+ chordtype     MAJOR
 
 object gsmajor : "g#" "ab" major "g#maj" "abmaj" "g#major" "abmajor"
-  class           CHORD
-  rootnote        11
-  chordtype       MAJOR
+ class         CHORD
+ rootnote      11
+ chordtype     MAJOR
 
 # --- MINOR CHORDS
 
 object aminor : a minor amin aminor
-  class           CHORD
-  rootnote        0
-  chordtype       MINOR
+ class         CHORD
+ rootnote      0
+ chordtype     MINOR
 
 object asminor : "a#" "bb" minor "bbmin" "a#min" "bbminor" "a#minor"
-  class           CHORD
-  rootnote        1
-  chordtype       MINOR
+ class         CHORD
+ rootnote      1
+ chordtype     MINOR
 
 object bminor : b minor bmin aminor
-  class           CHORD
-  rootnote        2
-  chordtype       MINOR
+ class         CHORD
+ rootnote      2
+ chordtype     MINOR
 
 object cminor : c minor cmin aminor
-  class           CHORD
-  rootnote        3
-  chordtype       MINOR
+ class         CHORD
+ rootnote      3
+ chordtype     MINOR
 
 object csminor : "c#" "db" minor "dbmin" "c#min" "dbminor" "c#minor"
-  class           CHORD
-  rootnote        4
-  chordtype       MINOR
+ class         CHORD
+ rootnote      4
+ chordtype     MINOR
 
 object dminor : "d" minor "dmin" "dminor"
-  class           CHORD
-  rootnote        5
-  chordtype       MINOR
+ class         CHORD
+ rootnote      5
+ chordtype     MINOR
 
 object dsminor : "d#" "eb" minor "d#min" "ebmin" "d#minor" "ebminor"
-  class           CHORD
-  rootnote        6
-  chordtype       MINOR
+ class         CHORD
+ rootnote      6
+ chordtype     MINOR
 
 object eminor : "e" minor "emin" "eminor"
-  class           CHORD
-  rootnote        7
-  chordtype       MINOR
+ class         CHORD
+ rootnote      7
+ chordtype     MINOR
 
 object fminor : "f" minor "fmin" "fminor"
-  class           CHORD
-  rootnote        8
-  chordtype       MINOR
+ class         CHORD
+ rootnote      8
+ chordtype     MINOR
 
 object fsminor : "f#" "gb" minor "f#min" "gbmin" "f#minor" "gbminor"
-  class           CHORD
-  rootnote        9
-  chordtype       MINOR
+ class         CHORD
+ rootnote      9
+ chordtype     MINOR
 
 object gminor : "g" minor "gmin" "gminor"
-  class           CHORD
-  rootnote        10
-  chordtype       MINOR
+ class         CHORD
+ rootnote      10
+ chordtype     MINOR
 
 object gsminor : "g#" "ab" minor "g#min" "abmin" "g#minor" "abminor"
-  class           CHORD
-  rootnote        11
-  chordtype       MINOR
+ class         CHORD
+ rootnote      11
+ chordtype     MINOR
 
 # --- DIMINISHED CHORDS
 
 object adiminished : a diminished adim adiminished
-  class           CHORD
-  rootnote        0
-  chordtype       DIMINISHED
+ class         CHORD
+ rootnote      0
+ chordtype     DIMINISHED
 
 object asdiminished : "a#" "bb" diminished "bbdim" "a#dim" "bbdiminished" "a#diminished"
-  class           CHORD
-  rootnote        1
-  chordtype       DIMINISHED
+ class         CHORD
+ rootnote      1
+ chordtype     DIMINISHED
 
 object bdiminished : b diminished bdim adiminished
-  class           CHORD
-  rootnote        2
-  chordtype       DIMINISHED
+ class         CHORD
+ rootnote      2
+ chordtype     DIMINISHED
 
 object cdiminished : c diminished cdim adiminished
-  class           CHORD
-  rootnote        3
-  chordtype       DIMINISHED
+ class         CHORD
+ rootnote      3
+ chordtype     DIMINISHED
 
 object csdiminished : "c#" "db" diminished "dbdim" "c#dim" "dbdiminished" "c#diminished"
-  class           CHORD
-  rootnote        4
-  chordtype       DIMINISHED
+ class         CHORD
+ rootnote      4
+ chordtype     DIMINISHED
 
 object ddiminished : "d" diminished "ddim" "ddiminished"
-  class           CHORD
-  rootnote        5
-  chordtype       DIMINISHED
+ class         CHORD
+ rootnote      5
+ chordtype     DIMINISHED
 
 object dsdiminished : "d#" "eb" diminished "d#dim" "ebdim" "d#diminished" "ebdiminished"
-  class           CHORD
-  rootnote        6
-  chordtype       DIMINISHED
+ class         CHORD
+ rootnote      6
+ chordtype     DIMINISHED
 
 object ediminished : "e" diminished "edim" "ediminished"
-  class           CHORD
-  rootnote        7
-  chordtype       DIMINISHED
+ class         CHORD
+ rootnote      7
+ chordtype     DIMINISHED
 
 object fdiminished : "f" diminished "fdim" "fdiminished"
-  class           CHORD
-  rootnote        8
-  chordtype       DIMINISHED
+ class         CHORD
+ rootnote      8
+ chordtype     DIMINISHED
 
 object fsdiminished : "f#" "gb" diminished "f#dim" "gbdim" "f#diminished" "gbdiminished"
-  class           CHORD
-  rootnote        9
-  chordtype       DIMINISHED
+ class         CHORD
+ rootnote      9
+ chordtype     DIMINISHED
 
 object gdiminished : "g" diminished "gdim" "gdiminished"
-  class           CHORD
-  rootnote        10
-  chordtype       DIMINISHED
+ class         CHORD
+ rootnote      10
+ chordtype     DIMINISHED
 
 object gsdiminished : "g#" "ab" diminished "g#dim" "abdim" "g#diminished" "abdiminished"
-  class           CHORD
-  rootnote        11
-  chordtype       DIMINISHED
+ class         CHORD
+ rootnote      11
+ chordtype     DIMINISHED
 

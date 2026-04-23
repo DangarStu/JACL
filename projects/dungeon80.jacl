@@ -1,33 +1,33 @@
 #!../bin/cgijacl
 
-constant 	game_version	1
-constant	game_title		"Dungeon 80"
-constant	game_author		"Stuart Allen"
-constant game_publish false
-constant	ifid			"JACL-116"
+constant game_version     1
+constant game_title       "Dungeon 80"
+constant game_author      "Stuart Allen"
+constant game_publish     false
+constant ifid             "JACL-116"
 
-constant	MAX_DEPTH		7
+constant MAX_DEPTH     7
 
-constant	dun_north		1
-constant	dun_south		2
-constant	dun_east		3
-constant	dun_west		4
+constant dun_north     1
+constant dun_south     2
+constant dun_east      3
+constant dun_west      4
 
 # The 2D array for storing the map
-integer_array map_array 36
-integer_array map_array_offsets 2
-integer map_array_dimensions 6 6
+integer_array map_array             36
+integer_array map_array_offsets     2
+integer map_array_dimensions     6 6
 
-integer next_location loc1
-integer previous_location loc1
+integer next_location         loc1
+integer previous_location     loc1
 
 # These arrays store the number of exits from each location
 # and the last location created.
 # These are needed for building due to the current lack 
 # of local variables in JACL
-integer_array exit_count 50
+integer_array exit_count     50
 
-integer_array location_stack 40
+integer_array location_stack     40
 integer location_stack_index
 
 {+intro
@@ -271,8 +271,8 @@ if red_key(parent) = nowhere
 endif
 }
 
-constant gate_obj 12
-constant gate_dir 13
+constant gate_obj     12
+constant gate_dir     13
 
 {+add_gate
 if blue_gate(parent) = nowhere
@@ -298,9 +298,9 @@ if red_gate(parent) = nowhere
 endif
 }
 
-constant fail 100
+constant fail     100
 integer temp
-integer ncounter 
+integer ncounter
 integer new_location
 
 {+pick_direction
@@ -418,7 +418,7 @@ if player has SITTING
 endif
 }
 
-integer status_window 3
+integer status_window     3
 integer OFFSET
 
 string status_text
@@ -605,11 +605,11 @@ location loc36 : thirty six
 
 location end_of_list
 
-integer xaxis 
+integer xaxis
 integer yaxis
 integer current_location
 
-grammar map numbered >map_numbered
+grammar map numbered     >map_numbered
 
 {+map_numbered
 style preformatted
@@ -688,7 +688,7 @@ until xaxis = 6
 write "^"
 }
 
-grammar map big >map_big
+grammar map big     >map_big
 
 {+map_big
 set yaxis = 0
@@ -777,10 +777,10 @@ until xaxis = 6
 write "^"
 }
 
-grammar map >map
+grammar map     >map
 
-constant wall_image "<image src=~/images/tiles/wall.png~>"
-constant blank_image "<image src=~/images/tiles/blank.png~>"
+constant wall_image      "<image src=~/images/tiles/wall.png~>"
+constant blank_image     "<image src=~/images/tiles/blank.png~>"
 
 {+map
 set linebreaks = false
@@ -852,7 +852,7 @@ until xaxis = 6
 write "^"
 }
 
-grammar jinfo >info
+grammar jinfo     >info
 
 {+info
 write "Deep rooms: " deep_rooms ^
@@ -867,11 +867,11 @@ set DOOR_DEPTH = MAX_DEPTH - 1
 set KEY_DEPTH = MAX_DEPTH - 3
 }
 
-constant title_image "/images/dungeon80.png"
-constant footer_image "none"
-constant header_colour "#8b6249"
-constant linkbar_colour "#333333"
-constant maintext_colour "#dddddd"
+constant title_image         "/images/dungeon80.png"
+constant footer_image        "none"
+constant header_colour       "#8b6249"
+constant linkbar_colour      "#333333"
+constant maintext_colour     "#dddddd"
 
 #include "tileinterface.library"
 #include "tileinterface.css"

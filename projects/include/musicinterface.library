@@ -1,21 +1,21 @@
 # HEADERS AND FOOTERS FOR MUSIC RELATED APPLICATIONS
 
-string current_image "none"
+string current_image     "none"
 
 integer MUSIC_verbx
 integer MUSIC_verby
 
 integer MUSIC_dot_coord
 
-constant MUSIC_dot_x -1 -1 -1 13 27 43 57 73 103 117 133 147 163 177
-constant MUSIC_dot_x 193 223 237 253 267 283 313 327 343 357 373 387 403
-constant MUSIC_dot_y -1 -1 -1 20 80 20 80 20 20  80  20  80  20  80
-constant MUSIC_dot_y 20  20  80  20  80  20  20  80  20  80  20  80  20
+constant MUSIC_dot_x     -1 -1 -1 13 27 43 57 73 103 117 133 147 163 177
+constant MUSIC_dot_x     193 223 237 253 267 283 313 327 343 357 373 387 403
+constant MUSIC_dot_y     -1 -1 -1 20 80 20 80 20 20 80 20 80 20 80
+constant MUSIC_dot_y     20 20 80 20 80 20 20 80 20 80 20 80 20
 
 parameter "verb.x" MUSIC_verbx
 parameter "verb.y" MUSIC_verby
 
-grammar standard >standard
+grammar standard     >standard
 
 {+header
 set linebreaks = false

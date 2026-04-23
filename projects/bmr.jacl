@@ -1,15 +1,15 @@
 #!../bin/jacl
 
-constant game_version 1
-constant ifid            "JACL-108"
-constant game_title "BAD MOON RISING"
-constant game_author "Davy Stedham."
-constant game_publish false
-constant portinfo "JACL port by Rob."
-integer curword 0
-constant SOAHC 1
-constant ELLIRG 2
-constant ANANSI 3
+constant game_version     1
+constant ifid             "JACL-108"
+constant game_title       "BAD MOON RISING"
+constant game_author      "Davy Stedham."
+constant game_publish     false
+constant portinfo         "JACL port by Rob."
+integer curword     0
+constant SOAHC      1
+constant ELLIRG     2
+constant ANANSI     3
 
 #monsters
 object corpse : corpse
@@ -1609,10 +1609,10 @@ object kryten: kryten
  damage        2
  player
 
-constant title_image "none"
-constant footer_image "none"
-constant header_colour "#42596d"
-constant linkbar_colour "#6a7a87"
-constant maintext_colour "#dddddd"
+constant title_image         "none"
+constant footer_image        "none"
+constant header_colour       "#42596d"
+constant linkbar_colour      "#6a7a87"
+constant maintext_colour     "#dddddd"
 
 #include "ff.library"

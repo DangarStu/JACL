@@ -1,6 +1,6 @@
 #!../bin/jacl
-constant game_publish false
-constant ifid            "JACL-117"
+constant game_publish     false
+constant ifid             "JACL-117"
 ;                                                            THE CURSE OF ELDOR
 ; -----------------------------------------------------------------------------
 ; Release 3, by Stuart Allen Copyright (C) 1995, 1996.
@@ -665,7 +665,7 @@ object nest a plain nest
  has           OUT_OF_REACH
  inventory     "nest"
  
-synonym nests nest
+synonym nests     nest
 
 {examine
 write "The bird's nests are hidden high up in the shadows." return
@@ -675,7 +675,7 @@ object bench a wooden bench
  inventory     "wooden bench"
  mass          scenery
 
-synonym benches bench
+synonym benches     bench
 
 {examine
 write "The wooden benches do not look particularly comfortable." return
@@ -699,7 +699,7 @@ object fire an open fire
  inventory     "open fire"
  mass          scenery
 
-synonym hearth fire
+synonym hearth     fire
 
 {examine
 write "The bright orange flames dance hipnotically as you stare deeper and "
@@ -710,7 +710,7 @@ object pillar a tall pillar
  inventory     "tall pillar"
  mass          scenery
 
-synonym pillars pillar
+synonym pillars     pillar
 
 {look_behind
 write "Looking behind the pillar you see nothing other than footsteps in "
@@ -895,7 +895,7 @@ object doors a double door
  inventory     "set of double doors"
  mass          scenery
  
-synonym doors door
+synonym doors     door
 
 {open
 write "The double door are already open." return
@@ -929,7 +929,7 @@ write "in the north." return
 object cobble some cobble stone
  inventory     "cobble stones"
 
-synonym stones stone
+synonym stones     stone
 
 {examine
 write "Worn smooth from years of weather and use the cobble stones are now "
@@ -1135,7 +1135,7 @@ write "sign in the corner." return
 object stairs_bot a wooden stairs
  inventory     "set of wooden stairs"
 
-synonym steps stairs
+synonym steps     stairs
 
 {examine
 write "The stairs lead up into the church's clock tower." return
@@ -1309,7 +1309,7 @@ object cogs some small cogs
  inventory     "small cogs"
  mass          scenery
 
-synonym smaller small
+synonym smaller     small
 
 {examine
 write "The smaller cogs mesh with the main cog to drive the hands on the face."
@@ -1416,8 +1416,8 @@ object falls a plain waterfall
  inventory     "waterfall"
  mass          scenery
  
-synonym curtain waterfall
-synonym falls   waterfall
+synonym curtain     waterfall
+synonym falls       waterfall
 
 {examine
 write "Although a powerful torrent of water, you notice that a rocky outcrop "
@@ -1794,7 +1794,7 @@ object ruins_obj an ancient temple
  inventory     "ancient temple"
  mass          scenery
 
-synonym ruins temple
+synonym ruins     temple
 
 {examine
 write "A crooked column and several moss covered blocks are all that remain "
@@ -1883,7 +1883,7 @@ object pools some slimy pool
  inventory     "slimy pools"
  mass          scenery
 
-synonym pool pools
+synonym pool     pools
 
 {examine
 write "To put it bluntly, they stink." return
@@ -2100,7 +2100,7 @@ object lantern a brass lantern
  quantity      30
  mass          10
  
-synonym lamp lantern
+synonym lamp     lantern
 
 {examine
 write "Made from finely crafted brass, a wire frame protects the glass bowl "
@@ -2983,7 +2983,7 @@ object head name eldor's head
  mass          10
  starts        limbo
 
-synonym eldors eldor's
+synonym eldors     eldor's
 
 {show_to_councillor
 write "Seeing the head, a smile breaks out on both the councillor and the "
@@ -3083,7 +3083,7 @@ object apparatus some strange apparatus
  inventory     "strange apparatus"
  mass          scenery
 
-synonym contraptions apparatus
+synonym contraptions     apparatus
 
 {take_override
 write "Probably not a good idea." return
@@ -3098,7 +3098,7 @@ object benches some work benches
  inventory     "work benches"
  mass          scenery
 
-synonym bench benches
+synonym bench     benches
 
 {examine
 write "The work benches are covered in all sorts of strange contraptions and "
@@ -3205,7 +3205,7 @@ object ship_crates some shipping crates
  inventory     "shipping crates"
  mass          scenery
 
-synonym crate crates
+synonym crate     crates
 
 {examine
 write "The shipping crates are plain wooden boxes." return
@@ -3394,7 +3394,7 @@ write "The men don't respond." return
 object stools a bar stool
  inventory     "bar stool"
 
-synonym stools stool
+synonym stools     stool
 
 {sit
 write "There are none free." return
@@ -3423,9 +3423,9 @@ object bartender a elderly bartender
  described     "An elderly bartender stands behind the bar washing glasses."
  mass          heavy
 
-synonym landlord bartender
-synonym barman   bartender 
-synonym publican bartender 
+synonym landlord     bartender
+synonym barman       bartender
+synonym publican     bartender
 
 {talk_to
 write "The bartender listens to your tale with a professional ear." return
@@ -3470,10 +3470,10 @@ object ale a plain ale
  mass          5
  starts        childof mug
 
-synonym lager  ale
-synonym beer   ale 
-synonym usual  ale 
-synonym bitter ale
+synonym lager      ale
+synonym beer       ale
+synonym usual      ale
+synonym bitter     ale
 
 {order
 proxy "ask bartender for ale"
@@ -3527,7 +3527,7 @@ object g_coin a gold coin
  starts        limbo
  mass          1
 
-synonym piece   coin
+synonym piece     coin
 
 {give_to_bartender
 write quote "I'm sorry, I don't have any change" quote " the bartender "
@@ -3695,7 +3695,7 @@ write "decide to leave the bottle of wine alone." return
 object racks some wine racks
  inventory     "wine racks"
 
-synonym rack racks
+synonym rack     racks
 
 {examine
 write "The racks are filled with bottles of some of the finest wine produced "
@@ -4451,9 +4451,9 @@ filter quickly
 filter carefully
 filter quietly
 
-variable           INDEX
-variable           OBJECT_BACKUP
-variable           OXYGEN
+variable INDEX
+variable OBJECT_BACKUP
+variable OXYGEN
 
 synonym onto       on
 synonym into       in
@@ -4518,23 +4518,23 @@ write "before eventually dying of hunger." return
 execute "global_death"
 }
 
-grammar say xyzzy ->xyzzy
-grammar xyzzy     ->xyzzy
+grammar say xyzzy -     >xyzzy
+grammar xyzzy -         >xyzzy
 
 {global_xyzzy
 write "Suddenly a magical white glove appears floating in the air before you, "
 write "slaps you several times across the face, then disappears." return
 }
 
-grammar offer to held *present  ->help_other
-grammar help *present           ->help_other
-grammar help out *present       ->help_other
+grammar offer to held *present -     >help_other
+grammar help *present -              >help_other
+grammar help out *present -          >help_other
 
 {global_help_other
 write "How did you intend to help " noun1 ? return
 }
 
-grammar help ->help
+grammar help -     >help
 
 {global_help
 write "Some common verbs to try are..." return return
@@ -4570,17 +4570,17 @@ write "the topic you require help with." return
 noturn
 }
 
-grammar help games ->help_games
+grammar help games -     >help_games
 
 {global_help_games
 write "`GAMES' REFERS TO MODELS, SIMULATIONS AND GAMES WHICH HAVE TACTICAL "
 write "AND STRATEGIC APPLICATIONS." return
 }
 
-grammar hug *present     ->hug
-grammar comfort *present ->hug
-grammar cuddle *present  ->hug
-grammar console *present ->hug
+grammar hug *present -         >hug
+grammar comfort *present -     >hug
+grammar cuddle *present -      >hug
+grammar console *present -     >hug
 
 {global_hug
 if noun1 has OUT_OF_REACH
@@ -4594,8 +4594,8 @@ endif
 write "I'm sure " noun1 " feels a whole lot better now." return
 }
 
-grammar kiss *present ->kiss
-grammar snog *present ->kiss
+grammar kiss *present -     >kiss
+grammar snog *present -     >kiss
 
 {global_kiss
 if noun1 has OUT_OF_REACH
@@ -4605,7 +4605,7 @@ endif
 write "Hmmmmmm..." return
 }
 
-grammar pick *present with *held ->pick_with
+grammar pick *present with *held -     >pick_with
 
 {pick_with
 if noun1 has OUT_OF_REACH
@@ -4615,9 +4615,9 @@ endif
 write "You can't pick " noun1 " with " noun2 . return
 }
 
-grammar rub *present    ->rub
-grammar pat *present    ->rub
-grammar stroke *present ->rub
+grammar rub *present -        >rub
+grammar pat *present -        >rub
+grammar stroke *present -     >rub
 
 {global_rub
 if noun1 has OUT_OF_REACH
@@ -4627,9 +4627,9 @@ endif
 write "I'm sure " noun1 " feels a lot better now." return
 }
 
-grammar rub *present with *held    ->rub_with
-grammar stroke *present with *held ->rub_with
-grammar pat *present with *held    ->rub_with
+grammar rub *present with *held -        >rub_with
+grammar stroke *present with *held -     >rub_with
+grammar pat *present with *held -        >rub_with
 
 {global_rub_with
 if noun1 has OUT_OF_REACH
@@ -4639,8 +4639,8 @@ endif
 write "They both just get a little warmer." return
 }
 
-grammar lick *present  ->lick
-grammar taste *present ->lick
+grammar lick *present -      >lick
+grammar taste *present -     >lick
 
 {global_lick
 if noun1 has OUT_OF_REACH
@@ -4650,9 +4650,9 @@ endif
 write "Yeuucck!" return
 }
 
-grammar pull *present ->pull
-grammar yank *present ->pull
-grammar tug *present  ->pull
+grammar pull *present -     >pull
+grammar yank *present -     >pull
+grammar tug *present -      >pull
 
 {global_pull
 if noun1 has OUT_OF_REACH
@@ -4662,12 +4662,12 @@ endif
 write "You can't pull " noun1 . return
 }
 
-grammar break *present   ->break
-grammar smash *present   ->break
-grammar crush *present   ->break
-grammar destroy *present ->break
-grammar wrech *present   ->break
-grammar crack *present   ->break
+grammar break *present -       >break
+grammar smash *present -       >break
+grammar crush *present -       >break
+grammar destroy *present -     >break
+grammar wrech *present -       >break
+grammar crack *present -       >break
 
 {global_break
 if noun1 has OUT_OF_REACH
@@ -4677,10 +4677,10 @@ endif
 write "Don't be so destructive." return
 }
 
-grammar clean *present  ->clean
-grammar wipe   *present ->clean
-grammar scrub  *present ->clean
-grammar polish *present ->clean
+grammar clean *present -      >clean
+grammar wipe *present -       >clean
+grammar scrub *present -      >clean
+grammar polish *present -     >clean
 
 {global_clean
 if noun1 has OUT_OF_REACH
@@ -4690,43 +4690,43 @@ endif
 write "That's very thoughtful of you." return
 }
 
-grammar swear    ->swear
-grammar shit     ->swear
-grammar crap     ->swear
-grammar bollocks ->swear
-grammar bugger   ->swear
-grammar smeg     ->swear
+grammar swear -        >swear
+grammar shit -         >swear
+grammar crap -         >swear
+grammar bollocks -     >swear
+grammar bugger -       >swear
+grammar smeg -         >swear
 
 {global_swear
 write "Delightful." return
 }
 
-grammar yell at *present   ->yell_at
-grammar scream at *present ->yell_at
-grammar roar at *present   ->yell_at
+grammar yell at *present -       >yell_at
+grammar scream at *present -     >yell_at
+grammar roar at *present -       >yell_at
 
 
 {global_yell_at
 write "Oooo scary..." return
 }
 
-grammar pay *present       ->pay
-grammar reimburse *present ->pay
+grammar pay *present -           >pay
+grammar reimburse *present -     >pay
 
 {global_pay
 write "You can't pay" noun1 . return
 }
 
-grammar order *anywhere ->order
-grammar buy *anywhere   ->order
+grammar order *anywhere -     >order
+grammar buy *anywhere -       >order
 
 
 {global_order
 write "Your order appears to have fallen on deaf ears." return
 }
 
-grammar knock on *present ->knock_on
-grammar rap on *present   ->knock_on
+grammar knock on *present -     >knock_on
+grammar rap on *present -       >knock_on
 
 {global_knock_on
 if noun1 has OUT_OF_REACH
@@ -4736,14 +4736,14 @@ endif
 write "Devastating productive..." return
 }
 
-grammar play *held ->play
+grammar play *held -     >play
 
 {global_play
 write "You can't play " noun1 . return
 noturn
 }
 
-grammar fill *held with *present ->fill_with
+grammar fill *held with *present -     >fill_with
 
 {global_fill_with
 if noun2 has OUT_OF_REACH
@@ -4774,15 +4774,15 @@ write "You fill " noun1 " with " noun2 . return
 move noun1 to noun2
 }
 
-grammar fill *held ->fill
+grammar fill *held -     >fill
 
 {global_fill
 write "What did you want to fill " noun1 " with?" return
 noturn
 }
 
-grammar stand    ->stand
-grammar stand up ->stand
+grammar stand -        >stand
+grammar stand up -     >stand
 
 {global_stand
 if kryten has SITTING
@@ -4794,8 +4794,8 @@ endif
 write "You are already standing." return
 }
 
-grammar sit on *present ->sit_on
-grammar sit in *present ->sit_on
+grammar sit on *present -     >sit_on
+grammar sit in *present -     >sit_on
 
 
 {global_sit_on
@@ -4806,21 +4806,21 @@ endif
 write "You can't sit on " noun1 . return
 }
 
-grammar empty *present                      ->take_all_from
-grammar pick up everything on *present      ->take_all_from
-grammar pick up everything from on *present ->take_all_from
-grammar take everything on *present         ->take_all_from
-grammar take everything from on *present    ->take_all_from
-grammar pick up everything in *present      ->take_all_from
-grammar pick up everything from in *present ->take_all_from
-grammar take everything in *present         ->take_all_from
-grammar take everything from in *present    ->take_all_from
-grammar pick everything up from *present    ->take_all_from
-grammar pick up everything from *present    ->take_all_from
-grammar take everything from *present       ->take_all_from
-grammar pick everything up from *present    ->take_all_from
+grammar empty *present -                          >take_all_from
+grammar pick up everything on *present -          >take_all_from
+grammar pick up everything from on *present -     >take_all_from
+grammar take everything on *present -             >take_all_from
+grammar take everything from on *present -        >take_all_from
+grammar pick up everything in *present -          >take_all_from
+grammar pick up everything from in *present -     >take_all_from
+grammar take everything in *present -             >take_all_from
+grammar take everything from in *present -        >take_all_from
+grammar pick everything up from *present -        >take_all_from
+grammar pick up everything from *present -        >take_all_from
+grammar take everything from *present -           >take_all_from
+grammar pick everything up from *present -        >take_all_from
 
-synonym taek take
+synonym taek     take
 
 {global_take_all_from
 if noun1 has OUT_OF_REACH
@@ -4871,11 +4871,11 @@ if INDEX = 0
 endif
 }
 
-grammar pick everything up ->take_all
-grammar pick up everything ->take_all
-grammar take everything    ->take_all
+grammar pick everything up -     >take_all
+grammar pick up everything -     >take_all
+grammar take everything -        >take_all
 
-synonym all everything
+synonym all     everything
 
 {global_take_all
 set INDEX to 0
@@ -4907,15 +4907,15 @@ if INDEX = 0
 endif
 }
 
-grammar pick *here up ->take
-grammar pick up *here ->take
-grammar take *here    ->take
-grammar pick *here    ->take
+grammar pick *here up -     >take
+grammar pick up *here -     >take
+grammar take *here -        >take
+grammar pick *here -        >take
 
-synonym get             take
-synonym steal           take
-synonym snatch          take
-synonym snaffle         take
+synonym get         take
+synonym steal       take
+synonym snatch      take
+synonym snaffle     take
 
 {global_take
 if noun1 has OUT_OF_REACH
@@ -4943,11 +4943,11 @@ move noun1 to player
 ensure noun1 has TOUCHED
 }
 
-grammar drop everything          ->drop_all
-grammar put everything down      ->drop_all
-grammar put everything on ground ->drop_all
-grammar put down everything      ->drop_all
-grammar lose everything          ->drop_all
+grammar drop everything -              >drop_all
+grammar put everything down -          >drop_all
+grammar put everything on ground -     >drop_all
+grammar put down everything -          >drop_all
+grammar lose everything -              >drop_all
 
 {global_drop_all
 if here has ON_WATER 
@@ -4980,11 +4980,11 @@ if INDEX = 0
 endif
 }
 
-grammar drop *held          ->drop
-grammar put *held down      ->drop
-grammar put *held on ground ->drop
-grammar put down *held      ->drop
-grammar lose *held          ->drop
+grammar drop *held -              >drop
+grammar put *held down -          >drop
+grammar put *held on ground -     >drop
+grammar put down *held -          >drop
+grammar lose *held -              >drop
 
 {global_drop
 if noun1 has WEARABLE 
@@ -5004,12 +5004,12 @@ write "You drop " noun1 . return
 move noun1 to here
 }
 
-grammar insert *held on *present ->insert_on
-grammar poke *held on *present   ->insert_on
+grammar insert *held on *present -     >insert_on
+grammar poke *held on *present -       >insert_on
 
-synonym wedge   insert
-synonym thrust  insert
-synonym put     insert
+synonym wedge      insert
+synonym thrust     insert
+synonym put        insert
 
 {global_insert_on
 if noun2 has OUT_OF_REACH
@@ -5042,8 +5042,8 @@ write "You put " noun1 " on " noun2 . return
 move noun1 to noun2
 }
 
-grammar insert *held in *present ->insert_in
-grammar poke *held in *present   ->insert_in
+grammar insert *held in *present -     >insert_in
+grammar poke *held in *present -       >insert_in
 
 
 {global_insert_in
@@ -5082,8 +5082,8 @@ write "You put " noun1 " in " noun2 . return
 move noun1 to noun2
 }
 
-grammar insert everything in *present ->insert_all_in
-grammar poke everything in *present   ->insert_all_in
+grammar insert everything in *present -     >insert_all_in
+grammar poke everything in *present -       >insert_all_in
 
 {global_insert_all_in
 if noun1 hasnt CONTAINER 
@@ -5126,7 +5126,7 @@ loop
 endloop
 }
 
-grammar insert everything on *present ->insert_all_on
+grammar insert everything on *present -     >insert_all_on
 
 {global_insert_all_on
 if noun1 hasnt SURFACE 
@@ -5169,7 +5169,7 @@ if INDEX = 0
    write "You are not carrying anything." return
 }
 
-grammar ask *present for *anywhere ->ask_for
+grammar ask *present for *anywhere -     >ask_for
 
 {global_ask_for
 if here has UNDER_WATER
@@ -5205,8 +5205,8 @@ endif
 write Noun1 " doesn't seem to have " noun2 . return
 }
 
-grammar tell *present about *anywhere     ->tell_about
-grammar tell *present all about *anywhere ->tell_about
+grammar tell *present about *anywhere -         >tell_about
+grammar tell *present all about *anywhere -     >tell_about
 
 {global_tell_about
 if here has UNDER_WATER
@@ -5232,8 +5232,8 @@ override
 write Noun1 " seems fascinated by your story about " noun2 . return
 }
 
-grammar ask *present about *anywhere     ->ask_about
-grammar ask *present all about *anywhere ->ask_about
+grammar ask *present about *anywhere -         >ask_about
+grammar ask *present all about *anywhere -     >ask_about
 
 {global_ask_about
 if here has UNDER_WATER
@@ -5259,9 +5259,9 @@ override
 write Noun1 " reluctantly admits to knowing little about " noun2 . return
 }
 
-grammar offer *held to *present     ->give_to
-grammar give *held to *present      ->give_to
-grammar give over *held to *present ->give_to
+grammar offer *held to *present -         >give_to
+grammar give *held to *present -          >give_to
+grammar give over *held to *present -     >give_to
 
 {global_give_to
 if noun2 hasnt ANIMATE
@@ -5287,9 +5287,9 @@ move noun1 to noun2
 write "You give " noun1 " to " noun2 . return
 }
 
-grammar move *present         ->move
-grammar push against *present ->move
-grammar push *present         ->move
+grammar move *present -             >move
+grammar push against *present -     >move
+grammar push *present -             >move
 
 {global_move
 if noun1 has OUT_OF_REACH
@@ -5322,13 +5322,13 @@ write "You move " noun1 " a short distance to one side." return
 ensure noun1 has TOUCHED
 }
 
-grammar read *present ->read
+grammar read *present -     >read
 
 {global_read
 write "There is nothing on " noun1 " to read." return
 }
 
-grammar look down ->look_down
+grammar look down -     >look_down
 
 {global_look_down
 if here has TIGHT_ROPE
@@ -5346,13 +5346,13 @@ endif
 write "You take a moment to admire your investigating feet." return
 }
 
-grammar look up *anywhere in *present ->look_up_in
+grammar look up *anywhere in *present -     >look_up_in
 
 {global_look_up_in
 write "You don't find any reference to " noun1 " in " noun2 . return
 }
 
-grammar look up ->look_up
+grammar look up -     >look_up
 
 {global_look_up
 if here has OUTDOORS
@@ -5366,9 +5366,9 @@ endif
 write "There is nothing unusual about the ceiling." return
 }
 
-grammar feel *present  ->feel
-grammar touch *present ->feel
-grammar grope *present ->feel
+grammar feel *present -      >feel
+grammar touch *present -     >feel
+grammar grope *present -     >feel
 
 {global_feel
 if noun1 has OUT_OF_REACH
@@ -5382,15 +5382,15 @@ endif
 write "Feels just like " noun1(inventory) . return
 }
 
-grammar smell *present ->smell
-grammar sniff *present ->smell
+grammar smell *present -     >smell
+grammar sniff *present -     >smell
 
 {global_smell
 write "Smells an awful lot like " noun1(inventory) . return
 }
 
-grammar taste *present ->taste
-grammar lick *present  ->taste
+grammar taste *present -     >taste
+grammar lick *present -      >taste
 
 {global_taste
 if noun1 has OUT_OF_REACH
@@ -5404,18 +5404,18 @@ endif
 write "Tastes just like you would expect " noun1(inventory) " to taste." return
 }
 
-grammar look *present    ->examine
-grammar look at *present ->examine
-grammar look in *present ->examine
-grammar look on *present ->examine
-grammar examine *present ->examine
+grammar look *present -        >examine
+grammar look at *present -     >examine
+grammar look in *present -     >examine
+grammar look on *present -     >examine
+grammar examine *present -     >examine
 
-synonym watch              examine
-synonym search             examine
-synonym x                  examine
-synonym exmaine            examine
-synonym examein            examine
-synonym examien            examine
+synonym watch       examine
+synonym search      examine
+synonym x           examine
+synonym exmaine     examine
+synonym examein     examine
+synonym examien     examine
 
 {global_examine
 if noun1 hasnt CLOSABLE
@@ -5513,10 +5513,10 @@ loop
 endloop
 }
 
-grammar inventory ->inventory
+grammar inventory -     >inventory
 
-synonym i           inventory 
-synonym inv         inventory
+synonym i       inventory
+synonym inv     inventory
 
 {global_inventory
 set INDEX to 0
@@ -5565,21 +5565,21 @@ if INDEX = 1
 endif
 }
 
-grammar relax ->relax
+grammar relax -     >relax
 
 {global_relax
 write "Taking a deep breath you release the tension from your mind and "
 write "muscles as you exhale slowly." return
 }
 
-grammar thanks   ->thankyou
-grammar thankyou ->thankyou
+grammar thanks -       >thankyou
+grammar thankyou -     >thankyou
 
 {global_thankyou
 write "You're welcome." return
 }
 
-grammar thank *present ->thank
+grammar thank *present -     >thank
 
 {global_thank
 if noun1 hasnt ANIMATE
@@ -5589,7 +5589,7 @@ endif
 write Noun1 " nods." return
 }
 
-grammar greet *present ->greet
+grammar greet *present -     >greet
 
 {global_greet
 if noun1 hasnt ANIMATE
@@ -5599,7 +5599,7 @@ endif
 write Noun1 " smiles and returns your greeting." return
 }
 
-grammar score ->score
+grammar score -     >score
 
 {global_score
 noturn
@@ -5637,7 +5637,7 @@ endif
 write "Master Adventurer." return
 }
 
-grammar open *present ->open
+grammar open *present -     >open
 
 {global_open
 if noun1 hasnt CLOSABLE 
@@ -5664,9 +5664,9 @@ write "You open " noun1 . return
 ensure noun1 hasnt CLOSED 
 }
 
-grammar close *present ->close
+grammar close *present -     >close
 
-synonym shut close
+synonym shut     close
 
 {global_close
 if noun1 hasnt CLOSABLE 
@@ -5688,7 +5688,7 @@ write "You close " noun1 . return
 ensure noun1 has CLOSED 
 }
 
-grammar lock *present ->lock
+grammar lock *present -     >lock
 
 {global_lock
 if noun1 has OUT_OF_REACH
@@ -5708,7 +5708,7 @@ override
 write "What did you want to lock " noun1 " with?" return
 }
 
-grammar lock *present with *held ->lock_with
+grammar lock *present with *held -     >lock_with
 
 {global_lock_with
 if noun1 hasnt LOCKABLE
@@ -5729,7 +5729,7 @@ write "You can't lock " noun1 " with " noun2 . return
 noturn
 }
 
-grammar unlock *present ->unlock
+grammar unlock *present -     >unlock
 
 {global_unlock
 if noun1 hasnt LOCKABLE 
@@ -5750,7 +5750,7 @@ override
 write "What did you want to unlock " noun1 " with?" return
 }
 
-grammar unlock *present with *held ->unlock_with
+grammar unlock *present with *held -     >unlock_with
 
 {global_unlock_with
 if noun1 hasnt LOCKABLE
@@ -5771,10 +5771,10 @@ write "You can't unlock " noun1 " with " noun2 . return
 noturn
 }
 
-grammar show *held to *present     ->show_to
-grammar show off *held to *present ->show_to
-grammar display *held to *present  ->show_to
-grammar present *held to *present  ->show_to
+grammar show *held to *present -         >show_to
+grammar show off *held to *present -     >show_to
+grammar display *held to *present -      >show_to
+grammar present *held to *present -      >show_to
 
 {global_show_to
 if noun1 = noun2
@@ -5786,14 +5786,14 @@ override
 write Noun2 " doesn't seem overly impressed by " noun1 . return
 }
 
-grammar attack *present ->attack
+grammar attack *present -     >attack
 
-synonym thump             attack
-synonym hit               attack
-synonym fight             attack
-synonym kill              attack
-synonym murder            attack
-synonym punch             attack
+synonym thump      attack
+synonym hit        attack
+synonym fight      attack
+synonym kill       attack
+synonym murder     attack
+synonym punch      attack
 
 {global_attack
 if noun1 has OUT_OF_REACH
@@ -5810,7 +5810,7 @@ override
 write "Attacking " noun1 " with your hands has little effect." return
 }
 
-grammar attack *present with *held ->attack_with
+grammar attack *present with *held -     >attack_with
 
 {global_attack_with
 if noun1 has OUT_OF_REACH
@@ -5838,24 +5838,24 @@ override
 write "Attacking " noun1 " with " noun2 " has little effect." return
 }
 
-grammar jump on to *here ->jump_on
-grammar hop on to *here  ->jump_on
-grammar leap on to *here ->jump_on
-grammar jump on *here    ->jump_on
-grammar hop on *here     ->jump_on
-grammar leap on *here    ->jump_on
-grammar stamp on *here   ->jump_on
-grammar stand on *here   ->jump_on
+grammar jump on to *here -     >jump_on
+grammar hop on to *here -      >jump_on
+grammar leap on to *here -     >jump_on
+grammar jump on *here -        >jump_on
+grammar hop on *here -         >jump_on
+grammar leap on *here -        >jump_on
+grammar stamp on *here -       >jump_on
+grammar stand on *here -       >jump_on
 
 {global_jump_on
 write "You can't jump on " noun1 . return
 noturn
 }
 
-grammar jump             ->jump
-grammar jump up and down ->jump
-grammar jump around      ->jump
-grammar jump about       ->jump
+grammar jump -                 >jump
+grammar jump up and down -     >jump
+grammar jump around -          >jump
+grammar jump about -           >jump
 
 {global_jump
 if here has MID_AIR
@@ -5878,34 +5878,34 @@ endif
 write "Consider it done." return
 }
 
-grammar yes ->yes
+grammar yes -     >yes
 
 {global_yes
 write "That was a rhetorical question." return
 noturn
 }
 
-grammar no ->no
+grammar no -     >no
 
 {global_no
 write "That was a rhetorical question." return
 noturn
 }
 
-grammar blow *held at *here ->blow_at
-grammar blow *held to *here ->blow_at
+grammar blow *held at *here -     >blow_at
+grammar blow *held to *here -     >blow_at
 
 {global_blow_at
 write "You can't blow " noun1 " at " noun2 . return
 }
 
-grammar throw *held at *here ->throw_at
-grammar throw *held to *here ->throw_at
+grammar throw *held at *here -     >throw_at
+grammar throw *held to *here -     >throw_at
 
-synonym chuck                  throw
-synonym pitch                  throw
-synonym lob                    throw
-synonym hurl                   throw
+synonym chuck     throw
+synonym pitch     throw
+synonym lob       throw
+synonym hurl      throw
 
 {global_throw_at
 if noun1 has WEARABLE
@@ -5932,10 +5932,10 @@ write Noun1 " bounces off " noun2 " and lands on the ground." return
 move noun1 to here
 }
 
-grammar shed *present     ->remove
-grammar remove *present   ->remove
-grammar take off *present ->remove
-grammar doff *present     ->remove
+grammar shed *present -         >remove
+grammar remove *present -       >remove
+grammar take off *present -     >remove
+grammar doff *present -         >remove
 
 {global_remove
 if noun1 has WEARABLE
@@ -5949,10 +5949,10 @@ write "You are not wearing " noun1 . return
 noturn
 }
 
-grammar wear *held   ->wear
-grammar put on *held ->wear
-grammar put *held on ->wear
-grammar don *held    ->wear
+grammar wear *held -       >wear
+grammar put on *held -     >wear
+grammar put *held on -     >wear
+grammar don *held -        >wear
 
 {global_wear
 if noun1 hasnt WEARABLE
@@ -5970,9 +5970,9 @@ ensure noun1 has WORN
 write "You put on " noun1 . return
 }
 
-grammar talk to *present ->talk_to
+grammar talk to *present -     >talk_to
 
-synonym speak              talk
+synonym speak     talk
 
 {global_talk_to
 if here has UNDER_WATER
@@ -5998,17 +5998,17 @@ override
 write Noun1 " doesn't appear very interested in a conversation." return
 }
 
-grammar eat *held     ->eat
-grammar consume *held ->eat
-grammar munch *held   ->eat
-grammar gobble *held  ->eat
+grammar eat *held -         >eat
+grammar consume *held -     >eat
+grammar munch *held -       >eat
+grammar gobble *held -      >eat
 
 {global_eat
 write "You can't eat " noun1 . return
 noturn
 }
 
-grammar drink *anywhere ->drink
+grammar drink *anywhere -     >drink
 
 {global_drink
 set noun3 parentof noun1
@@ -6031,7 +6031,7 @@ write "I don't see " noun1 " here." return
 noturn
 }
 
-grammar press *present ->press
+grammar press *present -     >press
 
 {global_press
 if noun1 has OUT_OF_REACH
@@ -6046,9 +6046,9 @@ override
 write "Pressing " noun1 " has no discernible effect." return
 }
 
-grammar light *present with *held  ->light_with
-grammar burn *present with *held   ->light_with
-grammar ignite *present with *held ->light_with
+grammar light *present with *held -      >light_with
+grammar burn *present with *held -       >light_with
+grammar ignite *present with *held -     >light_with
 
 {global_light_with
 if here has UNDER_WATER
@@ -6086,9 +6086,9 @@ ensure noun1 has BURNING
 ensure noun1 has LUMINOUS
 }
 
-grammar burn *present   ->light
-grammar light *present  ->light
-grammar ignite *present ->light
+grammar burn *present -       >light
+grammar light *present -      >light
+grammar ignite *present -     >light
 
 {global_light
 if here has UNDER_WATER
@@ -6120,8 +6120,8 @@ write "What did you intent to light " noun1 " with?" return
 noturn
 }
 
-grammar extinguish *present ->extinguish
-grammar put out *present    ->extinguish
+grammar extinguish *present -     >extinguish
+grammar put out *present -        >extinguish
 
 {global_extinguish
 if noun1 hasnt BURNING
@@ -6139,9 +6139,9 @@ ensure noun1 hasnt BURNING
 ensure noun1 hasnt LUMINOUS 
 }
 
-grammar swim west ->swim_west
+grammar swim west -     >swim_west
 
-synonym paddle      swim
+synonym paddle     swim
 
 {global_swim_west
 if here has UNDER_WATER
@@ -6156,17 +6156,17 @@ write "I don't see how you can swim when you are not in water." return
 noturn
 }
 
-grammar west      ->west
-grammar go west   ->west
-grammar walk west ->west
+grammar west -          >west
+grammar go west -       >west
+grammar walk west -     >west
 
-synonym w      west
+synonym w     west
 
 {global_west
 move player west
 }
 
-grammar swim east ->swim_east
+grammar swim east -     >swim_east
 
 {global_swim_east
 if here has UNDER_WATER
@@ -6181,17 +6181,17 @@ write "I don't see how you can swim when you are not in water." return
 noturn
 }
 
-grammar east      ->east
-grammar go east   ->east
-grammar walk east ->east
+grammar east -          >east
+grammar go east -       >east
+grammar walk east -     >east
 
-synonym e      east
+synonym e     east
 
 {global_east
 move player east
 }
 
-grammar swim south ->swim_south
+grammar swim south -     >swim_south
 
 {global_swim_south
 if here has UNDER_WATER
@@ -6206,17 +6206,17 @@ write "I don't see how you can swim when you are not in water." return
 noturn
 }
 
-grammar south      ->south
-grammar go south   ->south
-grammar walk south ->south
+grammar south -          >south
+grammar go south -       >south
+grammar walk south -     >south
 
-synonym s       south
+synonym s     south
 
 {global_south
 move player south
 }
 
-grammar swim southeast ->swim_southeast
+grammar swim southeast -     >swim_southeast
 
 {global_swim_southeast
 if here has UNDER_WATER
@@ -6231,17 +6231,17 @@ write "I don't see how you can swim when you are not in water." return
 noturn
 }
 
-grammar southeast      ->southeast
-grammar go southeast   ->southeast
-grammar walk southeast ->southeast
+grammar southeast -          >southeast
+grammar go southeast -       >southeast
+grammar walk southeast -     >southeast
 
-synonym se          southeast
+synonym se     southeast
 
 {global_southeast
 move player southeast
 }
 
-grammar swim southwest ->swim_southwest
+grammar swim southwest -     >swim_southwest
 
 {global_swim_southwest
 if here has UNDER_WATER
@@ -6256,17 +6256,17 @@ write "I don't see how you can swim when you are not in water." return
 noturn
 }
 
-grammar southwest      ->southwest
-grammar go southwest   ->southwest
-grammar walk southwest ->southwest
+grammar southwest -          >southwest
+grammar go southwest -       >southwest
+grammar walk southwest -     >southwest
 
-synonym sw          southwest
+synonym sw     southwest
 
 {global_southwest
 move player southwest
 }
 
-grammar swim north ->swim_north
+grammar swim north -     >swim_north
 
 {global_swim_north
 if here has UNDER_WATER
@@ -6281,17 +6281,17 @@ write "I don't see how you can swim when you are not in water." return
 noturn
 }
 
-grammar north      ->north
-grammar go north   ->north
-grammar walk north ->north
+grammar north -          >north
+grammar go north -       >north
+grammar walk north -     >north
 
-synonym n       north
+synonym n     north
 
 {global_north
 move player north
 }
 
-grammar swim northeast ->swim_northeast
+grammar swim northeast -     >swim_northeast
 
 {global_swim_northeast
 if here has UNDER_WATER
@@ -6306,17 +6306,17 @@ write "I don't see how you can swim when you are not in water." return
 noturn
 }
 
-grammar northeast      ->northeast
-grammar go northeast   ->northeast
-grammar walk northeast ->northeast
+grammar northeast -          >northeast
+grammar go northeast -       >northeast
+grammar walk northeast -     >northeast
 
-synonym ne          northeast
+synonym ne     northeast
 
 {global_northeast
 move player northeast
 }
 
-grammar swim northwest ->swim_northwest
+grammar swim northwest -     >swim_northwest
 
 {global_swim_northwest
 if here has UNDER_WATER
@@ -6331,40 +6331,40 @@ write "I don't see how you can swim when you are not in water." return
 noturn
 }
 
-grammar northwest      ->northwest
-grammar go northwest   ->northwest
-grammar walk northwest ->northwest
+grammar northwest -          >northwest
+grammar go northwest -       >northwest
+grammar walk northwest -     >northwest
 
-synonym nw          northwest
+synonym nw     northwest
 
 {global_northwest
 move player northwest
 }
 
-grammar climb up *here ->climb_up
-grammar walk up *here  ->climb_up
-grammar go up *here    ->climb_up
+grammar climb up *here -     >climb_up
+grammar walk up *here -      >climb_up
+grammar go up *here -        >climb_up
 
 {global_climb_up
 write "You can not climb up " noun1 . return
 }
 
-grammar climb down *here ->climb_down
-grammar walk down *here  ->climb_down
-grammar go down *here    ->climb_down
+grammar climb down *here -     >climb_down
+grammar walk down *here -      >climb_down
+grammar go down *here -        >climb_down
 
 {global_climb_down
 write "You can not climb down " noun1 . return
 }
 
-grammar climb *here ->climb
-grammar scale *here ->climb
+grammar climb *here -     >climb
+grammar scale *here -     >climb
 
 {global_climb
 write "You can not climb up " noun1 . return
 }
 
-grammar swim in ->swim_in
+grammar swim in -     >swim_in
 
 {global_swim_in
 if here has UNDER_WATER
@@ -6379,18 +6379,18 @@ write "I don't see how you can swim when you are not in water." return
 noturn
 }
 
-grammar get in   ->in
-grammar climb in ->in
-grammar in       ->in
-grammar enter    ->in
-grammar walk in  ->in
-grammar get in   ->in
+grammar get in -       >in
+grammar climb in -     >in
+grammar in -           >in
+grammar enter -        >in
+grammar walk in -      >in
+grammar get in -       >in
 
 {global_in
 move player in
 }
 
-grammar swim out ->swim_out
+grammar swim out -     >swim_out
 
 {global_swim_out
 if here has UNDER_WATER
@@ -6405,19 +6405,19 @@ write "I don't see how you can swim when you are not in water." return
 noturn
 }
 
-grammar get out   ->out
-grammar out       ->out
-grammar leave     ->out
-grammar climb out ->out
-grammar walk out  ->out
-grammar go out    ->out
+grammar get out -       >out
+grammar out -           >out
+grammar leave -         >out
+grammar climb out -     >out
+grammar walk out -      >out
+grammar go out -        >out
 
 {global_out
 move player out
 }
 
-grammar surface ->swim_up
-grammar swim up ->swim_up
+grammar surface -     >swim_up
+grammar swim up -     >swim_up
 
 {global_swim_up
 if here has UNDER_WATER
@@ -6432,21 +6432,21 @@ write "I don't see how you can swim when you are not in water." return
 noturn
 }
 
-grammar up       ->up
-grammar climb    ->up
-grammar climb up ->up
-grammar go up    ->up
-grammar walk up  ->up
+grammar up -           >up
+grammar climb -        >up
+grammar climb up -     >up
+grammar go up -        >up
+grammar walk up -      >up
 
-synonym u          up
+synonym u     up
 
 {global_up
 move player up
 }
 
-grammar swim down ->swim_down
-grammar dive down ->swim_down
-grammar dive      ->swim_down
+grammar swim down -     >swim_down
+grammar dive down -     >swim_down
+grammar dive -          >swim_down
 
 {global_swim_down
 if here has UNDER_WATER
@@ -6461,19 +6461,19 @@ write "I don't see how you can swim when you are not in water." return
 noturn
 }
 
-grammar down       ->down
-grammar climb down ->down
-grammar go down    ->down
-grammar walk down  ->down
+grammar down -           >down
+grammar climb down -     >down
+grammar go down -        >down
+grammar walk down -      >down
 
-synonym d            down
+synonym d     down
 
 {global_down
 move player down
 }
 
-grammar look  ->look_around
-grammar watch ->look_around
+grammar look -      >look_around
+grammar watch -     >look_around
 
 synonym l      look
 synonym ls     look
@@ -6482,9 +6482,9 @@ synonym ls     look
 look
 }
 
-grammar look under *present ->look_under
+grammar look under *present -     >look_under
 
-synonym beneath under
+synonym beneath     under
 
 {global_look_under
 if noun1(mass) = scenery
@@ -6495,7 +6495,7 @@ endif
 write "There is nothing unusual under " noun1 . return
 }
 
-grammar look behind *present ->look_behind
+grammar look behind *present -     >look_behind
 
 {global_look_behind
 if noun1(mass) = scenery
@@ -6506,14 +6506,14 @@ endif
 write "There is nothing unusual behind " noun1 . return
 }
 
-grammar look through *present ->look_through
+grammar look through *present -     >look_through
 
 {global_look_through
 write "You can't look through " noun1 . return
 noturn
 }
 
-grammar look at *present through *held ->look_at_through
+grammar look at *present through *held -     >look_at_through
 
 {global_look_at_through
 if noun1 = noun2
@@ -6525,29 +6525,29 @@ write "You can't look at " noun1 " through " noun2 . return
 noturn
 }
 
-grammar wait ->wait
+grammar wait -     >wait
 
-synonym z      wait
+synonym z     wait
 
 {global_wait
 write "Time passes..." return
 }
 
-grammar listen ->listen
+grammar listen -     >listen
 
 {global_listen
 write "You don't hear anything out of the ordinary." return
 }
 
-grammar listen to *present ->listen_to
+grammar listen to *present -     >listen_to
 
 {global_listen_to
 write "You don't hear anything out of the ordinary." return
 }
 
-grammar rotate *present  ->turn
-grammar turn *present    ->turn
-grammar twist *present   ->turn
+grammar rotate *present -     >turn
+grammar turn *present -       >turn
+grammar twist *present -      >turn
 
 {global_turn
 if noun1 has OUT_OF_REACH
@@ -6558,10 +6558,10 @@ write "You can't turn " noun1 . return
 noturn
 }
 
-grammar turn on *present   ->turn_on
-grammar turn *present on   ->turn_on
-grammar switch on *present ->turn_on
-grammar switch *present on ->turn_on
+grammar turn on *present -       >turn_on
+grammar turn *present on -       >turn_on
+grammar switch on *present -     >turn_on
+grammar switch *present on -     >turn_on
 
 {global_turn_on
 if noun1 hasnt SWITCHABLE
@@ -6583,10 +6583,10 @@ write "You switch on " noun1 . return
 ensure noun1 has ON
 }
 
-grammar turn off *present   ->turn_off
-grammar turn *present off   ->turn_off
-grammar switch off *present ->turn_on
-grammar switch *present off ->turn_on
+grammar turn off *present -       >turn_off
+grammar turn *present off -       >turn_off
+grammar switch off *present -     >turn_on
+grammar switch *present off -     >turn_on
 
 {global_turn_off
 if noun1 hasnt SWITCHABLE
@@ -6608,7 +6608,7 @@ write "You switch off " noun1 . return
 ensure noun1 hasnt ON
 }
 
-grammar pour *anywhere ->pour
+grammar pour *anywhere -     >pour
 
 {global_pour
 if noun1 hasnt LIQUID
@@ -6632,9 +6632,9 @@ write "You pour " noun1 " all over the ground." return
 move noun1 to here 
 }
 
-grammar pour *anywhere on *present   ->pour_on
-grammar pour *anywhere in *present   ->pour_on
-grammar pour *anywhere over *present ->pour_on
+grammar pour *anywhere on *present -       >pour_on
+grammar pour *anywhere in *present -       >pour_on
+grammar pour *anywhere over *present -     >pour_on
 
 {global_pour_on
 if noun1 hasnt LIQUID
@@ -6683,15 +6683,15 @@ move noun1 to limbo
 ; Grammar statements beginning with an object must be defined last in the game
 ; to avoid confusion with verbs that may also be objects such as "drink drink"
 
-grammar *present give myself *anywhere    ->ask_for
-grammar *present give *anywhere to myself ->ask_for
+grammar *present give myself *anywhere -        >ask_for
+grammar *present give *anywhere to myself -     >ask_for
 
-grammar *present tell myself about *anywhere     ->ask_about
-grammar *present tell myself all about *anywhere ->ask_about
+grammar *present tell myself about *anywhere -         >ask_about
+grammar *present tell myself all about *anywhere -     >ask_about
 
-grammar *present thanks   ->thank
-grammar *present thankyou ->thank
+grammar *present thanks -       >thank
+grammar *present thankyou -     >thank
 
-grammar *present hello    ->greet
-grammar *present hi there ->greet
-grammar *present hi       ->greet
+grammar *present hello -        >greet
+grammar *present hi there -     >greet
+grammar *present hi -           >greet

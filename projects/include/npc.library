@@ -1,22 +1,22 @@
 # NPC.library
 
-string npc_directions "north" "south" "east" "west"
-string npc_directions "northeast" "northwest" "southeast" "southwest"
-string npc_directions "up" "down" "in" "out"
+string npc_directions     "north" "south" "east" "west"
+string npc_directions     "northeast" "northwest" "southeast" "southwest"
+string npc_directions     "up" "down" "in" "out"
 
-string npc_opposite "the south" "the north" "the west" "the east"
-string npc_opposite "the southwest" "the southeast" "the northwest" "the northeast"
-string npc_opposite "below" "above"
+string npc_opposite     "the south" "the north" "the west" "the east"
+string npc_opposite     "the southwest" "the southeast" "the northwest" "the northeast"
+string npc_opposite     "below" "above"
 
-string npc_leaves " heads off to the "
-string npc_leaves " walks "
-string npc_leaves " heads "
-string npc_leaves " leaves to the "
+string npc_leaves     " heads off to the "
+string npc_leaves     " walks "
+string npc_leaves     " heads "
+string npc_leaves     " leaves to the "
 
-string npc_arrives " enters from "
-string npc_arrives " arrives from "
-string npc_arrives " arrives here from "
-string npc_arrives " approaches from "
+string npc_arrives     " enters from "
+string npc_arrives     " arrives from "
+string npc_arrives     " arrives here from "
+string npc_arrives     " approaches from "
 
 integer npc_index
 

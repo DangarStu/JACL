@@ -1,14 +1,14 @@
 #!../bin/jacl
 
-constant game_title		"Elevator and stairs"
-constant game_author	"Stuart Allen"
-constant game_version	2
-constant ifid            "JACL-118"
-constant game_publish false
+constant game_title       "Elevator and stairs"
+constant game_author      "Stuart Allen"
+constant game_version     2
+constant ifid             "JACL-118"
+constant game_publish     false
 
-attribute	OUTSIDE_LIFT
+attribute OUTSIDE_LIFT
 
-integer FLOOR_MAPPING ground_floor first_floor second_floor
+integer FLOOR_MAPPING     ground_floor first_floor second_floor
 
 {+intro
 write ^^ game_title " by " game_author ^^
@@ -75,13 +75,13 @@ proxy "up"
 proxy "down"
 }
 
-grammar take *here up >take_up
+grammar take *here up     >take_up
 
 {+take_up
 write "You can't take " noun1{the} " up.^"
 }
 
-grammar take *here down >take_down
+grammar take *here down     >take_down
 
 {+take_down
 write "You can't take " noun1{the} " down.^"
@@ -222,7 +222,7 @@ write ^
 execute examine_display
 }
 
-string led_display	G 1 2
+string led_display     G 1 2
 
 object display : led display
  short         an "LED display"
@@ -233,11 +233,11 @@ write led_display[lift_obj(floor)] "'.^"
 }
 
 # Elements of lift object:
-constant floor						5
-constant moving_to					6
+constant floor         5
+constant moving_to     6
 	constant arrived				42; POSSIBLE VALUE OF moving_to
-constant turns_till_doors_close 	7
-constant delta						8
+constant turns_till_doors_close     7
+constant delta                      8
 
 object lift_obj: lift door doors
  short         name "east lift"

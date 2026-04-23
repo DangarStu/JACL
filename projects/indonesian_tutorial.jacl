@@ -4,11 +4,11 @@
 # Indonesian translation of the JACL tutorial game.
 # -----------------------------------------------------------------------------
 
-constant game_title		"Permainan Tutorial"
-constant game_author		"Stuart Allen"
-constant game_version		1
-constant ifid            "JACL-125"
-constant game_publish true
+constant game_title       "Permainan Tutorial"
+constant game_author      "Stuart Allen"
+constant game_version     1
+constant ifid             "JACL-125"
+constant game_publish     true
 
 location kamar_tidur : kamar tidur
  short         name "Kamar Tidur"
@@ -206,7 +206,7 @@ write "Secantik biasanya.^"
 execute "+inventory"
 }
 
-grammar tentang >about
+grammar tentang     >about
 
 {+about
 write "Ini adalah permainan dari bagian tutorial Panduan Penulis JACL. "

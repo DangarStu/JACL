@@ -6,9 +6,9 @@
 # -----------------------------------------------------------------------------
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE
-constant game_publish false
-constant ifid            "JACL-105"
-constant IMAGE_blackjack 1
+constant game_publish        false
+constant ifid                "JACL-105"
+constant IMAGE_blackjack     1
 
 integer INDEX
 integer COUNTER
@@ -17,10 +17,10 @@ integer NODE2
 integer cardA
 integer cardB
 integer cardC
-integer CHECK_STRATEGY 0
+integer CHECK_STRATEGY     0
 
 string status_text
-integer status_window 3
+integer status_window     3
 integer OFFSET
 
 {+update_status_window
@@ -64,8 +64,8 @@ until COUNTER = 0
 }
 
 # Optional rules
-integer SOFT_SEVENTEEN		false	; DEALER HITS ON A SOFT SEVENTEEN
-integer DAS				true	; ALLOWED TO DOUBLE AFTER SPIT
+integer SOFT_SEVENTEEN     false ; DEALER HITS ON A SOFT SEVENTEEN
+integer DAS                true ; ALLOWED TO DOUBLE AFTER SPIT
 
 location casino : casino
 
@@ -109,7 +109,7 @@ integer GAME_PHASE
 	constant players_turn	2
 	constant dealers_turn	3
 
-grammar coach on >coach_on
+grammar coach on     >coach_on
 
 {+coach_on
 set CHECK_STRATEGY = 1
@@ -119,7 +119,7 @@ if GAME_PHASE != place_bet
 endif
 }
 
-grammar coach off >coach_off
+grammar coach off     >coach_off
 
 {+coach_off
 set CHECK_STRATEGY = 0
@@ -129,15 +129,15 @@ if GAME_PHASE != place_bet
 endif
 }
 
-grammar blankjacl	>view_table
-grammar look		>view_table	
+grammar blankjacl     >view_table
+grammar look          >view_table
 
 {+view_table
 execute "+display_table"
 }
 
-grammar help			>help
-grammar instructions	>help
+grammar help             >help
+grammar instructions     >help
 
 {+help
 write "The aim of Blackjack is to have a hand with a total value closer"
@@ -166,7 +166,7 @@ write "given the opportunity to 'double'. In this case your initial bet will "
 write "be doubled and you will receive one more card only.^^"
 }
 
-grammar about >about
+grammar about     >about
 
 {+about
 write "BlackJACL^"
@@ -185,7 +185,7 @@ write "Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, "
 write "USA.^"
 }
 
-grammar insurance	>insurance
+grammar insurance     >insurance
 
 {+insurance
 if GAME_PHASE = place_bet
@@ -199,7 +199,7 @@ set current_player(money) - INDEX
 execute "+display_table"
 }
 
-grammar double	>double
+grammar double     >double
 
 {+double
 if GAME_PHASE = place_bet
@@ -223,7 +223,7 @@ else
 endif
 }
 
-grammar hit	>hit
+grammar hit     >hit
 
 {+hit
 if GAME_PHASE = place_bet
@@ -256,7 +256,7 @@ endif
 execute "+display_table"
 }
 
-grammar stay	>stay
+grammar stay     >stay
 
 {+stay
 if GAME_PHASE = place_bet
@@ -277,7 +277,7 @@ else
 endif
 }
 
-grammar split	>split
+grammar split     >split
 
 {+split
 if GAME_PHASE = place_bet
@@ -325,10 +325,10 @@ set hand_two(total) + SECOND(value)
 execute "+display_table"
 }
 
-integer FIRST_CARD			;The first card of this hand
-integer PAST_LAST			;The last card of this hand
-integer NEAR_END			;The card twenty five cards from the end
-integer PASSED_NEAR_END	;The twenty fifth card from the end been reached
+integer FIRST_CARD          ;The first card of this hand
+integer PAST_LAST           ;The last card of this hand
+integer NEAR_END            ;The card twenty five cards from the end
+integer PASSED_NEAR_END     ;The twenty fifth card from the end been reached
 
 {+shuffle_decks
 ; Shuffle INDEX number of times
@@ -772,7 +772,7 @@ if current_player(hands) = 2
 endif
 }
 
-grammar omega2	>omega2
+grammar omega2     >omega2
 
 {+omega2
 write "The current Omega-II count is "
@@ -781,7 +781,7 @@ write ".^"
 execute "+display_table"
 }
 
-grammar highlow	>highlow
+grammar highlow     >highlow
 
 {+highlow
 write "The current HIGH-LOW count is "
@@ -790,7 +790,7 @@ write ".^"
 execute "+display_table"
 }
 
-grammar ko	>ko
+grammar ko     >ko
 
 {+ko
 write "The current KO count is "
@@ -807,7 +807,7 @@ else
 endif
 }
 
-grammar bet $integer	>bet
+grammar bet $integer     >bet
 
 {+bet
 if GAME_PHASE = players_turn

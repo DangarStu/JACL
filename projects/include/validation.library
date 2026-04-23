@@ -1,6 +1,6 @@
 # VALIDATION library
 
-string_array VALID_string 10
+string_array VALID_string     10
 integer VALID_count
 
 {+validate_date

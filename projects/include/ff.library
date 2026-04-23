@@ -5,59 +5,59 @@
 # -------------------------------------------------------------------------
 
 # Library info
-constant LibVersion 2
+constant LibVersion     2
 
-constant skill 1			;The current skill of a creature.
-constant stamina 3			;The current stamina of a creature.
-constant istamina 4 		;The initial stamina of a creature.
-constant luck 5 			;The current luck of a creature.
-constant iluck 6 			;The initial luck of a creature.
-constant attackstrength 7	;The attack strength of a creature in combat.
-constant damage 8			;The effectiveness in combat.
-constant dice1 9			;Four dice, mainly used by the random number generator.
-constant dice2 10
-constant dice3 11
-constant dice4 12
-constant iskill 13			;The initial skill of a creature.
+constant skill              1 ;The current skill of a creature.
+constant stamina            3 ;The current stamina of a creature.
+constant istamina           4 ;The initial stamina of a creature.
+constant luck               5 ;The current luck of a creature.
+constant iluck              6 ;The initial luck of a creature.
+constant attackstrength     7 ;The attack strength of a creature in combat.
+constant damage             8 ;The effectiveness in combat.
+constant dice1              9 ;Four dice, mainly used by the random number generator.
+constant dice2              10
+constant dice3              11
+constant dice4              12
+constant iskill             13 ;The initial skill of a creature.
 
 #Combat bonuses
-constant DoubleBonus 1 ;The player has two equal dice
-constant FirstHitBonus 2 ;The player manages to hit his/her opponent for the first time
+constant DoubleBonus       1 ;The player has two equal dice
+constant FirstHitBonus     2 ;The player manages to hit his/her opponent for the first time
 
 attribute CantChoose ;A location tagged with this attribute will have no numbered menu to choose a direction from.
 
-integer InCombat false ;When combat begins, this variable should be changed to true.
-integer VictoryPage 0 ;After a successful test, the player will be moved to this location.
-integer FailedPage 0 ;After a failed test, the player will be moved to this location.
-integer turncount 0 ;A variable to keep track of the turns in combat.
-integer turnslimit 0 ;A variable to limit the player's turns in combat
+integer InCombat        false ;When combat begins, this variable should be changed to true.
+integer VictoryPage     0 ;After a successful test, the player will be moved to this location.
+integer FailedPage      0 ;After a failed test, the player will be moved to this location.
+integer turncount       0 ;A variable to keep track of the turns in combat.
+integer turnslimit      0 ;A variable to limit the player's turns in combat
 
-integer_array CombatBonus 2 0 ;The array of combat bonuses (up to two items)
+integer_array CombatBonus     2 0 ;The array of combat bonuses (up to two items)
 integer MAX_OPTION
-integer_array OPTIONS 10 0
-integer OPTION_COUNT 0
-integer temp 0
-integer MONSTERS 10 0
+integer_array OPTIONS     10 0
+integer OPTION_COUNT              0
+integer temp                      0
+integer MONSTERS                  10 0
 integer MONSTER_COUNT
 integer FIRST_FIGHTING_OPTION
-integer multipleTests false
+integer multipleTests             false
 
 #The text which is printed when the player types 'eq'
-string before_eq "Looking into your backpack you see:"
+string before_eq     "Looking into your backpack you see:"
 
-grammar $integer >number
+grammar $integer     >number
 
-grammar blankjacl >blankjacl
+grammar blankjacl     >blankjacl
 
-grammar eq >display_eq
+grammar eq     >display_eq
 
-grammar stats >PrintStats
+grammar stats     >PrintStats
 
-integer status_window 3
+integer status_window     3
 
 integer INDEX
 
-string status_text "null"
+string status_text     "null"
 
 {+update_status_window
 style reverse
@@ -399,7 +399,7 @@ endif
 }
 
 location combat : Combat
-short name "Combat"
+ short         name "Combat"
 
 integer current_monster
 integer MONSTER_COUNT

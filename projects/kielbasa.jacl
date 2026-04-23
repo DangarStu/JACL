@@ -1,13 +1,13 @@
 #!../bin/jacl
 
-integer     INDEX
-integer     selected_key	-1
+integer INDEX
+integer selected_key     -1
 
-constant 	game_version	1
-constant	game_title		"Kielbasa"
-constant	game_author		"Stuart Allen"
-constant game_publish true
-constant	ifid			"JACL-126"
+constant game_version     1
+constant game_title       "Kielbasa"
+constant game_author      "Stuart Allen"
+constant game_publish     true
+constant ifid             "JACL-126"
 
 parameter   mode			MUSIC_mode
 
@@ -15,29 +15,29 @@ parameter   mode			MUSIC_mode
 # C C# D D# E F F# G  G#  A  A# B  C  C# D  D# E  F  F# G  G# A  A#
 # 3 4  5 6  7 8 9  10 11  12 13 14 15 16 17 18 19 20 21 22 23 24 25
 
-constant    blackKeys  4 6 -1 9 11 13 -1 16 18 -1 21 23 25
-constant    whiteKeys  3 5  7 8 10 12 14 15 17 19 20 22 24 26
+constant blackKeys     4 6 -1 9 11 13 -1 16 18 -1 21 23 25
+constant whiteKeys     3 5 7 8 10 12 14 15 17 19 20 22 24 26
 
-grammar chord mode >chord_mode
+grammar chord mode     >chord_mode
 
 {+chord_mode
 set MUSIC_mode = CHORD
 }
 
-grammar scale mode >scale_mode
+grammar scale mode     >scale_mode
 
 {+scale_mode
 set MUSIC_mode = SCALE
 }
 
-grammar instructions mode >instructions_mode
+grammar instructions mode     >instructions_mode
 
 {+instructions_mode
 set MUSIC_mode = INSTRUCTIONS
 execute "+instructions"
 }
 
-grammar about >about
+grammar about     >about
 
 {+about
 style bold
@@ -54,8 +54,8 @@ endif
 set time = false
 }
 
-grammar help >instructions_mode
-grammar instructions >instructions_mode
+grammar help             >instructions_mode
+grammar instructions     >instructions_mode
 
 {+instructions
 if interpreter != CGI
@@ -204,11 +204,11 @@ write "</h1>"
 
 string MUSIC_note_name
 
-grammar look >show_song
-grammar show >show_song
-grammar show song >show_song
-grammar display >show_song
-grammar display song >show_song
+grammar look             >show_song
+grammar show             >show_song
+grammar show song        >show_song
+grammar display          >show_song
+grammar display song     >show_song
 
 string temp
 
@@ -276,13 +276,13 @@ integer left
 integer right
 integer pressed
 
-grammar delete $integer		>delete_int
+grammar delete $integer     >delete_int
 
 {+delete_int
 execute "+delete_note<$integer[0]"
 }
 
-grammar delete **anywhere >delete
+grammar delete **anywhere     >delete
 
 {+delete
 if noun1(class) = CHORD
@@ -295,7 +295,7 @@ if noun1(class) = NOTE
 endif
 }
 
-grammar blankjacl >blankjacl
+grammar blankjacl     >blankjacl
 
 {+blankjacl
 if MUSIC_verbx != -42
@@ -346,9 +346,9 @@ if MUSIC_verbx != -42
 endif
 }
 
-grammar key *anywhere			>set_key
-grammar set key to *anywhere	>set_key
-grammar set key *anywhere		>set_key
+grammar key *anywhere            >set_key
+grammar set key to *anywhere     >set_key
+grammar set key *anywhere        >set_key
 
 {+set_key
 if noun1(class) = CHORD
@@ -364,7 +364,7 @@ endif
 write noun1{The} " is not a note. The key can only be set to a root note.^"
 }
 
-grammar show chord **anywhere	>show_chord
+grammar show chord **anywhere     >show_chord
 
 {+show_chord
 if noun1(class) = NOTE
@@ -382,7 +382,7 @@ endif
 write noun1{The} " is not a note or chord.^"
 }
 
-grammar display scale **anywhere >display_scale_web
+grammar display scale **anywhere     >display_scale_web
 
 {+display_scale_web
 if noun1(class) = NOTE
@@ -397,8 +397,8 @@ if noun1(class) = CHORD
 endif
 }
 
-grammar show scale **anywhere >show_scale
-grammar show key **anywhere >show_scale
+grammar show scale **anywhere     >show_scale
+grammar show key **anywhere       >show_scale
 
 {+show_scale
 if noun1(class) = NOTE
@@ -412,9 +412,9 @@ endif
 write noun1{The} " is not a note or scale.^"
 }
 
-grammar show chords **anywhere >show_chords
-grammar show chords in **anywhere >show_chords
-grammar show all chords **anywhere >show_chords
+grammar show chords **anywhere         >show_chords
+grammar show chords in **anywhere      >show_chords
+grammar show all chords **anywhere     >show_chords
 
 {+show_chords
 if noun1(class) = NOTE
@@ -428,7 +428,7 @@ endif
 write noun1{The} " is not a note or scale.^"
 }
 
-grammar clear chord >clear_chord
+grammar clear chord     >clear_chord
 
 {+clear_chord
 set MUSIC_chord_index = 0
@@ -437,7 +437,7 @@ set MUSIC_chord_roots_index = 0
 set MUSIC_chord_bass_index = 0
 }
 
-grammar add to song >add_to_song
+grammar add to song     >add_to_song
 
 {+add_to_song
 set INDEX = 0
@@ -449,8 +449,8 @@ endwhile
 execute "+determine_key"
 }
 
-grammar add **anywhere >add_action
-grammar add chord **anywhere >add_action
+grammar add **anywhere           >add_action
+grammar add chord **anywhere     >add_action
 
 {+add_action
 if noun1(class) = NOTE
@@ -471,10 +471,10 @@ write noun1{The} " is not a chord or note.^"
 return false
 }
 
-grammar key >what_key
-grammar what key >what_key
-grammar determine key >what_key
-grammar determine scale >what_key
+grammar key                 >what_key
+grammar what key            >what_key
+grammar determine key       >what_key
+grammar determine scale     >what_key
 
 {+what_key
 # IF THERE IS ONLY ONE KEY IN THE POSSIBLE KEYS SET, SET THE KEY OF THE SONG TO THAT KEY
@@ -562,7 +562,7 @@ write "...seriously?^"
 set time = false
 }
 
-integer status_window 3
+integer status_window     3
 integer OFFSET
 
 string status_text
@@ -594,12 +594,12 @@ endif
 }
 
 # CONSTANTS FOR THE WEB INTERFACE LIBRARY
-constant title_image "/images/kielbasa.png"
-constant footer_image "none"
-constant header_colour "#000000"
-constant header_height 87
-constant linkbar_colour "#c0b098"
-constant maintext_colour "#dddddd"
+constant title_image         "/images/kielbasa.png"
+constant footer_image        "none"
+constant header_colour       "#000000"
+constant header_height       87
+constant linkbar_colour      "#c0b098"
+constant maintext_colour     "#dddddd"
 
 #debug "debug.library"
 #include "musicinterface.library"

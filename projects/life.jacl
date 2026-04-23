@@ -1,16 +1,16 @@
 #!../bin/jacl
 
-constant game_publish false
-constant ifid            "JACL-128"
-integer status_window 21
+constant game_publish     false
+constant ifid             "JACL-128"
+integer status_window     21
 
-constant MAX_X 24
-constant MAX_Y 12
-constant TOTAL 288
+constant MAX_X     24
+constant MAX_Y     12
+constant TOTAL     288
 integer INDEX
 
-integer_array grid TOTAL
-integer_array buffer TOTAL
+integer_array grid       TOTAL
+integer_array buffer     TOTAL
 
 integer left_edge
 
@@ -34,7 +34,7 @@ write "from AVR version by Luc Small.^^"
 #execute "+init_array<buffer"
 }
 
-grammar god >god
+grammar god     >god
 
 {+god
 write "Creating random life.^"
@@ -202,7 +202,7 @@ repeat
 until tick_x = MAX_X
 }
 
-grammar stats >tick_stats
+grammar stats     >tick_stats
 
 {+tick_stats
 set tick_y = 0
@@ -284,28 +284,28 @@ repeat
 until temp_x = MAX_X
 }
 
-grammar stop >stop
+grammar stop     >stop
 
 {+stop
 write "Timer stopped.^"
 timer 0
 }
 
-grammar start $integer >start_custom
+grammar start $integer     >start_custom
 
 {+start_custom
 write "Timer started with " $integer " ms period.^"
 timer $integer
 }
 
-grammar start >start
+grammar start     >start
 
 {+start
 write "Timer started.^"
 timer 500
 }
 
-grammar clear >clear
+grammar clear     >clear
 
 {+clear
 write "All life in the universe killed.^"
@@ -313,10 +313,10 @@ execute "+clear_grid"
 updatestatus
 }
 
-grammar step	>tick
-grammar wait	>tick
-grammar tick	>tick
-grammar z 		>tick
+grammar step     >tick
+grammar wait     >tick
+grammar tick     >tick
+grammar z        >tick
 
 {+tick
 write "Like sand through the hour glass, so are the pixels "
@@ -324,8 +324,8 @@ write "on the screen...^"
 execute "+life_tick"
 }
 
-grammar neighbours $integer $integer >neighbours
-grammar n $integer $integer >neighbours
+grammar neighbours $integer $integer     >neighbours
+grammar n $integer $integer              >neighbours
 
 {+neighbours
 set temp_x = $integer[0]
@@ -335,8 +335,8 @@ set count = "+alive_neighbours<temp_x<temp_y"
 write count " neighbours.^"
 }
 
-grammar t $integer $integer			>toggle
-grammar toggle $integer $integer	>toggle
+grammar t $integer $integer          >toggle
+grammar toggle $integer $integer     >toggle
 
 {+toggle
 set pointer = MAX_X * $integer[1] + $integer[0]
@@ -358,7 +358,7 @@ until count = TOTAL
 updatestatus
 }
 
-grammar save $string >named_save
+grammar save $string     >named_save
 
 {+named_save
 savegame INDEX $string
@@ -368,7 +368,7 @@ endif
 set time = false
 }
 
-grammar restore $string >named_restore
+grammar restore $string     >named_restore
 
 {+named_restore
 restoregame INDEX $string
@@ -399,7 +399,7 @@ until TEMP = false
 return false
 }
 
-grammar save >save_game
+grammar save     >save_game
 
 {+save_game
 savegame INDEX
@@ -409,7 +409,7 @@ endif
 set time = false
 }
 
-grammar restore >restore_game
+grammar restore     >restore_game
 
 {+restore_game
 restoregame INDEX
@@ -421,7 +421,7 @@ endif
 set time = false
 }
 
-grammar help >help
+grammar help     >help
 
 {+help
 write "Available commands:^"

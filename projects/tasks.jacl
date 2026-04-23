@@ -1,13 +1,13 @@
 #!../bin/cgijacl
 # -----------------------------------------------------------------------------
 
-constant status_window 0
-constant game_title		"JACL Task Manager"
-constant game_author	"Stuart Allen"
-constant game_release    1
-constant game_build      1
-constant game_publish false
-constant ifid			"JACL-139"
+constant status_window     0
+constant game_title        "JACL Task Manager"
+constant game_author       "Stuart Allen"
+constant game_release      1
+constant game_build        1
+constant game_publish      false
+constant ifid              "JACL-139"
 
 # -----------------------------------------------------------------------------
 
@@ -18,15 +18,15 @@ integer now
 integer gmt
 integer errors
 
-integer last_task			0
-integer last_project		0
+integer last_task        0
+integer last_project     0
 
-constant VIEW           	1
-constant CREATE         	2
-constant SEARCH         	3
-constant EDIT           	4
+constant VIEW       1
+constant CREATE     2
+constant SEARCH     3
+constant EDIT       4
 
-constant tab_names "Tasks" "List" "Add Task" "Search" "Edit"
+constant tab_names     "Tasks" "List" "Add Task" "Search" "Edit"
 
 string id_data
 string description_data
@@ -73,12 +73,12 @@ execute "+before"
 execute "+after"
 }
 
-grammar blankjacl >blankjacl
+grammar blankjacl     >blankjacl
 
 {+blankjacl
 }
 
-grammar delete $integer >delete
+grammar delete $integer     >delete
 
 {+delete
 update $user_id
@@ -89,7 +89,7 @@ endupdate
 write "Task " $integer " deleted.^^"
 }
 
-grammar edit $integer >edit
+grammar edit $integer     >edit
 
 {+edit
 set editing = true
@@ -120,7 +120,7 @@ hidden
 write "</form>
 }
 
-grammar update $integer >update
+grammar update $integer     >update
 
 {+update
 update $user_id
@@ -226,7 +226,7 @@ hidden
 write "</form>
 }
 
-grammar add >add_task
+grammar add     >add_task
 
 {+add_task
 set last_task + 1
@@ -240,7 +240,7 @@ integer matches
 
 string action
 
-grammar quickadd >quickadd
+grammar quickadd     >quickadd
 
 {+quickadd
 set WEBAPP_mode = VIEW
@@ -253,7 +253,7 @@ setstring duedate_data		"NULL"
 execute "+add_task"
 }
 
-grammar search >search
+grammar search     >search
 
 {+search
 set WEBAPP_mode = SEARCH
@@ -337,19 +337,19 @@ enditerate
 write "</table>"
 }
 
-constant status_values "Open" "Completed" "Cancelled"
+constant status_values     "Open" "Completed" "Cancelled"
 
 location boardroom
 
 object you
 
-constant title_image        "none"
-constant footer_image       "none"
-constant header_colour      "#000000"
-constant header_height      87
-constant linkbar_colour     "#c0b098"
-constant maintext_colour    "#dddddd"
-constant tab_colour         "#60594e"
+constant title_image         "none"
+constant footer_image        "none"
+constant header_colour       "#000000"
+constant header_height       87
+constant linkbar_colour      "#c0b098"
+constant maintext_colour     "#dddddd"
+constant tab_colour          "#60594e"
 
 #include "forms.library"
 #include "time.library"

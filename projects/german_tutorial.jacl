@@ -4,8 +4,8 @@
 # Copyright (C) Stuart Allen 1999-2000. All rights resevered.
 # -----------------------------------------------------------------------------
 
-constant game_publish true
-constant ifid            "JACL-121"
+constant game_publish     true
+constant ifid             "JACL-121"
 location schlafzimmer : schlafzimmer
  definite      das "Schlafzimmer"
  west          badezimmer
@@ -198,7 +198,7 @@ write "Sch&ouml;n wie immer.^"
 execute "+inventory"
 }
 
-grammar about >about
+grammar about     >about
 
 {+about
 write "Dies ist das Spiel aus der ~Tutorial Section~ des JACL Author's Guide. "

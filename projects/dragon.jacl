@@ -6,15 +6,15 @@
 #
 # -----------------------------------------------------------------------------
 
-constant game_title     "The Down Dragon"           
-constant game_author    "Stuart Allen"
-constant game_release    1
-constant game_build      1
-constant game_publish true
-constant ifid           "JACL-003"
+constant game_title       "The Down Dragon"
+constant game_author      "Stuart Allen"
+constant game_release     1
+constant game_build       1
+constant game_publish     true
+constant ifid             "JACL-003"
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE
-constant image_dragon 1
+constant image_dragon     1
 
 # -----------------------------------------------------------------------------
 
@@ -187,9 +187,9 @@ object grapes: bunch of grapes
  mass          5
  parent        bowl
 
-grammar juice *present        >break
-grammar squash *present        >break
-grammar squeeze *present    >break
+grammar juice *present       >break
+grammar squash *present      >break
+grammar squeeze *present     >break
 grammar mash *present        >break
 
 {peel
@@ -297,8 +297,8 @@ write "You don't have a single yorkquid to your name.^"
 set time = false
 }
 
-grammar chat up *present    >talk_to
-grammar flirt with *present    >talk_to
+grammar chat up *present        >talk_to
+grammar flirt with *present     >talk_to
 
 object barmaid: busty barmaid maid
  short         a "barmaid"
@@ -1904,7 +1904,7 @@ write "DragonComp?^"
 set time = false
 }
 
-grammar wink at *present >wink_at
+grammar wink at *present     >wink_at
 
 {wink_at
 if noun1 hasnt ANIMATE
@@ -1913,7 +1913,7 @@ if noun1 hasnt ANIMATE
 endif
 }
 
-grammar wink >wink
+grammar wink     >wink
 
 {+wink
 set INDEX = @
@@ -1931,7 +1931,7 @@ print:
 .
 }
 
-grammar blink >blink
+grammar blink     >blink
 
 {+blink
 print:
@@ -1940,7 +1940,7 @@ print:
 .
 }
 
-grammar preen >preen
+grammar preen     >preen
 
 {+preen
 if here = club
@@ -1960,7 +1960,7 @@ print:
 .
 }
 
-grammar stare >stare
+grammar stare     >stare
 
 {+stare
 if here = club
@@ -1982,7 +1982,7 @@ print:
 .
 }
 
-grammar stare at *present >examine
+grammar stare at *present     >examine
 
 {+intro
 clear
@@ -2107,11 +2107,11 @@ endif
 }
 
 # CONSTANTS FOR THE WEB INTERFACE LIBRARY
-constant title_image "/images/dragon.png"
-constant footer_image "none"
-constant header_colour "#42596d"
-constant linkbar_colour "#3f3527"
-constant maintext_colour "#dddddd"
+constant title_image         "/images/dragon.png"
+constant footer_image        "none"
+constant header_colour       "#42596d"
+constant linkbar_colour      "#3f3527"
+constant maintext_colour     "#dddddd"
 
 #debug "debug.library"
 #include "webinterface.library"

@@ -1,9 +1,9 @@
 #!../bin/jacl
 
-constant 	game_version	1
-constant	game_title		"My Game"
-constant	game_author		"Me"
-constant	ifid			"JACL-000"
+constant game_version     1
+constant game_title       "My Game"
+constant game_author      "Me"
+constant ifid             "JACL-000"
 
 {+intro
 style bold
@@ -32,10 +32,10 @@ return false
 }
 
 object kryten: myself self me
- has		ANIMATE
- short		name "yourself"
- capacity	42
- parent		;PUT THE LABEL OF THE STARTING LOCATION HERE
+ has           ANIMATE
+ short         name "yourself"
+ capacity      42
+ parent        ;PUT THE LABEL OF THE STARTING LOCATION HERE
  player
 
 {examine
@@ -64,30 +64,30 @@ endif
 }
 
 object north_wall: north north wall
- has			NO_TAB
- plural			walls
- short          the "north wall"
+ has           NO_TAB
+ plural        walls
+ short         the "north wall"
 
 object south_wall: south southern wall
- has			NO_TAB
- plural			walls
- short          the "south wall"
+ has           NO_TAB
+ plural        walls
+ short         the "south wall"
 
 object east_wall: east eastern wall
- has			NO_TAB
- plural			walls
- short          the "east wall"
+ has           NO_TAB
+ plural        walls
+ short         the "east wall"
 
 object west_wall: west western wall
- has			NO_TAB
- plural			walls
- short          the "west wall"
+ has           NO_TAB
+ plural        walls
+ short         the "west wall"
 
 object ground: ground floor
- has            SURFACE NO_TAB
- short          the "ground"
+ has           SURFACE NO_TAB
+ short         the "ground"
 
-integer status_window 3
+integer status_window     3
 integer OFFSET
 
 string status_text

@@ -1,24 +1,24 @@
 # HEADERS AND FOOTERS FOR WEB-BASED APPLICATIONS
 
-string current_image "none"
+string current_image     "none"
 
 parameter "mode" WEBAPP_mode
-integer WEBAPP_mode 1
+integer WEBAPP_mode     1
 
 integer WEBAPP_index
 
 parameter "device" WEBAPP_device
-integer WEBAPP_device	1
-constant WEBAPP_desktop	1
-constant WEBAPP_mobile	2
+integer WEBAPP_device     1
+constant WEBAPP_desktop     1
+constant WEBAPP_mobile      2
 
-grammar change mode $integer >change_mode
+grammar change mode $integer     >change_mode
 
 {+change_mode 
 set WEBAPP_mode = $integer
 }
 
-grammar change device $integer >change_device
+grammar change device $integer     >change_device
 
 {+change_device
 set WEBAPP_device = $integer

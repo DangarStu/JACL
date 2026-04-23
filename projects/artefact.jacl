@@ -1,13 +1,13 @@
 #!../bin/jacl
 # -----------------------------------------------------------------------------
 
-constant status_window  0
-constant game_title     "JACL Artefact Database"
-constant game_author    "Stuart Allen"
-constant game_release   1
-constant game_build     0
-constant game_publish false
-constant ifid           "JACL-042"
+constant status_window     0
+constant game_title        "JACL Artefact Database"
+constant game_author       "Stuart Allen"
+constant game_release      1
+constant game_build        0
+constant game_publish      false
+constant ifid              "JACL-042"
 
 # -----------------------------------------------------------------------------
 
@@ -16,17 +16,17 @@ integer INDEX
 integer now
 integer gmt
 
-integer last_artefact       0
-integer current_artefact    0
+integer last_artefact        0
+integer current_artefact     0
 
 string temp_string
 
-string id          
+string id
 string short_desc      ""
 string description     ""
 string location        "Australia"
-integer datelost       0
-integer datefound      0
+integer datelost      0
+integer datefound     0
 string foundstatus     "NOT FOUND"
 
 {+intro
@@ -48,13 +48,13 @@ if matches > 1
 endif
 }
 
-grammar blankjacl >blankjacl
+grammar blankjacl     >blankjacl
 
 {+blankjacl
 write "Please type a command.^"
 }
 
-grammar delete >delete
+grammar delete     >delete
 
 {+delete
 write "This will delete artefact " current_artefact ", ~" short_desc "~. Are you sure?"
@@ -71,7 +71,7 @@ endupdate
 write "Artefact " current_artefact ", ~" short_desc "~ deleted.^"
 }
 
-grammar edit $integer >edit
+grammar edit $integer     >edit
 
 {+edit
 set editing = true
@@ -86,7 +86,7 @@ iterate "default"
 enditerate
 }
 
-grammar update >update
+grammar update     >update
 
 {+update
 update "default"
@@ -99,8 +99,8 @@ endupdate
 write "Artefact " current_artefact ", ~" short_desc "~ updated.^"
 }
 
-grammar clear >new
-grammar new >new
+grammar clear     >new
+grammar new       >new
 
 {+new
 setstring short_desc ""
@@ -114,52 +114,52 @@ setstring foundstatus "NOT FOUND"
 write "Artefact #" current_artefact " cleared.^"
 }
 
-grammar found $string >found
+grammar found $string     >found
 
 {+found
 set datefound = +parse_date<$string
 write "Date found set to " datefound{integer_date} "^"
 }
 
-grammar lost $string >lost
+grammar lost $string     >lost
 
 {+lost
 set datelost = +parse_date<$string
 write "Date lost set to " datefound{integer_date} "^"
 }
 
-grammar status $string >status
+grammar status $string     >status
 
 {+status
 setstring foundstatus $string
 write "New status set.^"
 }
 
-grammar location $string >location
+grammar location $string     >location
 
 {+location
 setstring location $string
 write "New location set.^"
 }
 
-grammar short $string >short
+grammar short $string     >short
 
 {+short
 setstring short_desc $string
 write "Short description set to ~" short_desc "~^"
 }
 
-grammar long $string >description
-grammar description $string >description
+grammar long $string            >description
+grammar description $string     >description
 
 {+description
 setstring description $string
 write "Description set to ~" description "~^"
 }
 
-grammar add >write
-grammar commit >write
-grammar write >write
+grammar add        >write
+grammar commit     >write
+grammar write      >write
 
 {+write
 if current_artefact <= last_artefact
@@ -170,8 +170,8 @@ append default current_artefact short_desc description location datelost datefou
 write "Artefact ~" short_desc "~ added.^"
 }
 
-grammar cat >print
-grammar print >print
+grammar cat       >print
+grammar print     >print
 
 {+print
 write "ID: " current_artefact "^"
@@ -197,7 +197,7 @@ integer matches
 
 string action
 
-grammar quickadd >quickadd
+grammar quickadd     >quickadd
 
 {+quickadd
 setstring description        "DEFAULT"
@@ -209,7 +209,7 @@ setstring duedate        "NULL"
 execute "+add_treasure"
 }
 
-grammar search $string >search
+grammar search $string     >search
 
 {+search
 set matches = 0
@@ -233,8 +233,8 @@ if matches > 1
 endif
 }
 
-grammar list >list
-grammar ls >list
+grammar list     >list
+grammar ls       >list
 
 {+list
 iterate "default"
@@ -242,9 +242,9 @@ iterate "default"
 enditerate
 }
 
-grammar display >display
-grammar export >display
-grammar dump >display
+grammar display     >display
+grammar export      >display
+grammar dump        >display
 
 {+display
 iterate "default"
@@ -263,15 +263,15 @@ location renko
 
 object you
 
-grammar last >last
-grammar total >last
+grammar last      >last
+grammar total     >last
 
 {+last
 write "The total number of artefacts is " last_artefact ".^"
 }
 
-grammar select $integer >select
-grammar set $integer >select
+grammar select $integer     >select
+grammar set $integer        >select
 
 {+select
 if $integer > last_artefact
@@ -295,9 +295,9 @@ iterate default
 enditerate
 }
 
-grammar pwd >current
-grammar current >current
-grammar current artefact >current
+grammar pwd                  >current
+grammar current              >current
+grammar current artefact     >current
 
 {+current
 write "The currently selected artefact is " current_artefact ".^"

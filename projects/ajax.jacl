@@ -1,6 +1,6 @@
 #!/usr/local/jacl/bin/cgijacl
-constant game_publish false
-constant ifid            "JACL-101"
+constant game_publish     false
+constant ifid             "JACL-101"
 {+header
 set linebreaks = false
 print:
@@ -51,13 +51,13 @@ print:
 .
 }
 
-grammar greenchest >greenchest
+grammar greenchest     >greenchest
 
 {+greenchest
 write "You clicked on the green chest.<br>"
 }
 
-grammar redchest >redchest
+grammar redchest     >redchest
 
 {+redchest
 write "You clicked on the red chest.<br>"

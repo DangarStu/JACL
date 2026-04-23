@@ -2,27 +2,27 @@
 
 # -----------------------------------------------------------------------------
 
-constant status_window 0
-constant game_title		"Football Manager"
-constant game_author	"Stuart Allen"
-constant game_release    1
-constant game_build      1
-constant game_publish false
-constant ifid			"JACL-120"
+constant status_window     0
+constant game_title        "Football Manager"
+constant game_author       "Stuart Allen"
+constant game_release      1
+constant game_build        1
+constant game_publish      false
+constant ifid              "JACL-120"
 
 # -----------------------------------------------------------------------------
 
 integer temp
 integer INDEX
-integer last_id			0
+integer last_id     0
 integer editing
 
-constant FORMATION		1
-constant SQUAD			2
-constant TABLE			3
-constant FIXTURES		4
+constant FORMATION     1
+constant SQUAD         2
+constant TABLE         3
+constant FIXTURES      4
 
-string tab_names "Contacts" "Formation" "Squad" "League table" "Fixtures"
+string tab_names     "Contacts" "Formation" "Squad" "League table" "Fixtures"
 
 {+links_div
 write "Football Manager"
@@ -41,8 +41,8 @@ if WEBAPP_mode = SQUAD
 endif
 }
 
-integer left_pos	100
-integer bottom_pos	100
+integer left_pos       100
+integer bottom_pos     100
 
 {+display_formation
 write "<div class=~pitch~>"
@@ -98,11 +98,11 @@ location boardroom
 object you
  player
 
-constant title_image "none"
-constant footer_image "none"
-constant header_colour "#000000"
-constant linkbar_colour "#c0b098"
-constant maintext_colour "#dddddd"
+constant title_image         "none"
+constant footer_image        "none"
+constant header_colour       "#000000"
+constant linkbar_colour      "#c0b098"
+constant maintext_colour     "#dddddd"
 
 #include "forms.library"
 #include "webapp.library"

@@ -2,27 +2,27 @@
 
 # -----------------------------------------------------------------------------
 
-constant status_window	0
-constant game_title		"DangarStu"
-constant game_author	"Stuart Allen"
-constant game_release    1
-constant game_build      1
-constant game_publish false
-constant ifid			"JACL-113"
+constant status_window     0
+constant game_title        "DangarStu"
+constant game_author       "Stuart Allen"
+constant game_release      1
+constant game_build        1
+constant game_publish      false
+constant ifid              "JACL-113"
 
 # -----------------------------------------------------------------------------
 
 integer temp
 integer INDEX
 
-constant SONGS			1
-constant NEWS			2
-constant LYRICS			3
-constant ABOUT			4
-constant REMIX			5
-constant WRITING			6
+constant SONGS       1
+constant NEWS        2
+constant LYRICS      3
+constant ABOUT       4
+constant REMIX       5
+constant WRITING     6
 
-string tab_names "DangarStu" "Songs" "News" "Lyrics" "About" "Remix" "Writing"
+string tab_names     "DangarStu" "Songs" "News" "Lyrics" "About" "Remix" "Writing"
 
 {+links_div
 print:
@@ -212,7 +212,7 @@ print:
 .
 }
 
-grammar blankjacl >blankjacl
+grammar blankjacl     >blankjacl
 
 {+blankjacl
 }
@@ -222,14 +222,14 @@ location studio
 object you
  player
 
-constant title_image		"/images/BandPage.jpg"
-constant footer_image		"none"
-constant header_colour		"#000000"
-constant header_height		200
+constant title_image       "/images/BandPage.jpg"
+constant footer_image      "none"
+constant header_colour     "#000000"
+constant header_height     200
 #constant linkbar_colour		"#c0b098"
-constant linkbar_colour		"#000000"
-constant maintext_colour	"#dddddd"
-constant tab_colour		"#60594e"
+constant linkbar_colour      "#000000"
+constant maintext_colour     "#dddddd"
+constant tab_colour          "#60594e"
 
 #include "forms.library"
 #include "dangarstu.library"

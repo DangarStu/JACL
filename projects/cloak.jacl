@@ -2,13 +2,13 @@
 #------------------------------------------------------------------------------
 #                                                             CLOAK OF DARKNESS
 
-constant game_title     "Cloak of Darkness"
-constant game_author    "Stuart Allen"
-constant game_version   1
-constant ifid            "JACL-110"
-constant game_publish true
+constant game_title       "Cloak of Darkness"
+constant game_author      "Stuart Allen"
+constant game_version     1
+constant ifid             "JACL-110"
+constant game_publish     true
 
-integer blundered_in	1
+integer blundered_in     1
 
 {+intro
 clear
@@ -184,7 +184,7 @@ move cloak to player
 ensure bar has DARK
 }
 
-grammar hang *held on *present	>insert_on
+grammar hang *held on *present     >insert_on
 
 {+no_light
 print:

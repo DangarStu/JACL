@@ -2,12 +2,12 @@
 
 parameter interface gui_mode
 
-integer gui_mode STANDARD
+integer gui_mode     STANDARD
 
-constant STANDARD	1
-constant GUI		2
+constant STANDARD     1
+constant GUI          2
 
-grammar interface >interface
+grammar interface     >interface
 
 {+interface
 if gui_mode = STANDARD

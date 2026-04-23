@@ -2,15 +2,15 @@
 
 parameter interface gui_mode
 
-integer gui_mode STANDARD
+integer gui_mode     STANDARD
 
-string current_image "none"
+string current_image     "none"
 
-constant STANDARD	1
-constant GUI		2
-constant MOBILE		3
+constant STANDARD     1
+constant GUI          2
+constant MOBILE       3
 
-grammar standard >standard
+grammar standard     >standard
 
 {+standard
 set gui_mode = STANDARD

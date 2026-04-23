@@ -1,10 +1,10 @@
 #!/usr/local/jacl/bin/jacl
 
-constant game_title		"Parser Lab"
-constant game_author	"Stuart Allen"
-constant game_version	1
-constant ifid            "JACL-127"
-constant game_publish false
+constant game_title       "Parser Lab"
+constant game_author      "Stuart Allen"
+constant game_version     1
+constant ifid             "JACL-127"
+constant game_publish     false
 
 integer testint
 

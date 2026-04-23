@@ -49,8 +49,8 @@ endwhile
 style normal
 }
 
-string LCNumber zero one two three four five six seven eight nine ten
-string UCNumber Zero One Two Three Four Five Six Seven Eight Nine Ten
+string LCNumber     zero one two three four five six seven eight nine ten
+string UCNumber     Zero One Two Three Four Five Six Seven Eight Nine Ten
 
 {+number_upper
 if arg[0] < 0 : arg[0] > 10
@@ -300,8 +300,8 @@ integer UTILS_first
 integer UTILS_second
 integer UTILS_first_val
 integer UTILS_second_val
-string  UTILS_first_str
-string  UTILS_second_str
+string UTILS_first_str
+string UTILS_second_str
 
 {+sort_set
 # string_arg[0] = name of set to sort

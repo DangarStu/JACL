@@ -1,16 +1,16 @@
 #!../bin/jacl
 
-constant game_title			"Tutorial Game"
-constant game_author		"Stuart Allen"
-constant game_version		1
-constant ifid            "JACL-133"
-constant game_publish false
+constant game_title       "Tutorial Game"
+constant game_author      "Stuart Allen"
+constant game_version     1
+constant ifid             "JACL-133"
+constant game_publish     false
 
-constant turns_since_last_sip		5
+constant turns_since_last_sip     5
 
 attribute EXAMINED
 
-grammar change $integer >change
+grammar change $integer     >change
 
 {+change
 set status_window = $integer
@@ -224,7 +224,7 @@ else
 endif
 }
 
-grammar yack to *present >yack_to
+grammar yack to *present     >yack_to
 
 {yack_to
 set MENU_MODAL = true
@@ -352,7 +352,7 @@ write "As beautiful as ever.^"
 execute "+inventory"
 }
 
-grammar about >about
+grammar about     >about
 
 {+about
 write "This is the game from the tutorial section of the JACL Author's Guide."
@@ -361,8 +361,8 @@ write "See the appendix for the full source to this program.^"
 
 integer OFFSET
 integer INDEX
-string status_text "temp"
-integer status_window 3
+string status_text     "temp"
+integer status_window     3
 
 {+update_status_window 
 style reverse
@@ -390,7 +390,7 @@ parameter PASSWORD password
 integer INDEX
 string password
 
-grammar form >form
+grammar form     >form
 
 {+form
 write "STATUS: " kryten(status) ^
@@ -416,7 +416,7 @@ write "<input type=~submit~ name=~command~ value=~processform~>"
 write "</form>^"
 }
 
-grammar processform >processform
+grammar processform     >processform
 
 {+processform
 write "Updating user file to now use ~" password "~.^"

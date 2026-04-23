@@ -1,28 +1,28 @@
 #!../bin/jacl
 
-constant 	game_version	1
-constant	game_title		"Random Map"
-constant	game_author		"Stuart Allen"
-constant game_publish false
-constant	ifid			"JACL-008"
+constant game_version     1
+constant game_title       "Random Map"
+constant game_author      "Stuart Allen"
+constant game_publish     false
+constant ifid             "JACL-008"
 
-constant	MAX_DEPTH		7
+constant MAX_DEPTH     7
 
 # The 2D array for storing the map
-integer_array map_array 36
-integer_array map_array_offsets 2
-integer map_array_dimensions 6 6
+integer_array map_array             36
+integer_array map_array_offsets     2
+integer map_array_dimensions     6 6
 
-integer next_location loc1
-integer previous_location loc1
+integer next_location         loc1
+integer previous_location     loc1
 
 # These arrays store the number of exits from each location
 # and the last location created.
 # These are needed for building due to the current lack 
 # of local variables in JACL
-integer_array exit_count 50
+integer_array exit_count     50
 
-integer_array location_stack 40
+integer_array location_stack     40
 integer location_stack_index
 
 {+intro
@@ -57,12 +57,12 @@ proxy "look"
 
 location test
 
-constant hallway	0
-constant big_room	1
-constant small_room	2
-constant rough_cave 3
+constant hallway        0
+constant big_room       1
+constant small_room     2
+constant rough_cave     3
 
-string titles "hallway" "big room" "small room" "rough cave"
+string titles     "hallway" "big room" "small room" "rough cave"
 
 {+look
 write "You are in a " titles[here(class)] ". "
@@ -158,9 +158,9 @@ if location_stack_index != 0
 endif
 }
 
-constant fail 100
+constant fail     100
 integer temp
-integer ncounter 
+integer ncounter
 integer new_location
 
 {+pick_direction
@@ -312,7 +312,7 @@ object ground: ground floor
  has           SURFACE NO_TAB
  short         the "ground"
 
-integer status_window 3
+integer status_window     3
 integer OFFSET
 
 string status_text
@@ -449,11 +449,11 @@ location loc35 : thirty five
 location loc36 : thirty six
  short         name "Location thirty six"
 
-integer xaxis 
+integer xaxis
 integer yaxis
 integer current_location
 
-grammar map numbered >map_numbered
+grammar map numbered     >map_numbered
 
 {+map_numbered
 set yaxis = 0
@@ -526,7 +526,7 @@ until xaxis = 6
 write "^"
 }
 
-grammar map big >map_big
+grammar map big     >map_big
 
 {+map_big
 set yaxis = 0
@@ -615,7 +615,7 @@ until xaxis = 6
 write "^"
 }
 
-grammar map >map
+grammar map     >map
 
 {+map
 set yaxis = 0

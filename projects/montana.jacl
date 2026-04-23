@@ -4,15 +4,15 @@
 # A Spanish language learning game set in the mountains of Chile.
 # -----------------------------------------------------------------------------
 
-constant game_title		"Vida en la Montaña"
-constant game_author	"Stuart Allen"
-constant game_version	1
-constant ifid            "JACL-130"
-constant game_publish true
+constant game_title       "Vida en la Montaña"
+constant game_author      "Stuart Allen"
+constant game_version     1
+constant ifid             "JACL-130"
+constant game_publish     true
 
-constant header_colour "#4a6741"
-constant linkbar_colour "#5c7a53"
-constant maintext_colour "#f0ece4"
+constant header_colour       "#4a6741"
+constant linkbar_colour      "#5c7a53"
+constant maintext_colour     "#f0ece4"
 
 # -----------------------------------------------------------------------------
 # LOCATIONS
@@ -569,8 +569,8 @@ endif
 return false
 }
 
-grammar acerca >about
-grammar sobre >about
+grammar acerca     >about
+grammar sobre      >about
 
 {+about
 write "Vida en la Montaña es un juego para aprender español. "

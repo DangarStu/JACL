@@ -1,12 +1,12 @@
 # STANDARD HEADERS AND FOOTERS FOR WEB-BASED INTERACTIVE FICTION
 
-string current_image "none"
-constant title_image "none"
-string game_language "en-US"
-constant header_colour "#42596d"
-constant linkbar_colour "#6a7a87"
-constant maintext_colour "#eeeeee"
-constant footer_image "none"
+string current_image     "none"
+constant title_image     "none"
+string game_language     "en-US"
+constant header_colour       "#42596d"
+constant linkbar_colour      "#6a7a87"
+constant maintext_colour     "#eeeeee"
+constant footer_image        "none"
 
 {+header
 set linebreaks = false

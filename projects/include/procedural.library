@@ -61,34 +61,34 @@ string cond_att
 # 	Arrays
 #-------------------------------------------------------------------------
 
-string 		INPUT loc adj range
+string INPUT     loc adj range
 
-string  OPERATORS add sub add_rand
+string OPERATORS     add sub add_rand
 
-string CONDITIONS loc_has_all loc_has_any loc_has_none 
-string CONDITIONS adj_has_all adj_has_any adj_has_none 
+string CONDITIONS     loc_has_all loc_has_any loc_has_none
+string CONDITIONS     adj_has_all adj_has_any adj_has_none
 ;string CONDITIONS set_has_all set_has_any set_has_none
 
-string	 KEYWORDS loc adj range
-string	 KEYWORDS add sub add_rand 
-string	 KEYWORDS loc_has_all loc_has_any loc_has_none 
-string	 KEYWORDS adj_has_all adj_has_any adj_has_none 
+string KEYWORDS     loc adj range
+string KEYWORDS     add sub add_rand
+string KEYWORDS     loc_has_all loc_has_any loc_has_none
+string KEYWORDS     adj_has_all adj_has_any adj_has_none
 ;string	 KEYWORDS set_has_all set_has_any set_has_none
 
 #-------------------------------------------------------------------------
 # 	Input Integer Pointers
 #-------------------------------------------------------------------------
 
-integer loc_start					
-integer loc_end						
-integer att_start					
-integer att_end						
-integer cond_start				
-integer cond_end	
+integer loc_start
+integer loc_end
+integer att_start
+integer att_end
+integer cond_start
+integer cond_end
 
-integer hit_condition	false
+integer hit_condition     false
 
-string stopper "condition" "integer"
+string stopper     "condition" "integer"
 
 #-------------------------------------------------------------------------
 # 	Public Functions

@@ -5,42 +5,42 @@
 # Copyright (C) Stuart Allen 2008. All rights reserved.
 # -----------------------------------------------------------------------------
 
-constant	game_release	1
-constant	game_build		8
-constant	game_title		"The Bloody Guns"
-constant	game_author		"Stuart Allen"
-constant game_publish true
-constant	ifid				"JACL-107"
+constant game_release     1
+constant game_build       8
+constant game_title       "The Bloody Guns"
+constant game_author      "Stuart Allen"
+constant game_publish     true
+constant ifid             "JACL-107"
 
 # -----------------------------------------------------------------------------
 # CONSTANTS FOR RESOURCES IN BLORB FILE
 # -----------------------------------------------------------------------------
 
-constant image_bloodyguns					1
-constant image_MelvilleMapInGame			2
+constant image_bloodyguns            1
+constant image_MelvilleMapInGame     2
 
-constant sound_TheBloodyGuns				3
-constant sound_AircraftBattle				4
-constant sound_ArtilleryNoExplosion		5
-constant sound_ArtilleryWithExplosion	6
-constant sound_CanoePaddle					7
-constant sound_Explosion					8
-constant sound_GunShot						9
-constant sound_MetalicClang				10
-constant sound_Alarm							11
-constant sound_RifleCocking				12
-constant sound_FiringRifle					13
-constant sound_Flies							14
-constant sound_MorseCodeShort				15
-constant sound_Thunder						16
-constant sound_Rain							17
-constant sound_DoorBreaking				18
-constant sound_GeneratorFalseStart		19
-constant sound_GeneratorStarting			20
-constant sound_GeneratorRunning			21
-constant sound_RadioStatic					22
-constant sound_RopeStrain					23
-constant sound_Windlass						24
+constant sound_TheBloodyGuns              3
+constant sound_AircraftBattle             4
+constant sound_ArtilleryNoExplosion       5
+constant sound_ArtilleryWithExplosion     6
+constant sound_CanoePaddle                7
+constant sound_Explosion                  8
+constant sound_GunShot                    9
+constant sound_MetalicClang               10
+constant sound_Alarm                      11
+constant sound_RifleCocking               12
+constant sound_FiringRifle                13
+constant sound_Flies                      14
+constant sound_MorseCodeShort             15
+constant sound_Thunder                    16
+constant sound_Rain                       17
+constant sound_DoorBreaking               18
+constant sound_GeneratorFalseStart        19
+constant sound_GeneratorStarting          20
+constant sound_GeneratorRunning           21
+constant sound_RadioStatic                22
+constant sound_RopeStrain                 23
+constant sound_Windlass                   24
 
 # -----------------------------------------------------------------------------
 # USER ATTRIBUTES
@@ -54,20 +54,20 @@ attribute ASKED
 
 # -----------------------------------------------------------------------------
 
-integer_array fade_out		8
-integer_array fade_in		8
+integer_array fade_out     8
+integer_array fade_in      8
 
-integer next_sound			0
-integer turn_count			0
-integer status_window 		0
+integer next_sound        0
+integer turn_count        0
+integer status_window     0
 
-constant loop					-1
+constant loop     -1
 
-constant foreground_channel	0
-constant background_channel	1
-constant eachturn_channel		2
-constant timed_channel			3 
-constant global_channel			4 
+constant foreground_channel     0
+constant background_channel     1
+constant eachturn_channel       2
+constant timed_channel          3
+constant global_channel         4
 
 {+intro
 set player = kryten
@@ -141,7 +141,7 @@ print:
 timer 500
 }
 
-grammar menu >menu
+grammar menu     >menu
 
 {+menu
 set MENU_MODE = MENU_EXECUTE
@@ -206,21 +206,21 @@ set time = false
 }
 
 #SCRIPTING CONSTANTS
-integer script_stage	intro
+integer script_stage     intro
 
-constant intro			0
-constant during_raid	1
-constant tally_ho		2
-constant player_paged	4
-constant after_raid		12
-constant on_melville	13
-constant steve_reported	14
-constant storm_started	20
-constant rain_started   25
-constant after_dark		35
-constant getting_tired	45
-constant alex_arrives	60
-constant day_two		61
+constant intro              0
+constant during_raid        1
+constant tally_ho           2
+constant player_paged       4
+constant after_raid         12
+constant on_melville        13
+constant steve_reported     14
+constant storm_started      20
+constant rain_started       25
+constant after_dark         35
+constant getting_tired      45
+constant alex_arrives       60
+constant day_two            61
 
 location outfield : darwin cricket oval outfield
  has           OUTDOORS KNOWN
@@ -760,7 +760,7 @@ print:
 .
 }
 
-grammar play $integer >play_sound
+grammar play $integer     >play_sound
 
 {+play_sound
 volume $integer foreground_channel
@@ -945,7 +945,7 @@ endif
 return false
 }
 
-integer TURNS_WAITING 0
+integer TURNS_WAITING     0
 
 {eachturn
 ifall script_stage > during_raid
@@ -1172,8 +1172,8 @@ print:
 execute "+game_over"
 }
 
-grammar full score >full_score
-grammar score full >full_score
+grammar full score     >full_score
+grammar score full     >full_score
 
 {+full_score
 execute "+score"
@@ -1515,7 +1515,7 @@ print:
 .
 }
 
-grammar set *present >set
+grammar set *present     >set
 
 {+set
 if +important<noun1 = true
@@ -1532,8 +1532,8 @@ write "You can't set " noun1{the} " to anything.^"
 set time = false
 }
 
-grammar put **held over *present	>insert_on
-grammar insert **held over *present	>insert_on
+grammar put **held over *present        >insert_on
+grammar insert **held over *present     >insert_on
 
 {insert_on_shell : insert_in_shell : insert_in_fuse : insert_on_fuse : use
 if shell isnt *present
@@ -1820,9 +1820,9 @@ endif
 set fuse(set_to) = 0
 }
 
-constant set_to			3
-constant fired_not_set	4
-constant total_shots		5
+constant set_to            3
+constant fired_not_set     4
+constant total_shots       5
 
 object fuse : fuse on shell ring rings holes felt gunpowder
  short         the "powder fuse"
@@ -2481,9 +2481,9 @@ endif
 return false
 }
 
-grammar tear **present off *present	>tear_off
-grammar rip **present off *present	>tear_off
-grammar pull **present off *present	>tear_off
+grammar tear **present off *present     >tear_off
+grammar rip **present off *present      >tear_off
+grammar pull **present off *present     >tear_off
 
 {+tear_off
 proxy "tear " noun1{names} " from " noun2{names}
@@ -2528,7 +2528,7 @@ object leftsleeve : left shirt sleeve
  mass          scenery
  parent        shirt
 
-grammar shoot *present with *held >shoot_with
+grammar shoot *present with *held     >shoot_with
 
 {+shoot_with
 if +important<noun1 = true
@@ -2556,7 +2556,7 @@ write "There is no need to shoot " noun1{the} .^
 set time = false
 }
 
-grammar fire *present	>fire
+grammar fire *present     >fire
 
 {+fire
 if +important<noun1 = true
@@ -2570,7 +2570,7 @@ write "You can't fire " noun1{the} ".^"
 set time = false
 }
 
-grammar shoot *present >shoot
+grammar shoot *present     >shoot
 
 {+shoot
 if your_rifle isnt *held
@@ -3502,15 +3502,15 @@ print:
 .
 }
 
-grammar f			>east
-grammar forward		>east
-grammar go forward	>east
+grammar f              >east
+grammar forward        >east
+grammar go forward     >east
 
-grammar a			>west
-grammar aftward		>west
-grammar go aftward	>west
-grammar aft			>west
-grammar go aft		>west
+grammar a              >west
+grammar aftward        >west
+grammar go aftward     >west
+grammar aft            >west
+grammar go aft         >west
 
 location afterdeck : afterdeck deck decking
  short         the "afterdeck"
@@ -3700,17 +3700,17 @@ endif
 return false
 }
 
-grammar turn *present port			>turn_anticlockwise
-grammar turn *present to port		>turn_anticlockwise
-grammar turn *present to left		>turn_anticlockwise
-grammar turn *present left			>turn_anticlockwise
+grammar turn *present port        >turn_anticlockwise
+grammar turn *present to port     >turn_anticlockwise
+grammar turn *present to left     >turn_anticlockwise
+grammar turn *present left        >turn_anticlockwise
 
-grammar turn *present starboard		>turn_clockwise
-grammar turn *present to starboard	>turn_clockwise
-grammar turn *present right			>turn_clockwise
-grammar turn *present to right		>turn_clockwise
+grammar turn *present starboard        >turn_clockwise
+grammar turn *present to starboard     >turn_clockwise
+grammar turn *present right            >turn_clockwise
+grammar turn *present to right         >turn_clockwise
 
-integer BLOOD_DISCOVERED	false
+integer BLOOD_DISCOVERED     false
 
 object windscreen : windscreen wind screen glass
  short         a "windscreen"
@@ -3940,7 +3940,7 @@ else
 endif
 }
 
-constant		tied_to		8
+constant tied_to     8
 
 object rope : length of rope
  short         a "length of rope"
@@ -4873,7 +4873,7 @@ execute "+message_sent"
 ensure radio has FIRST
 }
 
-grammar send message about *anywhere >send_message
+grammar send message about *anywhere     >send_message
 
 {+send_message
 if here != radio_room
@@ -4893,7 +4893,7 @@ override
 write "You can't think of anything important to report about " noun1{the} ".^"
 }
 
-grammar send question about *anywhere >send_question
+grammar send question about *anywhere     >send_question
 
 {+send_question
 if here != radio_room
@@ -7784,7 +7784,7 @@ return false
 # GRAMMAR SYNONYMS
 # -----------------------------------------------------------------------------
 
-grammar man *location		>go_to
+grammar man *location     >go_to
 
 # -----------------------------------------------------------------------------
 # GLOBAL FUNCTIONS
@@ -7871,7 +7871,7 @@ if next_sound != false
 endif
 }
 
-integer timer_count 0
+integer timer_count     0
 
 {+timer
 set timer_count + 1
@@ -8326,11 +8326,11 @@ endif
 }
 
 # CONSTANTS FOR THE WEB INTERFACE LIBRARY
-constant title_image "/images/bloodyguns.png"
-constant footer_image "none"
-constant header_colour "#8e987e"
-constant linkbar_colour "#454030"
-constant maintext_colour "#fdf1e5"
+constant title_image         "/images/bloodyguns.png"
+constant footer_image        "none"
+constant header_colour       "#8e987e"
+constant linkbar_colour      "#454030"
+constant maintext_colour     "#fdf1e5"
 
 #debug "debug.library"
 #include "webinterface.library"

@@ -1,16 +1,16 @@
 #--- Debug.library ---
 
-constant dl_version 1
+constant dl_version     1
 
-integer dl_index 0
-integer dl_temp 0
+integer dl_index       0
+integer dl_temp        0
 integer dl_count
 integer dl_counter
 
 string dl_total
 string dl_code
 
-grammar intarray $string >intarray
+grammar intarray $string     >intarray
 
 {+intarray
 setstring dl_total : "@", string_arg[0]
@@ -25,7 +25,7 @@ endwhile
 set time = false
 }
 
-grammar strarray $string >strarray
+grammar strarray $string     >strarray
 
 {+strarray
 setstring dl_total : "@", string_arg[0]
@@ -39,7 +39,7 @@ endwhile
 set time = false
 }
 
-grammar valueof $string >valueof
+grammar valueof $string     >valueof
 
 {+valueof
 set INDEX = $string
@@ -51,7 +51,7 @@ endif
 set time = false
 }
 
-grammar locationof *anywhere >locationof
+grammar locationof *anywhere     >locationof
 
 {+locationof
 if noun1 has LOCATION
@@ -63,7 +63,7 @@ write noun1{The} " is in " dl_index{the} ".^"
 set time = false
 }
 
-grammar is *anywhere grandof *anywhere >is_grandof
+grammar is *anywhere grandof *anywhere     >is_grandof
 
 {+is_grandof
 if noun1 grandof noun2
@@ -73,7 +73,7 @@ else
 endif
 }
 
-grammar grandof *anywhere >grandof
+grammar grandof *anywhere     >grandof
 
 {+grandof
 set dl_index grandof noun1
@@ -85,7 +85,7 @@ endif
 set time = false
 }
 
-grammar fetch **anywhere >fetch
+grammar fetch **anywhere     >fetch
 
 {+fetch
 if noun1(parent) = here
@@ -98,7 +98,7 @@ write noun1{The} " appears in a flash of light.^"
 set time = false
 }
 
-grammar inspectobj $string >inspect_obj
+grammar inspectobj $string     >inspect_obj
 
 {+inspect_obj
 set noun3 = $string
@@ -106,15 +106,15 @@ proxy "inspect " noun3{names}
 set time = false
 }
 
-grammar inspect **anywhere >inspect
+grammar inspect **anywhere     >inspect
 
 {+inspect
 inspect noun1
 set time = false
 }
 
-grammar teleport to *location	>teleport
-grammar teleport *location		>teleport
+grammar teleport to *location     >teleport
+grammar teleport *location        >teleport
 
 {+teleport
 if noun1 = here
@@ -127,7 +127,7 @@ set time = false
 }
 
 
-grammar stepto *location >stepto
+grammar stepto *location     >stepto
 
 {+stepto
 npc_to dl_index here noun1
@@ -143,7 +143,7 @@ write "To get to " noun1{the} " you need to travel " dir_command[dl_index] .^
 set time = false
 }
 
-grammar dlstats >dl_stats
+grammar dlstats     >dl_stats
 
 {+dl_stats
 write "*** Game Statistics ***^"
@@ -179,7 +179,7 @@ set time = false
 }
 
 
-grammar dlhelp >dl_help
+grammar dlhelp     >dl_help
 
 {+dl_help
 print:

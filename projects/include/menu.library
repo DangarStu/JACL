@@ -3,22 +3,22 @@
 integer MENU_RESPONSE
 integer MENU_IN_LOOP
 
-integer	     MENU_COUNT			0
-string_array MENU_OPTIONS		10
+integer MENU_COUNT     0
+string_array MENU_OPTIONS     10
 
 
-integer MENU_MODAL				
+integer MENU_MODAL
 # CAN BE SET TO TRUE OR FALSE
 
-integer  MENU_MODE 				MENU_PROXY
+integer MENU_MODE     MENU_PROXY
 # CAN BE SET TO ONE OF:
-constant MENU_PROXY				0
-constant MENU_EXECUTE			1
+constant MENU_PROXY       0
+constant MENU_EXECUTE     1
 
 # SET TO TRUE TO DISPLAY THE COMMAND WHILE IN PROXY MODE
-integer MENU_DISPLAY_COMMAND	true
+integer MENU_DISPLAY_COMMAND     true
 	
-grammar $integer >menu_number
+grammar $integer     >menu_number
 
 {+menu_number
 # THIS FUNCTION IS CALLED WHEN THE PLAYER TYPES AN IN-GAME COMMAND THAT 

@@ -1,14 +1,14 @@
 #!../bin/jacl
 
-constant 	game_version	1
-constant	game_title		"Le Roi de Fihnargaia"
-constant	game_author		"Eric Forgeot"
-constant game_publish true
-constant	ifid			"JACL-119"
+constant game_version     1
+constant game_title       "Le Roi de Fihnargaia"
+constant game_author      "Eric Forgeot"
+constant game_publish     true
+constant ifid             "JACL-119"
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE
-constant image_fihnargaia 1
-constant image_chope 2
+constant image_fihnargaia     1
+constant image_chope          2
 
 #### NEW DEFINITIONS #######
 
@@ -24,7 +24,7 @@ endloop
 
 attribute TALKED_TO
 
-grammar chanter 		>sing_only
+grammar chanter     >sing_only
 
 {+sing_only
 write "Vous chantez un petit air qui vous passe par la tête.^"
@@ -877,7 +877,7 @@ object ground: ground sol carrelage
  short         un "sol"
  definite      le
 
-integer status_window 3
+integer status_window     3
 integer OFFSET
 
 string status_text
@@ -910,11 +910,11 @@ endif
 }
 
 
-constant title_image "/images/fihnargaia.png"
-constant footer_image "none"
-constant header_colour "#535F38"
-constant linkbar_colour "#748768"
-constant maintext_colour "#D2DDD0"
+constant title_image         "/images/fihnargaia.png"
+constant footer_image        "none"
+constant header_colour       "#535F38"
+constant linkbar_colour      "#748768"
+constant maintext_colour     "#D2DDD0"
 
 
 #debug "debug.library"

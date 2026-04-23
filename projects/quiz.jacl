@@ -2,17 +2,17 @@
 
 # -----------------------------------------------------------------------------
 
-constant status_window 0
-constant game_title		"Quizafier "
-constant game_author	"Stuart Allen"
-constant game_release    1
-constant game_build      1
-constant game_publish false
-constant ifid			"JACL-135"
+constant status_window     0
+constant game_title        "Quizafier "
+constant game_author       "Stuart Allen"
+constant game_release      1
+constant game_build        1
+constant game_publish      false
+constant ifid              "JACL-135"
 
 # -----------------------------------------------------------------------------
 
-string letters			"Question" "A" "B" "C" "D" "E" "F"
+string letters     "Question" "A" "B" "C" "D" "E" "F"
 string command
 string answer
 
@@ -20,10 +20,10 @@ integer temp
 integer current_question
 integer questions_left
 
-string tab_names "Quiz" "Questions" "Score"
+string tab_names     "Quiz" "Questions" "Score"
 
-integer_array questions 100
-integer       questions_index
+integer_array questions     100
+integer questions_index
 
 {+intro
 set player = you
@@ -86,11 +86,11 @@ location school
 
 object you
 
-constant title_image "none"
-constant footer_image "none"
-constant header_colour "#000000"
-constant linkbar_colour "#c0b098"
-constant maintext_colour "#dddddd"
+constant title_image         "none"
+constant footer_image        "none"
+constant header_colour       "#000000"
+constant linkbar_colour      "#c0b098"
+constant maintext_colour     "#dddddd"
 
 #include "webapp.library"
 #include "webapp.css"

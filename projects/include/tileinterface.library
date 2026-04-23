@@ -1,9 +1,9 @@
 # STANDARD HEADERS AND FOOTERS FOR WEB-BASED INTERACTIVE FICTION
 
-string current_image "none"
-integer gui_mode false
+string current_image     "none"
+integer gui_mode     false
 
-grammar interface >interface
+grammar interface     >interface
 
 {+interface
 if gui_mode = false

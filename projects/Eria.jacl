@@ -4,19 +4,19 @@
 # By Parham Doustdar and Robert Osztolykan
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE
-constant sound_intro 1
+constant sound_intro     1
 
-constant game_release 1
-constant game_build 1
-constant game_title "Eria"
-constant ifid            "JACL-100"
-constant game_author "Parham Doustdar and Robert Osztolykan"
-constant game_publish true
+constant game_release     1
+constant game_build       1
+constant game_title       "Eria"
+constant ifid             "JACL-100"
+constant game_author      "Parham Doustdar and Robert Osztolykan"
+constant game_publish     true
 
 #Region stuff
-constant region 13
-constant Other 0
-constant Cellars 1
+constant region      13
+constant Other       0
+constant Cellars     1
 
 attribute WEAPON WIELDED
 
@@ -106,7 +106,7 @@ endif
 }
 
 integer bed_position
-grammar push *present >push
+grammar push *present     >push
 
 {pull
 if girl(parent) = here
@@ -507,7 +507,7 @@ The ceiling is made of iron. The floor is made of iron. The walls are made of ir
 write "You don't need this door to get out. You do, but you wouldn't be able to open it right now anyway. Don't fiddle with it, let it go. You'll get to it in time.^"
 }
 
-integer ERDoor false
+integer ERDoor     false
 
 {movement
 ifall compass = west : ERDoor = false
@@ -648,8 +648,8 @@ object spot: higher portion spot floor section bump ground
 write "When you think a little more on that, you haven't seen such a spot on the floor since that blurring began. And you wouldn't have noticed it if you hadn't looked a lot. Also, it's not too much higher than the surface which makes it a little suspicious. Why should it be here?^"
 }
 
-grammar put my weight on *here >jump_on
-grammar put your weight on *here >jump_on
+grammar put my weight on *here       >jump_on
+grammar put your weight on *here     >jump_on
 
 {jump_on
 if @ = 1
@@ -667,7 +667,7 @@ points 1
 endif
 }
 
-integer Shaped false
+integer Shaped     false
 
 object loose_point: loose point piece of floor
  short         the "loose point of the floor"
@@ -988,7 +988,7 @@ endif
 }
 
 integer curled_up
-integer ground_distance 1
+integer ground_distance     1
 
 {eachturn
 if ground_distance = 2
@@ -1028,13 +1028,13 @@ write "Get yourself ready for the impact somehow! You are going to hit the groun
 }
 
 
-grammar curl up >curl_up
-grammar get ready for impact>curl_up
-grammar bend knees >curl_up
-grammar bend my knees >curl_up
-grammar bend your knees >curl_up
-grammar go limp >curl_up
-grammar relax >curl_up
+grammar curl up                  >curl_up
+grammar get ready for impact     >curl_up
+grammar bend knees               >curl_up
+grammar bend my knees            >curl_up
+grammar bend your knees          >curl_up
+grammar go limp                  >curl_up
+grammar relax                    >curl_up
 
 {curl_up
 if curled_up = true
@@ -1115,7 +1115,7 @@ write "pushed against the table.^"
 endif
 }
 
-integer cdrawn false
+integer cdrawn     false
 
 {push
 if this.CheckIfSitting = true
@@ -1130,7 +1130,7 @@ write "The chair is not yet drawn!^"
 endif
 }
 
-grammar draw *present >pull
+grammar draw *present     >pull
 
 {pull
 if this.CheckIfSitting = true
@@ -1153,7 +1153,7 @@ execute this.pull
 endif
 }
 
-integer sitting_on_the_chair false
+integer sitting_on_the_chair     false
 
 {sit_on
 if cdrawn = true
@@ -1244,11 +1244,11 @@ location cells: cells
  south         nowhere
  region        Cellars
 
-integer cx 0
-integer cy 0
-integer cz 0
-string letters A B C D E F G H I J K L M N O P Q R
-string letters S T U V W X Y Z
+integer cx     0
+integer cy     0
+integer cz     0
+string letters     A B C D E F G H I J K L M N O P Q R
+string letters     S T U V W X Y Z
 
 {look
 write "You are in a huge open area. Looking around you, you find out that you are engulfed in some kind of maze, constructed of heart-breaking strong, iron doors with locks as tall as you everywhere."
@@ -1532,7 +1532,7 @@ endif
 
 
 
-grammar tear *held >tear
+grammar tear *held     >tear
 
 {+tear
 if +important<noun1 = true
@@ -1545,7 +1545,7 @@ write "Tearing that would achieve little.^"
 set time = false
 }
 
-grammar search *present >search
+grammar search *present     >search
 
 {+search
 if +important<noun1 = true
@@ -1560,14 +1560,14 @@ endif
 write "You search " noun1{the} ", but find nothing of interest.^"
 }
 
-grammar wield *held >wield
+grammar wield *held     >wield
 
 {+wield
 write "It is impossible to wield that.^"
 set time = false
 }
 
-grammar unwield *held >unwield
+grammar unwield *held     >unwield
 
 {+unwield
 write "You are not wielding it!^"
@@ -1621,8 +1621,8 @@ move ground to here
 endif
 }
 
-grammar stand behind *held >stand_behind
-grammar hold *held in front of me >stand_behind
+grammar stand behind *held            >stand_behind
+grammar hold *held in front of me     >stand_behind
 
 {+stand_behind
 if noun1 = loose_point
@@ -1634,7 +1634,7 @@ return
 endif
 }
 
-grammar wrap *held around *here >wrap
+grammar wrap *held around *here     >wrap
 
 {+wrap
 if noun1 = loose_point
@@ -1660,7 +1660,7 @@ override
 write "You can't push that.^"
 }
 
-grammar crawl under *present >crawl_under
+grammar crawl under *present     >crawl_under
 
 {+crawl_under
 if +important<noun1 = true
@@ -1676,7 +1676,7 @@ override
 write "You can't crawl under that!^"
 }
 
-grammar converse with *present >converse
+grammar converse with *present     >converse
 
 {+converse
 if noun1 hasnt ANIMATE
@@ -1735,7 +1735,7 @@ move noun1 to here
 
 integer OFFSET
 integer INDEX
-string status_text "temp"
+string status_text     "temp"
 
 {+update_status_window
 execute "+reverse_window"

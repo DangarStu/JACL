@@ -2,47 +2,47 @@
 
 # -----------------------------------------------------------------------------
 
-constant status_window 0
-string   game_title		"Unknown Participant"
-constant game_author	"Stuart Allen"
-constant game_release    1
-constant game_build      1
-constant game_publish false
-constant ifid			"JACL-137"
+constant status_window     0
+string game_title     "Unknown Participant"
+constant game_author      "Stuart Allen"
+constant game_release     1
+constant game_build       1
+constant game_publish     false
+constant ifid             "JACL-137"
 
 # -----------------------------------------------------------------------------
 
 integer temp
 integer INDEX
 integer COUNT
-integer last_id			0
+integer last_id       0
 integer editing
 integer errors
-integer obs_count			0
+integer obs_count     0
 
-integer_array			observations 100
+integer_array observations     100
 
-constant PARTICIPANT    1
-constant OBSERVATIONS   2
-constant FEEDBACK       3
+constant PARTICIPANT      1
+constant OBSERVATIONS     2
+constant FEEDBACK         3
 
-string tab_names "Contacts" "Participant" "Observations" "Feedback"
+string tab_names     "Contacts" "Participant" "Observations" "Feedback"
 
 string name_data
 string name_error
-integer gender_data 2
+integer gender_data     2
 string gender_error
-string gender_values "Male" "Female" "Unknown"
+string gender_values     "Male" "Female" "Unknown"
 string role_data
-string role_values "Allied health professionals" "Consultants" "Registrars" "Fellow trainees" 
-string role_values "Nurses: Clinical and non-clinical" "Clinical nurse educators" "Nurse educators"
+string role_values       "Allied health professionals" "Consultants" "Registrars" "Fellow trainees"
+string role_values       "Nurses: Clinical and non-clinical" "Clinical nurse educators" "Nurse educators"
 string role_error
 
 parameter name name_data
 parameter gender gender_data
 parameter role role_data
 
-grammar blankjacl >blankjacl
+grammar blankjacl     >blankjacl
 
 {+blankjacl
 }
@@ -105,7 +105,7 @@ set editing = false
 set errors = 0
 }
 
-grammar update >update
+grammar update     >update
 
 {+update
 setstring game_title "Observations for " name_data
@@ -181,7 +181,7 @@ hyperlink "Save Results" "write"
 integer gmt
 integer now
 
-grammar write >write
+grammar write     >write
 
 {+write
 set gmt = unixtime
@@ -201,7 +201,7 @@ enditerate
 write "<p>Results written to CSV file on " now{integer_date} " " now{time} ".^^"
 }
 
-grammar check $integer >check
+grammar check $integer     >check
 
 {+check
 set observations[$integer] = true
@@ -210,7 +210,7 @@ set observations[$integer] = true
 set time = false
 }
 
-grammar uncheck $integer >uncheck
+grammar uncheck $integer     >uncheck
 
 {+uncheck
 set observations[$integer] = false
@@ -223,13 +223,13 @@ location clinic
 
 object you
 
-constant title_image		"none"
-constant footer_image		"none"
-constant header_colour		"#000000"
-constant header_height		87
-constant linkbar_colour		"#c0b098"
-constant maintext_colour	"#dddddd"
-constant tab_colour			"#60594e"
+constant title_image         "none"
+constant footer_image        "none"
+constant header_colour       "#000000"
+constant header_height       87
+constant linkbar_colour      "#c0b098"
+constant maintext_colour     "#dddddd"
+constant tab_colour          "#60594e"
 
 #include "forms.library"
 #include "time.library"

@@ -2,9 +2,9 @@
 
 integer FORMS_length
 integer FORMS_index
-string  FORMS_string
-string  FORMS_error
-string  FORMS_data
+string FORMS_string
+string FORMS_error
+string FORMS_data
 
 {+textarea
 # arg[0] = field name

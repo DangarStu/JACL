@@ -2,28 +2,28 @@
 
 # -----------------------------------------------------------------------------
 
-constant status_window 0
-constant game_title		"Contacts Database"
-constant game_author	"Stuart Allen"
-constant game_release    1
-constant game_build      1
-constant game_publish false
-constant ifid			"JACL-112"
+constant status_window     0
+constant game_title        "Contacts Database"
+constant game_author       "Stuart Allen"
+constant game_release      1
+constant game_build        1
+constant game_publish      false
+constant ifid              "JACL-112"
 
 # -----------------------------------------------------------------------------
 
 integer temp
 integer INDEX
-integer last_id			0
+integer last_id     0
 integer editing
 integer errors
 
-constant SEARCH         1
-constant CREATE         2
-constant VIEW           3
-constant EDIT           4
+constant SEARCH     1
+constant CREATE     2
+constant VIEW       3
+constant EDIT       4
 
-string tab_names "Contacts" "Search" "Add" "List" "Edit"
+string tab_names     "Contacts" "Search" "Add" "List" "Edit"
 
 string id_data
 string firstname_data
@@ -65,7 +65,7 @@ enditerate
 execute "+display_search"
 }
 
-grammar delete $integer >delete
+grammar delete $integer     >delete
 
 {+delete
 update data
@@ -76,7 +76,7 @@ endupdate
 write "Record " $integer " deleted.^^"
 }
 
-grammar edit $integer >edit
+grammar edit $integer     >edit
 
 {+edit
 set editing = true
@@ -110,7 +110,7 @@ hidden
 write "</form>
 }
 
-grammar update $integer >update
+grammar update $integer     >update
 
 {+update
 if errors != 0
@@ -200,7 +200,7 @@ hidden
 write "</form>
 }
 
-grammar add >add_record
+grammar add     >add_record
 
 {+before_add_record : +before_update
 if +validate_email<email_data == false
@@ -224,7 +224,7 @@ integer matches
 
 string action
 
-grammar search >search
+grammar search     >search
 
 {+search
 set WEBAPP_mode = SEARCH
@@ -308,19 +308,19 @@ enditerate
 write "</table>"
 }
 
-constant title_values "Mr" "Mrs" "Ms" "Miss" "Dr"
+constant title_values     "Mr" "Mrs" "Ms" "Miss" "Dr"
 
 location boardroom
 
 object you
 
-constant title_image		"none"
-constant footer_image		"none"
-constant header_colour		"#000000"
-constant header_height		87
-constant linkbar_colour		"#c0b098"
-constant maintext_colour	"#dddddd"
-constant tab_colour			"#60594e"
+constant title_image         "none"
+constant footer_image        "none"
+constant header_colour       "#000000"
+constant header_height       87
+constant linkbar_colour      "#c0b098"
+constant maintext_colour     "#dddddd"
+constant tab_colour          "#60594e"
 
 #include "forms.library"
 #include "webapp.library"

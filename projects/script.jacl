@@ -1,9 +1,9 @@
 #!../bin/cgijacl
 
-string game_title       "JavaScript Example"
-constant game_author    "Stuart Allen"
-constant game_publish false
-constant ifid           "JACL-011"
+string game_title     "JavaScript Example"
+constant game_author      "Stuart Allen"
+constant game_publish     false
+constant ifid             "JACL-011"
 
 string environment
 
@@ -40,11 +40,11 @@ setstring game_title "Button has been pressed"
 object you
  player
 
-constant title_image "none"
-constant footer_image "none"
-constant header_colour "#42596d"
-constant linkbar_colour "#6a7a87"
-constant maintext_colour "#dddddd"
+constant title_image         "none"
+constant footer_image        "none"
+constant header_colour       "#42596d"
+constant linkbar_colour      "#6a7a87"
+constant maintext_colour     "#dddddd"
 
 #include "verbs.library"
 #include "webinterface.library"

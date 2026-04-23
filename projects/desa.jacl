@@ -4,15 +4,15 @@
 # An Indonesian language learning game set in a Balinese village.
 # -----------------------------------------------------------------------------
 
-constant game_title		"Kehidupan Desa"
-constant game_author	"Stuart Allen"
-constant game_version	1
-constant ifid            "JACL-114"
-constant game_publish true
+constant game_title       "Kehidupan Desa"
+constant game_author      "Stuart Allen"
+constant game_version     1
+constant ifid             "JACL-114"
+constant game_publish     true
 
-constant header_colour "#5a7a3a"
-constant linkbar_colour "#6e8c52"
-constant maintext_colour "#f5f0e8"
+constant header_colour       "#5a7a3a"
+constant linkbar_colour      "#6e8c52"
+constant maintext_colour     "#f5f0e8"
 
 # -----------------------------------------------------------------------------
 # LOCATIONS
@@ -1450,8 +1450,8 @@ object ground : tanah lantai
 # -----------------------------------------------------------------------------
 
 integer speech_choice
-integer weather_state 0
-integer weather_announced 0
+integer weather_state         0
+integer weather_announced     0
 
 {+intro
 style bold
@@ -1559,7 +1559,7 @@ endif
 return false
 }
 
-grammar tentang >about
+grammar tentang     >about
 
 {+about
 write "Kehidupan Desa adalah permainan untuk belajar bahasa Indonesia. "

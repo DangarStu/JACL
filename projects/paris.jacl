@@ -4,15 +4,15 @@
 # A French language learning game set in a Paris neighbourhood.
 # -----------------------------------------------------------------------------
 
-constant game_title     "Une Journée à Paris"
-constant game_author    "Stuart Allen"
-constant game_version   1
-constant ifid            "JACL-134"
-constant game_publish   true
+constant game_title       "Une Journée à Paris"
+constant game_author      "Stuart Allen"
+constant game_version     1
+constant ifid             "JACL-134"
+constant game_publish     true
 
-constant header_colour  "#2a3f5f"
-constant linkbar_colour "#4b6a92"
-constant maintext_colour "#f6f2ec"
+constant header_colour       "#2a3f5f"
+constant linkbar_colour      "#4b6a92"
+constant maintext_colour     "#f6f2ec"
 
 # -----------------------------------------------------------------------------
 # LOCATIONS
@@ -1040,7 +1040,7 @@ object ground : sol plancher
 # -----------------------------------------------------------------------------
 
 integer speech_choice
-integer meteo_etat 0
+integer meteo_etat        0
 
 {+intro
 style bold
@@ -1147,8 +1147,8 @@ endif
 return false
 }
 
-grammar a propos >about
-grammar à propos >about
+grammar a propos     >about
+grammar à propos     >about
 
 {+about
 write "Une Journée à Paris est un jeu d'apprentissage du français. "

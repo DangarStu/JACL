@@ -1,26 +1,27 @@
 #!/usr/bin/jacl
 
-constant     game_version    1
-constant    game_title        "Le camion frigorifique"
-constant    game_author        "Barnabé Froleneau"
-constant game_publish false
-constant    ifid            "JACL-109"
+constant game_version     1
+constant game_title       "Le camion frigorifique"
+constant game_author      "Barnabé Froleneau"
+constant game_publish     false
+constant ifid             "JACL-109"
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE
-constant image_camion_frigo 1
-constant music_camion_frigo01 2
-constant music_camion_frigo02 3
-constant music_camion_frigo03 4
+constant image_camion_frigo       1
+constant music_camion_frigo01     2
+constant music_camion_frigo02     3
+constant music_camion_frigo03     4
 
-integer AUDIO_CHANNEL02 2
-
-
-integer PLAYER_REPONSE 2
-integer LUCIEN_TIME_TALKED_TO 0
-integer LUCIEN_EXALTED 0
+integer AUDIO_CHANNEL02     2
 
 
-synonym soluce solution
+
+integer PLAYER_REPONSE            2
+integer LUCIEN_TIME_TALKED_TO     0
+integer LUCIEN_EXALTED            0
+
+
+synonym soluce     solution
  
 
 #### NEW DEFINITIONS #######
@@ -41,21 +42,21 @@ attribute NOTICED
 
 attribute ENTERED
 
-grammar mute >stop_sound
+grammar mute     >stop_sound
 
 {+stop_sound
 stop
 }
  
-grammar volume >volume
-grammar volume - >volume
+grammar volume       >volume
+grammar volume -     >volume
 
 {+volume
 # decrease volume
 volume 40
 }
 
-grammar volume + >volume_inc
+grammar volume +     >volume_inc
 
 {+volume_inc
 # inc volume
@@ -82,20 +83,20 @@ attribute SALUTED
 attribute LISTENED
 attribute BREAKED
 
-string camion_location "quai"
+string camion_location     "quai"
 
 
-grammar show *present to *present        >show_to
+grammar show *present to *present     >show_to
 
-grammar montrer *present to *present    >show_to
-grammar montrer *present au *present    >show_to
-grammar montrer *present à *present    >show_to
-grammar montrer *present a *present    >show_to
+grammar montrer *present to *present     >show_to
+grammar montrer *present au *present     >show_to
+grammar montrer *present à *present      >show_to
+grammar montrer *present a *present      >show_to
 
 
 # TODO? m approcher 
 
-grammar  m approcher    >approche
+grammar m approcher     >approche
 
 {+approche
 if here = magasin1 
@@ -118,15 +119,15 @@ write " par "
 write noun1{the} .^
 }
 
-grammar chanter         >sing_only
+grammar chanter     >sing_only
 
 {+sing_only
 write "Vous chantez un petit air populaire qui vous passe par la tête.^"
 write "C'est une chanson qui parle de " player{chanson}"^"
 }
 
-grammar démonter *present    >break
-grammar demonter *present    >break
+grammar démonter *present     >break
+grammar demonter *present     >break
 
 
 integer ALEATOIRE
@@ -204,11 +205,11 @@ write "Il n'y a pas d'autres astuces pour le moment...^"
 #### GAME ######
 
 
-grammar a propos >about
-grammar à propos >about
+grammar a propos     >about
+grammar à propos     >about
 
-grammar auteur >author
-grammar licence >about
+grammar auteur      >author
+grammar licence     >about
 
 {+author
   proxy "about"
@@ -330,7 +331,7 @@ endall
 
 #TODO : x route , x dehors
 
-string demod_article = "Un"
+string demod_article     = "Un"
 
 {+eachturn
 if total_moves = 0
@@ -397,7 +398,7 @@ if lucien(parent) = camion
 }
 
 
-grammar xyzzy>xyzzy
+grammar xyzzy     >xyzzy
 
 {+xyzzy
   write "Un gros jukebox chromé apparaît.^^"
@@ -415,9 +416,9 @@ grammar xyzzy>xyzzy
   write "... puis disparaît aussi vite qu'elle est apparue, en même temps que le jukebox, avant même que vous ayez pu lire le titre de la mélodie.^"
 }
 
-grammar regarder out      >look_out
-grammar examiner out      >look_out
-grammar x out      >look_out
+grammar regarder out     >look_out
+grammar examiner out     >look_out
+grammar x out            >look_out
 
 {+look_out
 if player(parent) = camion
@@ -1352,7 +1353,7 @@ if planche has BREAKED
   proxy "break planche"
 }
 
-string dir_fall "avant"
+string dir_fall     "avant"
 
 {climb_up
 set max_rand = 2
@@ -1463,7 +1464,7 @@ object ground: ground sol carrelage
  short         un "sol"
  definite      le
 
-integer status_window 3
+integer status_window     3
 integer OFFSET
 
 string status_text
@@ -1496,11 +1497,11 @@ endif
 }
 
 
-constant title_image "/images/camion_frigo.png"
-constant footer_image "none"
-constant header_colour "#777"
-constant linkbar_colour "#999"
-constant maintext_colour "#dedede"
+constant title_image         "/images/camion_frigo.png"
+constant footer_image        "none"
+constant header_colour       "#777"
+constant linkbar_colour      "#999"
+constant maintext_colour     "#dedede"
 
 
 #debug "debug.library"

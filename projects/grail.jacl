@@ -8,17 +8,17 @@
 #  
 # -----------------------------------------------------------------------------
 
-constant status_window 0
-constant game_title		"The Unholy Grail"
-constant game_author	"Stuart Allen"
-constant game_release    2
-constant game_build      3
-constant game_publish true
-constant ifid			"JACL-122"
+constant status_window     0
+constant game_title        "The Unholy Grail"
+constant game_author       "Stuart Allen"
+constant game_release      2
+constant game_build        3
+constant game_publish      true
+constant ifid              "JACL-122"
 # -----------------------------------------------------------------------------
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE
-constant image_unholygrail 1
+constant image_unholygrail     1
 # -----------------------------------------------------------------------------
 
 # THESE ARE USER ATTRIBUTES TO REPLACE THE SYSTEM ATTRIBUTES THAT NO
@@ -9697,16 +9697,16 @@ execute "+game_over"
 #                                                                 LOCAL GRAMMAR
 #------------------------------------------------------------------------------
 
-grammar tip up *present 				>tip_up
-grammar tip *present					>tip_up
-grammar tip over *present				>tip_up
-grammar tip *present up					>tip_up
-grammar tip *present over				>tip_up
-grammar flip up *present 				>tip_up
-grammar flip *present					>tip_up
-grammar flip over *present				>tip_up
-grammar flip *present up				>tip_up
-grammar flip *present over				>tip_up
+grammar tip up *present        >tip_up
+grammar tip *present           >tip_up
+grammar tip over *present      >tip_up
+grammar tip *present up        >tip_up
+grammar tip *present over      >tip_up
+grammar flip up *present       >tip_up
+grammar flip *present          >tip_up
+grammar flip over *present     >tip_up
+grammar flip *present up       >tip_up
+grammar flip *present over     >tip_up
 
 {+tip_up
 if +darkness = true
@@ -9723,14 +9723,14 @@ endif
 set time = false
 }
 
-grammar insert **held under *present	>insert_in
-grammar load **held under *present		>insert_in
-grammar mount **held under *present		>insert_in
-grammar wedge **held under *present		>insert_in
-grammar thrust **held under *present	>insert_in
-grammar poke **held under *present		>insert_in
-grammar put **held under *present		>insert_in
-grammar place **held under *present		>insert_in
+grammar insert **held under *present     >insert_in
+grammar load **held under *present       >insert_in
+grammar mount **held under *present      >insert_in
+grammar wedge **held under *present      >insert_in
+grammar thrust **held under *present     >insert_in
+grammar poke **held under *present       >insert_in
+grammar put **held under *present        >insert_in
+grammar place **held under *present      >insert_in
 
 # THIS FUNCTION OVERRIDES THE LIBRARY VERSION
 {+score_command
@@ -9805,10 +9805,10 @@ endif
 return false
 }
 
-grammar call *anywhere		>page
-grammar phone *anywhere		>page
-grammar page *anywhere		>page
-grammar contact *anywhere	>page
+grammar call *anywhere        >page
+grammar phone *anywhere       >page
+grammar page *anywhere        >page
+grammar contact *anywhere     >page
 
 {+page
 set time = false
@@ -9824,21 +9824,21 @@ write "If you want to page someone, you should ask the concierge to do it "
 write "for you.^"
 }
 
-grammar ring *present	>ring
+grammar ring *present     >ring
 
 {+ring
 write "You can't ring " noun1{the} .^
 set time = false
 }
 
-grammar flush *present	>flush
+grammar flush *present     >flush
 
 {+flush
 write "You can't flush " noun1{the} .^
 set time = false
 }
 
-grammar refill *held	>refill
+grammar refill *held     >refill
 
 {+refill
 if noun1 != tank
@@ -9887,7 +9887,7 @@ endif
 write ^
 }
 
-grammar shoot *present	>shoot
+grammar shoot *present     >shoot
 
 {+shoot
 if gun(parent) != kryten
@@ -9926,13 +9926,13 @@ endif
 return false
 }
 
-grammar tell *present im *anywhere				>tell_im
-grammar tell *present i'm *anywhere				>tell_im
-grammar tell *present i am *anywhere			>tell_im
-grammar tell *present that i am *anywhere		>tell_im
-grammar tell *present that im *anywhere			>tell_im
-grammar tell *present my name is *anywhere		>tell_im
-grammar tell *present that my name is *anywhere	>tell_im
+grammar tell *present im *anywhere                  >tell_im
+grammar tell *present i'm *anywhere                 >tell_im
+grammar tell *present i am *anywhere                >tell_im
+grammar tell *present that i am *anywhere           >tell_im
+grammar tell *present that im *anywhere             >tell_im
+grammar tell *present my name is *anywhere          >tell_im
+grammar tell *present that my name is *anywhere     >tell_im
 
 {+tell_im
 if +can_talk<noun1 = true
@@ -9942,14 +9942,14 @@ override
 write  noun1{The} " appears to ignore you.^"
 }
 
-grammar ask *present to page *anywhere		>ask_to_page
-grammar ask *present to contact *anywhere	>ask_to_page
-grammar ask *present to call *anywhere		>ask_to_page
-grammar ask *present to ring *anywhere		>ask_to_page
-grammar tell *present to page *anywhere		>ask_to_page
-grammar tell *present to call *anywhere		>ask_to_page
-grammar tell *present to contact *anywhere	>ask_to_page
-grammar tell *present to ring *anywhere		>ask_to_page
+grammar ask *present to page *anywhere         >ask_to_page
+grammar ask *present to contact *anywhere      >ask_to_page
+grammar ask *present to call *anywhere         >ask_to_page
+grammar ask *present to ring *anywhere         >ask_to_page
+grammar tell *present to page *anywhere        >ask_to_page
+grammar tell *present to call *anywhere        >ask_to_page
+grammar tell *present to contact *anywhere     >ask_to_page
+grammar tell *present to ring *anywhere        >ask_to_page
 
 {+ask_to_page
 if +can_talk<noun1 = true
@@ -10015,7 +10015,7 @@ write "~I am sorry, there is no " noun2{the} " on the guest list,~ the "
 write "concierge apologises.^"
 }
 
-grammar shoot *present with *held	>shoot_with
+grammar shoot *present with *held     >shoot_with
 
 {+shoot_with
 if noun2 = gun
@@ -10027,15 +10027,15 @@ write "I don't see how you can shoot " noun1{the} " with " noun2{the} .^
 set time = false
 }
 
-grammar submit *held	>submit
+grammar submit *held     >submit
 
 {+submit
 write "I'm afraid you will have to do that yourself.^"
 set time = false
 }
 
-grammar inject *present with *present		>inject_with
-grammar inoculate *present with *present	>inject_with
+grammar inject *present with *present        >inject_with
+grammar inoculate *present with *present     >inject_with
 
 {+inject_with
 if noun2(parent) = syringe
@@ -10058,8 +10058,8 @@ endall
 write "There is nothing in the syringe.^"
 }
 
-grammar inject *present in *present		>inject_in
-grammar squeeze *present in *present	>inject_in
+grammar inject *present in *present      >inject_in
+grammar squeeze *present in *present     >inject_in
 
 {+inject_in
 if noun1 = syringe
@@ -10109,26 +10109,26 @@ write "Inject " noun1{the} " into " noun2{the} "? I don't think so.^"
 #                                                                      SYNONYMS
 #------------------------------------------------------------------------------
 
-synonym fluid		liquid
-synonym doors		door
-synonym elevator	lift
-synonym lights		light
+synonym fluid        liquid
+synonym doors        door
+synonym elevator     lift
+synonym lights       light
 
 #                                                                     VARIABLES
 #------------------------------------------------------------------------------
 
-integer ENERGY_LEVEL		5
+integer ENERGY_LEVEL          5
 integer WISE_INFORMED
 integer WISE_ASKED
 integer WORK_PHASE
-integer FLASK_TEMPERATURE	4
+integer FLASK_TEMPERATURE     4
 
-integer LONGITUDE			37	
-integer LATITUDE			42
+integer LONGITUDE     37
+integer LATITUDE      42
 
 integer CURRENT_DEPTH
-integer TANK_PRESSURE		220
-integer RESERVE_PRESSURE	1000
+integer TANK_PRESSURE          220
+integer RESERVE_PRESSURE       1000
 integer WATER_LEVEL
 integer COUNTER_POSITION
 integer SCREEN_FADE
@@ -10139,10 +10139,10 @@ integer STRANGERS_SCRIPT
 integer HUGHES_SCRIPT
 integer AGING_SCRIPT
 integer SONG_PLAYED
-integer LIFT_1_POSITION	1
-integer LIFT_2_POSITION	3
-integer LIFT_1_TASK		42
-integer LIFT_2_TASK		42
+integer LIFT_1_POSITION        1
+integer LIFT_2_POSITION        3
+integer LIFT_1_TASK            42
+integer LIFT_2_TASK            42
 integer NEEDS_LINEFEED
 integer WHO_I_AM
 integer PAGE_REQUESTED
@@ -10151,12 +10151,12 @@ integer VAN_ABSENCE
 integer WISES_SCRIPT
 integer MPS_SCRIPT
 integer BEACH_SCRIPT
-integer JUNGLE_SCRIPT		13
+integer JUNGLE_SCRIPT          13
 integer FRANKS_SCRIPT
 integer BARMANS_SCRIPT
-integer WAITRESS_SCRIPT	1
+integer WAITRESS_SCRIPT        1
 integer PRETZELS_EATEN
-integer REPUTATION_CURRENT	true
+integer REPUTATION_CURRENT     true
 
 ;                                                              GLOBAL FUNCTIONS
 ;------------------------------------------------------------------------------
@@ -10523,9 +10523,9 @@ endif
 
 # LIFT STUFF
 
-attribute   OUTSIDE_LIFT
+attribute OUTSIDE_LIFT
 
-integer FLOOR_MAPPING ground_floor first_floor second_floor third_floor
+integer FLOOR_MAPPING     ground_floor first_floor second_floor third_floor
 
 location lift : lift
  short         the "elevator"
@@ -10666,7 +10666,7 @@ write ^
 execute examine_display
 }
 
-string led_display	G 1 2 3
+string led_display     G 1 2 3
 
 object display : led display
  short         an "LED display"
@@ -10677,11 +10677,11 @@ write led_display[lift_obj(floor)] "'.^"
 }
 
 # Elements of lift object:
-constant floor						5
-constant moving_to					6
+constant floor         5
+constant moving_to     6
 	constant arrived				42; POSSIBLE VALUE OF moving_to
-constant turns_till_doors_close 	7
-constant delta						8
+constant turns_till_doors_close     7
+constant delta                      8
 
 object lift_obj: lift door doors
  short         the "lift"
@@ -12889,7 +12889,7 @@ ensure ocean_bottom hasnt VISITED
 move s_water to here
 }
 
-grammar about	>about
+grammar about     >about
 
 {+about
 style bold
@@ -13093,11 +13093,11 @@ if interpreter = CGI
 endif
 }
 
-constant title_image "/images/unholygrail.png"
-constant footer_image "none"
-constant header_colour "#42596d"
-constant linkbar_colour "#6a7a87"
-constant maintext_colour "#eeeeee"
+constant title_image         "/images/unholygrail.png"
+constant footer_image        "none"
+constant header_colour       "#42596d"
+constant linkbar_colour      "#6a7a87"
+constant maintext_colour     "#eeeeee"
 
 #debug "debug.library"
 #include "webinterface.library"

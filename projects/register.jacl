@@ -2,13 +2,13 @@
 
 # -----------------------------------------------------------------------------
 
-constant status_window 0
-constant game_title		"Register"
-constant game_author	"Stuart Allen"
-constant game_release    1
-constant game_build      1
-constant game_publish false
-constant ifid			"JACL-136"
+constant status_window     0
+constant game_title        "Register"
+constant game_author       "Stuart Allen"
+constant game_release      1
+constant game_build        1
+constant game_publish      false
+constant ifid              "JACL-136"
 
 # -----------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ attribute EVENT
 
 integer event
 
-string tab_names "Register"
+string tab_names     "Register"
 
 string faculty_data
 string discipline_data
@@ -35,14 +35,14 @@ parameter nature		nature_data
 parameter laptop		laptop_data
 parameter comment		comment_data
 
-string laptop_values "Yes - I can bring a laptop with me" "No - I will need Intersect to provide a laptop for me"
-string position_values "Researcher - Professor" "Researcher - Associate Professor" "Researcher - Other" "Research Assistant or other Research Support staff" "Research Student - PhD" "Other"
+string laptop_values       "Yes - I can bring a laptop with me" "No - I will need Intersect to provide a laptop for me"
+string position_values     "Researcher - Professor" "Researcher - Associate Professor" "Researcher - Other" "Research Assistant or other Research Support staff" "Research Student - PhD" "Other"
 
-grammar subscribe *anywhere >subscribe
+grammar subscribe *anywhere     >subscribe
 
-grammar register *anywhere >register
+grammar register *anywhere     >register
 
-grammar blankjacl >blankjacl
+grammar blankjacl     >blankjacl
 
 {+blankjacl
 
@@ -52,7 +52,7 @@ grammar blankjacl >blankjacl
 write "Intersect Event Registration System"
 }
 
-grammar add >add_record
+grammar add     >add_record
 
 {+add_record
 set last_id + 1
@@ -137,11 +137,11 @@ location office
 object you
  player
 
-constant title_image "none"
-constant footer_image "none"
-constant header_colour "#000000"
-constant linkbar_colour "#c0b098"
-constant maintext_colour "#dddddd"
+constant title_image         "none"
+constant footer_image        "none"
+constant header_colour       "#000000"
+constant linkbar_colour      "#c0b098"
+constant maintext_colour     "#dddddd"
 
 #include "forms.library"
 #include "webapp.library"

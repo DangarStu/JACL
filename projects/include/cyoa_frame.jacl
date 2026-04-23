@@ -1,8 +1,8 @@
 #!../bin/jacl
 
-constant game_version	1
-constant game_title		"My Game"
-constant game_author 	"myself"
+constant game_version     1
+constant game_title       "My Game"
+constant game_author      "myself"
 
 {+intro
 clear
@@ -20,12 +20,12 @@ look
 }
 
 object kryten: kryten
- has		ANIMATE
- short		name "yourself"
- long		"Odly, you see yourself standing here."
- capacity	42
- parent 	#PUT THE LABEL OF THE STARTING LOCATION HERE
- damage		2
+ has           ANIMATE
+ short         name "yourself"
+ long          "Odly, you see yourself standing here."
+ capacity      42
+ parent        #PUT THE LABEL OF THE STARTING LOCATION HERE
+ damage        2
  player
 
 

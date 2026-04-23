@@ -78,8 +78,8 @@ integer map_dest_y
 integer map_stub_x
 integer map_stub_y
 integer map_loop
-integer map_window_mode 0
-integer map_show_all 0
+integer map_window_mode     0
+integer map_show_all        0
 integer map_should_draw
 integer map_word_count
 integer map_word_index
@@ -99,7 +99,7 @@ integer map_abs_dy
 integer map_cheby
 integer map_perp_x
 integer map_perp_y
-string_array map_label_parts 8
+string_array map_label_parts     8
 
 # Bounding-box globals populated by +map_bounds and consumed by +map_body.
 integer map_bounds_init
@@ -112,13 +112,13 @@ integer map_offset_y
 integer map_canvas_w
 integer map_canvas_h
 
-grammar map >map
-grammar m >map
-grammar map window >map_window_on
-grammar map open >map_window_on
-grammar map close >map_window_off
-grammar map all >map_all
-grammar map everything >map_all
+grammar map                >map
+grammar m                  >map
+grammar map window         >map_window_on
+grammar map open           >map_window_on
+grammar map close          >map_window_off
+grammar map all            >map_all
+grammar map everything     >map_all
 
 # -------------------------------------------------------------------
 # +library_header -- called by webinterface.library's +header emission

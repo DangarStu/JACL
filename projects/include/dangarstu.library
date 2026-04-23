@@ -1,19 +1,19 @@
 # HEADERS AND FOOTERS FOR MUSIC RELATED APPLICATIONS
 
-string current_image "none"
+string current_image     "none"
 
-integer WEBAPP_mode 1
+integer WEBAPP_mode      1
 integer WEBAPP_index
 
 parameter "mode" WEBAPP_mode
 
-grammar change mode $integer >change_mode
+grammar change mode $integer     >change_mode
 
 {+change_mode 
 set WEBAPP_mode = $integer
 }
 
-grammar standard >standard
+grammar standard     >standard
 
 {+header
 set linebreaks = false

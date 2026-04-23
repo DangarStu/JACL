@@ -1,19 +1,19 @@
 #!../bin/jacl
 
-constant game_publish false
-constant ifid            "JACL-102"
+constant game_publish     false
+constant ifid             "JACL-102"
 integer multi
 integer argument
 
 
-integer my_array 24 123,	3 4,	68 76
-integer my_array 78 45,		6 14,	12 66
-integer my_array 42 9,		99 1,	36 12
+integer my_array     24 123, 3 4, 68 76
+integer my_array     78 45, 6 14, 12 66
+integer my_array     42 9, 99 1, 36 12
 
-integer my_array_dimensions 3 3 2
-integer my_array_offsets    0 0 0
+integer my_array_dimensions     3 3 2
+integer my_array_offsets        0 0 0
 
-integer_array my_stack 5
+integer_array my_stack     5
 #integer my_stack 0 0 0 0 0 
 integer my_stack_index
 

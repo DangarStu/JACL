@@ -2,13 +2,13 @@
 
 # -----------------------------------------------------------------------------
 
-constant status_window 0
-constant game_title		"The Team Shabby Bumper Sticker Co Ltd Pty Inc"
-constant game_author	"Stuart Allen"
-constant game_release    1
-constant game_build      1
-constant game_publish false
-constant ifid			"JACL-032"
+constant status_window     0
+constant game_title        "The Team Shabby Bumper Sticker Co Ltd Pty Inc"
+constant game_author       "Stuart Allen"
+constant game_release      1
+constant game_build        1
+constant game_publish      false
+constant ifid              "JACL-032"
 
 # -----------------------------------------------------------------------------
 
@@ -19,13 +19,13 @@ integer now
 integer gmt
 integer errors
 
-integer last_sticker			0
+integer last_sticker     0
 
-constant VIEW           		1
-constant SEARCH					2
-constant CREATE					3
+constant VIEW       1
+constant SEARCH     2
+constant CREATE     3
 
-constant tab_names "Stickers" "View"
+constant tab_names     "Stickers" "View"
 
 string id_data
 string sticker_data
@@ -53,12 +53,12 @@ execute "+before"
 execute "+after"
 }
 
-grammar blankjacl >blankjacl
+grammar blankjacl     >blankjacl
 
 {+blankjacl
 }
 
-grammar delete $integer >delete
+grammar delete $integer     >delete
 
 {+delete
 update data
@@ -70,7 +70,7 @@ update data
 endupdate
 }
 
-grammar edit $integer >edit
+grammar edit $integer     >edit
 
 {+edit
 set editing = true
@@ -155,7 +155,7 @@ hidden
 write "</form>
 }
 
-grammar add >add_sticker
+grammar add     >add_sticker
 
 {+add_sticker
 set last_sticker + 1
@@ -166,14 +166,14 @@ integer matches
 
 string action
 
-grammar quickadd >quickadd
+grammar quickadd     >quickadd
 
 {+quickadd
 set WEBAPP_mode = VIEW
 execute "+add_sticker"
 }
 
-grammar search >search
+grammar search     >search
 
 {+search
 set WEBAPP_mode = SEARCH
@@ -257,13 +257,13 @@ location boardroom
 
 object you
 
-constant title_image        "none"
-constant footer_image       "none"
-constant header_colour      "#000000"
-constant header_height      87
-constant linkbar_colour     "#c0b098"
-constant maintext_colour    "#dddddd"
-constant tab_colour         "#60594e"
+constant title_image         "none"
+constant footer_image        "none"
+constant header_colour       "#000000"
+constant header_height       87
+constant linkbar_colour      "#c0b098"
+constant maintext_colour     "#dddddd"
+constant tab_colour          "#60594e"
 
 #include "forms.library"
 #include "time.library"

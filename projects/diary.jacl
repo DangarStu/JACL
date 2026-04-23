@@ -1,38 +1,38 @@
 #!../bin/jacl
 
-constant game_publish false
-constant ifid            "JACL-115"
-synonym january					1
-synonym jan						1
-synonym february				2
-synonym feb						2
-synonym march 					3
-synonym mar	 					3
-synonym april					4
-synonym apr						4
-synonym may						5
-synonym may						5
-synonym june					6
-synonym jun						6
-synonym july					7
-synonym jul						7
-synonym august					8
-synonym aug						8
-synonym september				9
-synonym sep						9
-synonym october					10
-synonym oct						10
-synonym november				11
-synonym nov						11
-synonym december				12
-synonym dec						12
+constant game_publish     false
+constant ifid             "JACL-115"
+synonym january       1
+synonym jan           1
+synonym february      2
+synonym feb           2
+synonym march         3
+synonym mar           3
+synonym april         4
+synonym apr           4
+synonym may           5
+synonym may           5
+synonym june          6
+synonym jun           6
+synonym july          7
+synonym jul           7
+synonym august        8
+synonym aug           8
+synonym september     9
+synonym sep           9
+synonym october       10
+synonym oct           10
+synonym november      11
+synonym nov           11
+synonym december      12
+synonym dec           12
 
 integer this_year
 integer this_month
 integer this_date
 integer this_day
 integer now
-integer epoch					# THIS THE CURRENT 'SELECTED' DATE
+integer epoch          # THIS THE CURRENT 'SELECTED' DATE
 integer gmt
 integer year
 integer month
@@ -47,35 +47,35 @@ integer rc
 string display_buffer
 string search_string
 
-integer	contacts				0
-integer current_contact			0
+integer contacts            0
+integer current_contact     0
 
-string_array contact_name		40		"EMPTY"
-string_array contact_address	40
-string_array contant_number 	40
-string_array contact_email		40
+string_array contact_name        40 "EMPTY"
+string_array contact_address     40
+string_array contant_number      40
+string_array contact_email       40
 
-integer meetings				0
-integer current_meeting			0
+integer meetings            0
+integer current_meeting     0
 
-string_array meeting_name		40 		"EMPTY"
-string_array meeting_place		40
-integer_array meeting_time		40
+string_array meeting_name      40 "EMPTY"
+string_array meeting_place     40
+integer_array meeting_time     40
 
-integer tasks					0
-integer current_task			0
+integer tasks            0
+integer current_task     0
 
-string_array task_content		40		"EMPTY"
-integer_array task_priority		40
-integer_array task_due			40
+string_array task_content     40 "EMPTY"
+integer_array task_priority     40
+integer_array task_due          40
 
-integer notes					0
-integer current_note			0
+integer notes            0
+integer current_note     0
 
-string_array note_content		40 		"EMPTY"
-integer_array note_date			40
+string_array note_content     40 "EMPTY"
+integer_array note_date     40
 
-integer display_calendar		false
+integer display_calendar     false
 
 {+intro
 clear
@@ -99,8 +99,8 @@ set this_day = TIME_day
 set display_calendar = true
 }
 
-grammar blankjacl >help
-grammar help >help
+grammar blankjacl     >help
+grammar help          >help
 
 {+help
 style subheader
@@ -115,8 +115,8 @@ write "cal    <month> (<year>)^"
 write "time^"
 }
 
-grammar add note $string	>add_note_content
-grammar a n $string			>add_note_content
+grammar add note $string     >add_note_content
+grammar a n $string          >add_note_content
 
 {+add_note_content
 set current_note = 0
@@ -137,8 +137,8 @@ set notes + 1
 execute "+save_diary"
 }
 
-grammar add note	>add_note
-grammar a n			>add_note
+grammar add note     >add_note
+grammar a n          >add_note
 
 {+add_note
 set current_note = 0
@@ -160,31 +160,31 @@ set notes + 1
 execute "+save_diary"
 }
 
-grammar current note	>current_note
-grammar c n				>current_note
+grammar current note     >current_note
+grammar c n              >current_note
 
 {+current_note
 write "The current note is " current_note ".^"
 }
 
-grammar show note		>show_note
-grammar s n				>show_note
+grammar show note     >show_note
+grammar s n           >show_note
 
 {+show_note
 write "[NOTE #" current_note "] " note_date[current_note]{full_date} "^"
 write note_content[current_note]  "^"
 }
 
-grammar show note $integer	>show_note1
-grammar s n $integer		>show_note1
+grammar show note $integer     >show_note1
+grammar s n $integer           >show_note1
 
 {+show_note1
 write "[NOTE #" $integer "] " note_date[$integer]{full_date} "^"
 write note_content[$integer]  "^"
 }
 
-grammar list notes	>list_notes
-grammar l n 		>list_notes
+grammar list notes     >list_notes
+grammar l n            >list_notes
 
 {+list_notes
 set INDEX = 0
@@ -197,8 +197,8 @@ endwhile
 write "^Total notes: " notes "^"
 }
 
-grammar delete note	>delete_note
-grammar d n			>delete_note
+grammar delete note     >delete_note
+grammar d n             >delete_note
 
 {+delete_note
 ifstring note_content[current_note] = "EMPTY"
@@ -218,8 +218,8 @@ else
 endif
 }
 
-grammar delete note	$integer	>delete_note1
-grammar d n $integer			>delete_note1
+grammar delete note $integer     >delete_note1
+grammar d n $integer             >delete_note1
 
 {+delete_note1
 ifstring note_content[$integer] = "EMPTY"
@@ -239,8 +239,8 @@ else
 endif
 }
 
-grammar search notes $string	>search_notes_string
-grammar s n $string				>search_notes_string
+grammar search notes $string     >search_notes_string
+grammar s n $string              >search_notes_string
 
 {+search_notes_string
 set INDEX = 0
@@ -260,8 +260,8 @@ else
 endif
 }
 
-grammar search notes	>search_notes
-grammar s n 			>search_notes
+grammar search notes     >search_notes
+grammar s n              >search_notes
 
 {+search_notes
 write "Enter your search string^: "
@@ -283,8 +283,8 @@ else
 endif
 }
 
-grammar add task	>add_task
-grammar a t			>add_task
+grammar add task     >add_task
+grammar a t          >add_task
 
 {+add_task
 set current_task = 0
@@ -307,7 +307,7 @@ set tasks + 1
 execute "+save_diary"
 }
 
-grammar list tasks >list_tasks
+grammar list tasks     >list_tasks
 
 {+list_tasks
 set INDEX = 0
@@ -321,8 +321,8 @@ endwhile
 write "^Total tasks: " tasks "^"
 }
 
-grammar add contact	>add_contact
-grammar a c			>add_contact
+grammar add contact     >add_contact
+grammar a c             >add_contact
 
 {+add_contact
 set current_contact = 0
@@ -421,13 +421,13 @@ endwhile
 write "^"
 }
 
-grammar cal >cal1
+grammar cal     >cal1
 
 {+cal1
 execute "+cal<epoch"
 }
 
-grammar cal $integer >cal2
+grammar cal $integer     >cal2
 
 {+cal2
 if $integer[0] < 1 : $integer[0] > 12
@@ -439,7 +439,7 @@ set epochtemp = +get_seconds_for_date<0<month<this_year
 execute "+cal<epochtemp"
 }
 
-grammar cal $integer $integer >cal3
+grammar cal $integer $integer     >cal3
 
 {+cal3
 if $integer[0] < 1 : $integer[0] > 12
@@ -456,7 +456,7 @@ set epochtemp = +get_seconds_for_date<0<month<year
 execute "+cal<epochtemp"
 }
 
-grammar time >time
+grammar time     >time
 
 {+time
 if interpreter = NDS
@@ -468,7 +468,7 @@ endif
 write "The current time is " epoch{time} ".^" 
 }
 
-grammar date >date
+grammar date     >date
 
 {+date
 set epoch = unixtime
@@ -476,13 +476,13 @@ execute "+process_epoch<epoch"
 write "Date set to " epoch{full_date} ".^"
 }
 
-grammar epoch >epoch
+grammar epoch     >epoch
 
 {+epoch
 write "Date set to " epoch{full_date} ".^"
 }
 
-grammar date $integer >date1
+grammar date $integer     >date1
 
 {+date1
 if $integer[0] < 1 : $integer[0] > 31
@@ -494,7 +494,7 @@ set epoch = +get_seconds_for_date<date<this_month<this_year
 write "Date set to " epoch{full_date} ".^"
 }
 
-grammar date $integer $integer >date2
+grammar date $integer $integer     >date2
 
 {+date2
 if $integer[0] < 1 : $integer[0] > 31
@@ -511,7 +511,7 @@ set epoch = +get_seconds_for_date<date<month<this_year
 write "Date set to " epoch{full_date} ".^"
 }
 
-grammar date $integer $integer $integer >date3
+grammar date $integer $integer $integer     >date3
 
 {+date3
 if $integer[0] < 1 : $integer[0] > 31
@@ -559,7 +559,7 @@ if display_calendar = true
 endif
 }
 
-integer status_window 18
+integer status_window     18
 
 {+update_status_window
 cursor 1 0
