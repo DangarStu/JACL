@@ -607,6 +607,16 @@ endif
 set time = false
 }
 
+# Di jacl (konsol) C-runtime menangkap QUIT_WORD sebelum parser — grammar
+# ini hanya aktif di cgijacl/fcgijacl. QUIT_WORD sekarang "quit" (bukan
+# "keluar"), jadi keluar tetap mengacu ke grammar >out untuk keluar ruangan.
+grammar quit     >quit_info
+
+{+quit_info
+write "Permainan disimpan secara otomatis. Untuk berhenti bermain, tutup tab browser atau buka halaman lain.^"
+set time = false
+}
+
 grammar bantu *present     >help_other
 grammar help *present      >help_other
 

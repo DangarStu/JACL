@@ -601,6 +601,16 @@ endif
 set time = false
 }
 
+# En jacl (consola) el runtime C captura QUIT_WORD antes del parser — esta
+# gramatica solo aplica en cgijacl/fcgijacl. QUIT_WORD ahora es "quit" (no
+# "salir"), asi que salir sigue mapeandose a grammar >out para salir de la sala.
+grammar quit     >quit_info
+
+{+quit_info
+write "La partida se guarda automaticamente. Para dejar de jugar, cierra la pestana del navegador o navega a otra pagina.^"
+set time = false
+}
+
 grammar ayuda *present     >help_other
 grammar help *present      >help_other
 
