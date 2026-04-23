@@ -324,6 +324,12 @@ set linebreaks = true
 # -------------------------------------------------------------------
 
 {+library_eachturn
+# The <jacl-directions> marker only means anything to the web interpreter's
+# ajax response handler; emitting it into a GLK/console transcript would
+# leak raw HTML into the text window.
+if interpreter <> CGI
+   return
+endif
 set linebreaks = false
 write "<jacl-directions style=~display:none~>"
 execute "+exits"

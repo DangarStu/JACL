@@ -560,8 +560,12 @@ grammar voice     >voice
 grammar suara     >voice
 
 {+voice
-write "Sintesis suara diaktifkan.^"
-write "<script>enableSpeak();</script>"
+if interpreter = CGI
+   write "Sintesis suara diaktifkan.^"
+   write "<script>enableSpeak();</script>"
+else
+   write "Sintesis suara hanya tersedia di penerjemah web.^"
+endif
 set time = false
 }
 
@@ -571,15 +575,23 @@ grammar diam             >unvoice
 grammar bisu             >unvoice
 
 {+unvoice
-write "Sintesis suara dinonaktifkan.^"
-write "<script>disableSpeak();</script>"
+if interpreter = CGI
+   write "Sintesis suara dinonaktifkan.^"
+   write "<script>disableSpeak();</script>"
+else
+   write "Sintesis suara hanya tersedia di penerjemah web.^"
+endif
 set time = false
 }
 
 grammar voices     >voices_list
 
 {+voices_list
-write "<script>jaclListVoices();</script>"
+if interpreter = CGI
+   write "<script>jaclListVoices();</script>"
+else
+   write "Sintesis suara hanya tersedia di penerjemah web.^"
+endif
 set time = false
 }
 
@@ -587,7 +599,11 @@ grammar voice $integer     >voice_select
 grammar suara $integer     >voice_select
 
 {+voice_select
-write "<script>jaclPickVoice(" $integer ");</script>"
+if interpreter = CGI
+   write "<script>jaclPickVoice(" $integer ");</script>"
+else
+   write "Sintesis suara hanya tersedia di penerjemah web.^"
+endif
 set time = false
 }
 
@@ -1639,7 +1655,9 @@ grammar insert **held on *present       >insert_on
 grammar put **held on *present          >insert_on
 grammar place **held on *present        >insert_on
 grammar taruh **held di *present        >insert_on
+grammar menaruh **held di *present      >insert_on
 grammar letakkan **held di *present     >insert_on
+grammar meletakkan **held di *present   >insert_on
 
 {+insert_on
 if +important<noun2 = true

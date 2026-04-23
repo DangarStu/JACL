@@ -551,8 +551,12 @@ grammar voz       >voice
 grammar voice     >voice
 
 {+voice
-write "Sintesis de voz activada.^"
-write "<script>enableSpeak();</script>"
+if interpreter = CGI
+   write "Sintesis de voz activada.^"
+   write "<script>enableSpeak();</script>"
+else
+   write "La sintesis de voz solo esta disponible en el interprete web.^"
+endif
 set time = false
 }
 
@@ -564,8 +568,12 @@ grammar mute               >unvoice
 grammar silenciar          >unvoice
 
 {+unvoice
-write "Sintesis de voz desactivada.^"
-write "<script>disableSpeak();</script>"
+if interpreter = CGI
+   write "Sintesis de voz desactivada.^"
+   write "<script>disableSpeak();</script>"
+else
+   write "La sintesis de voz solo esta disponible en el interprete web.^"
+endif
 set time = false
 }
 
@@ -573,7 +581,11 @@ grammar voices     >voices_list
 grammar voces      >voices_list
 
 {+voices_list
-write "<script>jaclListVoices();</script>"
+if interpreter = CGI
+   write "<script>jaclListVoices();</script>"
+else
+   write "La sintesis de voz solo esta disponible en el interprete web.^"
+endif
 set time = false
 }
 
@@ -581,7 +593,11 @@ grammar voice $integer     >voice_select
 grammar voz $integer       >voice_select
 
 {+voice_select
-write "<script>jaclPickVoice(" $integer ");</script>"
+if interpreter = CGI
+   write "<script>jaclPickVoice(" $integer ");</script>"
+else
+   write "La sintesis de voz solo esta disponible en el interprete web.^"
+endif
 set time = false
 }
 

@@ -481,8 +481,12 @@ set time = false
 grammar voice     >voice
 
 {+voice
-write "Speech synthesis enabled.^"
-write "<script>enableSpeak();</script>"
+if interpreter = CGI
+   write "Speech synthesis enabled.^"
+   write "<script>enableSpeak();</script>"
+else
+   write "Speech synthesis is only available in the web interpreter.^"
+endif
 set time = false
 }
 
@@ -492,22 +496,34 @@ grammar unvoice          >unvoice
 grammar mute             >unvoice
 
 {+unvoice
-write "Speech synthesis disabled.^"
-write "<script>disableSpeak();</script>"
+if interpreter = CGI
+   write "Speech synthesis disabled.^"
+   write "<script>disableSpeak();</script>"
+else
+   write "Speech synthesis is only available in the web interpreter.^"
+endif
 set time = false
 }
 
 grammar voices     >voices_list
 
 {+voices_list
-write "<script>jaclListVoices();</script>"
+if interpreter = CGI
+   write "<script>jaclListVoices();</script>"
+else
+   write "Speech synthesis is only available in the web interpreter.^"
+endif
 set time = false
 }
 
 grammar voice $integer     >voice_select
 
 {+voice_select
-write "<script>jaclPickVoice(" $integer ");</script>"
+if interpreter = CGI
+   write "<script>jaclPickVoice(" $integer ");</script>"
+else
+   write "Speech synthesis is only available in the web interpreter.^"
+endif
 set time = false
 }
 

@@ -633,23 +633,35 @@ set time = false
 grammar voix     >voice
 
 {+voice
-write "Synth&egrave;se vocale activ&eacute;e.^"
-write "<script>enableSpeak();</script>"
+if interpreter = CGI
+   write "Synth&egrave;se vocale activ&eacute;e.^"
+   write "<script>enableSpeak();</script>"
+else
+   write "La synth&egrave;se vocale n'est disponible que dans l'interpr&eacute;teur web.^"
+endif
 set time = false
 }
 
 grammar silence     >unvoice
 
 {+unvoice
-write "Synth&egrave;se vocale d&eacute;sactiv&eacute;e.^"
-write "<script>disableSpeak();</script>"
+if interpreter = CGI
+   write "Synth&egrave;se vocale d&eacute;sactiv&eacute;e.^"
+   write "<script>disableSpeak();</script>"
+else
+   write "La synth&egrave;se vocale n'est disponible que dans l'interpr&eacute;teur web.^"
+endif
 set time = false
 }
 
 grammar voices     >voices_list
 
 {+voices_list
-write "<script>jaclListVoices();</script>"
+if interpreter = CGI
+   write "<script>jaclListVoices();</script>"
+else
+   write "La synth&egrave;se vocale n'est disponible que dans l'interpr&eacute;teur web.^"
+endif
 set time = false
 }
 
@@ -657,7 +669,11 @@ grammar voice $integer     >voice_select
 grammar voix $integer      >voice_select
 
 {+voice_select
-write "<script>jaclPickVoice(" $integer ");</script>"
+if interpreter = CGI
+   write "<script>jaclPickVoice(" $integer ");</script>"
+else
+   write "La synth&egrave;se vocale n'est disponible que dans l'interpr&eacute;teur web.^"
+endif
 set time = false
 }
 

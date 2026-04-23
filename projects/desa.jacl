@@ -1459,20 +1459,23 @@ write "^^" game_title
 style normal
 write " oleh " game_author "^^"
 
-write "Apakah Anda ingin permainan ini berbicara? (ya/tidak)^"
-getyesorno speech_choice
-if interpreter = GLK
+if interpreter = CGI
+   write "Apakah Anda ingin permainan ini berbicara? (ya/tidak)^"
+   getyesorno speech_choice
+else
    execute "+start_game"
 endif
 }
 
 {+start_game
-if speech_choice = true
-   write "Sintesis suara diaktifkan.^^"
-   write "<script>enableSpeak();</script>"
-else
-   write "Sintesis suara dinonaktifkan.^^"
-   write "<script>disableSpeak();</script>"
+if interpreter = CGI
+   if speech_choice = true
+      write "Sintesis suara diaktifkan.^^"
+      write "<script>enableSpeak();</script>"
+   else
+      write "Sintesis suara dinonaktifkan.^^"
+      write "<script>disableSpeak();</script>"
+   endif
 endif
 
 print:

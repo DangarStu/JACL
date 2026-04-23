@@ -1048,20 +1048,23 @@ write "^^" game_title
 style normal
 write " par " game_author "^^"
 
-write "Voulez-vous que le jeu parle à voix haute ? (oui/non)^"
-getyesorno speech_choice
-if interpreter = GLK
+if interpreter = CGI
+   write "Voulez-vous que le jeu parle à voix haute ? (oui/non)^"
+   getyesorno speech_choice
+else
    execute "+start_game"
 endif
 }
 
 {+start_game
-if speech_choice = true
-   write "Synthèse vocale activée.^^"
-   write "<script>enableSpeak();</script>"
-else
-   write "Synthèse vocale désactivée.^^"
-   write "<script>disableSpeak();</script>"
+if interpreter = CGI
+   if speech_choice = true
+      write "Synthèse vocale activée.^^"
+      write "<script>enableSpeak();</script>"
+   else
+      write "Synthèse vocale désactivée.^^"
+      write "<script>disableSpeak();</script>"
+   endif
 endif
 
 print:
