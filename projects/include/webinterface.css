@@ -63,10 +63,12 @@ print:
 		color: black;
                 font-weight: 900; 
                 font-size: 12pt;}^
-	h1 { 		
+	h1 {
 		padding-left: 18px;
 		font-family: Merriweather, Verdana, Arial, Sanserif;
-		color: black; 
+.
+write "		color: " title_colour "; ^"
+print:
 		font-size: 24pt; }^
 	h2 {	
 		font-family: Merriweather, Georgia, Palatino, Times, Serif;

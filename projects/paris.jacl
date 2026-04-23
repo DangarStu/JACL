@@ -13,6 +13,7 @@ constant game_publish     true
 constant header_colour       "#2a3f5f"
 constant linkbar_colour      "#4b6a92"
 constant maintext_colour     "#f6f2ec"
+constant title_colour        "#e0e0e0"
 
 # -----------------------------------------------------------------------------
 # LOCATIONS

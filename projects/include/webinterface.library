@@ -6,6 +6,7 @@ string game_language     "en-US"
 constant header_colour       "#42596d"
 constant linkbar_colour      "#6a7a87"
 constant maintext_colour     "#eeeeee"
+constant title_colour        "black"
 constant footer_image        "none"
 
 {+header
