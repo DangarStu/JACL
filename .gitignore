@@ -35,4 +35,4 @@ __pycache__/
 
 # local data / misc
 map montana.png
-projects/data/
+projects/data/artefact-default.csv

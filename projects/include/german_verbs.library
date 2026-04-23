@@ -723,11 +723,24 @@ write "`SPIEL' BEZIEHT SICH AUF SIMULATIONEN UND SPIELE WELCHE TAKTISCHE UND "
 write "STRATEGISCHE APPLIKATIONEN BEINHALTEN.^"
 }
 
-grammar lookup $string     >lookup_word
-grammar dict $string       >lookup_word
+integer wort_gefunden
+
+grammar lookup $string         >lookup_word
+grammar dict $string           >lookup_word
+grammar nachschlagen $string   >lookup_word
+grammar bedeutung $string      >lookup_word
 
 {+lookup_word
-write "Für dieses Spiel ist kein Wörterbuch verfügbar.^"
+set wort_gefunden = false
+iterate "german_words.csv" skip_header
+   ifstring field[0] = $string
+      write "Das Wort " $string " bedeutet " field[1] ".^"
+      set wort_gefunden = true
+   endif
+enditerate
+if wort_gefunden = false
+   write "Das Wort ~" $string "~ steht nicht im Wörterbuch.^"
+endif
 set time = false
 }
 
