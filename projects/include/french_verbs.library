@@ -38,7 +38,6 @@ synonym using         with
 synonym gentleman     man
 
 
-
 synonym sur          on
 synonym dans         in
 synonym dedans       in
@@ -155,8 +154,6 @@ synonym aux        au
 synonym aupres     auprès
 
 
-
-
 integer_array available_exits     12 0
 string dir_command     nord sud est ouest nord-est nord-ouest
 string dir_command     sud-est sud-ouest haut bas dedans dehors
@@ -188,6 +185,7 @@ string dir_command     sud-est sud-ouest haut bas dedans dehors
     endif
 }
 
+
 grammar about         >about
 grammar "apropos"     >about
 
@@ -201,6 +199,7 @@ write " / JACL verb.library version " library_version "^^"
 }
 
 constant NO_GO     22000
+
 
 grammar exits       >exits
 grammar sorties     >exits
@@ -369,6 +368,7 @@ return false
 location limbo : limbo
  has           DONT_MAP
 
+
 grammar shake     >shake_only
 
 {+shake_only
@@ -376,10 +376,9 @@ write "Peur ?^"
 set time = false
 }
 
-grammar shake *held     >shake
-grammar wave *held      >shake
 
 grammar secouer *held     >secouer
+
 {+secouer
 	proxy "shake " noun1
 }
@@ -391,6 +390,9 @@ grammar secouer *held     >secouer
 # les verbes synonymes doivent être rajoutés en synonyme, pas en autre forme de verbe
 # (ou sinon c'est fastidieux)
 
+
+grammar shake *held       >shake
+grammar wave *held        >shake
 grammar secouer *held     >shake
 
 {+shake
@@ -400,7 +402,6 @@ endif
 write "Considérez cela comme étant fait.^"
 #TODO améliorer ?...
 }
-
 
 
 grammar say xyzzy     >xyzzy
@@ -426,8 +427,8 @@ write "^La porte se ferme et disparaît à nouveau. "
 write "Peut-être un autre jour...^"
 }
 
-grammar save $string     >named_save
 
+grammar save $string            >named_save
 grammar sauver $string          >named_save
 grammar sauvegarder $string     >named_save
 
@@ -438,6 +439,7 @@ if INDEX = true
 endif
 set time = false
 }
+
 
 grammar restore $string       >named_restore
 grammar charger $string       >named_restore
@@ -471,6 +473,7 @@ repeat
 until TEMP = false
 }
 
+
 grammar save            >save_game
 grammar sauvegarder     >save_game
 grammar sauver          >save_game
@@ -482,6 +485,7 @@ if INDEX = true
 endif
 set time = false
 }
+
 
 grammar restore       >restore_game
 grammar charger       >restore_game
@@ -497,6 +501,7 @@ endif
 set time = false
 }
 
+
 grammar status on     >status_on
 
 {+status_on
@@ -508,6 +513,7 @@ write "Status window turned on.^"
 endif
 set time = false
 }
+
 
 grammar status off     >status_off
 
@@ -521,10 +527,10 @@ endif
 set time = false
 }
 
+
 grammar sound on       >sound_on
 grammar music on       >sound_on
 grammar musique on     >sound_on
-
 
 {+sound_on
 if sound_enabled = true
@@ -535,6 +541,7 @@ write "Son activé.^"
 endif
 set time = false
 }
+
 
 grammar sound off        >sound_off
 grammar music off        >sound_off
@@ -555,6 +562,7 @@ endif
 set time = false
 }
 
+
 grammar graphics on     >graphics_on
 
 {+graphics_on
@@ -566,6 +574,7 @@ write "Graphics enabled.^"
 endif
 set time = false
 }
+
 
 grammar graphics off     >graphics_off
 
@@ -579,6 +588,7 @@ endif
 set time = false
 }
 
+
 grammar timer on     >timer_on
 
 {+timer_on
@@ -591,6 +601,7 @@ endif
 set time = false
 }
 
+
 grammar timer off     >timer_off
 
 {+timer_off
@@ -602,6 +613,7 @@ write "Timer disabled.^"
 endif
 set time = false
 }
+
 
 grammar verbose     >verbose
 
@@ -617,6 +629,7 @@ look
 set time = false
 }
 
+
 grammar brief     >brief
 
 {+brief
@@ -630,6 +643,7 @@ set display_mode = 0
 set time = false
 }
 
+
 grammar voix     >voice
 
 {+voice
@@ -641,6 +655,7 @@ else
 endif
 set time = false
 }
+
 
 grammar silence     >unvoice
 
@@ -654,6 +669,7 @@ endif
 set time = false
 }
 
+
 grammar voices     >voices_list
 
 {+voices_list
@@ -664,6 +680,7 @@ else
 endif
 set time = false
 }
+
 
 grammar voice $integer     >voice_select
 grammar voix $integer      >voice_select
@@ -679,6 +696,7 @@ set time = false
 
 # Sous jacl (console) le runtime C attrape QUIT_WORD avant le parseur ; cette
 # grammaire n'est donc active que dans cgijacl/fcgijacl.
+
 grammar quitter     >quit_info
 grammar quit        >quit_info
 
@@ -687,13 +705,15 @@ write "La partie est enregistrée automatiquement. Fermez l'onglet du navigateur
 set time = false
 }
 
-grammar help *present     >help_other
 
 grammar aider *held     >aider
+
 {+aider
 	proxy "help " noun1
 }
 
+
+grammar help *present                      >help_other
 grammar aider *present                     >help_other
 grammar donner coup of main à *present     >help_other
 grammar donner coup of main a *present     >help_other
@@ -702,12 +722,11 @@ grammar donner coup of main a *present     >help_other
 write "Comment comptez-vous aider " noun1{the} " ?^"
 }
 
-grammar hint *present     >hint_nonum
-grammar hint              >hint_nonum
 
+grammar hint *present        >hint_nonum
+grammar hint                 >hint_nonum
 grammar astuces *present     >hint_nonum
 grammar astuces              >hint_nonum
-
 
 {+hint_nonum
 if noun1 = false
@@ -716,6 +735,7 @@ else
    proxy "hint 1 " noun1{names} 
 endif
 }
+
 
 grammar hint $integer *present     >hint
 grammar hint $integer              >hint
@@ -729,6 +749,7 @@ endif
 set time = false
 }
 
+
 grammar help games      >help_games
 grammar aide de jeu     >help_games
 
@@ -738,6 +759,7 @@ write "AND STRATEGIC APPLICATIONS.^"
 }
 
 integer mot_trouve
+
 
 grammar lookup $string            >lookup_word
 grammar dict $string              >lookup_word
@@ -760,14 +782,15 @@ endif
 set time = false
 }
 
-grammar hug         >hug_only
-grammar comfort     >hug_only
-grammar cuddle      >hug_only
-grammar console     >hug_only
 
-grammar consoler     >hug_only
 #grammar embrasser		>hug_only
 
+
+grammar hug          >hug_only
+grammar comfort      >hug_only
+grammar cuddle       >hug_only
+grammar console      >hug_only
+grammar consoler     >hug_only
 
 {+hug_only
 if +get_animate != 0
@@ -779,20 +802,22 @@ setstring question "consoler "
 set time = false
 }
 
-grammar hug *present         >hug
-grammar comfort *present     >hug
-grammar cuddle *present      >hug
-grammar console *present     >hug
 
 grammar consoler *present     >consoler
+
 {+consoler
 	proxy "hug " noun1
 }
 
-grammar consoler *present     >hug
 synonym conforter     consoler
 
 #grammar embr-asser *present >hug
+
+grammar hug *present          >hug
+grammar comfort *present      >hug
+grammar cuddle *present       >hug
+grammar console *present      >hug
+grammar consoler *present     >hug
 
 {+hug
 if +important<noun1 = true
@@ -812,12 +837,13 @@ endif
 write "Il est certain que " noun1{the} " se sent" " bien mieux maintenant.^"
 }
 
-grammar kiss     >kiss_only
-grammar pash     >kiss_only
-grammar snog     >kiss_only
 
-grammar embrasser     >kiss_only
 # <!> conflit avec hug
+
+grammar kiss          >kiss_only
+grammar pash          >kiss_only
+grammar snog          >kiss_only
+grammar embrasser     >kiss_only
 
 {+kiss_only
 if +get_animate != 0
@@ -829,15 +855,17 @@ setstring question "kiss "
 set time = false
 }
 
-grammar kiss *present     >kiss
-grammar pash *present     >kiss
-grammar snog *present     >kiss
 
 grammar embrasser *present     >embrasser
+
 {+embrasser
 	proxy "kiss " noun1
 }
 
+
+grammar kiss *present          >kiss
+grammar pash *present          >kiss
+grammar snog *present          >kiss
 grammar embrasser *present     >kiss
 
 {+kiss
@@ -854,19 +882,21 @@ override
 write "Hmmmmmm...^"
 }
 
-grammar dig *present             >dig_in
-grammar dig in *present          >dig_in
-grammar dig up *present          >dig_in
-grammar dig through *present     >dig_in
 
 grammar creuser *present     >creuser
+
 {+creuser
 	proxy "dig " noun1
 }
 
-grammar creuser *present        >dig_in
-grammar creuser in *present     >dig_in
 #TODO
+
+grammar dig *present             >dig_in
+grammar dig in *present          >dig_in
+grammar dig up *present          >dig_in
+grammar dig through *present     >dig_in
+grammar creuser *present         >dig_in
+grammar creuser in *present      >dig_in
 
 {+dig_in
 if +important<noun1 = true
@@ -883,8 +913,8 @@ write "Vous ne pouvez creuser dans " noun1{the} ".^"
 set time = false
 }
 
-grammar dig     >dig
 
+grammar dig         >dig
 grammar creuser     >dig
 
 {+dig
@@ -900,16 +930,18 @@ endif
 set time = false
 }
 
-grammar pick     >pick_only
 
 #grammar prendre >pick_only
 #déjà utilisé avec get ?
+
+grammar pick     >pick_only
 
 {+pick_only
 write "What did you want to pick?^"
 setstring question "pick "
 set time = false
 }
+
 
 grammar pick *present     >pick_one
 
@@ -922,6 +954,7 @@ write "What did you want to pick " noun1{the} " with?^"
 setstring question "pick " noun1{the} " with "
 set time = false
 }
+
 
 grammar pick *present with *held     >pick_with
 
@@ -942,14 +975,16 @@ override
 write "You can't pick " noun1{the} " with " noun2{the} .^
 }
 
-grammar rub *present     >rub
-grammar pat *present     >rub
 
 grammar frotter *present     >frotter
+
 {+frotter
 	proxy "rub " noun1
 }
 
+
+grammar rub *present         >rub
+grammar pat *present         >rub
 grammar frotter *present     >rub
 
 {+rub
@@ -967,6 +1002,7 @@ write "Je suis certain que " noun1{the} " se sent mieux maintenant.^"
 }
 #TODO : default answer only relevant for animate?
 
+
 grammar rub *held on *present     >rub_on
 
 {+rub_on
@@ -983,10 +1019,11 @@ override
 proxy "rub " noun2{names} " with " noun1{names}
 }
 
-grammar rub *present with *held     >rub_with
 
 #TODO : french?
 
+
+grammar rub *present with *held         >rub_with
 grammar frotter *present with *held     >rub_with
 
 {+rub_with
@@ -1006,10 +1043,11 @@ override
 write "Ils sont juste un peu plus chaud.^"
 }
 
-grammar lick *present      >lick
-grammar taste *present     >lick
 
 #déjà avec taste ?
+
+grammar lick *present      >lick
+grammar taste *present     >lick
 
 {+lick
 if +important<noun1 = true
@@ -1025,14 +1063,16 @@ override
 write "Yeuucck!^"
 }
 
-grammar pull **present     >pull
-grammar tug **present      >pull
 
 grammar tirer *present     >tirer
+
 {+tirer
 	proxy "pull " noun1
 }
 
+
+grammar pull **present      >pull
+grammar tug **present       >pull
 grammar tirer **present     >pull
 
 {+pull
@@ -1049,15 +1089,17 @@ override
 write "Vous ne pouvez tirer " noun1{the} .^
 }
 
-grammar cut *present      >cut
-grammar chop *present     >cut
-grammar stab *present     >cut
 
 grammar couper *present     >couper
+
 {+couper
 	proxy "cut " noun1
 }
 
+
+grammar cut *present        >cut
+grammar chop *present       >cut
+grammar stab *present       >cut
 grammar couper *present     >cut
 
 {+cut
@@ -1066,15 +1108,15 @@ setstring question "couper " noun1{names} " avec "
 set time = false
 }
 
-grammar cut *present with *held      >cut_with
-grammar chop *present with *held     >cut_with
-grammar stab *present with *held     >cut_with
 
+# TODO : obligé de marquer les 2 formes
+
+grammar cut *present with *held          >cut_with
+grammar chop *present with *held         >cut_with
+grammar stab *present with *held         >cut_with
 grammar couper *present with *held       >cut_with
 grammar decouper *present with *held     >cut_with
 grammar découper *present with *held     >cut_with
-
-# TODO : obligé de marquer les 2 formes
 
 {+cut_with
 if +not_held<noun2 = true
@@ -1098,14 +1140,16 @@ write "Vandale !^"
 set time = false
 }
 
-grammar peel *present     >peel
-grammar skin *present     >peel
 
 grammar peler *present     >peler
+
 {+peler
 	proxy "peel " noun1
 }
 
+
+grammar peel *present      >peel
+grammar skin *present      >peel
 grammar peler *present     >peel
 
 {+peel
@@ -1123,6 +1167,24 @@ write "Vous ne pouvez peler " noun1{the} ".^"
 set time = false
 }
 
+
+grammar casser *present     >casser
+
+{+casser
+	proxy "break " noun1
+}
+
+
+synonym déchirer     casser
+synonym dechirer     casser
+synonym detruire     casser
+synonym detruire     casser
+
+#grammar déchirer **present 	>break
+#grammar détruire **present	>break
+#grammar dechirer **present 	>break
+#grammar detruire **present 	>break
+
 grammar break *present         >break
 grammar smash *present         >break
 grammar crush *present         >break
@@ -1139,23 +1201,7 @@ grammar rip up **present       >break
 grammar rip **present up       >break
 grammar rip off **present      >break
 grammar rip **present off      >break
-
-grammar casser *present     >casser
-{+casser
-	proxy "break " noun1
-}
-
-grammar casser **present     >break
-
-synonym déchirer     casser
-synonym dechirer     casser
-synonym detruire     casser
-synonym detruire     casser
-
-#grammar déchirer **present 	>break
-#grammar détruire **present	>break
-#grammar dechirer **present 	>break
-#grammar detruire **present 	>break
+grammar casser **present       >break
 
 {+break
 if +important<noun1 = true
@@ -1176,17 +1222,19 @@ endif
 set time = false
 }
 
-grammar clean *present      >clean
-grammar wash *present       >clean
-grammar wipe *present       >clean
-grammar scrub *present      >clean
-grammar polish *present     >clean
 
 grammar nettoyer *present     >nettoyer
+
 {+nettoyer
 	proxy "clean " noun1
 }
 
+
+grammar clean *present        >clean
+grammar wash *present         >clean
+grammar wipe *present         >clean
+grammar scrub *present        >clean
+grammar polish *present       >clean
 grammar nettoyer *present     >clean
 
 {+clean
@@ -1208,11 +1256,11 @@ override
 write "C'est très gentil de votre part.^"
 }
 
-grammar clean *present with *held     >clean_with
-grammar wipe *present with *held      >clean_with
-grammar scrub *present with *held     >clean_with
-grammar brush *present with *held     >clean_with
 
+grammar clean *present with *held        >clean_with
+grammar wipe *present with *held         >clean_with
+grammar scrub *present with *held        >clean_with
+grammar brush *present with *held        >clean_with
 grammar nettoyer *present with *held     >clean_with
 
 {+clean_with
@@ -1239,43 +1287,41 @@ write "Vous ne pouvez pas nettoyer " noun1{the} " avec " noun2{the} .^
 set time = false
 }
 
-grammar yell at *present       >yell_at
-grammar scream at *present     >yell_at
 
+# on utilise "on" car "sur" a été défini comme synonyme de "on" plus haut.
+
+grammar yell at *present         >yell_at
+grammar scream at *present       >yell_at
 grammar crier on *present        >yell_at
 grammar crier vers *present      >yell_at
 grammar hurler on *present       >yell_at
 grammar hurler vers *present     >yell_at
 
-# on utilise "on" car "sur" a été défini comme synonyme de "on" plus haut.
-
 {+yell_at
 write "Oooh, ça fait peur...^"
 }
 
+
 grammar yell       >yell
 grammar scream     >yell
-
 grammar crier      >yell
 grammar hurler     >yell
-
-
 
 {+yell
 write "Vous avez maintenant mal à la gorge.^"
 }
 
-grammar pay *present     >pay
 
+grammar pay *present       >pay
 grammar payer *present     >pay
 
 {+pay
 write "Vous ne pouvez payer pour " noun1{the} .^
 }
 
-grammar order *anywhere     >order
-grammar buy *anywhere       >order
 
+grammar order *anywhere       >order
+grammar buy *anywhere         >order
 grammar acheter *anywhere     >order
 
 {+order
@@ -1283,12 +1329,13 @@ write "Votre commande est tombée dans l'oreille d'un sourd.^"
 # Your order appears to have fallen on deaf ears
 }
 
-grammar knock on *present     >knock_on
-grammar tap on *present       >knock_on
-grammar tap *present          >knock_on
 
 #grammar frapper *present          >knock_on
 # doublon avec hit/attack
+
+grammar knock on *present     >knock_on
+grammar tap on *present       >knock_on
+grammar tap *present          >knock_on
 
 {+knock_on
 if +important<noun1 = true
@@ -1312,8 +1359,8 @@ endif
 write "You gently tap on " noun1{the} ".^"
 }
 
-grammar smoke *present     >smoke
 
+grammar smoke *present     >smoke
 grammar fumer *present     >smoke
 
 {+smoke
@@ -1331,13 +1378,11 @@ write "Vous ne pouvez fumer " noun1{the} .^
 set time = false
 }
 
+
 grammar play *present      >play
 grammar sound *present     >play
 grammar ring *present      >play
-
 grammar jouer *present     >play
-
-
 
 {+play
 if +important<noun1 = true
@@ -1355,10 +1400,10 @@ write "Vous ne pouvez jouer " noun1{the} .^
 set time = false
 }
 
+
 grammar play *present with *held      >play_with
 grammar sound *present with *held     >play_with
 grammar ring *present with *held      >play_with
-
 grammar jouer *present with *held     >play_with
 
 {+play_with
@@ -1379,8 +1424,8 @@ write "Vous ne pouvez jouer " noun1{the} " avec " noun1{the} .^
 set time = false
 }
 
-grammar pump *present     >pump
 
+grammar pump *present       >pump
 grammar pomper *present     >pump
 
 {+pump
@@ -1398,14 +1443,15 @@ write "Vous ne pouvez pomper " noun1{the} .^
 set time = false
 }
 
+
 grammar unload *here     >empty
 grammar empty *here      >empty
-
-grammar vider *here     >empty
+grammar vider *here      >empty
 
 {+empty
 proxy "take all from " noun1{names}
 }
+
 
 grammar extract **here with *held      >take_with
 grammar get **here with *held          >take_with
@@ -1421,10 +1467,11 @@ endif
 proxy "fill " noun2{names} " with " noun1{names}
 }
 
-grammar fill *held from *present     >fill_from
 
-grammar remplir *held from *present     >fill_from
 # nuance non pertinente en français ?
+
+grammar fill *held from *present        >fill_from
+grammar remplir *held from *present     >fill_from
 
 {+fill_from
 if +not_held<noun1 = true
@@ -1445,8 +1492,8 @@ endif
 proxy "fill " noun1{names} " with " CHILD{names}
 }
 
-grammar fill *held with *present     >fill_with
 
+grammar fill *held with *present        >fill_with
 grammar remplir *held with *present     >fill_with
 grammar emplir *held with *present      >fill_with
 
@@ -1522,8 +1569,8 @@ endselect
 return false
 }
 
-grammar fill *held     >fill
 
+grammar fill *held        >fill
 grammar emplir *held      >fill
 grammar remplir *held     >fill
 
@@ -1543,11 +1590,12 @@ setstring question "fill " noun1{names} " with "
 set time = false
 }
 
+
+#grammar southeast lever	>stand
+
 grammar stand        >stand
 grammar stand up     >stand
 grammar get up       >stand
-
-#grammar southeast lever	>stand
 grammar se lever     >stand
 grammar me lever     >stand
 
@@ -1560,8 +1608,8 @@ endif
 write "Vous êtes déjà debout.^"
 }
 
-grammar sleep     >sleep
 
+grammar sleep      >sleep
 grammar dormir     >sleep
 
 {+sleep
@@ -1569,14 +1617,13 @@ write "Vous aurez le temps de faire cela plus tard...^"
 set time = false
 }
 
-grammar lie on *present          >lie_on
-grammar lie down on *present     >lie_on
-grammar sleep on *present        >lie_on
-grammar sleep in *present        >lie_on
 
+grammar lie on *present            >lie_on
+grammar lie down on *present       >lie_on
+grammar sleep on *present          >lie_on
+grammar sleep in *present          >lie_on
 grammar se coucher on *present     >lie_on
 grammar me coucher on *present     >lie_on
-
 
 {+lie_on
 if +important<noun1 = true
@@ -1593,13 +1640,13 @@ write  noun1{The} " " noun1{doesnt} " semble pas être le meilleur endroit pour 
 write "faire un somme.^"
 }
 
+
 grammar sit            >sit
 grammar sit down       >sit
 grammar squat          >sit
 grammar squat down     >sit
-
-grammar s'asseoir     >sit
-grammar m'asseoir     >sit
+grammar s'asseoir      >sit
+grammar m'asseoir      >sit
 
 {+sit
 set time = false
@@ -1619,13 +1666,12 @@ write "Vous vous asseyez.^"
 ensure player has SITTING
 }
 
-grammar sit *here        >sit_on
-grammar sit on *here     >sit_on
-grammar sit in *here     >sit_on
 
+grammar sit *here             >sit_on
+grammar sit on *here          >sit_on
+grammar sit in *here          >sit_on
 grammar s'assoir on *here     >sit_on
 grammar m'assoir on *here     >sit_on
-
 grammar s'assoir in *here     >sit_on
 grammar m'assoir in *here     >sit_on
 
@@ -1648,8 +1694,8 @@ override
 write  noun1{The} " " noun1{doesnt} " semble pas très confortable.^"
 }
 
-grammar kick *present     >kick
 
+grammar kick *present       >kick
 grammar botter *present     >kick
 
 {+kick
@@ -1675,12 +1721,12 @@ write "Vous bottez " noun1{the} " à une courte distance.^"
 move noun1 to here
 }
 
-grammar throw *held     >throw
-grammar lob *held       >throw
-grammar hurl *held      >throw
-grammar pitch *held     >throw
-grammar cast *held      >throw
 
+grammar throw *held      >throw
+grammar lob *held        >throw
+grammar hurl *held       >throw
+grammar pitch *held      >throw
+grammar cast *held       >throw
 grammar jeter *held      >throw
 grammar lancer *held     >throw
 
@@ -1705,10 +1751,10 @@ write "Vous jetez " noun1{the} " à une petite distance.^"
 move noun1 to here
 }
 
+
 grammar drop         >drop_only
 grammar put down     >drop_only
-
-grammar laisser     >drop_only
+grammar laisser      >drop_only
 
 {+drop_only
 if +get_dropable != 0
@@ -1720,14 +1766,13 @@ setstring question "drop "
 set time = false
 }
 
-grammar drop **held         >drop
-grammar put **held down     >drop
-grammar put down **held     >drop
 
+grammar drop **held               >drop
+grammar put **held down           >drop
+grammar put down **held           >drop
 grammar laisser **held            >drop
 grammar se débarrasser **held     >drop
 grammar me débarrasser **held     >drop
-
 grammar se debarrasser **held     >drop
 grammar me debarrasser **held     >drop
 
@@ -1754,12 +1799,12 @@ write "Vous laissez " noun1{the} .^
 move noun1 to here
 }
 
+
 grammar take         >take_only
 grammar take out     >take_only
 grammar hold         >take_only
 grammar pick         >take_only
 grammar get          >take_only
-
 grammar prendre      >take_only
 grammar ramasser     >take_only
 
@@ -1773,6 +1818,12 @@ setstring question "prendre "
 set time = false
 }
 
+
+synonym pr           prendre
+synonym cueillir     prendre
+synonym attraper     prendre
+
+
 grammar take **here         >take
 grammar take out **here     >take
 grammar hold **here         >take
@@ -1780,11 +1831,6 @@ grammar pick up **here      >take
 grammar pick **here up      >take
 grammar get **here          >take
 grammar prendre **here      >take
-
-synonym pr           prendre
-synonym cueillir     prendre
-synonym attraper     prendre
-
 
 {+take
 if +important<noun1 = true
@@ -1859,11 +1905,12 @@ endif
 return false
 }
 
+
+#Mettre ?
+
 grammar insert **held on *present     >insert_on
 grammar put **held on *present        >insert_on
 grammar place **held on *present      >insert_on
-
-#Mettre ?
 
 {+insert_on
 if +important<noun2 = true
@@ -1916,6 +1963,7 @@ write "Vous mettez " noun1{the} " sur " noun2{the} .^
 move noun1 to noun2
 }
 
+
 grammar insert **held under *present     >insert_under
 grammar put **held under *present        >insert_under
 grammar place **held under *present      >insert_under
@@ -1952,10 +2000,10 @@ override
 proxy "drop " noun1{names}
 }
 
-grammar insert **held in *present     >insert_in
-grammar put **held in *present        >insert_in
-grammar place **held in *present      >insert_in
 
+grammar insert **held in *present      >insert_in
+grammar put **held in *present         >insert_in
+grammar place **held in *present       >insert_in
 grammar mettre **held in *present      >insert_in
 grammar inserer **held in *present     >insert_in
 
@@ -2031,10 +2079,15 @@ if INDEX = 0
 endif
 }
 
-grammar ask *present for **inside             >ask_for
-grammar tell *present to give me **inside     >ask_for
 
-grammar demander *present to **inside     >ask_for
+grammar ask *present for **inside                   >ask_for
+grammar tell *present to give me **inside           >ask_for
+grammar demander *present to **inside               >ask_for
+grammar *present comma give me *anywhere            >ask_for
+grammar *present comma give *anywhere to myself     >ask_for
+grammar *present comma give *anywhere to me         >ask_for
+grammar *present comma donne moi *anywhere          >ask_for
+grammar *present comma donnez moi *anywhere         >ask_for
 
 {+ask_for
 if +can_talk<noun1 = true
@@ -2072,6 +2125,7 @@ write  noun1{The} " vous donne"  noun1{nt}
 write " noun2{the}.^
 }
 
+
 grammar tell *present about *anywhere          >tell_about
 grammar talk to *present about *anywhere       >tell_about
 grammar talk *present about *anywhere          >tell_about
@@ -2086,7 +2140,19 @@ write  noun1{The} " seem" noun1{s} " fascinated by your story about "
 write noun2{the} .^
 }
 
-grammar ask *present about *anywhere     >ask_about
+
+grammar ask *present about *anywhere                       >ask_about
+grammar *present comma tell me about *anywhere             >ask_about
+grammar *present comma tell me all about *anywhere         >ask_about
+grammar *present comma what do you know about *anwhere     >ask_about
+grammar questionner *present on *anywhere                  >ask_about
+grammar questionner *present a propos *anywhere            >ask_about
+grammar questionner *present à propos *anywhere            >ask_about
+grammar questionner *present au sujet of *anywhere         >ask_about
+grammar parler à *present of *anywhere                     >ask_about
+grammar parler a *present of *anywhere                     >ask_about
+grammar parler avec *present of *anywhere                  >ask_about
+grammar *present comma parle moi *anywhere                 >ask_about
 
 {+ask_about
 if +can_talk<noun1 = true
@@ -2110,6 +2176,11 @@ endif
 write ".^"
 }
 
+
+#grammar donner *held *present	>give_to
+# MARCHE PAS
+
+
 grammar offer *held to *present          >give_to
 grammar give *held to *present           >give_to
 grammar give *held over to *present      >give_to
@@ -2125,15 +2196,11 @@ grammar heave *held to *present          >give_to
 grammar heave *held up to *present       >give_to
 grammar heave *held over to *present     >give_to
 grammar lower *held down to *present     >give_to
-
-#grammar donner *held *present	>give_to
-# MARCHE PAS
-grammar donner *held to *present      >give_to
-grammar donner *held au *present      >give_to
-grammar donner *held aux *present     >give_to
-grammar donner *held à *present       >give_to
-grammar donner *held a *present       >give_to
-
+grammar donner *held to *present         >give_to
+grammar donner *held au *present         >give_to
+grammar donner *held aux *present        >give_to
+grammar donner *held à *present          >give_to
+grammar donner *held a *present          >give_to
 
 {+give_to
 if +not_held<noun1 = true
@@ -2168,22 +2235,20 @@ else
 endif
 }
 
-grammar wiggle *present     >move
-grammar jiggle *present     >move
-grammar move *present       >move
-grammar push *present       >move
 
 #grammar pousser *present	>move
 # authors probably need the "push" action
 
-grammar push **present     >push
-grammar tug **present      >push
 
 grammar pousser *present     >pousser
+
 {+pousser
 	proxy "push " noun1
 }
 
+
+grammar push **present        >push
+grammar tug **present         >push
 grammar pousser **present     >push
 
 {+push
@@ -2201,6 +2266,10 @@ write "Vous ne pouvez pousser " noun1{the} .^
 }
 
 
+grammar wiggle *present     >move
+grammar jiggle *present     >move
+grammar move *present       >move
+grammar push *present       >move
 
 {+move
 if +important<noun1 = true
@@ -2237,8 +2306,8 @@ write "Vous déplacez un peu " noun1{the} ".^"
 ensure noun1 has TOUCHED
 }
 
-grammar read *present     >read
 
+grammar read *present     >read
 grammar lire *present     >read
 
 {+read
@@ -2251,8 +2320,8 @@ endif
 write "Il n'y a rien à lire sur " noun1{the} ".^"
 }
 
-grammar look down     >look_down
 
+grammar look down            >look_down
 grammar regarder en down     >look_down
 
 {+look_down
@@ -2270,6 +2339,7 @@ endif
 write "Vous passez un moment à admirer vos pieds.^"
 }
 
+
 grammar look up     >look_up
 
 {+look_up
@@ -2283,6 +2353,7 @@ else
    write "Vous ne voyez que le ciel.^"
 endif
 }
+
 
 grammar look up *anywhere in *present      >look_up_in
 grammar look for *anywhere in *present     >look_up_in
@@ -2300,10 +2371,10 @@ endif
 write "You don't find any reference to " noun1{the} " in " noun2{the} .^
 }
 
-grammar consult *present about *anywhere     >consult
-grammar consult *present re *anywhere        >consult
-grammar consult *present on *anywhere        >consult
 
+grammar consult *present about *anywhere          >consult
+grammar consult *present re *anywhere             >consult
+grammar consult *present on *anywhere             >consult
 grammar consulter *present au sujet *anywhere     >consult
 grammar consulter *present on *anywhere           >consult
 
@@ -2311,9 +2382,9 @@ grammar consulter *present on *anywhere           >consult
 proxy "look up " noun2{names} " in " noun1{names}
 }
 
-grammar feel *present      >feel
-grammar touch *present     >feel
 
+grammar feel *present        >feel
+grammar touch *present       >feel
 grammar toucher *present     >feel
 
 {+feel
@@ -2327,9 +2398,9 @@ endif
 write "C'est comme " noun1{list} .^
 }
 
-grammar smell     >sniff
-grammar sniff     >sniff
 
+grammar smell      >sniff
+grammar sniff      >sniff
 grammar sentir     >sniff
 
 {+sniff
@@ -2340,9 +2411,9 @@ endif
 write "Vous ne sentez rien de particulier.^"
 }
 
-grammar smell *present     >smell
-grammar sniff *present     >smell
 
+grammar smell *present      >smell
+grammar sniff *present      >smell
 grammar sentir *present     >smell
 
 {+smell
@@ -2357,9 +2428,9 @@ endif
 write "Cela sent comme " noun1{list} .^
 }
 
-grammar taste *present     >taste
-grammar lick *present      >taste
 
+grammar taste *present      >taste
+grammar lick *present       >taste
 grammar goûter *present     >taste
 grammar gouter *present     >taste
 grammar lécher *present     >taste
@@ -2376,10 +2447,11 @@ endif
 write "Cela a un goût de " noun1{list} ".^"
 }
 
-grammar look in *present     >look_in
 
 #grammar regarder in *present      >look_in
 # voir search
+
+grammar look in *present     >look_in
 
 {+look_in
 if +important<noun1 = true
@@ -2405,8 +2477,8 @@ execute "+details<noun1"
 write "^"
 }
 
-grammar search *present     >search
 
+grammar search *present          >search
 grammar fouiller *present        >search
 grammar regarder in *present     >search
 
@@ -2423,18 +2495,17 @@ else
 endif
 }
 
-grammar look *present        >examine
-grammar look at *present     >examine
-grammar l at *present        >examine
-grammar look on *present     >examine
-grammar examine *present     >examine
-grammar x *present           >examine
-grammar l *present           >examine
-grammar watch *present       >examine
 
+grammar look *present         >examine
+grammar look at *present      >examine
+grammar l at *present         >examine
+grammar look on *present      >examine
+grammar examine *present      >examine
+grammar x *present            >examine
+grammar l *present            >examine
+grammar watch *present        >examine
 grammar examiner *present     >examine
 grammar regarder *present     >examine
-
 
 {+examine
 if +important<noun1 = true
@@ -2605,10 +2676,11 @@ endselect
 return INDEX
 }
 
-grammar i        >list_inventory
-grammar list     >list_inventory
 
 integer INVENTORY
+
+grammar i        >list_inventory
+grammar list     >list_inventory
 
 {+list_inventory
 set INDEX = 0
@@ -2670,9 +2742,9 @@ if INDEX = 0
 endif
 }
 
-grammar inventory     >inventory
-grammar inv           >inventory
 
+grammar inventory      >inventory
+grammar inv            >inventory
 grammar inventaire     >inventory
 
 {+inventory
@@ -2737,8 +2809,8 @@ ifall arg[0] has CLOSABLE : arg[0] hasnt CLOSED
 endif
 }
 
-grammar sorry     >sorry
 
+grammar sorry      >sorry
 grammar desole     >sorry
 grammar désolé     >sorry
 
@@ -2746,14 +2818,15 @@ grammar désolé     >sorry
 write "Ça va...^"
 }
 
+
 grammar thanks        >thankyou
 grammar thank you     >thankyou
-
-grammar merci     >thankyou
+grammar merci         >thankyou
 
 {+thankyou
 write "De rien.^"
 }
+
 
 grammar notify     >notify
 
@@ -2768,6 +2841,7 @@ endif
 set time = false
 }
 
+
 grammar notify on     >notify_on
 
 {+notify_on
@@ -2780,6 +2854,7 @@ endif
 set time = false
 }
 
+
 grammar notify off     >notify_off
 
 {+notify_off
@@ -2791,6 +2866,7 @@ else
 endif
 set time = false
 }
+
 
 grammar debug     >debug
 
@@ -2805,6 +2881,7 @@ endif
 set time = false
 }
 
+
 grammar debug on     >debug_on
 
 {+debug_on
@@ -2817,6 +2894,7 @@ endif
 set time = false
 }
 
+
 grammar debug off     >debug_off
 
 {+debug_off
@@ -2828,6 +2906,7 @@ else
 endif
 set time = false
 }
+
 
 grammar score      >score_command
 grammar points     >score_command
@@ -2845,12 +2924,10 @@ else
 endif
 }
 
+
 grammar loosen     >open_only
 grammar open       >open_only
-
 grammar ouvrir     >open_only
-
-
 
 {+open_only
 if +get_openable != 0
@@ -2862,9 +2939,9 @@ setstring question "ouvrir "
 set time = false
 }
 
+
 grammar loosen *present     >open
 grammar open *present       >open
-
 grammar ouvrir *present     >open
 
 {+open
@@ -2924,11 +3001,11 @@ select noun1
 endselect
 }
 
+
 grammar tighten     >close_only
 grammar close       >close_only
 grammar shut        >close_only
-
-grammar fermer     >close_only
+grammar fermer      >close_only
 
 {+close_only
 if +get_closable != 0
@@ -2940,11 +3017,11 @@ setstring question "fermer "
 set time = false
 }
 
+
 grammar tighten *present     >close
 grammar close *present       >close
 grammar shut *present        >close
-
-grammar fermer *present     >close
+grammar fermer *present      >close
 
 {+close
 if +important<noun1 = true
@@ -2971,8 +3048,8 @@ write "Vous fermez " noun1{the} .^
 ensure noun1 has CLOSED
 }
 
-grammar lock *present     >lock
 
+grammar lock *present            >lock
 grammar verrouiller *present     >lock
 
 {+lock
@@ -3013,10 +3090,9 @@ setstring question "lock " noun1{names} " with "
 set time = false
 }
 
-grammar lock *present with *held     >lock_with
 
+grammar lock *present with *held            >lock_with
 grammar verrouiller *present with *held     >lock_with
-
 
 {+lock_with
 if +important<noun1 = true
@@ -3056,8 +3132,8 @@ write "You can't lock " noun1{the} " with " noun2{the} .^
 set time = false
 }
 
-grammar unlock     >unlock_only
 
+grammar unlock            >unlock_only
 grammar déverrouiller     >unlock_only
 grammar deverrouiller     >unlock_only
 
@@ -3067,8 +3143,8 @@ setstring question "unlock "
 set time = false
 }
 
-grammar unlock *present     >unlock
 
+grammar unlock *present            >unlock
 grammar déverrouiller *present     >unlock
 grammar deverrouiller *present     >unlock
 
@@ -3099,9 +3175,9 @@ setstring question "unlock " noun1{names} " with "
 set time = false
 }
 
-grammar unlock *present with *held     >unlock_with
-grammar open *present with *held       >unlock_with
 
+grammar unlock *present with *held            >unlock_with
+grammar open *present with *held              >unlock_with
 grammar déverrouiller *present with *held     >unlock_with
 grammar deverrouiller *present with *held     >unlock_with
 grammar ouvrir *present with *held            >unlock_with
@@ -3128,6 +3204,7 @@ write "Vous ne pouvez déverrouiller " noun1{the} " avec " noun2{the} .^
 set time = false
 }
 
+
 grammar show *held     >show
 
 {+show
@@ -3136,8 +3213,8 @@ setstring question "show " noun1{names} " to "
 set time = false
 }
 
-grammar show *held to *present     >show_to
 
+grammar show *held to *present        >show_to
 grammar montrer *held to *present     >show_to
 grammar montrer *held au *present     >show_to
 grammar montrer *held à *present      >show_to
@@ -3171,6 +3248,7 @@ write noun1{the} .^
 }
 #TODO female
 
+
 grammar untie     >untie_only
 grammar free      >untie_only
 grammar undo      >untie_only
@@ -3181,12 +3259,11 @@ setstring question "untie "
 set time = false
 }
 
-grammar untie *present     >untie
-grammar free *present      >untie
-grammar undo *present      >untie
 
+grammar untie *present       >untie
+grammar free *present        >untie
+grammar undo *present        >untie
 grammar défaire *present     >untie
-
 
 {+untie
 if +important<noun1 = true
@@ -3199,6 +3276,7 @@ write  noun1{The} " " noun1{is} " pas attaché à quoi que ce soit.^"
 #TODO grammaire
 set time = false
 }
+
 
 grammar tie *held        >tie
 grammar attach *held     >tie
@@ -3218,9 +3296,9 @@ setstring question "tie " noun1{names} " to "
 set time = false
 }
 
-grammar fix *present        >repair
-grammar repair *present     >repair
 
+grammar fix *present         >repair
+grammar repair *present      >repair
 grammar réparer *present     >repair
 
 {+repair
@@ -3238,10 +3316,10 @@ write "Vous ne savez pas comment réparer " noun1{the} ".^"
 set time = false
 }
 
-grammar tie *held to *present        >tie_to
-grammar fix *held to *present        >tie_to
-grammar attach *held to *present     >tie_to
 
+grammar tie *held to *present          >tie_to
+grammar fix *held to *present          >tie_to
+grammar attach *held to *present       >tie_to
 grammar attacher *held to *present     >tie_to
 
 {+tie_to
@@ -3262,13 +3340,13 @@ write "Vous ne pouvez attacher " noun1{the} " à " noun2{the} .^
 set time = false
 }
 
-grammar attack *present     >attack
-grammar hit *present        >attack
-grammar fight *present      >attack
-grammar kill *present       >attack
-grammar murder *present     >attack
-grammar punch *present      >attack
 
+grammar attack *present       >attack
+grammar hit *present          >attack
+grammar fight *present        >attack
+grammar kill *present         >attack
+grammar murder *present       >attack
+grammar punch *present        >attack
 grammar attaquer *present     >attack
 grammar frapper *present      >attack
 
@@ -3294,19 +3372,19 @@ write "d'effet.^"
 set time = false
 }
 
-grammar attack *present with *held      >attack_with
-grammar hit *present with *held         >attack_with
-grammar fight *present with *held       >attack_with
-grammar kill *present with *held        >attack_with
-grammar murder *present with *held      >attack_with
-grammar stab *present with *held        >attack_with
-grammar poke *present with *held        >attack_with
-grammar break *present with *held       >attack_with
-grammar smash *present with *held       >attack_with
-grammar crush *present with *held       >attack_with
-grammar destroy *present with *held     >attack_with
-grammar wreck *present with *held       >attack_with
 
+grammar attack *present with *held       >attack_with
+grammar hit *present with *held          >attack_with
+grammar fight *present with *held        >attack_with
+grammar kill *present with *held         >attack_with
+grammar murder *present with *held       >attack_with
+grammar stab *present with *held         >attack_with
+grammar poke *present with *held         >attack_with
+grammar break *present with *held        >attack_with
+grammar smash *present with *held        >attack_with
+grammar crush *present with *held        >attack_with
+grammar destroy *present with *held      >attack_with
+grammar wreck *present with *held        >attack_with
 grammar attaquer *present with *held     >attack_with
 
 {+attack_with
@@ -3341,11 +3419,13 @@ write "d'effet.^"
 set time = false
 }
 
+
 grammar wave     >wave
 
 {+wave
 write "You wave your arms around a bit.^"
 }
+
 
 grammar wave to *present     >wave_to
 
@@ -3363,6 +3443,7 @@ endif
 write  noun1{The} " barely raises an eye brow.^"
 }
 
+
 grammar salute     >salute
 
 {+salute
@@ -3371,11 +3452,11 @@ print:
 .
 }
 
+
 grammar salute *present        >salute_at
 grammar salute at *present     >salute_at
 grammar salute to *present     >salute_at
-
-grammar saluer *present     >salute_at
+grammar saluer *present        >salute_at
 
 {+salute_at
 if +important<noun1 = true
@@ -3392,12 +3473,12 @@ override
 write "Vous saluez " noun1{the} ".^"
 }
 
+
 grammar jump on to *here     >jump_on
 grammar jump on *here        >jump_on
 grammar hop on *here         >jump_on
 grammar stand on *here       >jump_on
-
-grammar sauter on *here     >jump_on
+grammar sauter on *here      >jump_on
 
 {+jump_on
 if +important<noun1 = true
@@ -3419,6 +3500,7 @@ endif
 write "Cela ne fera pas grand chose.^"
 }
 
+
 grammar jump over *here             >jump_over
 grammar sauter par dessus *here     >jump_over
 grammar sauter au dessus *here      >jump_over
@@ -3439,6 +3521,7 @@ override
 write "Vous ne pouvez sauter au dessus de " noun1{the} .^
 set time = false
 }
+
 
 grammar jump       >jump
 grammar sauter     >jump
@@ -3464,16 +3547,17 @@ endif
 write "Considérez que c'est fait.^"
 }
 
+
 grammar say yes     >yes
 grammar yes         >yes
 grammar okay        >yes
 grammar yeah        >yes
 
-
 {+yes
 write "Hmmm ?^"
 set time = false
 }
+
 
 grammar say no     >no
 grammar nah        >no
@@ -3484,6 +3568,7 @@ grammar no way     >no
 write "Hmmm ?^"
 set time = false
 }
+
 
 grammar say yes to *present      >say_yes
 grammar yes to *present          >say_yes
@@ -3503,6 +3588,7 @@ write  noun1{The} " ne semble" noun1{nt}
 write " pas prêter attention.^"
 }
 
+
 grammar say no to *present     >say_no
 grammar nah to *present        >say_no
 grammar no to *present         >say_no
@@ -3518,6 +3604,7 @@ write  noun1{The} " ne semble" noun1{nt}
 write " pas prêter attention.^"
 }
 
+
 grammar say *anywhere     >say_object
 
 {+say_object
@@ -3530,6 +3617,7 @@ override
 write "You say, ~" noun1{the} ".~^"
 }
 
+
 grammar say *anywhere to *present     >say_object_to
 
 {+say_object_to
@@ -3538,6 +3626,7 @@ override
 write "You say, ~" noun1{the} "~ to " noun2{the} ".^"
 }
 
+
 grammar why      >why
 grammar why?     >why
 
@@ -3545,6 +3634,7 @@ grammar why?     >why
 write "Because.^"
 set time = false
 }
+
 
 grammar blow *held at *present     >blow_at
 grammar blow *held to *present     >blow_at
@@ -3562,6 +3652,7 @@ endif
 write "You can't blow " noun1{the} " at " noun2{the} .^
 set time = false
 }
+
 
 grammar point *held at *present     >point_at
 grammar aim *held at *present       >point_at
@@ -3590,31 +3681,29 @@ endif
 write "You point " noun1{the} " at " noun2{the} ".^"
 }
 
-grammar throw *held in *here     >throw_at
-grammar hurl *held in *here      >throw_at
-grammar pitch *held in *here     >throw_at
-grammar cast *held in *here      >throw_at
-grammar throw *held on *here     >throw_at
-grammar hurl *held on *here      >throw_at
-grammar pitch *held on *here     >throw_at
-grammar cast *held on *here      >throw_at
-grammar throw *held at *here     >throw_at
-grammar throw *held to *here     >throw_at
-grammar cast *held to *here      >throw_at
-grammar cast *held at *here      >throw_at
-grammar pitch *held to *here     >throw_at
-grammar pitch *held at *here     >throw_at
-grammar lob *held to *here       >throw_at
-grammar lob *held at *here       >throw_at
-grammar hurl *held to *here      >throw_at
-grammar hurl *held at *here      >throw_at
 
-grammar jeter *held vers *here     >throw_at
-grammar jeter *held on *here       >throw_at
-
+grammar throw *held in *here        >throw_at
+grammar hurl *held in *here         >throw_at
+grammar pitch *held in *here        >throw_at
+grammar cast *held in *here         >throw_at
+grammar throw *held on *here        >throw_at
+grammar hurl *held on *here         >throw_at
+grammar pitch *held on *here        >throw_at
+grammar cast *held on *here         >throw_at
+grammar throw *held at *here        >throw_at
+grammar throw *held to *here        >throw_at
+grammar cast *held to *here         >throw_at
+grammar cast *held at *here         >throw_at
+grammar pitch *held to *here        >throw_at
+grammar pitch *held at *here        >throw_at
+grammar lob *held to *here          >throw_at
+grammar lob *held at *here          >throw_at
+grammar hurl *held to *here         >throw_at
+grammar hurl *held at *here         >throw_at
+grammar jeter *held vers *here      >throw_at
+grammar jeter *held on *here        >throw_at
 grammar lancer *held vers *here     >throw_at
 grammar lancer *held on *here       >throw_at
-
 
 {+throw_at
 if +important<noun2 = true
@@ -3715,12 +3804,12 @@ write " sur le sol.^"
 move noun1 to here
 }
 
+
 grammar remove **held       >remove
 grammar take off **held     >remove
 grammar doff **held         >remove
-
-grammar retirer **held     >remove
-grammar enlever **held     >remove
+grammar retirer **held      >remove
+grammar enlever **held      >remove
 
 {+remove
 ifall noun1(parent) has CONTAINER : noun1 isnt *held
@@ -3743,16 +3832,15 @@ ensure noun1 hasnt WORN
 write "Vous retirez " noun1{the} .^
 }
 
+
+# TODO clash de verbes
+
+
 grammar wear **held       >wear
 grammar put on **held     >wear
 grammar put **held on     >wear
 grammar don **held        >wear
-
 grammar mettre **held     >wear
-# TODO clash de verbes
-
-
-
 
 {+wear
 if +not_held<noun1 = true
@@ -3774,13 +3862,12 @@ ensure noun1 has WORN
 write "Vous mettez " noun1{the} ".^"
 }
 
-grammar talk          >talk_only
-grammar talk to       >talk_only
-grammar talk with     >talk_only
 
+grammar talk            >talk_only
+grammar talk to         >talk_only
+grammar talk with       >talk_only
 grammar parler          >talk_only
 grammar parler avec     >talk_only
-
 
 {+talk_only
 if +get_animate != 0
@@ -3792,10 +3879,14 @@ setstring question "parler à "
 set time = false
 }
 
-grammar talk *present          >talk_to
-grammar talk to *present       >talk_to
-grammar talk with *present     >talk_to
 
+#TODO à corriger dans french.library ?
+#constant DONT "ne"
+#constant DOESNT "ne"
+
+grammar talk *present            >talk_to
+grammar talk to *present         >talk_to
+grammar talk with *present       >talk_to
 grammar parler with *present     >talk_to
 grammar parler to *present       >talk_to
 grammar parler à *present        >talk_to
@@ -3803,10 +3894,6 @@ grammar parler a *present        >talk_to
 grammar parler au *present       >talk_to
 grammar parler aux *present      >talk_to
 grammar parler *present          >talk_to
-
-#TODO à corriger dans french.library ?
-#constant DONT "ne"
-#constant DOESNT "ne"
 
 {+talk_to
 if +can_talk<noun1 = true
@@ -3821,10 +3908,10 @@ endif
 write "conversation.^"
 }
 
+
 grammar consume *present     >eat
 grammar eat *present         >eat
-
-grammar manger *present     >eat
+grammar manger *present      >eat
 
 {+eat
 if +important<noun1 = true
@@ -3837,8 +3924,8 @@ write "Vous ne pouvez manger " noun1{the} .^
 set time = false
 }
 
-grammar eat     >eat_only
 
+grammar eat        >eat_only
 grammar manger     >eat_only
 
 {+eat_only
@@ -3847,9 +3934,9 @@ setstring question "manger "
 set time = false
 }
 
-grammar drink from *present     >drink_from
-grammar sip from *present       >drink_from
 
+grammar drink from *present       >drink_from
+grammar sip from *present         >drink_from
 grammar boire depuis *present     >drink_from
 grammar boire dans *present       >drink_from
 
@@ -3869,9 +3956,9 @@ write "Il n'y a rien à boire dans " noun1{the} .^
 set time = false
 }
 
+
 grammar drink *present     >drink
 grammar sip *present       >drink
-
 grammar boire *present     >drink
 
 {+drink
@@ -3894,6 +3981,7 @@ write "Vous buvez " noun1{the} .^
 move noun1 to limbo
 }
 
+
 grammar drink     >drink_only
 
 {+drink_only
@@ -3902,10 +3990,11 @@ setstring question "drink "
 set time = false
 }
 
-grammar flick **present     >flick
-grammar flip **present      >flick
 
 # chiquenaude, intraduisible ?
+
+grammar flick **present     >flick
+grammar flip **present      >flick
 
 {+flick
 if +important<noun1 = true
@@ -3926,9 +4015,9 @@ write "Flicking " noun1{the} " achieves nothing more than causing a sharp "
 write "pain in your index finger.^"
 }
 
-grammar press **present     >press
-grammar poke **present      >press
 
+grammar press **present       >press
+grammar poke **present        >press
 grammar presser **present     >press
 
 {+press
@@ -3949,14 +4038,15 @@ override
 write "Presser " noun1{the} " n'a pas d'effet visible.^"
 }
 
+
+#TODO? grammar allumer *present with *held >light_with
+
 grammar light *present with *held           >light_with
 grammar burn *present with *held            >light_with
 grammar ignite *present with *held          >light_with
 grammar set fire to *present with *held     >light_with
-
-grammar bruler *present with *held     >light_with
-grammar faire *present with *held      >light_with
-#TODO? grammar allumer *present with *held >light_with
+grammar bruler *present with *held          >light_with
+grammar faire *present with *held           >light_with
 
 {+light_with
 if +not_held<noun2 = true
@@ -3996,6 +4086,7 @@ ensure noun1 has BURNING
 ensure noun1 has LUMINOUS
 }
 
+
 grammar set *present to $integer      >set_to_integer
 grammar turn *present to $integer     >set_to_integer
 
@@ -4013,6 +4104,7 @@ override
 write "You can't set " noun1{the} " to anything.^"
 set time = false
 }
+
 
 grammar set *present to $integer with *held      >set_to_integer_with
 grammar turn *present to $integer with *held     >set_to_integer_with
@@ -4034,16 +4126,16 @@ override
 write "You can't set " noun1{the} " with " noun2{the} "^"
 }
 
-grammar burn *present            >light
-grammar light *present           >light
-grammar ignite *present          >light
-grammar set fire to *present     >light
 
+#TODO conflit probable avec allumer machine
+
+grammar burn *present             >light
+grammar light *present            >light
+grammar ignite *present           >light
+grammar set fire to *present      >light
 grammar bruler *present           >light
 grammar faire bruler *present     >light
-
-grammar allumer *present     >light
-#TODO conflit probable avec allumer machine
+grammar allumer *present          >light
 
 {+light
 if here has UNDER_WATER
@@ -4076,11 +4168,11 @@ setstring question "light " noun1{names} " with "
 set time = false
 }
 
+
 grammar extinguish *present     >extinguish
 grammar put out *present        >extinguish
-
-grammar éteindre *present     >extinguish
-grammar eteindre *present     >extinguish
+grammar éteindre *present       >extinguish
+grammar eteindre *present       >extinguish
 
 {+extinguish
 if noun1 hasnt BURNING
@@ -4140,8 +4232,8 @@ else
 endif
 }
 
-grammar swim     >swim_only
 
+grammar swim      >swim_only
 grammar nager     >swim_only
 
 {+swim_only
@@ -4154,6 +4246,7 @@ write "Vous ne pouvez nager ici.^"
 set time = false
 }
 
+
 grammar swim west     >swim_west
 
 {+swim_west
@@ -4165,10 +4258,10 @@ write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
 set time = false
 }
 
-grammar west          >west
-grammar go west       >west
-grammar walk west     >west
 
+grammar west                     >west
+grammar go west                  >west
+grammar walk west                >west
 grammar ouest                    >west
 grammar aller à l'ouest          >west
 grammar marcher vers ouest       >west
@@ -4182,6 +4275,7 @@ override
 execute "+travel<west"
 }
 
+
 grammar swim east     >swim_east
 
 {+swim_east
@@ -4194,10 +4288,10 @@ write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
 set time = false
 }
 
-grammar east          >east
-grammar go east       >east
-grammar walk east     >east
 
+grammar east                 >east
+grammar go east              >east
+grammar walk east            >east
 grammar est                  >east
 grammar aller à l'est        >east
 grammar aller vers est       >east
@@ -4211,6 +4305,7 @@ override
 execute "+travel<east"
 }
 
+
 grammar swim south     >swim_south
 
 {+swim_south
@@ -4222,17 +4317,18 @@ write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
 set time = false
 }
 
-grammar south          >south
-grammar go south       >south
-grammar walk south     >south
 
-grammar sud              >south
-grammar aller au sud     >south
-grammar aller sud        >south
 #TODO MARCHE PAS
+
+
+grammar south                >south
+grammar go south             >south
+grammar walk south           >south
+grammar sud                  >south
+grammar aller au sud         >south
+grammar aller sud            >south
 grammar aller sud            >south
 grammar marcher vers sud     >south
-
 
 {+south
 if +sitting = true
@@ -4241,6 +4337,7 @@ endif
 override
 execute "+travel<south"
 }
+
 
 grammar swim southeast     >swim_southeast
 
@@ -4253,12 +4350,11 @@ write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
 set time = false
 }
 
+
 grammar southeast          >southeast
 grammar go southeast       >southeast
 grammar walk southeast     >southeast
-
-grammar se     >southeast
-
+grammar se                 >southeast
 
 {+southeast
 if +sitting = true
@@ -4267,6 +4363,7 @@ endif
 override
 execute "+travel<southeast"
 }
+
 
 grammar swim southwest     >swim_southwest
 
@@ -4278,6 +4375,7 @@ endif
 write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau."
 set time = false
 }
+
 
 grammar southwest          >southwest
 grammar go southwest       >southwest
@@ -4291,6 +4389,7 @@ override
 execute "+travel<southwest"
 }
 
+
 grammar swim north     >swim_north
 
 {+swim_north
@@ -4302,13 +4401,14 @@ write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
 set time = false
 }
 
-grammar north          >north
-grammar go north       >north
-grammar walk north     >north
 
-grammar nord              >north
-grammar aller au nord     >north
 # TODO : AU = filtré
+
+grammar north                 >north
+grammar go north              >north
+grammar walk north            >north
+grammar nord                  >north
+grammar aller au nord         >north
 grammar aller nord            >north
 grammar marcher vers nord     >north
 
@@ -4320,6 +4420,7 @@ override
 execute "+travel<north"
 }
 
+
 grammar swim northeast     >swim_northeast
 
 {+swim_northeast
@@ -4330,6 +4431,7 @@ endif
 write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
 set time = false
 }
+
 
 grammar northeast          >northeast
 grammar go northeast       >northeast
@@ -4343,6 +4445,7 @@ override
 execute "+travel<northeast"
 }
 
+
 grammar swim northwest     >swim_northwest
 
 {+swim_northwest
@@ -4353,6 +4456,7 @@ endif
 write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
 set time = false
 }
+
 
 grammar northwest          >northwest
 grammar go northwest       >northwest
@@ -4366,16 +4470,14 @@ override
 execute "+travel<northwest"
 }
 
-grammar climb *here        >climb_up
-grammar climb up *here     >climb_up
-grammar walk up *here      >climb_up
-grammar go up *here        >climb_up
 
+grammar climb *here          >climb_up
+grammar climb up *here       >climb_up
+grammar walk up *here        >climb_up
+grammar go up *here          >climb_up
 grammar escalader *here      >climb_up
 grammar monter on *here      >climb_up
 grammar grimper on *here     >climb_up
-
-
 
 {+climb_up
 if noun1 is *held
@@ -4391,10 +4493,10 @@ write "Vous ne pouvez pas escalader " noun1{the} .^
 set time = false
 }
 
-grammar climb down *here     >climb_down
-grammar walk down *here      >climb_down
-grammar go down *here        >climb_down
 
+grammar climb down *here       >climb_down
+grammar walk down *here        >climb_down
+grammar go down *here          >climb_down
 grammar descendre de *here     >climb_down
 
 {+climb_down
@@ -4409,6 +4511,7 @@ write "Vous ne pouvez descendre de " noun1{the} .^
 set time = false
 }
 
+
 grammar enter *present          >enter
 grammar go through *present     >enter
 grammar go in *present          >enter
@@ -4417,14 +4520,11 @@ grammar climb in *present       >enter
 grammar get in *present         >enter
 grammar jump in *present        >enter
 grammar get on *present         >enter
-
 grammar entrer in *present      >enter
 grammar entrer *present         >enter
 grammar entrer in *present      >enter
 grammar monter in *present      >enter
 grammar grimper in *present     >enter
-
-grammar entrer     >in
 
 {+enter
 if +important<noun1 = true
@@ -4442,8 +4542,8 @@ set time = false
 
 integer NEARBY
 
-grammar follow *anywhere     >follow
 
+grammar follow *anywhere     >follow
 grammar suivre *anywhere     >follow
 
 {+follow
@@ -4472,10 +4572,10 @@ else
 endif
 }
 
-grammar go back     >go_back
-grammar back        >go_back
-grammar return      >go_back
 
+grammar go back       >go_back
+grammar back          >go_back
+grammar return        >go_back
 grammar revenir       >go_back
 grammar retourner     >go_back
 
@@ -4488,15 +4588,16 @@ write "Vous devez aller quelque part auparavant !^"
 set time = false
 }
 
-grammar move to *location     >go_to
-grammar walk to *location     >go_to
-grammar go to *location       >go_to
-grammar go *location          >go_to
 
-grammar aller vers *location     >go_to
-grammar aller au *location       >go_to
 # TODO : rajouter des formes et verbes pertinents
 
+
+grammar move to *location        >go_to
+grammar walk to *location        >go_to
+grammar go to *location          >go_to
+grammar go *location             >go_to
+grammar aller vers *location     >go_to
+grammar aller au *location       >go_to
 
 {+go_to
 if noun1 = here
@@ -4568,6 +4669,7 @@ if arg[0] = out
 endif
 }
 
+
 grammar swim in     >swim_in
 
 {+swim_in
@@ -4579,6 +4681,8 @@ write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
 set time = false
 }
 
+
+grammar entrer       >in
 grammar go in        >in
 grammar get in       >in
 grammar climb in     >in
@@ -4594,6 +4698,7 @@ override
 execute "+travel<in"
 }
 
+
 grammar swim out     >swim_out
 
 {+swim_out
@@ -4605,6 +4710,7 @@ write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
 set time = false
 }
 
+
 grammar get out       >out
 grammar out           >out
 grammar exit          >out
@@ -4612,8 +4718,7 @@ grammar leave         >out
 grammar climb out     >out
 grammar walk out      >out
 grammar go out        >out
-
-grammar sortir     >out
+grammar sortir        >out
 
 {+out
 if +sitting = true
@@ -4622,6 +4727,7 @@ endif
 override
 execute "+travel<out"
 }
+
 
 grammar surface     >swim_up
 grammar swim up     >swim_up
@@ -4635,15 +4741,15 @@ write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
 set time = false
 }
 
+
 grammar up           >up
 grammar climb        >up
 grammar climb up     >up
 grammar jump up      >up
 grammar go up        >up
 grammar walk up      >up
-
-grammar monter     >up
-grammar haut       >up
+grammar monter       >up
+grammar haut         >up
 
 {+up
 if +sitting = true
@@ -4653,11 +4759,11 @@ override
 execute "+travel<up"
 }
 
+
 grammar swim down     >swim_down
 grammar dive down     >swim_down
 grammar dive          >swim_down
-
-grammar plonger     >swim_down
+grammar plonger       >swim_down
 
 {+swim_down
 if here has UNDER_WATER : here has ON_WATER
@@ -4668,14 +4774,14 @@ write "Vous ne pouvez pas nager tant que vous n'êtes pas dans l'eau.^"
 set time = false
 }
 
+
 grammar down           >down
 grammar climb down     >down
 grammar jump down      >down
 grammar go down        >down
 grammar walk down      >down
-
-grammar descendre     >down
-grammar bas           >down
+grammar descendre      >down
+grammar bas            >down
 
 {+down
 if +sitting = true
@@ -4685,13 +4791,12 @@ override
 execute "+travel<down"
 }
 
+
 grammar look around     >look_around
 grammar look            >look_around
 grammar ls              >look_around
 grammar watch           >look_around
-
-grammar regarder     >look_around
-
+grammar regarder        >look_around
 
 {+look_around
 ensure here hasnt VISITED
@@ -4766,9 +4871,9 @@ endselect
 write "Il fait trop sombre pour voir.^"
 }
 
-grammar look under *present       >look_under
-grammar search under *present     >look_under
 
+grammar look under *present        >look_under
+grammar search under *present      >look_under
 grammar regarder sous *present     >look_under
 grammar fouiller sous *present     >look_under
 
@@ -4787,9 +4892,9 @@ endif
 write "Il n'y a rien de spécial sous " noun1{the} .^
 }
 
-grammar look behind *present       >look_behind
-grammar search behind *present     >look_behind
 
+grammar look behind *present           >look_behind
+grammar search behind *present         >look_behind
 grammar fouiller derrière *present     >look_behind
 grammar fouiller derriere *present     >look_behind
 
@@ -4808,9 +4913,9 @@ endif
 write "Il n'y a rien de spécial derrière " noun1{the} .^
 }
 
-grammar look through *present     >look_through
-grammar look out *present         >look_through
 
+grammar look through *present           >look_through
+grammar look out *present               >look_through
 grammar regarder à travers *present     >look_through
 grammar regarder travers *present       >look_through
 
@@ -4825,11 +4930,13 @@ write "Vous ne pouvez regarder à travers " noun1{the} .^
 set time = false
 }
 
+
 grammar look through *held at *present     >look_through_at
 
 {+look_through_at
 proxy "look at " noun2{names} " through " noun1{names}
 }
+
 
 grammar look at *present through *held     >look_at_through
 grammar look at *present with *held        >look_at_through
@@ -4858,6 +4965,7 @@ write "Vous ne pouvez regarder " noun1{the} "  à travers " noun2{the} .^
 set time = false
 }
 
+
 grammar wait         >wait
 grammar z            >wait
 grammar attendre     >wait
@@ -4866,8 +4974,8 @@ grammar attendre     >wait
 write "Le temps passe...^"
 }
 
-grammar listen     >listen
 
+grammar listen      >listen
 grammar écouter     >listen
 grammar ecouter     >listen
 
@@ -4876,9 +4984,9 @@ override
 write "Vous n'entendez rien de particulier.^"
 }
 
-grammar listen to *present     >listen_to
-grammar listen at *present     >listen_to
 
+grammar listen to *present      >listen_to
+grammar listen at *present      >listen_to
 grammar écouter at *present     >listen_to
 grammar écouter *present        >listen_to
 grammar ecouter *present        >listen_to
@@ -4887,10 +4995,10 @@ grammar ecouter *present        >listen_to
 write "Vous n'entendez rien de particulier.^"
 }
 
-grammar use *present         >use
-grammar work *present        >use
-grammar operate *present     >use
 
+grammar use *present          >use
+grammar work *present         >use
+grammar operate *present      >use
 grammar utiliser *present     >use
 
 {+use
@@ -4910,15 +5018,13 @@ write "Veuillez être un peu plus précis sur "
 write "la manière dont vous voulez utiliser " noun1{the} ".^"
 }
 
+
 grammar rotate *present      >turn
 grammar turn *present        >turn
 grammar twist *present       >turn
 grammar twiddle *present     >turn
 grammar spin *present        >turn
-
-grammar tourner *present     >tourner
 grammar tourner *present     >turn
-
 
 {+turn
 if +important<noun1 = true
@@ -4934,18 +5040,21 @@ write "Vous ne pouvez tourner " noun1{the} .^
 set time = false
 }
 
+grammar tourner *present     >tourner
+
 {+tourner
 	proxy "turn " noun1
 }
 
-grammar rotate *present clockwise      >turn_clockwise
-grammar turn *present clockwise        >turn_clockwise
-grammar twist *present clockwise       >turn_clockwise
-grammar twiddle *present clockwise     >turn_clockwise
-grammar spin *present clockwise        >turn_clockwise
 
-grammar tourner *present in le sens horaire     >turn_clockwise
 #marche pas, trop compliqué sans doute
+
+grammar rotate *present clockwise               >turn_clockwise
+grammar turn *present clockwise                 >turn_clockwise
+grammar twist *present clockwise                >turn_clockwise
+grammar twiddle *present clockwise              >turn_clockwise
+grammar spin *present clockwise                 >turn_clockwise
+grammar tourner *present in le sens horaire     >turn_clockwise
 
 {+turn_clockwise
 if +important<noun1 = true
@@ -4961,14 +5070,15 @@ write "Vous ne pouvez tourner " noun1{the} " dans le sens horaire.^"
 set time = false
 }
 
-grammar rotate *present anticlockwise      >turn_anticlockwise
-grammar turn *present anticlockwise        >turn_anticlockwise
-grammar twist *present anticlockwise       >turn_anticlockwise
-grammar twiddle *present anticlockwise     >turn_anticlockwise
-grammar spin *present anticlockwise        >turn_anticlockwise
 
-grammar tourner *present in le sens anti-horaire     >turn_anticlockwise
 #marche pas, trop compliqué sans doute
+
+grammar rotate *present anticlockwise                >turn_anticlockwise
+grammar turn *present anticlockwise                  >turn_anticlockwise
+grammar twist *present anticlockwise                 >turn_anticlockwise
+grammar twiddle *present anticlockwise               >turn_anticlockwise
+grammar spin *present anticlockwise                  >turn_anticlockwise
+grammar tourner *present in le sens anti-horaire     >turn_anticlockwise
 
 {+turn_anticlockwise
 if +important<noun1 = true
@@ -4984,15 +5094,16 @@ write "Vous ne pouvez tourner " noun1{the} " dans le sens anti-horaire.^"
 set time = false
 }
 
+
 grammar engage *present        >turn_on
 grammar turn on *present       >turn_on
 grammar turn *present on       >turn_on
 grammar switch on *present     >turn_on
 grammar switch *present on     >turn_on
 grammar start *present         >turn_on
-
-grammar démarrer *present     >turn_on
-grammar demarrer *present     >turn_on
+grammar démarrer *present      >turn_on
+grammar demarrer *present      >turn_on
+grammar disengage *present     >turn_on
 
 {+turn_on
 if +reach<noun1 = true
@@ -5007,7 +5118,7 @@ endif
 set time = false
 }
 
-grammar disengage *present      >turn_on
+
 grammar turn off *present       >turn_off
 grammar turn *present off       >turn_off
 grammar shut down *present      >turn_off
@@ -5017,8 +5128,7 @@ grammar power off *present      >turn_off
 grammar switch off *present     >turn_off
 grammar switch *present off     >turn_off
 grammar stop *present           >turn_off
-
-grammar arrêter *present     >turn_off
+grammar arrêter *present        >turn_off
 
 {+turn_off
 if +reach<noun1 = true
@@ -5028,6 +5138,7 @@ override
 write "Vous ne pouvez arrêter " noun1{the} ".^"
 set time = false
 }
+
 
 grammar pour *present     >pour
 
@@ -5060,6 +5171,7 @@ write "Vous versez " noun1{the} " par terre.^"
 move noun1 to limbo
 }
 
+
 grammar type $string on *present     >type_on
 grammar key $string on *present      >type_on
 grammar key $string in *present      >type_on
@@ -5079,6 +5191,7 @@ write "Vous ne pouvez écrire sur " noun1{the} ".^"
 set time = false
 }
 
+
 grammar list objects     >list_objs
 
 {+list_objs
@@ -5086,6 +5199,7 @@ select noun3(mass) > 0
    write noun3{The} 
 next
 }
+
 
 grammar tip *present on *present        >pour_on
 grammar tip *present down *present      >pour_on
@@ -5154,6 +5268,7 @@ write "ground.^"
 move noun1 to limbo
 }
 
+
 grammar blankjacl     >blankjacl
 
 {+blankjacl
@@ -5161,10 +5276,10 @@ write "Vous devez taper une commande. Tapez ~aide~ pour plus d'informations.^"
 set time = false
 }
 
+
 grammar instructions     >instructions
 grammar help             >instructions
-
-grammar aide     >instructions
+grammar aide             >instructions
 
 {+instructions
 style note
@@ -5183,6 +5298,7 @@ set time = false
 ; Grammar statements beginning with an object must be defined last in the game
 ; to avoid confusion with verbs that may also be objects such as "drink drink"
 
+
 grammar *present comma press *present     >tell_to_press
 grammar *present comma push *present      >tell_to_press
 
@@ -5193,32 +5309,13 @@ endif
 write "~You press it,~ " noun1{the} " replies.^"
 }
 
-grammar *present comma give me *anywhere            >ask_for
-grammar *present comma give *anywhere to myself     >ask_for
-grammar *present comma give *anywhere to me         >ask_for
-
-grammar *present comma donne moi *anywhere      >ask_for
-grammar *present comma donnez moi *anywhere     >ask_for
 
 #Marche pas :
 #grammar demander *anywhere au *present  	>ask_for
 #grammar demander *anywhere a *present  	>ask_for
 #grammar demander *anywhere à *present  	>ask_for
 
-grammar *present comma tell me about *anywhere             >ask_about
-grammar *present comma tell me all about *anywhere         >ask_about
-grammar *present comma what do you know about *anwhere     >ask_about
 
-grammar questionner *present on *anywhere              >ask_about
-grammar questionner *present a propos *anywhere        >ask_about
-grammar questionner *present à propos *anywhere        >ask_about
-grammar questionner *present au sujet of *anywhere     >ask_about
-
-grammar parler à *present of *anywhere        >ask_about
-grammar parler a *present of *anywhere        >ask_about
-grammar parler avec *present of *anywhere     >ask_about
-
-grammar *present comma parle moi *anywhere     >ask_about
 # <!> filtre sur "de, du...", aussi ne pas le rajouter
 
 synonym interroger     questionner
@@ -5237,11 +5334,11 @@ endif
 proxy "ask " noun1{names} " about " noun1{names}
 }
 
+
 grammar *present comma sorry          >apologise
 grammar *present comma im sorry       >apologise
 grammar *present comma i am sorry     >apologise
 grammar apologise to *present         >apologise
-
 grammar s'excuser auprès *present     >apologise
 grammar m'excuser auprès *present     >apologise
 
@@ -5253,11 +5350,11 @@ write  noun1{the} " assure qu'il n'est pas nécessaire de s'"
 write "excuser.^"
 }
 
+
 grammar *present comma thanks        >thank
 grammar *present comma thank you     >thank
 grammar thank *present               >thank
-
-grammar remercier *present     >thank
+grammar remercier *present           >thank
 
 {+thank
 if +can_talk<noun1 = true
@@ -5265,6 +5362,7 @@ if +can_talk<noun1 = true
 endif
 write "~De rien,~ répond "  noun1{the} ".^"
 }
+
 
 grammar hi *present                     >greet
 grammar hello *present                  >greet
@@ -5288,6 +5386,7 @@ else
    write " acquiesce.^"
 }
  
+
 grammar *present comma *anywhere     >object_object
 
 {+object_object
@@ -5299,6 +5398,7 @@ write "Vous n'obtenez pas de réponse.^"
 }
 
 string question     "none"
+
 
 grammar *present      >noun_only
 grammar *anywhere     >noun_only
