@@ -27,8 +27,35 @@
 #include "interpreter.h"
 #include "parser.h"
 #include "encapsulate.h"
+#include <dirent.h>
 
 extern int            style_index;
+
+/* Walk include_directory and return the newest mtime among its files.
+ * Used by the FCGI request loop to invalidate its preprocessed cache
+ * when a shared .library is modified even though the game's own .jacl
+ * is unchanged — without this, `git pull`s that only touch libraries
+ * don't take effect until fcgijacl is restarted. */
+static time_t
+newest_include_mtime(void)
+{
+    DIR *dir = opendir(include_directory);
+    if (dir == NULL) return 0;
+    time_t newest = 0;
+    struct dirent *ent;
+    char fullpath[1024];
+    while ((ent = readdir(dir)) != NULL) {
+        if (ent->d_name[0] == '.') continue;
+        snprintf(fullpath, sizeof(fullpath), "%s%s",
+                 include_directory, ent->d_name);
+        struct stat st;
+        if (stat(fullpath, &st) == 0 && st.st_mtime > newest) {
+            newest = st.st_mtime;
+        }
+    }
+    closedir(dir);
+    return newest;
+}
 
 /* Returns 1 for yes, 0 for no, -1 for invalid */
 static int
@@ -373,9 +400,18 @@ main(int argc, char *argv[])
          * FROM THE ENVIRONMENT VARIABLE SCRIPT_NAME*/
         strcpy (game_url, SCRIPT_NAME);
 
-        /* DETERMINE FILE MODIFICATION TIME */
+        /* DETERMINE FILE MODIFICATION TIME.  Take the newest mtime across
+         * the game file and every shared include, so a git pull that only
+         * touches a .library invalidates the preprocessed cache even when
+         * the game's own .jacl is unchanged. */
         stat(argv[1], &gamefilestat);
         current_last_modified = gamefilestat.st_mtime;
+        {
+            time_t inc_mtime = newest_include_mtime();
+            if (inc_mtime > current_last_modified) {
+                current_last_modified = inc_mtime;
+            }
+        }
 
         if (current_last_modified != previous_last_modified) {
             log_error(GAME_MODIFIED, LOG_ONLY);
