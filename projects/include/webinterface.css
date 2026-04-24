@@ -148,7 +148,28 @@ print:
                 font-size: 12pt;
 		float: left;
 		border: 1px;
-		width: 100%; }^
+		width: calc(100% - 52px); }^
+	button.mic {
+		float: right;
+		width: 42px;
+		height: 30px;
+		padding: 0;
+		margin-left: 6px;
+		font-size: 16pt;
+		line-height: 1;
+		background: transparent;
+		border: 1px solid #aaa;
+		border-radius: 4px;
+		cursor: pointer; }^
+	button.mic:hover { background: rgba(0,0,0,0.05); }^
+	button.mic.listening {
+		background: #d33;
+		color: white;
+		border-color: #a22;
+		animation: jaclMicPulse 1s ease-in-out infinite; }^
+	@keyframes jaclMicPulse {
+		0%, 100% { box-shadow: 0 0 4px 2px rgba(221,51,51,0.35); }
+		50%      { box-shadow: 0 0 10px 5px rgba(221,51,51,0.7); } }^
 	div.prompt_text {
 		float: left;
 		width: 20%; 

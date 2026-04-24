@@ -254,8 +254,61 @@ print:
            });^
         }^
    }^
+
+   // Web Speech API input. Click the mic button next to the command
+   // prompt to dictate a command; on a final result the transcript is
+   // dropped into the input and the form submits automatically. Uses
+   // window.jaclLang (set from the game_language constant) so the
+   // recognizer picks the right acoustic model per game.
+   var jaclRecog = null;^
+
+   function jaclStopMic() {^
+        var btn = document.getElementById('jaclMicButton');^
+        if (btn) btn.classList.remove('listening');^
+        if (jaclRecog) {^
+             try { jaclRecog.abort(); } catch (e) {}^
+             jaclRecog = null;^
+        }^
+   }^
+
+   function startListening() {^
+        var SR = window.SpeechRecognition || window.webkitSpeechRecognition;^
+        if (!SR) return;^
+        if (jaclRecog) { jaclStopMic(); return; }^
+        var input = document.getElementById('JACLCommandPrompt');^
+        var btn = document.getElementById('jaclMicButton');^
+        jaclRecog = new SR();^
+        jaclRecog.lang = window.jaclLang || 'en-US';^
+        jaclRecog.interimResults = true;^
+        jaclRecog.continuous = false;^
+        jaclRecog.maxAlternatives = 1;^
+        if (btn) btn.classList.add('listening');^
+        jaclRecog.onresult = function(ev) {^
+             var last = ev.results[ev.results.length - 1];^
+             if (input) input.value = last[0].transcript.trim();^
+             if (last.isFinal) {^
+                  jaclStopMic();^
+                  var form = document.JACLGameForm;^
+                  if (form) {^
+                       if (form.requestSubmit) form.requestSubmit();^
+                       else form.dispatchEvent(new Event('submit', {cancelable: true}));^
+                  }^
+             }^
+        };^
+        jaclRecog.onerror = function() { jaclStopMic(); };^
+        jaclRecog.onend = function() { jaclStopMic(); };^
+        try { jaclRecog.start(); } catch (e) { jaclStopMic(); }^
+   }^
+
+   function jaclInitMic() {^
+        var btn = document.getElementById('jaclMicButton');^
+        if (!btn) return;^
+        var SR = window.SpeechRecognition || window.webkitSpeechRecognition;^
+        if (!SR) btn.style.display = 'none';^
+   }^
 .
 write "</script>^"
+write "<script>window.jaclLang = '" game_language "';</script>"
 write "<script>window.jaclMapBg = '" maintext_colour "';</script>"
 write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
 ifexecute "+local_header"
@@ -266,7 +319,7 @@ ifexecute "+library_header"
    # WITHOUT COLLIDING WITH THE GAME'S +local_header.
 endif
 write "</head>^"
-write "<body onLoad=~document.getElementById('JACLCommandPrompt').focus(); jaclOfferVoice();~>^"
+write "<body onLoad=~document.getElementById('JACLCommandPrompt').focus(); jaclOfferVoice(); jaclInitMic();~>^"
 write "<div id=~header~>"
 ifstring title_image = "none"
   write "<h1 name=~title~>" game_title "</h1>"
@@ -307,6 +360,7 @@ execute "+exits"
 write "</div>"
 write "<form id=~commandForm~ name=~JACLGameForm~ method=~get~ autocomplete=~off~ onsubmit=~return submitForm(event);~>"
 write "<div class=~command_prompt~>^"
+write "<button id=~jaclMicButton~ type=~button~ class=~mic~ onclick=~startListening();~ title=~Speak a command~ aria-label=~Speak a command~>&#127908;</button>"
 prompt "KeyPressed();"
 print:
    </div>
