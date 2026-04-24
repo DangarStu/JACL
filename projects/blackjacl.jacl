@@ -66,56 +66,6 @@ integer GAME_PHASE
 	constant players_turn	2
 	constant dealers_turn	3
 
-grammar coach on     >coach_on
-
-{+coach_on
-set CHECK_STRATEGY = 1
-write "<p>Basic strategy coach on.^^"
-if GAME_PHASE != place_bet
-   execute "+display_table"
-endif
-}
-
-grammar coach off     >coach_off
-
-{+coach_off
-set CHECK_STRATEGY = 0
-write "<p>Basic strategy coach off.^^"
-if GAME_PHASE != place_bet
-   execute "+display_table"
-endif
-}
-
-
-grammar help             >help
-grammar instructions     >help
-
-{+help
-write "<p>The aim of Blackjack is to have a hand with a total value closer"
-write "to 21 than the dealer without going over 21. Ten, Jack, Queen and King"
-write "are all worth 10, an Ace is worth 11 or 1, and all other cards are worth"
-write "their face value. An Ace is treated as 11 unless it would put your "
-write "hand over 21, in which case it is treated as 1.^^"
-write "<p>There are two phases to the game of Blackjack. Firstly your must "
-write "place your bet, then you must playout the hand you are dealt. "
-write "When you are playing your hand, the commands available to you will be "
-write "displayed based on the current game situation. Unless you hand has "
-write "bust (gone over a total value of 21), you will always be able to 'hit' "
-write "(receive another card) or 'stay', (finish playing that hand).^^"
-write "<p>If the dealers first card is an ace, you will be given the option to "
-write "take insurance against the dealer getting blackjack by typing the "
-write "command 'insurance'. This must be done before any other action "
-write "regarding your hand is taken.^^"
-write "<p>If you two cards are of equal value, you will also be given the "
-write "the opportunity to split you hand. This takes you two initial cards "
-write "and makes two one-card hands from them. This is done using the 'split' "
-write "command. These two hands are then played out one at a time as normal. "
-write "Be sure to pay attention to the indicator at the bottom of the screen "
-write "telling you which card you are currently playing.^^"
-write "<p>If the first two card of any hand total 9, 10 or 11, you will be "
-write "given the opportunity to 'double'. In this case you initial bet will "
-write "be doubled and you will receive one more card only.^^"
-}
 
 grammar about     >about
 
@@ -276,41 +226,6 @@ set GAME_PHASE = place_bet
 integer RESULT
 
 
-{+display_table
-if GAME_PHASE = place_bet
-  write "^<p>No cards will be dealt until you place a bet. "
-  return
-endif
-
-# Display the dealer's cards
-
-if dealers_hand(cards) = 1
-   write "<p>Dealer's card"
-else
-   write "<p>Dealer's cards"
-endif
-
-execute "+display_hand<dealers_hand"
-
-# Display the player's first hand
-if current_player(hands) = 1
-   write "<p>Your cards -- Total: " hand_one(total)
-else
-   write "<p>First hand -- Total: " hand_one(total)
-endif
-write " -- Bet: $" hand_one(bet) 
-
-execute "+display_hand<hand_one"
-
-if current_player(hands) = 2
-   ; Display the player's second hand
-   write "<p>Second hand -- Total: " hand_two(total)
-   write " -- Bet: $" hand_two(bet) 
-   
-   execute "+display_hand<hand_two"
-endif
-}
-
 integer THIS_HAND
 
 {+display_hand
@@ -341,79 +256,6 @@ endif
 write "</tr></table>^"
 }
 
-{+display_final
-; Display the dealer's cards
-write "<p>Dealer's cards -- Total: " dealers_hand(total)
-
-execute "+display_hand<dealers_hand"
-
-; Display the player's first hand
-set current_hand = hand_one
-if current_player(hands) = 1
-   write "<p>Your cards -- Total: " hand_one(total)
-else
-   write "<p>First hand --- Total: " hand_one(total)
-endif
-write " -- Bet: $" hand_one(bet)
-execute "+display_result<hand_one"
-execute "+display_hand<hand_one"
-
-if current_player(hands) = 2
-   ; Display the player's second hand
-   write "<p>Second hand -- Total: " hand_two(total)
-   write " -- Bet: $" hand_two(bet)
-   execute "+display_result<hand_two"
-   execute "+display_hand<hand_two"
-   
-endif
-}
-
-grammar omega2     >omega2
-
-{+omega2
-write "<p>The current Omega-II count is "
-execute "+display_count<OMEGA2-COUNT"
-write ".^"
-execute "+display_table"
-}
-
-grammar highlow     >highlow
-
-{+highlow
-write "<p>The current HIGH-LOW count is "
-execute "+display_count<HIGH-LOW-COUNT"
-write ".^"
-execute "+display_table"
-}
-
-grammar ko     >ko
-
-{+ko
-write "<p>The current KO count is "
-execute "+display_count<KO-COUNT"
-write ".^"
-execute "+display_table"
-}
-
-
-grammar bet $integer     >bet
-
-{+bet
-if GAME_PHASE = players_turn
-   write "<p>You can't place a bet until the start of the next hand.^"
-   execute "+display_table"
-   return
-endif
-if $integer < 25 : $integer > 1000
-   write "<p>This table has a minimum bet of $25 and a maxium bet of $1000.^"
-   execute "+display_table"
-   return
-endif
-set GAME_PHASE = players_turn
-set current_player(money) - $integer
-set current_hand(bet) = $integer
-execute "+deal_initial"
-}
 
 object dealer : dealer
  static
@@ -437,16 +279,6 @@ object hand_two : hand two
 
 integer TEMP
 integer BACKUP
-
-{+basic_strategy_check
-if PREVIOUS_GAME_PHASE = place_bet : CHECK_STRATEGY = 0
-   return
-endif
-if last_move != best_move
-   write "<p>^You should have " MOVE_TYPE[best_move] !^
-endif
-#write " (LAST: " MOVE_TYPE[last_move] "  BEST: " MOVE_TYPE[best_move] ")^"
-}
 
 
 {+header

@@ -1,3 +1,8 @@
+# Paragraph tag used by the shared blackjack handlers below. Games using the
+# web build inherit this default; the console build overrides it to "" before
+# the include line above them.
+constant PARA_OPEN     "<p>"
+
 constant value     1
 
 constant type     2
@@ -2957,4 +2962,174 @@ set best_move = hit
 
 {+top
 set PREVIOUS_GAME_PHASE = GAME_PHASE
+}
+
+# -----------------------------------------------------------------------------
+# SHARED BLACKJACK HANDLERS WITH PARA_OPEN-GATED WEB MARKUP
+# (Phase 2 unification — was the cosmetic-drift set from Phase 1.)
+# -----------------------------------------------------------------------------
+
+grammar coach on     >coach_on
+
+{+coach_on
+set CHECK_STRATEGY = 1
+write PARA_OPEN "Basic strategy coach on.^^"
+if GAME_PHASE != place_bet
+   execute "+display_table"
+endif
+}
+
+grammar coach off     >coach_off
+
+{+coach_off
+set CHECK_STRATEGY = 0
+write PARA_OPEN "Basic strategy coach off.^^"
+if GAME_PHASE != place_bet
+   execute "+display_table"
+endif
+}
+
+grammar highlow     >highlow
+
+{+highlow
+write PARA_OPEN "The current HIGH-LOW count is "
+execute "+display_count<HIGH-LOW-COUNT"
+write ".^"
+execute "+display_table"
+}
+
+grammar ko     >ko
+
+{+ko
+write PARA_OPEN "The current KO count is "
+execute "+display_count<KO-COUNT"
+write ".^"
+execute "+display_table"
+}
+
+grammar omega2     >omega2
+
+{+omega2
+write PARA_OPEN "The current Omega-II count is "
+execute "+display_count<OMEGA2-COUNT"
+write ".^"
+execute "+display_table"
+}
+
+{+basic_strategy_check
+if CHECK_STRATEGY = 0
+   return
+endif
+if last_move != best_move
+   write PARA_OPEN "^You should have " MOVE_TYPE[best_move] !^
+endif
+#write " (LAST: " MOVE_TYPE[last_move] "  BEST: " MOVE_TYPE[best_move] ")^"
+}
+
+grammar bet $integer     >bet
+
+{+bet
+if GAME_PHASE = players_turn
+   write PARA_OPEN "You can't place a bet until the start of the next hand.^"
+   execute "+display_table"
+   return
+endif
+if $integer < 25 : $integer > 1000
+   write PARA_OPEN "This table has a minimum bet of $25 and a maximum bet of $1000.^"
+   execute "+display_table"
+   return
+endif
+set hand_one(bet) = $integer
+set GAME_PHASE = players_turn
+execute "+deal_initial"
+}
+
+grammar help             >help
+grammar instructions     >help
+
+{+help
+write PARA_OPEN "The aim of Blackjack is to have a hand with a total value closer"
+write "to 21 than the dealer without going over 21. Ten, Jack, Queen and King"
+write "are all worth 10, an Ace is worth 11 or 1, and all other cards are worth"
+write "their face value. An Ace is treated as 11 unless it would put your "
+write "hand over 21, in which case it is treated as 1.^^"
+write PARA_OPEN "There are two phases to the game of Blackjack. Firstly you must "
+write "place your bet, then you must playout the hand you are dealt. "
+write "When you are playing your hand, the commands available to you will be "
+write "displayed based on the current game situation. Unless your hand has "
+write "bust (gone over a total value of 21), you will always be able to 'hit' "
+write "(receive another card) or 'stay', (finish playing that hand).^^"
+write PARA_OPEN "If the dealers first card is an ace, you will be given the option to "
+write "take insurance against the dealer getting blackjack by typing the "
+write "command 'insurance'. This must be done before any other action "
+write "regarding your hand is taken.^^"
+write PARA_OPEN "If your two cards are of equal value, you will also be given the "
+write "opportunity to split your hand. This takes your two initial cards "
+write "and makes two one-card hands from them. This is done using the 'split' "
+write "command. These two hands are then played out one at a time as normal. "
+write "Be sure to pay attention to the indicator at the bottom of the screen "
+write "telling you which card you are currently playing.^^"
+write PARA_OPEN "If the first two card of any hand total 9, 10 or 11, you will be "
+write "given the opportunity to 'double'. In this case your initial bet will "
+write "be doubled and you will receive one more card only.^^"
+}
+
+{+display_table
+if GAME_PHASE = place_bet
+  write "^" PARA_OPEN "No cards will be dealt until you place a bet. "
+  return
+endif
+
+# Display the dealer's cards
+if dealers_hand(cards) = 1
+   write PARA_OPEN "Dealer's card"
+else
+   write PARA_OPEN "Dealer's cards"
+endif
+
+execute "+display_hand<dealers_hand"
+
+# Display the player's first hand
+if current_player(hands) = 1
+   write PARA_OPEN "Your cards -- Total: " hand_one(total)
+else
+   write PARA_OPEN "First hand -- Total: " hand_one(total)
+endif
+write " -- Bet: $" hand_one(bet)
+
+execute "+display_hand<hand_one"
+
+if current_player(hands) = 2
+   ; Display the player's second hand
+   write PARA_OPEN "Second hand -- Total: " hand_two(total)
+   write " -- Bet: $" hand_two(bet)
+
+   execute "+display_hand<hand_two"
+endif
+}
+
+{+display_final
+; Display the dealer's cards
+write PARA_OPEN "Dealer's cards -- Total: " dealers_hand(total)
+
+execute "+display_hand<dealers_hand"
+
+; Display the player's first hand
+set current_hand = hand_one
+if current_player(hands) = 1
+   write PARA_OPEN "Your cards -- Total: " hand_one(total)
+else
+   write PARA_OPEN "First hand --- Total: " hand_one(total)
+endif
+write " -- Bet: $" hand_one(bet)
+execute "+display_result<hand_one"
+execute "+display_hand<hand_one"
+
+if current_player(hands) = 2
+   ; Display the player's second hand
+   write PARA_OPEN "Second hand -- Total: " hand_two(total)
+   write " -- Bet: $" hand_two(bet)
+   execute "+display_result<hand_two"
+   execute "+display_hand<hand_two"
+endif
 }
