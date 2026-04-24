@@ -273,16 +273,21 @@ set hand_two(aces_as_one) = 0
 set hand_two(cards) = 1
 set BJ_FIRST = false
 set INDEX = FIRST_CARD
-repeat
-   if INDEX(parent) = current_hand
-      if BJ_FIRST = false
-         set BJ_FIRST = INDEX
-      else
-         set SECOND = INDEX
+if INDEX > 0
+   repeat
+      if INDEX(parent) = current_hand
+         if BJ_FIRST = false
+            set BJ_FIRST = INDEX
+         else
+            set SECOND = INDEX
+         endif
       endif
-   endif
-   set INDEX = INDEX(next)
-until INDEX = PAST_LAST
+      set INDEX = INDEX(next)
+      if INDEX < 1
+         set INDEX = PAST_LAST
+      endif
+   until INDEX = PAST_LAST
+endif
 set SECOND(parent) = hand_two
 if SECOND(value) = 11
    set hand_two(aces) = 1
@@ -459,17 +464,22 @@ integer SECOND
 {+is_pair
 set BJ_FIRST = 0
 set INDEX = FIRST_CARD
-repeat
-   if INDEX(parent) = current_hand
-      if BJ_FIRST = 0
-         set BJ_FIRST = INDEX(value)
-      else
-         set SECOND = INDEX(value)
-         return
+if INDEX > 0
+   repeat
+      if INDEX(parent) = current_hand
+         if BJ_FIRST = 0
+            set BJ_FIRST = INDEX(value)
+         else
+            set SECOND = INDEX(value)
+            return
+         endif
       endif
-   endif
-   set INDEX = INDEX(next)
-until INDEX = PAST_LAST
+      set INDEX = INDEX(next)
+      if INDEX < 1
+         set INDEX = PAST_LAST
+      endif
+   until INDEX = PAST_LAST
+endif
 }
 
 {+bootstrap
@@ -733,22 +743,27 @@ integer THIS_HAND
 set THIS_HAND = arg[0]
 
 if GAME_PHASE = place_bet
-  write "^No cards will be dealt until you place a bet. Use the command 'bet [amount]'.^"   
+  write "^No cards will be dealt until you place a bet. Use the command 'bet [amount]'.^"
   return
 endif
 
 write "<table>^<tr>"
- 
+
 set INDEX = FIRST_CARD
-repeat
-  if INDEX(parent) = THIS_HAND
-     write "<td>"
-     execute "+display_card<INDEX"
-     write "</td>"
-  endif
-  set INDEX = INDEX(next)
-until INDEX = PAST_LAST
-  
+if INDEX > 0
+  repeat
+    if INDEX(parent) = THIS_HAND
+       write "<td>"
+       execute "+display_card<INDEX"
+       write "</td>"
+    endif
+    set INDEX = INDEX(next)
+    if INDEX < 1
+       set INDEX = PAST_LAST
+    endif
+  until INDEX = PAST_LAST
+endif
+
 write "</tr></table>^"
 }
 
