@@ -486,12 +486,12 @@ endif
 set linebreaks = false
 }
 
-{+intro
-if interpreter = GLK
-   write "This game is intended to be run with a web-based interpreter such as cgijacl. "
-   write "To play from a Glk interpreter use the game file 'blackjack.jacl' instead.^"
-   terminate
-endif
+# Shuffle + reset game state. Called from +intro (new user, no command)
+# and from +setup (new user whose first request already has a command,
+# e.g. a bookmarked hyperlink). Without this, a first-request command
+# would run against GAME_PHASE=0, FIRST_CARD=0 and spray "undefined
+# container INDEX(parent)" all over error.log.
+{+new_game_state
 set max_rand = end
 set max_rand - d1_two_diamonds
 set max_rand / 2
@@ -505,6 +505,19 @@ set current_player(hands) = 1
 set current_hand = hand_one
 set GAME_PHASE = place_bet
 set PREVIOUS_GAME_PHASE = place_bet
+}
+
+{+setup
+execute "+new_game_state"
+}
+
+{+intro
+if interpreter = GLK
+   write "This game is intended to be run with a web-based interpreter such as cgijacl. "
+   write "To play from a Glk interpreter use the game file 'blackjack.jacl' instead.^"
+   terminate
+endif
+execute "+new_game_state"
 
 write "<center>"
 write "<h3>Blackjack pays 3:2<br>"
