@@ -255,11 +255,6 @@ print:
         }^
    }^
 
-   // Web Speech API input. Click the mic button next to the command
-   // prompt to dictate a command; on a final result the transcript is
-   // dropped into the input and the form submits automatically. Uses
-   // window.jaclLang (set from the game_language constant) so the
-   // recognizer picks the right acoustic model per game.
    var jaclRecog = null;^
 
    function jaclStopMic() {^
