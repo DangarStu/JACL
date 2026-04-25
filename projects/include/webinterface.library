@@ -355,7 +355,7 @@ execute "+exits"
 write "</div>"
 write "<form id=~commandForm~ name=~JACLGameForm~ method=~get~ autocomplete=~off~ onsubmit=~return submitForm(event);~>"
 write "<div class=~command_prompt~>^"
-write "<button id=~jaclMicButton~ type=~button~ class=~mic~ onclick=~startListening();~ title=~Speak a command~ aria-label=~Speak a command~>&#127908;</button>"
+write "<button id=~jaclMicButton~ type=~button~ class=~mic~ onclick=~startListening();~ title=~Click to speak a command. Pause when you are done and it will be submitted for you. Click again while recording to cancel.~ aria-label=~Speak a command~>&#127908;</button>"
 prompt "KeyPressed();"
 print:
    </div>

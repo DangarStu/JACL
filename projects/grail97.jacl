@@ -1240,7 +1240,7 @@ proxy "open drawer"
 proxy "close drawer"
 }
 
-object drawer: writing desk drawer
+object drawer: writing desk drawer draw draws
  has           CONTAINER CLOSABLE CLOSED
  inventory     a "desk drawer"
  quantity      12
@@ -3417,7 +3417,7 @@ write " pops out on to the work bench from an opening on the side of the "
 write "device." ^
 }
 
-object compartment: compartment drawer
+object compartment: compartment drawer draw draws
  has           CLOSABLE CLOSED CONTAINER
  inventory     a "compartment"
  starts        childof device
@@ -5341,7 +5341,7 @@ endall
 write "There really isn't much of it left." ^
 }
 
-object top_drawer: top cabinet drawer
+object top_drawer: top cabinet drawer draw draws
  has           CONTAINER CLOSABLE CLOSED
  inventory     a "top drawer"
  described     "The top drawer of the filing cabinet is here."
@@ -5438,7 +5438,7 @@ write "you can make out appears to say something about the energy obtained "
 write "from fish only being good for other fish." ^
 }
 
-object bottom_drawer: bottom cabinet drawer
+object bottom_drawer: bottom cabinet drawer draw draws
  has           CONTAINER CLOSED LOCKED
  inventory     a "bottom drawer"
  quantity      15

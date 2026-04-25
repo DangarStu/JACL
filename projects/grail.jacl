@@ -1388,7 +1388,7 @@ proxy "open drawer"
 proxy "close drawer"
 }
 
-object drawer: writing desk drawer
+object drawer: writing desk drawer draw draws
  has           CONTAINER CLOSABLE CLOSED
  short         a "desk drawer"
  quantity      12
@@ -3604,7 +3604,7 @@ write " pops out on to the work bench from an opening on the side of the "
 write "device.^"
 }
 
-object compartment: compartment drawer
+object compartment: compartment drawer draw draws
  has           CLOSABLE CLOSED CONTAINER
  short         a "compartment"
  parent        device
@@ -5900,7 +5900,7 @@ write "There really isn't much of it left.^"
 object top_drawer_lock: top cabinet drawer lock keyhole
  short         the "top drawer lock"
 
-object top_drawer: top cabinet drawer
+object top_drawer: top cabinet drawer draw draws
  has           CONTAINER CLOSABLE CLOSED
  short         a "top drawer"
  long          "The top drawer of the filing cabinet is here.^"
@@ -6008,7 +6008,7 @@ write "from fish only being good for other fish.^"
 object bottom_drawer_lock: bottom cabinet drawer lock keyhole
  short         the "bottom drawer lock"
 
-object bottom_drawer: bottom cabinet drawer
+object bottom_drawer: bottom cabinet drawer draw draws
  has           CONTAINER CLOSED LOCKED
  short         a "bottom drawer"
  quantity      15
