@@ -140,6 +140,7 @@ apache: install
 	  printf '%s\n' '      <p><strong>Interactive fiction</strong> is a genre of text-based computer games where you read a description of a scene and type simple commands (for example <em>go north</em>, <em>take lamp</em>, or <em>examine desk</em>) to move through a story and solve its puzzles.</p>'; \
 	  printf '%s\n' '      <p>It is a direct descendant of the text adventures of the 1970s and 80s &mdash; titles like <em>Zork</em>, <em>Adventure</em>, and <em>The Hitchhiker&rsquo;s Guide to the Galaxy</em> &mdash; and has a thriving modern community of authors and players.</p>'; \
 	  printf '%s\n' '      <p>Want to write your own? The <a href="/guide/">JACL Guide</a> walks you through the language.</p>'; \
+	  printf '%s\n' '      <p>The interpreter source code &mdash; for running JACL locally or contributing &mdash; is on <a href="https://github.com/DangarStu/JACL">GitHub</a>.</p>'; \
 	  printf '%s\n' '    </section>'; \
 	  printf '%s\n' '    <h2>Play a game</h2>'; \
 	  printf '%s\n' '    <ul class="games">'; \
