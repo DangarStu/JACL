@@ -32,7 +32,7 @@ print:
 		right:0;
 		display:block;
 		font-family: Merriweather, Verdana, Arial, Sanserif; 
-                height: 75px;
+                height: 83px;
 .
 ifstring footer_image != "none"
    write "background-image: url('" footer_image "'); "
@@ -51,7 +51,7 @@ print:
 ifstring current_image != "none"
    write "  margin-right: 500px;"
 endif
-write " bottom: 75px; "
+write " bottom: 83px; "
 write " background-color: " maintext_colour "; }^"
 print:
 	p {	font-family: Merriweather, Verdana, Arial, Sanserif;
@@ -110,7 +110,7 @@ print:
                 top: 87px;
 		width: 500px;
 		float: right;
-                bottom: 75px;
+                bottom: 83px;
 .
 write " background-color: " maintext_colour "; }^"
 print:
@@ -147,6 +147,8 @@ print:
 	#JACLCommandPrompt {
                 font-size: 12pt;
 		float: left;
+		box-sizing: border-box;
+		height: 30px;
 		border: 1px;
 		width: calc(100% - 52px); }^
 	button.mic {
