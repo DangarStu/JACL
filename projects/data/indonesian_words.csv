@@ -169,6 +169,7 @@ bangga,proud
 bangkit,"rise, get up"
 bangkrut,bankrupt
 bangku,bench
+bangku-bangku,benches
 bangsa,nation
 bangun,"wake up, build"
 bangunan,building
@@ -197,6 +198,7 @@ bata,brick
 batalkan,cancel/undo
 batang,"stem, trunk, bar"
 batas,"boundary, limit"
+batik,batik (patterned cloth)
 batu,"stone, rock"
 batuk,cough
 bau,"smell, odor"
@@ -205,6 +207,7 @@ bawa,"to carry, bring"
 bawaan,"innate, default"
 bawah tanah,underground
 bawah,"below, bottom"
+bawahan,subordinate; lower part of clothing
 bawang,onion
 baya,"age (as in paruh baya, middle-aged)"
 bayam,spinach
@@ -265,6 +268,7 @@ berbagai,various
 berbahaya,dangerous
 berbalut,"wrapped, coated"
 berbaring,lie down
+berbaris,"to line up, to march"
 berbeda,different
 berbelanja,go shopping
 berbicara,speak
@@ -283,6 +287,7 @@ bergerak-gerak,moving around repeatedly
 bergoyang,swaying
 berguna,useful
 berharap,hope
+berharga,"valuable, precious"
 berhasil,succeed
 berhembus,to blow
 berhenti,stop
@@ -302,6 +307,7 @@ berkas,"file, document"
 berkat,"blessing, thanks to"
 berkata,say
 berkembang,develop
+berkibar,"to flutter, wave (of a flag)"
 berkilat,to flash (lightning)
 berkokok,to crow (rooster)
 berkumpul,to gather
@@ -310,6 +316,7 @@ berlaku,"apply, be valid"
 berlalu,to pass by
 berlama-lama,for a long time
 berlari,run
+berlarian,running about
 berlawanan,opposite
 berlebihan,excessive
 bermacam-macam,various
@@ -321,6 +328,7 @@ bernafas,breathe
 bernama,named
 berniat,to intend
 bernilai,valuable
+berolahraga,"to exercise, do sports"
 berpakaian,dressed
 berpengaruh,influential
 bersabar,be patient
@@ -328,6 +336,8 @@ bersama,"together, with"
 bersandar,to lean against
 bersatu,unite
 bersedia,willing
+berseragam,"in uniform, uniformed"
+berseru,"to call out, exclaim"
 bersih,clean
 bersihkan,clean (verb)
 bersinar,to shine
@@ -343,6 +353,7 @@ berterima kasih,be grateful
 berterima,to give thanks (used in berterima kasih)
 bertindak,act
 beruang,bear (animal)
+berumput,"grassy, grass-covered"
 berumur,"aged, being N years old"
 beruntung,lucky
 berwarna,colored
@@ -389,6 +400,7 @@ brahma,Brahma (Hindu creator god)
 bu,"ma'am, Mrs."
 buah,fruit
 buah-buahan,fruits
+buahnya,its fruit
 buang,"throw away, discard"
 buat,"to make, do"
 buatan,"made by, made in"
@@ -409,6 +421,7 @@ bunga,"flower, interest"
 bunganya,its flower
 bunuh,kill
 bunyi,sound
+bunyinya,its sound
 bupati,regent
 bursa,"exchange, market"
 buru-buru,in a hurry
@@ -498,6 +511,7 @@ dagangan,wares
 dagangannya,his/her merchandise
 daging,meat
 dah,already (informal)
+dahan,branch (of a tree)
 dahulu,"before, formerly"
 dalam,"inside, deep"
 dalih,excuse
@@ -539,6 +553,7 @@ denah,"floor plan, layout"
 denda,fine (penalty)
 dendam,grudge
 dengan,with
+denganmu,with you
 dengar,hear
 dengarkan,listen to
 denyut,pulse
@@ -570,6 +585,7 @@ dibaca,to be read
 dibawa,"carried, brought (passive)"
 diberi,given (passive)
 dibuka,opened (passive)
+dicat,painted
 didengar,to be heard
 didik,educate
 diganggu,disturbed
@@ -780,6 +796,8 @@ guru,teacher
 guyur,"to pour, douse"
 habis,"finished, used up"
 hadap,to face
+hadapan,"front, in front of"
+hadapanmu,in front of you
 hadapi,face (confront)
 hadiah,"gift, prize"
 hadir,present
@@ -965,6 +983,7 @@ jembatan,bridge
 jemput,"pick up, fetch"
 jemuran,laundry being dried
 jendela,window
+jendelanya,its window
 jenis,"type, kind"
 jentik,flick
 jerat,"trap, snare"
@@ -1037,6 +1056,7 @@ kapan saja,anytime
 kapan,when
 kapan-kapan,sometime
 kapas,cotton
+kapur,chalk
 karakter,character
 karang,to compose; coral reef
 karangan,essay
@@ -1127,6 +1147,7 @@ kemarin,yesterday
 kemauan,"will, desire"
 kembali,return
 kembang,"to develop, bloom"
+kemeja,shirt
 kemenangan,victory
 kemerdekaan,"freedom, independence"
 kemewahan,luxury
@@ -1279,6 +1300,7 @@ kunang-kunang,firefly
 kunci,key
 kuncinya,the key
 kuning,yellow
+kuningan,brass
 kunjung,to visit
 kunjungan,visit
 kunjunganmu,your visit
@@ -1395,6 +1417,7 @@ lokasi,location
 lomba,"race, competition"
 lompat,jump
 lompati,jump over
+lonceng,bell
 longsor,landslide
 lorong,"corridor, hallway"
 lotere,lottery
@@ -1469,6 +1492,7 @@ mata,eye
 matahari,sun
 matang,"ripe, mature, cooked"
 matanya,his/her eyes
+matematika,mathematics
 mati,"dead, die"
 matikan,"turn off, switch off"
 mau,"want, want to"
@@ -1504,6 +1528,7 @@ meluangkan,to spare (time)
 memadamkan,"to extinguish, put out"
 memainkan,to play (something)
 memakai,"to wear, use"
+memakainya,wears/uses it
 memakan,to eat
 memang,"indeed, truly"
 memanjat,to climb
@@ -1554,6 +1579,7 @@ memperlihatkan,to show
 mempersilakan,to invite politely
 memuja,to worship
 memukul,"to hit, strike"
+memukulnya,"hits it, strikes it"
 memulai,to begin
 memulihkan,to restore
 memutar,"to turn, rotate"
@@ -1571,6 +1597,7 @@ menarik,interesting
 menaruh,"put, place"
 menata,"to arrange, organise"
 menatapmu,staring at you
+menaungi,"to shade, to shelter"
 menawar,to haggle
 mencari,search
 menceritakan,"to narrate, tell a story"
@@ -1610,6 +1637,7 @@ mengarahkan,"to aim, point"
 mengatur,"to set, arrange"
 mengawasi,to watch over
 mengecup,to kiss
+mengejar,"to chase, pursue"
 mengejutkan,surprising
 mengelilingi,to surround
 mengeluh,complain
@@ -1643,6 +1671,7 @@ menghilang,to disappear
 menghisap,"to suck, inhale"
 menghitung,count
 menghormati,honor
+menghormatinya,honors it/them
 menghubungkan,to connect
 mengikat,"to tie, bind"
 mengikuti,to follow
@@ -1699,8 +1728,11 @@ menutupnya,to close it
 menyajikan,to serve
 menyala,"to ignite, to light up"
 menyalakan,"to turn on, light"
+menyalin,to copy
 menyambut,welcome
 menyambutmu,welcoming you
+menyanyi,to sing
+menyanyikan,to sing (something)
 menyebabkan,to cause
 menyentuh,to touch
 menyerang,to attack
@@ -1754,6 +1786,9 @@ mulut,mouth
 mungkin,"maybe, perhaps"
 murah,cheap
 murid,"student, pupil"
+murid-murid,"students, pupils"
+murid-muridnya,his/her students
+muridku,my student
 musik,music
 musim,"season, monsoon"
 musuh,enemy
@@ -1867,6 +1902,8 @@ panjang,long
 panjat,climb
 pantai,"beach, coast"
 pantul,"to bounce, reflect"
+papan tulis,blackboard
+papan,"board, plank"
 para,the (plural marker)
 partai,party (political)
 paruh,"half, beak"
@@ -1897,6 +1934,7 @@ pekerjaan,job
 pelabuhan,"port, harbor"
 pelacur,prostitute
 pelajaran,lesson
+pelajarannya,his/her/the lesson
 pelajari,"to study, learn"
 pelan,"slow, quiet"
 pelan-pelan,slowly
@@ -1948,6 +1986,7 @@ pengiriman,delivery
 pengobatan,treatment
 pengumuman,announcement
 penilaian,assessment
+penjaga,"guard, keeper"
 penjara,prison
 penjelajah,explorer
 penjual,seller
@@ -2121,6 +2160,7 @@ rasanya,"its taste, it seems"
 rata,flat
 ratu,queen
 ratus,hundred
+ratusan,hundreds
 rawan,"vulnerable, prone"
 rawat,"treat, care for"
 raya,"great, grand"
@@ -2143,6 +2183,7 @@ restoran,restaurant
 retak,"crack, cracked"
 retoris,rhetorical
 ribu,thousand
+rindang,shady (of a tree)
 rindu,"miss, longing"
 ringan,light (weight)
 rintik,droplet
@@ -2153,6 +2194,7 @@ rob,tidal flood
 robek,torn
 roh-roh,spirits (plural)
 rohani,"spiritual, soul"
+rok,skirt
 rokok,cigarette
 roma,pore
 romantis,romantic
@@ -2265,8 +2307,10 @@ segehan,"ground offering (Balinese, for lower spirits)"
 segel,seal
 segera,"immediately, soon"
 segitiga,triangle
+sehari,"one day, a day"
 sehari-hari,daily
 sehat,healthy
+sehingga,"so that, therefore"
 seimbang,balanced
 sejak,since
 sejarah,history
@@ -2334,6 +2378,7 @@ sepi,quiet
 sepiring,a plateful
 sepuluh,ten
 sepupu,cousin
+seragam,uniform
 serang,attack
 serangan,attack
 serba,"completely, entirely"
@@ -2348,7 +2393,9 @@ sesekali,occasionally
 sesuatu,something
 sesudah,after
 set,set
+setahun,"one year, for a year"
 setandan,a bunch (of bananas)
+setelah,after
 setia,"faithful, loyal"
 setiap,every
 setidaknya,at least
@@ -2487,6 +2534,7 @@ tehnya,his/her tea
 tekan,"press, push"
 tekanan,pressure
 teknik,technique
+tekun,"diligent, persistent"
 teladan,example
 telah,"has, have (past tense)"
 telepon,telephone
@@ -2527,6 +2575,7 @@ terbagi,divided
 terbaik,the best
 terbang,fly (verb)
 terbelah,split
+terbentang,"stretched out, spread out"
 terbuat,made of
 terbuka,open
 tercampur,mixed
@@ -2553,6 +2602,7 @@ termasuk,including
 ternyata,"it turns out, apparently"
 terong,eggplant
 terpal,tarpaulin
+terpasang,"installed, mounted"
 tersaji,"presented, served"
 tersedia,available
 tersenyum,to smile
@@ -2588,6 +2638,7 @@ tindakan,"action, measure"
 tinggal,"live, stay"
 tinggalkan,to leave
 tinggi,"tall, high"
+tingginya,its height
 tipis,thin
 titik,"point, dot"
 tiup,blow

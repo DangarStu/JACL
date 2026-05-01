@@ -260,6 +260,7 @@ location jalan_utama : jalan utama
  north         warung
  south         banjar
  northeast     gang
+ northwest     sekolah
  west          pura
  southwest     pasar
  x             1
@@ -272,8 +273,9 @@ print:
    sebuah warung kecil. Sebuah jalan kecil menuju ke
    selatan ke banjar. Ke timur, jalan mengarah ke sawah.
    Sebuah gang sempit mengarah ke timur laut. Ke barat
-   terlihat gerbang pura desa, dan ke barat daya ada
-   pasar yang ramai.^
+   terlihat gerbang pura desa, ke barat laut sayup-sayup
+   terdengar suara anak-anak dari sekolah desa, dan ke
+   barat daya ada pasar yang ramai.^
 .
 execute "+weather_line"
 }
@@ -1255,6 +1257,213 @@ object batu_hitam : batu hitam
 {examine
 write "Batu hitam vulkanik yang kokoh, bahan utama padmasana dan tembok pura.^"
 }
+
+# -----------------------------------------------------------------------------
+
+location sekolah : sekolah dasar sd
+ short         name "Sekolah Desa"
+ has           OUTDOORS
+ southeast     jalan_utama
+ x             0
+ y             1
+
+{look
+print:
+   Kamu berada di halaman sekolah dasar desa. Sebuah
+   bangunan rendah dengan atap seng terbentang di
+   hadapanmu, jendelanya terbuka lebar sehingga papan
+   tulis di dalam kelas terlihat dari sini. Di tengah
+   halaman berdiri sebuah tiang bendera, dan di samping
+   pohon mangga tergantung sebuah lonceng tua. Beberapa
+   murid berseragam putih merah berlarian di lapangan
+   kecil. Jalan utama ada di sebelah tenggara.^
+.
+execute "+weather_line"
+}
+
+object bendera : bendera
+ short         sebuah "bendera"
+ mass          scenery
+
+{examine
+write "Bendera merah putih berkibar di puncak tiang. "
+write "Setiap hari Senin murid-murid berbaris untuk menghormatinya.^"
+}
+
+object tiang_bendera : tiang bendera
+ short         sebuah "tiang bendera"
+ mass          scenery
+
+{examine
+write "Tiang bendera dari besi yang dicat putih, tingginya sekitar empat meter.^"
+}
+
+object lonceng : lonceng
+ short         sebuah "lonceng"
+ mass          scenery
+
+{examine
+write "Lonceng tua dari kuningan tergantung di dahan pohon mangga. "
+write "Pak Penjaga memukulnya tiga kali sehari: masuk, istirahat, dan pulang.^"
+}
+
+object pohon_mangga : pohon mangga
+ short         sebuah "pohon mangga"
+ mass          scenery
+
+{examine
+write "Pohon mangga rindang menaungi sebagian halaman sekolah. "
+write "Buahnya masih hijau, belum matang.^"
+}
+
+object jendela : jendela
+ short         sebuah "jendela"
+ mass          scenery
+
+{examine
+write "Jendela kayu terbuka lebar agar udara segar masuk ke dalam kelas. "
+write "Dari sini kamu bisa melihat papan tulis dan bangku-bangku murid.^"
+}
+
+object papan_tulis : papan tulis
+ short         sebuah "papan tulis"
+ mass          scenery
+
+{examine
+write "Papan tulis hijau terpasang di dinding kelas. Tertulis di sana: "
+write "~Selamat pagi, anak-anak~ dengan kapur putih.^"
+}
+
+object kapur : kapur
+ short         sebatang "kapur"
+ mass          scenery
+
+{examine
+write "Sebatang kapur putih tergeletak di tepi jendela kelas, "
+write "siap dipakai Bu Wayan untuk menulis di papan tulis.^"
+}
+
+object lapangan : lapangan
+ short         name "lapangan"
+ mass          scenery
+
+{examine
+write "Lapangan kecil berumput pendek di samping bangunan sekolah. "
+write "Tempat anak-anak bermain bola dan berolahraga saat istirahat.^"
+}
+
+object murid : murid
+ short         name "murid-murid"
+ long          "Beberapa murid berseragam berlarian di lapangan.^"
+ has           ANIMATE
+ mass          scenery
+ parent        sekolah
+
+{examine
+write "Murid-murid berseragam putih merah, sebagian masih tertawa "
+write "mengejar bola, sebagian lagi duduk di bawah pohon mangga.^"
+}
+
+{talk_to
+write "Beberapa murid melambai sambil berseru, ~Halo, Kakak!~ "
+write "lalu kembali bermain.^"
+}
+
+object seragam : seragam
+ short         name "seragam"
+ mass          scenery
+
+{examine
+write "Seragam sekolah dasar: kemeja putih dan celana atau rok merah. "
+write "Semua murid memakainya dengan rapi.^"
+}
+
+object guru : guru wayan
+ short         name "Bu Wayan"
+ long          "Bu Wayan, sang guru, berdiri di pintu kelas mengawasi murid-muridnya.^"
+ has           ANIMATE
+ mass          heavy
+ parent        sekolah
+
+{examine
+write "Bu Wayan mengenakan kebaya cokelat dan kain batik. "
+write "Tangannya memegang sebuah buku pelajaran tebal.^"
+}
+
+{talk_to
+write "~Selamat pagi!~ sapa Bu Wayan ramah. ~Saya sudah hampir dua puluh "
+write "tahun mengajar di sini. Senang sekali bertemu denganmu.~^"
+}
+
+{ask_about_sekolah
+write "~Sekolah ini hanya punya enam kelas,~ kata Bu Wayan, ~tapi semua "
+write "anak desa belajar di sini sampai lulus SD.~^"
+}
+
+{ask_about_murid
+write "~Murid-murid kami pintar dan rajin,~ kata Bu Wayan bangga. "
+write "~Yang paling kecil baru kelas satu, yang paling besar kelas enam.~^"
+}
+
+{ask_about_pelajaran
+write "~Hari ini pelajarannya bahasa Indonesia,~ jawab Bu Wayan. "
+write "~Setelah istirahat, matematika dan menyanyi.~^"
+}
+
+{ask_about_mengajar
+write "~Saya senang mengajar,~ kata Bu Wayan tersenyum. ~Melihat anak-anak "
+write "bisa membaca dan menulis adalah hadiah yang paling berharga.~^"
+}
+
+{ask_about_belajar
+write "~Belajar harus tekun dan sabar,~ pesan Bu Wayan. "
+write "~Setiap hari satu kata baru, setahun sudah ratusan.~^"
+}
+
+{ask_about_bendera
+write "~Setiap hari Senin kami upacara bendera,~ kata Bu Wayan. "
+write "~Murid-murid menyanyikan lagu Indonesia Raya.~^"
+}
+
+{ask_about_lonceng
+write "~Lonceng itu sudah lama sekali,~ kata Bu Wayan. "
+write "~Bunyinya nyaring sampai terdengar ke seluruh desa.~^"
+}
+
+{ask_about_seragam
+write "~Seragam putih merah adalah seragam sekolah dasar di seluruh "
+write "Indonesia,~ kata Bu Wayan. ~Putih untuk atasan, merah untuk bawahan.~^"
+}
+
+{ask_about_papan_tulis
+write "~Papan tulis itu masih dipakai setiap hari,~ kata Bu Wayan. "
+write "~Saya menulis dengan kapur, lalu murid-murid menyalin ke buku mereka.~^"
+}
+
+{ask_about_kelas
+write "~Kelas saya kelas dua,~ kata Bu Wayan. ~Made juga muridku, "
+write "tapi sekarang dia sedang main di jalan utama.~^"
+}
+
+object pelajaran : pelajaran
+ has           NO_TAB
+ short         name "pelajaran"
+ mass          scenery
+
+object mengajar : mengajar
+ has           NO_TAB
+ short         name "mengajar"
+ mass          scenery
+
+object belajar : belajar
+ has           NO_TAB
+ short         name "belajar"
+ mass          scenery
+
+object kelas : kelas
+ has           NO_TAB
+ short         name "kelas"
+ mass          scenery
 
 # -----------------------------------------------------------------------------
 
