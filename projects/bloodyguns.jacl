@@ -11,6 +11,7 @@ constant game_title       "The Bloody Guns"
 constant game_author      "Stuart Allen"
 constant game_publish     true
 constant ifid             "JACL-107"
+string game_language      "en-US"
 
 # -----------------------------------------------------------------------------
 # CONSTANTS FOR RESOURCES IN BLORB FILE

@@ -12,6 +12,7 @@ constant game_release     1
 constant game_build       1
 constant game_publish     true
 constant ifid             "JACL-003"
+string game_language      "en-US"
 
 # CONSTANTS FOR RESOURCES IN BLORB FILE
 constant image_dragon     1

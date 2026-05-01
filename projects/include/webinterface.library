@@ -2,7 +2,6 @@
 
 string current_image     "none"
 constant title_image     "none"
-string game_language     "en-US"
 constant header_colour       "#42596d"
 constant linkbar_colour      "#6a7a87"
 constant maintext_colour     "#eeeeee"
@@ -32,6 +31,27 @@ print:
       }
    }^
 
+   var jaclVoicesReady = !!(window.speechSynthesis && speechSynthesis.getVoices().length > 0);^
+   var jaclVoicesPending = [];^
+
+   function jaclVoicesFlush() {^
+      if (jaclVoicesReady) return;^
+      jaclVoicesReady = true;^
+      var pending = jaclVoicesPending;^
+      jaclVoicesPending = [];^
+      for (var i = 0; i < pending.length; i++) {^
+         try { pending[i](); } catch (e) {}^
+      }^
+   }^
+
+   function jaclWhenVoicesReady(cb) {^
+      if (!window.speechSynthesis) { cb(); return; }^
+      if (jaclVoicesReady) { cb(); return; }^
+      if (speechSynthesis.getVoices().length > 0) { jaclVoicesFlush(); cb(); return; }^
+      jaclVoicesPending.push(cb);^
+      setTimeout(jaclVoicesFlush, 1500);^
+   }^
+
    function speakText(text) {^
       var doc = new DOMParser().parseFromString(text, 'text/html');^
       var html = doc.body.innerHTML;^
@@ -44,21 +64,23 @@ print:
          return p.replace(/\s+/g, ' ').trim();^
       }).filter(function(p) { return p.length > 0; });^
       if (paragraphs.length === 0) return;^
-      var lang = document.documentElement.lang || 'en-US';^
-      var voice = jaclPickedVoice();^
-      function speakNext(i) {^
-         if (i >= paragraphs.length) return;^
-         var utterance = new SpeechSynthesisUtterance(paragraphs[i]);^
-         utterance.lang = lang;^
-         if (voice) utterance.voice = voice;^
-         utterance.onend = function() {^
-            if (i < paragraphs.length - 1 && isSpeakEnabled()) {^
-               setTimeout(function() { speakNext(i + 1); }, 500);^
-            }^
-         };^
-         speechSynthesis.speak(utterance);^
-      }^
-      speakNext(0);^
+      jaclWhenVoicesReady(function() {^
+         var lang = document.documentElement.lang || 'en-US';^
+         var voice = jaclPickedVoice();^
+         function speakNext(i) {^
+            if (i >= paragraphs.length) return;^
+            var utterance = new SpeechSynthesisUtterance(paragraphs[i]);^
+            utterance.lang = lang;^
+            if (voice) utterance.voice = voice;^
+            utterance.onend = function() {^
+               if (i < paragraphs.length - 1 && isSpeakEnabled()) {^
+                  setTimeout(function() { speakNext(i + 1); }, 500);^
+               }^
+            };^
+            speechSynthesis.speak(utterance);^
+         }^
+         speakNext(0);^
+      });^
    }^
 
    function enableSpeak() {^
@@ -78,7 +100,7 @@ print:
       var lang = document.documentElement.lang || 'en-US';^
       var langPrefix = lang.split('-')[0];^
       return speechSynthesis.getVoices().filter(function(v) {^
-         return v.lang === lang || v.lang.indexOf(langPrefix + '-') === 0 || v.lang.indexOf(langPrefix + '_') === 0;^
+         return v.lang === lang || v.lang === langPrefix || v.lang.indexOf(langPrefix + '-') === 0 || v.lang.indexOf(langPrefix + '_') === 0;^
       });^
    }^
 
@@ -114,22 +136,24 @@ print:
    }^
 
    function jaclListVoices() {^
-      var voices = jaclGetVoicesForLang();^
-      if (voices.length === 0) {^
-         jaclAppendMain('<p>No voices available for this language yet. Try again in a moment.</p>');^
-         return;^
-      }^
-      var stored = localStorage.getItem('jaclVoiceName');^
-      var defaultVoice = jaclDefaultVoice(voices);^
-      var html = '<p>Available voices (type <b>voice N</b> to choose):</p><ol>';^
-      for (var i = 0; i < voices.length; i++) {^
-         var marker = '';^
-         if (stored && voices[i].name === stored) marker = ' &larr; selected';^
-         else if (!stored && voices[i] === defaultVoice) marker = ' &larr; default';^
-         html += '<li>' + voices[i].name + ' (' + voices[i].lang + ')' + marker + '</li>';^
-      }^
-      html += '</ol>';^
-      jaclAppendMain(html);^
+      jaclWhenVoicesReady(function() {^
+         var voices = jaclGetVoicesForLang();^
+         if (voices.length === 0) {^
+            jaclAppendMain('<p>No voices available for this language yet. Try again in a moment.</p>');^
+            return;^
+         }^
+         var stored = localStorage.getItem('jaclVoiceName');^
+         var defaultVoice = jaclDefaultVoice(voices);^
+         var html = '<p>Available voices (type <b>voice N</b> to choose):</p><ol>';^
+         for (var i = 0; i < voices.length; i++) {^
+            var marker = '';^
+            if (stored && voices[i].name === stored) marker = ' &larr; selected';^
+            else if (!stored && voices[i] === defaultVoice) marker = ' &larr; default';^
+            html += '<li>' + voices[i].name + ' (' + voices[i].lang + ')' + marker + '</li>';^
+         }^
+         html += '</ol>';^
+         jaclAppendMain(html);^
+      });^
    }^
 
    function jaclPickVoice(n) {^
@@ -144,7 +168,7 @@ print:
    }^
 
    if (window.speechSynthesis && typeof speechSynthesis.onvoiceschanged !== 'undefined') {^
-      speechSynthesis.onvoiceschanged = function() { /* voices now loaded */ };^
+      speechSynthesis.onvoiceschanged = jaclVoicesFlush;^
    }^
 
    var jaclMapPopup = null;^
