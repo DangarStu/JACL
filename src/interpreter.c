@@ -1534,21 +1534,74 @@ execute(const char *funcname)
                     write_text(option_buffer);
                 }
             } else if (!strcmp(word[0], "sound")) {
-                if (word[2] == NULL) {
-                    /* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
+                /* Web sound forms:
+                 *   sound URL mime [channel] [loop]   -- play (channel default 0)
+                 *   sound 0 channel                   -- stop a channel
+                 * The "stop" form is detected by word[1] being unquoted
+                 * (i.e., a numeric/identifier expression, not a string
+                 * literal) -- the play form requires a quoted URL. */
+                if (word[1] == NULL || word[2] == NULL) {
                     noproprun();
                     return (exit_function(TRUE));
+                }
+
+                if (quoted[1] == 0) {
+                    /* Stop form. */
+                    int stop_channel = (int) value_of(word[2], TRUE);
+                    sprintf(option_buffer,
+                            "<jacl-sound-stop data-jacl-channel=~%d~></jacl-sound-stop>",
+                            stop_channel);
+                    write_text(option_buffer);
                 } else {
-                    write_text("<audio autoplay=~autoplay~>");
-                    if (word[3] == NULL) {
-                        sprintf(option_buffer, "<source src=~%s~ type=~%s~>", text_of_word(1), text_of_word(2));
-                        write_text(option_buffer);
+                    /* Play form. Parse optional channel (integer arg) and
+                     * loop (the literal word "loop", which resolves to -1
+                     * via the constant defined in user games). */
+                    int play_channel = 0;
+                    int looping = 0;
+                    int i;
+                    for (i = 3; i < MAX_WORDS && word[i] != NULL; i++) {
+                        if (quoted[i] == 0) {
+                            int v = (int) value_of(word[i], TRUE);
+                            if (v == -1) {
+                                looping = 1;
+                            } else {
+                                play_channel = v;
+                            }
+                        }
                     }
+                    if (looping) {
+                        sprintf(option_buffer,
+                                "<audio autoplay=~autoplay~ loop=~loop~ "
+                                "data-jacl-channel=~%d~ data-jacl-pending=~1~>",
+                                play_channel);
+                    } else {
+                        sprintf(option_buffer,
+                                "<audio autoplay=~autoplay~ "
+                                "data-jacl-channel=~%d~ data-jacl-pending=~1~>",
+                                play_channel);
+                    }
+                    write_text(option_buffer);
+                    sprintf(option_buffer, "<source src=~%s~ type=~%s~>",
+                            text_of_word(1), text_of_word(2));
+                    write_text(option_buffer);
                     write_text("</audio>");
                 }
             } else if (!strcmp(word[0], "cursor")) {
             } else if (!strcmp(word[0], "timer")) {
             } else if (!strcmp(word[0], "volume")) {
+                /* volume LEVEL channel -- emits a marker the web client
+                 * applies to the audio element on that channel. LEVEL is
+                 * 0-100; the JS divides by 100 to get the HTMLMediaElement
+                 * volume range (0.0-1.0). */
+                if (word[2] != NULL) {
+                    int vol_level = (int) value_of(word[1], TRUE);
+                    int vol_channel = (int) value_of(word[2], TRUE);
+                    sprintf(option_buffer,
+                            "<jacl-sound-volume data-jacl-channel=~%d~ "
+                            "data-jacl-level=~%d~></jacl-sound-volume>",
+                            vol_channel, vol_level);
+                    write_text(option_buffer);
+                }
             } else if (!strcmp(word[0], "askstring") || !strcmp(word[0], "getstring")) {
                 if (word[1] != NULL) {
                     struct integer_type *ptype = PENDING_QUESTION_TYPE;

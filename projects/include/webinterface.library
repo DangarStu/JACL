@@ -242,6 +242,68 @@ print:
    function changeInterface() {^
       document.JACLInterfaceForm.submit();
    }^
+
+   /* Channel-aware audio processing.
+    * The engine emits three kinds of marker:
+    *   <audio data-jacl-channel="N" data-jacl-pending="1" [loop] ...>
+    *     -- play on channel N; replaces any prior audio on the same
+    *        channel; the pending flag tags this element as new in
+    *        the most recent response so existing loops aren't disturbed.
+    *   <jacl-sound-stop data-jacl-channel="N">     -- stop channel N.
+    *   <jacl-sound-volume data-jacl-channel="N" data-jacl-level="V">
+    *     -- set volume on channel N to V/100.
+    *
+    * Each marker, once acted on, is removed from the DOM. Audio elements
+    * that have been processed (pending flag cleared) keep playing across
+    * subsequent turns until something explicitly replaces or stops them.
+    * Browsers that blocked the initial autoplay get a retry opportunity
+    * here, since this runs in response to the user's command (a gesture). */
+   function jaclProcessAudioMarkers() {^
+      var maintext = document.getElementById('maintext');^
+      if (!maintext) return;^
+
+      maintext.querySelectorAll('jacl-sound-stop').forEach(function(marker) {^
+         var ch = marker.getAttribute('data-jacl-channel');^
+         maintext.querySelectorAll('audio[data-jacl-channel="' + ch + '"]').forEach(function(a) {^
+            try { a.pause(); } catch (e) {}^
+            a.remove();^
+         });^
+         marker.remove();^
+      });^
+
+      maintext.querySelectorAll('jacl-sound-volume').forEach(function(marker) {^
+         var ch = marker.getAttribute('data-jacl-channel');^
+         var level = parseInt(marker.getAttribute('data-jacl-level'), 10);^
+         if (isNaN(level)) level = 100;^
+         var v = Math.max(0, Math.min(1, level / 100));^
+         maintext.querySelectorAll('audio[data-jacl-channel="' + ch + '"]').forEach(function(a) {^
+            a.volume = v;^
+         });^
+         marker.remove();^
+      });^
+
+      maintext.querySelectorAll('audio[data-jacl-pending="1"]').forEach(function(audio) {^
+         var ch = audio.getAttribute('data-jacl-channel');^
+         maintext.querySelectorAll('audio[data-jacl-channel="' + ch + '"]:not([data-jacl-pending])').forEach(function(old) {^
+            try { old.pause(); } catch (e) {}^
+            old.remove();^
+         });^
+         audio.removeAttribute('data-jacl-pending');^
+         var p = audio.play();^
+         if (p && typeof p.catch === 'function') p.catch(function() {});^
+      });^
+
+      maintext.querySelectorAll('audio:not([data-jacl-pending])').forEach(function(audio) {^
+         if (audio.paused && !audio.ended) {^
+            var p = audio.play();^
+            if (p && typeof p.catch === 'function') p.catch(function() {});^
+         }^
+      });^
+   }^
+
+   document.addEventListener('DOMContentLoaded', function() {^
+      jaclProcessAudioMarkers();^
+   });^
 .
 #include "ajax.library"
 print:
@@ -414,7 +476,6 @@ set linebreaks = true
 {+local_success
 print:
       var maintext = document.getElementById("maintext");^
-      maintext.querySelectorAll('audio').forEach(function(el) { el.remove(); });^
       maintext.querySelectorAll('script').forEach(function(el) { el.remove(); });^
 
       maintext.innerHTML += "<br><b>&gt;" + details.command + "</b><br>"
@@ -429,10 +490,7 @@ print:
          main.scrollTop = main.scrollHeight;^
       }
       document.JACLGameForm.command.value = "";^
-      var sound = maintext.querySelector('audio');^
-      if (sound != null) {^
-         sound.play();
-      }^
+      jaclProcessAudioMarkers();^
       var jaclscript = maintext.querySelector('script');^
       if (jaclscript != null) {^
          (new Function(jaclscript.text))();

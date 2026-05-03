@@ -153,7 +153,7 @@ volume 100 foreground_channel
 if interpreter = GLK
    sound sound_bell foreground_channel
 else
-   sound "/sounds/MetalicClang.ogg" "audio/ogg"
+   sound "/sounds/MetalicClang.ogg" "audio/ogg" foreground_channel
 endif
 write "You strike the bell. It rings out loud and clear.^"
 }
@@ -165,7 +165,7 @@ volume 100 foreground_channel
 if interpreter = GLK
    sound sound_thunder foreground_channel
 else
-   sound "/sounds/Thunder.ogg" "audio/ogg"
+   sound "/sounds/Thunder.ogg" "audio/ogg" foreground_channel
 endif
 write "A long peal of thunder rolls across the sky.^"
 }
@@ -277,7 +277,7 @@ if interpreter = GLK
    sound sound_generator_start generator_channel
    sound sound_generator_run generator_channel loop
 else
-   sound "/sounds/GeneratorStarting.ogg" "audio/ogg"
+   sound "/sounds/GeneratorRunning.ogg" "audio/ogg" generator_channel loop
 endif
 write "You yank the cord. The generator coughs, catches, and settles "
 write "into a steady hum.^"
@@ -306,7 +306,7 @@ volume 60 background_channel
 if interpreter = GLK
    sound sound_rain background_channel loop
 else
-   sound "/sounds/Rain.ogg" "audio/ogg"
+   sound "/sounds/Rain.ogg" "audio/ogg" background_channel loop
 endif
 }
 
