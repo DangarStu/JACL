@@ -779,9 +779,23 @@ main(int argc, char *argv[])
                 /* CALL THE PARSER TO START PROCESSING THE COMMAND */
                 preparse();
 skip_command:
-    
+
                 if (current_command[0] != 0) {
                     strcpy(last_command, current_command);
+                }
+
+                /* Returning player with no command -- a page reload mid-
+                 * game. Nothing in the player's saved state advanced, so
+                 * eachturn() above wasn't called (the synthetic
+                 * "blankjacl" verb sets TIME=false). Fire +eachturn
+                 * explicitly so games can resync session-bound state
+                 * (ambient sound, music channels, periodic effects) that
+                 * the browser lost on reload. Skips total_moves increment
+                 * because no real action was taken. */
+                if (returning_player
+                    && cgi_val(entries, "command") == NULL
+                    && cgi_val(entries, "rpc") == NULL) {
+                    execute("+eachturn");
                 }
             }
         }
