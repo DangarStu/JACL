@@ -1,0 +1,367 @@
+#!../bin/jacl
+# =============================================================================
+# Media Demo
+# A small JACL multimedia test game: title image, map image, ambient looping
+# sound, one-shot foreground sound, separately-channelled sustained loop, and
+# three-room movement so an interpreter can be exercised on every feature
+# without slogging through a full game.
+# =============================================================================
+
+constant game_title       "Media Demo"
+constant game_author      "Stuart Allen"
+constant game_release     1
+constant game_build       1
+constant ifid             "JACL-MEDIADEMO"
+constant game_publish     true
+string   game_language    "en-US"
+
+constant header_colour    "#3a4a5e"
+constant linkbar_colour   "#4f607a"
+constant maintext_colour  "#eeeae0"
+
+# -----------------------------------------------------------------------------
+# BLORB RESOURCE IDS  (must match mediademo.blc)
+# -----------------------------------------------------------------------------
+
+constant image_title              1
+constant image_map                2
+
+constant sound_rain               3
+constant sound_bell               4
+constant sound_generator_start    5
+constant sound_generator_run      6
+constant sound_thunder            7
+
+constant loop                    -1
+
+constant foreground_channel       0
+constant background_channel       1
+constant generator_channel        2
+
+integer generator_running         0
+
+# -----------------------------------------------------------------------------
+# LOCATIONS
+# -----------------------------------------------------------------------------
+
+location hut : hut shack cabin
+ short     name "Hut"
+ has       KNOWN
+ south     clearing
+ x         1
+ y         1
+
+{look
+print:
+   You are inside a small wooden hut. Rain drums steadily on the
+   roof above you. A doorway leads south to a clearing.^^
+   This is the start of the multimedia demo. The looping sound on
+   the background channel is rain. Travel south to the clearing
+   to test foreground sound effects.^
+.
+}
+
+{+entered
+execute "+start_rain"
+}
+
+{+left
+# Stop background rain when leaving the hut.
+sound 0 background_channel
+}
+
+object hut_walls : wooden walls hut shack cabin
+ short     name "wooden walls"
+ mass      scenery
+ parent    hut
+
+{examine
+write "The hut is built from rough timber planks, weathered to grey by the rain.^"
+}
+
+object hut_roof : roof
+ short     name "roof"
+ mass      scenery
+ parent    hut
+
+{examine
+write "Tin roof, low and pitched. The rain hammers on it relentlessly.^"
+}
+
+object hut_doorway : doorway door opening
+ short     name "doorway"
+ mass      scenery
+ parent    hut
+
+{examine
+write "An open doorway in the south wall. The clearing is just beyond it.^"
+}
+
+object hut_rain : rain
+ short     name "rain"
+ mass      scenery
+ parent    hut
+
+{examine
+write "You can't see the rain from in here, only hear it on the roof.^"
+}
+
+# -----------------------------------------------------------------------------
+
+location clearing : clearing yard
+ short     name "Clearing"
+ has       KNOWN OUTDOORS
+ north     hut
+ south     lookout
+ x         1
+ y         2
+
+{look
+print:
+   You stand in a grassy clearing between the hut to the north
+   and a wooden lookout tower to the south. A heavy brass bell
+   hangs from a wooden frame in the middle of the clearing.^^
+   Type ~ring bell~ to play a one-shot sound on the foreground
+   channel. Type ~thunder~ to play a louder one-shot effect.^
+.
+}
+
+object grass : grass grassy
+ short     name "grass"
+ mass      scenery
+ parent    clearing
+
+{examine
+write "Coarse green grass underfoot, kept short by passing feet.^"
+}
+
+object bell : bell brass heavy wooden frame
+ short     name "brass bell"
+ long      "A heavy brass bell hangs from a wooden frame.^"
+ mass      scenery
+ parent    clearing
+
+{examine
+write "The bell is greened with verdigris but solid. Try ~ring bell~.^"
+}
+
+grammar ring     >ring
+grammar ring $string >ring
+
+{+ring
+volume 100 foreground_channel
+if interpreter = GLK
+   sound sound_bell foreground_channel
+else
+   sound "/sounds/MetalicClang.ogg" "audio/ogg"
+endif
+write "You strike the bell. It rings out loud and clear.^"
+}
+
+grammar thunder  >thunder
+
+{+thunder
+volume 100 foreground_channel
+if interpreter = GLK
+   sound sound_thunder foreground_channel
+else
+   sound "/sounds/Thunder.ogg" "audio/ogg"
+endif
+write "A long peal of thunder rolls across the sky.^"
+}
+
+# -----------------------------------------------------------------------------
+
+location lookout : lookout tower platform
+ short     name "Lookout"
+ has       KNOWN OUTDOORS
+ north     clearing
+ x         1
+ y         3
+
+{look
+print:
+   You are on a wooden lookout tower. From here you can see the
+   whole demo area. A small petrol generator sits in one corner.
+   A rolled-up map is pinned to the railing.^^
+.
+if generator_running = true
+   write "The generator is running, humming steadily.^^"
+endif
+print:
+   Type ~start generator~ to play a sustained looping sound on
+   its own channel. Type ~stop generator~ to stop it. Type
+   ~look at map~ to display the map image. The generator and
+   any rain or bell sounds run on separate channels and should
+   mix correctly.^
+.
+}
+
+object lookout_railing : railing rail wooden
+ short     name "railing"
+ mass      scenery
+ parent    lookout
+
+{examine
+write "A waist-high wooden railing runs around the platform. Splintery but solid.^"
+}
+
+object lookout_corner : corner
+ short     name "corner"
+ mass      scenery
+ parent    lookout
+
+{examine
+write "Just a corner of the platform, where the generator sits.^"
+}
+
+object generator : generator petrol small engine
+ short     name "petrol generator"
+ long      function
+ mass      scenery
+ parent    lookout
+
+{long
+if generator_running = true
+   write "A small petrol generator sits humming in the corner.^"
+else
+   write "A small petrol generator sits silent in the corner.^"
+endif
+}
+
+{examine
+if generator_running = true
+   write "The generator is running. Type ~stop generator~ to silence it.^"
+else
+   write "The generator is silent. Type ~start generator~ to begin its loop.^"
+endif
+}
+
+object map : map paper rolled rolled-up
+ short     name "rolled map"
+ long      "A rolled-up paper map is pinned to the railing.^"
+ mass      scenery
+ parent    lookout
+
+{examine
+write "You unroll the map and study it.^"
+if interpreter = GLK
+   image image_map
+else
+   write "<img src='/images/mediademo_map.png' alt='Demo map'/>^"
+endif
+print:
+   It shows the three rooms of the demo: Hut to the north,
+   Clearing in the middle, Lookout at the south. Exits are
+   labelled.^
+.
+}
+
+grammar start    >start
+grammar start $string >start
+grammar stop     >stop
+grammar stop $string >stop
+
+{+start
+if here != lookout
+   write "There is no generator here.^"
+   return
+endif
+if generator_running = true
+   write "The generator is already running.^"
+   return
+endif
+set generator_running = true
+volume 80 generator_channel
+if interpreter = GLK
+   sound sound_generator_start generator_channel
+   sound sound_generator_run generator_channel loop
+else
+   sound "/sounds/GeneratorStarting.ogg" "audio/ogg"
+endif
+write "You yank the cord. The generator coughs, catches, and settles "
+write "into a steady hum.^"
+}
+
+{+stop
+if here != lookout
+   write "There is nothing running here to stop.^"
+   return
+endif
+if generator_running = false
+   write "The generator is already off.^"
+   return
+endif
+set generator_running = false
+sound 0 generator_channel
+write "You flip the kill switch. The generator falls silent.^"
+}
+
+# -----------------------------------------------------------------------------
+# RAIN AMBIENCE
+# -----------------------------------------------------------------------------
+
+{+start_rain
+volume 60 background_channel
+if interpreter = GLK
+   sound sound_rain background_channel loop
+else
+   sound "/sounds/Rain.ogg" "audio/ogg"
+endif
+}
+
+# -----------------------------------------------------------------------------
+# PLAYER
+# -----------------------------------------------------------------------------
+
+object kryten : myself self me
+ short     name "yourself"
+ has       ANIMATE
+ parent    hut
+
+# -----------------------------------------------------------------------------
+# BOOTSTRAP
+# -----------------------------------------------------------------------------
+
+{+bootstrap
+set player = kryten
+execute "+intro"
+execute "+start_rain"
+execute "+display_location"
+}
+
+{+intro
+clear
+if interpreter = GLK
+   image image_title
+endif
+style header
+write "^ " game_title "^"
+style normal
+write "by " game_author ", release " game_release "/" game_build "^^"
+print:
+   This is a multimedia smoke-test for JACL interpreters. It exercises
+   every feature an interpreter needs to handle: image display, looping
+   ambient sound on the background channel, one-shot foreground sound,
+   a sustained loop on a separate channel, multi-channel mixing, volume
+   control, and movement between rooms.^^
+
+   Quick tour:
+   ^- You start in the Hut with looping rain on the background channel.
+   ^- Go ~south~ to the Clearing. Try ~ring bell~ and ~thunder~ for
+   foreground one-shots.
+   ^- Go ~south~ again to the Lookout. Try ~start generator~ for a
+   sustained loop, ~stop generator~ to silence it, and ~look at map~
+   to display the demo map image.
+   ^- ~map~ at any time shows the room map.^^
+.
+}
+
+# -----------------------------------------------------------------------------
+# INCLUDES
+# -----------------------------------------------------------------------------
+
+#include "webinterface.library"
+#include "webinterface.css"
+#include "verbs.library"
+#include "mapping.library"

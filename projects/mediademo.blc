@@ -1,0 +1,9 @@
+0 0 AUTH Stuart Allen
+1 0 RelN 1
+Pict 1 PNG images/mediademo.png
+Pict 2 PNG images/mediademo_map.png
+Snd 3 OGGV sounds/Rain.ogg
+Snd 4 OGGV sounds/MetalicClang.ogg
+Snd 5 OGGV sounds/GeneratorStarting.ogg
+Snd 6 OGGV sounds/GeneratorRunning.ogg
+Snd 7 OGGV sounds/Thunder.ogg

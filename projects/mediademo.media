@@ -1,0 +1,10 @@
+/include/jquery-3.6.0.min.js application/javascript www/jquery-3.6.0.min.js
+/include/raphael.min.js application/javascript www/raphael.min.js
+/images/favicon.ico image/x-icon images/favicon.ico
+/images/mediademo.png image/png images/mediademo.png
+/images/mediademo_map.png image/png images/mediademo_map.png
+/sounds/Rain.ogg audio/ogg sounds/Rain.ogg
+/sounds/MetalicClang.ogg audio/ogg sounds/MetalicClang.ogg
+/sounds/GeneratorStarting.ogg audio/ogg sounds/GeneratorStarting.ogg
+/sounds/GeneratorRunning.ogg audio/ogg sounds/GeneratorRunning.ogg
+/sounds/Thunder.ogg audio/ogg sounds/Thunder.ogg
