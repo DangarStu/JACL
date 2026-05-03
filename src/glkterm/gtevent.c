@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <poll.h>
+#include <unistd.h>
 
 #ifdef OPT_TIMED_INPUT
 #include <sys/time.h>
@@ -82,7 +84,20 @@ void glk_select(event_t *event)
             continue;
         }
 
-        /* key == ERR; it's an idle event */
+        /* key == ERR; it's an idle event.
+           If stdin is a closed pipe (writer hung up), ncurses' getch()
+           will return ERR on every call without blocking, busy-looping
+           this thread at 100% CPU. Detect that case via poll() and
+           exit cleanly rather than spin forever. */
+        if (!isatty(STDIN_FILENO)) {
+            struct pollfd pfd;
+            pfd.fd = STDIN_FILENO;
+            pfd.events = POLLIN;
+            pfd.revents = 0;
+            if (poll(&pfd, 1, 0) > 0 && (pfd.revents & POLLHUP)) {
+                gli_fast_exit();
+            }
+        }
         
 #ifdef OPT_USE_SIGNALS
 
