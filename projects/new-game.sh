@@ -61,6 +61,20 @@ constant maintext_colour "#eeeeee"
 # Each location gets x/y grid coordinates so the map command can render
 # it. Adjacent rooms should differ by 1 unit along a single axis for
 # clean orthogonal exit lines; use diagonals for NE/NW/SE/SW exits.
+#
+# Object/location NAMES (the tokens after the colon) are what the player
+# types to refer to the thing. Two rules:
+#  - Never use underscores in names; the player can't type them. The label
+#    BEFORE the colon may use underscores -- it's purely internal.
+#    Compound nouns split into separate words: \`object front_door : front door\`.
+#  - Cover every adjective and synonym from your description. If your look
+#    text says "a heavy brass bell hangs from a wooden frame", the bell
+#    object's names should include all of: bell brass heavy wooden frame.
+#    Skipping adjectives means commands like "examine brass bell" fail.
+#
+# Every noun mentioned in look text should also have a scenery object so
+# the player can examine it (use \`mass scenery\` -- there is no SCENERY
+# attribute).
 
 location start : start
  short     name "Start"
@@ -76,26 +90,44 @@ write "Edit this description and add more locations around it.^"
 # -----------------------------------------------------------------------------
 # PLAYER
 # -----------------------------------------------------------------------------
+# \`player\` is a reserved word, so the player object needs a different
+# label. \`set player = <label>\` inside +intro tells the engine which
+# object the player controls. The names line gives aliases the player can
+# type -- "examine yourself", "examine self", "inventory me" all resolve.
 
-object player : player yourself me
+object protagonist : self me yourself
  short    name "yourself"
  parent   start
  has      ANIMATE
 
 # -----------------------------------------------------------------------------
-# BOOTSTRAP
+# BOOTSTRAP / INTRO
 # -----------------------------------------------------------------------------
+# +bootstrap runs ONCE at game-load time, BEFORE cgijacl forks into its
+# server loop. Anything you write here goes to the LAUNCHING TERMINAL'S
+# stdout, NOT to a browser session -- so keep it silent. setstring
+# command_prompt and any other one-time engine config is what belongs
+# here.
+#
+# +intro runs once per new session: the engine auto-calls it for each new
+# browser connection in CGI mode and once at startup in GLK mode. This is
+# where player-visible setup belongs -- set the player object, print the
+# splash and narration, start any ambient sound, and call \`look\` to
+# show the starting room.
 
 {+bootstrap
-execute "+intro"
-execute "+display_location"
+if interpreter = CGI
+   setstring command_prompt ""
+endif
 }
 
 {+intro
+set player = protagonist
 style note
 write game_title
 style normal
 write ", a game by " game_author ".^^"
+look
 }
 
 # -----------------------------------------------------------------------------
