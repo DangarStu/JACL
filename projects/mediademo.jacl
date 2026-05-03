@@ -324,13 +324,13 @@ object kryten : myself self me
 # -----------------------------------------------------------------------------
 
 {+bootstrap
-set player = kryten
-execute "+intro"
-execute "+start_rain"
-execute "+display_location"
+if interpreter = CGI
+   setstring command_prompt ""
+endif
 }
 
 {+intro
+set player = kryten
 clear
 if interpreter = GLK
    image image_title
@@ -355,6 +355,8 @@ print:
    to display the demo map image.
    ^- ~map~ at any time shows the room map.^^
 .
+execute "+start_rain"
+look
 }
 
 # -----------------------------------------------------------------------------
