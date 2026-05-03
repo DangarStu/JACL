@@ -61,14 +61,6 @@ print:
 .
 }
 
-{+entered
-execute "+start_rain"
-}
-
-{+left
-# Stop background rain when leaving the hut.
-sound 0 background_channel
-}
 
 object hut_walls : wooden walls hut shack cabin
  short     name "wooden walls"
@@ -357,6 +349,21 @@ print:
 .
 execute "+start_rain"
 look
+}
+
+# Per-turn ambient management. The engine doesn't have a +entered hook,
+# so we reconcile each turn: emit the current room's ambient. The JS in
+# webinterface.library deduplicates -- a pending audio on a channel that
+# already has audio with the same source is dropped, so the existing
+# stream isn't interrupted. This also handles restored sessions: +intro
+# only fires for new sessions, so on a reloaded page +eachturn is what
+# brings the ambient back.
+{+eachturn
+if here = hut
+   execute "+start_rain"
+else
+   sound 0 background_channel
+endif
 }
 
 # -----------------------------------------------------------------------------

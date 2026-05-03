@@ -284,13 +284,29 @@ print:
 
       maintext.querySelectorAll('audio[data-jacl-pending="1"]').forEach(function(audio) {^
          var ch = audio.getAttribute('data-jacl-channel');^
-         maintext.querySelectorAll('audio[data-jacl-channel="' + ch + '"]:not([data-jacl-pending])').forEach(function(old) {^
-            try { old.pause(); } catch (e) {}^
-            old.remove();^
+         var newSource = audio.querySelector('source');^
+         var newSrc = newSource ? newSource.getAttribute('src') : '';^
+         var existingSame = null;^
+         var existing = maintext.querySelectorAll('audio[data-jacl-channel="' + ch + '"]:not([data-jacl-pending])');^
+         existing.forEach(function(old) {^
+            var oldSource = old.querySelector('source');^
+            if (oldSource && oldSource.getAttribute('src') === newSrc) existingSame = old;^
          });^
-         audio.removeAttribute('data-jacl-pending');^
-         var p = audio.play();^
-         if (p && typeof p.catch === 'function') p.catch(function() {});^
+         if (existingSame) {^
+            audio.remove();^
+            if (existingSame.paused && !existingSame.ended) {^
+               var p = existingSame.play();^
+               if (p && typeof p.catch === 'function') p.catch(function() {});^
+            }^
+         } else {^
+            existing.forEach(function(old) {^
+               try { old.pause(); } catch (e) {}^
+               old.remove();^
+            });^
+            audio.removeAttribute('data-jacl-pending');^
+            var p = audio.play();^
+            if (p && typeof p.catch === 'function') p.catch(function() {});^
+         }^
       });^
 
       maintext.querySelectorAll('audio:not([data-jacl-pending])').forEach(function(audio) {^
