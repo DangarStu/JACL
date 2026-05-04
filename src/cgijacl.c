@@ -696,6 +696,24 @@ main(int argc, char *argv[])
         /* RESET GLOBAL VARIABLES THAT ARE INTERNAL TO THE INTERPRETER */
         style_index = 0;
 
+        /* If the JS sent a measured 'status_cols' (the actual character
+         * width of the rendered #statuswin element on the client), use
+         * it as the grid width for this request so cursor X Y +
+         * +print_right land at the viewport's right edge. Without this
+         * the grid stays at status_window_width's default and the
+         * status text floats wherever that lands in pixel space. */
+        {
+            const char *scols = cgi_val(entries, "status_cols");
+            if (scols != NULL && scols[0] != 0) {
+                int v = atoi(scols);
+                if (v >= 40 && v <= 500) {
+                    struct integer_type *sww =
+                        integer_resolve("status_window_width");
+                    if (sww != NULL) sww->value = v;
+                }
+            }
+        }
+
         /* DISPLAY THE HEADER OF THE HTML PAGE */
         if (cgi_val(entries, "rpc") == NULL && 
             (cgi_val(entries, "ajax") == NULL || strcmp(cgi_val(entries, "ajax"), "true"))) {
