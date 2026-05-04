@@ -26,12 +26,17 @@ updatestatus
 }
 
 {+intro
+# Conway's Life is a utility, not interactive fiction -- skip the
+# voice/sound questions the helper would otherwise ask.
+set skip_intro_preferences = true
 set status_window = MAX_Y + 2
 set max_rand = 2
+execute "+game_intro"
+}
+
+{+game_dedication
 write "^^Conway's Game of Life, ported by Stuart Allen^"
 write "from AVR version by Luc Small.^^"
-#execute "+init_array<grid"
-#execute "+init_array<buffer"
 }
 
 grammar god     >god

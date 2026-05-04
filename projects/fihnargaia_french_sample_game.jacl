@@ -47,37 +47,32 @@ set time = false
 }
 
 {+intro
-if intro_dedication_shown = 0
-   set intro_dedication_shown = 1
-   clear
-   if interpreter = GLK
-      if graphics_supported = false
-           style bold
-      		write ^ game_title
-      		style normal
-      		write " par " game_author "^^"
-      else
-         image image_fihnargaia
-         style bold
-      		write ^ game_title
-      		style normal
-      		write " par " game_author "^^"
-      endif
+execute "+game_intro"
+}
+
+{+game_dedication
+clear
+if interpreter = GLK
+   if graphics_supported = false
+        style bold
+   		write ^ game_title
+   		style normal
+   		write " par " game_author "^^"
+   else
+      image image_fihnargaia
+      style bold
+   		write ^ game_title
+   		style normal
+   		write " par " game_author "^^"
    endif
 endif
+}
 
-execute "+startup_preferences"
-if pending_question_type != 0
-   return
-endif
-
-if intro_scene_shown = 0
-   set intro_scene_shown = 1
-   if here hasnt OUTDOORS
-   endall
-   move ground to here
-   look
-endif
+{+game_scene
+if here hasnt OUTDOORS
+endall
+move ground to here
+look
 }
 
 {+eachturn

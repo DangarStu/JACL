@@ -548,43 +548,38 @@ write "veas a tu alrededor.^"
 }
 
 {+intro
-if intro_dedication_shown = 0
-   set intro_dedication_shown = 1
-   style bold
-   write "^^" game_title
-   style normal
-   write " por " game_author "^^"
+execute "+game_intro"
+}
+
+{+game_dedication
+style bold
+write "^^" game_title
+style normal
+write " por " game_author "^^"
+}
+
+{+game_scene
+print:
+   El sol de la mañana ilumina las cumbres nevadas de los
+   volcanes. El aire fresco de la montaña huele a pino y
+   tierra húmeda. Los pájaros cantan en el bosque cercano.
+   Es un día perfecto para explorar las montañas de Chile
+   y descubrir sus secretos.^^
+.
+
+style note
+write "Consejo: escribe "
+style input
+write "ayuda"
+style note
+if interpreter = CGI
+   write " en cualquier momento para ver los comandos, o haz doble clic en una palabra en español para ver su traducción.^^"
+else
+   write " en cualquier momento para ver la lista de comandos disponibles.^^"
 endif
+style normal
 
-execute "+startup_preferences"
-if pending_question_type != 0
-   return
-endif
-
-if intro_scene_shown = 0
-   set intro_scene_shown = 1
-   print:
-      El sol de la mañana ilumina las cumbres nevadas de los
-      volcanes. El aire fresco de la montaña huele a pino y
-      tierra húmeda. Los pájaros cantan en el bosque cercano.
-      Es un día perfecto para explorar las montañas de Chile
-      y descubrir sus secretos.^^
-   .
-
-   style note
-   write "Consejo: escribe "
-   style input
-   write "ayuda"
-   style note
-   if interpreter = CGI
-      write " en cualquier momento para ver los comandos, o haz doble clic en una palabra en español para ver su traducción.^^"
-   else
-      write " en cualquier momento para ver la lista de comandos disponibles.^^"
-   endif
-   style normal
-
-   look
-endif
+look
 }
 
 {+movement
