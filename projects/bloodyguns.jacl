@@ -74,13 +74,20 @@ integer intro_dedication_shown
 integer intro_scene_shown
 
 {+intro
+# 'player' is a C-side pointer that isn't covered by the auto-save,
+# so it gets reset to 0 between requests. Re-set it on every entry,
+# not just the first, otherwise the second +intro pass (after the
+# first pending answer is resolved) crashes with
+# "attempt to use object pointer 'player' while it does not point to
+# an object".
+set player = kryten
+
 # Dedication / copyright -- only on first entry. The interpreter
 # re-enters +intro after each pending getyesorno answer (see
 # +startup_preferences below) so this guard prevents the credits
 # from re-printing on every pass.
 if intro_dedication_shown = 0
    set intro_dedication_shown = 1
-   set player = kryten
    clear
    if interpreter = GLK
       image image_bloodyguns
