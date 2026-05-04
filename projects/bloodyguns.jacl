@@ -7967,10 +7967,6 @@ endif
 }
 
 {+eachturn
-# Refresh the status bar each turn so 'Score' and 'Moves' tick over
-# (and so the web bar picks up any viewport-driven status_cols change
-# the JS sent on this request).
-updatestatus
 if witheridge(parent) != command_post
    if witheridge(parent) = here
       write ^
