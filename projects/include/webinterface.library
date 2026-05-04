@@ -509,7 +509,12 @@ print:
          var initialStatus = maintext.querySelector('jacl-status');^
          if (initialStatus) {^
             var statusBar = document.getElementById('statuswin');^
-            if (statusBar) statusBar.innerHTML = initialStatus.innerHTML;^
+            if (statusBar) {^
+               var lines = parseInt(initialStatus.getAttribute('data-lines') || '1', 10);^
+               if (isNaN(lines) || lines < 1) lines = 1;^
+               document.body.style.setProperty('--status-lines', lines);^
+               statusBar.innerHTML = initialStatus.innerHTML;^
+            }^
             initialStatus.remove();^
          }^
       }^
@@ -724,7 +729,12 @@ print:
       var jaclStatusUpdate = maintext.querySelector('jacl-status');^
       if (jaclStatusUpdate) {^
          var statusBar = document.getElementById('statuswin');^
-         if (statusBar) statusBar.innerHTML = jaclStatusUpdate.innerHTML;^
+         if (statusBar) {^
+            var lines = parseInt(jaclStatusUpdate.getAttribute('data-lines') || '1', 10);^
+            if (isNaN(lines) || lines < 1) lines = 1;^
+            document.body.style.setProperty('--status-lines', lines);^
+            statusBar.innerHTML = jaclStatusUpdate.innerHTML;^
+         }^
          jaclStatusUpdate.remove();^
       }^
       if (isSpeakEnabled()) {^

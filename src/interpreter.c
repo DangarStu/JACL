@@ -2101,21 +2101,25 @@ execute(const char *funcname)
             } else if (!strcmp(word[0], "updatestatus")) {
                 /* Web build: emit a <jacl-status> marker so the JS can
                  * relocate its content into the dedicated status div
-                 * above the main text area. Skip when the game hasn't
-                 * asked for a status bar. */
+                 * above the main text area. The data-lines attribute
+                 * tells the JS how tall to make the bar (status_window
+                 * value in lines). Skip when the game hasn't asked for a
+                 * status bar. */
                 {
                     struct integer_type *sw =
                         integer_resolve("status_window");
                     if (sw != NULL && sw->value > 0) {
-                        write_text("<jacl-status style=~display:none~>");
+                        sprintf(temp_buffer,
+                                "<jacl-status data-lines=~%d~ "
+                                "style=~display:none~>",
+                                sw->value);
+                        write_text(temp_buffer);
                         if (execute("+update_status_window_web") == FALSE) {
-                            /* Default: location title on the left, score
-                             * and turn count on the right. Games can
-                             * override by defining +update_status_window_web
-                             * to match the GLK +update_status_window. */
-                            write_text("<span class=~jacl-status-left~>");
-                            write_text(sentence_output(HERE, TRUE));
-                            write_text("</span>");
+                            /* Default: just score and turn count on the
+                             * right. Games override by defining
+                             * +update_status_window_web (the web analogue
+                             * of +update_status_window for GLK) to emit
+                             * whatever HTML they want inside the bar. */
                             sprintf(temp_buffer,
                                     "<span class=~jacl-status-right~>"
                                     "Score: %d &middot; Moves: %d</span>",
