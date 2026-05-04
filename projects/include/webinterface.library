@@ -270,13 +270,14 @@ print:
       jaclMapPopup = null;^
    }^
 
-   /* Speech synthesis is toggled by emitting <script>enableSpeak()</script>^
-    * or <script>disableSpeak()</script> from a JACL response (see the^
-    * 'voice'/'unvoice' verbs in verbs.library and the +startup_preferences^
-    * function below). Sound effects are toggled at the JACL level via the^
-    * sound_enabled integer -- the game simply doesn't issue 'sound' calls^
-    * when the player has opted out, so no JS-side suppression of audio^
-    * elements is required for that path. */^
+   /* Speech synthesis is toggled by JACL responses that emit a script^
+    * tag calling enableSpeak() or disableSpeak() -- see the 'voice' and^
+    * 'unvoice' verbs in verbs.library, and the +startup_preferences^
+    * function defined above. Sound effects are toggled at the JACL^
+    * level via the built-in sound_enabled integer; the interpreter^
+    * itself gates both GLK channels and CGI audio emission on it, so^
+    * no JS-side suppression of audio elements is needed for the JACL^
+    * sound path. */^
 
    /* Google Sign-In: optional. The engine emits^
     * window.JACL_GOOGLE_CLIENT_ID only when fcgijacl has both a^
