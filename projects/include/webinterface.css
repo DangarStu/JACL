@@ -115,7 +115,8 @@ print:
 .
 write " background-color: " linkbar_colour "80; }^"
 print:
-	div.links a.header { padding: 0 6px; }^
+	div.links a.header,
+	div.links #jaclAuthSlot { padding: 0 6px; }^
 	img.main {
 		width: 476px;
 		height: 376px; 
