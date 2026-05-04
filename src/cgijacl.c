@@ -1209,7 +1209,7 @@ word_check()
 void
 read_config_file()
 {
-    fgets(text_buffer, sizeof(text_buffer), file);
+    fgets(text_buffer, 1024, file);
 
     while (!feof(file)) {
         encapsulate();
@@ -1271,7 +1271,7 @@ read_config_file()
                 session_max_age_cfg = strtol(word[1], NULL, 10);
             }
         }
-        fgets(text_buffer, sizeof(text_buffer), file);
+        fgets(text_buffer, 1024, file);
     }
 
     fclose(file);
