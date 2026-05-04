@@ -243,22 +243,28 @@ print:
     * window.JACL_GOOGLE_CLIENT_ID only when fcgijacl has both a^
     * client_id and a session_secret configured, so the button is^
     * only ever rendered on properly-set-up servers. */^
+   /* JACL's preprocessor strips leading whitespace and JACL's loader^
+    * treats a leading '.' as the print-block terminator, so Promise^
+    * chains have to keep '.then'/'.catch' off column 0 -- written^
+    * here as `var p = fetch(...); p = p.then(...);` rather than the^
+    * usual fluent chain. Likewise multi-line object literals are^
+    * inlined so no continuation line can start with '{' or '}'. */^
    function jaclGoogleCallback(response) {^
       var token = response && response.credential;^
       if (!token) return;^
       var body = 'auth=google&credential=' + encodeURIComponent(token);^
-      fetch(window.location.pathname + '?' + body, { credentials: 'same-origin' })^
-        .then(function(r) { return r.json(); })^
-        .then(function(j) {^
-           if (j && j.ok) window.location.reload();^
-        })^
-        .catch(function() {});^
+      var url = window.location.pathname + '?' + body;^
+      var p = fetch(url, { credentials: 'same-origin' });^
+      p = p.then(function(r) { return r.json(); });^
+      p = p.then(function(j) { if (j && j.ok) window.location.reload(); });^
+      p.catch(function() {});^
    }^
 
    function jaclLogout() {^
-      fetch(window.location.pathname + '?auth=logout', { credentials: 'same-origin' })^
-        .then(function() { window.location.reload(); })^
-        .catch(function() {});^
+      var url = window.location.pathname + '?auth=logout';^
+      var p = fetch(url, { credentials: 'same-origin' });^
+      p = p.then(function() { window.location.reload(); });^
+      p.catch(function() {});^
    }^
 
    function jaclRenderGoogleAuth() {^
@@ -266,25 +272,17 @@ print:
       var slot = document.getElementById('jaclAuthSlot');^
       if (!slot) return;^
       if (window.JACL_GOOGLE_SIGNED_IN) {^
-         slot.innerHTML = 'Signed in &middot; ' +^
-            '<a href="javascript:jaclLogout()">log out</a>';^
+         slot.innerHTML = 'Signed in &middot; <a href="javascript:jaclLogout()">log out</a>';^
          return;^
       }^
       if (!window.google || !google.accounts || !google.accounts.id) {^
-         /* GIS client not loaded yet -- retry once it arrives. */^
          setTimeout(jaclRenderGoogleAuth, 200);^
          return;^
       }^
-      google.accounts.id.initialize({^
-         client_id: window.JACL_GOOGLE_CLIENT_ID,^
-         callback: jaclGoogleCallback,^
-         auto_select: false^
-      });^
+      google.accounts.id.initialize({ client_id: window.JACL_GOOGLE_CLIENT_ID, callback: jaclGoogleCallback, auto_select: false });^
       slot.innerHTML = '<div id="jaclGoogleBtn"></div>';^
-      google.accounts.id.renderButton(^
-         document.getElementById('jaclGoogleBtn'),^
-         { theme: 'outline', size: 'medium', type: 'standard' }^
-      );^
+      var btn = document.getElementById('jaclGoogleBtn');^
+      google.accounts.id.renderButton(btn, { theme: 'outline', size: 'medium', type: 'standard' });^
    }^
 
    function changeInterface() {^
