@@ -63,7 +63,15 @@ install: all
 	@mkdir -p /usr/local/jacl/projects/data
 	cp ../projects/data/*.csv /usr/local/jacl/projects/data/
 	cp ../etc/cgijacl.conf /usr/local/jacl/
-	cp ../etc/cgijacl.conf /etc/cgijacl.conf 2>/dev/null || true
+	@# Install /etc/cgijacl.conf only if it doesn't exist; otherwise the
+	@# admin's edits (google_client_id, session_secret, etc.) would be
+	@# wiped on every reinstall. Always refresh the .example template.
+	@if [ ! -f /etc/cgijacl.conf ]; then \
+		cp ../etc/cgijacl.conf /etc/cgijacl.conf 2>/dev/null || true; \
+	else \
+		echo "Preserving existing /etc/cgijacl.conf (template at /etc/cgijacl.conf.example)"; \
+	fi
+	cp ../etc/cgijacl.conf /etc/cgijacl.conf.example 2>/dev/null || true
 	@JACL_TEMP=$$(grep '^\s*temp\b' /etc/cgijacl.conf 2>/dev/null | sed -E 's/.*"([^"]+)".*/\1/' || echo /usr/local/jacl/projects/temp/); \
 	echo "Clearing stale save files from $$JACL_TEMP..."; \
 	rm -f "$$JACL_TEMP"/*
