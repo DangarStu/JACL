@@ -68,7 +68,22 @@ char *strcasestr(const char *s, const char *find)
 extern void jflush(void);
 #endif
 
-#define MAX_TRY 10 
+#define MAX_TRY 10
+
+#ifdef GLK
+/* Cross-fade duration for sound transitions on the Glk side, in ms.
+ * Mirrors JACL_FADE_MS in webinterface.library so both interpreters
+ * sound the same. */
+#define JACL_FADE_MS 600
+
+/* Per-logical-channel target volume the next play should ramp UP to,
+ * scaled to Glk's 0-65535 range. Updated by the `volume` command and
+ * read by the `sound` command. Defaults to full volume so a game that
+ * never sets volume still gets audible playback. */
+static glui32 jacl_target_volume[8] = {
+    65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535
+};
+#endif
 
 static struct flock    read_lck;
 static int            read_fd;
@@ -226,7 +241,10 @@ terminate(int code)
         if (sound_channel[index] != NULL) {
             glk_schannel_destroy(sound_channel[index]);
         }
-    }    
+        if (fade_channel[index] != NULL) {
+            glk_schannel_destroy(fade_channel[index]);
+        }
+    }
 
     /* CLOSE THE STREAM */
     if (game_stream != NULL) {
@@ -948,7 +966,10 @@ execute(const char *funcname)
                             channel = 0;
                         }
                     }
-                    glk_schannel_stop(sound_channel[channel]);
+                    /* Fade out instead of cutting. The schannel keeps
+                     * running silently until the next play replaces it. */
+                    glk_schannel_set_volume_ext(sound_channel[channel],
+                                                0, JACL_FADE_MS, 0);
                 }
             } else if (!strcmp(word[0], "volume")) {
                 int channel, volume;
@@ -991,7 +1012,10 @@ execute(const char *funcname)
                          * BY Glk */
                         volume = volume * 655;
 
-                        /* SET THE VOLUME */
+                        /* Remember this as the target the next play on
+                         * this channel should ramp up to, AND apply it
+                         * immediately to the currently-active sound. */
+                        jacl_target_volume[channel] = (glui32) volume;
                         glk_schannel_set_volume(sound_channel[channel], (glui32) volume);
                     }
                 }
@@ -1043,6 +1067,16 @@ execute(const char *funcname)
                         noproprun();
                         return(exit_function (TRUE));
                     } else {
+                        /* Cross-fade: swap primary and secondary slots so
+                         * the new sound plays on a clean channel while the
+                         * previous one keeps playing on the now-secondary
+                         * slot, then ramp them in opposite directions. */
+                        schanid_t old_chan = sound_channel[channel];
+                        sound_channel[channel] = fade_channel[channel];
+                        fade_channel[channel] = old_chan;
+
+                        glk_schannel_stop(sound_channel[channel]);
+                        glk_schannel_set_volume(sound_channel[channel], 0);
                         if (glk_schannel_play_ext(sound_channel[channel], (glui32) value_of(word[1], TRUE), repeats, channel + 1) == 0) {
                             /* THE CHANNEL NUMBER IS PASSED SO THAT THE SOUND
                              * NOTIFICATION EVENT CAN USE THE INFORMATION
@@ -1050,6 +1084,14 @@ execute(const char *funcname)
                              * NUMBER AND THE EVENT IS ACTIVATED */
                             sprintf(error_buffer, "Unable to play sound: %ld", value_of(word[1], FALSE));
                             log_error(error_buffer, PLUS_STDERR);
+                        } else {
+                            glk_schannel_set_volume_ext(sound_channel[channel],
+                                                        jacl_target_volume[channel],
+                                                        JACL_FADE_MS, 0);
+                            if (fade_channel[channel] != NULL) {
+                                glk_schannel_set_volume_ext(fade_channel[channel],
+                                                            0, JACL_FADE_MS, 0);
+                            }
                         }
                     }
                 }
@@ -1545,6 +1587,13 @@ execute(const char *funcname)
                     return (exit_function(TRUE));
                 }
 
+                /* Honor sound_enabled / SOUND_ENABLED so a player who
+                 * declines sound at intro (or types "sound off") gets
+                 * silence -- match the GLK branch's behavior. */
+                if (!SOUND_ENABLED->value) {
+                    return (exit_function(TRUE));
+                }
+
                 if (quoted[1] == 0) {
                     /* Stop form. */
                     int stop_channel = (int) value_of(word[2], TRUE);
@@ -1593,6 +1642,9 @@ execute(const char *funcname)
                  * applies to the audio element on that channel. LEVEL is
                  * 0-100; the JS divides by 100 to get the HTMLMediaElement
                  * volume range (0.0-1.0). */
+                if (!SOUND_ENABLED->value) {
+                    return (exit_function(TRUE));
+                }
                 if (word[2] != NULL) {
                     int vol_level = (int) value_of(word[1], TRUE);
                     int vol_channel = (int) value_of(word[2], TRUE);

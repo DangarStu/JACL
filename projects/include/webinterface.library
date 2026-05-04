@@ -258,6 +258,44 @@ print:
     * subsequent turns until something explicitly replaces or stops them.
     * Browsers that blocked the initial autoplay get a retry opportunity
     * here, since this runs in response to the user's command (a gesture). */
+   var JACL_FADE_MS = 600;^
+
+   function jaclFadeOut(audio, duration) {^
+      if (audio.dataset.jaclFading === 'out') return;^
+      audio.dataset.jaclFading = 'out';^
+      var startVol = audio.volume;^
+      var startTime = Date.now();^
+      var iv = setInterval(function() {^
+         var t = (Date.now() - startTime) / duration;^
+         if (t >= 1) {^
+            clearInterval(iv);^
+            try { audio.pause(); } catch (e) {}^
+            audio.remove();^
+         } else {^
+            audio.volume = startVol * (1 - t);^
+         }^
+      }, 30);^
+   }^
+
+   function jaclFadeIn(audio, target, duration) {^
+      audio.dataset.jaclFading = 'in';^
+      audio.volume = 0;^
+      var p = audio.play();^
+      if (p && typeof p.catch === 'function') p.catch(function() {});^
+      var startTime = Date.now();^
+      var iv = setInterval(function() {^
+         if (audio.dataset.jaclFading !== 'in') { clearInterval(iv); return; }^
+         var t = (Date.now() - startTime) / duration;^
+         if (t >= 1) {^
+            audio.volume = target;^
+            delete audio.dataset.jaclFading;^
+            clearInterval(iv);^
+         } else {^
+            audio.volume = target * t;^
+         }^
+      }, 30);^
+   }^
+
    function jaclProcessAudioMarkers() {^
       var maintext = document.getElementById('maintext');^
       if (!maintext) return;^
@@ -265,8 +303,7 @@ print:
       maintext.querySelectorAll('jacl-sound-stop').forEach(function(marker) {^
          var ch = marker.getAttribute('data-jacl-channel');^
          maintext.querySelectorAll('audio[data-jacl-channel="' + ch + '"]').forEach(function(a) {^
-            try { a.pause(); } catch (e) {}^
-            a.remove();^
+            jaclFadeOut(a, JACL_FADE_MS);^
          });^
          marker.remove();^
       });^
@@ -289,31 +326,55 @@ print:
          var existingSame = null;^
          var existing = maintext.querySelectorAll('audio[data-jacl-channel="' + ch + '"]:not([data-jacl-pending])');^
          existing.forEach(function(old) {^
+            if (old.dataset.jaclFading === 'out') return;^
             var oldSource = old.querySelector('source');^
             if (oldSource && oldSource.getAttribute('src') === newSrc) existingSame = old;^
          });^
-         if (existingSame) {^
+         if (existingSame && audio.hasAttribute('loop')) {^
+            // Same looping source already playing on this channel --^
+            // keep the old element so playback position is preserved^
+            // and discard the freshly emitted duplicate.^
             audio.remove();^
+            existing.forEach(function(old) {^
+               if (old !== existingSame) {^
+                  try { old.pause(); } catch (e) {}^
+                  old.remove();^
+               }^
+            });^
+            existingSame.removeAttribute('autoplay');^
             if (existingSame.paused && !existingSame.ended) {^
                var p = existingSame.play();^
                if (p && typeof p.catch === 'function') p.catch(function() {});^
             }^
          } else {^
-            existing.forEach(function(old) {^
-               try { old.pause(); } catch (e) {}^
-               old.remove();^
-            });^
+            var target = audio.volume;^
             audio.removeAttribute('data-jacl-pending');^
+            audio.removeAttribute('autoplay');^
+            if (audio.hasAttribute('loop')) {^
+               existing.forEach(function(old) { jaclFadeOut(old, JACL_FADE_MS); });^
+               jaclFadeIn(audio, target, JACL_FADE_MS);^
+            } else {^
+               existing.forEach(function(old) {^
+                  try { old.pause(); } catch (e) {}^
+                  old.remove();^
+               });^
+               var p = audio.play();^
+               if (p && typeof p.catch === 'function') p.catch(function() {});^
+            }^
+         }^
+      });^
+
+      maintext.querySelectorAll('audio[loop]:not([data-jacl-pending])').forEach(function(audio) {^
+         audio.removeAttribute('autoplay');^
+         if (audio.dataset.jaclFading) return;^
+         if (audio.paused && !audio.ended) {^
             var p = audio.play();^
             if (p && typeof p.catch === 'function') p.catch(function() {});^
          }^
       });^
 
-      maintext.querySelectorAll('audio:not([data-jacl-pending])').forEach(function(audio) {^
-         if (audio.paused && !audio.ended) {^
-            var p = audio.play();^
-            if (p && typeof p.catch === 'function') p.catch(function() {});^
-         }^
+      maintext.querySelectorAll('audio:not([loop]):not([data-jacl-pending])[autoplay]').forEach(function(audio) {^
+         audio.removeAttribute('autoplay');^
       });^
    }^
 
@@ -494,8 +555,7 @@ print:
       var maintext = document.getElementById("maintext");^
       maintext.querySelectorAll('script').forEach(function(el) { el.remove(); });^
 
-      maintext.innerHTML += "<br><b>&gt;" + details.command + "</b><br>"
-    + data;^
+      maintext.insertAdjacentHTML('beforeend', "<br><b>&gt;" + details.command + "</b><br>" + data);^
 
       var main = document.getElementById("main");^
       var textAdded = main.scrollHeight - main.scrollTop;

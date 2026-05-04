@@ -46,7 +46,14 @@
 
 glui32 				status_width, status_height;
 
-schanid_t 			sound_channel[8] = { NULL, NULL, NULL, NULL, 
+schanid_t 			sound_channel[8] = { NULL, NULL, NULL, NULL,
+										 NULL, NULL, NULL, NULL };
+
+/* Secondary slot per logical channel, holding the previously-active
+ * sound while it fades out so a new sound can fade in on the primary
+ * slot at the same time. Glk's schanid_t can play one sound at a time,
+ * so cross-fade requires two physical channels per logical channel. */
+schanid_t 			fade_channel[8] = { NULL, NULL, NULL, NULL,
 										 NULL, NULL, NULL, NULL };
 
 static event_t		*cancelled_event;
@@ -289,9 +296,10 @@ glk_main(void)
 #endif
 
 	if (SOUND_SUPPORTED->value) {
-		/* CREATE THE EIGHT SOUND CHANNELS */
+		/* CREATE THE EIGHT SOUND CHANNELS, PLUS A FADE SLOT EACH */
 		for (index = 0; index < 8; index++) {
 			sound_channel[index] = glk_schannel_create(0);
+			fade_channel[index] = glk_schannel_create(0);
 		}
 	}
 

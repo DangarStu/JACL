@@ -106,6 +106,7 @@ extern struct filter_type		*filter_table;
 
 #ifdef GLK
 extern schanid_t				sound_channel[];
+extern schanid_t				fade_channel[];
 extern strid_t					game_stream;
 extern winid_t					mainwin;
 extern winid_t 					statuswin;
