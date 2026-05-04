@@ -903,10 +903,26 @@ main(int argc, char *argv[])
                             }
 
                             TIME->value = TRUE;
-                            /* RUN EACHTURN SO THE GAME CAN REACT TO THE ANSWER.
-                             * USE THE C eachturn() FUNCTION, NOT execute("+eachturn"),
-                             * BECAUSE eachturn() INCREMENTS total_moves FIRST */
-                            eachturn();
+                            /* If the pending question came from +intro on a
+                             * fresh game (no real moves yet), give +intro
+                             * another go instead of running eachturn -- this
+                             * lets a multi-question intro chain getyesorno
+                             * calls across requests, with the game using
+                             * state guards to skip the parts already done
+                             * on prior passes. Otherwise (pending question
+                             * during normal gameplay) keep the historical
+                             * behaviour and run eachturn. */
+                            if (returning_player == FALSE
+                                && TOTAL_MOVES != NULL
+                                && TOTAL_MOVES->value == 0) {
+                                execute("+intro");
+                            } else {
+                                /* RUN EACHTURN SO THE GAME CAN REACT TO THE
+                                 * ANSWER. USE THE C eachturn() FUNCTION, NOT
+                                 * execute("+eachturn"), BECAUSE eachturn()
+                                 * INCREMENTS total_moves FIRST */
+                                eachturn();
+                            }
                         }
                         /* SKIP NORMAL COMMAND PROCESSING WHEN PENDING */
                         goto skip_command;
