@@ -949,6 +949,22 @@ main(int argc, char *argv[])
                                     answers->value++;
                                 }
                                 execute("+intro");
+                                /* If +intro fully resolved (no further
+                                 * pending question), do the same post-
+                                 * intro tick the fresh-game path would
+                                 * have done -- get_here() + eachturn().
+                                 * Without this TOTAL_MOVES stays at -1,
+                                 * the status bar shows 'Moves: -1', and
+                                 * +eachturn (which sets up first-turn
+                                 * NPC positions etc.) never runs. */
+                                {
+                                    struct integer_type *p =
+                                        PENDING_QUESTION_TYPE;
+                                    if (p == NULL || p->value == 0) {
+                                        get_here();
+                                        eachturn();
+                                    }
+                                }
                             } else {
                                 /* RUN EACHTURN SO THE GAME CAN REACT TO THE
                                  * ANSWER. USE THE C eachturn() FUNCTION, NOT
