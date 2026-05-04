@@ -137,6 +137,56 @@ print:
       });^
    }^
 
+   /* Periodic timer events. The 'timer N' JACL opcode emits a^
+    * <jacl-timer data-ms="N"> marker; on the JS side we replace any^
+    * existing setInterval with one that fires '?rpc=timer' ajax^
+    * requests every N ms. N == 0 cancels. Each tick runs the game's^
+    * +timer JACL function -- the web equivalent of Glk timer events. */^
+   var jaclTimerHandle = null;^
+   function jaclProcessTimerMarker(scope) {^
+      var root = scope || document.getElementById('maintext');^
+      if (!root) return;^
+      var marker = root.querySelector('jacl-timer');^
+      if (!marker) return;^
+      var ms = parseInt(marker.getAttribute('data-ms') || '0', 10);^
+      marker.remove();^
+      if (jaclTimerHandle) {^
+         clearInterval(jaclTimerHandle);^
+         jaclTimerHandle = null;^
+      }^
+      if (ms > 0) {^
+         jaclTimerHandle = setInterval(function() {^
+            var url = window.location.pathname^
+               + '?ajax=true&rpc=timer&status_cols='^
+               + (typeof jaclMeasureStatusCols === 'function' ? jaclMeasureStatusCols() : 80);^
+            fetch(url, { credentials: 'same-origin' })^
+               .then(function(r) { return r.text(); })^
+               .then(function(data) {^
+                  var maintext = document.getElementById('maintext');^
+                  if (!maintext) return;^
+                  /* Buffer the response into a detached fragment so^
+                   * we can extract markers (status, directions,^
+                   * timer) without polluting maintext. */^
+                  var holder = document.createElement('div');^
+                  holder.innerHTML = data;^
+                  var statusUpdate = holder.querySelector('jacl-status');^
+                  if (statusUpdate) {^
+                     var statusBar = document.getElementById('statuswin');^
+                     if (statusBar) {^
+                        var lines = parseInt(statusUpdate.getAttribute('data-lines') || '1', 10);^
+                        if (isNaN(lines) || lines < 1) lines = 1;^
+                        document.body.style.setProperty('--status-lines', lines);^
+                        statusBar.innerHTML = statusUpdate.innerHTML;^
+                     }^
+                     statusUpdate.remove();^
+                  }^
+                  jaclProcessTimerMarker(holder);^
+               })^
+               .catch(function() {});^
+         }, ms);^
+      }^
+   }^
+
    /* Measure how many monospace characters fit across the status bar^
     * so the JACL grid (which positions text via cursor X Y) lines up^
     * with the actual viewport. Without this, +print_right places^
@@ -572,6 +622,9 @@ print:
       window.addEventListener('resize', function() {^
          window.jaclStatusCols = jaclMeasureStatusCols();^
       });^
+      /* Pick up any <jacl-timer> the initial +intro emitted, in case^
+       * a game starts a timer right at game launch. */^
+      jaclProcessTimerMarker(maintext);^
    });^
 .
 #include "ajax.library"
@@ -791,6 +844,7 @@ print:
          }^
          jaclStatusUpdate.remove();^
       }^
+      jaclProcessTimerMarker(maintext);^
       if (isSpeakEnabled()) {^
          var speakData = data.replace(/<jacl-directions[\s\S]*?<\/jacl-directions>/gi, '');^
          speakData = speakData.replace(/<jacl-status[\s\S]*?<\/jacl-status>/gi, '');^
