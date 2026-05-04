@@ -440,3 +440,6 @@ string my_get
 integer pointer
 
 #include "utils.library"
+#include "webinterface.library"
+#include "webinterface.css"
+#include "verbs.library"

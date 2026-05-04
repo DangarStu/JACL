@@ -4990,6 +4990,14 @@ ifexecute "+library_eachturn"
    # TO EMIT PER-TURN UPDATES (e.g. refreshed directions bar) WITHOUT
    # COLLIDING WITH A GAME'S OWN +eachturn.
 endif
+# On web the engine doesn't auto-render the status window the way GLK
+# does (status_line is called from the GLK main loop after every turn).
+# Auto-fire updatestatus on web so any game with status_window > 0
+# gets a refreshed bar each turn without having to call updatestatus
+# itself -- matches the GLK behaviour life.jacl etc. rely on.
+if interpreter = CGI
+   updatestatus
+endif
 }
 
 integer candidate
