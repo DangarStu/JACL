@@ -1770,6 +1770,24 @@ execute(const char *funcname)
                 }
             } else if (!strcmp(word[0], "cursor")) {
             } else if (!strcmp(word[0], "timer")) {
+                /* Emit a <jacl-timer data-ms="N"> marker the JS picks
+                 * up to start (or stop, when N == 0) a setInterval
+                 * that fires ?rpc=timer ajax requests. Each tick
+                 * runs the game's +timer JACL function, just like
+                 * Glk timer events on console. */
+                if (word[1] != NULL) {
+                    int interval_ms = (int) value_of(word[1], TRUE);
+                    if (interval_ms < 0) interval_ms = 0;
+                    sprintf(option_buffer,
+                            "<jacl-timer data-ms=~%d~></jacl-timer>",
+                            interval_ms);
+                    write_text(option_buffer);
+                    {
+                        struct cinteger_type *et =
+                            cinteger_resolve("event_timer");
+                        if (et != NULL) et->value = interval_ms;
+                    }
+                }
             } else if (!strcmp(word[0], "volume")) {
                 /* volume LEVEL channel -- emits a marker the web client
                  * applies to the audio element on that channel. LEVEL is
