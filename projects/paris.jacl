@@ -1053,7 +1053,6 @@ object ground : sol plancher
 # GLOBAL FUNCTIONS
 # -----------------------------------------------------------------------------
 
-integer speech_choice
 integer meteo_etat        0
 
 # Fallback when a player asks a character about a topic the character has
@@ -1066,65 +1065,54 @@ write "chose que vous voyez autour de vous.^"
 }
 
 {+intro
-style bold
-write "^^" game_title
-style normal
-write " par " game_author "^^"
-
-if interpreter = CGI
-   write "Voulez-vous que le jeu parle à voix haute ? (oui/non)^"
-   getyesorno speech_choice
-else
-   execute "+start_game"
+if intro_dedication_shown = 0
+   set intro_dedication_shown = 1
+   style bold
+   write "^^" game_title
+   style normal
+   write " par " game_author "^^"
 endif
-}
 
-{+start_game
-if interpreter = CGI
-   if speech_choice = true
-      write "Synthèse vocale activée.^^"
-      write "<script>enableSpeak();</script>"
+execute "+startup_preferences"
+if pending_question_type != 0
+   return
+endif
+
+if intro_scene_shown = 0
+   set intro_scene_shown = 1
+   print:
+      Le soleil du matin baigne les toits parisiens
+      d'une lumière dorée. Les cloches d'une église
+      sonnent au loin et l'odeur du pain frais monte
+      de la rue. C'est une belle journée pour flâner
+      dans le quartier et rendre visite à un ami.^^
+   .
+
+   style note
+   write "Astuce : tapez "
+   style input
+   write "aide"
+   style note
+   if interpreter = CGI
+      write " à tout moment pour voir les commandes, ou double-cliquez sur un mot français pour en voir la traduction.^^"
    else
-      write "Synthèse vocale désactivée.^^"
-      write "<script>disableSpeak();</script>"
+      write " à tout moment pour voir la liste des commandes disponibles.^^"
    endif
+   style normal
+
+   if here hasnt OUTDOORS
+      move north_wall to here
+      move south_wall to here
+      move east_wall to here
+      move west_wall to here
+   endif
+
+   set ground(parent) = here
+   look
 endif
-
-print:
-   Le soleil du matin baigne les toits parisiens
-   d'une lumière dorée. Les cloches d'une église
-   sonnent au loin et l'odeur du pain frais monte
-   de la rue. C'est une belle journée pour flâner
-   dans le quartier et rendre visite à un ami.^^
-.
-
-style note
-write "Astuce : tapez "
-style input
-write "aide"
-style note
-if interpreter = CGI
-   write " à tout moment pour voir les commandes, ou double-cliquez sur un mot français pour en voir la traduction.^^"
-else
-   write " à tout moment pour voir la liste des commandes disponibles.^^"
-endif
-style normal
-
-if here hasnt OUTDOORS
-   move north_wall to here
-   move south_wall to here
-   move east_wall to here
-   move west_wall to here
-endif
-
-set ground(parent) = here
-look
 }
 
 {+eachturn
-if total_moves = 0
-   execute "+start_game"
-endif
 execute "+avancer_meteo"
 }
 

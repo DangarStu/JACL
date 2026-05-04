@@ -20,12 +20,20 @@ constant footer_image        "none"
 # *valid* answer in this pre-game window, drives which question is
 # next. An *invalid* answer also triggers a re-run but doesn't bump
 # the counter, so the same question gets re-emitted with context.
+#
+# intro_dedication_shown / intro_scene_shown are state guards a game's
+# +intro can use to split its text into "shown before the questions"
+# (dedication) and "shown after both questions are answered" (scene).
+# Each entry of +intro hits the guards and skips whichever blocks have
+# already fired on a previous pass.
 integer voice_enabled
+integer intro_dedication_shown
+integer intro_scene_shown
 
 {+startup_preferences
 if interpreter = CGI
    if intro_answers < 1
-      write "^Would you like the text read aloud?^"
+      write "^" VOICE_QUESTION "^"
       getyesorno voice_enabled
       # First valid answer: engine bumps intro_answers to 1 and
       # re-runs +intro. We'll skip this block and fall through.
@@ -36,7 +44,7 @@ if interpreter = CGI
       else
          write "<script>disableSpeak();</script>"
       endif
-      write "^Would you like sound effects?^"
+      write "^" SOUND_QUESTION "^"
       getyesorno sound_enabled
    endif
    # Both questions answered -- emit the sound preference and finish.
@@ -49,7 +57,7 @@ if interpreter = CGI
 else
    # GLK: getyesorno is synchronous, no state guards needed. TTS is
    # browser-only so only the sound question is asked.
-   write "^Would you like sound effects?^"
+   write "^" SOUND_QUESTION "^"
    getyesorno sound_enabled
 endif
 }

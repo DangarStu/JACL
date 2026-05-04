@@ -234,98 +234,88 @@ write "Camion frigo cover: http://mariohistoire.unblog.fr/2009/07/21/livreur-de-
 set time = false
 }
 
-integer speech_choice
-
 {+intro
-style bold
-write "^" game_title
-style normal
-write " par " game_author "^^"
-
-if interpreter = CGI
-   write "Voulez-vous que le jeu parle à voix haute ? (oui/non)^"
-   getyesorno speech_choice
-else
-   execute "+start_game"
-endif
-}
-
-{+start_game
-if interpreter = CGI
-   if speech_choice = true
-      write "Synthèse vocale activée.^^"
-      write "<script>enableSpeak();</script>"
-   else
-      write "Synthèse vocale désactivée.^^"
-      write "<script>disableSpeak();</script>"
-   endif
+if intro_dedication_shown = 0
+   set intro_dedication_shown = 1
+   style bold
+   write "^" game_title
+   style normal
+   write " par " game_author "^^"
 endif
 
-clear
-           style italic
-           write "^Elle vous cherche encore. « Lucien ! François ! » De sa voix stridente, elle vous appelle. Pas question de la faire attendre. « Lucien ! François ! »"
-           more "^^"
-clear
-           style normal
-           style bold
-        write "^"game_author "^"
-        write "présente ^"
-           if interpreter = GLK
-        if graphics_supported = false
+execute "+startup_preferences"
+if pending_question_type != 0
+   return
+endif
+
+if intro_scene_shown = 0
+   set intro_scene_shown = 1
+   clear
+              style italic
+              write "^Elle vous cherche encore. « Lucien ! François ! » De sa voix stridente, elle vous appelle. Pas question de la faire attendre. « Lucien ! François ! »"
+              more "^^"
+   clear
+              style normal
               style bold
-                  write ^ game_title
-                  style normal
-        else
-            volume 80
-            volume 50 AUDIO_CHANNEL02
-            image image_camion_frigo center
-            sound music_camion_frigo01
-            style bold
-          endif
-        endif
-        if interpreter = CGI
-            write ^ game_title
-          endif
-           write "^^"
-           style normal
-           more ""
-clear
-if interpreter = GLK
-if sound_supported = true
-  volume 80
-  volume 75
-  volume 70
-  volume 60
-  volume 55
-  volume 50
-  volume 45
-  volume 40
-  style italic
-  more "(tapez « aide » durant le jeu pour obtenir des instructions...)"
-  style normal
-  clear
-  volume 35
-  volume 30
-  volume 25
-  volume 20
-  volume 15
-  volume 10
-  volume 5
-  volume 0
-  stop
-  volume 80
-  endif
-endif
+           write "^"game_author "^"
+           write "présente ^"
+              if interpreter = GLK
+           if graphics_supported = false
+                 style bold
+                     write ^ game_title
+                     style normal
+           else
+               volume 80
+               volume 50 AUDIO_CHANNEL02
+               image image_camion_frigo center
+               sound music_camion_frigo01
+               style bold
+             endif
+           endif
+           if interpreter = CGI
+               write ^ game_title
+             endif
+              write "^^"
+              style normal
+              more ""
+   clear
+   if interpreter = GLK
+   if sound_supported = true
+     volume 80
+     volume 75
+     volume 70
+     volume 60
+     volume 55
+     volume 50
+     volume 45
+     volume 40
+     style italic
+     more "(tapez « aide » durant le jeu pour obtenir des instructions...)"
+     style normal
+     clear
+     volume 35
+     volume 30
+     volume 25
+     volume 20
+     volume 15
+     volume 10
+     volume 5
+     volume 0
+     stop
+     volume 80
+     endif
+   endif
 
-move sophiejeanne to limbo
-set CONCLUSION = 0
-if here hasnt OUTDOORS
-endall
-move ground to here
-look
-else
-move route to here
-endall
+   move sophiejeanne to limbo
+   set CONCLUSION = 0
+   if here hasnt OUTDOORS
+   endall
+   move ground to here
+   look
+   else
+   move route to here
+   endall
+endif
 }
 
 {+timer
@@ -337,9 +327,6 @@ endall
 string demod_article     = "Un"
 
 {+eachturn
-if total_moves = 0
-   execute "+start_game"
-endif
 set kryten(mass) = 100
 if here has BOUTIQUE
     move marchandises to here

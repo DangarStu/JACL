@@ -70,9 +70,6 @@ constant eachturn_channel       2
 constant timed_channel          3
 constant global_channel         4
 
-integer intro_dedication_shown
-integer intro_scene_shown
-
 {+intro
 # 'player' is a C-side pointer that isn't covered by the auto-save,
 # so it gets reset to 0 between requests. Re-set it on every entry,

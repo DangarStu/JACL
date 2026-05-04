@@ -1671,7 +1671,6 @@ object ground : tanah lantai
 # GLOBAL FUNCTIONS
 # -----------------------------------------------------------------------------
 
-integer speech_choice
 integer weather_state         0
 integer weather_announced     0
 
@@ -1685,64 +1684,53 @@ write "yang kamu lihat di sekitar sini.^"
 }
 
 {+intro
-style bold
-write "^^" game_title
-style normal
-write " oleh " game_author "^^"
-
-if interpreter = CGI
-   write "Apakah Anda ingin permainan ini berbicara? (ya/tidak)^"
-   getyesorno speech_choice
-else
-   execute "+start_game"
+if intro_dedication_shown = 0
+   set intro_dedication_shown = 1
+   style bold
+   write "^^" game_title
+   style normal
+   write " oleh " game_author "^^"
 endif
-}
 
-{+start_game
-if interpreter = CGI
-   if speech_choice = true
-      write "Sintesis suara diaktifkan.^^"
-      write "<script>enableSpeak();</script>"
+execute "+startup_preferences"
+if pending_question_type != 0
+   return
+endif
+
+if intro_scene_shown = 0
+   set intro_scene_shown = 1
+   print:
+      Matahari pagi bersinar cerah di atas desa. Ayam
+      berkokok di kejauhan dan udara terasa sejuk. Hari
+      ini adalah hari yang baik untuk menjelajahi desa
+      dan bertemu dengan tetangga.^^
+   .
+
+   style note
+   write "Petunjuk: ketik "
+   style input
+   write "bantuan"
+   style note
+   if interpreter = CGI
+      write " kapan saja untuk melihat perintah, atau klik ganda pada kata bahasa Indonesia mana pun untuk melihat terjemahannya.^^"
    else
-      write "Sintesis suara dinonaktifkan.^^"
-      write "<script>disableSpeak();</script>"
+      write " kapan saja untuk melihat daftar perintah yang tersedia.^^"
    endif
+   style normal
+
+   if here hasnt OUTDOORS
+      move north_wall to here
+      move south_wall to here
+      move east_wall to here
+      move west_wall to here
+   endif
+
+   set ground(parent) = here
+   look
 endif
-
-print:
-   Matahari pagi bersinar cerah di atas desa. Ayam
-   berkokok di kejauhan dan udara terasa sejuk. Hari
-   ini adalah hari yang baik untuk menjelajahi desa
-   dan bertemu dengan tetangga.^^
-.
-
-style note
-write "Petunjuk: ketik "
-style input
-write "bantuan"
-style note
-if interpreter = CGI
-   write " kapan saja untuk melihat perintah, atau klik ganda pada kata bahasa Indonesia mana pun untuk melihat terjemahannya.^^"
-else
-   write " kapan saja untuk melihat daftar perintah yang tersedia.^^"
-endif
-style normal
-
-if here hasnt OUTDOORS
-   move north_wall to here
-   move south_wall to here
-   move east_wall to here
-   move west_wall to here
-endif
-
-set ground(parent) = here
-look
 }
 
 {+eachturn
-if total_moves = 0
-   execute "+start_game"
-endif
 execute "+advance_weather"
 }
 
