@@ -276,12 +276,16 @@ value_of(const char *value, int run_time)
 	} else if (!strcmp(value, "status_width")) {
 		return screen_width;
 #else
+	/* Web build: surface the virtual TextGrid dimensions so games that
+	 * use status_width / status_height for layout (e.g. centring
+	 * something via 'set left_edge = status_width - n / 2') get the
+	 * actual bar geometry instead of -1. */
 	} else if (!strcmp(value, "status_height")) {
-		value_resolved = FALSE;
-		return -1;
+		struct integer_type *sh = integer_resolve("status_window");
+		return (sh != NULL && sh->value > 0) ? sh->value : 1;
 	} else if (!strcmp(value, "status_width")) {
-		value_resolved = FALSE;
-		return -1;
+		struct integer_type *sw = integer_resolve("status_window_width");
+		return (sw != NULL && sw->value > 0) ? sw->value : 80;
 #endif
 #endif
 	} else if (!strcmp(value, "unixtime")) {

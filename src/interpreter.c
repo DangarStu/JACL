@@ -1606,12 +1606,19 @@ execute(const char *funcname)
                 sprintf(temp_buffer, "<input type=hidden name=\"user_id\" value=\"%s\">", user_id);
                 write_text(temp_buffer);
             } else if (!strcmp(word[0], "style")) {
-                /* THIS COMMAND IS USED TO OUTPUT ANSI CODES OR SET GLK 
+                /* THIS COMMAND IS USED TO OUTPUT ANSI CODES OR SET GLK
                  * STREAM STYLES */
                 if (word[1] == NULL) {
                     /* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
                     noproprun();
                     return(exit_function (TRUE));
+                } else if (web_status_active()) {
+                    /* The web status grid is monospace text only --
+                     * skip the HTML tag emission so '<b>' etc. don't
+                     * end up baked into the grid as literal characters.
+                     * Push/pop are both skipped so the style stack
+                     * stays balanced when the grid emit returns to
+                     * normal text. */
                 } else {
                     int sidx = stylehint_index_from_name(word[1]);
                     const char *open_tag = NULL;
@@ -2131,7 +2138,13 @@ execute(const char *funcname)
                                 sw->value);
                         write_text(temp_buffer);
                         web_status_begin(sw->value, cols);
-                        if (execute("+update_status_window_web") == FALSE) {
+                        /* Try a web-specific override first, then the
+                         * GLK function name (so games that already have
+                         * +update_status_window can share it between
+                         * targets thanks to the grid emulation), then
+                         * fall back to a sensible default. */
+                        if (execute("+update_status_window_web") == FALSE
+                            && execute("+update_status_window") == FALSE) {
                             /* Default: 'Score: N  Moves: N' right-
                              * aligned on row 0. Pads with spaces to
                              * push the text against the right edge so
