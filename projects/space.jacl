@@ -46,36 +46,46 @@ integer velocity_mms      120
 integer mission_minutes     0
 
 # -----------------------------------------------------------------------------
-# THE WORLD
+# THE WORLD -- a Mission Control auditorium in Houston. The player is a
+# flight controller on console, not a pilot in space. The lander itself is
+# 380,000 km away; everything here is telemetry, voice loops and decisions.
 # -----------------------------------------------------------------------------
 
-location cockpit : flight cockpit deck cabin
- short         the "Lunar Lander Cockpit"
+location flight_control : mission control room moc auditorium houston
+ short         the "Mission Control Room"
 
-object kryten : commander pilot self me
+object kryten : flight director controller self me
  short         name "yourself"
  has           ANIMATE
- parent        cockpit
+ parent        flight_control
  player
 
-object panel : control panel console instruments
- short         the "control panel"
+object console : flight console position desk
+ short         the "FLIGHT console"
  static
- parent        cockpit
+ parent        flight_control
 
-object joystick : stick joystick attitude controller
- short         the "attitude joystick"
+object headset : headset comms loop microphone
+ short         the "comm loop headset"
  static
- parent        cockpit
+ parent        flight_control
 
-object viewscreen : screen viewscreen window viewport
- short         the "forward viewscreen"
+object big_screen : screen big board front projection map
+ short         the "big board"
  static
- parent        cockpit
+ parent        flight_control
+
+object plot_table : plotting table chart trajectory
+ short         the "plotting table"
+ static
+ parent        flight_control
+
+object coffee_mug : mug coffee cup
+ short         the "stained NASA coffee mug"
+ parent        flight_control
 
 # -----------------------------------------------------------------------------
-# +intro / dedication / scene -- delegate to the shared helper. See
-# webinterface.library for the +game_intro flow.
+# +intro / dedication / scene -- delegate to the shared helper.
 # -----------------------------------------------------------------------------
 
 {+intro
@@ -93,12 +103,13 @@ write "Module 1 -- the descent.^"
 style normal
 write "by " game_author ", build " game_release "/" game_build "^^"
 print:
-   You are commander of a one-person lander on final approach to the
-   Sea of Tranquility. Touchdown clearance is yours alone -- main
-   guidance has just gone red, the radar altimeter is intermittent,
-   and Earth is rising over the lunar limb.^^
-   Your ship is fast, low on fuel, and a little ahead of the
-   planned descent profile. You have minutes, not hours.^^
+   You are FLIGHT for this mission -- the flight director on console
+   in Building 30, Houston. A one-person lander is on final approach
+   to the Sea of Tranquility, three hundred and eighty thousand
+   kilometres away. Main guidance has just gone red, the radar
+   altimeter is intermittent, and the descent profile is hot.^^
+   Your astronaut is calm. Your team is not. The decisions are
+   yours; the consequences are 1.3 light-seconds away.^^
 .
 }
 
@@ -110,14 +121,17 @@ write "TRANQUILITY APPROACH^"
 style normal
 write "T+00:00:00^^"
 print:
-   Soft amber light from the instrument panel washes over the cabin.
-   The forward viewscreen frames a cratered grey horizon, and through
-   the upper edge of the glass the Earth -- a fragile blue arc --
-   slides into view. The attitude joystick rests under your right
-   hand. The control panel hums.^^
-   You have a few seconds to settle before the descent burn begins.
-   Type ~look~ to take stock, ~examine panel~ for telemetry, or ~go
-   down~ when you are ready.^
+   The Mission Control room is dim and warm and crowded. Banks of
+   monochrome monitors blink at the FIDO, EECOM, GUIDANCE and
+   RETRO consoles around you. At the front of the room the big
+   board shows a wireframe trajectory cutting across a grey lunar
+   limb -- and, in the corner, a live numerical readout slewing
+   too fast.^^
+   Your headset crackles. A green LED on the FLIGHT console is
+   waiting for your call. The lander begins its powered descent
+   in seconds.^^
+   Type ~look~ to take stock, ~examine board~ to read the trajectory,
+   or speak into the loop when you are ready.^
 .
 }
 
@@ -234,33 +248,54 @@ until repeat_index = arg[1]
 
 {look
 print:
-   The cockpit is small and lit by amber console lights. The forward
-   viewscreen frames the cratered lunar surface; a sliver of the Earth
-   hangs just above the horizon.^
+   Building 30, second floor. Eight rows of consoles step down toward
+   the front wall, where the big board glows with a wireframe of the
+   lunar approach trajectory. Your FLIGHT console is on the highest
+   tier, central, with a clear sightline. The room smells of cold
+   coffee and warm transistors.^
 .
 }
 
-{examine panel
+{examine console
 print:
-   Banks of instruments -- attitude indicator, fuel and oxygen gauges,
-   a radar altimeter currently flickering between 4.2 and 4.3 km. The
-   master alarm panel is dark for now.^
+   Your FLIGHT console: a comms loop selector with a dozen labelled
+   keys, two monochrome CRTs displaying mission elapsed time and
+   crew biomedical, and a row of green-yellow-red alert LEDs across
+   the top of the panel. The microphone arm waits to your right.^
 .
 }
 
-{examine joystick
+{examine headset
 print:
-   A four-axis attitude controller worn smooth from the simulators.
-   Pulling left of centre fires the +X RCS thrusters; right of centre
-   fires the -X. It feels weighty, ready.^
+   A standard agency-issue headset, one earpiece, foam crumbling at
+   the edges. It feeds the FLIGHT loop -- private to you and the
+   astronaut -- and a parallel line into the public-affairs feed.^
 .
 }
 
-{examine viewscreen
+{examine big_screen : examine board
 print:
-   Through the viewscreen the lunar surface scrolls slowly underneath.
-   Earth rises blue and white over the cratered limb. You catch
-   yourself holding your breath.^
+   The big board, projected on the front wall: a stylised cross-
+   section of the descent corridor with the lander's icon creeping
+   along the trajectory in real time. Numerical readouts on the
+   right-hand strip update every second -- altitude, range-to-go,
+   delta-V remaining.^
+.
+}
+
+{examine plot_table
+print:
+   A circular plotting table behind the FLIGHT consoles, currently
+   showing a top-down view of the landing zone. Boulder fields are
+   shaded in red; the planned touchdown point sits dead-centre of
+   a clear ellipse roughly four hundred metres across.^
+.
+}
+
+{examine coffee_mug
+print:
+   White porcelain with a faded blue NASA meatball. Half-empty,
+   well-stained, and roughly one descent burn old.^
 .
 }
 
@@ -274,9 +309,18 @@ print:
 print:
    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
    <style>
+   /* Taller header so the lunar-lander title art has room to breathe.
+      The image's own aspect ratio (~3:1) means height 120px gives it
+      ~360px of width on the left side of the bar. The rest of the
+      header keeps the linkbar visible across full width. */
+   #header { height: 120px; }
+   img.titleimage { height: 120px; width: auto; display: block; }
+   div.links { top: 90px; }
+   #statuswin { top: 120px; font-family: 'Courier New', ui-monospace, monospace; color: #ffb84a; }
+   #statuswin:empty + #main { top: 120px; }
+   #main { top: calc(120px + var(--status-lines) * 20px + 4px); }
    #header h1, #header h1 a { font-family: 'Orbitron', 'Courier New', monospace; letter-spacing: 0.08em; text-transform: uppercase; }
    div.maintext { font-family: 'Orbitron', Georgia, serif; font-weight: 500; }
-   #statuswin { font-family: 'Courier New', ui-monospace, monospace; color: #ffb84a; }
    </style>
 .
 }
