@@ -8,31 +8,50 @@ constant maintext_colour     "#eeeeee"
 constant title_colour        "black"
 constant footer_image        "none"
 
-# voice_enabled: player chose text-to-speech yes/no (web only, persisted
-# in the auto-save). sound_enabled is *not* declared here -- the loader
-# creates it for us and the interpreter's sound handler already gates
-# both GLK channels and CGI <audio> emission on its value, so writing it
-# from JACL is enough; no per-site `if sound_enabled` is required.
+# voice_enabled: player chose text-to-speech yes/no (web only).
+# sound_enabled is *not* declared here -- the loader creates it for us
+# and the interpreter's sound handler already gates both GLK channels
+# and CGI <audio> emission on its value, so writing it from JACL is
+# enough; no per-site `if sound_enabled` is required.
+#
+# voice_asked / sound_asked are the state guards that let
+# +startup_preferences chain its two getyesorno calls across separate
+# CGI requests. The interpreter calls +intro again after a pending
+# answer (when total_moves is still 0), so each re-entry advances one
+# step further through this function.
 integer voice_enabled
+integer voice_asked
+integer sound_asked
 
-# Asks the player whether they want text-to-speech (web only) and
-# whether they want sound effects (web + GLK). Uses the same
-# getyesorno blocking mechanism as 'restore?' in verbs.library --
-# each question pauses execution until the player types yes/no, and
-# the response that emits the next question (or finishes the intro)
-# also carries the JS that flips the in-browser speech preference.
 {+startup_preferences
-if interpreter = CGI
-   write "^Would you like the text read aloud?^"
-   getyesorno voice_enabled
-   if voice_enabled = true
-      write "<script>enableSpeak();</script>"
-   else
-      write "<script>disableSpeak();</script>"
+# First pass: ask about voice (web only -- TTS is browser-side).
+if voice_asked = 0
+   set voice_asked = 1
+   if interpreter = CGI
+      write "^Would you like the text read aloud?^"
+      getyesorno voice_enabled
+      # On web, getyesorno exits the function. The next +intro re-entry
+      # will skip this block (voice_asked is now 1) and fall through to
+      # the sound question below.
    endif
 endif
-write "^Would you like sound effects?^"
-getyesorno sound_enabled
+
+# Second pass: emit the speech preference now that the player has
+# answered, then ask about sound effects.
+if sound_asked = 0
+   set sound_asked = 1
+   if interpreter = CGI
+      if voice_enabled = true
+         write "<script>enableSpeak();</script>"
+      else
+         write "<script>disableSpeak();</script>"
+      endif
+   endif
+   write "^Would you like sound effects?^"
+   getyesorno sound_enabled
+endif
+
+# Third pass: emit the sound preference. Both questions answered.
 if interpreter = CGI
    if sound_enabled = true
       write "<script>enableSound();</script>"

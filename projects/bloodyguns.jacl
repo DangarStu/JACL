@@ -70,77 +70,99 @@ constant eachturn_channel       2
 constant timed_channel          3
 constant global_channel         4
 
+integer intro_dedication_shown
+integer intro_scene_shown
+
 {+intro
-set player = kryten
-clear
-if interpreter = GLK
-   image image_bloodyguns
-endif
-if graphics_supported = false
-   style header
-   write " ^"
-   write game_title
-   style normal
-   set status_window = 1
-endif
-updatestatus
-write "^Copyright (c) 2008 " game_author "^"
-write "Release " game_release " / build " game_build 
-write " / JACL verb.library version " library_version "^^"
-print:
-   This game is a work of fiction. No character in this story is based
-   upon the life of any real person, living or dead.^^
+# Dedication / copyright -- only on first entry. The interpreter
+# re-enters +intro after each pending getyesorno answer (see
+# +startup_preferences below) so this guard prevents the credits
+# from re-printing on every pass.
+if intro_dedication_shown = 0
+   set intro_dedication_shown = 1
+   set player = kryten
+   clear
+   if interpreter = GLK
+      image image_bloodyguns
+   endif
+   if graphics_supported = false
+      style header
+      write " ^"
+      write game_title
+      style normal
+      set status_window = 1
+   endif
+   updatestatus
+   write "^Copyright (c) 2008 " game_author "^"
+   write "Release " game_release " / build " game_build
+   write " / JACL verb.library version " library_version "^^"
+   print:
+      This game is a work of fiction. No character in this story is based
+      upon the life of any real person, living or dead.^^
 
-   This game would not exist in its present form if not for the generous 
-   assistance of Jack Mullholland. Mr Mullholland served as an anti-aircraft 
-   gunner in Darwin during World War II and I am extremely grateful to him 
-   for taking the time to share his personal experiences and answer my
-   endless questions.^^
+      This game would not exist in its present form if not for the generous
+      assistance of Jack Mullholland. Mr Mullholland served as an anti-aircraft
+      gunner in Darwin during World War II and I am extremely grateful to him
+      for taking the time to share his personal experiences and answer my
+      endless questions.^^
 
-   Type 'menu' for further information about playing this game.^^
-.
+      Type 'menu' for further information about playing this game.^^
+   .
+endif
+
 if interpreter = GLK
    ifexecute "+load_saved"
       return
    endif
 endif
-execute "+startup_preferences"
-set status_window = 1
-set script_stage = during_raid
-updatestatus
-clear
-volume 65 background_channel
-if interpreter = GLK
-   sound sound_TheBloodyGuns background_channel
-else
-   sound "/sounds/TheBloodyGuns.ogg" "audio/ogg"
-endif
-style bold
-write "DARWIN, AUSTRALIA^"
-write "SUNDAY 22 MARCH 1942^^"
-style normal
-move ground to here
 
-print:
-   The sun has almost risen above the tops of the gum trees at the
-   far side of the field and it will soon be too hot to play cricket.
-   From your position in the outfield you watch as
-   Jenkins begins his loping stride towards the crease to deliver the
-   final ball of the over.
-   The other fielders, dressed only in khaki shorts, boots and wide brimmed
-   hats stand stationary in the oppressive humidity.
-   For a moment you think you can hear the faint throbbing drone of
-   approaching aircraft, but then nothing. You tilt your head slightly,
-   straining to hear then jump at the frantic clanging of the improvised
-   air raid bell.^^
-   ~Man the bloody guns!~ Sergeant Thompson yells as he drops his
-   bat and lets Jenkins' ball run wide.^^
-   The players sprint from the field to the anti-aircraft gun mounted 
-   behind you at the western edge of the site as the sound of aircraft
-   returns louder than before.^^
-   The worn leather cricket ball rolls to a stop near your feet.^
-.
-timer 500
+# Pre-game preferences. On web this issues two getyesorno calls and
+# returns mid-flow each time -- the engine re-runs +intro after each
+# answer until the function completes.
+execute "+startup_preferences"
+
+# Scene start -- runs only once, after the preferences questions are
+# fully resolved. The sound and music here respect the player's choice
+# automatically (the interpreter gates 'sound' on sound_enabled).
+if intro_scene_shown = 0
+   set intro_scene_shown = 1
+   set status_window = 1
+   set script_stage = during_raid
+   updatestatus
+   clear
+   volume 65 background_channel
+   if interpreter = GLK
+      sound sound_TheBloodyGuns background_channel
+   else
+      sound "/sounds/TheBloodyGuns.ogg" "audio/ogg"
+   endif
+   style bold
+   write "DARWIN, AUSTRALIA^"
+   write "SUNDAY 22 MARCH 1942^^"
+   style normal
+   move ground to here
+
+   print:
+      The sun has almost risen above the tops of the gum trees at the
+      far side of the field and it will soon be too hot to play cricket.
+      From your position in the outfield you watch as
+      Jenkins begins his loping stride towards the crease to deliver the
+      final ball of the over.
+      The other fielders, dressed only in khaki shorts, boots and wide brimmed
+      hats stand stationary in the oppressive humidity.
+      For a moment you think you can hear the faint throbbing drone of
+      approaching aircraft, but then nothing. You tilt your head slightly,
+      straining to hear then jump at the frantic clanging of the improvised
+      air raid bell.^^
+      ~Man the bloody guns!~ Sergeant Thompson yells as he drops his
+      bat and lets Jenkins' ball run wide.^^
+      The players sprint from the field to the anti-aircraft gun mounted
+      behind you at the western edge of the site as the sound of aircraft
+      returns louder than before.^^
+      The worn leather cricket ball rolls to a stop near your feet.^
+   .
+   timer 500
+endif
 }
 
 grammar menu     >menu
