@@ -58,7 +58,21 @@ session_max_age   2592000
 
 `session_max_age` is the cookie lifetime in seconds; 2592000 = 30 days.
 
-## 5. Restart Apache / fcgijacl
+## 5. Serve over HTTPS
+
+Google Identity Services only runs on HTTPS origins (the sole
+exception is `http://localhost` for local testing). The origin you
+configured in step 2 must match your Apache vhost **exactly** -- same
+scheme, same hostname, no port, no trailing slash. So if Apache is
+serving `https://jacl.example.com`, the Google Console origin must be
+`https://jacl.example.com` and nothing else.
+
+`etc/jacl-apache.conf` ships with a commented-out `:443` vhost
+template you can adapt. fcgijacl automatically adds the `Secure` flag
+to the session cookie when Apache sets `HTTPS=on`, so once the vhost
+is live there's nothing further to do on the cookie side.
+
+## 6. Restart Apache / fcgijacl
 
 ```sh
 sudo systemctl restart apache2

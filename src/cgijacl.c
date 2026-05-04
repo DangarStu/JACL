@@ -482,11 +482,16 @@ main(int argc, char *argv[])
                                          err, sizeof(err)) == 0 &&
                     auth_make_session_cookie(sub, pending_session_cookie,
                                              sizeof(pending_session_cookie)) == 0) {
+                    const char *https_env = getenv("HTTPS");
+                    const char *secure_flag =
+                        (https_env != NULL && !strcasecmp(https_env, "on"))
+                        ? " Secure;" : "";
                     printf("Status: 200 OK\r\n");
                     printf("Content-type: application/json\r\n");
-                    printf("Set-Cookie: jacl_session=%s; Path=/; HttpOnly; "
+                    printf("Set-Cookie: jacl_session=%s; Path=/; HttpOnly;%s "
                            "SameSite=Lax; Max-Age=%ld\r\n",
-                           pending_session_cookie, auth_session_max_age());
+                           pending_session_cookie, secure_flag,
+                           auth_session_max_age());
                     printf("\r\n{\"ok\":true,\"sub\":\"%s\"}\n", sub);
                 } else {
                     sprintf(error_buffer,
@@ -500,10 +505,14 @@ main(int argc, char *argv[])
                 list_clear(&entries);
                 continue;
             } else if (!strcmp(auth_action, "logout")) {
+                const char *https_env = getenv("HTTPS");
+                const char *secure_flag =
+                    (https_env != NULL && !strcasecmp(https_env, "on"))
+                    ? " Secure;" : "";
                 printf("Status: 200 OK\r\n");
                 printf("Content-type: application/json\r\n");
-                printf("Set-Cookie: jacl_session=; Path=/; HttpOnly; "
-                       "SameSite=Lax; Max-Age=0\r\n");
+                printf("Set-Cookie: jacl_session=; Path=/; HttpOnly;%s "
+                       "SameSite=Lax; Max-Age=0\r\n", secure_flag);
                 printf("\r\n{\"ok\":true}\n");
                 list_clear(&entries);
                 continue;
