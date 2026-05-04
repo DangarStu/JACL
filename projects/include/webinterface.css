@@ -47,25 +47,23 @@ print:
 		top: 87px;
 		left: 0;
 		right: 0;
-		height: calc(var(--status-lines) * 24px);
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 0 12px;
-		font-family: Merriweather, Verdana, Arial, Sanserif;
-		font-size: 10pt;
+		height: calc(var(--status-lines) * 20px);
+		padding: 2px 12px;
+		font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace;
+		font-size: 12px;
+		line-height: 20px;
+		white-space: pre;
 		color: white;
 		overflow: hidden;
 .
 write "        background-color: " linkbar_colour "cc; }^"
 print:
       #statuswin:empty { display: none; }
-      #statuswin .jacl-status-left { font-weight: bold; }
-      #statuswin .jacl-status-right { opacity: 0.85; }
+      #statuswin .jacl-status-right { float: right; opacity: 0.85; }
       #main {
 		position:absolute;
 		left:0px;
-                top: calc(87px + var(--status-lines) * 24px);
+                top: calc(87px + var(--status-lines) * 20px + 4px);
 		right:0px;
 		overflow:auto;
 .
@@ -221,9 +219,9 @@ print:
 		#header { height: 60px; }^
 		h1 { font-size: 16pt; padding-left: 10px; }^
 		img.titleimage { height: 60px; }^
-		#statuswin { top: 60px; height: calc(var(--status-lines) * 22px); padding: 0 8px; }^
+		#statuswin { top: 60px; height: calc(var(--status-lines) * 18px); padding: 1px 8px; line-height: 18px; }^
 		#statuswin:empty + #main { top: 60px; }^
-		#main { top: calc(60px + var(--status-lines) * 22px); margin-right: 0 !important; }^
+		#main { top: calc(60px + var(--status-lines) * 18px + 2px); margin-right: 0 !important; }^
 		div.maintext {
 			padding: 10px 15px;
 			font-size: 11pt; }^
