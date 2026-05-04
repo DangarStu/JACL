@@ -704,10 +704,37 @@ main(int argc, char *argv[])
             }
         }
 
+        /* Detect a returning player whose auto-save was written mid-intro
+         * (TOTAL_MOVES still 0). The restored state may include a
+         * PENDING_QUESTION_TYPE from a getyesorno that the player never
+         * answered before closing the browser. With pending state set,
+         * the engine would treat the empty initial-GET input as the
+         * answer, write only "Please enter yes or no", and never re-show
+         * the question text. Clear the pending fields and let +intro re-
+         * run with its state guards so the unanswered question (and only
+         * that question) gets re-emitted. */
+        if (returning_player == TRUE
+            && TOTAL_MOVES != NULL && TOTAL_MOVES->value == 0
+            && (cgi_val(entries, "command") == NULL)
+            && (cgi_val(entries, "rpc") == NULL)) {
+            struct integer_type *ptype = PENDING_QUESTION_TYPE;
+            if (ptype != NULL && ptype->value != 0) {
+                struct integer_type *plow = PENDING_NUMBER_LOW;
+                struct integer_type *phigh = PENDING_NUMBER_HIGH;
+                struct string_type *ptarget =
+                    string_resolve("pending_target");
+                ptype->value = 0;
+                if (plow != NULL) plow->value = 0;
+                if (phigh != NULL) phigh->value = 0;
+                if (ptarget != NULL) ptarget->value[0] = 0;
+            }
+            returning_player = FALSE;
+        }
+
         if (returning_player == FALSE
             && (cgi_val(entries, "command") == NULL)
             && (cgi_val(entries, "rpc") == NULL)) {
-            /* THIS IS THE START OF A NEW GAME, NOT AN EXISTING USER 
+            /* THIS IS THE START OF A NEW GAME, NOT AN EXISTING USER
              * CONTINUING A GAME */
 
             /* DISPLAY THE GAMES INTRODUCTION AS THIS IS THE FIRST MOVE */
