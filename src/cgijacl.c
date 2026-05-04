@@ -510,7 +510,7 @@ main(int argc, char *argv[])
                                 snprintf(error_buffer,
                                          sizeof(error_buffer),
                                          "Migrated anonymous auto-save "
-                                         "%s -> %s on first sign-in",
+                                         "%.480s -> %.480s on first sign-in",
                                          old_auto, new_auto);
                                 log_error(error_buffer, LOG_ONLY);
                             }
