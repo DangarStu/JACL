@@ -4174,12 +4174,15 @@ set time = false
 }
 
 
-grammar baratdaya           >southwest
-grammar pergi baratdaya     >southwest
-grammar jalan baratdaya     >southwest
-grammar southwest           >southwest
-grammar go southwest        >southwest
-grammar walk southwest      >southwest
+grammar baratdaya            >southwest
+grammar pergi baratdaya      >southwest
+grammar jalan baratdaya      >southwest
+grammar barat daya           >southwest
+grammar pergi barat daya     >southwest
+grammar jalan barat daya     >southwest
+grammar southwest            >southwest
+grammar go southwest         >southwest
+grammar walk southwest       >southwest
 
 {+southwest
 if +sitting = true
@@ -4235,6 +4238,9 @@ set time = false
 grammar timurlaut           >northeast
 grammar pergi timurlaut     >northeast
 grammar jalan timurlaut     >northeast
+grammar timur laut          >northeast
+grammar pergi timur laut    >northeast
+grammar jalan timur laut    >northeast
 grammar northeast           >northeast
 grammar go northeast        >northeast
 grammar walk northeast      >northeast
@@ -4264,6 +4270,9 @@ set time = false
 grammar baratlaut           >northwest
 grammar pergi baratlaut     >northwest
 grammar jalan baratlaut     >northwest
+grammar barat laut          >northwest
+grammar pergi barat laut    >northwest
+grammar jalan barat laut    >northwest
 grammar northwest           >northwest
 grammar go northwest        >northwest
 grammar walk northwest      >northwest
