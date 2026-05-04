@@ -41,12 +41,13 @@ endif
 write "background-color: " header_colour "; "
 print:
 		text-align: center; }^
+      body { --status-lines: 1; }
       #statuswin {
 		position: absolute;
 		top: 87px;
 		left: 0;
 		right: 0;
-		height: 24px;
+		height: calc(var(--status-lines) * 24px);
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -54,6 +55,7 @@ print:
 		font-family: Merriweather, Verdana, Arial, Sanserif;
 		font-size: 10pt;
 		color: white;
+		overflow: hidden;
 .
 write "        background-color: " linkbar_colour "cc; }^"
 print:
@@ -63,7 +65,7 @@ print:
       #main {
 		position:absolute;
 		left:0px;
-                top: 111px;
+                top: calc(87px + var(--status-lines) * 24px);
 		right:0px;
 		overflow:auto;
 .
@@ -219,9 +221,9 @@ print:
 		#header { height: 60px; }^
 		h1 { font-size: 16pt; padding-left: 10px; }^
 		img.titleimage { height: 60px; }^
-		#statuswin { top: 60px; height: 22px; padding: 0 8px; }^
+		#statuswin { top: 60px; height: calc(var(--status-lines) * 22px); padding: 0 8px; }^
 		#statuswin:empty + #main { top: 60px; }^
-		#main { top: 82px; margin-right: 0 !important; }^
+		#main { top: calc(60px + var(--status-lines) * 22px); margin-right: 0 !important; }^
 		div.maintext {
 			padding: 10px 15px;
 			font-size: 11pt; }^
