@@ -9,11 +9,22 @@ string game_language      "en-US"
 string environment
 
 {+intro
-getenv environment "SERVER_SOFTWARE"
-write "Server is ~" environment "~.^^"
+if intro_dedication_shown = 0
+   set intro_dedication_shown = 1
+   getenv environment "SERVER_SOFTWARE"
+   write "Server is ~" environment "~.^^"
+   write "^^Welcome to the JavaScript example game.^"
+endif
 
-write "^^Welcome to the JavaScript example game.^"
-execute "+look_around"
+execute "+startup_preferences"
+if pending_question_type != 0
+   return
+endif
+
+if intro_scene_shown = 0
+   set intro_scene_shown = 1
+   execute "+look_around"
+endif
 }
 
 location cafe

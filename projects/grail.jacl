@@ -12926,47 +12926,58 @@ set time = false
 }
 
 {+intro
-clear
-if interpreter = GLK
-   image image_unholygrail
+if intro_dedication_shown = 0
+   set intro_dedication_shown = 1
+   clear
+   if interpreter = GLK
+      image image_unholygrail
+   endif
+   if graphics_supported = false
+      style header
+      write game_title
+      style normal
+   endif
+   write "^^Copyright (c) 2008 " game_author ".^"
+   write "Release " game_release " / build " game_build
+   write " / JACL verb.library version " library_version ".^^"
+
+   print:
+
+      For over three months now you have been stationed at this drab
+      research outpost, situated on a remote island somewhere in the
+      Pacific Ocean. You have been contracted by the military as a genetics
+      specialist to study recent deaths occurring in the local marine life,
+      determine the cause and assess any danger to human personnel.^^
+      Due to the classified nature of the majority of other projects being
+      carried out on the island, being one of the few civilians involved
+      hasn't made life easy. Little respect and even less information has
+      led you to find solace in the tranquillity of your tropical home,
+      indulging in as little contact with the main core of workers as
+      possible. Lisa, however, a Naval Officer and marine biologist based
+      with you, has fortunately been compassionate to your situation, acting
+      more as a scientific colleague than a military chaperone.^^
+   .
 endif
-if graphics_supported = false
-   style header
-   write game_title
+
+execute "+startup_preferences"
+if pending_question_type != 0
+   return
+endif
+
+if intro_scene_shown = 0
+   set intro_scene_shown = 1
+   set north_wall(parent) = here
+   set south_wall(parent) = here
+   set east_wall(parent) = here
+   set west_wall(parent) = here
+   set ground(parent) = here
+
+   style bold
+   write "REMOTE MILITARY BASE, SOMEWHERE IN THE PACIFIC OCEAN^"
+   write "MONDAY 3:42 PM^^"
    style normal
+   look
 endif
-write "^^Copyright (c) 2008 " game_author ".^"
-write "Release " game_release " / build " game_build
-write " / JACL verb.library version " library_version ".^^"
-
-print:
-
-   For over three months now you have been stationed at this drab
-   research outpost, situated on a remote island somewhere in the
-   Pacific Ocean. You have been contracted by the military as a genetics
-   specialist to study recent deaths occurring in the local marine life,
-   determine the cause and assess any danger to human personnel.^^
-   Due to the classified nature of the majority of other projects being
-   carried out on the island, being one of the few civilians involved
-   hasn't made life easy. Little respect and even less information has
-   led you to find solace in the tranquillity of your tropical home,
-   indulging in as little contact with the main core of workers as
-   possible. Lisa, however, a Naval Officer and marine biologist based
-   with you, has fortunately been compassionate to your situation, acting
-   more as a scientific colleague than a military chaperone.^^
-.
-
-set north_wall(parent) = here
-set south_wall(parent) = here
-set east_wall(parent) = here
-set west_wall(parent) = here
-set ground(parent) = here
-
-style bold
-write "REMOTE MILITARY BASE, SOMEWHERE IN THE PACIFIC OCEAN^"
-write "MONDAY 3:42 PM^^"
-style normal
-look
 }
 
 object plunger: plunger

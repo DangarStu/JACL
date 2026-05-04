@@ -173,25 +173,37 @@ return false
 }
 
 {+intro
-style bold
-write "^^" game_title
-style normal
-write " oleh " game_author "^^"
+if intro_dedication_shown = 0
+   set intro_dedication_shown = 1
+   style bold
+   write "^^" game_title
+   style normal
+   write " oleh " game_author "^^"
 
-print:
-   Alarmmu berbunyi dan kamu bangun dari tempat tidur.
-   Senin pagi lagi. Yah, setidaknya rumahmu tidak punya
-   pintu depan jadi kamu punya alasan bagus untuk tidak
-   pergi kerja.^^
-.
-if here hasnt OUTDOORS
-  set north_wall(parent) = here
-  set south_wall(parent) = here
-  set east_wall(parent) = here
-  set west_wall(parent) = here
+   print:
+      Alarmmu berbunyi dan kamu bangun dari tempat tidur.
+      Senin pagi lagi. Yah, setidaknya rumahmu tidak punya
+      pintu depan jadi kamu punya alasan bagus untuk tidak
+      pergi kerja.^^
+   .
 endif
-set ground(parent) = here
-look
+
+execute "+startup_preferences"
+if pending_question_type != 0
+   return
+endif
+
+if intro_scene_shown = 0
+   set intro_scene_shown = 1
+   if here hasnt OUTDOORS
+     set north_wall(parent) = here
+     set south_wall(parent) = here
+     set east_wall(parent) = here
+     set west_wall(parent) = here
+   endif
+   set ground(parent) = here
+   look
+endif
 }
 
 object kryten: aku diri sendiri saya

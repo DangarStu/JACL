@@ -46,54 +46,41 @@ write "Stuart Allen, for making JACL available.^"
 set time = false
 }
 
-integer speech_choice
-
 {+intro
-clear
-if interpreter = GLK
-   if graphics_supported = false
-        style bold
-   		write ^ game_title
-   		style normal
-   		write " par " game_author "^^"
-   else
-      image image_fihnargaia
-      style bold
-   		write ^ game_title
-   		style normal
-   		write " par " game_author "^^"
+if intro_dedication_shown = 0
+   set intro_dedication_shown = 1
+   clear
+   if interpreter = GLK
+      if graphics_supported = false
+           style bold
+      		write ^ game_title
+      		style normal
+      		write " par " game_author "^^"
+      else
+         image image_fihnargaia
+         style bold
+      		write ^ game_title
+      		style normal
+      		write " par " game_author "^^"
+      endif
    endif
 endif
 
-if interpreter = CGI
-   write "Voulez-vous que le jeu parle à voix haute ? (oui/non)^"
-   getyesorno speech_choice
-else
-   execute "+start_game"
-endif
-}
-
-{+start_game
-if interpreter = CGI
-   if speech_choice = true
-      write "Synthèse vocale activée.^^"
-      write "<script>enableSpeak();</script>"
-   else
-      write "Synthèse vocale désactivée.^^"
-      write "<script>disableSpeak();</script>"
-   endif
+execute "+startup_preferences"
+if pending_question_type != 0
+   return
 endif
 
-if here hasnt OUTDOORS
-endall
-move ground to here
-look
+if intro_scene_shown = 0
+   set intro_scene_shown = 1
+   if here hasnt OUTDOORS
+   endall
+   move ground to here
+   look
+endif
 }
 
 {+eachturn
-if total_moves = 0
-   execute "+start_game"
-endif
 }
 
 {+movement

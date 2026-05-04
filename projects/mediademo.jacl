@@ -375,68 +375,64 @@ if interpreter = CGI
 endif
 }
 
-integer sound_choice
-
 {+intro
+# C-side state -- re-bind on every entry; the auto-save doesn't cover
+# the player pointer.
 set player = kryten
-clear
-if interpreter = GLK
-   image image_title
-endif
-style header
-write "^ " game_title "^"
-style normal
-style note
-write "by " game_author ", release " game_release "/" game_build "^"
-style normal
-write "^"
-if sound_supported = true
-   style alert
-   write "Would you like sound effects? (yes/no)^"
-   style normal
-   getyesorno sound_choice
-   if interpreter <> CGI
-      if sound_choice = false
-         set sound_enabled = false
-      endif
-      execute "+start_game"
-   endif
-else
-   execute "+start_game"
-endif
-}
 
-{+start_game
-print:
-   This is a multimedia smoke-test for JACL interpreters. It exercises
-   every feature an interpreter needs to handle: image display, looping
-   ambient sound on the background channel, one-shot foreground sound,
-   a sustained loop on a separate channel, multi-channel mixing, volume
-   control, and movement between rooms.^^
-.
-style quote
-write "Note: every coloured snippet you see is driven by a stylehint declaration at the top of mediademo.jacl. Edit the colours there to retheme the game without touching the prose.^"
-style normal
-write "^"
-style subheader
-write "Quick tour:^"
-style normal
-print:
-   ^- You start in the Hut with looping rain on the background channel.
-   ^- Go ~south~ to the Clearing. The background ambient crossfades
-   from rain to a cloud of flies. Try ~ring bell~ and ~thunder~ for
-   foreground one-shots.
-   ^- Go ~south~ again to the Lookout (the flies follow you down
-   there). Try ~start generator~ for a sustained loop on its own
-   channel, ~stop generator~ to silence it, and ~look at map~ to
-   display the demo map image.
-.
-if interpreter = CGI
-   write "   - ~map~ at any time shows the room map.^"
+if intro_dedication_shown = 0
+   set intro_dedication_shown = 1
+   clear
+   if interpreter = GLK
+      image image_title
+   endif
+   style header
+   write "^ " game_title "^"
+   style normal
+   style note
+   write "by " game_author ", release " game_release "/" game_build "^"
+   style normal
+   write "^"
 endif
-write "^"
-execute "+start_rain"
-look
+
+execute "+startup_preferences"
+if pending_question_type != 0
+   return
+endif
+
+if intro_scene_shown = 0
+   set intro_scene_shown = 1
+   print:
+      This is a multimedia smoke-test for JACL interpreters. It exercises
+      every feature an interpreter needs to handle: image display, looping
+      ambient sound on the background channel, one-shot foreground sound,
+      a sustained loop on a separate channel, multi-channel mixing, volume
+      control, and movement between rooms.^^
+   .
+   style quote
+   write "Note: every coloured snippet you see is driven by a stylehint declaration at the top of mediademo.jacl. Edit the colours there to retheme the game without touching the prose.^"
+   style normal
+   write "^"
+   style subheader
+   write "Quick tour:^"
+   style normal
+   print:
+      ^- You start in the Hut with looping rain on the background channel.
+      ^- Go ~south~ to the Clearing. The background ambient crossfades
+      from rain to a cloud of flies. Try ~ring bell~ and ~thunder~ for
+      foreground one-shots.
+      ^- Go ~south~ again to the Lookout (the flies follow you down
+      there). Try ~start generator~ for a sustained loop on its own
+      channel, ~stop generator~ to silence it, and ~look at map~ to
+      display the demo map image.
+   .
+   if interpreter = CGI
+      write "   - ~map~ at any time shows the room map.^"
+   endif
+   write "^"
+   execute "+start_rain"
+   look
+endif
 }
 
 # Per-turn ambient management. The engine doesn't have a +entered hook,
@@ -446,21 +442,7 @@ look
 # stream isn't interrupted. This also handles restored sessions: +intro
 # only fires for new sessions, so on a reloaded page +eachturn is what
 # brings the ambient back.
-#
-# total_moves is -1 during +intro and 0 on the first +eachturn (the one
-# fired right after the player answers the sound question). That's our
-# cue to honor sound_choice and run +start_game so the actual intro and
-# initial ambient appear only after the question is answered.
 {+eachturn
-if total_moves = 0
-   if interpreter = CGI
-      if sound_choice = false
-         set sound_enabled = false
-      endif
-      execute "+start_game"
-      return
-   endif
-endif
 if here = hut
    execute "+start_rain"
 else

@@ -1986,34 +1986,49 @@ print:
 grammar stare at *present     >examine
 
 {+intro
-clear
-if interpreter = GLK
-   image image_dragon
-endif
-write "^^WARNING: "
-write "This game contains coarse language, sexual references, "
-write "adult themes, low-level violence, extremely poor-taste 'humour', "
-write "in-jokes, self-reference and a dragon.^"
-if interpreter = GLK 
-   if graphics_supported = false
-      style header
-      write "^^T H E   D O W N    D R A G O N^^"
-      style normal
-   else
-      write "^^"
+# C-side state -- re-bind on every entry; the auto-save doesn't cover
+# the player pointer.
+set player = kryten
+
+if intro_dedication_shown = 0
+   set intro_dedication_shown = 1
+   set player(parent) = tavern
+   clear
+   if interpreter = GLK
+      image image_dragon
    endif
+   write "^^WARNING: "
+   write "This game contains coarse language, sexual references, "
+   write "adult themes, low-level violence, extremely poor-taste 'humour', "
+   write "in-jokes, self-reference and a dragon.^"
+   if interpreter = GLK
+      if graphics_supported = false
+         style header
+         write "^^T H E   D O W N    D R A G O N^^"
+         style normal
+      else
+         write "^^"
+      endif
+   endif
+   write "Copyright (c) 2008 " game_author ".^"
+   write "Release " game_release " / build " game_build
+   write " / JACL verb.library version " library_version ".^^"
+   write "As a fantasy adventurer, the only commands you've used in a while have "
+   write "been WAIT, DOWN and OUT. But look on the bright side, at least "
+   write "you're not the only one...^^"
 endif
-write "Copyright (c) 2008 " game_author ".^"
-write "Release " game_release " / build " game_build
-write " / JACL verb.library version " library_version ".^^"
-write "As a fantasy adventurer, the only commands you've used in a while have "
-write "been WAIT, DOWN and OUT. But look on the bright side, at least "
-write "you're not the only one...^^"
-set player = kryten 
-set player(parent) = tavern
-more
-clear
-execute "+look_around"
+
+execute "+startup_preferences"
+if pending_question_type != 0
+   return
+endif
+
+if intro_scene_shown = 0
+   set intro_scene_shown = 1
+   more
+   clear
+   execute "+look_around"
+endif
 }
  
 {+rods

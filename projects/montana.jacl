@@ -537,8 +537,6 @@ execute "+inventory"
 # GLOBAL FUNCTIONS
 # -----------------------------------------------------------------------------
 
-integer speech_choice
-
 # Fallback when a player asks a character about a topic the character has
 # no specific line for. The NPCs here are mostly animals, so the tone is
 # curiosity rather than conversation — but the learner still gets a nudge
@@ -550,57 +548,47 @@ write "veas a tu alrededor.^"
 }
 
 {+intro
-style bold
-write "^^" game_title
-style normal
-write " por " game_author "^^"
-
-if interpreter = CGI
-   write "¿Quieres que el juego hable? (sí/no)^"
-   getyesorno speech_choice
-else
-   execute "+start_game"
+if intro_dedication_shown = 0
+   set intro_dedication_shown = 1
+   style bold
+   write "^^" game_title
+   style normal
+   write " por " game_author "^^"
 endif
-}
 
-{+start_game
-if interpreter = CGI
-   if speech_choice = true
-      write "Síntesis de voz activada.^^"
-      write "<script>enableSpeak();</script>"
+execute "+startup_preferences"
+if pending_question_type != 0
+   return
+endif
+
+if intro_scene_shown = 0
+   set intro_scene_shown = 1
+   print:
+      El sol de la mañana ilumina las cumbres nevadas de los
+      volcanes. El aire fresco de la montaña huele a pino y
+      tierra húmeda. Los pájaros cantan en el bosque cercano.
+      Es un día perfecto para explorar las montañas de Chile
+      y descubrir sus secretos.^^
+   .
+
+   style note
+   write "Consejo: escribe "
+   style input
+   write "ayuda"
+   style note
+   if interpreter = CGI
+      write " en cualquier momento para ver los comandos, o haz doble clic en una palabra en español para ver su traducción.^^"
    else
-      write "Síntesis de voz desactivada.^^"
-      write "<script>disableSpeak();</script>"
+      write " en cualquier momento para ver la lista de comandos disponibles.^^"
    endif
+   style normal
+
+   look
 endif
-
-print:
-   El sol de la mañana ilumina las cumbres nevadas de los
-   volcanes. El aire fresco de la montaña huele a pino y
-   tierra húmeda. Los pájaros cantan en el bosque cercano.
-   Es un día perfecto para explorar las montañas de Chile
-   y descubrir sus secretos.^^
-.
-
-style note
-write "Consejo: escribe "
-style input
-write "ayuda"
-style note
-if interpreter = CGI
-   write " en cualquier momento para ver los comandos, o haz doble clic en una palabra en español para ver su traducción.^^"
-else
-   write " en cualquier momento para ver la lista de comandos disponibles.^^"
-endif
-style normal
-
-look
 }
 
-{+eachturn
-if total_moves = 0
-   execute "+start_game"
-endif
+{+movement
+return false
 }
 
 {+movement
