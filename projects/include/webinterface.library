@@ -239,6 +239,52 @@ print:
       main.insertAdjacentHTML('afterbegin', html);^
    }^
 
+   /* Google Sign-In: optional. The engine emits^
+    * window.JACL_GOOGLE_CLIENT_ID only when fcgijacl has both a^
+    * client_id and a session_secret configured, so the button is^
+    * only ever rendered on properly-set-up servers. */^
+   /* JACL's preprocessor strips leading whitespace and JACL's loader^
+    * treats a leading '.' as the print-block terminator, so Promise^
+    * chains have to keep '.then'/'.catch' off column 0 -- written^
+    * here as `var p = fetch(...); p = p.then(...);` rather than the^
+    * usual fluent chain. Likewise multi-line object literals are^
+    * inlined so no continuation line can start with '{' or '}'. */^
+   function jaclGoogleCallback(response) {^
+      var token = response && response.credential;^
+      if (!token) return;^
+      var body = 'auth=google&credential=' + encodeURIComponent(token);^
+      var url = window.location.pathname + '?' + body;^
+      var p = fetch(url, { credentials: 'same-origin' });^
+      p = p.then(function(r) { return r.json(); });^
+      p = p.then(function(j) { if (j && j.ok) window.location.reload(); });^
+      p.catch(function() {});^
+   }^
+
+   function jaclLogout() {^
+      var url = window.location.pathname + '?auth=logout';^
+      var p = fetch(url, { credentials: 'same-origin' });^
+      p = p.then(function() { window.location.reload(); });^
+      p.catch(function() {});^
+   }^
+
+   function jaclRenderGoogleAuth() {^
+      if (!window.JACL_GOOGLE_CLIENT_ID) return;^
+      var slot = document.getElementById('jaclAuthSlot');^
+      if (!slot) return;^
+      if (window.JACL_GOOGLE_SIGNED_IN) {^
+         slot.innerHTML = 'Signed in &middot; <a href="javascript:jaclLogout()">log out</a>';^
+         return;^
+      }^
+      if (!window.google || !google.accounts || !google.accounts.id) {^
+         setTimeout(jaclRenderGoogleAuth, 200);^
+         return;^
+      }^
+      google.accounts.id.initialize({ client_id: window.JACL_GOOGLE_CLIENT_ID, callback: jaclGoogleCallback, auto_select: false });^
+      slot.innerHTML = '<div id="jaclGoogleBtn"></div>';^
+      var btn = document.getElementById('jaclGoogleBtn');^
+      google.accounts.id.renderButton(btn, { theme: 'outline', size: 'medium', type: 'standard' });^
+   }^
+
    function changeInterface() {^
       document.JACLInterfaceForm.submit();
    }^
@@ -469,6 +515,11 @@ write "</script>^"
 write "<script>window.jaclLang = '" game_language "';</script>"
 write "<script>window.jaclMapBg = '" maintext_colour "';</script>"
 write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
+ifstring google_client_id != ""
+   write "<script>window.JACL_GOOGLE_CLIENT_ID = '" google_client_id "';</script>"
+   write "<script>window.JACL_GOOGLE_SIGNED_IN = " google_signed_in ";</script>"
+   write "<script src=~https://accounts.google.com/gsi/client~ async defer></script>"
+endif
 ifexecute "+local_header"
    # GAME MAY INJECT ADDITIONAL HEAD CONTENT (extra stylesheets, scripts).
 endif
@@ -477,7 +528,7 @@ ifexecute "+library_header"
    # WITHOUT COLLIDING WITH THE GAME'S +local_header.
 endif
 write "</head>^"
-write "<body onLoad=~document.getElementById('JACLCommandPrompt').focus(); jaclOfferVoice(); jaclInitMic();~>^"
+write "<body onLoad=~document.getElementById('JACLCommandPrompt').focus(); jaclOfferVoice(); jaclInitMic(); jaclRenderGoogleAuth();~>^"
 write "<div id=~header~>"
 ifstring title_image = "none"
   write "<h1 name=~title~>" game_title "</h1>"
@@ -495,6 +546,8 @@ write " | "
 hyperlink "Restart" "restart" "header"
 write " | "
 hyperlink "Hint" "hint" "header"
+write " | "
+write "<span id=~jaclAuthSlot~ style=~display:inline-block; vertical-align:middle;~></span>"
 write " |"
 write "</div>^"
 write "</div>^"

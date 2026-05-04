@@ -27,6 +27,7 @@
 #include "interpreter.h"
 #include "parser.h"
 #include "encapsulate.h"
+#include "auth.h"
 #include <dirent.h>
 
 extern int            style_index;
@@ -111,6 +112,23 @@ int             start_of_this_command;
 
 int             prefer_remote_user = TRUE;
 int             cookie_read_successfully;
+
+/* Optional Google Sign-In configuration. Read from cgijacl.conf and
+ * passed to auth_configure() once the file has been parsed. Empty
+ * client_id or session_secret => auth disabled, anonymous flow only. */
+char            google_client_id_cfg[256] = "\0";
+char            session_secret_cfg[256] = "\0";
+long            session_max_age_cfg = 30L * 24L * 3600L;
+
+/* Set when auth_verify_session_cookie / auth_verify_id_token resolves
+ * the request to a Google account. Used to gate Set-Cookie issuance
+ * and to seed user_id for save-file resolution. */
+char            google_sub[AUTH_SUB_MAX] = "\0";
+
+/* Pending Set-Cookie value after a successful ?auth=google callback,
+ * written out alongside the normal response headers further below. */
+char            pending_session_cookie[AUTH_COOKIE_MAX] = "\0";
+int             pending_clear_session_cookie = FALSE;
 
 int             buffer_index = 0;
 
@@ -440,10 +458,82 @@ main(int argc, char *argv[])
 
         user_id[0] = (char) 0;             // CLEAR THE USER_ID
         rpc_function_name[0] = (char) 0;    // CLEAR THE RPC FUNCTION NAME
+        google_sub[0] = (char) 0;
+        pending_session_cookie[0] = (char) 0;
+        pending_clear_session_cookie = FALSE;
 
         read_cgi_input(&entries);
         parse_cookies(&jacl_cookies);
         cookie_read_successfully = FALSE;
+
+        /* ?auth=google&credential=<id_token> -- frontend posts the
+         * Google ID token here after the GIS button callback fires.
+         * Verify it, build a signed session cookie, and short-circuit
+         * the response with a tiny JSON body so the frontend can
+         * reload and pick up the cookie. */
+        if (auth_is_enabled() && cgi_val(entries, "auth") != NULL) {
+            const char *auth_action = cgi_val(entries, "auth");
+            if (!strcmp(auth_action, "google")) {
+                const char *credential = cgi_val(entries, "credential");
+                char sub[AUTH_SUB_MAX];
+                char err[128];
+                if (credential != NULL &&
+                    auth_verify_id_token(credential, sub, sizeof(sub),
+                                         err, sizeof(err)) == 0 &&
+                    auth_make_session_cookie(sub, pending_session_cookie,
+                                             sizeof(pending_session_cookie)) == 0) {
+                    const char *https_env = getenv("HTTPS");
+                    const char *secure_flag =
+                        (https_env != NULL && !strcasecmp(https_env, "on"))
+                        ? " Secure;" : "";
+                    printf("Status: 200 OK\r\n");
+                    printf("Content-type: application/json\r\n");
+                    printf("Set-Cookie: jacl_session=%s; Path=/; HttpOnly;%s "
+                           "SameSite=Lax; Max-Age=%ld\r\n",
+                           pending_session_cookie, secure_flag,
+                           auth_session_max_age());
+                    printf("\r\n{\"ok\":true,\"sub\":\"%s\"}\n", sub);
+                } else {
+                    sprintf(error_buffer,
+                            "Google ID token verify failed: %s",
+                            credential ? err : "no credential");
+                    log_error(error_buffer, LOG_ONLY);
+                    printf("Status: 401 Unauthorized\r\n");
+                    printf("Content-type: application/json\r\n\r\n");
+                    printf("{\"ok\":false}\n");
+                }
+                list_clear(&entries);
+                continue;
+            } else if (!strcmp(auth_action, "logout")) {
+                const char *https_env = getenv("HTTPS");
+                const char *secure_flag =
+                    (https_env != NULL && !strcasecmp(https_env, "on"))
+                    ? " Secure;" : "";
+                printf("Status: 200 OK\r\n");
+                printf("Content-type: application/json\r\n");
+                printf("Set-Cookie: jacl_session=; Path=/; HttpOnly;%s "
+                       "SameSite=Lax; Max-Age=0\r\n", secure_flag);
+                printf("\r\n{\"ok\":true}\n");
+                list_clear(&entries);
+                continue;
+            }
+        }
+
+        /* If a valid jacl_session cookie is present, the user_id for
+         * this request is "google_<sub>". Falls through to the
+         * existing anonymous flow on missing/invalid cookie so guests
+         * still work. */
+        if (auth_is_enabled()) {
+            const char *session = cgi_val(jacl_cookies, "jacl_session");
+            if (session != NULL &&
+                auth_verify_session_cookie(session, google_sub,
+                                           sizeof(google_sub)) == 0) {
+                snprintf(user_id, sizeof(user_id), "google_%s", google_sub);
+                cookie_read_successfully = TRUE;
+                returning_player = TRUE;
+                REMOTE_USER_USED->value = TRUE;
+            }
+        }
 
         //sprintf (error_buffer, "HTTP_COOKIE: %s", getenv("HTTP_COOKIE"));
         //log_message(error_buffer, PLUS_STDERR);
@@ -451,7 +541,12 @@ main(int argc, char *argv[])
         //sprintf (error_buffer, "user_id value pulled from cookies: %s", cgi_val(jacl_cookies, "user_id"));
         //log_message(error_buffer, PLUS_STDERR);
 
-        if (cgi_val(entries, "user_id") != NULL || cgi_val(jacl_cookies, "user_id") != NULL) {
+        if (google_sub[0] != 0) {
+            /* user_id already resolved from jacl_session above; the
+             * existing user_id-cookie / parameter / REMOTE_USER /
+             * generate-random fallback chain is skipped so a Google
+             * sign-in always wins over a stale anonymous cookie. */
+        } else if (cgi_val(entries, "user_id") != NULL || cgi_val(jacl_cookies, "user_id") != NULL) {
             // A user_id HAS BEEN PASSED TO THIS REQUEST VIA A PARMETER OR A COOKIE
             if (prefer_remote_user == TRUE && REMOTE_USER != NULL && strcmp("", REMOTE_USER)) {
                 /* PREFER REMOTE_USER FOR POTENTIAL SECURE SITES. */
@@ -526,7 +621,31 @@ main(int argc, char *argv[])
 
         }
 
-        /* COPY THE VALUE OF ANY DEFINED PARAMETERS FROM THE HTTP 
+        /* Surface the auth state to game code. google_client_id is
+         * populated even on anonymous requests so the front-end can
+         * still render the Sign-In button; google_signed_in /
+         * google_sub are zeroed unless this request is bound to a
+         * verified Google session. */
+        {
+            struct string_type *cid = cstring_resolve("google_client_id");
+            struct string_type *sub_str = cstring_resolve("google_sub");
+            struct cinteger_type *signed_in = cinteger_resolve("google_signed_in");
+            if (cid != NULL) {
+                strncpy(cid->value, auth_google_client_id(),
+                        sizeof(cid->value) - 1);
+                cid->value[sizeof(cid->value) - 1] = 0;
+            }
+            if (sub_str != NULL) {
+                strncpy(sub_str->value, google_sub,
+                        sizeof(sub_str->value) - 1);
+                sub_str->value[sizeof(sub_str->value) - 1] = 0;
+            }
+            if (signed_in != NULL) {
+                signed_in->value = google_sub[0] != 0;
+            }
+        }
+
+        /* COPY THE VALUE OF ANY DEFINED PARAMETERS FROM THE HTTP
          * PARAMETERS INTO THE SPECIFIED JACL INTEGER ELEMENTS */
         update_parameters();
 
@@ -1135,12 +1254,32 @@ read_config_file()
             if (word[1] != NULL) {
                 strncpy(cookie_expiry, word[1], 80);
             }
+        } else if (!strcmp(word[0], "google_client_id")) {
+            if (word[1] != NULL) {
+                strncpy(google_client_id_cfg, word[1],
+                        sizeof(google_client_id_cfg) - 1);
+                google_client_id_cfg[sizeof(google_client_id_cfg) - 1] = 0;
+            }
+        } else if (!strcmp(word[0], "session_secret")) {
+            if (word[1] != NULL) {
+                strncpy(session_secret_cfg, word[1],
+                        sizeof(session_secret_cfg) - 1);
+                session_secret_cfg[sizeof(session_secret_cfg) - 1] = 0;
+            }
+        } else if (!strcmp(word[0], "session_max_age")) {
+            if (word[1] != NULL) {
+                session_max_age_cfg = strtol(word[1], NULL, 10);
+            }
         }
         fgets(text_buffer, 80, file);
     }
 
     fclose(file);
     file = NULL;
+
+    auth_configure(google_client_id_cfg,
+                   session_secret_cfg,
+                   session_max_age_cfg);
 }
 
 void
