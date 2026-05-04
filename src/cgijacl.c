@@ -188,7 +188,7 @@ main(int argc, char *argv[])
 {
     int             index;
     char           *last_slash;
-    short int       returning_player;
+    short int       returning_player = FALSE;
 
     time_t          tnow;
     time_t          current_last_modified,
