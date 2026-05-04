@@ -153,6 +153,14 @@ read_gamefile()
     create_cinteger ("GLK", 0);
     create_cinteger ("CGI", 1);
     create_cinteger ("NDS", 2);
+
+    /* Optional Google Sign-In state. cgijacl writes these on each
+     * request before parsing user commands; on GLK / console builds
+     * they stay at their defaults so games can branch on them
+     * without ifdefs. */
+    create_cinteger ("google_signed_in", 0);
+    create_cstring  ("google_sub", "");
+    create_cstring  ("google_client_id", "");
 #ifdef GLK
     create_cinteger ("interpreter", 0);
 #else

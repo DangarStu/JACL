@@ -169,6 +169,58 @@ else
 fi
 
 # -----------------------------------------------------------
+# Optional Google Sign-In dependencies for fcgijacl / cgijacl.
+# Requires libcurl + jansson + openssl. Without all three present
+# fcgijacl still builds, but auth_stub.c provides no-op auth_*
+# entry points and the anonymous flow is the only one available.
+# -----------------------------------------------------------
+AUTH_CFLAGS=""
+AUTH_LIBS=""
+AUTH_SRC="auth_stub.c"
+HAVE_GOOGLE_AUTH=no
+
+AC_CHECK_PROG([HAVE_PKG_CONFIG], [pkg-config], [yes], [no])
+if test "$HAVE_PKG_CONFIG" = "yes"; then
+    if pkg-config --exists libcurl jansson openssl 2>/dev/null; then
+        save_CFLAGS="$CFLAGS"
+        save_LDFLAGS="$LDFLAGS"
+        AUTH_CFLAGS=`pkg-config --cflags libcurl jansson openssl`
+        AUTH_LIBS=`pkg-config --libs   libcurl jansson openssl`
+        CFLAGS="$CFLAGS $AUTH_CFLAGS"
+        LDFLAGS="$LDFLAGS $AUTH_LIBS"
+        AC_MSG_CHECKING([whether auth.c builds against libcurl/jansson/openssl])
+        AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+            #include <curl/curl.h>
+            #include <jansson.h>
+            #include <openssl/evp.h>
+            #include <openssl/hmac.h>
+        ]], [[
+            curl_easy_init(); json_loads("",0,0); EVP_sha256();
+        ]])],
+        [HAVE_GOOGLE_AUTH=yes; AUTH_SRC="auth.c"; AC_MSG_RESULT([yes])],
+        [AC_MSG_RESULT([no])])
+        CFLAGS="$save_CFLAGS"
+        LDFLAGS="$save_LDFLAGS"
+    fi
+fi
+
+if test "$HAVE_GOOGLE_AUTH" != "yes"; then
+    AUTH_CFLAGS=""
+    AUTH_LIBS=""
+fi
+
+AC_SUBST([AUTH_CFLAGS])
+AC_SUBST([AUTH_LIBS])
+AC_SUBST([AUTH_SRC])
+
+if test "$HAVE_GOOGLE_AUTH" = "yes"; then
+    AC_MSG_NOTICE([libcurl + jansson + openssl found -- Google Sign-In enabled in fcgijacl])
+else
+    AC_MSG_NOTICE([Google Sign-In disabled (need libcurl, jansson, openssl)])
+    AC_MSG_NOTICE([  Debian/Ubuntu: sudo apt install libcurl4-openssl-dev libjansson-dev libssl-dev])
+fi
+
+# -----------------------------------------------------------
 # Build the target list
 # -----------------------------------------------------------
 BUILD_TARGETS="bjorb cgijacl"

@@ -12,6 +12,9 @@ NCURSES_CFLAGS = @NCURSES_CFLAGS@
 NCURSES_LIBS = @NCURSES_LIBS@
 FCGI_CFLAGS = @FCGI_CFLAGS@
 FCGI_LIBS = @FCGI_LIBS@
+AUTH_CFLAGS = @AUTH_CFLAGS@
+AUTH_LIBS = @AUTH_LIBS@
+AUTH_SRC = @AUTH_SRC@
 
 # Source files
 COMMON_SRC = @COMMON_SRC@
@@ -31,11 +34,11 @@ jacl: libglkterm.a
 
 # Cgijacl target (CGI web)
 cgijacl: libcgihtml.a webjacl.o
-	$(CC) $(CFLAGS) -DWEBJACL cgijacl.c $(COMMON_SRC) saver.c webjacl.o -I$(CGIHTML_DIR) -Iwebjacl -L$(CGIHTML_DIR) -lcgihtml -lm -o cgijacl
+	$(CC) $(CFLAGS) $(AUTH_CFLAGS) -DWEBJACL cgijacl.c $(AUTH_SRC) $(COMMON_SRC) saver.c webjacl.o -I$(CGIHTML_DIR) -Iwebjacl -L$(CGIHTML_DIR) -lcgihtml $(AUTH_LIBS) -lm -o cgijacl
 
 # Fcgijacl target (FastCGI web, requires libfcgi)
 fcgijacl: libcgihtml.a
-	$(CC) $(CFLAGS) -DFCGIJACL cgijacl.c $(COMMON_SRC) saver.c -I$(CGIHTML_DIR) -L$(CGIHTML_DIR) -lcgihtml $(FCGI_CFLAGS) $(FCGI_LIBS) -lm -o fcgijacl
+	$(CC) $(CFLAGS) $(AUTH_CFLAGS) -DFCGIJACL cgijacl.c $(AUTH_SRC) $(COMMON_SRC) saver.c -I$(CGIHTML_DIR) -L$(CGIHTML_DIR) -lcgihtml $(FCGI_CFLAGS) $(FCGI_LIBS) $(AUTH_LIBS) -lm -o fcgijacl
 
 # webjacl.o target
 webjacl.o: webjacl.c webjacl.h language.h
@@ -76,6 +79,8 @@ apache: install
 	else \
 		echo "mod_fcgid already enabled."; \
 	fi
+	@echo "Ensuring optional Google Sign-In dependencies are available..."
+	@apt-get install -y libcurl4-openssl-dev libjansson-dev libssl-dev 2>&1 | tail -3 || true
 	@mkdir -p /usr/local/jacl/fcgi-bin
 	@echo "Creating wrapper scripts..."
 	@cp ../projects/*.jacl /usr/local/jacl/projects/ 2>/dev/null || true

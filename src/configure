@@ -597,12 +597,15 @@ ac_subst_vars='LTLIBOBJS
 LIBOBJS
 INSTALL_CMDS
 BUILD_TARGETS
+AUTH_SRC
+AUTH_LIBS
+AUTH_CFLAGS
+HAVE_PKG_CONFIG
 FCGI_LIBS
 FCGI_CFLAGS
 NCURSES_LIBS
 NCURSES_CFLAGS
 COMMON_SRC
-CHEAPGLK_DIR
 GLKTERM_DIR
 CGIHTML_DIR
 AR
@@ -1284,7 +1287,7 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-language=LANG    set interpreter language: english (default), french,
-                          german, indonesian
+                          german, indonesian, spanish
 
 Some influential environment variables:
   CC          C compiler command
@@ -3581,6 +3584,37 @@ if test "x$USER_CFLAGS_SET" = "x"; then
     CFLAGS="-Wall -O2"
 fi
 
+# Suppress warnings that are false positives or from third-party code.
+# These flags are gcc-specific so check before adding them.
+for wflag in -Wno-unused-result -Wno-stringop-truncation -Wno-unused-but-set-variable; do
+    save_CFLAGS="$CFLAGS"
+    CFLAGS="$CFLAGS $wflag"
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC supports $wflag" >&5
+printf %s "checking whether $CC supports $wflag... " >&6; }
+
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+else case e in #(
+  e) { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }; CFLAGS="$save_CFLAGS" ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+done
+
 # -----------------------------------------------------------
 # Language selection
 # -----------------------------------------------------------
@@ -3600,39 +3634,17 @@ case "$jacl_language" in
     german)      LANGUAGE_FLAG="-DNATIVE_LANGUAGE=2" ;;
     french)      LANGUAGE_FLAG="-DNATIVE_LANGUAGE=3" ;;
     indonesian)  LANGUAGE_FLAG="-DNATIVE_LANGUAGE=4" ;;
-    *)  as_fn_error $? "unknown language \"$jacl_language\" (choose: english, french, german, indonesian)" "$LINENO" 5 ;;
+    spanish)     LANGUAGE_FLAG="-DNATIVE_LANGUAGE=5" ;;
+    *)  as_fn_error $? "unknown language \"$jacl_language\" (choose: english, french, german, indonesian, spanish)" "$LINENO" 5 ;;
 esac
 
 CFLAGS="$CFLAGS $LANGUAGE_FLAG"
 { printf '%s\n' "$as_me:${as_lineno-$LINENO}: interpreter language: $jacl_language" >&5
 printf '%s\n' "$as_me: interpreter language: $jacl_language" >&6;}
 
-# Suppress warnings that are false positives or from third-party code.
-# These flags are gcc-specific so check before adding them.
-for wflag in -Wno-unused-result -Wno-stringop-truncation -Wno-unused-but-set-variable; do
-    save_CFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS $wflag"
-    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC supports $wflag" >&5
-printf %s "checking whether $CC supports $wflag... " >&6; }
-    cat > conftest.c <<_ACEOF
-int main(void) { return 0; }
-_ACEOF
-    if $CC $CFLAGS -Werror conftest.c -o conftest >/dev/null 2>&1; then
-        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf '%s\n' "yes" >&6; }
-    else
-        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf '%s\n' "no" >&6; }
-        CFLAGS="$save_CFLAGS"
-    fi
-    rm -f conftest.c conftest
-done
-
 # Directories for bundled libraries
 CGIHTML_DIR=cgihtml-1.69
 GLKTERM_DIR=glkterm
-
-
 
 
 
@@ -3643,7 +3655,6 @@ COMMON_SRC="findroute.c interpreter.c loader.c logging.c parser.c display.c util
 # -----------------------------------------------------------
 # Check for math library (always required)
 # -----------------------------------------------------------
-
 { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for library containing floor" >&5
 printf %s "checking for library containing floor... " >&6; }
 if test ${ac_cv_search_floor+y}
@@ -3814,14 +3825,14 @@ fi
 
 # -----------------------------------------------------------
 # Check for libfcgi (needed for fcgijacl)
-# Check that we can both #include <fcgi_stdio.h> and link against
-# -lfcgi. On Debian/Ubuntu the libfcgi-dev headers live in
-# /usr/include/fastcgi/, not /usr/include/.
 # -----------------------------------------------------------
 FCGI_CFLAGS=""
 FCGI_LIBS=""
 HAVE_FCGI=no
 
+# Try common include and lib path combinations. On Debian/Ubuntu the
+# headers from libfcgi-dev are installed to /usr/include/fastcgi/
+# rather than /usr/include/.
 for fcgi_inc in /opt/homebrew/include /usr/local/include /usr/include/fastcgi /usr/include ""; do
     for fcgi_lib in /opt/homebrew/lib /usr/local/lib ""; do
         if test -n "$fcgi_inc"; then
@@ -3835,30 +3846,45 @@ for fcgi_inc in /opt/homebrew/include /usr/local/include /usr/include/fastcgi /u
             test_ldflags=""
         fi
 
-        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for fcgi_stdio.h and libfcgi ($test_cflags $test_ldflags)" >&5
-printf %s "checking for fcgi_stdio.h and libfcgi ($test_cflags $test_ldflags)... " >&6; }
+        save_CFLAGS="$CFLAGS"
+        save_LDFLAGS="$LDFLAGS"
+        CFLAGS="$CFLAGS $test_cflags"
+        LDFLAGS="$LDFLAGS $test_ldflags"
 
-        cat > conftest.$ac_ext <<_ACEOF
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for fcgi_stdio.h and libfcgi in ($test_cflags $test_ldflags)" >&5
+printf %s "checking for fcgi_stdio.h and libfcgi in ($test_cflags $test_ldflags)... " >&6; }
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
 #include <fcgi_stdio.h>
-int main(void) { FCGI_Accept(); return 0; }
+int
+main (void)
+{
+FCGI_Accept();
+  ;
+  return 0;
+}
 _ACEOF
-
-        if $CC $CFLAGS $test_cflags conftest.$ac_ext $test_ldflags -lfcgi -o conftest$ac_exeext >/dev/null 2>&1; then
-            HAVE_FCGI=yes
-            FCGI_CFLAGS="$test_cflags"
-            if test -n "$test_ldflags"; then
-                FCGI_LIBS="$test_ldflags -lfcgi"
-            else
-                FCGI_LIBS="-lfcgi"
-            fi
-            { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+if ac_fn_c_try_link "$LINENO"
+then :
+  HAVE_FCGI=yes
+             { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf '%s\n' "yes" >&6; }
-        else
-            { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf '%s\n' "no" >&6; }
-        fi
+             FCGI_CFLAGS="$test_cflags"
+             if test -n "$test_ldflags"; then
+                 FCGI_LIBS="$test_ldflags -lfcgi"
+             else
+                 FCGI_LIBS="-lfcgi"
+             fi
+else case e in #(
+  e) { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; } ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
 
-        rm -f conftest.$ac_ext conftest$ac_exeext conftest.o
+        CFLAGS="$save_CFLAGS"
+        LDFLAGS="$save_LDFLAGS"
 
         if test "$HAVE_FCGI" = "yes"; then
             break
@@ -3878,8 +3904,124 @@ printf '%s\n' "$as_me: libfcgi found -- will build fcgijacl" >&6;}
 else
     { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: libfcgi not found -- fcgijacl will not be built" >&5
 printf '%s\n' "$as_me: WARNING: libfcgi not found -- fcgijacl will not be built" >&2;}
-    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: On Debian/Ubuntu install with: sudo apt install libfcgi-dev" >&5
-printf '%s\n' "$as_me: WARNING: On Debian/Ubuntu install with: sudo apt install libfcgi-dev" >&2;}
+fi
+
+# -----------------------------------------------------------
+# Optional Google Sign-In dependencies for fcgijacl / cgijacl.
+# Requires libcurl + jansson + openssl. Without all three present
+# fcgijacl still builds, but auth_stub.c provides no-op auth_*
+# entry points and the anonymous flow is the only one available.
+# -----------------------------------------------------------
+AUTH_CFLAGS=""
+AUTH_LIBS=""
+AUTH_SRC="auth_stub.c"
+HAVE_GOOGLE_AUTH=no
+
+# Extract the first word of "pkg-config", so it can be a program name with args.
+set dummy pkg-config; ac_word=$2
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+printf %s "checking for $ac_word... " >&6; }
+if test ${ac_cv_prog_HAVE_PKG_CONFIG+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) if test -n "$HAVE_PKG_CONFIG"; then
+  ac_cv_prog_HAVE_PKG_CONFIG="$HAVE_PKG_CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
+    ac_cv_prog_HAVE_PKG_CONFIG="yes"
+    printf '%s\n' "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_prog_HAVE_PKG_CONFIG" && ac_cv_prog_HAVE_PKG_CONFIG="no"
+fi ;;
+esac
+fi
+HAVE_PKG_CONFIG=$ac_cv_prog_HAVE_PKG_CONFIG
+if test -n "$HAVE_PKG_CONFIG"; then
+  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $HAVE_PKG_CONFIG" >&5
+printf '%s\n' "$HAVE_PKG_CONFIG" >&6; }
+else
+  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+fi
+
+
+if test "$HAVE_PKG_CONFIG" = "yes"; then
+    if pkg-config --exists libcurl jansson openssl 2>/dev/null; then
+        save_CFLAGS="$CFLAGS"
+        save_LDFLAGS="$LDFLAGS"
+        AUTH_CFLAGS=`pkg-config --cflags libcurl jansson openssl`
+        AUTH_LIBS=`pkg-config --libs   libcurl jansson openssl`
+        CFLAGS="$CFLAGS $AUTH_CFLAGS"
+        LDFLAGS="$LDFLAGS $AUTH_LIBS"
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether auth.c builds against libcurl/jansson/openssl" >&5
+printf %s "checking whether auth.c builds against libcurl/jansson/openssl... " >&6; }
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+            #include <curl/curl.h>
+            #include <jansson.h>
+            #include <openssl/evp.h>
+            #include <openssl/hmac.h>
+
+int
+main (void)
+{
+
+            curl_easy_init(); json_loads("",0,0); EVP_sha256();
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  HAVE_GOOGLE_AUTH=yes; AUTH_SRC="auth.c"; { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+else case e in #(
+  e) { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; } ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+        CFLAGS="$save_CFLAGS"
+        LDFLAGS="$save_LDFLAGS"
+    fi
+fi
+
+if test "$HAVE_GOOGLE_AUTH" != "yes"; then
+    AUTH_CFLAGS=""
+    AUTH_LIBS=""
+fi
+
+
+
+
+
+if test "$HAVE_GOOGLE_AUTH" = "yes"; then
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: libcurl + jansson + openssl found -- Google Sign-In enabled in fcgijacl" >&5
+printf '%s\n' "$as_me: libcurl + jansson + openssl found -- Google Sign-In enabled in fcgijacl" >&6;}
+else
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: Google Sign-In disabled (need libcurl, jansson, openssl)" >&5
+printf '%s\n' "$as_me: Google Sign-In disabled (need libcurl, jansson, openssl)" >&6;}
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}:   Debian/Ubuntu: sudo apt install libcurl4-openssl-dev libjansson-dev libssl-dev" >&5
+printf '%s\n' "$as_me:   Debian/Ubuntu: sudo apt install libcurl4-openssl-dev libjansson-dev libssl-dev" >&6;}
 fi
 
 # -----------------------------------------------------------
