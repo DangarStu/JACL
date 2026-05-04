@@ -405,7 +405,7 @@ print:
       if (!jaclMapPopup) return null;^
       var w = jaclMapPopup;^
       w.document.open();^
-      w.document.write("<!doctype html><html lang='en'><head><meta charset='utf-8'><title>Map</title><style>html,body{margin:0;padding:0;background:" + (window.jaclMapBg || '#eee') + ";font-family:Georgia,Palatino,Times,serif;}#jacl_map{display:inline-block;}</style><script src='/include/raphael.min.js'><\/script></head><body><div id='jacl_map'></div></body></html>");^
+      w.document.write("<!doctype html><html lang='en'><head><meta charset='utf-8'><title>Map</title><style>html,body{margin:0;padding:0;background:" + (window.jaclMapBg || '#eee') + ";font-family:Georgia,Palatino,Times,serif;}#jacl_map{display:inline-block;}</style><script src='/include/raphael.min.js'><\/script><script>function jaclWrapMapLabel(paper, x, y, text, maxW){if(!maxW)maxW=70;var t=paper.text(x,y,text);if(t.getBBox().width<=maxW)return t;var words=text.split(' ');if(words.length<2)return t;var lines=[];var current=words[0];for(var i=1;i<words.length;i++){var trial=current+' '+words[i];t.attr('text',trial);if(t.getBBox().width<=maxW){current=trial;}else{lines.push(current);current=words[i];}}lines.push(current);t.attr('text',lines.join('\\n'));return t;}<\/script></head><body><div id='jacl_map'></div></body></html>");^
       w.document.close();^
       return w;^
    }^

@@ -435,39 +435,15 @@ select LOCATION map_here
    endif
 
    # CENTRE THE LABEL. map_x/map_y are still the rect's top-left, so
-   # add half the node size (40) to reach the rect's centre.
+   # add half the node size (40) to reach the rect's centre. The
+   # popup-side helper jaclWrapMapLabel measures the rendered text
+   # width and greedy-wraps onto multiple lines so long location
+   # names don't overflow the 80-px node.
    set map_x + 40
    set map_y + 40
-   # Two separate paper.text calls for multi-word labels -- safer than
-   # trying to embed a newline inside a JS string literal (whose
-   # escaping through JACL's write/print layers is finicky). Top line
-   # shifted up 9 px, bottom line shifted down 9 px, giving ~18 px
-   # total line-height inside the 80-px node.
-   split map_word_count map_here{The} " " map_label_parts
-   if map_word_count < 2
-      write "paper.text(" map_x ", " map_y ", ~"
-      write map_here{The}
-      write "~);"
-   else
-      set map_label_y = map_y
-      set map_label_y - 9
-      write "paper.text(" map_x ", " map_label_y ", ~"
-      set map_word_index = 0
-      write map_label_parts[map_word_index]
-      write "~);"
-      set map_label_y = map_y
-      set map_label_y + 9
-      write "paper.text(" map_x ", " map_label_y ", ~"
-      set map_word_index = 1
-      repeat
-         write map_label_parts[map_word_index]
-         set map_word_index + 1
-         if map_word_index < map_word_count
-            write " "
-         endif
-      until map_word_index = map_word_count
-      write "~);"
-   endif
+   write "jaclWrapMapLabel(paper, " map_x ", " map_y ", ~"
+   write map_here{The}
+   write "~);"
    endif
 endselect
 }
