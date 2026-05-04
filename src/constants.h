@@ -169,3 +169,5 @@
 #define SUBHEADER				5
 #define REVERSE					6
 #define PRE						7
+#define ALERT					8
+#define QUOTE					9

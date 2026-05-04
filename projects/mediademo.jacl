@@ -20,6 +20,24 @@ constant linkbar_colour   "#4f607a"
 constant maintext_colour  "#eeeae0"
 
 # -----------------------------------------------------------------------------
+# STYLE HINTS
+# -----------------------------------------------------------------------------
+# Recolour the JACL styles used in this game. Top-level stylehint
+# declarations are recorded once at load time and applied before any Glk
+# window opens; on the web they emit inline CSS on the corresponding HTML
+# tag whenever 'style <name>' is invoked. See guide/multimedia.html for the
+# full list of attributes and named colours.
+
+stylehint header     textcolor "white"
+stylehint header     backcolor "#3a4a5e"
+stylehint subheader  textcolor "yellow"
+stylehint note       textcolor "lightgray"
+stylehint reverse    textcolor "white"
+stylehint reverse    backcolor "red"
+stylehint alert      textcolor "orange"
+stylehint quote      textcolor "lightgray"
+
+# -----------------------------------------------------------------------------
 # BLORB RESOURCE IDS  (must match mediademo.blc)
 # -----------------------------------------------------------------------------
 
@@ -368,9 +386,14 @@ endif
 style header
 write "^ " game_title "^"
 style normal
-write "by " game_author ", release " game_release "/" game_build "^^"
+style note
+write "by " game_author ", release " game_release "/" game_build "^"
+style normal
+write "^"
 if sound_supported = true
+   style alert
    write "Would you like sound effects? (yes/no)^"
+   style normal
    getyesorno sound_choice
    if interpreter <> CGI
       if sound_choice = false
@@ -390,8 +413,15 @@ print:
    ambient sound on the background channel, one-shot foreground sound,
    a sustained loop on a separate channel, multi-channel mixing, volume
    control, and movement between rooms.^^
-
-   Quick tour:
+.
+style quote
+write "Note: every coloured snippet you see is driven by a stylehint declaration at the top of mediademo.jacl. Edit the colours there to retheme the game without touching the prose.^"
+style normal
+write "^"
+style subheader
+write "Quick tour:^"
+style normal
+print:
    ^- You start in the Hut with looping rain on the background channel.
    ^- Go ~south~ to the Clearing. The background ambient crossfades
    from rain to a cloud of flies. Try ~ring bell~ and ~thunder~ for

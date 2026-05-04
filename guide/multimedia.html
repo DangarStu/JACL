@@ -207,7 +207,7 @@ endif
 
 <h2><a class="section" name="multimedia7">The STYLE Command</a></h2>
 
-<p>The <b>style</b> command is used to output either ANSI terminal codes or set Glk styles depending on the interpreter being used. The <b>style</b> command accepts a single string containing the name of the style to set. Here is an example of using the <b>style</b> command to output some bold text:
+<p>The <b>style</b> command is used to change the appearance of subsequent text output. Depending on the interpreter being used, it sets a Glk stream style, emits ANSI terminal codes, or writes an HTML tag. The <b>style</b> command accepts a single string containing the name of the style to set. Here is an example of using the <b>style</b> command to output some bold text:
 
 <pre>
 style bold
@@ -215,48 +215,136 @@ write "This is bold.^"
 style normal
 </pre>
 
-<p>Below is a table showing styles available in JACL and the Glk styles they map to:
+<p>Below is a table showing the styles available in JACL and how each one is rendered by the Glk and web (<b>cgijacl</b> / <b>fcgijacl</b>) interpreters:
 
 <center>
-<table width=80%>
+<table width=90%>
 <tr>
 	<th>JACL Style</th>
-	<th>Glk Style</Th>
+	<th>Glk Style</th>
+	<th>Web (HTML)</th>
 </tr>
 <tr>
-	<td>bold</td>
+	<td>bold (or emphasised)</td>
 	<td>style_Emphasized</td>
+	<td>&lt;b&gt;</td>
 </tr>
 <tr>
 	<td>note</td>
 	<td>style_Note</td>
+	<td>&lt;i&gt;</td>
 </tr>
 <tr>
 	<td>input</td>
 	<td>style_Input</td>
+	<td>&lt;i&gt;</td>
 </tr>
 <tr>
 	<td>header</td>
 	<td>style_Header</td>
+	<td>&lt;h1&gt;</td>
 </tr>
 <tr>
 	<td>subheader</td>
 	<td>style_Subheader</td>
+	<td>&lt;h2&gt;</td>
 </tr>
 <tr>
-	<td>reverse</td>
-	<td>style_Note</td>
+	<td>reverse (or inverse)</td>
+	<td>style_User1 / style_User2</td>
+	<td>&lt;b&gt;</td>
 </tr>
 <tr>
-	<td>pre</td>
+	<td>pre (or preformatted)</td>
 	<td>style_Preformatted</td>
+	<td>&lt;pre&gt;</td>
+</tr>
+<tr>
+	<td>alert</td>
+	<td>style_Alert</td>
+	<td>&lt;strong&gt;</td>
+</tr>
+<tr>
+	<td>quote (or blockquote)</td>
+	<td>style_BlockQuote</td>
+	<td>&lt;blockquote&gt;</td>
 </tr>
 <tr>
 	<td>normal</td>
 	<td>style_Normal</td>
+	<td>closes all open style tags</td>
 </tr>
 </table>
 </center>
+
+<p>The <b>alert</b> and <b>quote</b> styles are extra colourable buckets exposed by JACL and have no built-in default beyond what the interpreter chooses; pair them with <b>stylehint</b> declarations (see below) to give them a colour appropriate to your game.
+
+<p>A few things to keep in mind when targeting the web interpreters:
+
+<ul>
+<li>Styles nest. Each non-<b>normal</b> style pushes its tag onto an internal stack and writes the opening tag immediately. Issuing <b>style normal</b> pops the entire stack, closing every open tag in reverse order. There is no way to close just the most recent style; <b>normal</b> is always a full reset.
+<li>Because <b>header</b> and <b>subheader</b> emit <b>&lt;h1&gt;</b> and <b>&lt;h2&gt;</b>, they introduce HTML block-level breaks in the rendered transcript. Under Glk they are simply a styled run of text.
+<li><b>reverse</b> and <b>inverse</b> select <b>style_User2</b> in the main window and <b>style_User1</b> in the status window under Glk; both render as bold on the web.
+</ul>
+
+<h2><a class="section" name="stylehint">The STYLEHINT Declaration</a></h2>
+
+<p>The default appearance of each style is up to the interpreter and the user's preferences. To recolour a style for your game, use the top-level <b>stylehint</b> declaration. Like <b>constant</b>, <b>stylehint</b> sits outside any function block and is processed once when the game file is loaded -- before any windows are opened. This is the only place colour can be set, because the Glk specification only honours style hints that are recorded before window creation.
+
+<pre>
+stylehint header textcolor "white"
+stylehint header backcolor "darkblue"
+stylehint note textcolor "#00ccff"
+stylehint reverse textcolor "white"
+stylehint reverse backcolor "red"
+</pre>
+
+<p>The general form is:
+
+<pre>
+stylehint &lt;style&gt; &lt;attribute&gt; &lt;value&gt;
+</pre>
+
+<p>Where <b>&lt;style&gt;</b> is one of the JACL style names from the table above (<b>bold</b>, <b>note</b>, <b>input</b>, <b>header</b>, <b>subheader</b>, <b>reverse</b>, <b>pre</b>, <b>alert</b>, or <b>quote</b>; the synonyms <b>emphasised</b>, <b>inverse</b>, <b>preformatted</b>, and <b>blockquote</b> are also accepted), <b>&lt;attribute&gt;</b> is one of:
+
+<center>
+<table width=80%>
+<tr>
+	<th>Attribute</th>
+	<th>Aliases</th>
+	<th>Meaning</th>
+</tr>
+<tr>
+	<td>textcolor</td>
+	<td>color, colour</td>
+	<td>Foreground (text) colour for the style.</td>
+</tr>
+<tr>
+	<td>backcolor</td>
+	<td>background, bgcolor</td>
+	<td>Background colour for the style.</td>
+</tr>
+<tr>
+	<td>reverse</td>
+	<td>reversecolor</td>
+	<td>An integer flag (0 or 1) requesting the interpreter to swap foreground and background for the style. Glk-only; ignored on the web.</td>
+</tr>
+</table>
+</center>
+
+<p>And <b>&lt;value&gt;</b> for the colour attributes is either a named colour or a quoted hex string of the form <b>&quot;#rrggbb&quot;</b> or <b>&quot;#rgb&quot;</b>. The recognised colour names are:
+
+<p><b>black</b>, <b>white</b>, <b>red</b>, <b>green</b>, <b>blue</b>, <b>yellow</b>, <b>cyan</b>, <b>magenta</b>, <b>gray</b> (or <b>grey</b>), <b>lightgray</b> (<b>lightgrey</b>), <b>darkgray</b> (<b>darkgrey</b>), <b>orange</b>, <b>purple</b>, <b>brown</b>, and <b>pink</b>.
+
+<p>Behaviour by interpreter:
+
+<ul>
+<li><b>Glk</b>: each declaration is translated into a <b>glk_stylehint_set</b> call on both the buffer and grid window types before the windows are opened. The interpreter is free to ignore hints (some libraries always do, and the user's preferences usually win), and library support for colour varies; expect Gargoyle to honour them and a curses-based library like GlkTerm to ignore them.
+<li><b>Web (cgijacl, fcgijacl)</b>: the recorded colours are emitted as inline CSS on the corresponding HTML tag whenever the runtime <b>style</b> command opens it -- for example, <b>style header</b> with <b>stylehint header textcolor &quot;red&quot;</b> writes <b>&lt;h1 style=&quot;color: #cc0000;&quot;&gt;</b>. The <b>reverse</b> attribute has no web rendering.
+<li><b>Console</b>: the declarations are recorded but not used; the console interpreter falls back to the same ANSI escapes it uses when no hints are set.
+</ul>
+
+<p>The <b>reverse</b> JACL style is special: under Glk it sets style hints on the user-defined styles <b>style_User2</b> (main window) and <b>style_User1</b> (status window), since those are the slots the runtime <b>style reverse</b> command targets.
 
 <h2><a class="section" name="multimedia8">The Status Window</a></h2>
 

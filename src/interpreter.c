@@ -204,6 +204,93 @@ extern int                        note_mode;
 // VALUES FROM LOADER
 extern int                        value_resolved;
 
+stylehint_t                       jacl_stylehints[STYLEHINT_TABLE_SIZE];
+int                               jacl_stylehints_dirty = 0;
+
+int
+stylehint_index_from_name(const char *name)
+{
+    if (name == NULL) return -1;
+    if (!strcmp(name, "bold") || !strcmp(name, "emphasised")) return BOLD;
+    if (!strcmp(name, "note")) return NOTE;
+    if (!strcmp(name, "input")) return INPUT;
+    if (!strcmp(name, "header")) return HEADER;
+    if (!strcmp(name, "subheader")) return SUBHEADER;
+    if (!strcmp(name, "reverse") || !strcmp(name, "inverse")) return REVERSE;
+    if (!strcmp(name, "pre") || !strcmp(name, "preformatted")) return PRE;
+    if (!strcmp(name, "alert")) return ALERT;
+    if (!strcmp(name, "quote") || !strcmp(name, "blockquote")) return QUOTE;
+    return -1;
+}
+
+int
+stylehint_parse_color(const char *spec, unsigned long *out)
+{
+    static const struct { const char *name; unsigned long rgb; } named[] = {
+        {"black",     0x000000UL},
+        {"white",     0xffffffUL},
+        {"red",       0xcc0000UL},
+        {"green",     0x00aa00UL},
+        {"blue",      0x0000ccUL},
+        {"yellow",    0xcccc00UL},
+        {"cyan",      0x00ccccUL},
+        {"magenta",   0xcc00ccUL},
+        {"gray",      0x808080UL},
+        {"grey",      0x808080UL},
+        {"lightgray", 0xc0c0c0UL},
+        {"lightgrey", 0xc0c0c0UL},
+        {"darkgray",  0x404040UL},
+        {"darkgrey",  0x404040UL},
+        {"orange",    0xff8000UL},
+        {"purple",    0x800080UL},
+        {"brown",     0x804000UL},
+        {"pink",      0xff80c0UL},
+        {NULL, 0}
+    };
+    char buf[32];
+    size_t len, i;
+    int j;
+
+    if (spec == NULL || spec[0] == 0 || out == NULL) return -1;
+
+    if (spec[0] == '#') {
+        const char *hex = spec + 1;
+        unsigned long val = 0;
+        len = strlen(hex);
+        if (len != 3 && len != 6) return -1;
+        for (i = 0; i < len; i++) {
+            char c = hex[i];
+            int d;
+            if (c >= '0' && c <= '9') d = c - '0';
+            else if (c >= 'a' && c <= 'f') d = c - 'a' + 10;
+            else if (c >= 'A' && c <= 'F') d = c - 'A' + 10;
+            else return -1;
+            val = (val << 4) | (unsigned long) d;
+        }
+        if (len == 3) {
+            unsigned long r = (val >> 8) & 0xfUL;
+            unsigned long g = (val >> 4) & 0xfUL;
+            unsigned long b = val & 0xfUL;
+            val = (r << 20) | (r << 16) | (g << 12) | (g << 8) | (b << 4) | b;
+        }
+        *out = val;
+        return 0;
+    }
+
+    len = strlen(spec);
+    if (len >= sizeof(buf)) return -1;
+    for (i = 0; i <= len; i++) {
+        buf[i] = (char) tolower((unsigned char) spec[i]);
+    }
+    for (j = 0; named[j].name != NULL; j++) {
+        if (!strcmp(buf, named[j].name)) {
+            *out = named[j].rgb;
+            return 0;
+        }
+    }
+    return -1;
+}
+
 char                              integer_buffer[16];
 static char                        called_name[1024];
 static char                        scope_criterion[24];
@@ -1208,12 +1295,17 @@ execute(const char *funcname)
                         } else {
                             glk_set_style(style_User1);
                         }
-                    } else if (!strcmp(word[1], "pre") 
+                    } else if (!strcmp(word[1], "pre")
                                 || !strcmp(word[1], "preformatted")) {
                         glk_set_style(style_Preformatted);
+                    } else if (!strcmp(word[1], "alert")) {
+                        glk_set_style(style_Alert);
+                    } else if (!strcmp(word[1], "quote")
+                                || !strcmp(word[1], "blockquote")) {
+                        glk_set_style(style_BlockQuote);
                     } else if (!strcmp(word[1], "normal")) {
                         glk_set_style(style_Normal);
-                    } 
+                    }
                 }
             } else if (!strcmp(word[0], "flush")) {
             } else if (!strcmp(word[0], "hyperlink")) {
@@ -1341,10 +1433,15 @@ execute(const char *funcname)
                                 || !strcmp(word[1], "inverse")) {
                         printf("\x1b[7m");    // SET TO DIM WHITE
                         reverse_mode = TRUE;
-                    } else if (!strcmp(word[1], "pre") 
+                    } else if (!strcmp(word[1], "pre")
                                 || !strcmp(word[1], "preformatted")) {
                         printf("\x1b[37;0m");     // SET TO DIM WHITE
                         pre_mode = TRUE;
+                    } else if (!strcmp(word[1], "alert")) {
+                        printf("\x1b[31;1m");     // SET TO BRIGHT RED
+                    } else if (!strcmp(word[1], "quote")
+                                || !strcmp(word[1], "blockquote")) {
+                        printf("\x1b[36;1m");     // SET TO BRIGHT CYAN
                     } else if (!strcmp(word[1], "normal")) {
                         printf("\x1b[37;0m");     // SET TO DIM WHITE
                         bold_mode = FALSE;
@@ -1353,7 +1450,7 @@ execute(const char *funcname)
                         input_mode = FALSE;
                         subheader_mode = FALSE;
                         note_mode = FALSE;
-                    } 
+                    }
                 }
             } else if (!strcmp(word[0], "hyperlink")) {
                 /* OUTPUT LINK TEXT AS PLAIN TEXT UNDER Glk */
@@ -1504,30 +1601,41 @@ execute(const char *funcname)
                     noproprun();
                     return(exit_function (TRUE));
                 } else {
-                    if (!strcmp(word[1], "bold") 
-                                || !strcmp(word[1], "emphasised")) {
-                        write_text("<b>");
-                        style_stack[style_index++] = BOLD;
-                    } else if (!strcmp(word[1], "note")) {
-                        write_text("<i>");
-                        style_stack[style_index++] = NOTE;
-                    } else if (!strcmp(word[1], "input")) {
-                        write_text("<i>");
-                        style_stack[style_index++] = INPUT;
-                    } else if (!strcmp(word[1], "header")) {
-                        write_text("<h1>");
-                        style_stack[style_index++] = HEADER;
-                    } else if (!strcmp(word[1], "subheader")) {
-                        write_text("<h2>");
-                        style_stack[style_index++] = SUBHEADER;
-                    } else if (!strcmp(word[1], "reverse")
-                                || !strcmp(word[1], "inverse")) {
-                        write_text("<b>");
-                        style_stack[style_index++] = REVERSE;
-                    } else if (!strcmp(word[1], "pre") 
-                                || !strcmp(word[1], "preformatted")) {
-                        write_text("<pre>");
-                        style_stack[style_index++] = PRE;
+                    int sidx = stylehint_index_from_name(word[1]);
+                    const char *open_tag = NULL;
+                    int push_kind = 0;
+
+                    if (sidx == BOLD)               { open_tag = "b";          push_kind = BOLD; }
+                    else if (sidx == NOTE)          { open_tag = "i";          push_kind = NOTE; }
+                    else if (sidx == INPUT)         { open_tag = "i";          push_kind = INPUT; }
+                    else if (sidx == HEADER)        { open_tag = "h1";         push_kind = HEADER; }
+                    else if (sidx == SUBHEADER)     { open_tag = "h2";         push_kind = SUBHEADER; }
+                    else if (sidx == REVERSE)       { open_tag = "b";          push_kind = REVERSE; }
+                    else if (sidx == PRE)           { open_tag = "pre";        push_kind = PRE; }
+                    else if (sidx == ALERT)         { open_tag = "strong";     push_kind = ALERT; }
+                    else if (sidx == QUOTE)         { open_tag = "blockquote"; push_kind = QUOTE; }
+
+                    if (open_tag != NULL) {
+                        stylehint_t *h = (sidx >= 0 && sidx < STYLEHINT_TABLE_SIZE)
+                                         ? &jacl_stylehints[sidx] : NULL;
+                        char tag_buffer[128];
+                        if (h != NULL && (h->has_text_color || h->has_back_color)) {
+                            char css[96];
+                            css[0] = 0;
+                            if (h->has_text_color) {
+                                sprintf(css + strlen(css), "color: #%06lx;",
+                                        h->text_color & 0xffffffUL);
+                            }
+                            if (h->has_back_color) {
+                                sprintf(css + strlen(css), "background-color: #%06lx;",
+                                        h->back_color & 0xffffffUL);
+                            }
+                            sprintf(tag_buffer, "<%s style=\"%s\">", open_tag, css);
+                        } else {
+                            sprintf(tag_buffer, "<%s>", open_tag);
+                        }
+                        write_text(tag_buffer);
+                        style_stack[style_index++] = push_kind;
                     } else if (!strcmp(word[1], "normal")) {
                         style_index--;
                         for(; style_index > -1; style_index--) {
@@ -1553,8 +1661,14 @@ execute(const char *funcname)
                                 case PRE:
                                     write_text("</pre>");
                                     break;
+                                case ALERT:
+                                    write_text("</strong>");
+                                    break;
+                                case QUOTE:
+                                    write_text("</blockquote>");
+                                    break;
                             }
-                        } 
+                        }
                         style_index = 0;
                     } 
                 }

@@ -467,6 +467,61 @@ read_gamefile()
                         index++;
                     }
                 }
+            } else if (!strcmp(word[0], "stylehint")) {
+                if (word[3] == NULL) {
+                    noproperr(line);
+                    errors++;
+                } else {
+                    int sidx = stylehint_index_from_name(word[1]);
+                    if (sidx < 0) {
+                        sprintf(error_buffer,
+                                "Line %d: stylehint: unknown style name '%s'.\n",
+                                line, word[1]);
+                        log_error(error_buffer, PLUS_STDERR);
+                        errors++;
+                    } else if (!strcmp(word[2], "textcolor")
+                               || !strcmp(word[2], "color")
+                               || !strcmp(word[2], "colour")) {
+                        unsigned long c;
+                        if (stylehint_parse_color(word[3], &c) != 0) {
+                            sprintf(error_buffer,
+                                    "Line %d: stylehint: cannot parse colour '%s'.\n",
+                                    line, word[3]);
+                            log_error(error_buffer, PLUS_STDERR);
+                            errors++;
+                        } else {
+                            jacl_stylehints[sidx].has_text_color = 1;
+                            jacl_stylehints[sidx].text_color = c;
+                            jacl_stylehints_dirty = 1;
+                        }
+                    } else if (!strcmp(word[2], "backcolor")
+                               || !strcmp(word[2], "background")
+                               || !strcmp(word[2], "bgcolor")) {
+                        unsigned long c;
+                        if (stylehint_parse_color(word[3], &c) != 0) {
+                            sprintf(error_buffer,
+                                    "Line %d: stylehint: cannot parse colour '%s'.\n",
+                                    line, word[3]);
+                            log_error(error_buffer, PLUS_STDERR);
+                            errors++;
+                        } else {
+                            jacl_stylehints[sidx].has_back_color = 1;
+                            jacl_stylehints[sidx].back_color = c;
+                            jacl_stylehints_dirty = 1;
+                        }
+                    } else if (!strcmp(word[2], "reverse")
+                               || !strcmp(word[2], "reversecolor")) {
+                        jacl_stylehints[sidx].has_reverse = 1;
+                        jacl_stylehints[sidx].reverse_value = atoi(word[3]) ? 1 : 0;
+                        jacl_stylehints_dirty = 1;
+                    } else {
+                        sprintf(error_buffer,
+                                "Line %d: stylehint: unknown attribute '%s'.\n",
+                                line, word[2]);
+                        log_error(error_buffer, PLUS_STDERR);
+                        errors++;
+                    }
+                }
             } else if (!strcmp(word[0], "attribute")) {
                 if (word[1] == NULL) {
                     noproperr(line);
@@ -832,6 +887,7 @@ read_gamefile()
         else if (!strcmp(word[0], "synonym"));
         else if (!strcmp(word[0], "grammar"));
         else if (!strcmp(word[0], "filter"));
+        else if (!strcmp(word[0], "stylehint"));
         else if (!strcmp(word[0], "has")) {
             if (word[1] == NULL) {
                 noproperr(line);
