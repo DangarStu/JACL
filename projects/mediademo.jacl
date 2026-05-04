@@ -31,6 +31,7 @@ constant sound_bell               4
 constant sound_generator_start    5
 constant sound_generator_run      6
 constant sound_thunder            7
+constant sound_flies              8
 
 constant loop                    -1
 
@@ -112,10 +113,20 @@ location clearing : clearing yard
 print:
    You stand in a grassy clearing between the hut to the north
    and a wooden lookout tower to the south. A heavy brass bell
-   hangs from a wooden frame in the middle of the clearing.^^
+   hangs from a wooden frame in the middle of the clearing. A
+   cloud of flies drifts in the warm air above the grass.^^
    Type ~ring bell~ to play a one-shot sound on the foreground
    channel. Type ~thunder~ to play a louder one-shot effect.^
 .
+}
+
+object clearing_flies : flies cloud fly buzzing
+ short     name "flies"
+ mass      scenery
+ parent    clearing
+
+{examine
+write "A drifting cloud of black flies, lazy in the sun.^"
 }
 
 object grass : grass grassy
@@ -175,7 +186,8 @@ location lookout : lookout tower platform
 print:
    You are on a wooden lookout tower. From here you can see the
    whole demo area. A small petrol generator sits in one corner.
-   A rolled-up map is pinned to the railing.^^
+   A rolled-up map is pinned to the railing. A swarm of flies
+   buzzes lazily in the warm air around the platform.^^
 .
 if generator_running = true
    write "The generator is running, humming steadily.^^"
@@ -187,6 +199,15 @@ print:
    any rain or bell sounds run on separate channels and should
    mix correctly.^
 .
+}
+
+object lookout_flies : flies swarm fly buzzing
+ short     name "flies"
+ mass      scenery
+ parent    lookout
+
+{examine
+write "A swarm of fat black flies buzzes around the tower, drawn by the warm boards.^"
 }
 
 object lookout_railing : railing rail wooden
@@ -264,15 +285,21 @@ if generator_running = true
    return
 endif
 set generator_running = true
-volume 80 generator_channel
 if interpreter = GLK
    sound sound_generator_start generator_channel
+endif
+execute "+generator_loop"
+write "You yank the cord. The generator coughs, catches, and settles "
+write "into a steady hum.^"
+}
+
+{+generator_loop
+volume 80 generator_channel
+if interpreter = GLK
    sound sound_generator_run generator_channel loop
 else
    sound "/sounds/GeneratorRunning.ogg" "audio/ogg" generator_channel loop
 endif
-write "You yank the cord. The generator coughs, catches, and settles "
-write "into a steady hum.^"
 }
 
 {+stop
@@ -302,6 +329,15 @@ else
 endif
 }
 
+{+start_flies
+volume 60 background_channel
+if interpreter = GLK
+   sound sound_flies background_channel loop
+else
+   sound "/sounds/Flies.ogg" "audio/ogg" background_channel loop
+endif
+}
+
 # -----------------------------------------------------------------------------
 # PLAYER
 # -----------------------------------------------------------------------------
@@ -321,6 +357,8 @@ if interpreter = CGI
 endif
 }
 
+integer sound_choice
+
 {+intro
 set player = kryten
 clear
@@ -331,6 +369,21 @@ style header
 write "^ " game_title "^"
 style normal
 write "by " game_author ", release " game_release "/" game_build "^^"
+if sound_supported = true
+   write "Would you like sound effects? (yes/no)^"
+   getyesorno sound_choice
+   if interpreter <> CGI
+      if sound_choice = false
+         set sound_enabled = false
+      endif
+      execute "+start_game"
+   endif
+else
+   execute "+start_game"
+endif
+}
+
+{+start_game
 print:
    This is a multimedia smoke-test for JACL interpreters. It exercises
    every feature an interpreter needs to handle: image display, looping
@@ -340,13 +393,18 @@ print:
 
    Quick tour:
    ^- You start in the Hut with looping rain on the background channel.
-   ^- Go ~south~ to the Clearing. Try ~ring bell~ and ~thunder~ for
+   ^- Go ~south~ to the Clearing. The background ambient crossfades
+   from rain to a cloud of flies. Try ~ring bell~ and ~thunder~ for
    foreground one-shots.
-   ^- Go ~south~ again to the Lookout. Try ~start generator~ for a
-   sustained loop, ~stop generator~ to silence it, and ~look at map~
-   to display the demo map image.
-   ^- ~map~ at any time shows the room map.^^
+   ^- Go ~south~ again to the Lookout (the flies follow you down
+   there). Try ~start generator~ for a sustained loop on its own
+   channel, ~stop generator~ to silence it, and ~look at map~ to
+   display the demo map image.
 .
+if interpreter = CGI
+   write "   - ~map~ at any time shows the room map.^"
+endif
+write "^"
 execute "+start_rain"
 look
 }
@@ -358,11 +416,32 @@ look
 # stream isn't interrupted. This also handles restored sessions: +intro
 # only fires for new sessions, so on a reloaded page +eachturn is what
 # brings the ambient back.
+#
+# total_moves is -1 during +intro and 0 on the first +eachturn (the one
+# fired right after the player answers the sound question). That's our
+# cue to honor sound_choice and run +start_game so the actual intro and
+# initial ambient appear only after the question is answered.
 {+eachturn
+if total_moves = 0
+   if interpreter = CGI
+      if sound_choice = false
+         set sound_enabled = false
+      endif
+      execute "+start_game"
+      return
+   endif
+endif
 if here = hut
    execute "+start_rain"
 else
-   sound 0 background_channel
+   execute "+start_flies"
+endif
+if generator_running = true
+   if here = lookout
+      execute "+generator_loop"
+   else
+      sound 0 generator_channel
+   endif
 endif
 }
 
