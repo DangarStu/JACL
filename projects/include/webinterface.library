@@ -83,17 +83,41 @@ print:
       });^
    }^
 
+   /* Per-game localStorage keys: prefix lookups with the game id so^
+    * a 'yes' to voice/sound in one game doesn't silently apply to^
+    * every other JACL game served from the same host. */^
+   function jaclLSKey(name) {^
+      return name + '_' + (window.jaclGameId || 'default');^
+   }^
+
    function enableSpeak() {^
-      localStorage.setItem('jaclSpeak', 'true');^
+      localStorage.setItem(jaclLSKey('jaclSpeak'), 'true');^
    }^
 
    function disableSpeak() {^
       speechSynthesis.cancel();^
-      localStorage.setItem('jaclSpeak', 'false');^
+      localStorage.setItem(jaclLSKey('jaclSpeak'), 'false');^
    }^
 
    function isSpeakEnabled() {^
-      return localStorage.getItem('jaclSpeak') === 'true';^
+      return localStorage.getItem(jaclLSKey('jaclSpeak')) === 'true';^
+   }^
+
+   function enableSound() {^
+      localStorage.setItem(jaclLSKey('jaclSound'), 'true');^
+   }^
+
+   function disableSound() {^
+      localStorage.setItem(jaclLSKey('jaclSound'), 'false');^
+      var maintext = document.getElementById('maintext');^
+      if (!maintext) return;^
+      maintext.querySelectorAll('audio').forEach(function(a) {^
+         try { a.pause(); a.remove(); } catch (e) {}^
+      });^
+   }^
+
+   function isSoundEnabled() {^
+      return localStorage.getItem(jaclLSKey('jaclSound')) === 'true';^
    }^
 
    function jaclGetVoicesForLang() {^
@@ -220,14 +244,14 @@ print:
    }^
 
    function jaclDeclineVoice() {^
-      localStorage.setItem('jaclSpeak', 'false');^
+      localStorage.setItem(jaclLSKey('jaclSpeak'), 'false');^
       var banner = document.getElementById('jaclVoiceOffer');^
       if (banner) banner.remove();^
    }^
 
    function jaclOfferVoice() {^
       if (!window.speechSynthesis) return;^
-      if (localStorage.getItem('jaclSpeak') !== null) return;^
+      if (localStorage.getItem(jaclLSKey('jaclSpeak')) !== null) return;^
       var main = document.getElementById('maintext');^
       if (!main) return;^
       var html = '<div id="jaclVoiceOffer" style="padding:0.5em 0.75em; margin:0 0 0.75em; border:1px solid #888; background:rgba(255,255,255,0.08);">' +^
@@ -235,6 +259,32 @@ print:
                  '<a href="javascript:jaclAcceptVoice()">Yes</a>' +^
                  ' &nbsp; ' +^
                  '<a href="javascript:jaclDeclineVoice()">No</a>' +^
+                 '</div>';^
+      main.insertAdjacentHTML('afterbegin', html);^
+   }^
+
+   function jaclAcceptSound() {^
+      enableSound();^
+      var banner = document.getElementById('jaclSoundOffer');^
+      if (banner) banner.remove();^
+      jaclProcessAudioMarkers();^
+   }^
+
+   function jaclDeclineSound() {^
+      disableSound();^
+      var banner = document.getElementById('jaclSoundOffer');^
+      if (banner) banner.remove();^
+   }^
+
+   function jaclOfferSound() {^
+      if (localStorage.getItem(jaclLSKey('jaclSound')) !== null) return;^
+      var main = document.getElementById('maintext');^
+      if (!main) return;^
+      var html = '<div id="jaclSoundOffer" style="padding:0.5em 0.75em; margin:0 0 0.75em; border:1px solid #888; background:rgba(255,255,255,0.08);">' +^
+                 'Would you like sound effects? ' +^
+                 '<a href="javascript:jaclAcceptSound()">Yes</a>' +^
+                 ' &nbsp; ' +^
+                 '<a href="javascript:jaclDeclineSound()">No</a>' +^
                  '</div>';^
       main.insertAdjacentHTML('afterbegin', html);^
    }^
@@ -345,6 +395,18 @@ print:
    function jaclProcessAudioMarkers() {^
       var maintext = document.getElementById('maintext');^
       if (!maintext) return;^
+
+      /* Until the player has explicitly enabled sound (banner Yes), keep^
+       * any audio paused. The elements stay in the DOM so that clicking^
+       * Yes can re-run this function and the pending markers below^
+       * resume normal playback. Decline removes the elements outright^
+       * via disableSound(). */^
+      if (!isSoundEnabled()) {^
+         maintext.querySelectorAll('audio').forEach(function(a) {^
+            try { a.pause(); } catch (e) {}^
+         });^
+         return;^
+      }^
 
       maintext.querySelectorAll('jacl-sound-stop').forEach(function(marker) {^
          var ch = marker.getAttribute('data-jacl-channel');^
@@ -513,6 +575,7 @@ print:
 .
 write "</script>^"
 write "<script>window.jaclLang = '" game_language "';</script>"
+write "<script>window.jaclGameId = '" game_id "';</script>"
 write "<script>window.jaclMapBg = '" maintext_colour "';</script>"
 write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
 ifstring google_client_id != ""
@@ -528,7 +591,7 @@ ifexecute "+library_header"
    # WITHOUT COLLIDING WITH THE GAME'S +local_header.
 endif
 write "</head>^"
-write "<body onLoad=~document.getElementById('JACLCommandPrompt').focus(); jaclOfferVoice(); jaclInitMic(); jaclRenderGoogleAuth();~>^"
+write "<body onLoad=~document.getElementById('JACLCommandPrompt').focus(); jaclOfferVoice(); jaclOfferSound(); jaclInitMic(); jaclRenderGoogleAuth();~>^"
 write "<div id=~header~>"
 ifstring title_image = "none"
   write "<h1 name=~title~>" game_title "</h1>"

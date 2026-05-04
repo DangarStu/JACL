@@ -690,6 +690,12 @@ read_gamefile()
         create_cstring ("game_title", prefix);
     }
 
+    /* game_id is the immutable filename-derived identifier -- games can
+     * override game_title for display, but game_id stays stable so the
+     * web interpreter can use it to scope per-game localStorage keys
+     * (voice/sound preferences) without bleeding between games. */
+    create_cstring ("game_id", prefix);
+
     create_language_constants();
 
     /* MUST RE-DETERMINE THE POINT IN THE GAME FILE THAT ENCRYPTION STARTS */
