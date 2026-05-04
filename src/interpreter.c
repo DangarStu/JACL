@@ -2179,16 +2179,32 @@ execute(const char *funcname)
                          * fall back to a sensible default. */
                         if (execute("+update_status_window_web") == FALSE
                             && execute("+update_status_window") == FALSE) {
-                            /* Default: 'Score: N  Moves: N' right-
-                             * aligned on row 0. Pads with spaces to
-                             * push the text against the right edge so
-                             * it lines up regardless of bar width. */
+                            /* Default: location title left-justified,
+                             * 'Score: N  Moves: N' right-justified.
+                             * Skipped when HERE doesn't resolve to a
+                             * real object (e.g. utility games like
+                             * life.jacl whose player has no parent). */
                             char defstr[64];
                             int len, pad, j;
+                            int here_idx = HERE;
+                            if (here_idx > 0 && here_idx <= objects
+                                && object[here_idx] != NULL) {
+                                const char *here_text =
+                                    sentence_output(here_idx, TRUE);
+                                if (here_text != NULL) {
+                                    web_status_cursor(1, 0);
+                                    for (j = 0;
+                                         here_text[j] && j + 2 < cols;
+                                         j++) {
+                                        web_status_putchar(
+                                            (unsigned char)here_text[j]);
+                                    }
+                                }
+                            }
                             sprintf(defstr, "Score: %d  Moves: %d",
                                     SCORE->value, TOTAL_MOVES->value);
                             len = (int) strlen(defstr);
-                            pad = cols - len;
+                            pad = cols - len - 1;
                             if (pad < 0) pad = 0;
                             web_status_cursor(pad, 0);
                             for (j = 0; defstr[j]; j++) {
