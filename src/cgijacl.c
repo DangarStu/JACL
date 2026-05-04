@@ -482,6 +482,39 @@ main(int argc, char *argv[])
                                          err, sizeof(err)) == 0 &&
                     auth_make_session_cookie(sub, pending_session_cookie,
                                              sizeof(pending_session_cookie)) == 0) {
+                    /* If the player was anonymous up to this point, carry
+                     * their auto-continue file across to the signed-in
+                     * slot so the act of logging in doesn't reset the
+                     * game. Only migrate when the google slot is empty,
+                     * so a first-time sign-in on a different browser
+                     * never overwrites real signed-in progress. Manual
+                     * saves (bookmark and named) are intentionally left
+                     * behind under the anonymous user_id. */
+                    {
+                        const char *prior_uid =
+                            cgi_val(jacl_cookies, "user_id");
+                        if (prior_uid != NULL && prior_uid[0] != 0 &&
+                            strncmp(prior_uid, "google_", 7) != 0) {
+                            char old_auto[1024];
+                            char new_auto[1024];
+                            struct stat sb;
+                            snprintf(old_auto, sizeof(old_auto),
+                                     "%s%s-%s.auto",
+                                     temp_directory, prefix, prior_uid);
+                            snprintf(new_auto, sizeof(new_auto),
+                                     "%s%s-google_%s.auto",
+                                     temp_directory, prefix, sub);
+                            if (stat(new_auto, &sb) != 0 &&
+                                stat(old_auto, &sb) == 0 &&
+                                rename(old_auto, new_auto) == 0) {
+                                sprintf(error_buffer,
+                                        "Migrated anonymous auto-save "
+                                        "%s -> %s on first sign-in",
+                                        old_auto, new_auto);
+                                log_error(error_buffer, LOG_ONLY);
+                            }
+                        }
+                    }
                     const char *https_env = getenv("HTTPS");
                     const char *secure_flag =
                         (https_env != NULL && !strcasecmp(https_env, "on"))
