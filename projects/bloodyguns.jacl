@@ -121,6 +121,14 @@ endif
 # answer until the function completes.
 execute "+startup_preferences"
 
+# If +startup_preferences left a pending question, bail before the
+# scene -- the engine ends the turn, the player answers, and +intro
+# is re-entered. Without this the first response would dump the
+# scene out below the unanswered Q1.
+if pending_question_type != 0
+   return
+endif
+
 # Scene start -- runs only once, after the preferences questions are
 # fully resolved. The sound and music here respect the player's choice
 # automatically (the interpreter gates 'sound' on sound_enabled).
