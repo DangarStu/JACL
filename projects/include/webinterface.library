@@ -137,6 +137,33 @@ print:
       });^
    }^
 
+   /* Measure how many monospace characters fit across #statuswin so^
+    * the JACL grid (which positions text via cursor X Y) lines up with^
+    * the actual viewport. Without this, +print_right places content^
+    * at column status_window_width-strlen which is mid-bar on wide^
+    * screens. The measured value rides every ajax request as^
+    * &status_cols= -- the engine reads it and updates^
+    * status_window_width before each updatestatus. */^
+   function jaclMeasureStatusCols() {^
+      var bar = document.getElementById('statuswin');^
+      if (!bar) return 80;^
+      var rect = bar.getBoundingClientRect();^
+      var w = rect.width;^
+      if (w <= 0) return 80;^
+      var probe = document.createElement('span');^
+      var cs = window.getComputedStyle(bar);^
+      probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre';^
+      probe.style.fontFamily = cs.fontFamily;^
+      probe.style.fontSize = cs.fontSize;^
+      probe.textContent = '0123456789012345678901234567890123456789';^
+      document.body.appendChild(probe);^
+      var charW = probe.offsetWidth / 40;^
+      document.body.removeChild(probe);^
+      if (charW <= 0) return 80;^
+      var cols = Math.floor(w / charW) - 2;^
+      return Math.max(40, Math.min(400, cols));^
+   }^
+
    /* Per-game localStorage keys: prefix lookups with the game id so^
     * a 'yes' to voice/sound in one game doesn't silently apply to^
     * every other JACL game served from the same host. */^
@@ -518,6 +545,17 @@ print:
             initialStatus.remove();^
          }^
       }^
+      /* Measure available status-bar columns now that #statuswin is^
+       * laid out. The value rides every ajax request as &status_cols=^
+       * so the engine sizes the grid to match the viewport and^
+       * +print_right lands at the right edge. The first +intro render^
+       * used the engine default (120) -- if the player's viewport is^
+       * wider, the right-aligned segment sits short of the edge until^
+       * the next updatestatus call (typically the first command). */^
+      window.jaclStatusCols = jaclMeasureStatusCols();^
+      window.addEventListener('resize', function() {^
+         window.jaclStatusCols = jaclMeasureStatusCols();^
+      });^
    });^
 .
 #include "ajax.library"
