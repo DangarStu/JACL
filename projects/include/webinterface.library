@@ -8,6 +8,41 @@ constant maintext_colour     "#eeeeee"
 constant title_colour        "black"
 constant footer_image        "none"
 
+# voice_enabled: player chose text-to-speech yes/no (web only, persisted
+# in the auto-save). sound_enabled is *not* declared here -- the loader
+# creates it for us and the interpreter's sound handler already gates
+# both GLK channels and CGI <audio> emission on its value, so writing it
+# from JACL is enough; no per-site `if sound_enabled` is required.
+integer voice_enabled
+
+# Asks the player whether they want text-to-speech (web only) and
+# whether they want sound effects (web + GLK). Uses the same
+# getyesorno blocking mechanism as 'restore?' in verbs.library --
+# each question pauses execution until the player types yes/no, and
+# the response that emits the next question (or finishes the intro)
+# also carries the JS that flips the in-browser speech preference.
+{+startup_preferences
+if interpreter = CGI
+   write "^Would you like the text read aloud?^"
+   getyesorno voice_enabled
+   if voice_enabled = true
+      write "<script>enableSpeak();</script>"
+   else
+      write "<script>disableSpeak();</script>"
+   endif
+endif
+write "^Would you like sound effects?^"
+getyesorno sound_enabled
+if interpreter = CGI
+   if sound_enabled = true
+      write "<script>enableSound();</script>"
+   else
+      write "<script>disableSound();</script>"
+   endif
+endif
+write "^"
+}
+
 {+header
 set linebreaks = false
 print:
@@ -235,59 +270,13 @@ print:
       jaclMapPopup = null;^
    }^
 
-   function jaclAcceptVoice() {^
-      enableSpeak();^
-      var banner = document.getElementById('jaclVoiceOffer');^
-      if (banner) banner.remove();^
-      var main = document.getElementById('maintext');^
-      if (main && main.textContent.trim().length > 0) speakText(main.innerHTML);^
-   }^
-
-   function jaclDeclineVoice() {^
-      localStorage.setItem(jaclLSKey('jaclSpeak'), 'false');^
-      var banner = document.getElementById('jaclVoiceOffer');^
-      if (banner) banner.remove();^
-   }^
-
-   function jaclOfferVoice() {^
-      if (!window.speechSynthesis) return;^
-      if (localStorage.getItem(jaclLSKey('jaclSpeak')) !== null) return;^
-      var main = document.getElementById('maintext');^
-      if (!main) return;^
-      var html = '<div id="jaclVoiceOffer" style="padding:0.5em 0.75em; margin:0 0 0.75em; border:1px solid #888; background:rgba(255,255,255,0.08);">' +^
-                 'Would you like the text read aloud? ' +^
-                 '<a href="javascript:jaclAcceptVoice()">Yes</a>' +^
-                 ' &nbsp; ' +^
-                 '<a href="javascript:jaclDeclineVoice()">No</a>' +^
-                 '</div>';^
-      main.insertAdjacentHTML('afterbegin', html);^
-   }^
-
-   function jaclAcceptSound() {^
-      enableSound();^
-      var banner = document.getElementById('jaclSoundOffer');^
-      if (banner) banner.remove();^
-      jaclProcessAudioMarkers();^
-   }^
-
-   function jaclDeclineSound() {^
-      disableSound();^
-      var banner = document.getElementById('jaclSoundOffer');^
-      if (banner) banner.remove();^
-   }^
-
-   function jaclOfferSound() {^
-      if (localStorage.getItem(jaclLSKey('jaclSound')) !== null) return;^
-      var main = document.getElementById('maintext');^
-      if (!main) return;^
-      var html = '<div id="jaclSoundOffer" style="padding:0.5em 0.75em; margin:0 0 0.75em; border:1px solid #888; background:rgba(255,255,255,0.08);">' +^
-                 'Would you like sound effects? ' +^
-                 '<a href="javascript:jaclAcceptSound()">Yes</a>' +^
-                 ' &nbsp; ' +^
-                 '<a href="javascript:jaclDeclineSound()">No</a>' +^
-                 '</div>';^
-      main.insertAdjacentHTML('afterbegin', html);^
-   }^
+   /* Speech synthesis is toggled by emitting <script>enableSpeak()</script>^
+    * or <script>disableSpeak()</script> from a JACL response (see the^
+    * 'voice'/'unvoice' verbs in verbs.library and the +startup_preferences^
+    * function below). Sound effects are toggled at the JACL level via the^
+    * sound_enabled integer -- the game simply doesn't issue 'sound' calls^
+    * when the player has opted out, so no JS-side suppression of audio^
+    * elements is required for that path. */^
 
    /* Google Sign-In: optional. The engine emits^
     * window.JACL_GOOGLE_CLIENT_ID only when fcgijacl has both a^
@@ -396,14 +385,18 @@ print:
       var maintext = document.getElementById('maintext');^
       if (!maintext) return;^
 
-      /* Until the player has explicitly enabled sound (banner Yes), keep^
-       * any audio paused. The elements stay in the DOM so that clicking^
-       * Yes can re-run this function and the pending markers below^
-       * resume normal playback. Decline removes the elements outright^
-       * via disableSound(). */^
-      if (!isSoundEnabled()) {^
+      /* If the player has explicitly opted out of sound (set by^
+       * +startup_preferences), pause and remove any audio that the^
+       * game still emitted. The localStorage flag is the source of^
+       * truth on web; GLK respects sound_enabled at JACL level. The^
+       * unanswered case (key not yet set) intentionally falls through^
+       * so audio plays normally before the player has been asked. */^
+      if (localStorage.getItem(jaclLSKey('jaclSound')) === 'false') {^
          maintext.querySelectorAll('audio').forEach(function(a) {^
-            try { a.pause(); } catch (e) {}^
+            try { a.pause(); a.remove(); } catch (e) {}^
+         });^
+         maintext.querySelectorAll('jacl-sound-stop, jacl-sound-volume').forEach(function(m) {^
+            m.remove();^
          });^
          return;^
       }^
@@ -591,7 +584,7 @@ ifexecute "+library_header"
    # WITHOUT COLLIDING WITH THE GAME'S +local_header.
 endif
 write "</head>^"
-write "<body onLoad=~document.getElementById('JACLCommandPrompt').focus(); jaclOfferVoice(); jaclOfferSound(); jaclInitMic(); jaclRenderGoogleAuth();~>^"
+write "<body onLoad=~document.getElementById('JACLCommandPrompt').focus(); jaclInitMic(); jaclRenderGoogleAuth();~>^"
 write "<div id=~header~>"
 ifstring title_image = "none"
   write "<h1 name=~title~>" game_title "</h1>"

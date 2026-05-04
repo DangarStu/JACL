@@ -104,6 +104,7 @@ if interpreter = GLK
       return
    endif
 endif
+execute "+startup_preferences"
 set status_window = 1
 set script_stage = during_raid
 updatestatus
