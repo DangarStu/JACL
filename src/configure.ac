@@ -134,8 +134,10 @@ for fcgi_inc in /opt/homebrew/include /usr/local/include /usr/include/fastcgi /u
 
         save_CFLAGS="$CFLAGS"
         save_LDFLAGS="$LDFLAGS"
+        save_LIBS="$LIBS"
         CFLAGS="$CFLAGS $test_cflags"
         LDFLAGS="$LDFLAGS $test_ldflags"
+        LIBS="-lfcgi $LIBS"
 
         AC_MSG_CHECKING([for fcgi_stdio.h and libfcgi in ($test_cflags $test_ldflags)])
         AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <fcgi_stdio.h>]],
@@ -152,6 +154,7 @@ for fcgi_inc in /opt/homebrew/include /usr/local/include /usr/include/fastcgi /u
 
         CFLAGS="$save_CFLAGS"
         LDFLAGS="$save_LDFLAGS"
+        LIBS="$save_LIBS"
 
         if test "$HAVE_FCGI" = "yes"; then
             break
@@ -186,11 +189,11 @@ AC_CHECK_PROG([HAVE_PKG_CONFIG], [pkg-config], [yes], [no])
 if test "$HAVE_PKG_CONFIG" = "yes"; then
     if pkg-config --exists libcurl jansson openssl 2>/dev/null; then
         save_CFLAGS="$CFLAGS"
-        save_LDFLAGS="$LDFLAGS"
+        save_LIBS="$LIBS"
         AUTH_CFLAGS=`pkg-config --cflags libcurl jansson openssl`
         AUTH_LIBS=`pkg-config --libs   libcurl jansson openssl`
         CFLAGS="$CFLAGS $AUTH_CFLAGS"
-        LDFLAGS="$LDFLAGS $AUTH_LIBS"
+        LIBS="$AUTH_LIBS $LIBS"
         AC_MSG_CHECKING([whether auth.c builds against libcurl/jansson/openssl])
         AC_LINK_IFELSE([AC_LANG_PROGRAM([[
             #include <curl/curl.h>
@@ -203,7 +206,7 @@ if test "$HAVE_PKG_CONFIG" = "yes"; then
         [HAVE_GOOGLE_AUTH=yes; AUTH_SRC="auth.c"; AC_MSG_RESULT([yes])],
         [AC_MSG_RESULT([no])])
         CFLAGS="$save_CFLAGS"
-        LDFLAGS="$save_LDFLAGS"
+        LIBS="$save_LIBS"
     fi
 fi
 

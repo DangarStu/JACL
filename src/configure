@@ -3851,8 +3851,10 @@ for fcgi_inc in /opt/homebrew/include /usr/local/include /usr/include/fastcgi /u
 
         save_CFLAGS="$CFLAGS"
         save_LDFLAGS="$LDFLAGS"
+        save_LIBS="$LIBS"
         CFLAGS="$CFLAGS $test_cflags"
         LDFLAGS="$LDFLAGS $test_ldflags"
+        LIBS="-lfcgi $LIBS"
 
         { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for fcgi_stdio.h and libfcgi in ($test_cflags $test_ldflags)" >&5
 printf %s "checking for fcgi_stdio.h and libfcgi in ($test_cflags $test_ldflags)... " >&6; }
@@ -3888,6 +3890,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 
         CFLAGS="$save_CFLAGS"
         LDFLAGS="$save_LDFLAGS"
+        LIBS="$save_LIBS"
 
         if test "$HAVE_FCGI" = "yes"; then
             break
@@ -3967,11 +3970,11 @@ fi
 if test "$HAVE_PKG_CONFIG" = "yes"; then
     if pkg-config --exists libcurl jansson openssl 2>/dev/null; then
         save_CFLAGS="$CFLAGS"
-        save_LDFLAGS="$LDFLAGS"
+        save_LIBS="$LIBS"
         AUTH_CFLAGS=`pkg-config --cflags libcurl jansson openssl`
         AUTH_LIBS=`pkg-config --libs   libcurl jansson openssl`
         CFLAGS="$CFLAGS $AUTH_CFLAGS"
-        LDFLAGS="$LDFLAGS $AUTH_LIBS"
+        LIBS="$AUTH_LIBS $LIBS"
         { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether auth.c builds against libcurl/jansson/openssl" >&5
 printf %s "checking whether auth.c builds against libcurl/jansson/openssl... " >&6; }
         cat confdefs.h - <<_ACEOF >conftest.$ac_ext
@@ -4004,7 +4007,7 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
     conftest$ac_exeext conftest.$ac_ext
         CFLAGS="$save_CFLAGS"
-        LDFLAGS="$save_LDFLAGS"
+        LIBS="$save_LIBS"
     fi
 fi
 
