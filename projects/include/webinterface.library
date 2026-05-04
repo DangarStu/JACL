@@ -282,7 +282,7 @@ print:
       google.accounts.id.initialize({ client_id: window.JACL_GOOGLE_CLIENT_ID, callback: jaclGoogleCallback, auto_select: false });^
       slot.innerHTML = '<div id="jaclGoogleBtn"></div>';^
       var btn = document.getElementById('jaclGoogleBtn');^
-      google.accounts.id.renderButton(btn, { theme: 'outline', size: 'medium', type: 'standard' });^
+      google.accounts.id.renderButton(btn, { theme: 'outline', size: 'small', type: 'standard' });^
    }^
 
    function changeInterface() {^
