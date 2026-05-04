@@ -405,7 +405,7 @@ print:
       if (!jaclMapPopup) return null;^
       var w = jaclMapPopup;^
       w.document.open();^
-      w.document.write("<!doctype html><html lang='en'><head><meta charset='utf-8'><title>Map</title><style>html,body{margin:0;padding:0;background:" + (window.jaclMapBg || '#eee') + ";font-family:Georgia,Palatino,Times,serif;}#jacl_map{display:inline-block;}</style><script src='/include/raphael.min.js'><\/script><script>function jaclWrapMapLabel(paper,x,y,text,maxW){if(!maxW)maxW=70;var t=paper.text(x,y,text);if(t.getBBox().width<=maxW)return;t.remove();var words=text.split(' ');if(words.length<2){paper.text(x,y,text);return;}var lines=[];var current=words[0];var probe=paper.text(-9999,-9999,'');for(var i=1;i<words.length;i++){var trial=current+' '+words[i];probe.attr('text',trial);if(probe.getBBox().width<=maxW){current=trial;}else{lines.push(current);current=words[i];}}lines.push(current);probe.remove();var lineH=14;var startY=y-(lines.length-1)*lineH/2;for(var j=0;j<lines.length;j++){paper.text(x,startY+j*lineH,lines[j]);}}<\/script></head><body><div id='jacl_map'></div></body></html>");^
+      w.document.write("<!doctype html><html lang='en'><head><meta charset='utf-8'><title>Map</title><style>html,body{margin:0;padding:0;background:" + (window.jaclMapBg || '#eee') + ";font-family:Georgia,Palatino,Times,serif;}#jacl_map{display:inline-block;}</style><script src='/include/raphael.min.js'><\/script></head><body><div id='jacl_map'></div></body></html>");^
       w.document.close();^
       return w;^
    }^
@@ -428,6 +428,45 @@ print:
          try { drawFn(paper, popup); } catch (e) { console.warn('jacl map draw error', e); }^
       };^
       attempt();^
+   }^
+
+   /* Render a map node label that may be too wide for the 80px box.^
+    * Measures the rendered Raphael text via getBBox() and greedy-^
+    * wraps onto multiple paper.text elements stacked vertically.^
+    * Defined in the parent window because the drawFn passed to^
+    * jaclDrawMapInPopup runs in this window's scope -- the popup's^
+    * own JS context can't see it. paper / paper.text still operate^
+    * on the popup's SVG since paper *is* the popup's Raphael instance. */^
+   function jaclWrapMapLabel(paper, x, y, text, maxW) {^
+      if (!maxW) maxW = 70;^
+      var t = paper.text(x, y, text);^
+      if (t.getBBox().width <= maxW) return;^
+      t.remove();^
+      var words = text.split(' ');^
+      if (words.length < 2) {^
+         paper.text(x, y, text);^
+         return;^
+      }^
+      var lines = [];^
+      var current = words[0];^
+      var probe = paper.text(-9999, -9999, '');^
+      for (var i = 1; i < words.length; i++) {^
+         var trial = current + ' ' + words[i];^
+         probe.attr('text', trial);^
+         if (probe.getBBox().width <= maxW) {^
+            current = trial;^
+         } else {^
+            lines.push(current);^
+            current = words[i];^
+         }^
+      }^
+      lines.push(current);^
+      probe.remove();^
+      var lineH = 14;^
+      var startY = y - (lines.length - 1) * lineH / 2;^
+      for (var j = 0; j < lines.length; j++) {^
+         paper.text(x, startY + j * lineH, lines[j]);^
+      }^
    }^
 
    function jaclCloseMapPopup() {^
