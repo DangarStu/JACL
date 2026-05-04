@@ -477,6 +477,11 @@ endselect
 # -------------------------------------------------------------------
 
 {+map
+if interpreter <> CGI
+   write "The map command is currently only available in the web interpreter.^"
+   set time = false
+   return
+endif
 set map_show_all = 0
 execute "+map_bounds"
 set linebreaks = false
@@ -505,6 +510,11 @@ set time = false
 # -------------------------------------------------------------------
 
 {+map_window_on
+if interpreter <> CGI
+   write "The map command is currently only available in the web interpreter.^"
+   set time = false
+   return
+endif
 set map_show_all = 0
 execute "+map_bounds"
 set map_window_mode = 1
@@ -540,6 +550,11 @@ set time = false
 # -------------------------------------------------------------------
 
 {+map_all
+if interpreter <> CGI
+   write "The map command is currently only available in the web interpreter.^"
+   set time = false
+   return
+endif
 set map_show_all = 1
 execute "+map_bounds"
 set linebreaks = false
@@ -573,6 +588,11 @@ set time = false
 # -------------------------------------------------------------------
 
 {+map_window_off
+if interpreter <> CGI
+   write "The map command is currently only available in the web interpreter.^"
+   set time = false
+   return
+endif
 set map_window_mode = 0
 set linebreaks = false
 write "<script>window.jaclMapMode = 0; jaclCloseMapPopup();</script>"
@@ -587,6 +607,9 @@ set time = false
 # -------------------------------------------------------------------
 
 {+after_look
+if interpreter <> CGI
+   return
+endif
 if map_window_mode = 1
    set map_show_all = 0
    execute "+map_bounds"
