@@ -90,6 +90,27 @@ extern char		data_directory[];
 extern int		noun[];
 extern char		last_command[];
 
+/* STYLE HINTS DECLARED AT THE TOP LEVEL OF A GAME FILE.
+ * Indexed by the BOLD..PRE constants in constants.h (index 0 is unused).
+ * Populated by the 'stylehint' loader handler, applied to Glk before windows
+ * are opened, and consulted by the web interpreter when emitting style tags. */
+typedef struct stylehint_t {
+	int has_text_color;
+	int has_back_color;
+	int has_reverse;
+	unsigned long text_color;
+	unsigned long back_color;
+	int reverse_value;
+} stylehint_t;
+
+#define STYLEHINT_TABLE_SIZE 10
+
+extern stylehint_t				jacl_stylehints[STYLEHINT_TABLE_SIZE];
+extern int						jacl_stylehints_dirty;
+
+int  stylehint_index_from_name(const char *name);
+int  stylehint_parse_color(const char *spec, unsigned long *out);
+
 extern struct object_type		*object[];
 extern struct integer_type		*integer_table;
 extern struct integer_type		*integer[];

@@ -274,6 +274,67 @@ glk_main(void)
 		terminate(48);
 	}
 
+	/* APPLY ANY 'stylehint' DECLARATIONS FROM THE GAME FILE.
+	 * Glk only honours hints set BEFORE a window opens, so for each style
+	 * with a recorded hint we set it on both the TextBuffer (mainwin) and
+	 * TextGrid (statuswin) wintypes, then close and re-open mainwin so the
+	 * already-open buffer window picks up the new hints. statuswin opens
+	 * later in this function and inherits them automatically. */
+	if (jacl_stylehints_dirty) {
+		static const int hint_styles[] = {
+			BOLD, NOTE, INPUT, HEADER, SUBHEADER, REVERSE, PRE, ALERT, QUOTE, -1
+		};
+		static const glui32 glk_styles[] = {
+			style_Emphasized, style_Note, style_Input, style_Header,
+			style_Subheader, 0 /* REVERSE handled below */, style_Preformatted,
+			style_Alert, style_BlockQuote
+		};
+		int hi;
+		for (hi = 0; hint_styles[hi] >= 0; hi++) {
+			int sidx = hint_styles[hi];
+			stylehint_t *h = &jacl_stylehints[sidx];
+			glui32 buf_style = glk_styles[hi];
+			glui32 grid_style = glk_styles[hi];
+			if (sidx == REVERSE) {
+				/* The 'reverse' style maps to User2 in mainwin and User1
+				 * in statuswin -- mirror what the runtime style command
+				 * does in interpreter.c. */
+				buf_style = style_User2;
+				grid_style = style_User1;
+			}
+			if (h->has_text_color) {
+				glk_stylehint_set(wintype_TextBuffer, buf_style,
+						stylehint_TextColor, (glsi32) h->text_color);
+				glk_stylehint_set(wintype_TextGrid, grid_style,
+						stylehint_TextColor, (glsi32) h->text_color);
+			}
+			if (h->has_back_color) {
+				glk_stylehint_set(wintype_TextBuffer, buf_style,
+						stylehint_BackColor, (glsi32) h->back_color);
+				glk_stylehint_set(wintype_TextGrid, grid_style,
+						stylehint_BackColor, (glsi32) h->back_color);
+			}
+			if (h->has_reverse) {
+				glk_stylehint_set(wintype_TextBuffer, buf_style,
+						stylehint_ReverseColor, (glsi32) h->reverse_value);
+				glk_stylehint_set(wintype_TextGrid, grid_style,
+						stylehint_ReverseColor, (glsi32) h->reverse_value);
+			}
+		}
+
+		/* Re-open mainwin so the new hints take effect. mainwin has had no
+		 * game-visible output yet (read_gamefile only loads declarations),
+		 * so closing it discards nothing meaningful. */
+		glk_window_close(mainwin, NULL);
+		mainwin = glk_window_open(0, 0, 0, wintype_TextBuffer, 1);
+		if (!mainwin) {
+			return;
+		}
+		mainstr = glk_window_get_stream(mainwin);
+		jacl_set_window(mainwin);
+		inputwin = mainwin;
+	}
+
 	execute ("+bootstrap");
 
     // OPEN A SECOND WINDOW: A TEXT GRID, ABOVE THE MAIN WINDOW, ONE LINE
