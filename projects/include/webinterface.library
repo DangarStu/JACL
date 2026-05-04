@@ -501,6 +501,18 @@ print:
 
    document.addEventListener('DOMContentLoaded', function() {^
       jaclProcessAudioMarkers();^
+      /* Move any <jacl-status> emitted during the initial +intro render^
+       * into the dedicated #statuswin div above the main text. Ajax^
+       * responses do the same thing in +local_success below. */^
+      var maintext = document.getElementById('maintext');^
+      if (maintext) {^
+         var initialStatus = maintext.querySelector('jacl-status');^
+         if (initialStatus) {^
+            var statusBar = document.getElementById('statuswin');^
+            if (statusBar) statusBar.innerHTML = initialStatus.innerHTML;^
+            initialStatus.remove();^
+         }^
+      }^
    });^
 .
 #include "ajax.library"
@@ -629,6 +641,7 @@ endif
 write " |"
 write "</div>^"
 write "</div>^"
+write "<div id=~statuswin~></div>^"
 write "<div id=~main~>^"
 write "<div id=~maintext~ class=~maintext~ onclick=~focusInput(event);~ ondblclick=~lookupWord(event);~>^"
 set linebreaks = true
@@ -708,8 +721,15 @@ print:
          if (dirBar) dirBar.innerHTML = jaclDirUpdate.innerHTML;^
          jaclDirUpdate.remove();^
       }^
+      var jaclStatusUpdate = maintext.querySelector('jacl-status');^
+      if (jaclStatusUpdate) {^
+         var statusBar = document.getElementById('statuswin');^
+         if (statusBar) statusBar.innerHTML = jaclStatusUpdate.innerHTML;^
+         jaclStatusUpdate.remove();^
+      }^
       if (isSpeakEnabled()) {^
          var speakData = data.replace(/<jacl-directions[\s\S]*?<\/jacl-directions>/gi, '');^
+         speakData = speakData.replace(/<jacl-status[\s\S]*?<\/jacl-status>/gi, '');^
          speakText(speakData);^
       }^
       document.getElementById('JACLCommandPrompt').focus();

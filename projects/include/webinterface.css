@@ -41,10 +41,29 @@ endif
 write "background-color: " header_colour "; "
 print:
 		text-align: center; }^
+      #statuswin {
+		position: absolute;
+		top: 87px;
+		left: 0;
+		right: 0;
+		height: 24px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0 12px;
+		font-family: Merriweather, Verdana, Arial, Sanserif;
+		font-size: 10pt;
+		color: white;
+.
+write "        background-color: " linkbar_colour "cc; }^"
+print:
+      #statuswin:empty { display: none; }
+      #statuswin .jacl-status-left { font-weight: bold; }
+      #statuswin .jacl-status-right { opacity: 0.85; }
       #main {
 		position:absolute;
 		left:0px;
-                top: 87px;
+                top: 111px;
 		right:0px;
 		overflow:auto;
 .
@@ -53,6 +72,9 @@ ifstring current_image != "none"
 endif
 write " bottom: 83px; "
 write " background-color: " maintext_colour "; }^"
+print:
+      #statuswin:empty + #main { top: 87px; }
+.
 print:
 	p {	font-family: Merriweather, Verdana, Arial, Sanserif;
                 font-size: 12pt;}^
@@ -197,7 +219,9 @@ print:
 		#header { height: 60px; }^
 		h1 { font-size: 16pt; padding-left: 10px; }^
 		img.titleimage { height: 60px; }^
-		#main { top: 60px; margin-right: 0 !important; }^
+		#statuswin { top: 60px; height: 22px; padding: 0 8px; }^
+		#statuswin:empty + #main { top: 60px; }^
+		#main { top: 82px; margin-right: 0 !important; }^
 		div.maintext {
 			padding: 10px 15px;
 			font-size: 11pt; }^
