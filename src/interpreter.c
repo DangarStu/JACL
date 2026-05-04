@@ -1722,12 +1722,12 @@ execute(const char *funcname)
 
                 /* Honor sound_enabled / SOUND_ENABLED so a player who
                  * declines sound at intro (or types "sound off") gets
-                 * silence -- match the GLK branch's behavior. */
+                 * silence. Skip the marker emission but stay in the
+                 * function -- exit_function() here would prematurely
+                 * terminate whatever JACL is currently running. */
                 if (!SOUND_ENABLED->value) {
-                    return (exit_function(TRUE));
-                }
-
-                if (quoted[1] == 0) {
+                    /* fall through, skipping the emission below */
+                } else if (quoted[1] == 0) {
                     /* Stop form. */
                     int stop_channel = (int) value_of(word[2], TRUE);
                     sprintf(option_buffer,
@@ -1774,11 +1774,13 @@ execute(const char *funcname)
                 /* volume LEVEL channel -- emits a marker the web client
                  * applies to the audio element on that channel. LEVEL is
                  * 0-100; the JS divides by 100 to get the HTMLMediaElement
-                 * volume range (0.0-1.0). */
-                if (!SOUND_ENABLED->value) {
-                    return (exit_function(TRUE));
-                }
-                if (word[2] != NULL) {
+                 * volume range (0.0-1.0). When the player has disabled
+                 * sound, silently skip the marker -- but stay in the
+                 * function. The previous code did exit_function() which
+                 * terminated whatever JACL was currently running, e.g.
+                 * leaving +intro half-rendered when 'volume 65 channel'
+                 * appeared in a scene block. */
+                if (SOUND_ENABLED->value && word[2] != NULL) {
                     int vol_level = (int) value_of(word[1], TRUE);
                     int vol_channel = (int) value_of(word[2], TRUE);
                     sprintf(option_buffer,
@@ -2132,6 +2134,20 @@ execute(const char *funcname)
                             integer_resolve("status_window_width");
                         int cols = (sww != NULL && sww->value > 0)
                                    ? sww->value : 80;
+                        /* Clamp TOTAL_MOVES to >= 0 for the duration of
+                         * the bar emission. The loader starts it at -1
+                         * ("TIME PASSES BEFORE THE FIRST PROMPT") so a
+                         * status bar rendered during +intro -- before
+                         * eachturn() has bumped it to 0 -- would otherwise
+                         * show 'Moves: -1'. Restore the original value
+                         * after so other JACL code (e.g. Eria.jacl which
+                         * checks total_moves = -1) keeps working. */
+                        struct integer_type *tm =
+                            integer_resolve("total_moves");
+                        int saved_tm = (tm != NULL) ? tm->value : 0;
+                        if (tm != NULL && tm->value < 0) {
+                            tm->value = 0;
+                        }
                         sprintf(temp_buffer,
                                 "<jacl-status data-lines=~%d~ "
                                 "style=~display:none~>",
@@ -2163,6 +2179,9 @@ execute(const char *funcname)
                         }
                         web_status_end();
                         write_text("</jacl-status>");
+                        if (tm != NULL) {
+                            tm->value = saved_tm;
+                        }
                     }
                 }
 #endif
