@@ -1,0 +1,292 @@
+#!../bin/jacl
+#ifid:JACL-200
+# -----------------------------------------------------------------------------
+# MISSION CONTROL -- starter template for a JACL space game
+# -----------------------------------------------------------------------------
+# Wires up:
+#   * 10-line monospace status bar with telemetry laid out via cursor X Y
+#   * Sci-fi (Orbitron) header font + a title-bar image
+#   * The shared +game_intro scaffold (dedication / voice+sound / scene)
+#   * One placeholder location (cockpit) and a couple of sample verbs
+# -----------------------------------------------------------------------------
+
+constant game_release     1
+constant game_build       1
+constant game_title       "Mission Control"
+constant game_author      "Stuart Allen"
+constant game_publish     false
+constant ifid             "JACL-200"
+string game_language      "en-US"
+
+# Header / theme. The colour pair below is meant to read as a NASA-era
+# control room: dark instrument panel, soft-amber accents.
+constant title_image      "/images/missioncontrol-title.png"
+constant header_colour    "#0c1626"
+constant linkbar_colour   "#1a2a44"
+constant maintext_colour  "#e8e0c8"
+constant title_colour     "#ffb84a"
+
+# Telemetry needs a wide grid -- 60 columns is enough for two-up
+# label / value pairs without crowding.
+integer status_window         10
+integer status_window_width   60
+
+# -----------------------------------------------------------------------------
+# TELEMETRY STATE -- what the status bar shows. A real game would tick these
+# from +eachturn / +timer; here they're just initial values so the layout is
+# visible the moment the player lands in the cockpit.
+# -----------------------------------------------------------------------------
+
+integer hull_pct          100
+integer fuel_pct          100
+integer oxygen_pct         98
+integer power_pct          87
+integer altitude_m       4230
+integer velocity_mms      120
+integer mission_minutes     0
+
+# -----------------------------------------------------------------------------
+# THE WORLD
+# -----------------------------------------------------------------------------
+
+location cockpit : flight cockpit deck cabin
+ short         the "Lunar Lander Cockpit"
+
+object kryten : commander pilot self me
+ short         name "yourself"
+ has           ANIMATE
+ parent        cockpit
+ player
+
+object panel : control panel console instruments
+ short         the "control panel"
+ static
+ parent        cockpit
+
+object joystick : stick joystick attitude controller
+ short         the "attitude joystick"
+ static
+ parent        cockpit
+
+object viewscreen : screen viewscreen window viewport
+ short         the "forward viewscreen"
+ static
+ parent        cockpit
+
+# -----------------------------------------------------------------------------
+# +intro / dedication / scene -- delegate to the shared helper. See
+# webinterface.library for the +game_intro flow.
+# -----------------------------------------------------------------------------
+
+{+intro
+set player = kryten
+execute "+game_intro"
+}
+
+{+game_dedication
+clear
+style header
+write "^ MISSION CONTROL^"
+style normal
+style note
+write "Module 1 -- the descent.^"
+style normal
+write "by " game_author ", build " game_release "/" game_build "^^"
+print:
+   You are commander of a one-person lander on final approach to the
+   Sea of Tranquility. Touchdown clearance is yours alone -- main
+   guidance has just gone red, the radar altimeter is intermittent,
+   and Earth is rising over the lunar limb.^^
+   Your ship is fast, low on fuel, and a little ahead of the
+   planned descent profile. You have minutes, not hours.^^
+.
+}
+
+{+game_scene
+updatestatus
+clear
+style header
+write "TRANQUILITY APPROACH^"
+style normal
+write "T+00:00:00^^"
+print:
+   Soft amber light from the instrument panel washes over the cabin.
+   The forward viewscreen frames a cratered grey horizon, and through
+   the upper edge of the glass the Earth -- a fragile blue arc --
+   slides into view. The attitude joystick rests under your right
+   hand. The control panel hums.^^
+   You have a few seconds to settle before the descent burn begins.
+   Type ~look~ to take stock, ~examine panel~ for telemetry, or ~go
+   down~ when you are ready.^
+.
+}
+
+# -----------------------------------------------------------------------------
+# +update_status_window -- draws the 10-line telemetry panel using the same
+# cursor X Y idiom on both Glk (real TextGrid) and web (virtual grid
+# emulated by the engine + jaclWrapMapLabel-style monospace bar).
+# -----------------------------------------------------------------------------
+
+string status_text
+
+{+update_status_window
+# Row 0: title left, mission timer right.
+cursor 1 0
+write "MISSION CONTROL"
+setstring status_text "T+" mission_minutes "m"
+execute "+print_right<status_text<0"
+
+# Row 1: separator.
+cursor 0 1
+execute "+print_repeat<-<60"
+
+# Rows 2-5: bar gauges. Each call writes a label, the value as a
+# right-padded percentage, and a fixed-width [#####...] bar.
+set status_row = 2
+setstring status_label "Hull"
+set status_value = hull_pct
+execute "+telem_bar"
+
+set status_row = 3
+setstring status_label "Fuel"
+set status_value = fuel_pct
+execute "+telem_bar"
+
+set status_row = 4
+setstring status_label "Oxygen"
+set status_value = oxygen_pct
+execute "+telem_bar"
+
+set status_row = 5
+setstring status_label "Power"
+set status_value = power_pct
+execute "+telem_bar"
+
+# Row 6: separator.
+cursor 0 6
+execute "+print_repeat<-<60"
+
+# Rows 7-9: scalar telemetry.
+cursor 1 7
+write "Altitude"
+setstring status_text altitude_m " m"
+execute "+print_right<status_text<7"
+
+cursor 1 8
+write "Velocity"
+setstring status_text velocity_mms " mm/s"
+execute "+print_right<status_text<8"
+
+cursor 1 9
+write "Fuel burn"
+setstring status_text "STANDBY"
+execute "+print_right<status_text<9"
+}
+
+# Helper: draw one row of "Label  [######....]   N%" at status_row.
+integer status_row
+integer status_value
+string  status_label
+integer telem_bar_filled
+integer telem_bar_index
+
+{+telem_bar
+cursor 1 status_row
+write status_label
+
+# Bar is 20 cells. Compute filled cells from status_value (0..100).
+set telem_bar_filled = status_value
+set telem_bar_filled / 5
+
+cursor 18 status_row
+write "["
+set telem_bar_index = 0
+repeat
+   if telem_bar_index < telem_bar_filled
+      write "#"
+   else
+      write "."
+   endif
+   set telem_bar_index + 1
+until telem_bar_index = 20
+write "]"
+
+setstring status_text status_value "%"
+execute "+print_right<status_text<status_row"
+}
+
+# Helper: write one char N times at the cursor's current row, starting from
+# column 0. Caller positions the cursor first via 'cursor 0 <row>'.
+# string_arg[0] = char to repeat, arg[1] = count.
+integer repeat_index
+
+{+print_repeat
+set repeat_index = 0
+repeat
+   write string_arg[0]
+   set repeat_index + 1
+until repeat_index = arg[1]
+}
+
+# -----------------------------------------------------------------------------
+# Look text and examine handlers for each scenery object.
+# -----------------------------------------------------------------------------
+
+{look
+print:
+   The cockpit is small and lit by amber console lights. The forward
+   viewscreen frames the cratered lunar surface; a sliver of the Earth
+   hangs just above the horizon.^
+.
+}
+
+{examine panel
+print:
+   Banks of instruments -- attitude indicator, fuel and oxygen gauges,
+   a radar altimeter currently flickering between 4.2 and 4.3 km. The
+   master alarm panel is dark for now.^
+.
+}
+
+{examine joystick
+print:
+   A four-axis attitude controller worn smooth from the simulators.
+   Pulling left of centre fires the +X RCS thrusters; right of centre
+   fires the -X. It feels weighty, ready.^
+.
+}
+
+{examine viewscreen
+print:
+   Through the viewscreen the lunar surface scrolls slowly underneath.
+   Earth rises blue and white over the cratered limb. You catch
+   yourself holding your breath.^
+.
+}
+
+# -----------------------------------------------------------------------------
+# +local_header -- inject a Google Fonts <link> and a per-game CSS rule that
+# uses Orbitron for the page title. webinterface.library calls this from
+# inside <head> after its own styles, so the override wins.
+# -----------------------------------------------------------------------------
+
+{+local_header
+print:
+   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+   <style>
+   #header h1, #header h1 a { font-family: 'Orbitron', 'Courier New', monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+   div.maintext { font-family: 'Orbitron', Georgia, serif; font-weight: 500; }
+   #statuswin { font-family: 'Courier New', ui-monospace, monospace; color: #ffb84a; }
+   </style>
+.
+}
+
+# -----------------------------------------------------------------------------
+# Standard libraries. webinterface.library / .css drive the web build;
+# verbs.library / utils.library provide the parser and helpers used above.
+# -----------------------------------------------------------------------------
+
+#include "webinterface.library"
+#include "webinterface.css"
+#include "verbs.library"
+#include "utils.library"
