@@ -3585,10 +3585,13 @@ if test "x$USER_CFLAGS_SET" = "x"; then
 fi
 
 # Suppress warnings that are false positives or from third-party code.
-# These flags are gcc-specific so check before adding them.
+# These flags are gcc-specific so check before adding them. The test
+# uses -Werror so clang's "unknown warning option" notice -- which is
+# only a warning by default and would slip past AC_COMPILE_IFELSE --
+# becomes a hard failure and we drop the unsupported flag.
 for wflag in -Wno-unused-result -Wno-stringop-truncation -Wno-unused-but-set-variable; do
     save_CFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS $wflag"
+    CFLAGS="$CFLAGS $wflag -Werror"
     { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC supports $wflag" >&5
 printf %s "checking whether $CC supports $wflag... " >&6; }
 
@@ -3606,7 +3609,7 @@ _ACEOF
 if ac_fn_c_try_compile "$LINENO"
 then :
   { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf '%s\n' "yes" >&6; }
+printf '%s\n' "yes" >&6; }; CFLAGS="$save_CFLAGS $wflag"
 else case e in #(
   e) { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf '%s\n' "no" >&6; }; CFLAGS="$save_CFLAGS" ;;
