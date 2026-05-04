@@ -1025,19 +1025,31 @@ execute(const char *funcname)
             } else if (!strcmp(word[0], "break")) {
                 current_level++;
                 execution_level--;
-#ifdef GLK
             } else if (!strcmp(word[0], "cursor")) {
                 if (word[2] == NULL) {
                     /* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
                     noproprun();
                     return(exit_function (TRUE));
                 } else {
+#ifdef GLK
                     if (current_window == statuswin) {
                         glk_window_move_cursor(statuswin, value_of(word[1], TRUE), value_of(word[2], TRUE));
                     } else {
                         log_error(BAD_CURSOR, PLUS_STDOUT);
                     }
+#else
+                    /* Web build: only meaningful inside
+                     * +update_status_window_web, where the grid is
+                     * active. Outside of that the call is a no-op so
+                     * games can share +print_centred / +print_right
+                     * helpers between GLK and web. */
+                    if (web_status_active()) {
+                        web_status_cursor(value_of(word[1], TRUE),
+                                          value_of(word[2], TRUE));
+                    }
+#endif
                 }
+#ifdef GLK
             } else if (!strcmp(word[0], "stop")) {
                 int channel;
 
@@ -2099,33 +2111,44 @@ execute(const char *funcname)
 #else
             } else if (!strcmp(word[0], "undomove")) {
             } else if (!strcmp(word[0], "updatestatus")) {
-                /* Web build: emit a <jacl-status> marker so the JS can
-                 * relocate its content into the dedicated status div
-                 * above the main text area. The data-lines attribute
-                 * tells the JS how tall to make the bar (status_window
-                 * value in lines). Skip when the game hasn't asked for a
-                 * status bar. */
+                /* Web build: render the status bar through a virtual
+                 * character grid so the same cursor X Y + write idiom
+                 * works as on a GLK TextGrid. status_window holds the
+                 * row count; status_window_width (default 80) the
+                 * column count. The marker wrapping <jacl-status>
+                 * stays in maintext for the JS to relocate. */
                 {
                     struct integer_type *sw =
                         integer_resolve("status_window");
                     if (sw != NULL && sw->value > 0) {
+                        struct integer_type *sww =
+                            integer_resolve("status_window_width");
+                        int cols = (sww != NULL && sww->value > 0)
+                                   ? sww->value : 80;
                         sprintf(temp_buffer,
                                 "<jacl-status data-lines=~%d~ "
                                 "style=~display:none~>",
                                 sw->value);
                         write_text(temp_buffer);
+                        web_status_begin(sw->value, cols);
                         if (execute("+update_status_window_web") == FALSE) {
-                            /* Default: just score and turn count on the
-                             * right. Games override by defining
-                             * +update_status_window_web (the web analogue
-                             * of +update_status_window for GLK) to emit
-                             * whatever HTML they want inside the bar. */
-                            sprintf(temp_buffer,
-                                    "<span class=~jacl-status-right~>"
-                                    "Score: %d &middot; Moves: %d</span>",
+                            /* Default: 'Score: N  Moves: N' right-
+                             * aligned on row 0. Pads with spaces to
+                             * push the text against the right edge so
+                             * it lines up regardless of bar width. */
+                            char defstr[64];
+                            int len, pad, j;
+                            sprintf(defstr, "Score: %d  Moves: %d",
                                     SCORE->value, TOTAL_MOVES->value);
-                            write_text(temp_buffer);
+                            len = (int) strlen(defstr);
+                            pad = cols - len;
+                            if (pad < 0) pad = 0;
+                            web_status_cursor(pad, 0);
+                            for (j = 0; defstr[j]; j++) {
+                                web_status_putchar((unsigned char)defstr[j]);
+                            }
                         }
+                        web_status_end();
                         write_text("</jacl-status>");
                     }
                 }

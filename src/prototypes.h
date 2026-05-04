@@ -15,6 +15,15 @@ void convert_to_utf8(glui32 *text, int len);
 glui32 parse_utf8(unsigned char *buf, glui32 buflen, glui32 *out, glui32 outlen);
 #else
 void update_parameters(void);
+/* Web status-window grid -- lets games use the same cursor X Y +
+ * write pattern they'd use for a GLK TextGrid status window. State
+ * lives in cgijacl.c; the interpreter calls these from its
+ * updatestatus / cursor opcodes. */
+void web_status_begin(int rows, int cols);
+void web_status_end(void);
+void web_status_cursor(int x, int y);
+void web_status_putchar(int c);
+int  web_status_active(void);
 #endif
 
 void default_footer(void);
