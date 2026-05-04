@@ -156,33 +156,34 @@ print:
       }^
       if (ms > 0) {^
          jaclTimerHandle = setInterval(function() {^
-            var url = window.location.pathname^
-               + '?ajax=true&rpc=timer&status_cols='^
-               + (typeof jaclMeasureStatusCols === 'function' ? jaclMeasureStatusCols() : 80);^
-            fetch(url, { credentials: 'same-origin' })^
-               .then(function(r) { return r.text(); })^
-               .then(function(data) {^
-                  var maintext = document.getElementById('maintext');^
-                  if (!maintext) return;^
-                  /* Buffer the response into a detached fragment so^
-                   * we can extract markers (status, directions,^
-                   * timer) without polluting maintext. */^
-                  var holder = document.createElement('div');^
-                  holder.innerHTML = data;^
-                  var statusUpdate = holder.querySelector('jacl-status');^
-                  if (statusUpdate) {^
-                     var statusBar = document.getElementById('statuswin');^
-                     if (statusBar) {^
-                        var lines = parseInt(statusUpdate.getAttribute('data-lines') || '1', 10);^
-                        if (isNaN(lines) || lines < 1) lines = 1;^
-                        document.body.style.setProperty('--status-lines', lines);^
-                        statusBar.innerHTML = statusUpdate.innerHTML;^
-                     }^
-                     statusUpdate.remove();^
+            var url = window.location.pathname + '?ajax=true&rpc=timer&status_cols=' + (typeof jaclMeasureStatusCols === 'function' ? jaclMeasureStatusCols() : 80);^
+            /* Promise chain assembled with prefixed assignments so no^
+             * line starts with a leading dot -- JACL's loader treats^
+             * a column-0 '.' as the print-block terminator. */^
+            var p = fetch(url, { credentials: 'same-origin' });^
+            p = p.then(function(r) { return r.text(); });^
+            p = p.then(function(data) {^
+               var maintext = document.getElementById('maintext');^
+               if (!maintext) return;^
+               /* Buffer the response in a detached fragment so we can^
+                * extract markers (status, directions, further timer)^
+                * without polluting maintext on every tick. */^
+               var holder = document.createElement('div');^
+               holder.innerHTML = data;^
+               var statusUpdate = holder.querySelector('jacl-status');^
+               if (statusUpdate) {^
+                  var statusBar = document.getElementById('statuswin');^
+                  if (statusBar) {^
+                     var lines = parseInt(statusUpdate.getAttribute('data-lines') || '1', 10);^
+                     if (isNaN(lines) || lines < 1) lines = 1;^
+                     document.body.style.setProperty('--status-lines', lines);^
+                     statusBar.innerHTML = statusUpdate.innerHTML;^
                   }^
-                  jaclProcessTimerMarker(holder);^
-               })^
-               .catch(function() {});^
+                  statusUpdate.remove();^
+               }^
+               jaclProcessTimerMarker(holder);^
+            });^
+            p.catch(function() {});^
          }, ms);^
       }^
    }^
