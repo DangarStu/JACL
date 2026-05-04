@@ -1390,10 +1390,131 @@ version_info()
     write_text(buffer);
 }
 
+/* ----- Web status window grid ------------------------------------------
+ * Mimics a GLK TextGrid window for the web build so games can use the
+ * same cursor X Y + write pattern in +update_status_window_web that they
+ * use in +update_status_window for GLK. The grid is filled with spaces,
+ * cursor commands move the cursor, and write_text below diverts output
+ * into the grid (one char per cursor position) when web_status_active().
+ * web_status_end emits the buffered grid as <br>-separated rows back
+ * through write_text -- now in normal mode -- so the rest of the
+ * <jacl-status> machinery in the JS picks it up. */
+
+#define WEB_STATUS_MAX_ROWS 32
+#define WEB_STATUS_MAX_COLS 200
+
+static int  web_status_mode = 0;
+static int  web_status_x = 0;
+static int  web_status_y = 0;
+static int  web_status_w = 80;
+static int  web_status_h = 1;
+static char web_status_grid[WEB_STATUS_MAX_ROWS][WEB_STATUS_MAX_COLS + 1];
+
+void
+web_status_begin(int rows, int cols)
+{
+    int i, j;
+    if (rows < 1) rows = 1;
+    if (rows > WEB_STATUS_MAX_ROWS) rows = WEB_STATUS_MAX_ROWS;
+    if (cols < 1) cols = 1;
+    if (cols > WEB_STATUS_MAX_COLS) cols = WEB_STATUS_MAX_COLS;
+    web_status_h = rows;
+    web_status_w = cols;
+    web_status_x = 0;
+    web_status_y = 0;
+    for (i = 0; i < web_status_h; i++) {
+        for (j = 0; j < web_status_w; j++) {
+            web_status_grid[i][j] = ' ';
+        }
+        web_status_grid[i][web_status_w] = 0;
+    }
+    web_status_mode = 1;
+}
+
+void
+web_status_cursor(int x, int y)
+{
+    web_status_x = x;
+    web_status_y = y;
+}
+
+void
+web_status_putchar(int c)
+{
+    if (c == '^' || c == '\n') {
+        web_status_y++;
+        web_status_x = 0;
+        return;
+    }
+    if (web_status_y < 0 || web_status_y >= web_status_h) return;
+    if (web_status_x < 0 || web_status_x >= web_status_w) return;
+    web_status_grid[web_status_y][web_status_x] = (char) c;
+    web_status_x++;
+}
+
+int
+web_status_active(void)
+{
+    return web_status_mode;
+}
+
+void
+web_status_end(void)
+{
+    int i, j;
+    char row_html[WEB_STATUS_MAX_COLS * 6 + 16];
+    int p;
+
+    /* Switch off status mode FIRST so the write_text calls below go
+     * out as normal HTML rather than back into the grid. */
+    web_status_mode = 0;
+
+    for (i = 0; i < web_status_h; i++) {
+        if (i > 0) write_text("<br>");
+        p = 0;
+        for (j = 0; j < web_status_w; j++) {
+            char c = web_status_grid[i][j];
+            if (c == '<') {
+                strcpy(&row_html[p], "&lt;");
+                p += 4;
+            } else if (c == '>') {
+                strcpy(&row_html[p], "&gt;");
+                p += 4;
+            } else if (c == '&') {
+                strcpy(&row_html[p], "&amp;");
+                p += 5;
+            } else if (c == ' ') {
+                /* Preserve runs of spaces -- white-space:pre on the
+                 * #statuswin div handles this, but be defensive in
+                 * case the HTML gets rendered somewhere else too. */
+                strcpy(&row_html[p], "&nbsp;");
+                p += 6;
+            } else {
+                row_html[p++] = c;
+            }
+        }
+        row_html[p] = 0;
+        write_text(row_html);
+    }
+}
+
 void
 write_text(const char *tout_buffer)
 {
     int             index;
+
+    /* Status-grid mode: route every character into the virtual grid
+     * at the current cursor position. ~ -> " conversion still
+     * applies so games can use the same JACL string syntax as for
+     * normal text. The grid emits itself as HTML in web_status_end. */
+    if (web_status_active()) {
+        for (index = 0; tout_buffer[index] != 0; index++) {
+            int c = tout_buffer[index];
+            if (c == '~') c = '"';
+            web_status_putchar(c);
+        }
+        return;
+    }
 
     if (!strcmp(tout_buffer, "tilde")) {
         chunk_buffer[buffer_index] = '~';
