@@ -714,7 +714,7 @@ main(int argc, char *argv[])
          * run with its state guards so the unanswered question (and only
          * that question) gets re-emitted. */
         if (returning_player == TRUE
-            && TOTAL_MOVES != NULL && TOTAL_MOVES->value == 0
+            && TOTAL_MOVES != NULL && TOTAL_MOVES->value <= 0
             && (cgi_val(entries, "command") == NULL)
             && (cgi_val(entries, "rpc") == NULL)) {
             struct integer_type *ptype = PENDING_QUESTION_TYPE;
@@ -942,7 +942,7 @@ main(int argc, char *argv[])
                              * cookies; both cases need the intro re-run
                              * so we only condition on TOTAL_MOVES. */
                             if (TOTAL_MOVES != NULL
-                                && TOTAL_MOVES->value == 0) {
+                                && TOTAL_MOVES->value <= 0) {
                                 struct integer_type *answers =
                                     integer_resolve("intro_answers");
                                 if (answers != NULL) {
@@ -958,7 +958,7 @@ main(int argc, char *argv[])
                             }
                         } else if (question_type == 1
                                    && TOTAL_MOVES != NULL
-                                   && TOTAL_MOVES->value == 0) {
+                                   && TOTAL_MOVES->value <= 0) {
                             /* Invalid yes/no answer during the pre-game
                              * intro flow. The "Please enter yes or no"
                              * hint has been written above; re-run +intro
