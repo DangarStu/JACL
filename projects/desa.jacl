@@ -1684,50 +1684,45 @@ write "yang kamu lihat di sekitar sini.^"
 }
 
 {+intro
-if intro_dedication_shown = 0
-   set intro_dedication_shown = 1
-   style bold
-   write "^^" game_title
-   style normal
-   write " oleh " game_author "^^"
+execute "+game_intro"
+}
+
+{+game_dedication
+style bold
+write "^^" game_title
+style normal
+write " oleh " game_author "^^"
+}
+
+{+game_scene
+print:
+   Matahari pagi bersinar cerah di atas desa. Ayam
+   berkokok di kejauhan dan udara terasa sejuk. Hari
+   ini adalah hari yang baik untuk menjelajahi desa
+   dan bertemu dengan tetangga.^^
+.
+
+style note
+write "Petunjuk: ketik "
+style input
+write "bantuan"
+style note
+if interpreter = CGI
+   write " kapan saja untuk melihat perintah, atau klik ganda pada kata bahasa Indonesia mana pun untuk melihat terjemahannya.^^"
+else
+   write " kapan saja untuk melihat daftar perintah yang tersedia.^^"
+endif
+style normal
+
+if here hasnt OUTDOORS
+   move north_wall to here
+   move south_wall to here
+   move east_wall to here
+   move west_wall to here
 endif
 
-execute "+startup_preferences"
-if pending_question_type != 0
-   return
-endif
-
-if intro_scene_shown = 0
-   set intro_scene_shown = 1
-   print:
-      Matahari pagi bersinar cerah di atas desa. Ayam
-      berkokok di kejauhan dan udara terasa sejuk. Hari
-      ini adalah hari yang baik untuk menjelajahi desa
-      dan bertemu dengan tetangga.^^
-   .
-
-   style note
-   write "Petunjuk: ketik "
-   style input
-   write "bantuan"
-   style note
-   if interpreter = CGI
-      write " kapan saja untuk melihat perintah, atau klik ganda pada kata bahasa Indonesia mana pun untuk melihat terjemahannya.^^"
-   else
-      write " kapan saja untuk melihat daftar perintah yang tersedia.^^"
-   endif
-   style normal
-
-   if here hasnt OUTDOORS
-      move north_wall to here
-      move south_wall to here
-      move east_wall to here
-      move west_wall to here
-   endif
-
-   set ground(parent) = here
-   look
-endif
+set ground(parent) = here
+look
 }
 
 {+eachturn

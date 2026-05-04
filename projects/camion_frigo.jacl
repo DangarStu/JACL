@@ -235,87 +235,82 @@ set time = false
 }
 
 {+intro
-if intro_dedication_shown = 0
-   set intro_dedication_shown = 1
-   style bold
-   write "^" game_title
-   style normal
-   write " par " game_author "^^"
-endif
+execute "+game_intro"
+}
 
-execute "+startup_preferences"
-if pending_question_type != 0
-   return
-endif
+{+game_dedication
+style bold
+write "^" game_title
+style normal
+write " par " game_author "^^"
+}
 
-if intro_scene_shown = 0
-   set intro_scene_shown = 1
-   clear
-              style italic
-              write "^Elle vous cherche encore. « Lucien ! François ! » De sa voix stridente, elle vous appelle. Pas question de la faire attendre. « Lucien ! François ! »"
-              more "^^"
-   clear
-              style normal
+{+game_scene
+clear
+           style italic
+           write "^Elle vous cherche encore. « Lucien ! François ! » De sa voix stridente, elle vous appelle. Pas question de la faire attendre. « Lucien ! François ! »"
+           more "^^"
+clear
+           style normal
+           style bold
+        write "^"game_author "^"
+        write "présente ^"
+           if interpreter = GLK
+        if graphics_supported = false
               style bold
-           write "^"game_author "^"
-           write "présente ^"
-              if interpreter = GLK
-           if graphics_supported = false
-                 style bold
-                     write ^ game_title
-                     style normal
-           else
-               volume 80
-               volume 50 AUDIO_CHANNEL02
-               image image_camion_frigo center
-               sound music_camion_frigo01
-               style bold
-             endif
-           endif
-           if interpreter = CGI
-               write ^ game_title
-             endif
-              write "^^"
-              style normal
-              more ""
-   clear
-   if interpreter = GLK
-   if sound_supported = true
-     volume 80
-     volume 75
-     volume 70
-     volume 60
-     volume 55
-     volume 50
-     volume 45
-     volume 40
-     style italic
-     more "(tapez « aide » durant le jeu pour obtenir des instructions...)"
-     style normal
-     clear
-     volume 35
-     volume 30
-     volume 25
-     volume 20
-     volume 15
-     volume 10
-     volume 5
-     volume 0
-     stop
-     volume 80
-     endif
-   endif
-
-   move sophiejeanne to limbo
-   set CONCLUSION = 0
-   if here hasnt OUTDOORS
-   endall
-   move ground to here
-   look
-   else
-   move route to here
-   endall
+                  write ^ game_title
+                  style normal
+        else
+            volume 80
+            volume 50 AUDIO_CHANNEL02
+            image image_camion_frigo center
+            sound music_camion_frigo01
+            style bold
+          endif
+        endif
+        if interpreter = CGI
+            write ^ game_title
+          endif
+           write "^^"
+           style normal
+           more ""
+clear
+if interpreter = GLK
+if sound_supported = true
+  volume 80
+  volume 75
+  volume 70
+  volume 60
+  volume 55
+  volume 50
+  volume 45
+  volume 40
+  style italic
+  more "(tapez « aide » durant le jeu pour obtenir des instructions...)"
+  style normal
+  clear
+  volume 35
+  volume 30
+  volume 25
+  volume 20
+  volume 15
+  volume 10
+  volume 5
+  volume 0
+  stop
+  volume 80
+  endif
 endif
+
+move sophiejeanne to limbo
+set CONCLUSION = 0
+if here hasnt OUTDOORS
+endall
+move ground to here
+look
+else
+move route to here
+endall
 }
 
 {+timer

@@ -30,6 +30,58 @@ integer voice_enabled
 integer intro_dedication_shown
 integer intro_scene_shown
 
+# Opt-out for utility / non-IF games (life, blackjacl, etc.). Set to
+# true in +intro before 'execute "+game_intro"' to skip the voice
+# and sound questions, which don't make sense for them.
+integer skip_intro_preferences
+
+# Standard +intro scaffold shared by every game that includes this
+# library. Games provide:
+#   {+game_dedication ... }   -- credits / opening text shown ONCE
+#                                before the voice/sound questions.
+#   {+game_scene ... }        -- scene setup + opening prose shown
+#                                ONCE after both questions answered.
+# Their +intro shrinks to whatever per-entry state they need plus
+# `execute "+game_intro"`, e.g.:
+#   {+intro
+#   set player = kryten
+#   execute "+game_intro"
+#   }
+# The web build re-enters +intro after each pending getyesorno
+# answer, so the scaffold guards each block with intro_dedication_shown
+# / intro_scene_shown to fire it once. GLK runs it straight through.
+{+game_intro
+if intro_dedication_shown = 0
+   set intro_dedication_shown = 1
+   ifexecute "+game_dedication"
+      # game-specific credits / opening text
+   endif
+endif
+
+# GLK only: optional "would you like to restore?" prompt before the
+# scene. Web ignores -- restoration there is handled by the engine
+# via the Google sign-in / cookie-based auto-save.
+if interpreter = GLK
+   ifexecute "+load_saved"
+      return
+   endif
+endif
+
+if skip_intro_preferences = false
+   execute "+startup_preferences"
+   if pending_question_type != 0
+      return
+   endif
+endif
+
+if intro_scene_shown = 0
+   set intro_scene_shown = 1
+   ifexecute "+game_scene"
+      # game-specific scene start
+   endif
+endif
+}
+
 {+startup_preferences
 if interpreter = CGI
    if intro_answers < 1
