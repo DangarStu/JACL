@@ -3,7 +3,7 @@ write "var url_string = ~" $url "?ajax=true&command=~ + encodeURIComponent(detai
 if remote_user = false
 	write " + ~&user_id=" $user_id "~"
 endif
-write " + ~&status_cols=~ + (window.jaclStatusCols || 80);^"
+write " + ~&status_cols=~ + (typeof jaclMeasureStatusCols === 'function' ? jaclMeasureStatusCols() : (window.jaclStatusCols || 80));^"
 write "fetch(url_string)^"
 write "  .then(function(response) { return response.text(); })^"
 write "  .then(function(data) {^"
@@ -26,7 +26,7 @@ write "var url_string = ~" $url "?ajax=true&command=~ + encodeURIComponent(detai
 if remote_user = false
 	write " + ~&user_id=" $user_id "~"
 endif
-write " + ~&status_cols=~ + (window.jaclStatusCols || 80);^"
+write " + ~&status_cols=~ + (typeof jaclMeasureStatusCols === 'function' ? jaclMeasureStatusCols() : (window.jaclStatusCols || 80));^"
 write "fetch(url_string)^"
 write "  .then(function(response) { return response.text(); })^"
 write "  .then(function(data) {^"

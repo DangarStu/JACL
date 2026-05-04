@@ -137,29 +137,45 @@ print:
       });^
    }^
 
-   /* Measure how many monospace characters fit across #statuswin so^
-    * the JACL grid (which positions text via cursor X Y) lines up with^
-    * the actual viewport. Without this, +print_right places content^
-    * at column status_window_width-strlen which is mid-bar on wide^
-    * screens. The measured value rides every ajax request as^
-    * &status_cols= -- the engine reads it and updates^
-    * status_window_width before each updatestatus. */^
+   /* Measure how many monospace characters fit across the status bar^
+    * so the JACL grid (which positions text via cursor X Y) lines up^
+    * with the actual viewport. Without this, +print_right places^
+    * content at column status_window_width-strlen, which is mid-bar^
+    * on wide screens. The measured value rides every ajax request as^
+    * &status_cols= and the engine reads it before each updatestatus.^
+    *^
+    * Falls back to #main when #statuswin is :empty / display:none^
+    * (no status emitted yet). Both elements span the same horizontal^
+    * extent so the measurement is equivalent. */^
    function jaclMeasureStatusCols() {^
       var bar = document.getElementById('statuswin');^
-      if (!bar) return 80;^
-      var rect = bar.getBoundingClientRect();^
-      var w = rect.width;^
+      var main = document.getElementById('main');^
+      var w = 0;^
+      if (bar) {^
+         w = bar.getBoundingClientRect().width;^
+      }^
+      if (w <= 0 && main) {^
+         w = main.getBoundingClientRect().width;^
+      }^
+      if (w <= 0) {^
+         w = document.documentElement.clientWidth || 0;^
+      }^
       if (w <= 0) return 80;^
       var probe = document.createElement('span');^
-      var cs = window.getComputedStyle(bar);^
+      var fontTarget = bar || main || document.body;^
+      var cs = window.getComputedStyle(fontTarget);^
       probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre';^
-      probe.style.fontFamily = cs.fontFamily;^
-      probe.style.fontSize = cs.fontSize;^
+      /* Force monospace family even if the fallback target has a^
+       * proportional font, so the measurement matches the bar's^
+       * actual monospace stack. */^
+      probe.style.fontFamily = 'ui-monospace, SF Mono, Menlo, Consolas, Courier New, monospace';^
+      probe.style.fontSize = (bar ? cs.fontSize : '12px');^
       probe.textContent = '0123456789012345678901234567890123456789';^
       document.body.appendChild(probe);^
       var charW = probe.offsetWidth / 40;^
       document.body.removeChild(probe);^
       if (charW <= 0) return 80;^
+      /* Subtract a couple of chars for left/right padding on the bar. */^
       var cols = Math.floor(w / charW) - 2;^
       return Math.max(40, Math.min(400, cols));^
    }^
