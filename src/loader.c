@@ -131,6 +131,7 @@ read_gamefile()
     create_integer ("local_a", 0);
     create_integer ("linebreaks", 1);
     create_integer ("pending_question_type", 0);
+    create_integer ("intro_answers", 0);
     create_integer ("pending_number_low", 0);
     create_integer ("pending_number_high", 0);
 

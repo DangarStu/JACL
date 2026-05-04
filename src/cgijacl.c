@@ -904,17 +904,23 @@ main(int argc, char *argv[])
 
                             TIME->value = TRUE;
                             /* If the pending question came from +intro on a
-                             * fresh game (no real moves yet), give +intro
-                             * another go instead of running eachturn -- this
-                             * lets a multi-question intro chain getyesorno
-                             * calls across requests, with the game using
-                             * state guards to skip the parts already done
-                             * on prior passes. Otherwise (pending question
-                             * during normal gameplay) keep the historical
-                             * behaviour and run eachturn. */
+                             * fresh game (no real moves yet), bump the
+                             * intro_answers counter and give +intro another
+                             * go instead of running eachturn -- this lets a
+                             * multi-question intro chain getyesorno calls
+                             * across requests. The JACL state guards key
+                             * off intro_answers to know which question is
+                             * up. Otherwise (pending question during normal
+                             * gameplay) keep the historical behaviour and
+                             * run eachturn. */
                             if (returning_player == FALSE
                                 && TOTAL_MOVES != NULL
                                 && TOTAL_MOVES->value == 0) {
+                                struct integer_type *answers =
+                                    integer_resolve("intro_answers");
+                                if (answers != NULL) {
+                                    answers->value++;
+                                }
                                 execute("+intro");
                             } else {
                                 /* RUN EACHTURN SO THE GAME CAN REACT TO THE
@@ -923,6 +929,17 @@ main(int argc, char *argv[])
                                  * INCREMENTS total_moves FIRST */
                                 eachturn();
                             }
+                        } else if (question_type == 1
+                                   && returning_player == FALSE
+                                   && TOTAL_MOVES != NULL
+                                   && TOTAL_MOVES->value == 0) {
+                            /* Invalid yes/no answer during the pre-game
+                             * intro flow. The "Please enter yes or no"
+                             * hint has been written above; re-run +intro
+                             * so the game's state-guarded question text
+                             * is re-emitted, restoring context for the
+                             * player who's now staring at just the hint. */
+                            execute("+intro");
                         }
                         /* SKIP NORMAL COMMAND PROCESSING WHEN PENDING */
                         goto skip_command;
