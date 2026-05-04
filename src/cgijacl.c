@@ -507,10 +507,11 @@ main(int argc, char *argv[])
                             if (stat(new_auto, &sb) != 0 &&
                                 stat(old_auto, &sb) == 0 &&
                                 rename(old_auto, new_auto) == 0) {
-                                sprintf(error_buffer,
-                                        "Migrated anonymous auto-save "
-                                        "%s -> %s on first sign-in",
-                                        old_auto, new_auto);
+                                snprintf(error_buffer,
+                                         sizeof(error_buffer),
+                                         "Migrated anonymous auto-save "
+                                         "%s -> %s on first sign-in",
+                                         old_auto, new_auto);
                                 log_error(error_buffer, LOG_ONLY);
                             }
                         }
