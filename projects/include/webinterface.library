@@ -14,52 +14,44 @@ constant footer_image        "none"
 # and CGI <audio> emission on its value, so writing it from JACL is
 # enough; no per-site `if sound_enabled` is required.
 #
-# voice_asked / sound_asked are the state guards that let
-# +startup_preferences chain its two getyesorno calls across separate
-# CGI requests. The interpreter calls +intro again after a pending
-# answer (when total_moves is still 0), so each re-entry advances one
-# step further through this function.
+# On web, +startup_preferences gets re-entered after each pending
+# getyesorno answer (the engine re-runs +intro while TOTAL_MOVES is
+# still 0). The intro_answers counter, bumped by the engine for each
+# *valid* answer in this pre-game window, drives which question is
+# next. An *invalid* answer also triggers a re-run but doesn't bump
+# the counter, so the same question gets re-emitted with context.
 integer voice_enabled
-integer voice_asked
-integer sound_asked
 
 {+startup_preferences
-# First pass: ask about voice (web only -- TTS is browser-side).
-if voice_asked = 0
-   set voice_asked = 1
-   if interpreter = CGI
+if interpreter = CGI
+   if intro_answers < 1
       write "^Would you like the text read aloud?^"
       getyesorno voice_enabled
-      # On web, getyesorno exits the function. The next +intro re-entry
-      # will skip this block (voice_asked is now 1) and fall through to
-      # the sound question below.
+      # First valid answer: engine bumps intro_answers to 1 and
+      # re-runs +intro. We'll skip this block and fall through.
    endif
-endif
-
-# Second pass: emit the speech preference now that the player has
-# answered, then ask about sound effects.
-if sound_asked = 0
-   set sound_asked = 1
-   if interpreter = CGI
+   if intro_answers < 2
       if voice_enabled = true
          write "<script>enableSpeak();</script>"
       else
          write "<script>disableSpeak();</script>"
       endif
+      write "^Would you like sound effects?^"
+      getyesorno sound_enabled
    endif
-   write "^Would you like sound effects?^"
-   getyesorno sound_enabled
-endif
-
-# Third pass: emit the sound preference. Both questions answered.
-if interpreter = CGI
+   # Both questions answered -- emit the sound preference and finish.
    if sound_enabled = true
       write "<script>enableSound();</script>"
    else
       write "<script>disableSound();</script>"
    endif
+   write "^"
+else
+   # GLK: getyesorno is synchronous, no state guards needed. TTS is
+   # browser-only so only the sound question is asked.
+   write "^Would you like sound effects?^"
+   getyesorno sound_enabled
 endif
-write "^"
 }
 
 {+header
