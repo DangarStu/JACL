@@ -107,7 +107,7 @@ print:
 		right: 0px;
 		left: 0px;
 		height: 30px;
-		font-family: Merriweather, Verdana, Arial, Sanserif;
+		font-family: Verdana, Arial, sans-serif;
 		padding-right: 10px;
 		display: flex;
 		align-items: center;
@@ -116,7 +116,7 @@ print:
 write " background-color: " linkbar_colour "80; }^"
 print:
 	div.links a.header,
-	div.links #jaclAuthSlot { padding: 0 6px; }^
+	div.links #jaclAuthSlot { padding: 0 6px; font-family: Verdana, Arial, sans-serif; }^
 	img.main {
 		width: 476px;
 		height: 376px; 
