@@ -21,29 +21,73 @@ string game_language      "en-US"
 # Header / theme. The colour pair below is meant to read as a NASA-era
 # control room: dark instrument panel, soft-amber accents.
 constant title_image      "/images/missioncontrol-title.png"
-constant header_colour    "#0c1626"
+constant header_colour    "#000000"
 constant linkbar_colour   "#1a2a44"
-constant maintext_colour  "#e8e0c8"
+constant maintext_colour  "#c8ccd0"
 constant title_colour     "#ffb84a"
 
 # Telemetry needs a wide grid -- 60 columns is enough for two-up
 # label / value pairs without crowding.
-integer status_window         10
-integer status_window_width   60
+integer status_window          7
+integer status_window_width   80
 
 # -----------------------------------------------------------------------------
-# TELEMETRY STATE -- what the status bar shows. A real game would tick these
-# from +eachturn / +timer; here they're just initial values so the layout is
-# visible the moment the player lands in the cockpit.
+# TELEMETRY STATE -- a single integer array that holds every value the
+# status bar displays. Constants below name each slot so call sites stay
+# readable, e.g. 'telemetry[TLM_FUEL]' instead of 'telemetry[5]'.
+#
+# Initial values are a snapshot of the lander a few seconds before powered
+# descent: ~12.5 km altitude, ~1,440 m/s horizontal velocity, full tanks,
+# nominal life support. A real mission would tick these from +eachturn and
+# +timer.
 # -----------------------------------------------------------------------------
 
-integer hull_pct          100
-integer fuel_pct          100
-integer oxygen_pct         98
-integer power_pct          87
-integer altitude_m       4230
-integer velocity_mms      120
-integer mission_minutes     0
+constant TLM_MET            0    # mission elapsed time, seconds
+constant TLM_ALTITUDE       1    # m above ground / lunar surface
+constant TLM_HVEL           2    # horizontal velocity, m/s
+constant TLM_VVEL           3    # vertical velocity, m/s (negative = descending)
+constant TLM_RANGE          4    # downrange distance from pad / range to target, m
+constant TLM_FUEL           5    # % fuel remaining
+constant TLM_THROTTLE       6    # % main engine throttle
+constant TLM_DELTAV         7    # delta-v remaining, m/s
+constant TLM_OXYGEN         8    # % crew O2 reserve
+constant TLM_POWER          9    # % battery / fuel-cell reserve
+constant TLM_CABIN         10    # cabin pressure, kPa
+constant TLM_SIGNAL        11    # % comm signal strength
+constant TLM_PITCH         12    # vehicle pitch, degrees from vertical (90 = up)
+constant TLM_GLOAD         13    # acceleration felt by crew, g (integer)
+constant TLM_MACH          14    # vehicle speed in Mach (integer; zero in vacuum)
+constant TLM_LOXPSI        15    # LOX tank ullage pressure, psi -- EECOM's leak gauge
+constant TLM_MASS          16    # vehicle mass, tonnes (drops as propellant burns)
+constant TLM_HR            17    # astronaut heart rate, bpm
+constant TLM_AOA           18    # angle of attack, degrees (atmospheric flight)
+constant TLM_BUSV          19    # main electrical bus voltage, V (28 nominal)
+constant TLM_COUNT         20    # number of slots
+
+integer_array telemetry TLM_COUNT
+
+# -----------------------------------------------------------------------------
+# ACT 1 STATE -- "FINAL COUNT"
+#
+# The opening scene is the launch. Vehicle (the BURROUGHS stack, fictitious,
+# vintage-Apollo-class) is on the pad in Florida. MET starts at -60 (T-1:00)
+# and counts up through zero to ignition. At MET = -30 (T-30s) FIDO calls
+# wind shear at altitude and the GO/NO-GO opens. Decision window closes 24 s
+# later at MET = -6 (T-6s) -- the launch sequencer locks itself out there.
+#
+# Same three mechanics as the descent draft they replace:
+#   1. Live MET tick via +timer (3-second cadence)
+#   2. Examine-as-polling for the four controllers, phase-aware
+#   3. Real-clock countdown rendered into the status panel during the
+#      decision window; commit / abort / hold (c / a / h) all valid verbs
+# -----------------------------------------------------------------------------
+
+integer alarm_fired
+integer decision_made
+integer timer_started
+integer decision_deadline      # MET value at which the window closes
+integer decision_seconds_left  # scratch for status-bar countdown
+integer abs_met                # scratch for T-MINUS rendering
 
 # -----------------------------------------------------------------------------
 # THE WORLD -- a Mission Control auditorium in Houston. The player is a
@@ -65,24 +109,177 @@ object console : flight console position desk
  static
  parent        flight_control
 
+{examine
+print:
+   Your FLIGHT console: a comms loop selector with a dozen labelled
+   keys, two monochrome CRTs displaying mission elapsed time and
+   crew biomedical, and a row of green-yellow-red alert LEDs across
+   the top of the panel. The microphone arm waits to your right.^
+.
+}
+
 object headset : headset comms loop microphone
  short         the "comm loop headset"
  static
  parent        flight_control
+
+{examine
+print:
+   A standard agency-issue headset, one earpiece, foam crumbling at
+   the edges. It feeds the FLIGHT loop -- private to you and the
+   astronaut -- and a parallel line into the public-affairs feed.^
+.
+}
 
 object big_screen : screen big board front projection map
  short         the "big board"
  static
  parent        flight_control
 
+{examine
+print:
+   The big board, projected on the front wall: the BURROUGHS stack
+   in pale wireframe on its pad, status panels around its outline
+   all green. Numerical readouts on the right-hand strip update
+   every second -- countdown clock, tank pressures, platform
+   alignment, range-safety arming.^
+.
+}
+
 object plot_table : plotting table chart trajectory
  short         the "plotting table"
  static
  parent        flight_control
 
+{examine
+print:
+   A circular plotting table behind the FLIGHT consoles, currently
+   showing the planned ascent: a clean parabola from the pad arcing
+   out over the Atlantic, with insertion point sixty kilometres above
+   the African coast. Wind-shear contours are sketched in red along
+   the climb-out, between eight and twelve kilometres altitude.^
+.
+}
+
 object coffee_mug : mug coffee cup
  short         the "stained NASA coffee mug"
  parent        flight_control
+
+{examine
+print:
+   White porcelain with a faded blue NASA meatball. Half-empty,
+   well-stained, and roughly one descent burn old.^
+.
+}
+
+# Controllers around the room. Each is ANIMATE so 'examine X' produces a
+# live read rather than the static-scenery default. The bare {examine}
+# block immediately after each object def is what the JACL loader binds
+# to that object's label -- placement matters.
+
+object fido : fido fdo dynamics officer woman
+ short         name "the FIDO controller"
+ has           ANIMATE
+ parent        flight_control
+
+{examine
+if alarm_fired = false
+   print:
+   FIDO, fast and bright on the loop: "Flight, FIDO. Range tracking
+   nominal, ascent profile loaded, predicted insertion point clean.
+   Weather balloon's still climbing -- we'll have wind data at
+   altitude in about a minute."^
+.
+else
+   print:
+   FIDO, sharper now: "FIDO, Flight. The wind data is in and it is
+   not ambiguous. Forty-six knot gust at ten kilometres, lateral
+   against our trajectory. Twelve percent over the load envelope at
+   max-Q. I am still on HOLD. Recycle the count and wait the gust
+   pattern out."^^
+   He does not tell you what HOLD costs in fuel-boil-off, crew
+   bladder, or political capital. That isn't on his console.^
+.
+endif
+}
+
+object eecom : eecom electrical environmental life support engineer
+ short         name "the EECOM controller"
+ has           ANIMATE
+ parent        flight_control
+
+{examine
+if alarm_fired = false
+   print:
+   EECOM, slow and unbothered: "Flight, EECOM. All buses on internal,
+   draws nominal. Tank one ullage two-six-eight psi, tank two two-six-
+   nine. Crew O2 one hundred, suit loop closed. Everything I can
+   measure is doing what it ought to be."^
+.
+else
+   print:
+   EECOM, same slow voice -- the only person in the room not lifting
+   his pulse: "Flight, EECOM. I am not in this argument; the wind is
+   not a consumables problem and the steering law is not my console.
+   But for what it is worth, I have been watching tank one ullage
+   pressure for the last ninety seconds. It is dropping two psi a
+   minute. That is small. It is not zero. I do not know if that is
+   gauge drift or a slow leak in the LOX manifold. I do know that
+   if you HOLD the count, that trend gets worse, not better.
+   Whatever you call, Flight, you are calling against a clock I
+   cannot stop."^
+.
+endif
+}
+
+object guidance : guidance gnc nav navigation computer man
+ short         name "the GUIDANCE controller"
+ has           ANIMATE
+ parent        flight_control
+
+{examine
+if alarm_fired = false
+   print:
+   GUIDANCE, technical and a little formal: "Flight, GUIDANCE. Inertial
+   platform aligned, drift inside spec. Computer is running pre-flight
+   sequence on schedule."^
+.
+else
+   print:
+   GUIDANCE, formal and a touch too certain: "Flight, GUIDANCE. The
+   ascent steering law has explicit wind-shear margin. The autopilot
+   pitches into the gust, trims angle of attack, the vehicle adapts.
+   I have flown this in the simulator. Recommend COMMIT."^^
+   He does not, you notice, mention the structural load envelope --
+   the question of how much sideways FIDO's vehicle can actually take
+   before something parts. The aero engineers live three buildings
+   over. He is reading from his own console.^
+.
+endif
+}
+
+object retro : retro retrofire abort man
+ short         name "the RETRO controller"
+ has           ANIMATE
+ parent        flight_control
+
+{examine
+if alarm_fired = false
+   print:
+   RETRO, gravelly and short: "RETRO. Range safety armed. Recovery
+   forces in position."^
+.
+else
+   print:
+   RETRO, same gravel, slower: "Flight, RETRO. I have an abort. The
+   escape tower is armed and the trajectory through max-Q is inside
+   the recoverable envelope -- if she comes apart, the capsule gets
+   pulled clear, the woman comes down on a canopy in salt water,
+   and the carriers are inside her landing footprint." He pauses.
+   "What I do not have is an opinion on whether you should need it."^
+.
+endif
+}
 
 # -----------------------------------------------------------------------------
 # +intro / dedication / scene -- delegate to the shared helper.
@@ -90,7 +287,40 @@ object coffee_mug : mug coffee cup
 
 {+intro
 set player = kryten
+execute "+setup_telemetry"
 execute "+game_intro"
+# Kick off the live MET tick once preferences have all been answered.
+# Guarded so multi-pass +intro doesn't restart the Glk timer each pass.
+if timer_started = false
+   set timer_started = true
+   timer 3000
+endif
+}
+
+# Pre-launch snapshot at T-1:00. Vehicle on the pad: motion values zero,
+# pitch vertical, sitting on 1g, tanks topped off, comms locked, calm
+# astronaut. Mass is the BURROUGHS stack fully fuelled.
+{+setup_telemetry
+set telemetry[TLM_MET]      = -60
+set telemetry[TLM_ALTITUDE] = 0
+set telemetry[TLM_HVEL]     = 0
+set telemetry[TLM_VVEL]     = 0
+set telemetry[TLM_RANGE]    = 0
+set telemetry[TLM_FUEL]     = 99
+set telemetry[TLM_THROTTLE] = 0
+set telemetry[TLM_DELTAV]   = 9400
+set telemetry[TLM_OXYGEN]   = 100
+set telemetry[TLM_POWER]    = 100
+set telemetry[TLM_CABIN]    = 101
+set telemetry[TLM_SIGNAL]   = 100
+set telemetry[TLM_PITCH]    = 90
+set telemetry[TLM_GLOAD]    = 1
+set telemetry[TLM_MACH]     = 0
+set telemetry[TLM_LOXPSI]   = 268
+set telemetry[TLM_MASS]     = 2940
+set telemetry[TLM_HR]       = 64
+set telemetry[TLM_AOA]      = 0
+set telemetry[TLM_BUSV]     = 28
 }
 
 {+game_dedication
@@ -99,17 +329,18 @@ style header
 write "^ MISSION CONTROL^"
 style normal
 style note
-write "Module 1 -- the descent.^"
+write "Module 1 -- the launch.^"
 style normal
 write "by " game_author ", build " game_release "/" game_build "^^"
 print:
    You are FLIGHT for this mission -- the flight director on console
-   in Building 30, Houston. A one-person lander is on final approach
-   to the Sea of Tranquility, three hundred and eighty thousand
-   kilometres away. Main guidance has just gone red, the radar
-   altimeter is intermittent, and the descent profile is hot.^^
-   Your astronaut is calm. Your team is not. The decisions are
-   yours; the consequences are 1.3 light-seconds away.^^
+   in Building 30, Houston. On the pad in Florida, fifteen hundred
+   kilometres south-east, a four-stage liquid-fuelled vehicle stands
+   ready: the BURROUGHS stack, fully fuelled and on internal power,
+   with a single astronaut in the command capsule at the top.^^
+   The count is at T-minus one minute. Your team is sharp and quiet.
+   The decisions are yours; the consequences are seven thousand tonnes
+   of cryogenic propellant and a woman strapped to the front of it.^^
 .
 }
 
@@ -117,129 +348,156 @@ print:
 updatestatus
 clear
 style header
-write "TRANQUILITY APPROACH^"
+write "FINAL COUNT^"
 style normal
-write "T+00:00:00^^"
+write "T-00:01:00^^"
 print:
    The Mission Control room is dim and warm and crowded. Banks of
-   monochrome monitors blink at the FIDO, EECOM, GUIDANCE and
-   RETRO consoles around you. At the front of the room the big
-   board shows a wireframe trajectory cutting across a grey lunar
-   limb -- and, in the corner, a live numerical readout slewing
-   too fast.^^
+   monochrome monitors blink at the FIDO, EECOM, GUIDANCE and RETRO
+   consoles around you. At the front of the room the big board shows
+   the BURROUGHS stack on its pad, drawn in pale wireframe against
+   the ochre Florida sky -- status lights green across the panel,
+   strip charts on the right scrolling smoothly.^^
    Your headset crackles. A green LED on the FLIGHT console is
-   waiting for your call. The lander begins its powered descent
-   in seconds.^^
-   Type ~look~ to take stock, ~examine board~ to read the trajectory,
+   waiting for your call. Sixty seconds to ignition.^^
+   Type ~look~ to take stock, ~examine board~ to read the pad status,
    or speak into the loop when you are ready.^
 .
 }
 
 # -----------------------------------------------------------------------------
-# +update_status_window -- draws the 10-line telemetry panel using the same
-# cursor X Y idiom on both Glk (real TextGrid) and web (virtual grid
-# emulated by the engine + jaclWrapMapLabel-style monospace bar).
+# +update_status_window -- draws the 7-line telemetry panel using cursor X Y,
+# which works on both Glk (real TextGrid) and web (virtual grid emulated by
+# the engine).
+#
+# Layout: 80 cols wide, four columns of label/value pairs grouped by theme:
+#   col 1 (timing/command): MET, Throttle, Pitch, G-load, AoA
+#   col 2 (trajectory):     Altitude, Range, H-Vel, V-Vel, Mach
+#   col 3 (propellant):     Fuel, LOX press, Delta-V, Mass, Bus V
+#   col 4 (crew/systems):   Oxygen (or DECIDE), Power, Cabin, Signal, Crew HR
+# Each cell is 20 chars: label at offset 0, value at offset 10.
+# Rows 0 and 6 are intentional buffer rows. The DECIDE countdown hijacks
+# the top-right cell during the alarm -- a flight director's eye snaps to
+# that corner when something's wrong.
 # -----------------------------------------------------------------------------
 
-string status_text
-
 {+update_status_window
-# Row 0: title left, mission timer right.
-cursor 1 0
-write "MISSION CONTROL"
-setstring status_text "T+" mission_minutes "m"
-execute "+print_right<status_text<0"
+# Row 0 left blank as a top buffer between the title bar and the panel.
 
-# Row 1: separator.
-cursor 0 1
-execute "+print_repeat<-<60"
-
-# Rows 2-5: bar gauges. Each call writes a label, the value as a
-# right-padded percentage, and a fixed-width [#####...] bar.
-set status_row = 2
-setstring status_label "Hull"
-set status_value = hull_pct
-execute "+telem_bar"
-
-set status_row = 3
-setstring status_label "Fuel"
-set status_value = fuel_pct
-execute "+telem_bar"
-
-set status_row = 4
-setstring status_label "Oxygen"
-set status_value = oxygen_pct
-execute "+telem_bar"
-
-set status_row = 5
-setstring status_label "Power"
-set status_value = power_pct
-execute "+telem_bar"
-
-# Row 6: separator.
-cursor 0 6
-execute "+print_repeat<-<60"
-
-# Rows 7-9: scalar telemetry.
-cursor 1 7
+# Row 1: MET / Altitude / Fuel / Oxygen (or DECIDE during alarm).
+cursor 1 1
+write "MET"
+cursor 11 1
+if telemetry[TLM_MET] < 0
+   set abs_met = 0
+   set abs_met - telemetry[TLM_MET]
+   write "T-" abs_met "s"
+else
+   write "T+" telemetry[TLM_MET] "s"
+endif
+cursor 21 1
 write "Altitude"
-setstring status_text altitude_m " m"
-execute "+print_right<status_text<7"
-
-cursor 1 8
-write "Velocity"
-setstring status_text velocity_mms " mm/s"
-execute "+print_right<status_text<8"
-
-cursor 1 9
-write "Fuel burn"
-setstring status_text "STANDBY"
-execute "+print_right<status_text<9"
-}
-
-# Helper: draw one row of "Label  [######....]   N%" at status_row.
-integer status_row
-integer status_value
-string  status_label
-integer telem_bar_filled
-integer telem_bar_index
-
-{+telem_bar
-cursor 1 status_row
-write status_label
-
-# Bar is 20 cells. Compute filled cells from status_value (0..100).
-set telem_bar_filled = status_value
-set telem_bar_filled / 5
-
-cursor 18 status_row
-write "["
-set telem_bar_index = 0
-repeat
-   if telem_bar_index < telem_bar_filled
-      write "#"
+cursor 31 1
+write telemetry[TLM_ALTITUDE] " m"
+cursor 41 1
+write "Fuel"
+cursor 51 1
+write telemetry[TLM_FUEL] " %"
+cursor 61 1
+if alarm_fired = true
+   if decision_made = false
+      write "DECIDE"
+      set decision_seconds_left = decision_deadline
+      set decision_seconds_left - telemetry[TLM_MET]
+      if decision_seconds_left < 0
+         set decision_seconds_left = 0
+      endif
+      cursor 71 1
+      write decision_seconds_left "s"
    else
-      write "."
+      write "Oxygen"
+      cursor 71 1
+      write telemetry[TLM_OXYGEN] " %"
    endif
-   set telem_bar_index + 1
-until telem_bar_index = 20
-write "]"
+else
+   write "Oxygen"
+   cursor 71 1
+   write telemetry[TLM_OXYGEN] " %"
+endif
 
-setstring status_text status_value "%"
-execute "+print_right<status_text<status_row"
-}
+# Row 2: Throttle / Range / LOX press / Power.
+cursor 1 2
+write "Throttle"
+cursor 11 2
+write telemetry[TLM_THROTTLE] " %"
+cursor 21 2
+write "Range"
+cursor 31 2
+write telemetry[TLM_RANGE] " m"
+cursor 41 2
+write "LOX press"
+cursor 51 2
+write telemetry[TLM_LOXPSI] " psi"
+cursor 61 2
+write "Power"
+cursor 71 2
+write telemetry[TLM_POWER] " %"
 
-# Helper: write one char N times at the cursor's current row, starting from
-# column 0. Caller positions the cursor first via 'cursor 0 <row>'.
-# string_arg[0] = char to repeat, arg[1] = count.
-integer repeat_index
+# Row 3: Pitch / H-Vel / Delta-V / Cabin.
+cursor 1 3
+write "Pitch"
+cursor 11 3
+write telemetry[TLM_PITCH] " deg"
+cursor 21 3
+write "H-Vel"
+cursor 31 3
+write telemetry[TLM_HVEL] " m/s"
+cursor 41 3
+write "Delta-V"
+cursor 51 3
+write telemetry[TLM_DELTAV] " m/s"
+cursor 61 3
+write "Cabin"
+cursor 71 3
+write telemetry[TLM_CABIN] " kPa"
 
-{+print_repeat
-set repeat_index = 0
-repeat
-   write string_arg[0]
-   set repeat_index + 1
-until repeat_index = arg[1]
+# Row 4: G-load / V-Vel / Mass / Signal.
+cursor 1 4
+write "G-load"
+cursor 11 4
+write telemetry[TLM_GLOAD] " g"
+cursor 21 4
+write "V-Vel"
+cursor 31 4
+write telemetry[TLM_VVEL] " m/s"
+cursor 41 4
+write "Mass"
+cursor 51 4
+write telemetry[TLM_MASS] " t"
+cursor 61 4
+write "Signal"
+cursor 71 4
+write telemetry[TLM_SIGNAL] " %"
+
+# Row 5: AoA / Mach / Bus V / Crew HR.
+cursor 1 5
+write "AoA"
+cursor 11 5
+write telemetry[TLM_AOA] " deg"
+cursor 21 5
+write "Mach"
+cursor 31 5
+write telemetry[TLM_MACH]
+cursor 41 5
+write "Bus"
+cursor 51 5
+write telemetry[TLM_BUSV] " V"
+cursor 61 5
+write "Crew HR"
+cursor 71 5
+write telemetry[TLM_HR] " bpm"
+
+# Row 6 left blank as a bottom buffer before the maintext begins.
 }
 
 # -----------------------------------------------------------------------------
@@ -250,52 +508,13 @@ until repeat_index = arg[1]
 print:
    Building 30, second floor. Eight rows of consoles step down toward
    the front wall, where the big board glows with a wireframe of the
-   lunar approach trajectory. Your FLIGHT console is on the highest
-   tier, central, with a clear sightline. The room smells of cold
-   coffee and warm transistors.^
-.
-}
-
-{examine console
-print:
-   Your FLIGHT console: a comms loop selector with a dozen labelled
-   keys, two monochrome CRTs displaying mission elapsed time and
-   crew biomedical, and a row of green-yellow-red alert LEDs across
-   the top of the panel. The microphone arm waits to your right.^
-.
-}
-
-{examine headset
-print:
-   A standard agency-issue headset, one earpiece, foam crumbling at
-   the edges. It feeds the FLIGHT loop -- private to you and the
-   astronaut -- and a parallel line into the public-affairs feed.^
-.
-}
-
-{examine big_screen : examine board
-print:
-   The big board, projected on the front wall: a stylised cross-
-   section of the descent corridor with the lander's icon creeping
-   along the trajectory in real time. Numerical readouts on the
-   right-hand strip update every second -- altitude, range-to-go,
-   delta-V remaining.^
-.
-}
-
-{examine plot_table
-print:
-   A circular plotting table behind the FLIGHT consoles, currently
-   showing a top-down view of the landing zone. Boulder fields are
-   shaded in red; the planned touchdown point sits dead-centre of
-   a clear ellipse roughly four hundred metres across.^
-.
-}
-
-{examine coffee_mug
-print:
-   White porcelain with a faded blue NASA meatball. Half-empty,
-   well-stained, and roughly one descent burn old.^
+   BURROUGHS stack on its pad, every status light green. Your FLIGHT
+   console is on the highest tier, central, with a clear sightline.
+   To your left and right -- FIDO, GUIDANCE, EECOM, RETRO -- four of
+   the people whose calls you will weigh in the next ninety seconds.
+   The room smells of cold coffee and warm transistors, and faintly
+   of the ozone that rolls off the high-voltage tubes that have been
+   running since dawn.^
 .
 }
 
@@ -316,12 +535,197 @@ print:
    #header { height: 120px; }
    img.titleimage { height: 120px; width: auto; display: block; }
    div.links { top: 90px; }
-   #statuswin { top: 120px; font-family: 'Courier New', ui-monospace, monospace; color: #ffb84a; }
+   #statuswin { top: 120px; font-family: 'Courier New', ui-monospace, monospace; font-size: 12pt; color: #ffffff; background-color: #2a2f36; }
    #statuswin:empty + #main { top: 120px; }
    #main { top: calc(120px + var(--status-lines) * 20px + 4px); }
    #header h1, #header h1 a { font-family: 'Orbitron', 'Courier New', monospace; letter-spacing: 0.08em; text-transform: uppercase; }
    div.maintext { font-family: 'Orbitron', Georgia, serif; font-weight: 500; }
+   div.maintext h1 { font-family: 'Orbitron', 'Courier New', monospace; color: #ffffff; text-align: center; padding-left: 0; letter-spacing: 0.08em; }
+   div.maintext h2 { font-family: 'Orbitron', 'Courier New', monospace; letter-spacing: 0.06em; text-transform: uppercase; }
    </style>
+.
+}
+
+# -----------------------------------------------------------------------------
+# ACT 1 PROTOTYPE -- live timer, alarm, GO/NO-GO, controller polling.
+#
+# The timer keeps firing during the decision prompt -- that's how the real
+# countdown works. The player types commit / abort / hold (or c / a / h);
+# while they think, MET advances and the cell-zero countdown ticks down.
+# If MET reaches the deadline with no decision, +timer fires the timeout
+# path and chooses the worst outcome for them.
+# -----------------------------------------------------------------------------
+
+# Decision verbs and single-letter shortcuts.
+grammar commit  >commit
+grammar c       >commit
+grammar abort   >abort
+grammar a       >abort
+grammar hold    >hold
+grammar h       >hold
+
+{+timer
+# Silent tick: advance MET, repaint status. Nothing prints to maintext
+# unless an event fires. Pre-launch the motion values stay zero -- the
+# only thing actually moving is the clock.
+set telemetry[TLM_MET] + 3
+
+# At MET >= -30 (T-30s), FIDO calls wind shear and forces a GO/NO-GO.
+if alarm_fired = false
+   if telemetry[TLM_MET] >= -30
+      set alarm_fired = true
+      set decision_deadline = telemetry[TLM_MET]
+      set decision_deadline + 24
+      execute "+fire_alarm"
+   endif
+endif
+
+# Window closes if no decision by deadline.
+if alarm_fired = true
+   if decision_made = false
+      if telemetry[TLM_MET] >= decision_deadline
+         set decision_made = true
+         timer 0
+         execute "+timeout_path"
+      endif
+   endif
+endif
+
+updatestatus
+}
+
+{+fire_alarm
+print:
+   The MET clock crosses T-30 and FIDO comes up sharp on the loop --
+   sharp enough that across the room three other heads turn:^^
+   FIDO, fast and clipped: "Flight, FIDO -- I have wind shear at ten
+   kilometres altitude. Peak gust forty-six knots, against trajectory.
+   That puts the vehicle through max-Q with twelve percent more lateral
+   load than she's certified for. I am recommending HOLD. Recycle the
+   count."^^
+   GUIDANCE's chair slides forward. He cuts in over FIDO's last word:^^
+   GUIDANCE, formal even with stress: "Flight, GUIDANCE -- the
+   steering law has wind-shear margin. The autopilot pitches into the
+   gust, trims angle of attack, we ride it. Recommend COMMIT."^^
+   EECOM and RETRO are silent. The DECIDE counter on the panel has
+   started ticking down -- twenty-four seconds before the launch
+   sequencer locks itself out at T-6. Type ~commit~ (or ~c~), ~hold~
+   (or ~h~), ~abort~ (or ~a~). Hitting the loop on a silent console
+   (~examine eecom~, ~examine retro~) is free -- the clock keeps
+   ticking either way.^
+.
+}
+
+# -----------------------------------------------------------------------------
+# Decision verbs. Each guards against being typed before the alarm or after
+# a decision is logged, then routes to the appropriate branch.
+# -----------------------------------------------------------------------------
+
+{+commit
+if alarm_fired = false
+   print: "There is nothing to commit to yet, Flight. Stand by."^.
+   exit_function
+endif
+if decision_made = true
+   print: "Decision logged, Flight. Stand by."^.
+   exit_function
+endif
+set decision_made = true
+timer 0
+execute "+commit_path"
+}
+
+{+abort
+if alarm_fired = false
+   print: "Nothing to abort, Flight."^.
+   exit_function
+endif
+if decision_made = true
+   print: "Decision logged, Flight. Stand by."^.
+   exit_function
+endif
+set decision_made = true
+timer 0
+execute "+abort_path"
+}
+
+{+hold
+if alarm_fired = false
+   print: "Nothing to hold on, Flight."^.
+   exit_function
+endif
+if decision_made = true
+   print: "Decision logged, Flight. Stand by."^.
+   exit_function
+endif
+set decision_made = true
+timer 0
+execute "+hold_path"
+}
+
+# -----------------------------------------------------------------------------
+# Branch outcomes. Each is a stub for now; the real game would set up the
+# next act here.
+# -----------------------------------------------------------------------------
+
+{+commit_path
+updatestatus
+print:
+   FLIGHT: "All controllers -- we are GO for launch. CAPCOM, pass
+   the call."^^
+   The room exhales. The count drops through T-6, T-3 -- five F-1
+   analogues at the base of the BURROUGHS stack ignite. The building
+   shakes a quarter-second later as the sound finally arrives from
+   Florida. The vehicle clears the tower.^^
+   At max-Q the autopilot trims as GUIDANCE promised. The structural
+   margins protest as FIDO predicted. Strip charts go briefly, badly
+   red, and then settle back to green. She is uphill -- with the
+   trajectory degraded enough that you will spend the rest of the
+   day repaying the delta-V you just spent on luck.^^
+   ~[ACT 2 prototype ends here -- powered ascent and orbit insertion
+   continue from this seat.]~^
+.
+}
+
+{+abort_path
+updatestatus
+print:
+   FLIGHT: "All controllers -- SCRUB the count. Safe the vehicle.
+   CAPCOM, pass the wave-off."^^
+   The launch sequencer halts at T-6. Hold-down arms grip. On the
+   pad fifteen hundred kilometres south, the astronaut speaks one
+   syllable into the loop you cannot quite make out, and the room
+   briefly applauds her for it before the political reality of a
+   one-day slip lands and the applause stops.^^
+   ~[Scrub debrief ends here. Recycle for tomorrow's window.]~^
+.
+}
+
+{+hold_path
+updatestatus
+print:
+   FLIGHT: "FIDO, copy your HOLD. All controllers -- we recycle the
+   count. CAPCOM, pass the hold."^^
+   The launch sequencer freezes. Mile-long valves close in sequence,
+   tank pressures equalise, and the wind data starts coming in fresh
+   from the next balloon. Then, slow and clear and indifferent on
+   the loop:^^
+   EECOM: "Flight, EECOM. The LOX trend is still dropping. Two-six-
+   six and falling. That is no longer gauge drift, Flight. That is
+   a leak."^^
+   The clock that is ticking now is the one EECOM warned you about.^^
+   ~[Hold path ends here -- the leak diagnostic sub-act goes next.]~^
+.
+}
+
+{+timeout_path
+print:
+   The DECIDE counter rolls through zero. The launch sequencer's own
+   abort-on-no-call watchdog cuts the count at T-6 -- the worst version
+   of a SCRUB, the one that is logged, written up, and remembered with
+   your name attached. Every controller in the room is now wondering,
+   privately and without saying so, who flies for them next time.^^
+   ~[Timeout debrief ends here.]~^
 .
 }
 
