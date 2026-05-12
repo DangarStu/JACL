@@ -32,9 +32,16 @@ from pathlib import Path
 
 BLOCK_START = re.compile(r"^(location|object|player)\b")
 TOP_DECL = re.compile(r"^(constant|integer|integer_array|string|string_array|synonym|attribute|variable|grammar)\b")
+PRINT_START = re.compile(r"^([ \t]*)print:\s*$")
+# Print-block terminator. The JACL loader checks text_buffer[0] == '.'
+# after jpp has stripped leading whitespace, so the source-level '.'
+# can sit at any indent. We reformat it to match the opening 'print:'
+# column for readability.
+PRINT_END = re.compile(r"^[ \t]*\.\s*$")
 
 DEFAULT_COLUMN = 16
 DECL_TRAILING_SPACES = 5
+PRINT_BODY_INDENT = 3
 
 
 def lint_line(line: str, column: int) -> str:
@@ -135,9 +142,39 @@ def lint_text(text: str, column: int) -> str:
     raw_lines = text.splitlines(keepends=True)
     out = []
     in_block = False
+    in_print = False
+    print_indent = ""
     i = 0
     while i < len(raw_lines):
         line = raw_lines[i]
+        # Print-block re-indent has highest priority. Body lines are
+        # rewritten so they sit PRINT_BODY_INDENT spaces past the
+        # opening 'print:' keyword's own indent. Blank lines are
+        # preserved verbatim. The '.' terminator (must be at column 0
+        # for the JACL loader) ends the block.
+        if in_print:
+            if PRINT_END.match(line):
+                in_print = False
+                # Indent the '.' terminator to match the opening 'print:'.
+                # jpp strips leading whitespace before the loader reads
+                # the file, so this is purely a source-readability tweak.
+                out.append(print_indent + ".\n")
+                i += 1
+                continue
+            stripped_full = line.lstrip(" \t")
+            if not stripped_full.strip():
+                out.append(line)
+            else:
+                out.append(print_indent + " " * PRINT_BODY_INDENT + stripped_full)
+            i += 1
+            continue
+        m_print = PRINT_START.match(line)
+        if m_print:
+            in_print = True
+            print_indent = m_print.group(1)
+            out.append(line)
+            i += 1
+            continue
         if BLOCK_START.match(line):
             in_block = True
             out.append(line)

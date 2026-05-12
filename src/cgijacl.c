@@ -28,6 +28,7 @@
 #include "parser.h"
 #include "encapsulate.h"
 #include "auth.h"
+#include "errno.h"
 #include <dirent.h>
 
 extern int            style_index;
@@ -355,6 +356,13 @@ main(int argc, char *argv[])
         log_message(error_buffer, PLUS_STDERR);
     }
 
+    if (mkdir(temp_directory, 0755) != 0 && errno != EEXIST) {
+        sprintf(error_buffer, "Cannot create temp directory \"%s\": %s",
+                temp_directory, strerror(errno));
+        log_error(error_buffer, PLUS_STDERR);
+        terminate(42);
+    }
+
     sprintf(error_buffer, "Cookie expiry set to \"%s\"", cookie_expiry);
     log_message(error_buffer, PLUS_STDERR);
 
@@ -393,7 +401,7 @@ main(int argc, char *argv[])
 
     if (save_game(saved_start) == FALSE) {
         sprintf(error_buffer, cstring_resolve("CANT_SAVE")->value, saved_start);
-        log_error(error_buffer, LOG_ONLY);
+        log_error(error_buffer, PLUS_STDERR);
     }
 
     if (object[2] == NULL) {
