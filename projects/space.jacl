@@ -14,7 +14,7 @@ constant game_release     1
 constant game_build       1
 constant game_title       "Mission Control"
 constant game_author      "Stuart Allen"
-constant game_publish     false
+constant game_publish     true
 constant ifid             "JACL-200"
 string game_language      "en-US"
 
