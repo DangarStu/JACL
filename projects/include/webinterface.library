@@ -74,6 +74,11 @@ if skip_intro_preferences = false
    endif
 endif
 
+# All preferences answered (or skipped). Run the game-specific
+# +game_scene block. By convention each game's +game_scene starts
+# with `clear` to wipe the dedication and voice/sound Q&A before the
+# opening prose -- doing it inside +game_scene keeps the clear gated
+# by the same flag that protects the scene block.
 if intro_scene_shown = 0
    set intro_scene_shown = 1
    ifexecute "+game_scene"
@@ -187,6 +192,27 @@ print:
          }^
          speakNext(0);^
       });^
+   }^
+
+   /* The 'clear' JACL opcode emits a <jacl-clear> marker. Each marker^
+    * means "everything before me in #maintext goes". We process the^
+    * last clear in the response, delete every node before it, and^
+    * remove the markers themselves -- the web equivalent of the Glk^
+    * glk_window_clear call. Returns true if a clear was processed,^
+    * so the caller can reset scroll position to the top of the new^
+    * content rather than running its usual "scroll to bottom" math. */^
+   function jaclProcessClearMarker(scope) {^
+      var root = scope || document.getElementById('maintext');^
+      if (!root) return false;^
+      var clears = root.querySelectorAll('jacl-clear');^
+      if (clears.length === 0) return false;^
+      var lastClear = clears[clears.length - 1];^
+      var range = document.createRange();^
+      range.setStart(root, 0);^
+      range.setEndBefore(lastClear);^
+      range.deleteContents();^
+      root.querySelectorAll('jacl-clear').forEach(function(m) { m.remove(); });^
+      return true;^
    }^
 
    /* Periodic timer events. The 'timer N' JACL opcode emits a^
@@ -685,6 +711,14 @@ print:
    }^
 
    document.addEventListener('DOMContentLoaded', function() {^
+      var initialMaintext = document.getElementById('maintext');^
+      if (initialMaintext) {^
+         var initialCleared = jaclProcessClearMarker(initialMaintext);^
+         if (initialCleared) {^
+            var initialMain = document.getElementById('main');^
+            if (initialMain) initialMain.scrollTop = 0;^
+         }^
+      }^
       jaclProcessAudioMarkers();^
       /* Move any <jacl-status> emitted during the initial +intro render^
        * into the dedicated #statuswin div above the main text. Ajax^
@@ -903,15 +937,23 @@ print:
       var maintext = document.getElementById("maintext");^
       maintext.querySelectorAll('script').forEach(function(el) { el.remove(); });^
 
-      maintext.insertAdjacentHTML('beforeend', "<br><b>&gt;" + details.command + "</b><br>" + data);^
+      maintext.insertAdjacentHTML('beforeend', "<br><i class='jacl-command'>&gt;" + details.command + "</i><br>" + data);^
+      var cleared = jaclProcessClearMarker(maintext);^
 
       var main = document.getElementById("main");^
-      var textAdded = main.scrollHeight - main.scrollTop;
-      var mainHeight = main.offsetHeight;
-      if (textAdded > mainHeight) {
-         main.scrollTop += mainHeight;
-      } else {
-         main.scrollTop = main.scrollHeight;^
+      if (cleared) {^
+         /* A clear wiped the prior content; the new content now sits^
+          * at the top of #maintext. Reset to row 0 so the player sees^
+          * the start of the new scene before scrolling. */^
+         main.scrollTop = 0;^
+      } else {^
+         var textAdded = main.scrollHeight - main.scrollTop;
+         var mainHeight = main.offsetHeight;
+         if (textAdded > mainHeight) {
+            main.scrollTop += mainHeight;
+         } else {
+            main.scrollTop = main.scrollHeight;^
+         }
       }
       document.JACLGameForm.command.value = "";^
       jaclProcessAudioMarkers();^

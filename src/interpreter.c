@@ -1853,6 +1853,10 @@ execute(const char *funcname)
                     }
                 }
             } else if (!strcmp(word[0], "clear")) {
+                /* Emit a <jacl-clear> marker that the web frontend uses
+                 * to wipe everything in #maintext before the marker --
+                 * matching the Glk glk_window_clear behaviour above. */
+                write_text("<jacl-clear></jacl-clear>");
             } else if (!strcmp(word[0], "more")) {
             } else if (!strcmp(word[0], "terminate")) {
 #endif
