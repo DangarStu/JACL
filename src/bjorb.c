@@ -109,13 +109,14 @@ static void
 write_id (FILE * f, const char *s)
 /*
  * write_id writes a string to a file as a blorb ID string (4 bytes, space
- * padded)
+ * padded). Clamp at 4 chars so a stray longer string can't corrupt the
+ * IFF stream silently.
  */
 {
   int i;
   char sp = ' ';
 
-  for (i = 0; i < strlen (s); i++)
+  for (i = 0; i < 4 && s[i]; i++)
     fwrite (&s[i], 1, 1, f);
   for (; i < 4; i++)
     fwrite (&sp, 1, 1, f);
@@ -123,12 +124,13 @@ write_id (FILE * f, const char *s)
 
 static void
 str_id (char *f, const char *s)
-// str_id writes a blorb identifier to a string
+// str_id writes a blorb identifier to a string. Same 4-char clamp as
+// write_id.
 {
   int i;
   char sp = ' ';
 
-  for (i = 0; i < strlen (s); i++)
+  for (i = 0; i < 4 && s[i]; i++)
     f[i] = s[i];
   for (; i < 4; i++)
     f[i] = sp;
@@ -155,13 +157,18 @@ ReadChunk (FILE * f)
       free (N);
       return NULL;
     }
-  // Read in the rest of the line to the buffer
+  // Read in the rest of the line to the buffer. Always allocate at
+  // least one byte even if the line is empty -- the Use="1"/"3"/file
+  // branches below all write Buffer[current] = 0 and dereference it,
+  // so a NULL Buffer from an empty line would crash.
+  buflen = 16;
+  Buffer = (char *) my_malloc (buflen);
   while (1)
     {
       c = fgetc (f);
       if (c == EOF || c == '\n')
 	break;
-      if (current == buflen)
+      if (current + 1 >= buflen)
 	{
 	  buflen = (buflen + 1) * 2;
 	  Buffer = (char *) my_realloc (Buffer, buflen);
@@ -267,6 +274,13 @@ BuildIndex (FILE * f)
   // Load all the chunks
   while (!feof (f))
     {
+      if (Chunks >= MAX_BLORB)
+	{
+	  fprintf (stderr,
+		   "%s: Error: BLC file has more than %d chunks; aborting.\n",
+		   MyName, MAX_BLORB);
+	  exit (1);
+	}
       Line++;
       Blorb[Chunks] = ReadChunk (f);
       if (Blorb[Chunks])
@@ -379,15 +393,27 @@ main (int argc, char **argv)
     }
 
   if (argc == 2) {
-	/* SINGLE ARGUMENT SUPPLIED, CONSIDER IT A BASE NAME FOR THE BLC AND BLORB FILES */
-	  strcpy (InName, argv[1]);
-	  strcat (InName, ".blc");
-
-      strcpy (OutName, argv[1]);
-	  strcat (OutName, ".blorb");
+	/* SINGLE ARGUMENT SUPPLIED, CONSIDER IT A BASE NAME FOR THE BLC AND BLORB FILES.
+	 * Both buffers are 81 bytes; argv[1] up to 74 chars fits before the
+	 * ".blorb" suffix overflows. Refuse longer paths cleanly. */
+	  if (strlen (argv[1]) + 6 >= sizeof (InName)) {
+		  fprintf (stderr,
+			   "%s: Error: base name too long (max %zu chars).\n",
+			   MyName, sizeof (InName) - 7);
+		  exit (1);
+	  }
+	  snprintf (InName, sizeof (InName), "%s.blc", argv[1]);
+	  snprintf (OutName, sizeof (OutName), "%s.blorb", argv[1]);
     } else {
-	  strcpy (InName, argv[1]);
-      strcpy (OutName, argv[2]);
+	  if (strlen (argv[1]) >= sizeof (InName) ||
+	      strlen (argv[2]) >= sizeof (OutName)) {
+		  fprintf (stderr,
+			   "%s: Error: file name too long (max %zu chars).\n",
+			   MyName, sizeof (InName) - 1);
+		  exit (1);
+	  }
+	  snprintf (InName, sizeof (InName), "%s", argv[1]);
+	  snprintf (OutName, sizeof (OutName), "%s", argv[2]);
 	}
 
     in = fopen (InName, "r");

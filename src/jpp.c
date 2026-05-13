@@ -144,6 +144,7 @@ process_file(const char *sourceFile1, const char *sourceFile2)
 
 	if (fgets(text_buffer, 1024, inputFile) == NULL) {
 		sprintf (error_buffer, READ_ERROR);
+		fclose(inputFile);
 		return (FALSE);
 	}
 
@@ -158,15 +159,22 @@ process_file(const char *sourceFile1, const char *sourceFile2)
 			includeFile = strchr(text_buffer, '"');
 
 			if (includeFile != NULL) {
-				strcpy(temp_buffer1, game_path);
-				strcat(temp_buffer1, includeFile + 1);
-				strcpy(temp_buffer2, include_directory);
-				strcat(temp_buffer2, includeFile + 1);
+				/* Bound path assembly: game_path (up to 255 chars per
+				 * cgijacl globals) plus an include name read from the
+				 * source line (up to ~1023 chars after the leading
+				 * quote) easily overflows temp_buffer1[1025] with
+				 * strcpy+strcat. snprintf truncates cleanly instead. */
+				snprintf(temp_buffer1, sizeof(temp_buffer1),
+					 "%s%s", game_path, includeFile + 1);
+				snprintf(temp_buffer2, sizeof(temp_buffer2),
+					 "%s%s", include_directory, includeFile + 1);
 				if (process_file(temp_buffer1, temp_buffer2) == FALSE) {
+					fclose(inputFile);
 					return (FALSE);
 				}
 			} else {
 				sprintf (error_buffer, BAD_INCLUDE);
+				fclose(inputFile);
 				return (FALSE);
 			}
 		} else {

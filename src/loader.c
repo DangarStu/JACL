@@ -782,9 +782,14 @@ read_gamefile()
                         nongloberr(line);
                         errors++;
                     } else {
-                        strncpy(function_name, word[wp], 59);
-                        strcat(function_name, "_");
-                        strcat(function_name, object[object_count]->label);
+                        /* Assemble "<verb>_<label>" into function_name[81].
+                         * The previous strncpy(59)+strcat+strcat could
+                         * write up to 59+1+43+1 = 104 bytes when label
+                         * is at its declared max of 44 chars; snprintf
+                         * truncates cleanly at the buffer size. */
+                        snprintf(function_name, sizeof(function_name),
+                                 "%s_%s", word[wp],
+                                 object[object_count]->label);
                         self_parent = object_count;
                     }
                     if ((current_function->next_function =
@@ -1287,12 +1292,14 @@ restart_game()
     /* FREE ALL OBJECTS */
     for (index = 1; index <= objects; index++) {
         current_name = object[index]->first_name;
-        while (current_name->next_name != NULL) {
+        /* Guard against an object whose first_name was never set
+         * (declaration failed mid-load). The previous unguarded loop
+         * crashed on the first iteration. */
+        while (current_name != NULL) {
             next_name = current_name->next_name;
             free(current_name);
             current_name = next_name;
         }
-        free(current_name);
         free(object[index]);
     }
 
