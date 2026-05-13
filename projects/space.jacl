@@ -160,7 +160,8 @@ print:
    Your FLIGHT console: a comms loop selector with a dozen labelled
    keys, two monochrome CRTs displaying mission elapsed time and
    crew biomedical, and a row of green-yellow-red alert LEDs across
-   the top of the panel. The microphone arm waits to your right.^
+   the top of the panel. A boom microphone on a counterweighted arm
+   waits at your right, swung out of the way until you key it.^
 .
 if hailing_controller != 0
    write "^On the selector, the "
@@ -246,20 +247,22 @@ else
 endif
 }
 
-object mic_arm : arm boom
+object mic_arm : microphone mic boom arm bar push-to-talk ptt
  short         the "microphone arm"
  static
  parent        flight_control
 
 {examine
 print:
-   A counterweighted arm carrying a small dynamic mic, swung in
-   close to your mouth. The push-to-talk bar is on the underside,
-   right under your thumb.^
+   A counterweighted swing-out boom carrying a small dynamic
+   microphone, parked just clear of your face until you need it.
+   A push-to-talk bar runs along the underside of the boom, right
+   under your thumb -- press it to transmit on the FLIGHT loop;
+   release it to fall back to listening.^
 .
 }
 
-object headset : headset comms loop microphone
+object headset : headset comms loop earpiece
  short         the "comm loop headset"
  static
  parent        flight_control
@@ -1306,8 +1309,9 @@ print:
    North, a frosted-glass door bears your name and title in black
    caps. East, a wider doorway opens onto the public viewing gallery
    where the VIPs and the press pool wait behind glass.^^
-   On the wall beside you: a wall clock counting down with a red
-   sweep hand, a cork bulletin board pocked from years of thumbtacks
+   On the wall beside you: a wall clock whose thin red sweep hand
+   keeps time with the count, a cork bulletin board pocked from
+   years of thumbtacks
    and sun-faded along its right edge, and a drinking fountain
    someone has captioned in marker pen. The air is dry and smells
    faintly of floor wax, cigarettes, and the ozone that rolls off
@@ -1439,7 +1443,11 @@ print:
 if telemetry[TLM_MET] < 0
    set abs_met = 0
    set abs_met - telemetry[TLM_MET]
-   write "Right now it reads T-" abs_met " seconds and falling.^"
+   if timer_started = true
+      write "Right now it reads T-" abs_met " seconds and falling.^"
+   else
+      write "Right now it reads T-" abs_met " seconds and holding.^"
+   endif
 else
    write "Right now it reads T+" telemetry[TLM_MET] " seconds and climbing.^"
 endif
@@ -1453,7 +1461,11 @@ print:
 if telemetry[TLM_MET] < 0
    set abs_met = 0
    set abs_met - telemetry[TLM_MET]
-   write "T-" abs_met " seconds.^"
+   if timer_started = true
+      write "T-" abs_met " seconds.^"
+   else
+      write "T-" abs_met " seconds, holding.^"
+   endif
 else
    write "T+" telemetry[TLM_MET] " seconds.^"
 endif
