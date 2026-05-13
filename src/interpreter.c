@@ -1221,7 +1221,7 @@ execute(const char *funcname)
 
                     // PROMPT THE USER TO INPUT A STRING AND STORE IT IN THE
                     // RESOLVED VARIABLE
-                    get_string(resolved_string->value);
+                    get_string(resolved_string->value, sizeof(resolved_string->value));
                 }
                 
             } else if (!strcmp(word[0], "asknumber") || !strcmp(word[0], "getnumber")) {
@@ -1360,7 +1360,7 @@ execute(const char *funcname)
 
                     // PROMPT THE USER TO INPUT A STRING AND STORE IT IN THE
                     // RESOLVED VARIABLE
-                    get_string(resolved_string->value);
+                    get_string(resolved_string->value, sizeof(resolved_string->value));
                 }
                 
             } else if (!strcmp(word[0], "asknumber") || !strcmp(word[0], "getnumber")) {

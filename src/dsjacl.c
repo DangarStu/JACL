@@ -315,7 +315,9 @@ main(int argc, char *argv[])
 		index = 0;
 
 		if (*current_command) {
-			while (*(current_command + index) && index < 1024) {
+			/* Cap at 1023 so the trailing terminator below lands inside
+			 * text_buffer[1024]. */
+			while (*(current_command + index) && index < 1023) {
 				if (*(current_command + index) == '\r' || *(current_command + index) == '\n') {
 					break;
 				} else {
@@ -858,11 +860,12 @@ get_character(char *message)
 }
 
 void
-get_string(char *string_buffer)
+get_string(char *string_buffer, int size)
 {
     char *cx;
 	char commandbuf[256];
 	int index;
+	int copy_cap;
 
 	jflush();
 	printf("\x1b[32;0m"); 							// SET TO DIM GREEN
@@ -880,9 +883,12 @@ get_string(char *string_buffer)
 		}
 	}
 
-	// COPY UP TO 255 BYTES OF THE ENTERED TEXT INTO THE SUPPLIED STRING
-	strncpy (string_buffer, cx, 255);
-	
+	/* Copy up to size-1 bytes; previously this strncpy'd 255 bytes
+	 * with no terminator at all if the input filled commandbuf. */
+	copy_cap = (size > 256) ? 255 : size - 1;
+	if (copy_cap < 0) copy_cap = 0;
+	strncpy (string_buffer, cx, copy_cap);
+	string_buffer[copy_cap] = 0;
 }
 
 char *
