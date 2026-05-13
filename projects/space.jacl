@@ -133,6 +133,14 @@ integer smoke_test_fired        # TEMP: gate the inbound-comms smoke test in +in
 integer hailing_controller
 integer hailing_topic
 
+# Player's mic state. 0 = boom mic is parked, the player is on listen-only;
+# 1 = push-to-talk bar pressed, the player is transmitting on the FLIGHT
+# loop. Gated by 'press arm' (toggle). ask/tell/commit/abort/hold all
+# refuse to transmit when this is 0. 'answer' auto-keys for the duration
+# of the response, since taking a call is itself the press-and-talk
+# gesture.
+integer mic_open
+
 # -----------------------------------------------------------------------------
 # THE WORLD -- a Mission Control auditorium in Houston. The player is a
 # flight controller on console, not a pilot in space. The lander itself is
@@ -163,6 +171,9 @@ print:
    the top of the panel. A boom microphone on a counterweighted arm
    waits at your right, swung out of the way until you key it.^
 .
+if mic_open = 1
+   write "^Your own loop LED, above the selector, is lit green. You are transmitting.^"
+endif
 if hailing_controller != 0
    write "^On the selector, the "
    execute "+write_callsign"<hailing_controller
@@ -260,6 +271,28 @@ print:
    under your thumb -- press it to transmit on the FLIGHT loop;
    release it to fall back to listening.^
 .
+if mic_open = 1
+   write "^The bar is depressed under your thumb right now -- your loop LED is lit.^"
+else
+   write "^The bar sits flush at the moment -- your mic is parked.^"
+endif
+}
+
+# The push-to-talk bar IS the mic arm for parser purposes (synonyms
+# include 'bar' and 'ptt'). 'press arm' / 'press bar' / 'press ptt'
+# all route here. Toggle semantics rather than hold-to-talk so the
+# player can issue a run of commands without re-keying each line.
+{press
+if mic_open = 1
+   set mic_open = 0
+   write "You lift your thumb off the bar. The boom microphone settles "
+   write "back to its parked position; the loop LED goes dark.^"
+else
+   set mic_open = 1
+   write "You press the push-to-talk bar with your thumb. The boom mic "
+   write "swings in close; the loop LED above the comm-selector lights "
+   write "up green. You are live on the FLIGHT loop.^"
+endif
 }
 
 object headset : headset comms loop earpiece
@@ -1790,10 +1823,73 @@ if hailing_controller = 0
    return
 endif
 
+# 'answer' is itself the press-and-talk gesture: key the mic for the
+# duration of the response so the player doesn't have to remember a
+# separate 'press arm' mid-call. The mic stays open after the reply
+# so a follow-up ask/tell flows naturally; the player can release it
+# manually with another 'press arm'.
+if mic_open = 0
+   set mic_open = 1
+   write "You press the push-to-talk bar; the loop LED lights green.^^"
+endif
+
 set hailing_controller(keyed) = 0
 proxy "ask " hailing_controller{names} " about " hailing_topic{names}
 set hailing_controller = 0
 set hailing_topic = 0
+}
+
+# Override the standard library's +ask_about and +tell_about so that
+# speaking on the loop requires the player's mic to be keyed. The game's
+# definitions appear before the verbs.library #include at the bottom of
+# this file, so they win first-match resolution and shadow the library
+# versions. We reimplement the library's normal flow (can_talk gate,
+# override lookup for per-topic handlers, generic fallback) so behaviour
+# stays identical once the mic gate is satisfied.
+{+ask_about
+if mic_open = 0
+   print:
+      You start to form the question in your head and then catch
+      yourself. The push-to-talk bar is flush; your mic is parked.
+      Whatever you were going to ask stays inside the carrier hush of
+      the headset. (~press arm~ to key your mic first.)^
+   .
+   set time = false
+   return true
+endif
+if +can_talk<noun1 = true
+   return true
+endif
+override
+if noun2 = noun1
+   write noun1{The}
+   if noun1 has PLURAL
+      write " are too shy to say much.^"
+   else
+      write " is too shy to say much.^"
+   endif
+   return true
+endif
+write noun1{The} " " noun1{doesnt} " have anything to say about " noun2{the}
+write ".^"
+}
+
+{+tell_about
+if mic_open = 0
+   print:
+      You almost speak and don't. The mic is parked; the loop carries
+      only the steady hush of an open carrier. (~press arm~ to key
+      your mic first.)^
+   .
+   set time = false
+   return true
+endif
+if +can_talk<noun1 = true
+   return true
+endif
+override
+write noun1{The} " seem" noun1{s} " fascinated by your story about "
+write noun2{the} .^
 }
 
 # Emit one line of the big-board status-light cluster. Anything inside
@@ -2358,6 +2454,15 @@ if decision_made = true
    print: "Decision logged, Flight. Stand by."^.
    exit_function
 endif
+if mic_open = 0
+   print:
+      You frame the word in your head and your thumb finds the bar --
+      and stops. Your loop LED is dark. Nothing you say leaves your
+      own jaw until you press it. (~press arm~ to key your mic.)^
+   .
+   set time = false
+   exit_function
+endif
 set decision_made = true
 timer 0
 execute "+commit_path"
@@ -2372,6 +2477,14 @@ if decision_made = true
    print: "Decision logged, Flight. Stand by."^.
    exit_function
 endif
+if mic_open = 0
+   print:
+      You start to call it and stop. The mic is parked; the call
+      doesn't leave this seat. (~press arm~ to key your mic first.)^
+   .
+   set time = false
+   exit_function
+endif
 set decision_made = true
 timer 0
 execute "+abort_path"
@@ -2384,6 +2497,15 @@ if alarm_fired = false
 endif
 if decision_made = true
    print: "Decision logged, Flight. Stand by."^.
+   exit_function
+endif
+if mic_open = 0
+   print:
+      You reach for the bar and stop yourself. With the mic parked,
+      a HOLD call doesn't reach the controllers -- it just stays in
+      your head. (~press arm~ to key your mic first.)^
+   .
+   set time = false
    exit_function
 endif
 set decision_made = true
