@@ -59,6 +59,66 @@ newest_include_mtime(void)
     return newest;
 }
 
+/* Returns 1 if s is a safe identifier for use in a file path or
+ * HTTP header value: non-empty, ASCII [A-Za-z0-9_.-], no longer than
+ * max-1 bytes (room for NUL). Used to gate every user_id assignment so
+ * a malicious cookie/parameter can neither traverse out of
+ * temp_directory nor inject CRLF into Set-Cookie. */
+static int
+is_safe_user_id(const char *s, size_t max)
+{
+    size_t i;
+    if (s == NULL || s[0] == 0) return 0;
+    for (i = 0; s[i] != 0; i++) {
+        unsigned char c = (unsigned char) s[i];
+        if (i + 1 >= max) return 0;
+        if (!((c >= 'A' && c <= 'Z') ||
+              (c >= 'a' && c <= 'z') ||
+              (c >= '0' && c <= '9') ||
+              c == '_' || c == '-' || c == '.'))
+            return 0;
+    }
+    return 1;
+}
+
+/* Same charset as is_safe_user_id, and additionally rejects ".." to
+ * defang path-traversal attempts through save-game filenames coming
+ * from game-supplied text (text_of() in save_interaction). */
+static int
+is_safe_filename_component(const char *s, size_t max)
+{
+    if (!is_safe_user_id(s, max)) return 0;
+    if (strstr(s, "..") != NULL) return 0;
+    return 1;
+}
+
+/* Fill buf with "anon_" + 32 hex chars from /dev/urandom + NUL.
+ * Returns 0 on success, -1 on failure (caller should treat as fatal
+ * for the request rather than fall back to a guessable ID). The
+ * previous implementation used rand() seeded with time(NULL), giving
+ * ~32k entropy guessable from the request timestamp. */
+static int
+secure_random_user_id(char *buf, size_t buflen)
+{
+    /* "anon_" (5) + 32 hex + NUL = 38 */
+    if (buflen < 38) return -1;
+    FILE *fp = fopen("/dev/urandom", "rb");
+    if (fp == NULL) return -1;
+    unsigned char raw[16];
+    size_t got = fread(raw, 1, sizeof(raw), fp);
+    fclose(fp);
+    if (got != sizeof(raw)) return -1;
+    static const char hex[] = "0123456789abcdef";
+    memcpy(buf, "anon_", 5);
+    size_t i;
+    for (i = 0; i < sizeof(raw); i++) {
+        buf[5 + i * 2]     = hex[(raw[i] >> 4) & 0xF];
+        buf[5 + i * 2 + 1] = hex[raw[i] & 0xF];
+    }
+    buf[5 + sizeof(raw) * 2] = 0;
+    return 0;
+}
+
 /* Returns 1 for yes, 0 for no, -1 for invalid */
 static int
 resolve_yes_or_no(const char *input)
@@ -583,6 +643,12 @@ main(int argc, char *argv[])
         //sprintf (error_buffer, "user_id value pulled from cookies: %s", cgi_val(jacl_cookies, "user_id"));
         //log_message(error_buffer, PLUS_STDERR);
 
+        /* Every code path that assigns user_id below routes through
+         * is_safe_user_id(). The id ends up in a file path (auto-save)
+         * and an HTTP Set-Cookie header, so a value containing '/',
+         * CR/LF, or '..' would yield path traversal or response
+         * splitting. Invalid candidates fall through to fresh
+         * anonymous-id creation. */
         if (google_sub[0] != 0) {
             /* user_id already resolved from jacl_session above; the
              * existing user_id-cookie / parameter / REMOTE_USER /
@@ -590,51 +656,58 @@ main(int argc, char *argv[])
              * sign-in always wins over a stale anonymous cookie. */
         } else if (cgi_val(entries, "user_id") != NULL || cgi_val(jacl_cookies, "user_id") != NULL) {
             // A user_id HAS BEEN PASSED TO THIS REQUEST VIA A PARMETER OR A COOKIE
+            const char *candidate = NULL;
+            int from_cookie = FALSE;
             if (prefer_remote_user == TRUE && REMOTE_USER != NULL && strcmp("", REMOTE_USER)) {
                 /* PREFER REMOTE_USER FOR POTENTIAL SECURE SITES. */
-                strcpy (user_id, REMOTE_USER);
-                //sprintf(error_buffer, "Using user_id %s from REMOTE_USER.", user_id);
-                //log_message(error_buffer, PLUS_STDERR);
-                REMOTE_USER_USED->value = TRUE;
+                candidate = REMOTE_USER;
+            } else if (cgi_val(jacl_cookies, "user_id") != NULL) {
+                candidate = cgi_val(jacl_cookies, "user_id");
+                from_cookie = TRUE;
+            } else {
+                candidate = cgi_val(entries, "user_id");
+            }
+            if (is_safe_user_id(candidate, sizeof(user_id))) {
+                strcpy(user_id, candidate);
+                REMOTE_USER_USED->value = (from_cookie || candidate == REMOTE_USER) ? TRUE : FALSE;
+                cookie_read_successfully = from_cookie ? TRUE : cookie_read_successfully;
                 returning_player = TRUE;
             } else {
-                // THERE IS NO REMOTE_USER OR prefer_remote_user IS SET TO FALSE
-                // SO USE THE PASSED user_id
-                if (cgi_val(jacl_cookies, "user_id") != NULL) {
-                    strcpy(user_id, cgi_val(jacl_cookies, "user_id"));
-                    REMOTE_USER_USED->value = TRUE;
-                    cookie_read_successfully = TRUE;
-                    //sprintf(error_buffer, "Using user_id %s from cookie.", user_id);
-                    //log_message(error_buffer, PLUS_STDERR);
-                } else {
-                    strcpy(user_id, cgi_val(entries, "user_id"));
-                    REMOTE_USER_USED->value = FALSE;
-                    //sprintf(error_buffer, "Using user_id %s from parameter.", user_id);
-                    //log_message(error_buffer, PLUS_STDERR);
-                }
-                returning_player = TRUE;
+                sprintf(error_buffer,
+                        "Rejected unsafe user_id (length or charset); using a fresh anonymous id.");
+                log_error(error_buffer, LOG_ONLY);
+                /* Leave user_id untouched; the else-branch below will
+                 * generate a secure random id. */
             }
         } else if (REMOTE_USER != NULL && strcmp("", REMOTE_USER)) {
             // REMOTE_USER IS SET AND user_id IS NULL SO USE REMOTE_USER
-            strcpy (user_id, REMOTE_USER);
-            //sprintf(error_buffer, "Using user_id %s from REMOTE_USER.", user_id);
-            //log_message(error_buffer, PLUS_STDERR);
-            REMOTE_USER_USED->value = TRUE;
-            returning_player = TRUE;
-        } else {
-            // REMOTE_USER ISN'T SET AND user_id IS BLANK SO CREATE A NEW user_id
-            sprintf(user_id, "%d-%d",
-                    (1 + (int) ((float) 58408 * rand() / (RAND_MAX + 1.0))),
-                    (1 + (int) ((float) 256 * rand() / (RAND_MAX + 1.0))));
+            if (is_safe_user_id(REMOTE_USER, sizeof(user_id))) {
+                strcpy(user_id, REMOTE_USER);
+                REMOTE_USER_USED->value = TRUE;
+                returning_player = TRUE;
+            } else {
+                sprintf(error_buffer,
+                        "Rejected unsafe REMOTE_USER value; using a fresh anonymous id.");
+                log_error(error_buffer, LOG_ONLY);
+            }
+        }
+        if (google_sub[0] == 0 && user_id[0] == 0) {
+            // No usable user_id yet -- create a secure anonymous one.
+            if (secure_random_user_id(user_id, sizeof(user_id)) != 0) {
+                /* /dev/urandom unavailable -- refuse rather than fall
+                 * back to rand() which gave guessable ~32k entropy
+                 * seeded from request time. */
+                log_error("Unable to read /dev/urandom for anonymous user_id; aborting request.",
+                          PLUS_STDOUT);
+                list_clear(&entries);
+                continue;
+            }
 
             // THIS IS THE FIRST COMMAND OF A NEW GAME
             returning_player = FALSE;
 
-            //sprintf(error_buffer, "Created user_id %s for new user.", user_id);
-            //log_message(error_buffer, PLUS_STDERR);
-
             // SET THIS TO TRUE ASSUMING THAT COOKIES ARE ENABLED
-            REMOTE_USER_USED->value = TRUE; 
+            REMOTE_USER_USED->value = TRUE;
         }
 
         if (returning_player == TRUE) {
@@ -1617,7 +1690,15 @@ restore_interaction(const char *filename)
     if (filename == NULL) {
         sprintf(file_buffer, "%s%s-%s-bookmark", temp_directory, prefix, user_id);
     } else {
-        sprintf(file_buffer, "%s%s-%s-%s", temp_directory, prefix, user_id, text_of(filename));
+        const char *raw = text_of(filename);
+        /* `raw` is game-supplied (the JACL author passes a noun or a
+         * literal). Reject anything that could escape temp_directory:
+         * slashes, backslashes, "..", control chars. */
+        if (!is_safe_filename_component(raw, 81)) {
+            write_text(cstring_resolve("CANT_RESTORE")->value);
+            return (FALSE);
+        }
+        sprintf(file_buffer, "%s%s-%s-%s", temp_directory, prefix, user_id, raw);
     }
 
     if (restore_game(file_buffer, TRUE) == FALSE) {
@@ -1635,7 +1716,12 @@ save_interaction(const char *filename)
     if (filename == NULL) {
         sprintf(file_buffer, "%s%s-%s-bookmark", temp_directory, prefix, user_id);
     } else {
-        sprintf(file_buffer, "%s%s-%s-%s", temp_directory, prefix, user_id, text_of(filename));
+        const char *raw = text_of(filename);
+        if (!is_safe_filename_component(raw, 81)) {
+            write_text(cstring_resolve("CANT_SAVE")->value);
+            return (FALSE);
+        }
+        sprintf(file_buffer, "%s%s-%s-%s", temp_directory, prefix, user_id, raw);
     }
 
     if (save_game(file_buffer)) {

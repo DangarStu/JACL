@@ -281,7 +281,13 @@ wj_setupdb(void)
 				*terminator = 0;
 
 			if (!feof(fp)) {
-				fields = sscanf(sline, "%s %s %s", sreq, smime, spath);
+				/* Width specifiers bound each field; sline is
+				 * 6144 bytes and a single unbroken word could
+				 * otherwise overflow sreq/smime/spath. The widths
+				 * are chosen so the reassembled "%s %s %s" fits
+				 * in p->data[1024]: 255 + 1 + 127 + 1 + 511 = 895
+				 * plus NUL. */
+				fields = sscanf(sline, "%255s %127s %511s", sreq, smime, spath);
 
 				/* Test for empty line or comment */
 				if ((fields != 3) || (sreq[0] == '#'))
@@ -290,8 +296,13 @@ wj_setupdb(void)
 
 				/* Allocate space for a new element */
 				p = (struct media *) malloc(sizeof(struct media));
+				if (p == NULL) {
+					fprintf(stderr, "WebJACL: out of memory loading media list\n");
+					break;
+				}
 				oldp->next = p;
-				sprintf(p->data, "%s %s %s", sreq, smime, spath);
+				snprintf(p->data, sizeof(p->data),
+					 "%s %s %s", sreq, smime, spath);
 				p->next = NULL;
 				oldp = p;
 			}
@@ -614,11 +625,18 @@ listen_again:
 							 * match! Extract the
 							 * relevant fields
 							 */
-							sscanf(mp->data, "%s %s %s", sreq, smime, spath);
+							/* Widths bound each field. mp->data is 1024
+							 * bytes; the source widths used by wj_setupdb
+							 * (255/127/511) make these caps generous. */
+							sscanf(mp->data, "%1023s %1023s %2047s",
+							    sreq, smime, spath);
 							if (wj_script_dir[0] != '\0')
-								sprintf(fullpath, "%s/%s", wj_script_dir, spath);
-							else
-								strcpy(fullpath, spath);
+								snprintf(fullpath, sizeof(fullpath),
+									 "%s/%s", wj_script_dir, spath);
+							else {
+								strncpy(fullpath, spath, sizeof(fullpath) - 1);
+								fullpath[sizeof(fullpath) - 1] = 0;
+							}
 
 							/*
 							 * Now read in the
@@ -646,6 +664,25 @@ listen_again:
 								FILE           *media_fp;
 								char           *media_buffer;
 
+								/* Cap media reads to keep a multi-GB
+								 * file (or fd manipulation that makes
+								 * stat return a huge size) from DoSing
+								 * the server with a single request. */
+								#define WJ_MEDIA_MAX_BYTES (64L * 1024L * 1024L)
+								if (filestat.st_size < 0 ||
+								    (long) filestat.st_size > WJ_MEDIA_MAX_BYTES) {
+									printf
+										("HTTP/1.0 413 Payload Too Large\r\nServer: %s\r\nConnection: close\r\nContent-Type: text/html\r\n\r\n",
+										 WJ_SERVERNAME);
+									printf
+										("<HTML><HEAD></HEAD><BODY><H1>413 Payload Too Large</H1></BODY></HTML>\r\n");
+									fflush(stdout);
+									dup2(savefdOUT, MYSTDOUT);
+									dup2(savefdIN, MYSTDIN);
+									shutdown(clientFd, 2);
+									clientFd = -1;
+									goto listen_again;
+								}
 								if ((media_buffer =
 								     malloc(filestat.st_size + 1)) == NULL) {
 									fprintf(stderr,
