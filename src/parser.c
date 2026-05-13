@@ -1491,7 +1491,14 @@ noun_resolve(struct word_type *scope_word, int finding_from, int noun_number)
 				counter++;
 				current_name = current_name->next_name;
 			}
-			confidence[index] = ((confidence[index] - 1) * 100) / counter;
+			/* Guard against an object with no names (first_name == NULL):
+			 * dividing by counter would SIGFPE. Treat no-name objects as
+			 * having zero confidence so they can't win disambiguation. */
+			if (counter > 0) {
+				confidence[index] = ((confidence[index] - 1) * 100) / counter;
+			} else {
+				confidence[index] = 0;
+			}
 		}
 	}
 
@@ -1694,14 +1701,21 @@ noun_resolve(struct word_type *scope_word, int finding_from, int noun_number)
 			sentence_output(index, 0);
 			write_text(temp_buffer);
 			matches--;
-			if (counter < 9)
-				counter++;
 			write_text("^");
+			if (counter >= 9) {
+				/* Cap displayed options at 9; without breaking out of
+				 * the loop, additional iterations would overwrite
+				 * possible_objects[9] and emit duplicate "[9] ..."
+				 * lines because the prior cap stopped incrementing
+				 * `counter` but did not stop the loop. */
+				break;
+			}
+			counter++;
 		}
 	}
 
 	/* GET A NUMBER: don't insist, low = 1, high = counter */
-	selection = get_number(FALSE, 1, counter - 1);
+	selection = get_number(FALSE, 1, counter);
 
 	if (selection == -1) {
 		write_text (cstring_resolve("INVALID_SELECTION")->value);
@@ -1779,7 +1793,9 @@ scope(int index, const char *expected, int restricted)
 			 * BEING HELD. IE, A LABEL ON A JAR CAN BE SHOWN BECAUSE
 			 * THE JAR IS BEING HELD. */
             temp = object[index]->PARENT;
-			if (temp > 0 && temp < objects) {
+			/* Valid object indices are 1..objects inclusive; the prior
+			 * `temp < objects` excluded the highest-numbered object. */
+			if (temp > 0 && temp <= objects) {
 				if (object[temp]->PARENT == HELD) {
 					return (TRUE);
 				}
@@ -1811,7 +1827,8 @@ scope(int index, const char *expected, int restricted)
 	} else if (!strcmp(expected, "*anywhere") || !strcmp(expected, "**anywhere")) {
 		return (TRUE);
 	} else if (!strcmp(expected, "*inside") || !strcmp(expected, "**inside")) {
-		if (object_list[0][0] >0 && object_list[0][0] < objects) {
+		/* Valid object indices are 1..objects inclusive. */
+		if (object_list[0][0] > 0 && object_list[0][0] <= objects) {
 			return (parent_of(object_list[0][0], index, restricted));
 		} else {
 			// THERE IS NO PREVIOUS OBJECT SO TREAT THIS LIKE A *here 

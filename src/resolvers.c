@@ -331,6 +331,7 @@ integer_resolve(const char *name)
 	char            expression[84];
 
 	strncpy(expression, name, 80);
+	expression[80] = 0;	/* strncpy doesn't NUL-terminate when src >= 80 chars */
 
 	counter = strlen(expression);
 
@@ -421,6 +422,7 @@ cinteger_resolve(const char *name)
 	char            expression[84];
 
 	strncpy(expression, name, 80);
+	expression[80] = 0;	/* strncpy doesn't NUL-terminate when src >= 80 chars */
 
 	counter = strlen(expression);
 
@@ -511,6 +513,7 @@ string_resolve(const char *name)
 	char            expression[84];
 
 	strncpy(expression, name, 80);
+	expression[80] = 0;	/* strncpy doesn't NUL-terminate when src >= 80 chars */
 
 	counter = strlen(expression);
 
@@ -592,6 +595,7 @@ cstring_resolve(const char *name)
 	char            expression[84];
 
 	strncpy(expression, name, 80);
+	expression[80] = 0;	/* strncpy doesn't NUL-terminate when src >= 80 chars */
 
 	counter = strlen(expression);
 
@@ -1192,13 +1196,22 @@ object_resolve(const char *object_string)
 		return (HERE);
 	else if (!strcmp(object_string, "self") ||
 			 !strcmp(object_string, "this")) {
-		if (executing_function != NULL && executing_function->self == 0) {
+		/* Three cases: no function, global function (self==0), or
+		 * method on a real object. Previously the chain dereferenced
+		 * executing_function->self even when executing_function was
+		 * NULL because the && short-circuited the first check. */
+		if (executing_function == NULL) {
+			sprintf(error_buffer,
+					"ERROR: Reference to 'self' outside any function.^");
+			write_text(error_buffer);
+		} else if (executing_function->self == 0) {
 			sprintf(error_buffer,
 					"ERROR: Reference to 'self' from global function \"%s\".^",
 					executing_function->name);
 			write_text(error_buffer);
-		} else
+		} else {
 			return (executing_function->self);
+		}
 	} else {
 		for (index = 1; index <= objects; index++) {
 			if (!strcmp(object_string, object[index]->label))

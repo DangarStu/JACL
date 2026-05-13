@@ -3397,7 +3397,7 @@ push_proxy()
             while (current_cstring != NULL);
         }
 
-        proxy_backup[proxy_stack].textcount = counter;
+        proxy_backup[proxy_stack].textcount = text;
         proxy_backup[proxy_stack].commandcount = command;
         proxy_backup[proxy_stack].after_from = after_from;
         proxy_backup[proxy_stack].last_exact = last_exact;
@@ -3862,7 +3862,14 @@ inspect (int object_num)
     } else {
         while (object_elements[index] != NULL) {
             if (index == 0) {
-                sprintf(temp_buffer, "%s: %s (%d)^", object_elements[index], object[object[object_num]->integer[index]]->label, object[object_num]->integer[index]);
+                /* PARENT slot: mirror the bounds check the LOCATION
+                 * branch above does, otherwise objects with PARENT == 0
+                 * (limbo) or a corrupt index crash on object[oob]->label. */
+                if (object[object_num]->integer[index] < 1 || object[object_num]->integer[index] > objects) {
+                    sprintf(temp_buffer, "%s: nowhere (%d)^", object_elements[index], object[object_num]->integer[index]);
+                } else {
+                    sprintf(temp_buffer, "%s: %s (%d)^", object_elements[index], object[object[object_num]->integer[index]]->label, object[object_num]->integer[index]);
+                }
             } else {
                 sprintf(temp_buffer, "%s: %d^", object_elements[index], object[object_num]->integer[index]);
             }
