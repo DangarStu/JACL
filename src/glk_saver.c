@@ -46,7 +46,12 @@ save_game(frefid_t saveref)
 	}
 
     while (current_function != NULL) {
-		write_integer (bookmark, current_function->call_count);
+		/* Filter by nosave so the format matches saver.c (CGI). The
+		 * previous unfiltered write made glk saves silently
+		 * incompatible with CGI saves of the same game. */
+		if (current_function->nosave == FALSE) {
+			write_integer (bookmark, current_function->call_count);
+		}
         current_function = current_function->next_function;
     }
 
@@ -69,6 +74,13 @@ save_game(frefid_t saveref)
 		}
         current_string = current_string->next_string;
     }
+
+	/* Persist last_command so 'again' works after restore. saver.c
+	 * already did this; glk_saver previously dropped it, leaving
+	 * restored Glk saves with an empty or stale last-command slot. */
+	for (index = 0; index < 1024; index++) {
+		glk_put_char_stream(bookmark, last_command[index]);
+	}
 
 	write_integer (bookmark, player);
 	write_integer (bookmark, noun[3]);
@@ -137,7 +149,12 @@ restore_game(frefid_t saveref, int warn)
 	}
 
 	while (current_function != NULL) {
-		current_function->call_count = read_integer (bookmark);
+		/* Matched filter from save_game above; must agree with the
+		 * write side or the byte stream shifts by 4 bytes per
+		 * non-nosave function and the rest of the read goes haywire. */
+		if (current_function->nosave == FALSE) {
+			current_function->call_count = read_integer (bookmark);
+		}
 		current_function = current_function->next_function;
 	}
 
@@ -159,6 +176,12 @@ restore_game(frefid_t saveref, int warn)
 		}
         current_string = current_string->next_string;
     }
+
+	/* Matches the save side: pull last_command back so 'again' still
+	 * has a target after the restore. */
+	for (index = 0; index < 1024; index++) {
+		last_command[index] = glk_get_char_stream(bookmark);
+	}
 
 	player = read_integer(bookmark);
 	noun[3] = read_integer(bookmark);
