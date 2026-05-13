@@ -266,7 +266,10 @@ wj_setupdb(void)
 		 */
 		int             fields;
 		char           *terminator;
-		char            sreq[1024], smime[1024], spath[2048], sline[6144];
+		/* Sized to match the sscanf width specs below so the compiler
+		 * can prove the subsequent snprintf into p->data[1024] cannot
+		 * truncate. 256 + 128 + 512 + 2 separators + NUL = 899 bytes. */
+		char            sreq[256], smime[128], spath[512], sline[6144];
 
 		while (!feof(fp)) {
 			fgets(sline, sizeof(sline) - 1, fp);
@@ -615,9 +618,14 @@ listen_again:
 					//printf("%ld\n", mediadb.next);
 					for             (mp = mediadb.next; mp != NULL; mp = mp->next) {
 						if (strstr(mp->data, qstring_copy) == mp->data) {
-							char            sreq[1024],
-							                smime[1024],
-							                spath[2048], fullpath[4096];
+							/* Sized to match wj_setupdb's widths so the
+							 * compiler can prove the snprintf below
+							 * cannot truncate. fullpath bumped to 8192
+							 * to give headroom over wj_script_dir
+							 * (4096) + "/" + spath (512). */
+							char            sreq[256],
+							                smime[128],
+							                spath[512], fullpath[8192];
 							requested_item_found = 1;
 
 							/*
@@ -625,10 +633,7 @@ listen_again:
 							 * match! Extract the
 							 * relevant fields
 							 */
-							/* Widths bound each field. mp->data is 1024
-							 * bytes; the source widths used by wj_setupdb
-							 * (255/127/511) make these caps generous. */
-							sscanf(mp->data, "%1023s %1023s %2047s",
+							sscanf(mp->data, "%255s %127s %511s",
 							    sreq, smime, spath);
 							if (wj_script_dir[0] != '\0')
 								snprintf(fullpath, sizeof(fullpath),
