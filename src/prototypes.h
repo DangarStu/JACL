@@ -48,7 +48,7 @@ void create_paths(char *full_path);
 int get_key(void);
 char get_character(const char *message);
 int get_yes_or_no(void);
-void get_string(char *string_buffer);
+void get_string(char *string_buffer, int size);
 int get_number(int insist, int low, int high);
 int save_interaction(const char *filename);
 int restore_interaction(const char *filename);

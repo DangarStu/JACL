@@ -462,6 +462,16 @@ glk_main(void)
 		// THE PLAYER'S INPUT WILL BE UTF-32. CONVERT IT TO UTF-8 AND NULL TERMINATE IT
 #ifndef NOUNICODE
 		convert_to_utf8(command_buffer_uni, ev.val1);
+#else
+		/* Glk does not NUL-terminate command_buffer after a byte-mode
+		 * line event. Without this terminator the read loop below
+		 * walks past ev.val1 bytes into stale data from a previous
+		 * turn (command_buffer is a file-scope static, so its tail
+		 * holds whatever the previous input wrote there). */
+		if (ev.val1 < (int) sizeof(command_buffer))
+			command_buffer[ev.val1] = 0;
+		else
+			command_buffer[sizeof(command_buffer) - 1] = 0;
 #endif
 
 		current_command = command_buffer;
@@ -481,7 +491,9 @@ glk_main(void)
 		index = 0;
 
 		if (*current_command) {
-			while (*(current_command + index) && index < 1024) {
+			/* Cap at 1023 so the trailing `text_buffer[index] = 0;`
+			 * below lands inside the buffer; text_buffer is 1024 bytes. */
+			while (*(current_command + index) && index < 1023) {
 				if (*(current_command + index) == '\r' || *(current_command + index) == '\n') {
 					break;
 				} else {
@@ -1064,11 +1076,12 @@ get_number(int insist, int low, int high)
 }
 
 void
-get_string(char *string_buffer)
+get_string(char *string_buffer, int size)
 {
     char *cx;
 	char commandbuf[256];
     int gotline;
+    int copy_cap;
     event_t ev;
 
     status_line();
@@ -1105,9 +1118,13 @@ get_string(char *string_buffer)
     commandbuf[ev.val1] = '\0';
     for (cx = commandbuf; *cx == ' '; cx++) { };
 
-	// COPY UP TO 255 BYTES OF THE ENTERED TEXT INTO THE SUPPLIED STRING
-	strncpy (string_buffer, cx, 255);
-	string_buffer[255] = 0;
+	/* Copy up to size-1 bytes of the entered text into the caller's
+	 * buffer; the previous fixed 255+terminate-at-[255] wrote past the
+	 * end of any caller buffer smaller than 256 bytes. */
+	copy_cap = (size > 256) ? 255 : size - 1;
+	if (copy_cap < 0) copy_cap = 0;
+	strncpy (string_buffer, cx, copy_cap);
+	string_buffer[copy_cap] = 0;
 }
 
 int

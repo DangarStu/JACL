@@ -32,16 +32,28 @@ winglk_startup_code(const char* cmdline)
 	sprintf(temp_buffer, "JACL v%d.%d.%d by Stuart Allen.", J_VERSION, J_RELEASE, J_BUILD);
 	winglk_set_about_text(temp_buffer);
 
-	/* CHECK FOR ANY COMMAND LINE ARGUMENTS AND REMOVE THEM */
+	/* CHECK FOR ANY COMMAND LINE ARGUMENTS AND REMOVE THEM.
+	 *
+	 * The previous logic had two bugs:
+	 *   1. `else if` chain meant only the first flag found was honoured;
+	 *      the second was silently dropped.
+	 *   2. `*argument = 0` truncated the entire cmdline at the start of
+	 *      the flag. A cmdline like `-noencrypt game.jacl` would lose
+	 *      the filename portion before winglk_get_initial_filename
+	 *      could see it; the user then got the file-open dialog with
+	 *      no explanation.
+	 *
+	 * Now: independent ifs so both flags are honoured, and blanking with
+	 * spaces in place so the surrounding cmdline tokens survive. */
 	if (cmdline != NULL) {
-    	if ((argument = strstr(cmdline, "-noencrypt")) != NULL) {
+		if ((argument = strstr(cmdline, "-noencrypt")) != NULL) {
 			encrypt = FALSE;
-			*argument = 0;
-        } else if ((argument = strstr(cmdline, "-release")) != NULL) {
-			release = TRUE;
-			*argument = 0;
+			memset(argument, ' ', strlen("-noencrypt"));
 		}
-
+		if ((argument = strstr(cmdline, "-release")) != NULL) {
+			release = TRUE;
+			memset(argument, ' ', strlen("-release"));
+		}
 	}
 
 	/* PROCESS THE COMMAND LINE AND GET A FILE NAME FROM THAT.
