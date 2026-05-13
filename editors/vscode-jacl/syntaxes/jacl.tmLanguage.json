@@ -74,7 +74,7 @@
     "print-block": {
       "name": "meta.print-block.jacl",
       "begin": "^\\s*(print):\\s*$",
-      "end": "^\\.\\s*$",
+      "end": "^\\s*\\.\\s*$",
       "beginCaptures": {
         "1": { "name": "keyword.other.command.jacl" }
       },
