@@ -160,10 +160,120 @@ H2		{
 			margin-top: 2cm;
 		}
 
-H3		{	
+H3		{
 			font-family: Helvetica, Arial, Sans;
 		 	font-size: 18pt;
 			text-align: left;
 			margin-top: 2cm;
 			margin-bottom: 0.5cm
 		}
+
+/* ---------------------------------------------------------------------
+ * @media print-book: print-on-demand build overrides.
+ *
+ * Activated when WeasyPrint is invoked with `--media-type print-book`
+ * by generate-print.sh; not seen by the default screen-PDF build
+ * (which uses the default media type "print"). All rules below are
+ * AUTHOR CSS, so they cascade normally over the screen defaults --
+ * no !important required.
+ *
+ * Trim size 7"x9.25" (178x235mm), Pragmatic-Bookshelf-style technical
+ * book. Asymmetric margins with the wider edge on the binding side,
+ * smaller body / code fonts, and chapters open on right-hand pages.
+ *
+ * Notes for the press:
+ *   - WeasyPrint emits RGB; KDP accepts RGB. IngramSpark may request
+ *     CMYK. Convert post-hoc via Ghostscript:
+ *         gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=pdfwrite \
+ *            -sColorConversionStrategy=CMYK \
+ *            -sOutputFile=JACLGuide-print-cmyk.pdf JACLGuide-print.pdf
+ *   - No bleed declared (no full-bleed images). Add `bleed: 3mm` to
+ *     the @page rules below if a full-bleed cover image ever lands.
+ *   - front.jpg is 460x405 -- about 64 DPI at 7" wide. Replace with
+ *     at least a 2100x1850 source before final upload.
+ * --------------------------------------------------------------------- */
+
+@media print-book {
+	@page {
+		size: 7in 9.25in;
+		margin: 0.625in 0.5in 0.625in 0.875in;
+	}
+	@page :right {
+		/* Recto: binding on the left, wider left margin. */
+		size: 7in 9.25in;
+		margin-left: 0.875in;
+		margin-right: 0.5in;
+		@top-right {
+			content: string(chapter-title);
+			font-family: Helvetica, Arial, sans-serif;
+			font-size: 8.5pt;
+			color: #555;
+		}
+		@bottom-right {
+			content: counter(page);
+			font-family: Helvetica, Arial, sans-serif;
+			font-size: 9pt;
+		}
+		@bottom-center { content: ""; }
+	}
+	@page :left {
+		/* Verso: binding on the right, wider right margin. */
+		size: 7in 9.25in;
+		margin-left: 0.5in;
+		margin-right: 0.875in;
+		@top-left {
+			content: string(chapter-title);
+			font-family: Helvetica, Arial, sans-serif;
+			font-size: 8.5pt;
+			color: #555;
+		}
+		@bottom-left {
+			content: counter(page);
+			font-family: Helvetica, Arial, sans-serif;
+			font-size: 9pt;
+		}
+		@bottom-center { content: ""; }
+		@top-right { content: ""; }
+	}
+	@page :first {
+		size: 7in 9.25in;
+		@top-left { content: ""; }
+		@top-right { content: ""; }
+		@bottom-left { content: ""; }
+		@bottom-right { content: ""; }
+		@bottom-center { content: ""; }
+	}
+
+	/* Chapters open on right-hand pages; a blank verso is inserted if
+	 * the previous chapter ended on a recto. */
+	H1 {
+		page-break-before: right;
+		font-size: 22pt;
+		margin-top: 0;
+		margin-bottom: 0.75cm;
+	}
+	H2 { font-size: 14pt;   margin-top: 1.2cm; }
+	H3 { font-size: 11.5pt; margin-top: 0.8cm; }
+
+	/* Don't orphan a heading at the bottom of a page. */
+	H1, H2, H3 { page-break-after: avoid; }
+
+	/* Body text smaller for print. */
+	BODY, P, LI, OL, UL, DL { font-size: 10.5pt; line-height: 1.35; }
+	TD, TH { font-size: 10pt; }
+
+	/* Code blocks: smaller monospace, keep together where possible,
+	 * wrap long lines rather than running off the trim edge. */
+	PRE {
+		font-size: 8.5pt;
+		line-height: 1.25;
+		page-break-inside: avoid;
+		white-space: pre-wrap;
+	}
+	CODE { font-size: 9.5pt; }
+
+	/* Avoid breaking individual rows across pages. */
+	TR { page-break-inside: avoid; }
+
+	IMG { margin: 0.3cm; }
+}
