@@ -123,10 +123,11 @@ integer abs_met                   # scratch for T-MINUS rendering
 integer hint_examine_shown      # has the player seen the 'try examine' hint?
 integer hint_ask_role_shown     # has the player seen the 'try ask about role' hint?
 integer hint_poll_shown         # has the player seen the 'try poll' hint?
-integer hint_answer_shown       # has the player seen the 'type answer' hint?
-# Note: the 'live on the FLIGHT loop' explanation in {press} on mic_arm
-# uses @ (this function's call_count) to fire on the first couple of
-# presses rather than a dedicated hint flag.
+# Note: a couple of other one-time hints elide the explicit "shown"
+# integer in favour of the function's own call_count (via the @ token):
+#   - The 'live on the FLIGHT loop' explanation in {press} on mic_arm
+#     gates on @ < 4.
+#   - The 'type answer' nudge in +hail gates on @ = 1.
 integer smoke_test_fired        # TEMP: gate the inbound-comms smoke test in +intro
 
 # Inbound-comms state. When a controller keys their mic, +hail records
@@ -1805,8 +1806,10 @@ set hailing_controller = arg[0]
 set hailing_topic = arg[1]
 set hailing_controller(keyed) = 1
 
-if hint_answer_shown = false
-   set hint_answer_shown = true
+# First hail in the game: nudge the player to learn the 'answer' verb.
+# @ is +hail's own call_count -- the first call lands here regardless
+# of which controller hails.
+if @ = 1
    write "^(Type ~answer~ to take the call.)^"
 endif
 }
