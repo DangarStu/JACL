@@ -109,7 +109,7 @@ Ave, Cambridge, MA 02139, USA.
 		<li><a href="#screendisplay8">Printing the Value of String Constants</a>
 	</ol>
 	<li><a href="#screendisplay9">The PRINT Command</a>
-	<li><a href="#screendisplay10">The LOOK Command</a>
+	<li><a href="#screendisplay10">The OUTPUT Command</a>
 	<li><a href="#screendisplay11">The LOOK Command</a>
 	<li><a href="#screendisplay12">The MORE Command</a>
 </ol>
@@ -124,7 +124,6 @@ Ave, Cambridge, MA 02139, USA.
 	<li><a href="#multimedia5">The STOP Command</a></h2>
 	<li><a href="#multimedia6">The TIMER Command</a></h2>
 	<li><a href="#multimedia7">The STYLE Command</a></h2>
-	<li><a href="#stylehint">The STYLEHINT Declaration</a></h2>
 	<li><a href="#multimedia8">The Status Window</a></h2>
 	<li><a href="#multimedia9">The UPDATESTATUS Command</a></h2>
 </ol>
@@ -137,11 +136,12 @@ Ave, Cambridge, MA 02139, USA.
 	<li><a href="#http4">The Player's Commands</a>
 	<li><a href="#http5">Ajax Requests</a>
 	<li><a href="#http6">The BUTTON Command</a>
-	<li><a href="#http7">The HYPERLINK Command</a>
+	<li><a href="#http7">The HYPERLINK and HYPERLINKNE Commands</a>
 	<li><a href="#http8">The CONTROL Command</a>
 	<li><a href="#http9">The OPTION Command</a>
-	<li><a href="#http10">The IMAGE Command</a>
-	<li><a href="#http11">The Media File</a>
+	<li><a href="#http10">The GETENV Command</a>
+	<li><a href="#http11">The IMAGE Command</a>
+	<li><a href="#http12">The Media File</a>
 </ol>
 
 <li><a href="#webinterface0">GUI Web Interface</a>
@@ -158,8 +158,9 @@ Ave, Cambridge, MA 02139, USA.
 	<li><a href="#flowcontrol4">The ELSE Command</a>
 	<li><a href="#flowcontrol5">The LOOP and ENDLOOP Commands</a>
 	<li><a href="#flowcontrol6">The SELECT and ENDSELECT Commands</a>
-	<li><a href="#flowcontrol7">The REPEAT and UNTIL Commands</a>
-	<li><a href="#flowcontrol8">The WHILE and ENDWHILE Commands</a>
+	<li><a href="#flowcontrol7">The REPEAT, UNTIL and UNTILALL Commands</a>
+	<li><a href="#flowcontrol8">The WHILE, WHILEALL and ENDWHILE Commands</a>
+	<li><a href="#flowcontrol10">The BREAK Command</a>
 	<li><a href="#flowcontrol9">The RETURN Command</a>
 </ol>
 
@@ -169,7 +170,7 @@ Ave, Cambridge, MA 02139, USA.
 	<li><a href="#set2">Type Casting</a>
 	<li><a href="#set3">The SETSTRING and ADDSTRING Commands</a>
 	<li><a href="#set4">The PADSTRING Command</a>
-
+	<li><a href="#set5">The SPLIT Command</a>
 </ol>
 
 <li><a href="#movement0">Movement</a>
@@ -196,6 +197,7 @@ Ave, Cambridge, MA 02139, USA.
 	<li><a href="#special8">The GETSTRING Command</a>
 	<li><a href="#special9">The GETYESORNO Command</a>
 	<li><a href="#special10">The SAVEGAME and RESTOREGAME Commands</a>
+	<li><a href="#special14">The FLUSH Command</a>
 	<li><a href="#special12">The TERMINATE Command</a>
 	<li><a href="#special13">The UNDOMOVE Command</a>
 
@@ -276,6 +278,7 @@ Ave, Cambridge, MA 02139, USA.
 	<li><a href="#csv1">The ITERATE and ENDITERATE Commands</a>
 	<li><a href="#csv2">The UPDATE, ENDUPDATE and INSERT Commands</a>
 	<li><a href="#csv3">The APPEND Command</a>
+	<li><a href="#csv4">The APPEND_FC, APPEND_NT and APPEND_LC Commands</a>
 </ol>
 
 <li><a href="#attributesummary0">Appendix A: JACL Attributes</a>
@@ -357,7 +360,6 @@ git clone https://github.com/DangarStu/JACL.git
 <td>GlkTerm by Andrew Plotkin (included) and ncursesw.
 </td>
 </tr><tr>
-
 <td><b>cgijacl</b></td>
 <td>No special libraries are required to compile <b>cgijacl</b>, however a POSIX compliant system is needed.
 </tr><tr>
@@ -376,9 +378,7 @@ sudo apt install libfcgi-dev libapache2-mod-fcgid
 make install
 </pre>
 
-<p>This will compile all the relevant programs and copy the executable binaries into the <b>bin</b> subdirectory.
-
-<p>The build will install the binaries and supporting files to <b>/usr/local/jacl/</b> as well as copying them to the <b>bin</b> subdirectory of the source tree.
+<p>This will compile all the relevant programs and copy the executable binaries into the <b>bin</b> subdirectory, as well as installing the binaries, libraries, and configuration files to <b>/usr/local/jacl/</b>.
 
 <p>In the <b>projects</b> directory you will find several JACL games. A JACL game consists of one or more <b>.jacl</b> files and an optional <b>.blorb</b> file that contains multimedia resources used by the game. If a JACL game consists of more than one <b>.jacl</b> file, the other file will be one of the library files from the <b>include</b> directory.
 
@@ -389,7 +389,7 @@ make install
 <td>Under Unix, the user the JACL interpreter is run as must have write permissions to the <b>temp</b> directory.</td>
 </tr></table>
 
-<p>The <b>include</b> directory is found inside the <b>projects</b> directory. In the <b>include</b> directory you will find <b>verbs.library</b>, the main interactive fiction library and <b>frame.jacl</b>, a skeleton program used as a starting point when writing a new piece of interactive fiction.
+<p>The <b>include</b> directory is found inside the <b>projects</b> directory. In the <b>include</b> directory you will find <b>verbs.library</b>, the main interactive fiction library and other language-specific libraries.
 
 <p>In the <b>guide</b> directory you will find this documentation.
 
@@ -464,7 +464,6 @@ WebJACL server configured on localhost:4269
 <p>To play this game, open your favourite web browser and navigate to the URL <b>http://localhost:4269</b>. When you do so, you should see something like the screen below. If not, see the section on <a href="troubleshooting.html">Trouble Shooting</a>.
 
 
-
 <p>To play this same game from the console, try the following command from the <b>bin</b> directory:
 
 <pre>
@@ -485,18 +484,31 @@ WebJACL server configured on localhost:4269
 sudo make apache
 </pre>
 
-<p>This command will install and enable <b>mod_fcgid</b> if needed, copy game files to <b>/usr/local/jacl/</b>, create FastCGI wrapper scripts in <b>/usr/local/jacl/fcgi-bin/</b>, install the Apache configuration at <b>/etc/apache2/conf-available/jacl.conf</b>, set permissions for the <b>www-data</b> user, and restart Apache. Once complete, your games will be available at <b>http://localhost/jacl/<i>gamename</i>.fcgi</b>.
+<p>This command will:
+
+<ol>
+<li>Install and enable <b>mod_fcgid</b> if not already present</li>
+<li>Copy game files, libraries, and data to <b>/usr/local/jacl/</b></li>
+<li>Create FastCGI wrapper scripts in <b>/usr/local/jacl/fcgi-bin/</b></li>
+<li>Create and enable the Apache configuration at <b>/etc/apache2/conf-available/jacl.conf</b></li>
+<li>Set correct ownership and permissions for the <b>www-data</b> user</li>
+<li>Restart Apache</li>
+</ol>
+
+<p>Once complete, your games will be available at <b>http://localhost/jacl/<i>gamename</i>.fcgi</b>.
 
 <h3><a class="section" name="installation8">Manual Setup</a></h3>
 
-<p>If you prefer to configure Apache manually, install Apache2 and the <b>mod_fcgid</b> module:
+<p>If you prefer to configure Apache manually, or are using a non-Debian system, the steps below describe the process in detail.
+
+<p>First, install Apache2 and the <b>mod_fcgid</b> module. On Ubuntu/Debian:
 
 <pre>
 sudo apt install apache2 libapache2-mod-fcgid
 sudo a2enmod fcgid
 </pre>
 
-<p>Create an Apache configuration file at <b>/etc/apache2/conf-available/jacl.conf</b> with the following contents:
+<p>Next, create an Apache configuration file at <b>/etc/apache2/conf-available/jacl.conf</b> with the following contents:
 
 <pre>
 &lt;IfModule mod_fcgid.c&gt;
@@ -520,15 +532,10 @@ sudo a2enmod fcgid
     Options -Indexes
     Require all granted
   &lt;/Directory&gt;
-
-  Alias /images/ "/usr/local/jacl/projects/images/"
-
-  &lt;Directory "/usr/local/jacl/projects/images"&gt;
-    Options -Indexes
-    Require all granted
-  &lt;/Directory&gt;
 &lt;/IfModule&gt;
 </pre>
+
+<p>The <b>ScriptAlias</b> directive maps URLs beginning with <b>/jacl/</b> to the wrapper scripts directory. The <b>FcgidMaxProcessesPerClass 1</b> setting ensures only one process runs per game, which is appropriate as <b>fcgijacl</b> handles multiple users via session cookies. The <b>FcgidIdleTimeout</b> keeps idle processes alive for 5 minutes to avoid the startup cost of reloading game files.
 
 <p>Enable the configuration and restart Apache:
 
@@ -537,7 +544,7 @@ sudo a2enconf jacl
 sudo apache2ctl graceful
 </pre>
 
-<p>For each JACL game, create a small wrapper script in <b>/usr/local/jacl/fcgi-bin/</b>. For example, for a game called <b>desa.jacl</b>:
+<p>For each JACL game, create a small wrapper script in <b>/usr/local/jacl/fcgi-bin/</b>. For example, to set up a game called <b>desa.jacl</b>:
 
 <pre>
 #!/bin/sh
@@ -546,16 +553,26 @@ exec /usr/local/bin/fcgijacl /usr/local/jacl/projects/desa.jacl
 
 <p>Save this as <b>/usr/local/jacl/fcgi-bin/desa.fcgi</b> and make it executable with <b>chmod 755</b>. The game will then be accessible at <b>http://localhost/jacl/desa.fcgi</b>.
 
-<p>Ensure the Apache user (<b>www-data</b> on Debian/Ubuntu) has write permissions to the temp and log directories:
+<p>Finally, ensure the Apache user (<b>www-data</b> on Debian/Ubuntu) has write permissions to the temp and log directories:
 
 <pre>
 sudo chown -R www-data:www-data /usr/local/jacl/projects/temp
 sudo chown -R www-data:www-data /usr/local/jacl/logs
 sudo chmod 775 /usr/local/jacl/projects/temp
+sudo chmod 775 /usr/local/jacl/projects/data
 sudo chmod 775 /usr/local/jacl/logs
 </pre>
 
-<p>If a game does not load, check <b>/var/log/apache2/error.log</b> for Apache errors and <b>/usr/local/jacl/logs/error.log</b> for JACL interpreter errors.
+<h3><a class="section" name="installation9">Troubleshooting</a></h3>
+
+<p>If a game does not load, check the following log files for error messages:
+
+<ul>
+<li><b>/var/log/apache2/error.log</b> &mdash; Apache errors, including mod_fcgid process failures</li>
+<li><b>/usr/local/jacl/logs/error.log</b> &mdash; JACL interpreter errors</li>
+</ul>
+
+<p>Common issues include incorrect file permissions on the <b>temp</b> directory, a missing or misconfigured <b>cgijacl.conf</b> file, or the <b>fcgijacl</b> binary not being found at the path specified in the wrapper script.
 
 
 
@@ -761,7 +778,7 @@ luck, and above all have fun!
 
 <h1><a class="title" name="tutorial0">Tutorial Game</a></h1>
 
-<P>JACL is a language for writing interactive fiction. By providing short definitions for objects and locations you will rapidly build your virtual world. By associating small amounts of simple code with these objects and locations you will bring your world to life. During the course of this tutorial you will see the construction of a small text-only game from beginning to end. The full <a href="tutorialsource.html">source code</a> for this tutorial game is included in Appendix D and in the <b>projects</b> subdirectory of your JACL distribution. 
+<P>JACL is a language for writing interactive fiction. By providing short definitions for objects and locations you will rapidly build your virtual world. By associating small amounts of simple code with these objects and locations you will bring your world to life. During the course of this tutorial you will see the construction of a small text-only game from beginning to end. The full <a href="tutorialsource.html">source code</a> for this tutorial game is included in Appendix D and in the <b>games</b> subdirectory of your JACL distribution. 
 
 <h2><a class="section" name="tutorial1">Language Syntax</a></h2>
 
@@ -1896,6 +1913,10 @@ write noun1{The} " is no good to eat.^"
 	<td>Prints the letter <B>s</B> if the object hasn't got the attribute <B>PLURAL</B>, or nothing if the object does have the attribute <B>PLURAL</B>.</TD>
 </tr>
 <tr>
+	<td><i>object_label</I><B>{label}</B></TD>
+	<td>Prints internal label of the object. This is useful for debugging, building function names internally and generating web code for the browser.</TD>
+</tr>
+<tr>
 <td><i>object_label</I><B>{sub}</B></TD>
 <td>Prints the word <b>you</b> if the object is the current player, <b>he</b> if the object has the attribute <b>ANIMATE</b>, <b>she</b> if the object has both the <b>ANIMATE</b> and the <b>FEMALE</b> attribute, <b>it</b> if the object has neither the <b>ANIMATE</b> nor the <b>FEMALE</b> attribute or the word <b>they</b> if the object being refered to has the attribute <b>PLURAL</b>.</td>
 </tr><tr>
@@ -1980,7 +2001,23 @@ print:
 }
 
 </pre>
-<h2><a class="section" name="screendisplay10">The LOOK Command</a></h2>
+<h2><a class="section" name="screendisplay10">The OUTPUT Command</a></h2>
+
+<p>The <b>output</b> command reads the entire contents of a file and writes it to the game's output stream. The file is read from the game's data directory. A single parameter specifying the filename is required:
+
+<pre>
+<b>output</b> <i>FileName</i>
+</pre>
+
+<p>For example, the following command will read and display the contents of a file called <b>welcome_text</b> from the data directory:
+
+<pre>
+output welcome_text
+</pre>
+
+<p>This command is useful for including large blocks of pre-written text that would be unwieldy to embed directly in the game source code.
+
+<h2><a class="section" name="screendisplay11">The LOOK Command</a></h2>
 
 <P>The <b>look</b> command will print the long description of the current location and any visible objects that are in the current location. A <b>look</b> command is executed implicitly by the JACL interpreter whenever a description of the player's current location is required. This is at times such as when then player moves into a location for the first time or restores a saved game.
 
@@ -2004,7 +2041,7 @@ write here{The} ^
 
 <P>It is a convention to have a <B>look</B> command at the end of the <B>+intro </B>function so the player can see where they are and what objects are nearby when the game begins.
 
-<h2><a class="section" name="screendisplay11">The MORE Command</a></h2>
+<h2><a class="section" name="screendisplay12">The MORE Command</a></h2>
 
 <p>The <b>more</b> command will print a message and then wait for the player to press a key before continuing. The message to print is passed as the only parameter of a <b>more</b> command. If no message is provided, the message <b>[MORE]</b> is used as a default. Below is an example of using the <b>more</b> command with a custom message:
 
@@ -2654,7 +2691,7 @@ button "Read Map"
 
 <p>It is possible to use a second HTML control, such as a list box, in conjunction with a submit button to create verb-noun commands. See the <b>control</b> command below for more information.
  
-<h2><a class="section" name="http7">The HYPERLINK Command</a></h2>
+<h2><a class="section" name="http7">The HYPERLINK and HYPERLINKNE Commands</a></h2>
 
 <p>The command <b>hyperlink</b> is a simple method of creating a hyperlink that issues a command for the player. It can accept either two or three parameters.
 The first is the visible text to be displayed. The second parameter is the command to be issued when the link is clicked. The third, optional, parameter is the name of a CSS class that should be applied to the link. Below are some sample hyperlinks:
@@ -2669,8 +2706,10 @@ hyperlink "Where am I?" look big
 
 <table class="infowarn"><tr>
 <td><img src="warning.png"></td>
-<td>When using the <b>hyperlink</b> command, any spaces in the third parameter (the command to be executed), must be replaced with plus signs. This is due to the fact that the command is pasted as part of the URL sent to the web browser, and spaces are not valid in a URL.</td>
+<td>When using the <b>hyperlink</b> command, any spaces in the second parameter (the command to be executed), must be replaced with plus signs. This is due to the fact that the command is passed as part of the URL sent to the web browser, and spaces are not valid in a URL.</td>
 </tr></table>
+
+<p>The <b>hyperlinkNE</b> command works in the same way as the <b>hyperlink</b> command except that it does not URL-encode the command parameter. This can be useful when the command string has already been encoded or when constructing complex URLs manually.
 
 <p>When manually creating special-purpose hyperlinks, the <b>{+name}</b> macro is very useful. For more information, see the chapter on <a href="screendisplay.html">Screen Display</a>.
 
@@ -2727,7 +2766,26 @@ parameter destination SOME_VARIABLE
 
 <p>When this form is submitted, the <b>cgijacl</b> interpreter will look for the parameter <b>destination</b>, as it has been defined using a <b>parameter</b> statement. This parameter will contain the internal number of the object that was selected and this number will be copied into the location specified by the <b>parameter</b> statement. In this case, a variable called <b>SOME_VARIABLE</b>. For more information see the section on <a href="#definitions10">parameters</a>.
 
-<h2><a class="section" name="http10">The IMAGE Command</a></h2>
+<h2><a class="section" name="http10">The GETENV Command</a></h2>
+
+<p>The <b>getenv</b> command is used to retrieve the value of an environment variable and store it in a JACL string variable. This is primarily useful for reading CGI environment variables such as HTTP headers and request parameters. A <b>getenv</b> command must be of the following format:
+
+<pre>
+<b>getenv</b> <i>StringVariable EnvironmentVariableName</i>
+</pre>
+
+<p>The first parameter is the JACL string variable to store the value in. The second parameter is the name of the environment variable to read. If the specified environment variable does not exist, the string variable will be set to an empty string. Below is an example of its use:
+
+<pre>
+string current_user
+
+{+header
+getenv current_user "REMOTE_USER"
+write "&lt;p&gt;Welcome, " current_user "!&lt;/p&gt;"
+}
+</pre>
+
+<h2><a class="section" name="http11">The IMAGE Command</a></h2>
 
 <p>The <b>image</b> command is used to display an image &mdash; no surprise there. It requires three parameters using the following syntax:
 	
@@ -2743,7 +2801,7 @@ image "/images/view.jpg" left "[View from the balcony]"
 
 <p>This command displays the image <b>/images/view.jpg</b> aligned to the left. If the picture is not found, or is displayed in a text-only browser such as Lynx, the text <b>[View from the balcony]</b> will be displayed instead. This is also the text that will be displayed by most graphical browsers when the cursor is held over the image.
 
-<h2><a class="section" name="http11">The Media File</a></h2>
+<h2><a class="section" name="http12">The Media File</a></h2>
 
 <p>When played with the <b>cgijacl</b> interpreter, each game will require a corresponding <b>.media</b> file in order to serve multi-media content such as images. This file must have the same name as the game, with a <b>.media</b> suffix in place of the <b>.jacl</b> suffix. For example, the game <b>grail.jacl</b> has a matching media file called <b>grail.media</b>. As this game only has one image, its media file only has one line:
 
@@ -2804,7 +2862,7 @@ constant maintext_colour "#dddddd"
 
 <h1><a class="title" name="flowcontrol0">Flow Control</a></h1>
 
-<h2><a class="section" name="flowcontrol1">The IF, IFALL and ENDIF Commands</a></h2>
+<h2><a class="section" name="flowcontrol1">The IF, IFALL, ENDIF and ENDALL Commands</a></h2>
 
 <P>An <b>if</b> command tests whether an expression is true or false for the purpose of selectively executing code. If the expression is true, execution will continue from the next line. If the expression is false, execution will continue from the line after the matching <b>endif</b> or <b>else</b> command. If no <b>endif</b> command is found by the end of the function, the function will terminate normally with an implicit <b>return true</b>. An <b>if</b> command must be of the format:
 
@@ -2929,6 +2987,18 @@ if sword(parent) = field
 
 <P>It is possible to nest <B>if</B> statements. Nesting involves placing a second <B>if</B> command before the matching <B>endif</B> command of a first. The end result of this is that the code between the second <B>if</B> command and its matching <B>endif</B> command will only be executed if both statements are true &mdash; a logical <b>AND</b>.
 
+<p>The <b>endall</b> command can be used to exit all nested conditional blocks at once by immediately resetting the nesting level to zero. This is useful when deeply nested <b>if</b> statements all need to be exited at a certain point without requiring a matching <b>endif</b> for each level. For example:
+
+<pre>
+if condition1
+   if condition2
+      if condition3
+         write "All three conditions are true.^"
+      endall
+</pre>
+
+<p>In the above code, the <b>endall</b> command exits all three <b>if</b> blocks at once, removing the need for three separate <b>endif</b> commands.
+
 <h2><a class="section" name="flowcontrol2">The IFSTRING Command</a></h2>
 
 <p>An <b>ifstring</b> command is used to compare two strings of text. If the string of text is to contain any spaces, it must be enclosed in double quotes. An <b>ifstring</b> command must use the following format:
@@ -2970,6 +3040,13 @@ if sword(parent) = field
 </tr><tr>
 <td><b>!containsC</b></td>
 <td>This tests if the first string doesn't contain the second string including case</td>
+</tr>
+<tr>
+<td><b>beginswith</b></td>
+<td>This tests if the first string begins with the second string</td>
+</tr><tr>
+<td><b>!beginswith</b></td>
+<td>This tests if the first string doesn't begin with the second string</td>
 </tr>
 </table>
 </center>
@@ -3164,9 +3241,9 @@ The following scopes can be used with the <b>select</b> command:
 <tr><td><img src="info.png" alt="Information"></td>
 <td>As only a single parameter can be used with a <b>select</b> command it is more efficient to use the criterion that selects the smallest set of the object when <b>if</b> statements are required to filter the list further. For example, if you wanted a list of all the objects that are being carried by the player that don't have a <b>mass</b> of <b>scenery</b>, the it would be more efficient to use the <b>select</b> command to find the objects that are children of the player and then <b>if</b> statements to check their mass. This is because there will generally be fewer objects in the game that are currently being carried by the player than objects with a <b>mass</b> that isn't set to <b>scenery</b>. If the <b>select</b> command has been used to find all the objects that aren't scenery, the <b>if</b> statement to check if each object is also carried by the player would need to be executed many more times.
 </td></tr></table>
-<h2><a class="section" name="flowcontrol7">The REPEAT and UNTIL Commands</a></h2>
+<h2><a class="section" name="flowcontrol7">The REPEAT, UNTIL and UNTILALL Commands</a></h2>
 
-<P>A <B>repeat</B>... <B>until</B> loop allows you to repeat a section of code until a specified condition is true. The expression or expressions to be tested should follow the <B>until</B> statement, using the same syntax as an <B>if </B>statement. 
+<P>A <B>repeat</B>... <B>until</B> loop allows you to repeat a section of code until a specified condition is true. The expression or expressions to be tested should follow the <B>until</B> statement, using the same syntax as an <B>if </B>statement.
 
 <P>The following is an example of a <B>repeat</B>... <B>until</B> loop:
 
@@ -3176,6 +3253,14 @@ repeat
   write "DON'T PANIC! "
   set INDEX - 1
 until INDEX = 0
+</pre>
+
+<p>The <b>untilall</b> command works in the same way as <b>until</b> except that when multiple expressions are supplied, the loop only exits when all of the expressions are true &mdash; a logical <b>AND</b>. This is equivalent to the relationship between <b>if</b> and <b>ifall</b>. For example:
+
+<pre>
+repeat
+   set counter + 1
+untilall counter = 10 : status = 1
 </pre>
 
 <table class="infowarn"><tr>
@@ -3206,7 +3291,7 @@ endloop
 </td>
 </tr></table>
 
-<h2><a class="section" name="flowcontrol8">The WHILE and ENDWHILE Commands</a></h2>
+<h2><a class="section" name="flowcontrol8">The WHILE, WHILEALL and ENDWHILE Commands</a></h2>
 
 <p>As a <b>repeat</b> loop will always happen at least once, if there is any chance that a loop should happen zero times, a <b>while</b> loop must be used. A <b>while</b> loop performs its test first, then executes the code following the expression if it evaluates to <b>true</b>. On reaching an <b>endwhile</b> command it will return to the matching <b>while</b> command and re-evaluate the expression. When the expression eventually evaluates to <b>false</b>, execution will continue from the line after the <b>endwhile</b> command. For example, the following function will output the value of the passed arguments:
 
@@ -3219,6 +3304,29 @@ while INDEX != @arg
 endwhile
 }
 </pre>
+
+<p>The <b>whileall</b> command works in the same way as <b>while</b> except that when multiple expressions are supplied, the loop continues only if all of the expressions are true &mdash; a logical <b>AND</b>. This is equivalent to the relationship between <b>if</b> and <b>ifall</b>. For example:
+
+<pre>
+whileall counter &lt; 10 : status = 1
+   set counter + 1
+endwhile
+</pre>
+
+<h2><a class="section" name="flowcontrol10">The BREAK Command</a></h2>
+
+<p>The <b>break</b> command is used to immediately exit the current loop. When a <b>break</b> command is executed, execution continues from the line after the end of the loop (<b>endwhile</b>, <b>until</b>, <b>endloop</b>, <b>endselect</b>, <b>enditerate</b>, etc.). For example:
+
+<pre>
+while counter &lt; 100
+   if counter = 50
+      break
+   endif
+   set counter + 1
+endwhile
+</pre>
+
+<p>In the above code, if <b>counter</b> reaches 50, the <b>break</b> command will exit the <b>while</b> loop immediately and execution will continue from after the <b>endwhile</b> command.
 
 <h2><a class="section" name="flowcontrol9">The RETURN Command</a></h2>
 
@@ -3391,6 +3499,16 @@ string status_text
 {+update_status_window
 padstring status_text " " status_width
 }
+</pre>
+
+<h2><a class="section" name="set5">The SPLIT Command</a></h2>
+
+<p>The <b>split</b> command accepts a string and splits it into one or more substrings which are stored in the specified string array. The number of strings the original string is split into is stored into an integer variable specified as the first parameter of the command. The second argument is the string to split, the third is the delimeter to split on and the final parameter is the array to store the results in.
+
+<p>The following command is from the <b>validation.library</b> for splitting a date into it's components.
+
+<pre>
+split VALID_count string_arg[0] "/" VALID_string
 </pre>
 
 
@@ -3794,6 +3912,16 @@ if save_timer = 0
 endif
 </pre>
 
+<h2><a class="section" name="special14">The FLUSH Command</a></h2>
+
+<p>The <b>flush</b> command forces the display buffer to be flushed to the screen. This command takes no parameters:
+
+<pre>
+flush
+</pre>
+
+<p>This command is platform-specific. On the Nintendo DS interpreter it forces the display to update immediately. On Glk and CGI interpreters this command has no effect and is safely ignored. It is included primarily to allow games that target the Nintendo DS to control when output appears on the screen.
+
 <h2><a class="section" name="special12">The TERMINATE Command</a></h2> 
 
 <p>The <b>terminate</b> command will directly initiate the termination of the JACL interpreter.
@@ -4186,9 +4314,16 @@ arg[6]: 13   string_arg[6]: 13
 
 <h2><a class="section" name="functions3">The function-call count</a></h2>
 
-<p>Every time a function is executed, an internal count of the number of times it has been called is increased by one. The value of this count is obtained by prefixing the full internal name of the function with an at symbol (<b>@</b>). If an at symbol is used on its own, the number of times the current function has executed is returned.
+<p>Every time a function is executed, an internal counter on that function is incremented by one. The counter is set to zero when the game starts and is preserved by <b>save</b> / <b>restore</b>, so an arbitrarily old save will reload with the exact counts it had when it was written.
 
-<p>For example, below is the same example used in the section <a href="#attributes4">User Attributes<a>, modified to use the function-call count:
+<p>To read a counter, use the at symbol (<b>@</b>):
+
+<table width=100%>
+<tr><td width=20%><b>@</b></td><td>The counter for the currently executing function. The first call into a function returns <b>1</b> here, because the interpreter increments the counter <em>before</em> running the function body.</td></tr>
+<tr><td><b>@</b><i>funcname</i></td><td>The counter for any function in the game, addressed by its <em>full internal name</em>. Use the auto-suffixed name for object-scoped functions (see below).</td></tr>
+</table>
+
+<p>The most common use is gating first-time behaviour. The example below is the same one used in the section <a href="#attributes4">User Attributes<a>, but rewritten without the user attribute &mdash; the call counter does the same job for free:
 
 <pre>
 {open_override
@@ -4201,6 +4336,60 @@ endif
 write "You open the door again.^"
 }
 </pre>
+
+<h3>Reading another function's counter</h3>
+
+<p>You can ask any function how many times it has run. This is useful when one function wants to react to whether <em>another</em> has executed at all yet, without you having to maintain a separate <b>integer</b> flag for it.
+
+<pre>
+{+eachturn
+if @+intro = 0
+   # Intro hasn't fired yet -- skip the per-turn weather report.
+   return
+endif
+execute "+weather"
+}
+</pre>
+
+<p>For functions defined <em>inside</em> an object or location, JACL auto-suffixes the function name with the object's label when it stores the function (see <a href="#functions1">Function Names</a> earlier in this chapter). So a block like:
+
+<pre>
+object fido : fido
+ ...
+
+{examine
+   ...
+}
+</pre>
+
+<p>is stored internally as <b>examine_fido</b>. To check its counter, use the full name:
+
+<pre>
+if @examine_fido + @examine_eecom + @examine_guidance + @examine_retro = 0
+   write "(Tip: try ~examine fido~ to hear what FIDO is reading.)^"
+endif
+</pre>
+
+<h3>Idiomatic patterns</h3>
+
+<table width=100%>
+<tr><td width=20%><tt>if @ = 1</tt></td><td>Run this branch only on the first call.</td></tr>
+<tr><td><tt>if @ &lt; 4</tt></td><td>Show a tutorial nudge for the first few calls, then go quiet.</td></tr>
+<tr><td><tt>if @+intro = 0</tt></td><td>True only before <b>+intro</b> has ever fired.</td></tr>
+<tr><td><tt>if @ % 5 = 0</tt></td><td>Trigger something every fifth time this function runs.</td></tr>
+</table>
+
+<p>Prefer these patterns over a hand-rolled <b>integer hint_X_shown</b> flag whenever the trigger is "has this function fired N times" rather than "has the world reached state X" &mdash; one fewer variable to declare, save and clear on restart.
+
+<table class="infowarn"><tr>
+<td><img src="info.png" alt="Information"></td>
+<td>
+<p>The counter increments on <em>every</em> entry into the function, regardless of which branch the body takes. If your function toggles state (e.g. open/close on each press), <b>@</b> advances on both branches; gate against the specific state you care about if the distinction matters.
+</td></tr></table>
+
+<h3>Fallback: array length</h3>
+
+<p>If <b>@</b><i>name</i> does not match any function, the interpreter falls back to interpreting <i>name</i> as an array and returns the array's length. This is why the <b>+adder</b> example later in this chapter uses <tt>while INDEX != @arg</tt> &mdash; <b>arg</b> is the integer array of arguments, and <b>@arg</b> resolves via the fallback to "how many arguments were passed". The same form works on any integer or string array you have declared.
 
 <h2><a class="section" name="functions4">The RETURN Command</a></h2>
 
@@ -5539,9 +5728,11 @@ Type a number between 1 and 5:
 
 <h1><a class="title" name="csv0">CSV Files</a></h1>
 
-<p>A comma-separated values (CSV) file stores tabular data (numbers and text) in plain-text form. Each column in the file is, as the name suggests, separated by commas. JACL supports both the reading and writing of CSV files. By default stores CSV files in a directory named <b>data</b> that in the same location as the program that is accessing them. For example, the demonstration program <b>contacts.jacl</b> lives in the <b>projects</b> directory and stores its data in <b>projects/data</b>.
+<p>A comma-separated values (CSV) file stores tabular data (numbers and text) in plain-text form. Each column in the file is, as the name suggests, separated by commas. JACL supports both the reading and writing of CSV files. By default, CSV files are stored in a directory named <b>data</b> in the same location as the program that is accessing them. For example, the demonstration program <b>contacts.jacl</b> lives in the <b>projects</b> directory and stores its data in <b>projects/data</b>.
 
-When referring to a CSV file using any of the commands detailed in this section only a portion of the filename is specified. This supplied name is used to build the full name of the file using the following formula:
+When referring to a CSV file using any of the commands detailed in this section, there are two ways to specify the filename:
+
+<p><b>Per-game files</b> &mdash; supply a short name without a file extension. This name is used to build the full filename using the following formula:
 
 <pre>
 <i>&lt;DataDirectory&gt;</i><b>/</b><i>&lt;ProgramName&gt;</i><b>-</b><i>&lt;Name&gt;</i><b>.csv</b>
@@ -5554,6 +5745,24 @@ When referring to a CSV file using any of the commands detailed in this section 
 </pre>
 
 <p>This system ensures that no two JACL programs can overwrite each others data or access arbitrary files from the filesystem of the webserver.</p>
+
+<p><b>Global files</b> &mdash; supply a filename that includes the <b>.csv</b> extension, enclosed in double quotes. The file is accessed directly from the data directory without any program name prefix:
+
+<pre>
+<i>&lt;DataDirectory&gt;</i><b>/</b><i>&lt;Name&gt;</i>
+</pre>
+
+<p>For example, a shared vocabulary file called <b>indonesian_words.csv</b> can be accessed by any program:</p>
+
+<pre>
+iterate <b>"indonesian_words.csv"</b> skip_header
+   write field[0] ": " field[1] ^
+enditerate
+</pre>
+
+<p>The quotes are required to prevent the dot in the filename from being interpreted as a scope separator.</p>
+
+<p>This is useful for reference data that is shared across multiple programs.</p>
 
 <h2><a class="section" name="csv1">The ITERATE and ENDITERATE Commands</a></h2>
 
@@ -5661,6 +5870,40 @@ set last_id + 1
 append data last_id firstname_data surname_data email_data home_phone_data mobile_phone_data address_data
 write firstname_data " " surname_data " added to database.^^"
 </pre>
+
+<h2><a class="section" name="csv4">The APPEND_FC, APPEND_NT and APPEND_LC Commands</a></h2>
+
+<p>These three commands are used together to build a single CSV row incrementally across multiple commands. This is useful when the number of columns in a row is not known in advance, such as when iterating over a variable-length data set.
+
+<p>The commands use the following format:
+
+<pre>
+<B>append_fc</B> <I>&lt;FileName&gt;</I> <I>&lt;Field0&gt;</I> [<I>&lt;Field1&gt;</I>...]
+<B>append_nt</B> <I>&lt;FileName&gt;</I> <I>&lt;Field0&gt;</I> [<I>&lt;Field1&gt;</I>...]
+<B>append_lc</B> <I>&lt;FileName&gt;</I> <I>&lt;Field0&gt;</I> [<I>&lt;Field1&gt;</I>...]
+</pre>
+
+<p>The <b>append_fc</b> (first column) command starts a new line in the CSV file and writes the specified fields. It does not terminate the line, leaving it open for further fields to be added.
+
+<p>The <b>append_nt</b> (no terminate) command continues writing fields to the current open line without terminating it. This command can be called multiple times to add additional columns.
+
+<p>The <b>append_lc</b> (last column) command continues writing fields to the current open line and then terminates the line with a newline character, closing the file.
+
+<p>Below is an example of these three commands being used together to build a row with a variable number of columns:
+
+<pre>
+append_fc results date time name
+iterate data skip_header
+   if COUNT &lt; obs_count
+      append_nt results observations[INDEX]
+      set COUNT + 1
+   else
+      append_lc results observations[INDEX]
+   endif
+enditerate
+</pre>
+
+<p>In this example, <b>append_fc</b> starts the row with three fixed columns. The <b>iterate</b> loop then adds a variable number of observation columns using <b>append_nt</b>, with the final column being written using <b>append_lc</b> to close the line.
 
 
 

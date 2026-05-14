@@ -192,9 +192,16 @@ arg[6]: 13   string_arg[6]: 13
 
 <h2><a class="section" name="functions3">The function-call count</a></h2>
 
-<p>Every time a function is executed, an internal count of the number of times it has been called is increased by one. The value of this count is obtained by prefixing the full internal name of the function with an at symbol (<b>@</b>). If an at symbol is used on its own, the number of times the current function has executed is returned.
+<p>Every time a function is executed, an internal counter on that function is incremented by one. The counter is set to zero when the game starts and is preserved by <b>save</b> / <b>restore</b>, so an arbitrarily old save will reload with the exact counts it had when it was written.
 
-<p>For example, below is the same example used in the section <a href="attribute.html#attributes4">User Attributes<a>, modified to use the function-call count:
+<p>To read a counter, use the at symbol (<b>@</b>):
+
+<table width=100%>
+<tr><td width=20%><b>@</b></td><td>The counter for the currently executing function. The first call into a function returns <b>1</b> here, because the interpreter increments the counter <em>before</em> running the function body.</td></tr>
+<tr><td><b>@</b><i>funcname</i></td><td>The counter for any function in the game, addressed by its <em>full internal name</em>. Use the auto-suffixed name for object-scoped functions (see below).</td></tr>
+</table>
+
+<p>The most common use is gating first-time behaviour. The example below is the same one used in the section <a href="attribute.html#attributes4">User Attributes<a>, but rewritten without the user attribute &mdash; the call counter does the same job for free:
 
 <pre>
 {open_override
@@ -207,6 +214,60 @@ endif
 write "You open the door again.^"
 }
 </pre>
+
+<h3>Reading another function's counter</h3>
+
+<p>You can ask any function how many times it has run. This is useful when one function wants to react to whether <em>another</em> has executed at all yet, without you having to maintain a separate <b>integer</b> flag for it.
+
+<pre>
+{+eachturn
+if @+intro = 0
+   # Intro hasn't fired yet -- skip the per-turn weather report.
+   return
+endif
+execute "+weather"
+}
+</pre>
+
+<p>For functions defined <em>inside</em> an object or location, JACL auto-suffixes the function name with the object's label when it stores the function (see <a href="#functions1">Function Names</a> earlier in this chapter). So a block like:
+
+<pre>
+object fido : fido
+ ...
+
+{examine
+   ...
+}
+</pre>
+
+<p>is stored internally as <b>examine_fido</b>. To check its counter, use the full name:
+
+<pre>
+if @examine_fido + @examine_eecom + @examine_guidance + @examine_retro = 0
+   write "(Tip: try ~examine fido~ to hear what FIDO is reading.)^"
+endif
+</pre>
+
+<h3>Idiomatic patterns</h3>
+
+<table width=100%>
+<tr><td width=20%><tt>if @ = 1</tt></td><td>Run this branch only on the first call.</td></tr>
+<tr><td><tt>if @ &lt; 4</tt></td><td>Show a tutorial nudge for the first few calls, then go quiet.</td></tr>
+<tr><td><tt>if @+intro = 0</tt></td><td>True only before <b>+intro</b> has ever fired.</td></tr>
+<tr><td><tt>if @ % 5 = 0</tt></td><td>Trigger something every fifth time this function runs.</td></tr>
+</table>
+
+<p>Prefer these patterns over a hand-rolled <b>integer hint_X_shown</b> flag whenever the trigger is "has this function fired N times" rather than "has the world reached state X" &mdash; one fewer variable to declare, save and clear on restart.
+
+<table class="infowarn"><tr>
+<td><img src="info.png" alt="Information"></td>
+<td>
+<p>The counter increments on <em>every</em> entry into the function, regardless of which branch the body takes. If your function toggles state (e.g. open/close on each press), <b>@</b> advances on both branches; gate against the specific state you care about if the distinction matters.
+</td></tr></table>
+
+<h3>Fallback: array length</h3>
+
+<p>If <b>@</b><i>name</i> does not match any function, the interpreter falls back to interpreting <i>name</i> as an array and returns the array's length. This is why the <b>+adder</b> example later in this chapter uses <tt>while INDEX != @arg</tt> &mdash; <b>arg</b> is the integer array of arguments, and <b>@arg</b> resolves via the fallback to "how many arguments were passed". The same form works on any integer or string array you have declared.
 
 <h2><a class="section" name="functions4">The RETURN Command</a></h2>
 
