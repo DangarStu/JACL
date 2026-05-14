@@ -190,7 +190,7 @@ process_file(const char *sourceFile1, const char *sourceFile2)
 
 			/* ENCRYPT PROCESSED FILE IF REQUIRED */
 			if (encrypting) {
-				jacl_encrypt(stripped_line);
+				jacl_obfuscate(stripped_line);
 			}
 
 			fputs(stripped_line, outputFile);

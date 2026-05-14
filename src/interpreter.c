@@ -490,7 +490,7 @@ execute(const char *funcname)
     fgets(text_buffer, 1024, file);
 #endif
 
-    if (encrypted) jacl_decrypt(text_buffer);
+    if (encrypted) jacl_deobfuscate(text_buffer);
 
     while (text_buffer[0] != '}' && !interrupted) {
         encapsulate();
@@ -555,7 +555,7 @@ execute(const char *funcname)
             fgets(text_buffer, 1024, file);
 #endif
 
-            if (encrypted) jacl_decrypt(text_buffer);
+            if (encrypted) jacl_deobfuscate(text_buffer);
 
             while (text_buffer[0] != '.') {
                 // GET THE NEXT LINE
@@ -565,7 +565,7 @@ execute(const char *funcname)
                 fgets(text_buffer, 1024, file);
 #endif
 
-                if (encrypted) jacl_decrypt(text_buffer);
+                if (encrypted) jacl_deobfuscate(text_buffer);
 
             }
         } else if (!strcmp(word[0], "endif")) {
@@ -992,7 +992,7 @@ execute(const char *funcname)
                     fgets(text_buffer, 1024, file);
 #endif
 
-                    if (encrypted) jacl_decrypt(text_buffer);
+                    if (encrypted) jacl_deobfuscate(text_buffer);
 
                     while (text_buffer[0] != '}') {
                         encapsulate();
@@ -2006,7 +2006,7 @@ execute(const char *funcname)
                 fgets(text_buffer, 1024, file);
 #endif
 
-                if (encrypted) jacl_decrypt(text_buffer);
+                if (encrypted) jacl_deobfuscate(text_buffer);
 
                 while (text_buffer[0] != '.') {
                     index = 0;
@@ -2060,7 +2060,7 @@ execute(const char *funcname)
                     fgets(text_buffer, 1024, file);
 #endif
 
-                    if (encrypted) jacl_decrypt(text_buffer);
+                    if (encrypted) jacl_deobfuscate(text_buffer);
                 }
             } else if (!strcmp(word[0], "mesg")) {
                 for (counter = 1; word[counter] != NULL && counter < MAX_WORDS; counter++) {
@@ -2812,7 +2812,7 @@ execute(const char *funcname)
         before_command = ftell(file);
         fgets(text_buffer, 1024, file);
 #endif
-        if (encrypted) jacl_decrypt(text_buffer);
+        if (encrypted) jacl_deobfuscate(text_buffer);
     };
 
     return (exit_function(TRUE));

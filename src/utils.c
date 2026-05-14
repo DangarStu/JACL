@@ -207,13 +207,24 @@ stripwhite (char *string)
     return string;
 }
 
+/* XOR-with-0xFF obfuscation, NOT encryption. There is no key; anyone
+ * who notices the .j2 file starts with a "#encrypted" marker can
+ * recover the original source with a 5-line script. The historical
+ * names jacl_encrypt / jacl_decrypt overstated this -- "obfuscate"
+ * is honest. Both directions are the same transform because XOR is
+ * self-inverse; the two functions are kept distinct only for caller
+ * intent (jpp obfuscates on write; loader deobfuscates on read).
+ *
+ * Both stop at the first '\n' or '\r' so the line terminator is
+ * preserved verbatim in the obfuscated stream -- the loader still
+ * uses fgets-style line splits to walk the file. */
 void
-jacl_encrypt(char *string)
+jacl_obfuscate(char *string)
 {
 	int index, length;
 
 	length = strlen(string);
-	
+
 	for (index = 0; index < length; index++) {
 		if (string[index] == '\n' || string[index] == '\r') {
 			return;
@@ -223,12 +234,12 @@ jacl_encrypt(char *string)
 }
 
 void
-jacl_decrypt(char *string)
+jacl_deobfuscate(char *string)
 {
 	int index, length;
 
 	length = strlen(string);
-	
+
 	for (index = 0; index < length; index++) {
 		if (string[index] == '\n' || string[index] == '\r') {
 			return;

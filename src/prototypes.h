@@ -52,8 +52,9 @@ void get_string(char *string_buffer, int size);
 int get_number(int insist, int low, int high);
 int save_interaction(const char *filename);
 int restore_interaction(const char *filename);
-void jacl_encrypt (char *string);
-void jacl_decrypt (char *string);
+/* XOR-with-0xFF obfuscation; not encryption. See utils.c. */
+void jacl_obfuscate (char *string);
+void jacl_deobfuscate (char *string);
 void log_message(const char *message, int console);
 void preparse(void);
 void inspect(int object_num);

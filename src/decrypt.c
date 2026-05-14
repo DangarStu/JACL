@@ -37,7 +37,7 @@ main(int argc, char *argv[])
 			continue;
 		}
 		if (encrypted) {
-			jacl_decrypt(text_buffer);
+			jacl_deobfuscate(text_buffer);
 		}
 		stripwhite(text_buffer);
 		printf("%s", text_buffer);
@@ -85,13 +85,20 @@ stripwhite (char *string)
     return string;
 }
 
+/* Same XOR-with-0xFF obfuscation as utils.c. This file is the
+ * standalone "decrypt" CLI tool's copy -- it doesn't link against the
+ * runtime utils so the implementation is duplicated here. The
+ * difference vs utils.c's pair: this jacl_deobfuscate NUL-terminates
+ * the line at the first '\n'/'\r' so the CLI's printf below skips
+ * the newline; utils.c keeps the line break so the loader still sees
+ * line-delimited input. */
 void
-jacl_encrypt(char *string)
+jacl_obfuscate(char *string)
 {
 	int index, length;
 
 	length = strlen(string);
-	
+
 	for (index = 0; index < length; index++) {
 		if (string[index] == '\n' || string[index] == '\r') {
 			return;
@@ -101,12 +108,12 @@ jacl_encrypt(char *string)
 }
 
 void
-jacl_decrypt(char *string)
+jacl_deobfuscate(char *string)
 {
 	int index, length;
 
 	length = strlen(string);
-	
+
 	for (index = 0; index < length; index++) {
 		if (string[index] == '\n' || string[index] == '\r') {
 			string[index] = 0;

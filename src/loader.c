@@ -286,7 +286,7 @@ read_gamefile()
         line++;
     }
 
-    if (encrypted) jacl_decrypt(text_buffer);
+    if (encrypted) jacl_deobfuscate(text_buffer);
 
     while (result)
     {
@@ -310,7 +310,7 @@ read_gamefile()
 #endif
                     line++;
                 }
-                if (encrypted) jacl_decrypt(text_buffer);
+                if (encrypted) jacl_deobfuscate(text_buffer);
                 if (text_buffer[0] == '}')
                     break;
             }
@@ -665,7 +665,7 @@ read_gamefile()
 #endif
             line++;
         }
-        if (encrypted) jacl_decrypt(text_buffer);
+        if (encrypted) jacl_deobfuscate(text_buffer);
     }
 
     if (errors) {
@@ -727,7 +727,7 @@ read_gamefile()
 #endif
         line++;
     }
-    if (encrypted) jacl_decrypt(text_buffer);
+    if (encrypted) jacl_deobfuscate(text_buffer);
 
     while (result)
     {
@@ -832,7 +832,7 @@ read_gamefile()
 #endif
                     line++;
                 }
-                if (encrypted) jacl_decrypt(text_buffer);
+                if (encrypted) jacl_deobfuscate(text_buffer);
                 encapsulate();
                 if (word[0] != NULL && !strcmp(word[0], "print")) {
                     // NOW INSIDE A PRINT BLOCK, SKIP UNTIL '.' IS REACHED
@@ -1080,7 +1080,7 @@ read_gamefile()
 #endif
             line++;
         }
-        if (encrypted) jacl_decrypt(text_buffer);
+        if (encrypted) jacl_deobfuscate(text_buffer);
     }
 
     /* CREATE THE CONSTANT THE RECORDS THE TOTAL NUMBER OF OBJECTS */
