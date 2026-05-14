@@ -120,14 +120,19 @@ integer abs_met                   # scratch for T-MINUS rendering
 # Tutorial nudges. Each flag is flipped the first time the player exercises
 # the corresponding command, suppressing the next-step hint on subsequent
 # uses. The intro graduates: scene -> look -> examine -> ask role -> poll.
-integer hint_examine_shown      # has the player seen the 'try examine' hint?
-integer hint_ask_role_shown     # has the player seen the 'try ask about role' hint?
 integer hint_poll_shown         # has the player seen the 'try poll' hint?
-# Note: a couple of other one-time hints elide the explicit "shown"
-# integer in favour of the function's own call_count (via the @ token):
-#   - The 'live on the FLIGHT loop' explanation in {press} on mic_arm
+# Other one-time hints elide an explicit "shown" integer in favour of
+# the function's own call_count (via the @ token):
+#   - 'live on the FLIGHT loop' explanation in {press} on mic_arm
 #     gates on @ < 4.
-#   - The 'type answer' nudge in +hail gates on @ = 1.
+#   - 'type answer' nudge in +hail gates on @ = 1.
+#   - 'try examine fido' hint in +game_intro gates on the sum of the
+#     four examine_<callsign> call_counts being zero.
+#   - 'try ask fido about role' hint in each examine_<callsign> gates
+#     on the sum of the four ask_about_role_<callsign> call_counts
+#     being zero. (hint_poll_shown stays as an integer because its
+#     guarded block has nested conditions that would make the @
+#     rewrite uglier than the flag.)
 integer smoke_test_fired        # TEMP: gate the inbound-comms smoke test in +intro
 
 # Inbound-comms state. When a controller keys their mic, +hail records
@@ -555,7 +560,6 @@ object fido : fido fdo dynamics officer woman
  parent        flight_control
 
 {examine
-set hint_examine_shown = true
 if self(keyed) = 1
    write "(FIDO's loop LED is lit -- she's keyed her mic.)^^"
 endif
@@ -566,7 +570,7 @@ if alarm_fired = false
       Weather balloon's still climbing -- we'll have wind data at
       altitude in about a minute."^
    .
-   if hint_ask_role_shown = false
+   if @ask_about_role_fido + @ask_about_role_eecom + @ask_about_role_guidance + @ask_about_role_retro = 0
       print:
          Try ~ask fido about role~ for a fuller picture of what FIDO
          actually does. The same form works on any controller, and
@@ -587,7 +591,6 @@ endif
 }
 
 {ask_about_role
-set hint_ask_role_shown = true
 print:
    FIDO: "Flight Dynamics Officer, Flight. The 'F-D-O' on the
    acronym schedule. My console watches the vehicle's trajectory
@@ -753,7 +756,6 @@ object eecom : eecom electrical environmental life support engineer
  parent        flight_control
 
 {examine
-set hint_examine_shown = true
 if self(keyed) = 1
    write "(EECOM's loop LED is lit -- he's keyed his mic.)^^"
 endif
@@ -764,7 +766,7 @@ if alarm_fired = false
       nine. Crew O2 one hundred, suit loop closed. Everything I can
       measure is doing what it ought to be."^
    .
-   if hint_ask_role_shown = false
+   if @ask_about_role_fido + @ask_about_role_eecom + @ask_about_role_guidance + @ask_about_role_retro = 0
       print:
          Try ~ask eecom about role~ for a fuller picture of what EECOM
          actually does. The same form works on any controller, and
@@ -788,7 +790,6 @@ endif
 }
 
 {ask_about_role
-set hint_ask_role_shown = true
 print:
    EECOM: "Electrical, Environmental and Consumables, Flight. Three
    words and a lot of dials. Electrical means the spacecraft's power
@@ -940,7 +941,6 @@ object guidance : guidance gnc nav navigation computer man
  parent        flight_control
 
 {examine
-set hint_examine_shown = true
 if self(keyed) = 1
    write "(GUIDANCE's loop LED is lit -- he's keyed his mic.)^^"
 endif
@@ -950,7 +950,7 @@ if alarm_fired = false
       platform aligned, drift inside spec. Computer is running pre-flight
       sequence on schedule."^
    .
-   if hint_ask_role_shown = false
+   if @ask_about_role_fido + @ask_about_role_eecom + @ask_about_role_guidance + @ask_about_role_retro = 0
       print:
          Try ~ask guidance about role~ for a fuller picture of what
          GUIDANCE actually does. The same form works on any controller,
@@ -972,7 +972,6 @@ endif
 }
 
 {ask_about_role
-set hint_ask_role_shown = true
 print:
    GUIDANCE: "Guidance, Navigation and Control, Flight. 'G-N-C' if
    we're being formal. My console watches the on-board computer --
@@ -1158,7 +1157,6 @@ object retro : retro retrofire abort man
  parent        flight_control
 
 {examine
-set hint_examine_shown = true
 if self(keyed) = 1
    write "(RETRO's loop LED is lit -- he's keyed his mic.)^^"
 endif
@@ -1167,7 +1165,7 @@ if alarm_fired = false
       RETRO, gravelly and short: "RETRO. Range safety armed. Recovery
       forces in position."^
    .
-   if hint_ask_role_shown = false
+   if @ask_about_role_fido + @ask_about_role_eecom + @ask_about_role_guidance + @ask_about_role_retro = 0
       print:
          Try ~ask retro about role~ for a fuller picture of what RETRO
          actually does. The same form works on any controller, and
@@ -1187,7 +1185,6 @@ endif
 }
 
 {ask_about_role
-set hint_ask_role_shown = true
 print:
    RETRO: "Retrofire and Range Safety, Flight. The 'retro' is from
    retrograde -- the fire-the-engines-backwards burn that brings
@@ -2214,7 +2211,7 @@ print:
    of the ozone that rolls off the high-voltage tubes that have been
    running since dawn.^
 .
-if hint_examine_shown = false
+if @examine_fido + @examine_eecom + @examine_guidance + @examine_retro = 0
    print:
       Try ~examine fido~ to key the loop on FIDO's console and hear
       her read.^
