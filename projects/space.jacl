@@ -124,6 +124,9 @@ integer hint_examine_shown      # has the player seen the 'try examine' hint?
 integer hint_ask_role_shown     # has the player seen the 'try ask about role' hint?
 integer hint_poll_shown         # has the player seen the 'try poll' hint?
 integer hint_answer_shown       # has the player seen the 'type answer' hint?
+# Note: the 'live on the FLIGHT loop' explanation in {press} on mic_arm
+# uses @ (this function's call_count) to fire on the first couple of
+# presses rather than a dedicated hint flag.
 integer smoke_test_fired        # TEMP: gate the inbound-comms smoke test in +intro
 
 # Inbound-comms state. When a controller keys their mic, +hail records
@@ -292,6 +295,19 @@ else
    write "You press the push-to-talk bar with your thumb. The boom mic "
    write "swings in close; the loop LED above the comm-selector lights "
    write "up green. You are live on the FLIGHT loop.^"
+   # Surface the plain-English explanation while the player is still
+   # learning the gesture. @ is this function's call_count; in toggle
+   # use it alternates open/close, so @ < 4 catches the first couple
+   # of opens (after which the term should be familiar).
+   if @ < 4
+      print:
+         ^(The FLIGHT loop is your private intercom to the four
+         controllers in this room. While the LED is lit, anything you
+         say with ~ask~, ~tell~, ~commit~, ~abort~ or ~hold~ goes out
+         to all of them. ~press arm~ again to park the mic when you
+         want to listen without transmitting.)^
+      .
+   endif
 endif
 }
 
