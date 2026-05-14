@@ -431,6 +431,18 @@ make install
 <td><b>temp</b> <i>Directory</i></td>
 <td>This indicates the directory to store the processed version of the game file.</td>
 <td>A directory called <b>temp</b> beneath the directory the game file is stored in. If this directory does not exist, the <b>.j2</b> file will be created in the same directory as the game file.</td>
+</tr><tr>
+<td><b>google_client_id</b> <i>ClientID</i></td>
+<td>OAuth 2.0 client ID issued by the Google Cloud console for your site. Enables the Google Sign-In flow described in the <a href="#http_auth">HTTP and HTML</a> chapter. Empty (or omitted) disables sign-in and leaves the anonymous flow as the only option.</td>
+<td>Empty &mdash; sign-in disabled.</td>
+</tr><tr>
+<td><b>session_secret</b> <i>String</i></td>
+<td>High-entropy secret used to HMAC the <b>jacl_session</b> cookie. Required when <b>google_client_id</b> is set; if empty, sign-in is disabled regardless of the client ID. Treat as a credential &mdash; keep out of source control.</td>
+<td>Empty &mdash; sign-in disabled.</td>
+</tr><tr>
+<td><b>session_max_age</b> <i>Seconds</i></td>
+<td>Lifetime of the <b>jacl_session</b> cookie in seconds. The cookie's HMAC includes this expiry, so a stale cookie can't be replayed past it.</td>
+<td><b>2592000</b> (30 days).</td>
 </tr></table>
 
 <p style="page-break-before: always">Below is an example <b>cgijacl</b> configuration file:
@@ -439,10 +451,15 @@ make install
 # "cgijacl.conf"
 # CGIJACL interpreter configuration file.
 
-access_log    "/usr/local/jacl/logs/access.log"
-error_log     "/usr/local/jacl/logs/error.log"
-temp          "/usr/local/jacl/projects/temp/"
-include       "/usr/local/jacl/projects/include/"
+access_log         "/usr/local/jacl/logs/access.log"
+error_log          "/usr/local/jacl/logs/error.log"
+temp               "/usr/local/jacl/projects/temp/"
+include            "/usr/local/jacl/projects/include/"
+
+# Optional Google Sign-In configuration. Omit both lines (or leave
+# either empty) to keep sign-in disabled and run the anonymous flow.
+google_client_id   "1234567890-abcdefg.apps.googleusercontent.com"
+session_secret     "long-random-string-known-only-to-this-server"
 </pre>
 
 <h2><a class="section" name="installation5">Playing the Sample Games</a></h2>
@@ -2805,6 +2822,92 @@ image "/images/view.jpg" left "[View from the balcony]"
 </pre>
 
 <p>This command displays the image <b>/images/view.jpg</b> aligned to the left. If the picture is not found, or is displayed in a text-only browser such as Lynx, the text <b>[View from the balcony]</b> will be displayed instead. This is also the text that will be displayed by most graphical browsers when the cursor is held over the image.
+
+<h2><a class="section" name="http_auth">Google Sign-In Authentication</a></h2>
+
+<p>The <b>cgijacl</b> and <b>fcgijacl</b> interpreters can optionally bind each request to a verified Google account. When enabled, a player's signed-in identity becomes their <b>user_id</b>, so the auto-save the interpreter restores on every move belongs to that account no matter which browser, device or network they're playing from. The flow is opt-in &mdash; if you don't configure it, the existing anonymous flow with randomly-generated user IDs continues to work unchanged.
+
+<h3><a class="section" name="http_auth_config">Enabling sign-in</a></h3>
+
+<p>Sign-in is enabled by setting two directives in <b>cgijacl.conf</b>:
+
+<pre>
+google_client_id   "1234567890-abcdefg.apps.googleusercontent.com"
+session_secret     "long-random-string-known-only-to-this-server"
+session_max_age    2592000        # optional, in seconds; default 30 days
+</pre>
+
+<p>The <b>google_client_id</b> is the OAuth 2.0 client ID issued by the Google Cloud console for your site. The <b>session_secret</b> is an arbitrary high-entropy string used to HMAC the cookie the interpreter issues after a successful sign-in &mdash; anyone who knows this secret can forge sessions, so keep it out of source control and rotate it if you suspect it has leaked. <b>session_max_age</b> sets how long a signed cookie remains valid; the default is 30 days. If either <b>google_client_id</b> or <b>session_secret</b> is empty, sign-in is treated as disabled and the rest of this section is skipped &mdash; useful for development copies of a game.
+
+<h3><a class="section" name="http_auth_endpoints">The auth endpoints</a></h3>
+
+<p>The interpreter reserves the request parameter <b>auth</b> for sign-in workflow messages. Two values are recognised:
+
+<table width=100%>
+<tr><th width=20%>Request</th><th>Behaviour</th></tr>
+<tr><td><b>?auth=google&amp;credential=<i>token</i></b></td>
+<td>The frontend calls this URL after Google Identity Services (GIS) returns an ID token to the page. The interpreter verifies the token against Google's live JWKS, builds a signed session cookie, and returns a small JSON body (<b>{"ok":true,"sub":"<i>sub</i>"}</b>) with a <b>Set-Cookie: jacl_session=...</b> header. The frontend should then reload the page (or restart its Ajax loop) so the new cookie is picked up. On verification failure the interpreter replies <b>401 Unauthorized</b> with <b>{"ok":false}</b>; the player remains anonymous.</td></tr>
+<tr><td><b>?auth=logout</b></td>
+<td>Clears the <b>jacl_session</b> cookie by re-issuing it with <b>Max-Age=0</b> and returns <b>{"ok":true}</b>. The next request from the browser will fall through to the anonymous flow.</td></tr>
+</table>
+
+<p>Neither endpoint runs the game's normal command-processing loop; both short-circuit the request after sending their JSON response.
+
+<h3><a class="section" name="http_auth_cookie">The session cookie</a></h3>
+
+<p>On successful sign-in the interpreter sets a cookie named <b>jacl_session</b>. The cookie value is <b>sub.expiry.hmac</b> where <b>sub</b> is the Google account identifier, <b>expiry</b> is a Unix timestamp, and <b>hmac</b> is a SHA-256 HMAC of <b>sub.expiry</b> using <b>session_secret</b> as the key. The cookie is set with <b>HttpOnly</b>, <b>SameSite=Lax</b>, and (if the request was over HTTPS) <b>Secure</b>. On every subsequent request the interpreter verifies the HMAC in constant time, checks that the expiry is in the future, and if both pass sets <b>user_id</b> to <b>google_<i>sub</i></b> for the duration of the request. A missing, malformed or expired cookie causes the request to fall through to the existing anonymous flow.
+
+<h3><a class="section" name="http_auth_game">Reading auth state from the game</a></h3>
+
+<p>The interpreter surfaces three game-visible variables every request so your <b>+header</b>, <b>+footer</b> or other UI code can render appropriately:
+
+<table width=100%>
+<tr><th width=20%>Container</th><th>Type</th><th>Contents</th></tr>
+<tr><td><b>google_client_id</b></td><td>cstring</td>
+<td>The configured client ID from <b>cgijacl.conf</b>. Populated on every request &mdash; even anonymous ones &mdash; so the frontend can render the GIS Sign-In button. Empty if sign-in isn't enabled.</td></tr>
+<tr><td><b>google_sub</b></td><td>cstring</td>
+<td>The verified Google account identifier from the cookie, or empty if the player is anonymous on this request.</td></tr>
+<tr><td><b>google_signed_in</b></td><td>cinteger</td>
+<td>Set to <b>1</b> if a valid session cookie was presented this request, <b>0</b> otherwise. Cheaper to test than comparing <b>google_sub</b> to an empty string.</td></tr>
+</table>
+
+<p>A typical header snippet that renders a sign-in button for anonymous players and a sign-out link for signed-in ones:
+
+<pre>
+{+header
+if google_signed_in = 1
+   write "&lt;div class=~auth~&gt;Signed in as " google_sub
+   write " &mdash; &lt;a href=~?auth=logout~&gt;sign out&lt;/a&gt;&lt;/div&gt;"
+else
+   if google_client_id != ""
+      write "&lt;div id=~g_id_onload~ data-client_id=~"
+      write google_client_id "~ data-callback=~handleCredential~&gt;&lt;/div&gt;"
+      write "&lt;div class=~g_id_signin~&gt;&lt;/div&gt;"
+   endif
+endif
+}
+</pre>
+
+<p>The <b>handleCredential</b> Javascript function on your page receives the GIS callback's <b>{credential: "&lt;jwt&gt;"}</b> object and submits it to <b>?auth=google&amp;credential=<i>jwt</i></b> via fetch or XMLHttpRequest. On <b>ok:true</b> reload the page; the cookie picked up on the next request will resolve <b>user_id</b> to <b>google_<i>sub</i></b>.
+
+<h3><a class="section" name="http_auth_save">User ID resolution and auto-save migration</a></h3>
+
+<p>The interpreter's <b>user_id</b> resolution order is:
+
+<ol>
+<li>A valid <b>jacl_session</b> cookie &rArr; <b>google_<i>sub</i></b>.</li>
+<li>A <b>user_id</b> parameter or cookie passed by the request (legacy anonymous flow).</li>
+<li>The <b>REMOTE_USER</b> environment variable, if the webserver supplied one.</li>
+<li>A fresh anonymous ID (<b>anon_</b> followed by 32 hex characters drawn from <b>/dev/urandom</b>).</li>
+</ol>
+
+<p>Whichever route resolves first wins. A signed-in cookie always beats an anonymous one for the same browser, so a player who signs in mid-game does <em>not</em> get bounced back to the start.
+
+<p>On a player's first sign-in the interpreter looks for an anonymous auto-save (<b><i>prefix</i>-<i>anon-id</i>.auto</b> in the <b>temp</b> directory) and, if a matching signed-in auto-save (<b><i>prefix</i>-google_<i>sub</i>.auto</b>) does not yet exist, renames the anonymous file across. This means signing in does not reset the game in progress. Manual saves (bookmark and named) are intentionally left under the anonymous user_id &mdash; only the auto-continue file is migrated.
+
+<table class="infowarn"><tr>
+<td><img src="info.png"></td>
+<td>The signed-in slot is per-Google-account, not per-browser. A player who logs into Google in two browsers will see the same auto-save on both. The signed-out slot is per-browser (cookie-scoped). This is the behaviour most players expect and is the whole reason for sign-in.</td></tr></table>
 
 <h2><a class="section" name="http12">The Media File</a></h2>
 
