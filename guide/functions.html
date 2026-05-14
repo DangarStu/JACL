@@ -197,8 +197,8 @@ arg[6]: 13   string_arg[6]: 13
 <p>To read a counter, use the at symbol (<b>@</b>):
 
 <table width=100%>
-<tr><td width=20%><b>@</b></td><td>The counter for the currently executing function. The first call into a function returns <b>1</b> here, because the interpreter increments the counter <em>before</em> running the function body.</td></tr>
-<tr><td><b>@</b><i>funcname</i></td><td>The counter for any function in the game, addressed by its <em>full internal name</em>. Use the auto-suffixed name for object-scoped functions (see below).</td></tr>
+<tr><td width=20%><b>@</b>&nbsp;&nbsp;</td><td>The counter for the currently executing function. The first call into a function returns <b>1</b> here, because the interpreter increments the counter <em>before</em> running the function body.</td></tr>
+<tr><td><b>@</b><i>funcname</i>&nbsp;&nbsp;</td><td>The counter for any function in the game, addressed by its <em>full internal name</em>. Use the auto-suffixed name for object-scoped functions (see below).</td></tr>
 </table>
 
 <p>The most common use is gating first-time behaviour. The example below is the same one used in the section <a href="attribute.html#attributes4">User Attributes<a>, but rewritten without the user attribute &mdash; the call counter does the same job for free:
@@ -251,10 +251,10 @@ endif
 <h3>Idiomatic patterns</h3>
 
 <table width=100%>
-<tr><td width=20%><tt>if @ = 1</tt></td><td>Run this branch only on the first call.</td></tr>
-<tr><td><tt>if @ &lt; 4</tt></td><td>Show a tutorial nudge for the first few calls, then go quiet.</td></tr>
-<tr><td><tt>if @+intro = 0</tt></td><td>True only before <b>+intro</b> has ever fired.</td></tr>
-<tr><td><tt>if @ % 5 = 0</tt></td><td>Trigger something every fifth time this function runs.</td></tr>
+<tr><td width=20%><tt>if @ = 1</tt>&nbsp;&nbsp;</td><td>Run this branch only on the first call.</td></tr>
+<tr><td><tt>if @ &lt; 4</tt>&nbsp;&nbsp;</td><td>Show a tutorial nudge for the first few calls, then go quiet.</td></tr>
+<tr><td><tt>if @+intro = 0</tt>&nbsp;&nbsp;</td><td>True only before <b>+intro</b> has ever fired.</td></tr>
+<tr><td><tt>if @ % 5 = 0</tt>&nbsp;&nbsp;</td><td>Trigger something every fifth time this function runs.</td></tr>
 </table>
 
 <p>Prefer these patterns over a hand-rolled <b>integer hint_X_shown</b> flag whenever the trigger is "has this function fired N times" rather than "has the world reached state X" &mdash; one fewer variable to declare, save and clear on restart.

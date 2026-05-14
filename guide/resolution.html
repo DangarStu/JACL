@@ -53,15 +53,15 @@ object ball_3: big red ball
 <p>When called, this function will be passed a single argument being the context in which the ambiguous reference was made. The possible values for this argument are:
 
 <table width=100%>
-<tr><th width=20%>Value</th><th width=80%>Description</th></tr>
-<tr><td>0</td><td>The list of objects for <b>noun1</b>.</td></tr>
-<tr><td>1</td><td>The list of objects for <b>noun2</b>.</td></tr>
-<tr><td>2</td><td>Exceptions to the list of objects for <b>noun1</b>.</td></tr>
-<tr><td>3</td><td>Exceptions to the list of objects for <b>noun2</b>.</td></tr>
-<tr><td>4</td><td>The list of objects <b>noun1</b> should be from.</td></tr>
-<tr><td>5</td><td>The list of objects <b>noun2</b> should be from.</td></tr>
-<tr><td>6</td><td>The list of objects <b>noun1</b>'s exceptions should be from.</td></tr>
-<tr><td>7</td><td>The list of objects <b>noun2</b>'s exceptions should be from.</td></tr>
+<tr><th width=20%>Value&nbsp;&nbsp;</th><th width=80%>Description</th></tr>
+<tr><td>0&nbsp;&nbsp;</td><td>The list of objects for <b>noun1</b>.</td></tr>
+<tr><td>1&nbsp;&nbsp;</td><td>The list of objects for <b>noun2</b>.</td></tr>
+<tr><td>2&nbsp;&nbsp;</td><td>Exceptions to the list of objects for <b>noun1</b>.</td></tr>
+<tr><td>3&nbsp;&nbsp;</td><td>Exceptions to the list of objects for <b>noun2</b>.</td></tr>
+<tr><td>4&nbsp;&nbsp;</td><td>The list of objects <b>noun1</b> should be from.</td></tr>
+<tr><td>5&nbsp;&nbsp;</td><td>The list of objects <b>noun2</b> should be from.</td></tr>
+<tr><td>6&nbsp;&nbsp;</td><td>The list of objects <b>noun1</b>'s exceptions should be from.</td></tr>
+<tr><td>7&nbsp;&nbsp;</td><td>The list of objects <b>noun2</b>'s exceptions should be from.</td></tr>
 </table>
 
 <p>To demonstrate, consider a game that had two objects, a red ball and a red book. The following <b>disambiguate</b> function could be added to the book in order to allow the commands <b>read red</b> and <b>look in red</b> to prefer the book to the ball instead of displaying the usual &quot;ambiguous reference&quot; message:
