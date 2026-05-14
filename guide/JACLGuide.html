@@ -652,11 +652,11 @@ glass". Following is a list of some of the other actions that can be used to int
 <TD><b>take</b>&nbsp;&nbsp;</TD><TD><b>drop</b>&nbsp;&nbsp;</TD><TD><b>insert</b>&nbsp;&nbsp;</TD><TD><b>remove</b></TD>
 </tr></table></center>
 
-<p>Where an object is expected, the words <b>it</b>, <b>them</b>, <b>him</b> and <b>her</b> can be used to indicate the last appropriate object referred to in one of your commands. With some commands it is possible to supply more than one object. Multiple objects can be specified in a multitude of ways. The words <b>all</b> or <b>everything</b> will tell the interpreter that you wish to perform the action on all the objects in the appropriate scope. For example, with the command <b>drop all</b>, the interpreter will perform the <b>drop</b> action for every object you are currently carrying.
+<p>Where an object is expected, the words <b>it</b>, <b>them</b>, <b>him</b> and <b>her</b> can be used to indicate the last appropriate object referred to in one of your commands. The reflexive forms <b>itself</b>, <b>themselves</b>, <b>himself</b> and <b>herself</b> are accepted as equivalents (so <b>look at itself</b> is interpreted the same way as <b>look at it</b>). The plural form <b>ones</b> is also recognised as a synonym for <b>them</b>. With some commands it is possible to supply more than one object. Multiple objects can be specified in a multitude of ways. The words <b>all</b> or <b>everything</b> will tell the interpreter that you wish to perform the action on all the objects in the appropriate scope. For example, with the command <b>drop all</b>, the interpreter will perform the <b>drop</b> action for every object you are currently carrying. The optional filler word <b>of</b> is permitted after <b>all</b> (so <b>take all of chest</b> and <b>take all from chest</b> behave the same way).
 
-<p>Any object reference can be qualified by using the word <b>from</b>. Although this can be used at any time, it is most useful in conjunction with <b>all</b> to construct commands such as <b>take all from chest</b>. This command will perform the <b>take</b> action for every object that is currrently inside the chest. 
+<p>Any object reference can be qualified by using the word <b>from</b>. Although this can be used at any time, it is most useful in conjunction with <b>all</b> to construct commands such as <b>take all from chest</b>. This command will perform the <b>take</b> action for every object that is currrently inside the chest.
 
-<p>The word <b>except</b> can be used once per list of objects, with any object to the right of the word <b>except</b> being removed from list of objects to the left. An example of this is the command <b>take all from chest except the gem</b>. The important thing to be aware of with the word <b>except</b> is that any objects supplied after the word <b>except</b> are objects the action is not to be performed on. With this in mind you can see how the two commands below have very different results.
+<p>The word <b>except</b> (or its synonym <b>but</b>) can be used once per list of objects, with any object to the right of the word being removed from list of objects to the left. An optional filler word <b>for</b> may follow it (<b>take all except for the gem</b> reads the same way as <b>take all except the gem</b>). An example of this is the command <b>take all from chest except the gem</b>. The important thing to be aware of with the word <b>except</b> is that any objects supplied after the word <b>except</b> are objects the action is not to be performed on. With this in mind you can see how the two commands below have very different results.
 
 <pre>
 &gt;take sword and all from chest except gem
@@ -2163,7 +2163,7 @@ image 6 up
 
 <p>The <b>sound</b> command is used to play one of the sounds stored in the game's blorb file. The sound to play is specified using its index in the blorb file. The index can be supplied either as a literal integer or any JACL container that resolves to an integer. 
 
-<p>The index of the sound can optionally be followed by a channel to play the sound on. There are eight available channels numbered zero to eight (0 -8). If no channel is specified, channel 0 is used as the default.
+<p>The index of the sound can optionally be followed by a channel to play the sound on. There are eight available channels numbered 0 through 7. If no channel is specified, channel 0 is used as the default.
 
 <p>If a channel is specified, it can be followed by the number of times to repeat the sound. If <b>-1</b> is specified as the number of times to repeat the sound, the sound will keep playing until it is manually stopped using the <b>stop</b> command. If no number of times to repeat the sound is specified it is played once.
 
@@ -2207,7 +2207,7 @@ volume 50 2
 
 <h2><a class="section" name="multimedia5">The STOP Command</a></h2>
 
-<p>The <b>stop</b> command simply stops the sound being played on the specified sound channel. The channel to stop is specified as an integer between 0 and 3. If no channel is specified channel 0 is stopped by default.
+<p>The <b>stop</b> command simply stops the sound being played on the specified sound channel. The channel to stop is specified as an integer between 0 and 7 (matching the eight channels available to <b>sound</b>). If no channel is specified channel 0 is stopped by default.
 
 <p>The following code demonstrates the <b>stop</b> command:
 
@@ -2391,6 +2391,11 @@ stylehint &lt;style&gt; &lt;attribute&gt; &lt;value&gt;
 <p>The <b>reverse</b> JACL style is special: under Glk it sets style hints on the user-defined styles <b>style_User2</b> (main window) and <b>style_User1</b> (status window), since those are the slots the runtime <b>style reverse</b> command targets.
 
 <h2><a class="section" name="multimedia8">The Status Window</a></h2>
+
+<table class="infowarn"><tr>
+<td><img src="info.png" alt="Information"></td>
+<td>The same status-window code works unchanged under the web interpreters (<b>cgijacl</b> and <b>fcgijacl</b>). The runtime intercepts the <b>cursor</b> and <b>write</b> opcodes used inside <b>+update_status_window</b>, builds an in-memory grid the same shape as the Glk text grid would have, and emits it as an HTML <b>&lt;table&gt;</b> with one cell per character position. You write your status code once; Glk renders it as a fixed-width window, the web emits it as a styled HTML grid.</td>
+</tr></table>
 
 <p>The status window at the top of the screen is implemented as a Glk window, and is therefore covered here. It is possible to have no status window at all, use the built-in, default status window or design a custom one yourself. The vertical height of the status window in rows is defined by using the constant <b>status_window</b>. If the constant <b>status_window</b> is set to <b>0</b>, no status window will be created. For example, to create a status window that is three rows tall, define the following constant:
 
@@ -3313,9 +3318,25 @@ whileall counter &lt; 10 : status = 1
 endwhile
 </pre>
 
+<h2><a class="section" name="flowcontrol_iterate">The ITERATE, ENDITERATE, UPDATE and ENDUPDATE Commands</a></h2>
+
+<p>JACL has two additional loop constructs that walk an external data source row-by-row rather than iterating over the in-memory object table. They share a syntax and only differ in how each row is supplied to the body.
+
+<p>An <b>iterate</b>...<b>enditerate</b> loop reads each row of a CSV file in turn. The body of the loop is executed once per row with the special integer array <b>field[]</b> populated with the comma-separated values from that row and the integer <b>field_count</b> set to how many fields were on it. The first argument is the CSV filename; an optional second argument <b>skip_header</b> causes the loop to discard the first row before iterating.
+
+<pre>
+iterate "german_words.csv" skip_header
+   write "Row " field[0] " says " field[1] ^
+enditerate
+</pre>
+
+<p>An <b>update</b>...<b>endupdate</b> loop is the writable counterpart. The body runs for each row of the named CSV file, with the same <b>field[]</b> and <b>field_count</b> bindings, but anything the body writes back into <b>field[]</b> is persisted to the file when the matching <b>endupdate</b> is reached. This is the canonical way to mutate CSV-backed state from inside JACL.
+
+<p>The <b>break</b> command terminates either of these loops in the same way it does an <b>endwhile</b> or <b>endloop</b>; see the next section. For a full discussion of CSV iteration, including escaping conventions and the <b>field[]</b> contract, see the <a href="csv.html">CSV chapter</a>.
+
 <h2><a class="section" name="flowcontrol10">The BREAK Command</a></h2>
 
-<p>The <b>break</b> command is used to immediately exit the current loop. When a <b>break</b> command is executed, execution continues from the line after the end of the loop (<b>endwhile</b>, <b>until</b>, <b>endloop</b>, <b>endselect</b>, <b>enditerate</b>, etc.). For example:
+<p>The <b>break</b> command is used to immediately exit the current loop. When a <b>break</b> command is executed, execution continues from the line after the end of the loop (<b>endwhile</b>, <b>until</b>, <b>endloop</b>, <b>endselect</b>, <b>enditerate</b>, <b>endupdate</b>). For example:
 
 <pre>
 while counter &lt; 100
@@ -4040,6 +4061,15 @@ ensure lantern hasnt LUMINOUS
 <TR><td><B>SITTING</B></TD>
 <td>If the player is currently sitting, this attribute should be given, as the function <B>+movement</B> will check if it is set before moving the player.</TD>
 </TR><tr>
+<td><b>NPC</b></td>
+<td>Free for use by the author. Typically given to <B>ANIMATE</B> objects that should be driven by the optional <b>npc.library</b> for autonomous movement and behaviour.</td>
+</tr><tr>
+<td><b>DONE</b></td>
+<td>Free for use by the author. By convention, given to objects representing tasks or puzzles once they have been completed, so subsequent attempts can produce a different response.</td>
+</tr><tr>
+<td><b>GAS</b></td>
+<td>Free for use by the author. By convention, given to gaseous objects so they can be distinguished from <B>LIQUID</B> objects in container/pouring code.</td>
+</tr><tr>
 <td><b>NO_TAB</b></td>
 <td>This attribute indicates that the object's names should not be included during tab completion. Tab completion is only used by the console interpreter.</td>
 </tr>
@@ -4094,6 +4124,9 @@ ensure lantern hasnt LUMINOUS
 </tr><tr>
 <td><B>LOCATION</B></TD>
 <td>All locations have the attribute <B>LOCATION</B>. If this is taken away the location will become an object.</TD>
+</tr><tr>
+<td><B>KNOWN</B></TD>
+<td>Set by the standard library's <b>look_around</b> function when the player first enters a location. Used by neighbouring locations' direction-link rendering: if a destination has <B>KNOWN</B>, the exit list shows the destination's full name (<b>"north to the kitchen"</b>); otherwise just the direction (<b>"north"</b>).</TD>
 </tr><tr>
 <td><B>SCORED</B></TD>
 <td>Free for use by the author.</TD>
@@ -4853,6 +4886,12 @@ endloop
 <td><b>noun2</b></td>
 <td>This pointer is set to the second object referred to in the player's last move.</td>
 </tr><tr>
+<td><b>noun3</b></td>
+<td>A general-purpose object pointer not bound to the player's move. The standard library uses it as the iteration variable inside <b>loop</b> blocks, and it also receives the first argument passed to a function (see the <a href="#functions2">Passing Arguments</a> section) for historical reasons. The example at the top of this chapter sets it implicitly via <b>loop</b>.</td>
+</tr><tr>
+<td><b>noun4</b></td>
+<td>A second general-purpose object pointer. By convention <b>noun4</b> is used for scratch work that needs to outlive a single statement (the example above uses it to hold each object's parent during a <b>loop</b>).</td>
+</tr><tr>
 <td><b>self</b> or <b>this</b></td>
 <td>This pointer is set to the object that the currently executing function is associated with.</td>
 </tr></table>
@@ -4871,6 +4910,9 @@ endloop
 </tr><tr>
 <td><b>self</b> or <b>this</b></td>
 <td>This pointer is set to the location that the currently executing function is associated with.</td>
+</tr><tr>
+<td><b>limbo</b></td>
+<td>A sink location for objects that are out of play. When an object is dropped in a location with <b>ON_WATER</b>, <b>MID_WATER</b>, <b>MID_AIR</b>, or <b>TIGHT_ROPE</b>, the standard library moves the object to <b>limbo</b> rather than leaving it on the floor. Items in <b>limbo</b> are not visible or reachable by the player; setting an object's <b>parent</b> to <b>limbo</b> is the canonical way to take it out of play without destroying it.</td>
 </tr></table>
 
 <table class="infowarn"><TR>
@@ -5072,7 +5114,7 @@ return false
 
 <pre>
      set noun4(parent) = chest
-     set noun4(10) = chest
+     set noun4(0) = chest
 
      # ...and to iterate through all properties
      set INDEX = 0
@@ -5442,10 +5484,10 @@ take coin from bag
 <td>Indicates that one or more objects in the current location may be supplied at this point in the move.</TD>
 </tr><tr>
 <td><B>*held</b></td>
-<td>Indicates that an object held by the player must be supplied at this point in the move.</TD>
+<td>Indicates that an object held by the player must be supplied at this point in the move. Objects that are immediate children of the player satisfy this directly; in addition, an object whose <b>mass</b> is <b>HEAVY</b> or greater and whose parent is itself held by the player is accepted (so the label on a jar in your inventory can be referred to as a held object).</TD>
 </TR><TR>
 <td><B>**held</b></td>
-<td>Indicates that one or more objects held by the player must be supplied at this point in the move.</TD>
+<td>Indicates that one or more objects held by the player must be supplied at this point in the move. The same heavy-parent allowance as <B>*held</b> applies.</TD>
 </TR><TR>
 <td><b>*present</b></td>
 <td>Indicates that an object either in the current location or held by the player must be specified at this point in the move.</td>
@@ -5460,10 +5502,10 @@ take coin from bag
 <td>Indicates that one or more objects anywhere in the game world must be specified at this point in the move.</td>
 </tr><tr>
 <td><B>*inside</b></td>
-<td>This scope indicator can only be used as the second noun of verbs that have two nouns. It indicates that an object that is a child of the first noun must be specified at this point in the move.</td>
+<td>Intended as the second noun of verbs that have two nouns -- indicates that an object that is a child of the first noun must be specified at this point in the move. If the grammar is invoked without a first noun resolved, the interpreter falls back to <B>*here</b> scope rather than rejecting the command.</td>
 </tr><tr>
 <td><B>**inside</b></td>
-<td>This scope indicator can only be used as the second noun of verbs that have two nouns. It indicates that multiple objects that are children of the first noun must be specified at this point in the move.</td>
+<td>Same intent as <B>*inside</b> but matches one or more objects. The same fallback to <B>**here</b> scope applies when no first noun has been resolved.</td>
 </tr><tr>
 <td><B>*location</b></td>
 <td>Indicates that a location in the game world must be specified at this point in the move.</td>

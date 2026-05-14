@@ -115,6 +115,15 @@ ensure lantern hasnt LUMINOUS
 <TR><td><B>SITTING</B></TD>
 <td>If the player is currently sitting, this attribute should be given, as the function <B>+movement</B> will check if it is set before moving the player.</TD>
 </TR><tr>
+<td><b>NPC</b></td>
+<td>Free for use by the author. Typically given to <B>ANIMATE</B> objects that should be driven by the optional <b>npc.library</b> for autonomous movement and behaviour.</td>
+</tr><tr>
+<td><b>DONE</b></td>
+<td>Free for use by the author. By convention, given to objects representing tasks or puzzles once they have been completed, so subsequent attempts can produce a different response.</td>
+</tr><tr>
+<td><b>GAS</b></td>
+<td>Free for use by the author. By convention, given to gaseous objects so they can be distinguished from <B>LIQUID</B> objects in container/pouring code.</td>
+</tr><tr>
 <td><b>NO_TAB</b></td>
 <td>This attribute indicates that the object's names should not be included during tab completion. Tab completion is only used by the console interpreter.</td>
 </tr>
@@ -169,6 +178,9 @@ ensure lantern hasnt LUMINOUS
 </tr><tr>
 <td><B>LOCATION</B></TD>
 <td>All locations have the attribute <B>LOCATION</B>. If this is taken away the location will become an object.</TD>
+</tr><tr>
+<td><B>KNOWN</B></TD>
+<td>Set by the standard library's <b>look_around</b> function when the player first enters a location. Used by neighbouring locations' direction-link rendering: if a destination has <B>KNOWN</B>, the exit list shows the destination's full name (<b>"north to the kitchen"</b>); otherwise just the direction (<b>"north"</b>).</TD>
 </tr><tr>
 <td><B>SCORED</B></TD>
 <td>Free for use by the author.</TD>

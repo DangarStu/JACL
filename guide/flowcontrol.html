@@ -460,9 +460,25 @@ whileall counter &lt; 10 : status = 1
 endwhile
 </pre>
 
+<h2><a class="section" name="flowcontrol_iterate">The ITERATE, ENDITERATE, UPDATE and ENDUPDATE Commands</a></h2>
+
+<p>JACL has two additional loop constructs that walk an external data source row-by-row rather than iterating over the in-memory object table. They share a syntax and only differ in how each row is supplied to the body.
+
+<p>An <b>iterate</b>...<b>enditerate</b> loop reads each row of a CSV file in turn. The body of the loop is executed once per row with the special integer array <b>field[]</b> populated with the comma-separated values from that row and the integer <b>field_count</b> set to how many fields were on it. The first argument is the CSV filename; an optional second argument <b>skip_header</b> causes the loop to discard the first row before iterating.
+
+<pre>
+iterate "german_words.csv" skip_header
+   write "Row " field[0] " says " field[1] ^
+enditerate
+</pre>
+
+<p>An <b>update</b>...<b>endupdate</b> loop is the writable counterpart. The body runs for each row of the named CSV file, with the same <b>field[]</b> and <b>field_count</b> bindings, but anything the body writes back into <b>field[]</b> is persisted to the file when the matching <b>endupdate</b> is reached. This is the canonical way to mutate CSV-backed state from inside JACL.
+
+<p>The <b>break</b> command terminates either of these loops in the same way it does an <b>endwhile</b> or <b>endloop</b>; see the next section. For a full discussion of CSV iteration, including escaping conventions and the <b>field[]</b> contract, see the <a href="csv.html">CSV chapter</a>.
+
 <h2><a class="section" name="flowcontrol10">The BREAK Command</a></h2>
 
-<p>The <b>break</b> command is used to immediately exit the current loop. When a <b>break</b> command is executed, execution continues from the line after the end of the loop (<b>endwhile</b>, <b>until</b>, <b>endloop</b>, <b>endselect</b>, <b>enditerate</b>, etc.). For example:
+<p>The <b>break</b> command is used to immediately exit the current loop. When a <b>break</b> command is executed, execution continues from the line after the end of the loop (<b>endwhile</b>, <b>until</b>, <b>endloop</b>, <b>endselect</b>, <b>enditerate</b>, <b>endupdate</b>). For example:
 
 <pre>
 while counter &lt; 100
