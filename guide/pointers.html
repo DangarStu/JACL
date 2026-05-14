@@ -47,6 +47,12 @@ endloop
 <td><b>noun2</b></td>
 <td>This pointer is set to the second object referred to in the player's last move.</td>
 </tr><tr>
+<td><b>noun3</b></td>
+<td>A general-purpose object pointer not bound to the player's move. The standard library uses it as the iteration variable inside <b>loop</b> blocks, and it also receives the first argument passed to a function (see the <a href="functions.html#functions2">Passing Arguments</a> section) for historical reasons. The example at the top of this chapter sets it implicitly via <b>loop</b>.</td>
+</tr><tr>
+<td><b>noun4</b></td>
+<td>A second general-purpose object pointer. By convention <b>noun4</b> is used for scratch work that needs to outlive a single statement (the example above uses it to hold each object's parent during a <b>loop</b>).</td>
+</tr><tr>
 <td><b>self</b> or <b>this</b></td>
 <td>This pointer is set to the object that the currently executing function is associated with.</td>
 </tr></table>
@@ -65,6 +71,9 @@ endloop
 </tr><tr>
 <td><b>self</b> or <b>this</b></td>
 <td>This pointer is set to the location that the currently executing function is associated with.</td>
+</tr><tr>
+<td><b>limbo</b></td>
+<td>A sink location for objects that are out of play. When an object is dropped in a location with <b>ON_WATER</b>, <b>MID_WATER</b>, <b>MID_AIR</b>, or <b>TIGHT_ROPE</b>, the standard library moves the object to <b>limbo</b> rather than leaving it on the floor. Items in <b>limbo</b> are not visible or reachable by the player; setting an object's <b>parent</b> to <b>limbo</b> is the canonical way to take it out of play without destroying it.</td>
 </tr></table>
 
 <table class="infowarn"><TR>

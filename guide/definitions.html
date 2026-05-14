@@ -118,7 +118,7 @@
 
 <pre>
      set noun4(parent) = chest
-     set noun4(10) = chest
+     set noun4(0) = chest
 
      # ...and to iterate through all properties
      set INDEX = 0
@@ -488,10 +488,10 @@ take coin from bag
 <td>Indicates that one or more objects in the current location may be supplied at this point in the move.</TD>
 </tr><tr>
 <td><B>*held</b></td>
-<td>Indicates that an object held by the player must be supplied at this point in the move.</TD>
+<td>Indicates that an object held by the player must be supplied at this point in the move. Objects that are immediate children of the player satisfy this directly; in addition, an object whose <b>mass</b> is <b>HEAVY</b> or greater and whose parent is itself held by the player is accepted (so the label on a jar in your inventory can be referred to as a held object).</TD>
 </TR><TR>
 <td><B>**held</b></td>
-<td>Indicates that one or more objects held by the player must be supplied at this point in the move.</TD>
+<td>Indicates that one or more objects held by the player must be supplied at this point in the move. The same heavy-parent allowance as <B>*held</b> applies.</TD>
 </TR><TR>
 <td><b>*present</b></td>
 <td>Indicates that an object either in the current location or held by the player must be specified at this point in the move.</td>
@@ -506,10 +506,10 @@ take coin from bag
 <td>Indicates that one or more objects anywhere in the game world must be specified at this point in the move.</td>
 </tr><tr>
 <td><B>*inside</b></td>
-<td>This scope indicator can only be used as the second noun of verbs that have two nouns. It indicates that an object that is a child of the first noun must be specified at this point in the move.</td>
+<td>Intended as the second noun of verbs that have two nouns -- indicates that an object that is a child of the first noun must be specified at this point in the move. If the grammar is invoked without a first noun resolved, the interpreter falls back to <B>*here</b> scope rather than rejecting the command.</td>
 </tr><tr>
 <td><B>**inside</b></td>
-<td>This scope indicator can only be used as the second noun of verbs that have two nouns. It indicates that multiple objects that are children of the first noun must be specified at this point in the move.</td>
+<td>Same intent as <B>*inside</b> but matches one or more objects. The same fallback to <B>**here</b> scope applies when no first noun has been resolved.</td>
 </tr><tr>
 <td><B>*location</b></td>
 <td>Indicates that a location in the game world must be specified at this point in the move.</td>

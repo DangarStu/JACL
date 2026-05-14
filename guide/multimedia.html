@@ -119,7 +119,7 @@ image 6 up
 
 <p>The <b>sound</b> command is used to play one of the sounds stored in the game's blorb file. The sound to play is specified using its index in the blorb file. The index can be supplied either as a literal integer or any JACL container that resolves to an integer. 
 
-<p>The index of the sound can optionally be followed by a channel to play the sound on. There are eight available channels numbered zero to eight (0 -8). If no channel is specified, channel 0 is used as the default.
+<p>The index of the sound can optionally be followed by a channel to play the sound on. There are eight available channels numbered 0 through 7. If no channel is specified, channel 0 is used as the default.
 
 <p>If a channel is specified, it can be followed by the number of times to repeat the sound. If <b>-1</b> is specified as the number of times to repeat the sound, the sound will keep playing until it is manually stopped using the <b>stop</b> command. If no number of times to repeat the sound is specified it is played once.
 
@@ -163,7 +163,7 @@ volume 50 2
 
 <h2><a class="section" name="multimedia5">The STOP Command</a></h2>
 
-<p>The <b>stop</b> command simply stops the sound being played on the specified sound channel. The channel to stop is specified as an integer between 0 and 3. If no channel is specified channel 0 is stopped by default.
+<p>The <b>stop</b> command simply stops the sound being played on the specified sound channel. The channel to stop is specified as an integer between 0 and 7 (matching the eight channels available to <b>sound</b>). If no channel is specified channel 0 is stopped by default.
 
 <p>The following code demonstrates the <b>stop</b> command:
 
@@ -347,6 +347,11 @@ stylehint &lt;style&gt; &lt;attribute&gt; &lt;value&gt;
 <p>The <b>reverse</b> JACL style is special: under Glk it sets style hints on the user-defined styles <b>style_User2</b> (main window) and <b>style_User1</b> (status window), since those are the slots the runtime <b>style reverse</b> command targets.
 
 <h2><a class="section" name="multimedia8">The Status Window</a></h2>
+
+<table class="infowarn"><tr>
+<td><img src="info.png" alt="Information"></td>
+<td>The same status-window code works unchanged under the web interpreters (<b>cgijacl</b> and <b>fcgijacl</b>). The runtime intercepts the <b>cursor</b> and <b>write</b> opcodes used inside <b>+update_status_window</b>, builds an in-memory grid the same shape as the Glk text grid would have, and emits it as an HTML <b>&lt;table&gt;</b> with one cell per character position. You write your status code once; Glk renders it as a fixed-width window, the web emits it as a styled HTML grid.</td>
+</tr></table>
 
 <p>The status window at the top of the screen is implemented as a Glk window, and is therefore covered here. It is possible to have no status window at all, use the built-in, default status window or design a custom one yourself. The vertical height of the status window in rows is defined by using the constant <b>status_window</b>. If the constant <b>status_window</b> is set to <b>0</b>, no status window will be created. For example, to create a status window that is three rows tall, define the following constant:
 
