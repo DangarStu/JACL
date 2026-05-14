@@ -1,4 +1,38 @@
-BODY	{	
+/* CSS Paged Media rules for WeasyPrint. htmldoc ignored these; the
+ * legacy guide.book carried equivalent settings on the command line.
+ * Match the prior htmldoc defaults: A4-ish page, 1.0in inside margin,
+ * 0.5in elsewhere, page number bottom-centre, chapter title in the
+ * top-right running header. */
+@page {
+	size: A4;
+	margin: 1.5cm 1.5cm 1.5cm 2.5cm;
+	@top-right {
+		content: string(chapter-title);
+		font-family: Helvetica, Arial, sans-serif;
+		font-size: 9pt;
+		color: #555;
+	}
+	@bottom-center {
+		content: counter(page);
+		font-family: Helvetica, Arial, sans-serif;
+		font-size: 10pt;
+	}
+}
+
+/* Suppress the running header on the title page and on each chapter's
+ * first page (htmldoc had --header1 ... for this). */
+@page :first {
+	@top-right { content: ""; }
+	@bottom-center { content: ""; }
+}
+
+/* The chapter title is set by H1 elements and picked up by the @page
+ * @top-right slot above. */
+H1 {
+	string-set: chapter-title content();
+}
+
+BODY	{
 			background-color: white;
 		}
  
@@ -43,18 +77,23 @@ DIV.spacer	{
 			margin-bottom: 12pt;
 			}
 
-TABLE	{ 	
+TABLE	{
 			margin-top: 12pt;
 			margin-bottom: 12pt;
-			padding: 5px;
-			border-style: solid;
-			border-width: 1px;
+			border-collapse: collapse;
+			border: 1px solid #aaa;
 		}
 
 TD		{
 			font-family: Georgia;
 		 	font-size: 12pt;
 			vertical-align: top;
+			/* htmldoc ignored both cellpadding= and CSS padding on
+			 * TD; we used &nbsp; padding inside cells to compensate.
+			 * WeasyPrint honours this rule, so the &nbsp; hacks can
+			 * be removed from chapter HTML over time. */
+			padding: 5px 10px;
+			border: 1px solid #ddd;
 		}
 
 TH		{	
