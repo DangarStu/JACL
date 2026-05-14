@@ -101,6 +101,18 @@ make install
 <td><b>temp</b> <i>Directory</i></td>
 <td>This indicates the directory to store the processed version of the game file.</td>
 <td>A directory called <b>temp</b> beneath the directory the game file is stored in. If this directory does not exist, the <b>.j2</b> file will be created in the same directory as the game file.</td>
+</tr><tr>
+<td><b>google_client_id</b> <i>ClientID</i></td>
+<td>OAuth 2.0 client ID issued by the Google Cloud console for your site. Enables the Google Sign-In flow described in the <a href="http.html#http_auth">HTTP and HTML</a> chapter. Empty (or omitted) disables sign-in and leaves the anonymous flow as the only option.</td>
+<td>Empty &mdash; sign-in disabled.</td>
+</tr><tr>
+<td><b>session_secret</b> <i>String</i></td>
+<td>High-entropy secret used to HMAC the <b>jacl_session</b> cookie. Required when <b>google_client_id</b> is set; if empty, sign-in is disabled regardless of the client ID. Treat as a credential &mdash; keep out of source control.</td>
+<td>Empty &mdash; sign-in disabled.</td>
+</tr><tr>
+<td><b>session_max_age</b> <i>Seconds</i></td>
+<td>Lifetime of the <b>jacl_session</b> cookie in seconds. The cookie's HMAC includes this expiry, so a stale cookie can't be replayed past it.</td>
+<td><b>2592000</b> (30 days).</td>
 </tr></table>
 
 <p style="page-break-before: always">Below is an example <b>cgijacl</b> configuration file:
@@ -109,10 +121,15 @@ make install
 # "cgijacl.conf"
 # CGIJACL interpreter configuration file.
 
-access_log    "/usr/local/jacl/logs/access.log"
-error_log     "/usr/local/jacl/logs/error.log"
-temp          "/usr/local/jacl/projects/temp/"
-include       "/usr/local/jacl/projects/include/"
+access_log         "/usr/local/jacl/logs/access.log"
+error_log          "/usr/local/jacl/logs/error.log"
+temp               "/usr/local/jacl/projects/temp/"
+include            "/usr/local/jacl/projects/include/"
+
+# Optional Google Sign-In configuration. Omit both lines (or leave
+# either empty) to keep sign-in disabled and run the anonymous flow.
+google_client_id   "1234567890-abcdefg.apps.googleusercontent.com"
+session_secret     "long-random-string-known-only-to-this-server"
 </pre>
 
 <h2><a class="section" name="installation5">Playing the Sample Games</a></h2>
