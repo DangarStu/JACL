@@ -272,7 +272,14 @@ H3		{
 	}
 	CODE { font-size: 9.5pt; }
 
-	/* Avoid breaking individual rows across pages. */
+	/* Try to keep small tables together on one page. WeasyPrint
+	 * falls back to row-by-row breaks if the table is too tall to
+	 * fit (the multi-page Glossary and Attributes tables, for
+	 * example), at which point the TR rule below keeps individual
+	 * rows from splitting too. The two rules together eliminate the
+	 * "table breaks with one row stranded on the next page" pattern
+	 * for any table small enough to fit on a single page. */
+	TABLE { page-break-inside: avoid; }
 	TR { page-break-inside: avoid; }
 
 	IMG { margin: 0.3cm; }
