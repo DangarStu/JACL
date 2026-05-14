@@ -642,32 +642,33 @@ way in which you interact with these objects.
 
 <!-- NEW PAGE -->
 <p>The basic sentence structures understood by the game are:
-<center><table width=50%><tr>
-<th>Command Structure&nbsp;&nbsp;</th><th>Example command</th>
+<table width=100%><tr>
+<th width=50% align=left>Command Structure</th>
+<th width=50% align=left>Example command</th>
 </tr><tr>
-<TD><i>action</i>&nbsp;&nbsp;</TD><TD><b>scream</b></TD>
-</TR><TR>
-<TD><i>action object</i>&nbsp;&nbsp;</TD><TD><b>take book</b></TD>
-</TR><TR>
-<TD><i>action object preposition object</i>&nbsp;&nbsp;</TD><TD><b>unlock door with key</b></TD>
-</TR><TR>
-</table></center>
+<td><i>action</i></td><td><b>scream</b></td>
+</tr><tr>
+<td><i>action object</i></td><td><b>take book</b></td>
+</tr><tr>
+<td><i>action object preposition object</i></td><td><b>unlock door with key</b></td>
+</tr>
+</table>
 <p>An action does not necessarily have to be a single word. For instance, 
 "examine rock through magnifying glass", an example of the last 
 syntax, may also be expressed as "look at rock through magnifying 
 glass". Following is a list of some of the other actions that can be used to interact with the objects you find:
 
-<center><table width=80%><tr>
-<TD><b>turn</b>&nbsp;&nbsp;</TD><TD><b>read</b>&nbsp;&nbsp;</TD><TD><b>pull</b>&nbsp;&nbsp;</TD><TD><b>push</b>&nbsp;&nbsp;</TD><TD><b>eat</b>&nbsp;&nbsp;</TD><TD><b>cut</b></TD>
-</TR><TR>
-<TD><b>lock</b>&nbsp;&nbsp;</TD><TD><b>unlock</b>&nbsp;&nbsp;</TD><TD><b>rub</b>&nbsp;&nbsp;</TD><TD><b>attack</b>&nbsp;&nbsp;</TD><TD><b>taste</b>&nbsp;&nbsp;</TD><TD><b>drink</b></TD>
-</TR><TR>
-<TD><b>break</b>&nbsp;&nbsp;</TD><TD><b>smell</b>&nbsp;&nbsp;</TD><TD><b>listen</b>&nbsp;&nbsp;</TD><TD><b>pour</b>&nbsp;&nbsp;</TD><TD><b>move</b>&nbsp;&nbsp;</TD><TD><b>light</b></TD>
-</TR><TR>
-<TD><b>play</b>&nbsp;&nbsp;</TD><TD><b>blow</b>&nbsp;&nbsp;</TD><TD><b>throw</b>&nbsp;&nbsp;</TD><TD><b>wear</b>&nbsp;&nbsp;</TD><TD><b>open</b>&nbsp;&nbsp;</TD><TD><b>close</b></TD>
-</TR><TR>
-<TD><b>take</b>&nbsp;&nbsp;</TD><TD><b>drop</b>&nbsp;&nbsp;</TD><TD><b>insert</b>&nbsp;&nbsp;</TD><TD><b>remove</b></TD>
-</tr></table></center>
+<table width=100%><tr>
+<td width=17%><b>turn</b></td><td width=17%><b>read</b></td><td width=17%><b>pull</b></td><td width=17%><b>push</b></td><td width=16%><b>eat</b></td><td width=16%><b>cut</b></td>
+</tr><tr>
+<td><b>lock</b></td><td><b>unlock</b></td><td><b>rub</b></td><td><b>attack</b></td><td><b>taste</b></td><td><b>drink</b></td>
+</tr><tr>
+<td><b>break</b></td><td><b>smell</b></td><td><b>listen</b></td><td><b>pour</b></td><td><b>move</b></td><td><b>light</b></td>
+</tr><tr>
+<td><b>play</b></td><td><b>blow</b></td><td><b>throw</b></td><td><b>wear</b></td><td><b>open</b></td><td><b>close</b></td>
+</tr><tr>
+<td><b>take</b></td><td><b>drop</b></td><td><b>insert</b></td><td><b>remove</b></td>
+</tr></table>
 
 <p>Where an object is expected, the words <b>it</b>, <b>them</b>, <b>him</b> and <b>her</b> can be used to indicate the last appropriate object referred to in one of your commands. The reflexive forms <b>itself</b>, <b>themselves</b>, <b>himself</b> and <b>herself</b> are accepted as equivalents (so <b>look at itself</b> is interpreted the same way as <b>look at it</b>). The plural form <b>ones</b> is also recognised as a synonym for <b>them</b>. With some commands it is possible to supply more than one object. Multiple objects can be specified in a multitude of ways. The words <b>all</b> or <b>everything</b> will tell the interpreter that you wish to perform the action on all the objects in the appropriate scope. For example, with the command <b>drop all</b>, the interpreter will perform the <b>drop</b> action for every object you are currently carrying. The optional filler word <b>of</b> is permitted after <b>all</b> (so <b>take all of chest</b> and <b>take all from chest</b> behave the same way).
 
@@ -2278,8 +2279,7 @@ style normal
 
 <p>Below is a table showing the styles available in JACL and how each one is rendered by the Glk and web (<b>cgijacl</b> / <b>fcgijacl</b>) interpreters:
 
-<center>
-<table width=90%>
+<table width=100%>
 <tr>
 	<th>JACL Style</th>
 	<th>Glk Style</th>
@@ -2336,7 +2336,6 @@ style normal
 	<td>closes all open style tags</td>
 </tr>
 </table>
-</center>
 
 <p>The <b>alert</b> and <b>quote</b> styles are extra colourable buckets exposed by JACL and have no built-in default beyond what the interpreter chooses; pair them with <b>stylehint</b> declarations (see below) to give them a colour appropriate to your game.
 
@@ -2368,8 +2367,7 @@ stylehint &lt;style&gt; &lt;attribute&gt; &lt;value&gt;
 
 <p>Where <b>&lt;style&gt;</b> is one of the JACL style names from the table above (<b>bold</b>, <b>note</b>, <b>input</b>, <b>header</b>, <b>subheader</b>, <b>reverse</b>, <b>pre</b>, <b>alert</b>, or <b>quote</b>; the synonyms <b>emphasised</b>, <b>inverse</b>, <b>preformatted</b>, and <b>blockquote</b> are also accepted), <b>&lt;attribute&gt;</b> is one of:
 
-<center>
-<table width=80%>
+<table width=100%>
 <tr>
 	<th>Attribute</th>
 	<th>Aliases</th>
@@ -2391,7 +2389,6 @@ stylehint &lt;style&gt; &lt;attribute&gt; &lt;value&gt;
 	<td>An integer flag (0 or 1) requesting the interpreter to swap foreground and background for the style. Glk-only; ignored on the web.</td>
 </tr>
 </table>
-</center>
 
 <p>And <b>&lt;value&gt;</b> for the colour attributes is either a named colour or a quoted hex string of the form <b>&quot;#rrggbb&quot;</b> or <b>&quot;#rgb&quot;</b>. The recognised colour names are:
 
@@ -2987,10 +2984,9 @@ constant maintext_colour "#dddddd"
 <td>Each object defined is assigned a unique number when the game is loaded. In a <B>set</B>, <B>if</B> or <b>ifall</b> command, an object's label is substituted for this number. Objects are numbered in the order they appear in the game file starting at one.</td>
 </tr></table>
 
-<center>
-<table width=80%>
-<TR><th>Test</th>
-<th>Description</th>
+<table width=100%>
+<TR><th width=20%>Test</th>
+<th width=80%>Description</th>
 </TR>
 <TR><td><B>=</B> or <b>==</b></TD>
 <td>This tests if the left value is equal to the right value.</TD>
@@ -3011,15 +3007,13 @@ constant maintext_colour "#dddddd"
 <TR><td><B>!=</b> or <b>&lt;&gt;</B></TD>
 <td>This tests if the left value is not equal to the right value.</TD>
 </tr></table>
-</center>
 
 <P>The following are the possible tests that can be used with an <B>if</B> command when the left and right values are both set to an object:  
 
-<center>
-<table width=80%>
+<table width=100%>
 <TR>
-<th>Test</th>
-<th>Description</th>
+<th width=20%>Test</th>
+<th width=80%>Description</th>
 </TR><TR>
 <td><B>grandof</B></TD>
 <td>This tests if the left object is the grand parent of the right object.</TD>
@@ -3027,17 +3021,15 @@ constant maintext_colour "#dddddd"
 <td><B>!grandof</B></TD>
 <td>This tests if the left object is not the grand parent of the right object.</TD>
 </tr></table>
-</center>
 
 <P>When an object is placed inside another object, which is then placed inside yet another object, the last object is said to be the grand parent of the first. This is the case no matter how many intermediate objects there are.
 
 <P>The following are the possible tests that can be used with an <B>if</B> command when the left value is a location and the right value is an object:</p>
 
-<center>
-<table width=80%>
+<table width=100%>
 <TR>
-<th>Test</th>
-<th>Description</th>
+<th width=20%>Test</th>
+<th width=80%>Description</th>
 </TR><TR>
 <td><B>locationof</B></TD>
 <td>This tests if the left value is the location of the right object.</TD>
@@ -3045,17 +3037,15 @@ constant maintext_colour "#dddddd"
 <td><B>!locationof</B></TD>
 <td>This tests if the left value is not the location of the right object.</TD>
 </tr></table>
-</center>
 
 <p>The difference between <b>grandof</b> and <b>locationof</b> is that, for example, if a key is put on a keyring, which is put in a box, which is put into a bag, and the bag is in a room called "beach", '<b>locationof key</b>' would refer to the beach, but '<b>grandof key</b>' would refer to the bag.</p>
 
 <P>The following are the possible tests that can be used with an <B>if</B> command when the left value is an object and the right value is an attribute. For more information see the chapter on <a href="attributes.html">Attributes</a>.
 
-<center>
-<table width=80%>
+<table width=100%>
 <tr>
-<th>Test</th>
-<th>Description</th>
+<th width=20%>Test</th>
+<th width=80%>Description</th>
 </TR><TR>
 <td><b>has</b></td>
 <td>This tests if the object has the specified attribute set</TD>
@@ -3063,15 +3053,13 @@ constant maintext_colour "#dddddd"
 <td><B>hasnt</B></TD>
 <td>This tests if the object hasn't the specified attribute set</TD>
 </tr></table>
-</center>
 
 <P>The following are the possible tests that can be used with an <B>if</B> command when the left value is an object and the right value is one of the words <B>*here</B>, <B>*held</B>, <B>*present </B>or <B>*anywhere</B>. These words have the same meanings when used in an <b>if</b> statement as in a <B>grammar</B> statement. For more information see the section on <a href="#definitions11">Grammar Statements</a>.
 
-<center>
-<table width=80%>
+<table width=100%>
 <TR>
-<th>Test</th>
-<th>Description</th>
+<th width=20%>Test</th>
+<th width=80%>Description</th>
 </TR><TR>
 <td><B>is</B></TD>
 <td>This tests if the object is in the specified scope.</TD>
@@ -3079,7 +3067,6 @@ constant maintext_colour "#dddddd"
 <td><B>isnt</B></TD>
 <td>This tests if the object isnt in the specified scope.</TD>
 </tr></table>
-</center>
 
 <P>To help clarify, here are some examples of the various types of <b>if</b> commands:
 
@@ -3117,11 +3104,10 @@ if condition1
 
 <p>Below is a list of the possible tests:
 
-<center>
-<table width=80%>
+<table width=100%>
 <tr>
-<th width=40%>Test</th>
-<th>Description</th>
+<th width=20%>Test</th>
+<th width=80%>Description</th>
 </tr>
 <tr>
 <td><b>==</b> or <b>=</b></td>
@@ -3157,7 +3143,6 @@ if condition1
 <td>This tests if the first string doesn't begin with the second string</td>
 </tr>
 </table>
-</center>
 
 <p>Below are some examples of the <b>ifstring</b> command being used.
 
@@ -3331,10 +3316,9 @@ Becareful not to use the default iteration container <b>noun3</b> more than once
 
 The following scopes can be used with the <b>select</b> command:
 
-<center>
-<table width=60%>
+<table width=100%>
 <tr><th>Scope</th>
-<th>Description</th>
+<th width=80%>Description</th>
 </tr><tr>
 <td><b>*held</b>&nbsp;&nbsp;</td><td>All objects held by the player.</td>
 </tr><tr>
@@ -3343,7 +3327,7 @@ The following scopes can be used with the <b>select</b> command:
 <td><b>*present</b>&nbsp;&nbsp;</td><td>All objects either in the current location or currently held.</td>
 </tr><tr>
 <td><b>*anywhere</b>&nbsp;&nbsp;</td><td>All objects in the game (use <b>loop</b> command instead).</td>
-</tr></table></center>
+</tr></table>
 
 <table class="infowarn">
 <tr><td><img src="info.png" alt="Information"></td>
@@ -5181,7 +5165,7 @@ return false
 <P>When a command requires a numerical value as a parameter, the following object elements can be referred to:
 
 <CENTER>
-<table cellpadding=8><tr>
+<table cellpadding=8 width=100%><tr>
 <td colspan=4><hr></td>
 </tr><tr>
 <td><I>object_label</I><B>(parent)</B>&nbsp;&nbsp;</TD><td>0</td>
@@ -5211,7 +5195,6 @@ return false
 <td colspan=4><hr></td>
 </tr>
 </table>
-</center>
 
 <p> These elements can be referred to by name or index number. For example, the following two commands are equivalent:
 
@@ -5295,7 +5278,7 @@ A direction property must be followed by the label of the location that the dire
 <!-- NEW PAGE -->
 <P>When a command requires a numerical value as a parameter, the following location elements can be referred to:
 
-<P><CENTER><table cellpadding=8><tr>
+<P><CENTER><table cellpadding=8 width=100%><tr>
 <td colspan=4><hr></td>
 </tr><tr>
 <td><I>location_label</I><B>(north)</B>&nbsp;&nbsp;</TD><td>0</td>
@@ -5324,7 +5307,6 @@ A direction property must be followed by the label of the location that the dire
 </tr><tr>
 <td colspan=4><hr></td>
 </tr></table>
-</center>
 
 <p> These elements can be referred to by name or number. For example, the following two commands are equivalent:
 
@@ -5366,12 +5348,11 @@ integer MOTOR_POWER       DEFAULT_POWER
 <P>The following is a list of integer variables defined internally by the JACL interpreter.
 
 <P>
-<center>
-<table cellpadding=3 width=90%><tr>
+<table cellpadding=3 width=100%><tr>
 <th>Variable</th>
 <th>Description</th>
 </tr><tr>
-<td><B>compass</B></TD>
+<td><B>compass</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td>This variable is used to store the direction the player moved in when they travel between locations. This variable may be tested in either of the <B>movement</B> functions allowing you to prevent the move from occurring or displaying some special text as required. The direction travelled is encoded as an integer that can be compared to a set of constants. See the section on <a href="#movement3">Moving Non-player Characters</a> for details.</TD>
 </TR>
 <TR><td>
@@ -5399,7 +5380,7 @@ integer MOTOR_POWER       DEFAULT_POWER
 <B>max_rand</B></TD>
 <td>When the word <B>random</B> is supplied as a parameter to a command expecting an integer value, a random number between one and the current value of <B>max_rand</B> will be generated. The default value is 100.</TD>
 </TR>
-<tr><td><b>notify</b></td>
+<tr><td><b>notify</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>When set to <b>true</b> the player will be notified of any increase in their score when the <b>points</b> command is used.</td>
 </tr>
 </TABLE>
@@ -5575,52 +5556,50 @@ take coin from bag
 <p>The table below details the tokens that can be used as part of the <i>MoveSyntax</i>:
 
 <p>
-<center>
-<table width=90%><tr>
+<table width=100%><tr>
 <th>Token</th>
 <th>Description</th>
 </tr><tr>
-<td><B>*here</b></td>
+<td><B>*here</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that an object in the current location must be supplied at this point in the move.</TD>
 </tr><tr>
-<td><B>**here</b></td>
+<td><B>**here</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that one or more objects in the current location may be supplied at this point in the move.</TD>
 </tr><tr>
-<td><B>*held</b></td>
+<td><B>*held</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that an object held by the player must be supplied at this point in the move. Objects that are immediate children of the player satisfy this directly; in addition, an object whose <b>mass</b> is <b>HEAVY</b> or greater and whose parent is itself held by the player is accepted (so the label on a jar in your inventory can be referred to as a held object).</TD>
 </TR><TR>
-<td><B>**held</b></td>
+<td><B>**held</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that one or more objects held by the player must be supplied at this point in the move. The same heavy-parent allowance as <B>*held</b> applies.</TD>
 </TR><TR>
-<td><b>*present</b></td>
+<td><b>*present</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that an object either in the current location or held by the player must be specified at this point in the move.</td>
 </tr><tr>
-<td><b>**present</b></td>
+<td><b>**present</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that one or more objects either in the current location or held by the player must be specified at this point in the move.</td>
 </tr><tr>
-<td><B>*anywhere</b></td>
+<td><B>*anywhere</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that an object anywhere in the game world must be specified at this point in the move.</td>
 </tr><tr>
-<td><B>**anywhere</b></td>
+<td><B>**anywhere</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that one or more objects anywhere in the game world must be specified at this point in the move.</td>
 </tr><tr>
-<td><B>*inside</b></td>
+<td><B>*inside</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Intended as the second noun of verbs that have two nouns -- indicates that an object that is a child of the first noun must be specified at this point in the move. If the grammar is invoked without a first noun resolved, the interpreter falls back to <B>*here</b> scope rather than rejecting the command.</td>
 </tr><tr>
-<td><B>**inside</b></td>
+<td><B>**inside</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Same intent as <B>*inside</b> but matches one or more objects. The same fallback to <B>**here</b> scope applies when no first noun has been resolved.</td>
 </tr><tr>
-<td><B>*location</b></td>
+<td><B>*location</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that a location in the game world must be specified at this point in the move.</td>
 </tr><tr>
 </tr><tr>
-<td><B>$string</b></td>
+<td><B>$string</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that an arbitrary text string must occur at this point in the move. If this text string is to contain spaces, the player must enclose the string in double quotes when typing their command.</td>
 </tr><tr>
-<td><B>$integer</b></td>
+<td><B>$integer</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that an integer must be supplied at this point in the move.</td>
 </tr></table>
-</center>
 
 <P>For example, the following are some valid <B>grammar</B> statements:
 
@@ -6869,98 +6848,98 @@ object ground: ground floor
 <h1><a class="title" name="glossary0">Glossary</a></h1>
 
 <table cellpadding=10 width=100%>
-<TR><td valign=top><B>association</B></TD>
+<tr><th width=20%>Term</th><th width=80%>Definition</th></tr>
+<TR><td valign=top><B>association</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>A function is said to be associated with the nearest object or location that is defined above it in the game file. An underscore and the label of the item it is associated with is appended to the function name specified in the code to form the function's full internal name.</TD>
 </TR>
-<TR><td valign=top><B>attribute</B></TD>
+<TR><td valign=top><B>attribute</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>An attribute is a boolean value, or flag, that can be set on or off (using the <B>ensure</B> command) for any given item.</TD>
 </TR>
-<TR><td valign=top><B>child</B></TD>
+<TR><td valign=top><B>child</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>An object is said to be a child of whichever other item its <B>parent</B> element is currently set to. This indicates that the child object is somehow contained within or possessed by the parent item.</TD>
 </TR>
-<TR><td valign=top><B>command</B></TD>
+<TR><td valign=top><B>command</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>A command is one of the basic actions that can be performed within a function.</TD>
 </TR>
-<TR><td valign=top><B>container</B></TD>
+<TR><td valign=top><B>container</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>A container is any expression that can have its value <B>set</B> to an integer. These are item elements, item pointers and integer variables.</TD>
 </TR>
-<TR><td valign=top><B>current location</B></TD>
+<TR><td valign=top><B>current location</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>The current location is whichever location the <B>parent</B> element of the object representing the player is set to. The object that represents the current player is specified by the current value of the object pointer <B>player</B>.</TD>
 </TR>
-<TR><td valign=top><B>directive</B></TD>
+<TR><td valign=top><B>directive</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>A directive is a setting that may be placed in the interpreter's configuration file.</TD>
 </TR>
-<TR><td valign=top><B>element
-</B></TD>
+<TR><td valign=top><B>element</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>An element is any of the properties of an item that can be set to hold an integer value.</TD>
 </TR>
-<TR><td valign=top><B>expression</B></TD>
+<TR><td valign=top><B>expression</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>An expression is a group of three parameters that may be used with an <B>if</B> command. All expressions evaluate to either <B>true</B> or <B>false</B>.</TD>
 </TR>
-<TR><td valign=top><B>filter</B></TD>
+<TR><td valign=top><B>filter</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>A <B>filter</B> is any word that has been specified to be removed from the player's move before it is processed by the interpreter.</TD>
 </TR>
-<TR><td valign=top><B>full internal name</B></TD>
+<TR><td valign=top><B>full internal name</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>If a function's name begins with a plus sign, it is global and the name specified in the code will also be its full internal name. If not, the name that appears after a function's opening curly brace, followed by an underscore then the label of the item that the function is associated with will be its full internal name.</TD>
 </TR>
-<TR><td valign=top><B>grammar</B></TD>
+<TR><td valign=top><B>grammar</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>A <B>grammar</B> statement is the definition of a command construct that may be used by the player during the game and the function that should be called when that move is made.</TD>
 </TR>
-<TR><td valign=top><B>grand parent</B></TD>
+<TR><td valign=top><B>grand parent</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>The grand parent of an object is the last object in the chain of possession. For example, if a coin is inside a purse that is in turn inside a bag, the bag is said to be the grand parent of the coin, while the purse is its parent.</TD>
 </TR>
-<TR><td valign=top><B>integer</B></TD>
+<TR><td valign=top><B>integer</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>An integer is a 32 bit signed whole number. It can range between -2147483648 and 2147483647.</TD>
 </TR>
-<TR><td valign=top><B>item</B></TD>
+<TR><td valign=top><B>item</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>Item is the group term for objects and locations.</TD>
 </TR>
-<TR><td valign=top><B>keyword</B></TD>
+<TR><td valign=top><B>keyword</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>Keywords are any of the terms that define the nine basic data elements in a game. They are <B>object</B>, <B>location</B>, <B>filter</B>, <B>synonym</B>, <B>variable</B>, <B>grammar</B>, <b>constant</b>, <b>string</b> and <b>parameter</b>.</TD>
 </TR>
-<TR><td valign=top><B>label</B></TD>
+<TR><td valign=top><B>label</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>A label is the internal name given to an object, location or variable. No two labels can be the same.</TD>
 </TR>
-<TR><td valign=top><B>location</B></TD>
+<TR><td valign=top><B>location</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>A location is an item that the player may be inside. All locations have the attribute <B>LOCATION </B>and are defined using the keyword <B>location</B>.</TD>
 </TR>
-<TR><td valign=top><B>name</B></TD>
+<TR><td valign=top><B>name</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>All items must have one or more names. These are the names that the player may use to refer to that item during the course of the game.</TD>
 </TR>
-<TR><td valign=top><B>object</B></TD>
+<TR><td valign=top><B>object</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>An object is an item that represents any aspect of the game that the player must be able to refer to, but not be inside.</TD>
 </TR>
-<TR><td valign=top><B>parameter</B></TD>
+<TR><td valign=top><B>parameter</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>The term parameter refers to one of two things. Firstly a parameter is any information that follows a JACL command, keyword or property. If multiple parameters are specified, they must be separated by white space.</TD>
 </TR>
-<TR><td valign=top><B>parent</B></TD>
+<TR><td valign=top><B>parent</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>An object's parent is the item that it is currently inside or possessed by. The parent of the object that represents the player is the location they are currently in.</TD>
 </TR>
-<TR><td valign=top><B>pointer</B></TD>
+<TR><td valign=top><B>pointer</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>A pointer is a special type of variable that may be used anywhere an item label can be. When used, it will be substituted for the label of the item that it is currently set to.</TD>
 </TR>
-<TR><td valign=top><B>indefinite article</B></TD>
+<TR><td valign=top><B>indefinite article</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>An indefinite article is used before singular nouns that refer to any member of a group. In English these are <b>a</b> or <b>an</b>. An item's indefinite article is defined using the first parameter of a <b>short</b> property. This article will be displayed when using a <B>{list}</B> macro.</TD>
 </TR>
-<TR><td valign=top><B>definite article</B></TD>
+<TR><td valign=top><B>definite article</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>A definite article is used before singular nouns that refer to a particular member of a group. In English this is <b>the</b>. An item's indefinite article defaults to <b>the</b> unless otherwise specified by supplying a <b>definite</b> property. This article will be displayed when using a <B>{the}</B> macro.</TD>
 </TR>
-<TR><td valign=top><B>property</B></TD>
+<TR><td valign=top><B>property</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>A property is one of the elements of an object or location that can be defined at start-up.</TD>
 </TR>
-<TR><td valign=top><B>scope</B></TD>
+<TR><td valign=top><B>scope</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>Scope describes the position of an object relative to the player. The scope indicators are <B>*present</B>, <B>*here</B>, <B>*held</B> and <B>*anywhere</B>.</TD>
 </TR>
-<TR><td valign=top><B>statement</B></TD>
+<TR><td valign=top><B>statement</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>A statement is a command, keyword or property along with all of its parameters.</TD>
 </TR>
-<TR><td valign=top><B>synonym</B></TD>
+<TR><td valign=top><B>synonym</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>A <B>synonym</B> is any word that has been specified to be swapped for another word in all moves typed by the player.</TD>
 </TR>
-<TR><td valign=top><a name="value"><B>value</B></a></TD>
+<TR><td valign=top><a name="value"><B>value</B></a>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>A value is an integer, or anything that resolves to an integer such as: an object label, an object element, an object pointer, a variable, <B>true</B> (1), <B>false</B> (0), <B>scenery</B> (100), <B>heavy</B>(99), <B>nowhere</B> (0), <B>lines</B> (the number of lines the screen can display) or <B>random</B>. For more information on constants and <B>random</B> see the chapter on <a href="internals.html">Internals</a>.</TD>
 </TR>
-<TR><td valign=top><B>white space</B></TD>
+<TR><td valign=top><B>white space</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td valign=top>White space is any tab, space, comma or colon that occurs outside double quotes</TD>
 </tr></table>
 

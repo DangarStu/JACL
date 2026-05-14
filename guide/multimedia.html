@@ -217,8 +217,7 @@ style normal
 
 <p>Below is a table showing the styles available in JACL and how each one is rendered by the Glk and web (<b>cgijacl</b> / <b>fcgijacl</b>) interpreters:
 
-<center>
-<table width=90%>
+<table width=100%>
 <tr>
 	<th>JACL Style</th>
 	<th>Glk Style</th>
@@ -275,7 +274,6 @@ style normal
 	<td>closes all open style tags</td>
 </tr>
 </table>
-</center>
 
 <p>The <b>alert</b> and <b>quote</b> styles are extra colourable buckets exposed by JACL and have no built-in default beyond what the interpreter chooses; pair them with <b>stylehint</b> declarations (see below) to give them a colour appropriate to your game.
 
@@ -307,8 +305,7 @@ stylehint &lt;style&gt; &lt;attribute&gt; &lt;value&gt;
 
 <p>Where <b>&lt;style&gt;</b> is one of the JACL style names from the table above (<b>bold</b>, <b>note</b>, <b>input</b>, <b>header</b>, <b>subheader</b>, <b>reverse</b>, <b>pre</b>, <b>alert</b>, or <b>quote</b>; the synonyms <b>emphasised</b>, <b>inverse</b>, <b>preformatted</b>, and <b>blockquote</b> are also accepted), <b>&lt;attribute&gt;</b> is one of:
 
-<center>
-<table width=80%>
+<table width=100%>
 <tr>
 	<th>Attribute</th>
 	<th>Aliases</th>
@@ -330,7 +327,6 @@ stylehint &lt;style&gt; &lt;attribute&gt; &lt;value&gt;
 	<td>An integer flag (0 or 1) requesting the interpreter to swap foreground and background for the style. Glk-only; ignored on the web.</td>
 </tr>
 </table>
-</center>
 
 <p>And <b>&lt;value&gt;</b> for the colour attributes is either a named colour or a quoted hex string of the form <b>&quot;#rrggbb&quot;</b> or <b>&quot;#rgb&quot;</b>. The recognised colour names are:
 

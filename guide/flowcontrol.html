@@ -26,10 +26,9 @@
 <td>Each object defined is assigned a unique number when the game is loaded. In a <B>set</B>, <B>if</B> or <b>ifall</b> command, an object's label is substituted for this number. Objects are numbered in the order they appear in the game file starting at one.</td>
 </tr></table>
 
-<center>
-<table width=80%>
-<TR><th>Test</th>
-<th>Description</th>
+<table width=100%>
+<TR><th width=20%>Test</th>
+<th width=80%>Description</th>
 </TR>
 <TR><td><B>=</B> or <b>==</b></TD>
 <td>This tests if the left value is equal to the right value.</TD>
@@ -50,15 +49,13 @@
 <TR><td><B>!=</b> or <b>&lt;&gt;</B></TD>
 <td>This tests if the left value is not equal to the right value.</TD>
 </tr></table>
-</center>
 
 <P>The following are the possible tests that can be used with an <B>if</B> command when the left and right values are both set to an object:  
 
-<center>
-<table width=80%>
+<table width=100%>
 <TR>
-<th>Test</th>
-<th>Description</th>
+<th width=20%>Test</th>
+<th width=80%>Description</th>
 </TR><TR>
 <td><B>grandof</B></TD>
 <td>This tests if the left object is the grand parent of the right object.</TD>
@@ -66,17 +63,15 @@
 <td><B>!grandof</B></TD>
 <td>This tests if the left object is not the grand parent of the right object.</TD>
 </tr></table>
-</center>
 
 <P>When an object is placed inside another object, which is then placed inside yet another object, the last object is said to be the grand parent of the first. This is the case no matter how many intermediate objects there are.
 
 <P>The following are the possible tests that can be used with an <B>if</B> command when the left value is a location and the right value is an object:</p>
 
-<center>
-<table width=80%>
+<table width=100%>
 <TR>
-<th>Test</th>
-<th>Description</th>
+<th width=20%>Test</th>
+<th width=80%>Description</th>
 </TR><TR>
 <td><B>locationof</B></TD>
 <td>This tests if the left value is the location of the right object.</TD>
@@ -84,17 +79,15 @@
 <td><B>!locationof</B></TD>
 <td>This tests if the left value is not the location of the right object.</TD>
 </tr></table>
-</center>
 
 <p>The difference between <b>grandof</b> and <b>locationof</b> is that, for example, if a key is put on a keyring, which is put in a box, which is put into a bag, and the bag is in a room called "beach", '<b>locationof key</b>' would refer to the beach, but '<b>grandof key</b>' would refer to the bag.</p>
 
 <P>The following are the possible tests that can be used with an <B>if</B> command when the left value is an object and the right value is an attribute. For more information see the chapter on <a href="attributes.html">Attributes</a>.
 
-<center>
-<table width=80%>
+<table width=100%>
 <tr>
-<th>Test</th>
-<th>Description</th>
+<th width=20%>Test</th>
+<th width=80%>Description</th>
 </TR><TR>
 <td><b>has</b></td>
 <td>This tests if the object has the specified attribute set</TD>
@@ -102,15 +95,13 @@
 <td><B>hasnt</B></TD>
 <td>This tests if the object hasn't the specified attribute set</TD>
 </tr></table>
-</center>
 
 <P>The following are the possible tests that can be used with an <B>if</B> command when the left value is an object and the right value is one of the words <B>*here</B>, <B>*held</B>, <B>*present </B>or <B>*anywhere</B>. These words have the same meanings when used in an <b>if</b> statement as in a <B>grammar</B> statement. For more information see the section on <a href="definitions.html#definitions11">Grammar Statements</a>.
 
-<center>
-<table width=80%>
+<table width=100%>
 <TR>
-<th>Test</th>
-<th>Description</th>
+<th width=20%>Test</th>
+<th width=80%>Description</th>
 </TR><TR>
 <td><B>is</B></TD>
 <td>This tests if the object is in the specified scope.</TD>
@@ -118,7 +109,6 @@
 <td><B>isnt</B></TD>
 <td>This tests if the object isnt in the specified scope.</TD>
 </tr></table>
-</center>
 
 <P>To help clarify, here are some examples of the various types of <b>if</b> commands:
 
@@ -156,11 +146,10 @@ if condition1
 
 <p>Below is a list of the possible tests:
 
-<center>
-<table width=80%>
+<table width=100%>
 <tr>
-<th width=40%>Test</th>
-<th>Description</th>
+<th width=20%>Test</th>
+<th width=80%>Description</th>
 </tr>
 <tr>
 <td><b>==</b> or <b>=</b></td>
@@ -196,7 +185,6 @@ if condition1
 <td>This tests if the first string doesn't begin with the second string</td>
 </tr>
 </table>
-</center>
 
 <p>Below are some examples of the <b>ifstring</b> command being used.
 
@@ -370,10 +358,9 @@ Becareful not to use the default iteration container <b>noun3</b> more than once
 
 The following scopes can be used with the <b>select</b> command:
 
-<center>
-<table width=60%>
+<table width=100%>
 <tr><th>Scope</th>
-<th>Description</th>
+<th width=80%>Description</th>
 </tr><tr>
 <td><b>*held</b>&nbsp;&nbsp;</td><td>All objects held by the player.</td>
 </tr><tr>
@@ -382,7 +369,7 @@ The following scopes can be used with the <b>select</b> command:
 <td><b>*present</b>&nbsp;&nbsp;</td><td>All objects either in the current location or currently held.</td>
 </tr><tr>
 <td><b>*anywhere</b>&nbsp;&nbsp;</td><td>All objects in the game (use <b>loop</b> command instead).</td>
-</tr></table></center>
+</tr></table>
 
 <table class="infowarn">
 <tr><td><img src="info.png" alt="Information"></td>
