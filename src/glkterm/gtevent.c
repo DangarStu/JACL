@@ -10,6 +10,7 @@
 #include <string.h>
 #include <poll.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #ifdef OPT_TIMED_INPUT
 #include <sys/time.h>
@@ -85,17 +86,36 @@ void glk_select(event_t *event)
         }
 
         /* key == ERR; it's an idle event.
-           If stdin is a closed pipe (writer hung up), ncurses' getch()
-           will return ERR on every call without blocking, busy-looping
-           this thread at 100% CPU. Detect that case via poll() and
-           exit cleanly rather than spin forever. */
+           If stdin can't yield more keystrokes (closed pipe, /dev/null,
+           regular file at EOF), ncurses' getch() returns ERR on every
+           call without blocking, busy-looping this thread at 100% CPU.
+           Detect that family of cases and exit cleanly. The original
+           fix (POLLHUP only) covered closed pipes; this extends it to
+           the other no-more-input fd shapes. */
         if (!isatty(STDIN_FILENO)) {
             struct pollfd pfd;
             pfd.fd = STDIN_FILENO;
             pfd.events = POLLIN;
             pfd.revents = 0;
-            if (poll(&pfd, 1, 0) > 0 && (pfd.revents & POLLHUP)) {
-                gli_fast_exit();
+            if (poll(&pfd, 1, 0) > 0) {
+                /* POLLHUP -- pipe writer hung up. POLLNVAL -- macOS sets
+                   this when stdin is /dev/null. Either way, no more
+                   input is coming. */
+                if (pfd.revents & (POLLHUP | POLLNVAL)) {
+                    gli_fast_exit();
+                }
+                /* POLLIN on a non-tty whose underlying fd is a regular
+                   file or a character device (e.g. /dev/null on Linux,
+                   which sets POLLIN rather than POLLNVAL) at EOF: getch
+                   sees end-of-stream and returns ERR forever. Distinguish
+                   from a still-active pipe by checking the fd kind. */
+                if (pfd.revents & POLLIN) {
+                    struct stat st;
+                    if (fstat(STDIN_FILENO, &st) == 0 &&
+                        (S_ISREG(st.st_mode) || S_ISCHR(st.st_mode))) {
+                        gli_fast_exit();
+                    }
+                }
             }
         }
         
