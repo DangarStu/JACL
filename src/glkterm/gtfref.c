@@ -293,7 +293,7 @@ frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
     
     if (fmode != filemode_Read) {
         if (!stat(newbuf, &sbuf) && S_ISREG(sbuf.st_mode)) {
-            sprintf(prbuf, "Overwrite \"%s\"? [y/n] ", cx);
+            snprintf(prbuf, BUFLEN, "Overwrite \"%s\"? [y/n] ", cx);
             while (1) {
                 ix = gli_msgin_getchar(prbuf, FALSE);
                 if (ix == 'n' || ix == 'N' || ix == '\033' || ix == '\007') {
