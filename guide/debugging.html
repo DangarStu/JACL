@@ -53,11 +53,11 @@ Comment ignored.
 
 <p>You stop a transcript from being recorded by using the command <b>unscript</b>.
 
-<h1><a class="section" name="debugging3">The Debug Library</a></h1>
+<h2><a class="section" name="debugging3">The Debug Library</a></h2>
 
 <p>The library <b>debug.library</b> contains a set of JACL verbs that are useful for testing your game during development. This library should be included using the <b>#debug</b> directive so that it is not included in the release version of your game (see below).
 
-<h2><a class="section" name="debugging3">The INSPECT Command</a></h2>
+<h2><a class="section" name="debugging4">The INSPECT Command</a></h2>
 
 <p>The <b>inspect</b> command displays the label, attribute and element values of the object passed as a parameter. Two special verbs in <b>debug.library</b> allows an object to be inspected while playing a game, these are <b>inspect</b> and <b>inspectobj</b>. Below is some sample output of the <b>inspect</b> verb from <i>The Unholy Grail</i>:
 
@@ -92,7 +92,7 @@ y: 0
 &gt;inspectobj here
 </pre>
 
-<h2><a class="section" name="debugging4">The Verb VALUEOF</a></h2>
+<h2><a class="section" name="debugging5">The Verb VALUEOF</a></h2>
 
 <p>The <b>valueof</b> verb is a way of displaying the current integer value of any resolveable container. This includes an object label, an object element and an integer variable or constant. Below is an example of the <b>valueof</b> command being used while playing The Unholy Grail:
 
@@ -102,13 +102,13 @@ report(parent) = 44
 </pre>
 
 
-<h2><a class="section" name="debugging5">The Verb FETCH</a></h2>
+<h2><a class="section" name="debugging6">The Verb FETCH</a></h2>
 
 <p>Where the verb <b>inspect</b> is a way of accessing the JACL command <b>inspect</b> during game play, <b>fetch</b> is simply a convenience verb to move an object to the current location and remove the attribute <b>OUT_OF_REACH</b> from that object should it have it. The verb is handy when you need to test a puzzle that involves the use or one or move objects that are time consuming to obtain manually. 
 
 <p>For thorough testing it is preferable to use the <b>walkthru</b> verb to test all the steps normally taken to obtain the object or objects, but <b>fetch</b> can still be of use when testing small parts of your game in isolation.
 
-<h1><a class="section" name="debugging8">Releasing Your Game</a></h1>
+<h2><a class="section" name="debugging7">Releasing Your Game</a></h2>
 
 <p>Once you have completed your game and all known bugs are fixed you will want to release it to the public to be played. Although it is possible to simply distribute the <b>.jacl</b> file you have been working on (presuming only standard JACL libraries are used), it is often preferable to distribute the <b>.j2</b> file. This file is created in the <b>temp</b> subdirectory when the game is run. This file can be thought of a statically-linked version of your game, with all <b>#included</b> files appended to the game file. In addition to appending all the required library files, unnecessary whitespace is removed from the beginning of each line to reduce file size and improve run-time performance.
 

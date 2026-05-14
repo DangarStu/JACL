@@ -26,15 +26,15 @@ A.title		{
 			margin-bottom: 1cm
 			}
 
-IMG		{ 	
-			margin: 0.5cm
-			margin-right: 2cm
+IMG		{
+			margin: 0.5cm;
+			margin-right: 2cm;
 		}
 
-TABLE.infowarn	{ 	
+TABLE.infowarn	{
 			margin-top: 12pt;
 			margin-bottom: 12pt;
-			padding: 10;
+			padding: 10pt;
 			border-style: none;
 				}
 

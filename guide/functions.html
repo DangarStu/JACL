@@ -142,7 +142,7 @@ write noun1{The} " sails high in the air.^"
 <td>When using the above technique to manually associate a function with an object, the label of the object must not contain an underscore. This is because the supplied function name is parsed from the right, with everything after the first underscore encountered being considered the object label. If a function was to be given the name <b>*kick_blue_ball</b>, the interpreter would attempt to associate the function <b>kick_blue</b> with the object <b>ball</b>.</td>
 </tr></table>
 
-<p>It is also possible to supply the name of the function to be executed in a string variable or constant. This technique allows strings to be used as function pointers and is used by the <b>menu.library</b> as a way of passing a call-back function to function in the library. See the chapter on the <a href="menu.html#menu1">menu.library</a> for an example.
+<p>It is also possible to supply the name of the function to be executed in a string variable or constant. This technique allows strings to be used as function pointers and is used by the <b>menu.library</b> as a way of passing a call-back function to function in the library. See the chapter on the <a href="menu.html#menu0">menu.library</a> for an example.
 
 <p>A function will stop executing and return to the function that it was called from when it encounters a <b>return</b> command or arrives at the closing brace. If a function reaches its closing brace, an implicit <b>return true</b> is executed. 
 
