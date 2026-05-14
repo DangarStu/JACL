@@ -12,9 +12,12 @@
 void
 log_error(const char *message, int console)
 {
+	/* consoleMessage is small (256B) but `message` is typically
+	 * error_buffer[1024], so the prior sprintf could overflow on a
+	 * long error string. snprintf truncates instead. */
 	char 			consoleMessage[256];
 
-	sprintf(consoleMessage, "ERROR: %s^", message);
+	snprintf(consoleMessage, sizeof(consoleMessage), "ERROR: %s^", message);
 
 	write_text(consoleMessage);
 }
@@ -28,8 +31,8 @@ log_error(const char *message, int console)
 	char 			consoleMessage[256];
     event_t			event;
 
-	// BUILD A STRING SUITABLE FOR DISPLAY ON THE CONSOLE.
-	sprintf(consoleMessage, "ERROR: %s^", message);
+	/* See __NDS__ branch above re: snprintf-vs-sprintf rationale. */
+	snprintf(consoleMessage, sizeof(consoleMessage), "ERROR: %s^", message);
 
 	glk_set_style(style_Alert);
 	write_text(consoleMessage);
@@ -67,11 +70,14 @@ log_error(const char *message, int console)
 	char 			temp_buffer[256];
 
 	time(&tnow);
-	/* MAKE THE LOG MESSAGE WITH TIME, USER_ID AND GAME PREFIX */
-	sprintf(temp_buffer, "%s - %s - %s - %s\n", strip_return(ctime(&tnow)), user_id, prefix, message);
+	/* Both destinations are 256B but `message` is typically
+	 * error_buffer[1024] and user_id / prefix are each up to 80
+	 * chars. The prior sprintfs could blow the 256B stack buffers by
+	 * ~1100 bytes on a long error string. snprintf truncates. */
+	snprintf(temp_buffer, sizeof(temp_buffer), "%s - %s - %s - %s\n",
+		strip_return(ctime(&tnow)), user_id, prefix, message);
 
-	/* MAKE THE MESSAGE FOR STDERR AND STDOUT WITH ERROR PREFIX */
-	sprintf(consoleMessage, "%s: %s", prefix, message);
+	snprintf(consoleMessage, sizeof(consoleMessage), "%s: %s", prefix, message);
 
 	if (console < ONLY_STDERR) {
 		if (errorLog != NULL) {
