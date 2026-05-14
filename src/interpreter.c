@@ -1977,11 +1977,14 @@ execute(const char *funcname)
                             sprintf(error_buffer, "Failed to open file %s to output: %s\n", temp_buffer, strerror(errno));
                             log_error(error_buffer, PLUS_STDOUT);
                     } else {
-                        fgets(temp_buffer, 1024, tempfile);
-
-                        while (!feof(tempfile)) {
+                        /* Drive the loop off the read return, not feof,
+                         * so the last line isn't reprocessed once on
+                         * EOF. The prior form printed text_buffer one
+                         * extra time when fgets returned NULL but the
+                         * feof check was still false (read had failed
+                         * but EOF not yet flagged). */
+                        while (fgets(temp_buffer, 1024, tempfile) != NULL) {
                             write_text(temp_buffer);
-                            fgets(temp_buffer, 1024, tempfile);
                         }
 
                         fclose(tempfile);

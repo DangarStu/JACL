@@ -14,25 +14,37 @@ static int jacl_whitespace(int character);
 int
 main(int argc, char *argv[])
 {
-     int            index;
      FILE*		file;
 	char			text_buffer[1024];
      int			encrypted = 0;
 
-     if ((file = fopen(argv[1], "r")) != NULL) {
-          while (!feof(file)) {
-               fgets(text_buffer, 1024, file);
-			if (strstr(text_buffer, "#encrypted")) {
-				encrypted = 1;
-				continue;
-			}
-			if (encrypted) {
-				jacl_decrypt(text_buffer);
-			}
-			stripwhite(text_buffer);
-			printf("%s", text_buffer);
-		}
+	if (argc < 2) {
+		fprintf(stderr, "usage: %s <encrypted-jacl-file>\n",
+			argc > 0 ? argv[0] : "decrypt");
+		return 1;
 	}
+
+	if ((file = fopen(argv[1], "r")) == NULL) {
+		fprintf(stderr, "%s: can't open %s\n", argv[0], argv[1]);
+		return 1;
+	}
+
+	/* Drive the loop off fgets so a read error / EOF doesn't leave
+	 * the last line in text_buffer to be re-printed. */
+	while (fgets(text_buffer, 1024, file) != NULL) {
+		if (strstr(text_buffer, "#encrypted")) {
+			encrypted = 1;
+			continue;
+		}
+		if (encrypted) {
+			jacl_decrypt(text_buffer);
+		}
+		stripwhite(text_buffer);
+		printf("%s", text_buffer);
+	}
+
+	fclose(file);
+	return 0;
 }
 
 int

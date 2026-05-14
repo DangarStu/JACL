@@ -1417,9 +1417,9 @@ word_check()
 void
 read_config_file()
 {
-    fgets(text_buffer, 1024, file);
-
-    while (!feof(file)) {
+    /* Drive the loop off fgets's return rather than feof so a read
+     * error or EOF doesn't cause the last line to be re-encapsulated. */
+    while (fgets(text_buffer, 1024, file) != NULL) {
         encapsulate();
 
         if (word[0] == NULL) {
@@ -1479,7 +1479,6 @@ read_config_file()
                 session_max_age_cfg = strtol(word[1], NULL, 10);
             }
         }
-        fgets(text_buffer, 1024, file);
     }
 
     fclose(file);

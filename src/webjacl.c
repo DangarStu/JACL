@@ -271,9 +271,9 @@ wj_setupdb(void)
 		 * truncate. 256 + 128 + 512 + 2 separators + NUL = 899 bytes. */
 		char            sreq[256], smime[128], spath[512], sline[6144];
 
-		while (!feof(fp)) {
-			fgets(sline, sizeof(sline) - 1, fp);
-
+		/* Drive the loop off fgets so we don't re-process the last
+		 * line on EOF / read error. */
+		while (fgets(sline, sizeof(sline) - 1, fp) != NULL) {
 			terminator = (char *) NULL;
 			terminator = strrchr(sline, '\r');
 			if (terminator != (char *) NULL)
@@ -283,7 +283,7 @@ wj_setupdb(void)
 			if (terminator != (char *) NULL)
 				*terminator = 0;
 
-			if (!feof(fp)) {
+			{
 				/* Width specifiers bound each field; sline is
 				 * 6144 bytes and a single unbroken word could
 				 * otherwise overflow sreq/smime/spath. The widths
