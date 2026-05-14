@@ -50,9 +50,13 @@ read_gamefile()
     int            index,
                 counter,
                    errors;
-#ifdef GLK
+    /* Tracks whether the most recent read of a line succeeded. The Glk
+     * path stores glk_get_bin_line_stream's return; the stdio path
+     * stores (fgets(...) != NULL). The previous while(!feof(file))
+     * loop condition let stdio fall through one extra iteration with a
+     * stale text_buffer, causing the last line to be processed twice
+     * on partial reads or EOF. */
     int            result;
-#endif
     int            location_count = 0;
     int            object_count = 0;
     int            line = 0;
@@ -267,7 +271,7 @@ read_gamefile()
     result = glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
 #else
     fseek(file, start_of_file, SEEK_SET);
-    fgets(text_buffer, 1024, file);
+    result = (fgets(text_buffer, 1024, file) != NULL);
 #endif
 
     line++;
@@ -277,18 +281,14 @@ read_gamefile()
 #ifdef GLK
         result = glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
 #else
-        fgets(text_buffer, 1024, file);
+        result = (fgets(text_buffer, 1024, file) != NULL);
 #endif
         line++;
     }
 
     if (encrypted) jacl_decrypt(text_buffer);
 
-#ifdef GLK
     while (result)
-#else
-    while (!feof(file))
-#endif
     {
         encapsulate();
         if (word[0] == NULL);
@@ -297,8 +297,8 @@ read_gamefile()
             while (result) {
                 result = glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
 #else
-            while (!feof(file)) {
-                fgets(text_buffer, 1024, file);
+            while (result) {
+                result = (fgets(text_buffer, 1024, file) != NULL);
 #endif
                 line++;
                 if (!encrypted && strstr(text_buffer, "#encrypted")) {
@@ -306,7 +306,7 @@ read_gamefile()
 #ifdef GLK
                     result = glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
 #else
-                    fgets(text_buffer, 1024, file);
+                    result = (fgets(text_buffer, 1024, file) != NULL);
 #endif
                     line++;
                 }
@@ -652,7 +652,7 @@ read_gamefile()
 #ifdef GLK
         result = glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
 #else
-        fgets(text_buffer, 1024, file);
+        result = (fgets(text_buffer, 1024, file) != NULL);
 #endif
         line++;
 
@@ -661,7 +661,7 @@ read_gamefile()
 #ifdef GLK
             result = glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
 #else
-            fgets(text_buffer, 1024, file);
+            result = (fgets(text_buffer, 1024, file) != NULL);
 #endif
             line++;
         }
@@ -713,7 +713,7 @@ read_gamefile()
     result = glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
 #else
     fseek(file, start_of_file, SEEK_SET);
-    fgets(text_buffer, 1024, file);
+    result = (fgets(text_buffer, 1024, file) != NULL);
 #endif
 
     line++;
@@ -723,17 +723,13 @@ read_gamefile()
 #ifdef GLK
         result = glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
 #else
-        fgets(text_buffer, 1024, file);
+        result = (fgets(text_buffer, 1024, file) != NULL);
 #endif
         line++;
     }
     if (encrypted) jacl_decrypt(text_buffer);
 
-#ifdef GLK
     while (result)
-#else
-    while (!feof(file))
-#endif
     {
         encapsulate();
         if (word[0] == NULL);
@@ -822,8 +818,8 @@ read_gamefile()
             while (result) {
                 result = glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
 #else
-            while (!feof(file)) {
-                fgets(text_buffer, 1024, file);
+            while (result) {
+                result = (fgets(text_buffer, 1024, file) != NULL);
 #endif
                 line++;
 
@@ -832,7 +828,7 @@ read_gamefile()
 #ifdef GLK
                     result = glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
 #else
-                    fgets(text_buffer, 1024, file);
+                    result = (fgets(text_buffer, 1024, file) != NULL);
 #endif
                     line++;
                 }
@@ -1071,7 +1067,7 @@ read_gamefile()
 #ifdef GLK
         result = glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
 #else
-        fgets(text_buffer, 1024, file);
+        result = (fgets(text_buffer, 1024, file) != NULL);
 #endif
         line++;
 
@@ -1080,7 +1076,7 @@ read_gamefile()
 #ifdef GLK
             result = glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
 #else
-            fgets(text_buffer, 1024, file);
+            result = (fgets(text_buffer, 1024, file) != NULL);
 #endif
             line++;
         }
