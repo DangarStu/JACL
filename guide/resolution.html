@@ -46,7 +46,7 @@ object ball_3: big red ball
 
 <p>If during the game the player was to type the command <b>take balls</b>, all of the above objects would be selected and three separate take commands would be issued. It is the use of the plural name that tells the parser that a reference to multiple objects was intended and that the reference is not ambiguous. It is also possible to further qualify a reference to a plural name by using one or more regular name. For example, the command <b>take red balls</b> would result in only the small red ball and the large red ball being taken.
 
-<h2><a class="section" name="resolution1">Disambiguation</a></h2>
+<h2><a class="section" name="resolution2">Disambiguation</a></h2>
 
 <p>It is also possible for each object to have the associated function <b>disambiguate</b> to assist in the process of disambiguation. The parser will attempt to call this function on every object that is a possible result for an ambiguous reference that needs to be resolved to a single object. 
 

@@ -75,14 +75,14 @@
 
 <P>A <B>player</B> property has no parameters and indicates that this object is to represent the player in the game. Behind the scenes this sets the object pointer <b>player</b> to point to this object. The value of this pointer can be changed during the course of the game if required.
 
-<p>The properties <b>bearing</b>, <b>velocity</b>, <b>x</b> and <b>y</b> are used by the special-purpose commands <b>position</b>, <b>bearing</b> and <b>distance</b>. See the chapter on <a href="special.html#special">Special-Purpose Commands</a> for more information.
+<p>The properties <b>bearing</b>, <b>velocity</b>, <b>x</b> and <b>y</b> are used by the special-purpose commands <b>position</b>, <b>bearing</b> and <b>distance</b>. See the chapter on <a href="special.html#special0">Special-Purpose Commands</a> for more information.
 
 <P>The properties <B>next</B>, <B>previous</B>, <b>child</b>, <B>index</B>, <B>status</B>, <B>state</B>, <B>counter</B>, <B>points</B> and <b>class</b> have no pre-determined meaning for objects. You are free to set and test these values as required.
 
 <P>When a command requires a numerical value as a parameter, the following object elements can be referred to:
 
 <CENTER>
-<table cellpadding=8><tr>
+<table cellpadding=8 width=100%><tr>
 <td colspan=4><hr></td>
 </tr><tr>
 <td><I>object_label</I><B>(parent)</B>&nbsp;&nbsp;</TD><td>0</td>
@@ -112,7 +112,6 @@
 <td colspan=4><hr></td>
 </tr>
 </table>
-</center>
 
 <p> These elements can be referred to by name or index number. For example, the following two commands are equivalent:
 
@@ -196,7 +195,7 @@ A direction property must be followed by the label of the location that the dire
 <!-- NEW PAGE -->
 <P>When a command requires a numerical value as a parameter, the following location elements can be referred to:
 
-<P><CENTER><table cellpadding=8><tr>
+<P><CENTER><table cellpadding=8 width=100%><tr>
 <td colspan=4><hr></td>
 </tr><tr>
 <td><I>location_label</I><B>(north)</B>&nbsp;&nbsp;</TD><td>0</td>
@@ -225,7 +224,6 @@ A direction property must be followed by the label of the location that the dire
 </tr><tr>
 <td colspan=4><hr></td>
 </tr></table>
-</center>
 
 <p> These elements can be referred to by name or number. For example, the following two commands are equivalent:
 
@@ -267,12 +265,11 @@ integer MOTOR_POWER       DEFAULT_POWER
 <P>The following is a list of integer variables defined internally by the JACL interpreter.
 
 <P>
-<center>
-<table cellpadding=3 width=90%><tr>
+<table cellpadding=3 width=100%><tr>
 <th>Variable</th>
 <th>Description</th>
 </tr><tr>
-<td><B>compass</B></TD>
+<td><B>compass</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
 <td>This variable is used to store the direction the player moved in when they travel between locations. This variable may be tested in either of the <B>movement</B> functions allowing you to prevent the move from occurring or displaying some special text as required. The direction travelled is encoded as an integer that can be compared to a set of constants. See the section on <a href="movement.html#movement3">Moving Non-player Characters</a> for details.</TD>
 </TR>
 <TR><td>
@@ -300,7 +297,7 @@ integer MOTOR_POWER       DEFAULT_POWER
 <B>max_rand</B></TD>
 <td>When the word <B>random</B> is supplied as a parameter to a command expecting an integer value, a random number between one and the current value of <B>max_rand</B> will be generated. The default value is 100.</TD>
 </TR>
-<tr><td><b>notify</b></td>
+<tr><td><b>notify</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>When set to <b>true</b> the player will be notified of any increase in their score when the <b>points</b> command is used.</td>
 </tr>
 </TABLE>
@@ -476,52 +473,50 @@ take coin from bag
 <p>The table below details the tokens that can be used as part of the <i>MoveSyntax</i>:
 
 <p>
-<center>
-<table width=90%><tr>
+<table width=100%><tr>
 <th>Token</th>
 <th>Description</th>
 </tr><tr>
-<td><B>*here</b></td>
+<td><B>*here</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that an object in the current location must be supplied at this point in the move.</TD>
 </tr><tr>
-<td><B>**here</b></td>
+<td><B>**here</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that one or more objects in the current location may be supplied at this point in the move.</TD>
 </tr><tr>
-<td><B>*held</b></td>
+<td><B>*held</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that an object held by the player must be supplied at this point in the move. Objects that are immediate children of the player satisfy this directly; in addition, an object whose <b>mass</b> is <b>HEAVY</b> or greater and whose parent is itself held by the player is accepted (so the label on a jar in your inventory can be referred to as a held object).</TD>
 </TR><TR>
-<td><B>**held</b></td>
+<td><B>**held</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that one or more objects held by the player must be supplied at this point in the move. The same heavy-parent allowance as <B>*held</b> applies.</TD>
 </TR><TR>
-<td><b>*present</b></td>
+<td><b>*present</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that an object either in the current location or held by the player must be specified at this point in the move.</td>
 </tr><tr>
-<td><b>**present</b></td>
+<td><b>**present</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that one or more objects either in the current location or held by the player must be specified at this point in the move.</td>
 </tr><tr>
-<td><B>*anywhere</b></td>
+<td><B>*anywhere</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that an object anywhere in the game world must be specified at this point in the move.</td>
 </tr><tr>
-<td><B>**anywhere</b></td>
+<td><B>**anywhere</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that one or more objects anywhere in the game world must be specified at this point in the move.</td>
 </tr><tr>
-<td><B>*inside</b></td>
+<td><B>*inside</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Intended as the second noun of verbs that have two nouns -- indicates that an object that is a child of the first noun must be specified at this point in the move. If the grammar is invoked without a first noun resolved, the interpreter falls back to <B>*here</b> scope rather than rejecting the command.</td>
 </tr><tr>
-<td><B>**inside</b></td>
+<td><B>**inside</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Same intent as <B>*inside</b> but matches one or more objects. The same fallback to <B>**here</b> scope applies when no first noun has been resolved.</td>
 </tr><tr>
-<td><B>*location</b></td>
+<td><B>*location</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that a location in the game world must be specified at this point in the move.</td>
 </tr><tr>
 </tr><tr>
-<td><B>$string</b></td>
+<td><B>$string</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that an arbitrary text string must occur at this point in the move. If this text string is to contain spaces, the player must enclose the string in double quotes when typing their command.</td>
 </tr><tr>
-<td><B>$integer</b></td>
+<td><B>$integer</b>&nbsp;&nbsp;&nbsp;&nbsp;</td>
 <td>Indicates that an integer must be supplied at this point in the move.</td>
 </tr></table>
-</center>
 
 <P>For example, the following are some valid <B>grammar</B> statements:
 
