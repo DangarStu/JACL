@@ -299,7 +299,8 @@ main(int argc, char *argv[])
 		status_line();
 
 		if (current_command != NULL) {
-			strncpy(last_command, current_command, 256);
+			strncpy(last_command, current_command, sizeof(last_command) - 1);
+			last_command[sizeof(last_command) - 1] = 0;
 		}
 
 		row = 0;
@@ -472,8 +473,10 @@ word_check()
 					TIME->value = FALSE;
 				}
 			} else {
-				strncpy(oops_buffer, word[wp], 255);
-				strncpy(text_buffer, last_command, 255);
+				strncpy(oops_buffer, word[wp], sizeof(oops_buffer) - 1);
+				oops_buffer[sizeof(oops_buffer) - 1] = 0;
+				strncpy(text_buffer, last_command, sizeof(text_buffer) - 1);
+				text_buffer[sizeof(text_buffer) - 1] = 0;
 				command_encapsulate();
 				//printf("--- trying to replace %s with %s\n", word[oops_word], oops_buffer);
 				jacl_truncate();
@@ -512,7 +515,8 @@ word_check()
 			write_text(cstring_resolve("NOT_CLEVER")->value);
 			TIME->value = FALSE;
 		} else {
-			strncpy(text_buffer, last_command, 256);
+			strncpy(text_buffer, last_command, sizeof(text_buffer) - 1);
+			text_buffer[sizeof(text_buffer) - 1] = 0;
 			current_command = last_command;
 			command_encapsulate();
 			jacl_truncate();

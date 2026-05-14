@@ -1422,11 +1422,17 @@ read_config_file()
     while (fgets(text_buffer, 1024, file) != NULL) {
         encapsulate();
 
+        /* Each config directive that copies word[1] into a fixed-size
+         * buffer uses snprintf here so the destination is bounded AND
+         * guaranteed NUL-terminated. The previous strncpy(dst, src, 80)
+         * left the trailing byte uninitialized when src was >= 80 chars,
+         * and the strcat() calls a few lines below would walk off the
+         * end looking for a NUL. */
         if (word[0] == NULL) {
             // DO NOTHING
         } else if (!strcmp(word[0], "temp")) {
             if (word[1] != NULL) {
-                strncpy(temp_directory, word[1], 80);
+                snprintf(temp_directory, sizeof(temp_directory), "%s", word[1]);
                 if (temp_directory[strlen(temp_directory) - 1] != '/')
                     strcat(temp_directory, "/");
             }
@@ -1436,31 +1442,31 @@ read_config_file()
             prefer_remote_user = FALSE;
         } else if (!strcmp(word[0], "data")) {
             if (word[1] != NULL) {
-                strncpy(data_directory, word[1], 80);
+                snprintf(data_directory, sizeof(data_directory), "%s", word[1]);
                 if (data_directory[strlen(data_directory) - 1] != '/')
                     strcat(data_directory, "/");
             }
         } else if (!strcmp(word[0], "include")) {
             if (word[1] != NULL) {
-                strncpy(include_directory, word[1], 80);
+                snprintf(include_directory, sizeof(include_directory), "%s", word[1]);
                 if (include_directory[strlen(include_directory) - 1] != '/')
                     strcat(include_directory, "/");
             }
         } else if (!strcmp(word[0], "error_log")) {
             if (word[1] != NULL) {
-                strncpy(error_log, word[1], 80);
+                snprintf(error_log, sizeof(error_log), "%s", word[1]);
                 if (error_log[strlen(error_log) - 1] == '/')
                     strcat(error_log, "error.log");
             }
         } else if (!strcmp(word[0], "access_log")) {
             if (word[1] != NULL) {
-                strncpy(access_log, word[1], 80);
+                snprintf(access_log, sizeof(access_log), "%s", word[1]);
                 if (access_log[strlen(access_log) - 1] == '/')
                     strcat(access_log, "access.log");
             }
         } else if (!strcmp(word[0], "cookie_expiry")) {
             if (word[1] != NULL) {
-                strncpy(cookie_expiry, word[1], 80);
+                snprintf(cookie_expiry, sizeof(cookie_expiry), "%s", word[1]);
             }
         } else if (!strcmp(word[0], "google_client_id")) {
             if (word[1] != NULL) {
