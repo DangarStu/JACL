@@ -30,6 +30,18 @@ integer voice_enabled
 integer intro_dedication_shown
 integer intro_scene_shown
 
+# Status-bar character grid width on the web build. resolvers.c
+# returns this for the JACL `status_width` symbol (which +print_right
+# and +print_centred read to position text at the right/centre of
+# the bar). cgijacl reads &status_cols= from each ajax/hyperlink
+# request and writes the measured column count here, so the bar
+# tracks viewport resizes. Must be declared in the game image
+# (integer_resolve returns NULL otherwise, the cgijacl assignment
+# silently no-ops, and status_width falls through to its 80-column
+# fallback). 120 is a sensible pre-measurement default for the
+# first +intro render before any ajax request has arrived.
+integer status_window_width 120
+
 # Opt-out for utility / non-IF games (life, blackjacl, etc.). Set to
 # true in +intro before 'execute "+game_intro"' to skip the voice
 # and sound questions, which don't make sense for them.
