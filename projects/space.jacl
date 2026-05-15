@@ -26,10 +26,11 @@ constant linkbar_colour      "#1a2a44"
 constant maintext_colour     "#c8ccd0"
 constant title_colour        "#ffb84a"
 
-# Telemetry needs a wide grid -- 60 columns is enough for two-up
-# label / value pairs without crowding.
+# Telemetry needs eight status lines for the two-up label/value pairs.
+# status_window_width is declared in webinterface.library and driven
+# by the runtime from &status_cols= on each ajax request -- don't set
+# a width here.
 integer status_window           8
-integer status_window_width     106
 
 # -----------------------------------------------------------------------------
 # TELEMETRY STATE -- a single integer array that holds every value the
