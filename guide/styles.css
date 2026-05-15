@@ -194,32 +194,44 @@ H3		{
  * AUTHOR CSS, so they cascade normally over the screen defaults --
  * no !important required.
  *
- * Trim size 7"x9.25" (178x235mm), Pragmatic-Bookshelf-style technical
- * book. Asymmetric margins with the wider edge on the binding side,
- * smaller body / code fonts, and chapters open on right-hand pages.
+ * Trim size: Executive 7"x10" (178x254mm), one of Lulu's standard
+ * paperback sizes. Asymmetric margins with the wider edge on the
+ * binding side, smaller body / code fonts, and chapters open on
+ * right-hand pages.
  *
  * Notes for the press:
- *   - WeasyPrint emits RGB; KDP accepts RGB. IngramSpark may request
- *     CMYK. Convert post-hoc via Ghostscript:
+ *   - WeasyPrint emits RGB. Lulu accepts RGB (sRGB IEC61966-2.1 per
+ *     their book-creation guide). KDP also accepts RGB. IngramSpark
+ *     may request CMYK -- convert post-hoc via Ghostscript:
  *         gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=pdfwrite \
  *            -sColorConversionStrategy=CMYK \
  *            -sOutputFile=JACLGuide-print-cmyk.pdf JACLGuide-print.pdf
- *   - No bleed declared (no full-bleed images). Add `bleed: 3mm` to
- *     the @page rules below if a full-bleed cover image ever lands.
- *   - The cover image (front.png) is referenced from title.html. The
- *     legacy front.jpg is kept in the repo for history but no longer
- *     used in the build.
+ *   - No bleed declared. The interior has no full-bleed images, so
+ *     we build at exact trim size and Lulu adds its 0.125"/3.175mm
+ *     bleed automatically (per the Lulu book-creation guide p.10).
+ *     If a full-bleed image ever lands, add `bleed: 3mm` to the
+ *     @page rules below and bump the @page size to 7.25x10.25in.
+ *   - Inside (binding-side) margin is 1in, which combined with the
+ *     0.5in safety zone gives Lulu's recommended 1in total inside
+ *     margin for the 151-400 page band.
+ *   - The cover image (front.png) is referenced from title.html for
+ *     the screen build. The print interior is built via
+ *     generate-print-interior.sh from title-interior.html, which
+ *     omits front.png so the cover can be supplied separately as a
+ *     wrap-cover upload.
+ *   - The legacy front.jpg is kept in the repo for history but no
+ *     longer used in any build.
  * --------------------------------------------------------------------- */
 
 @media print-book {
 	@page {
-		size: 7in 9.25in;
-		margin: 0.625in 0.5in 0.625in 0.875in;
+		size: 7in 10in;
+		margin: 0.625in 0.5in 0.625in 1in;
 	}
 	@page :right {
 		/* Recto: binding on the left, wider left margin. */
-		size: 7in 9.25in;
-		margin-left: 0.875in;
+		size: 7in 10in;
+		margin-left: 1in;
 		margin-right: 0.5in;
 		@top-right {
 			content: string(chapter-title);
@@ -236,9 +248,9 @@ H3		{
 	}
 	@page :left {
 		/* Verso: binding on the right, wider right margin. */
-		size: 7in 9.25in;
+		size: 7in 10in;
 		margin-left: 0.5in;
-		margin-right: 0.875in;
+		margin-right: 1in;
 		@top-left {
 			content: string(chapter-title);
 			font-family: Helvetica, Arial, sans-serif;
@@ -254,7 +266,7 @@ H3		{
 		@top-right { content: ""; }
 	}
 	@page :first {
-		size: 7in 9.25in;
+		size: 7in 10in;
 		@top-left { content: ""; }
 		@top-right { content: ""; }
 		@bottom-left { content: ""; }
