@@ -748,6 +748,26 @@ print:
       window.addEventListener('resize', function() {^
          window.jaclStatusCols = jaclMeasureStatusCols();^
       });^
+      /* Hyperlinks emitted by the `hyperlink` opcode are plain^
+       * <a href=~?command=...&user_id=...~> anchors that cause a full^
+       * page reload. Unlike the AJAX form path, they don't carry^
+       * &status_cols= in the URL, so a resize wouldn't propagate to^
+       * the engine on the next hyperlink click and +print_right would^
+       * keep landing at the old column. Intercept those clicks at the^
+       * document level and append a fresh measurement to the href^
+       * before navigation -- modifying this.href in a click handler^
+       * is honoured by browsers as the destination URL. */^
+      document.addEventListener('click', function(e) {^
+         var a = e.target && e.target.closest ? e.target.closest('a') : null;^
+         if (!a) return;^
+         var href = a.getAttribute('href');^
+         if (!href) return;^
+         if (href.indexOf('command=') === -1) return;^
+         if (href.indexOf('status_cols=') !== -1) return;^
+         var cols = (typeof jaclMeasureStatusCols === 'function') ? jaclMeasureStatusCols() : (window.jaclStatusCols || 80);^
+         var sep = (href.indexOf('?') !== -1) ? '&' : '?';^
+         a.setAttribute('href', href + sep + 'status_cols=' + cols);^
+      }, true);^
       /* Pick up any <jacl-timer> the initial +intro emitted, in case^
        * a game starts a timer right at game launch. */^
       jaclProcessTimerMarker(maintext);^
