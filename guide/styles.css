@@ -63,6 +63,12 @@ A.title		{
 IMG		{
 			margin: 0.5cm;
 			margin-right: 2cm;
+			/* Scale any image down to the available content width
+			 * so a high-resolution screenshot doesn't run off the
+			 * page edge in print or off-screen on web. Aspect ratio
+			 * is preserved by `height: auto`. */
+			max-width: 100%;
+			height: auto;
 		}
 
 TABLE.infowarn	{
