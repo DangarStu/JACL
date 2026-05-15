@@ -43,11 +43,7 @@ git clone https://github.com/DangarStu/JACL.git
 </tr>
 <tr>
 <td><b>fcgijacl</b></td>
-<td>FastCGI development library:
-<pre>
-sudo apt install libfcgi-dev
-</pre>
-Built only when <b>libfcgi</b> is detected.</td>
+<td><b>libfcgi</b> (the FastCGI development library). Built only when <b>libfcgi</b> is detected.</td>
 </tr>
 <tr>
 <td><b>bjorb</b></td>
@@ -55,6 +51,12 @@ Built only when <b>libfcgi</b> is detected.</td>
 </tr>
 </table>
 </center>
+
+<p>On Debian and Ubuntu, both optional libraries can be installed in one go:
+
+<pre>
+sudo apt install libncursesw5-dev libfcgi-dev
+</pre>
 
 <p>Compilation is a two-step process. From the <b>src</b> subdirectory:
 
