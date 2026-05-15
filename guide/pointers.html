@@ -2,7 +2,7 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -15,8 +15,8 @@
 {+where_is
 loop noun3
    if noun3 hasnt LOCATION
-      noun4 = noun3(parent)
-      write noun3{The} 
+      set noun4 = noun3(parent)
+      write noun3{The}
       write " is in " noun4{the} ^
    endif
 endloop
@@ -38,7 +38,7 @@ endloop
 <th width=20%>Pointer</th>
 <th>Description</th>
 </tr><tr>
-<td><B>player</TD>
+<td><B>player</B></td>
 <td>This pointer is set to the object that currently represents the player in the game.</td>
 </tr><tr>
 <td><b>noun1</b></td>
@@ -64,7 +64,7 @@ endloop
 <th>Description</th>
 </tr><tr>
 <td><b>here</b></td>
-<td>This pointer represents the location that the player is currently in. It is synonymous to the element <B>player(parent)</b>.</td>
+<td>This pointer represents the location that the player is currently in. It is synonymous with the element <B>player(parent)</b>.</td>
 </tr><tr>
 <td><b>destination</b></td>
 <td>This represents the location that the player is attempting to move into. The value of <B>destination</B> can be tested in the <B>+movement</B> function before the move is completed. Once the move is complete, <B>destination</B> will equal <B>here</B> until the next move is attempted. This is a read-only pointer and therefore cannot be used as the <I>container</I> parameter of a <B>set</B> command.</td>
@@ -82,6 +82,6 @@ endloop
 </tr></table>
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body>
 </html>

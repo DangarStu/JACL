@@ -511,7 +511,7 @@ set time = false
 }
 
 
-grammar silience         >unvoice
+grammar silence          >unvoice
 grammar stop talking     >unvoice
 grammar unvoice          >unvoice
 grammar mute             >unvoice

@@ -1,8 +1,8 @@
 <html>
 <head>
-	<title>The JACL Programmer's Guide</title>
+	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -58,7 +58,7 @@ endif
 <b>travel</b> <i>direction</i>
 </pre>
 
-<p>The <b>travel</b> command is used to move the player from one location to another. It simulates the player moving in the specified direction under their own steam. The player can also be moved to a different location by directly setting their <b>parent</b> to equal the new location. This, however, does not in perform any tests as to whether this movement is physically possible.
+<p>The <b>travel</b> command is used to move the player from one location to another. It simulates the player moving in the specified direction under their own steam. The player can also be moved to a different location by directly setting their <b>parent</b> to equal the new location. This, however, does not perform any tests as to whether this movement is physically possible.
 The <b>travel</b> command is normally only ever used by the direction verbs in the library. One of the directions <b>north</b>, <b>south</b>, <b>east</b>, <b>west</b>, <b>up</b>, <b>down</b>, <b>in</b>, <b>out</b>, <b>northeast</b>, <b>northwest</b>, <b>southeast</b> or <b>southwest</b> must be specified as its single parameter.
 
 <P>Before the move actually occurs, two functions are executed. If either of these functions exists, and does not return <b>false</b>, the move will be prevented from occurring. The first of these functions is the <b>movement</b> function associated with the location the player is attempting to move out of. The second, executed if this first function does not exist or issues a <b>return false</b> command, is the global function <b>+movement</b>. Before either of these functions are called the integer variable <b>compass</b> is set to the direction the player is travelling in and the integer variable <b>destination</b> is set to the location the player is travelling into.
@@ -104,11 +104,11 @@ return false
 }
 </pre>
 
-<p>This function would display the message &quot;The only exit from here is to the south.&quot; whenever the player attempt to travel in a direction that is currently set to <b>nowhere</b>.
+<p>This function would display the message &quot;The only exit from here is to the south.&quot; whenever the player attempts to travel in a direction that is currently set to <b>nowhere</b>.
 
 <h2><a class="section" name="movement3">Moving Non-player Characters</a></h2>
 
-<P>The file <B>utils.library</B> contains several functions to help simulate the natural movement of objects, such as a non-player character walking around. In addition to moving the object, these functions will display the appropriate message required to announce the movement to the player.
+<P>The file <B>npc.library</B> contains several functions to help simulate the natural movement of objects, such as a non-player character walking around. In addition to moving the object, these functions will display the appropriate message required to announce the movement to the player.
 
 <p>The function called from your game to initiate the movement is <B>+push_object</B>. This function is passed two arguments: the object to be moved and the direction to move the object in. The direction passed is one of the following integer constants:
 
@@ -196,6 +196,6 @@ dir_to INDEX clearing ledge
 </td></tr></table>
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body>
 </html>

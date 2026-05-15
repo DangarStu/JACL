@@ -78,6 +78,17 @@ TABLE.infowarn	{
 			border-style: none;
 				}
 
+/* The info/warning callouts are icon-plus-text layouts using a
+ * table for positioning, not tabular data, so the generic TD
+ * border below (added for real data tables) shouldn't apply.
+ * vertical-align: middle so short callouts read as icon-beside-text
+ * rather than icon-floating-below-text (the generic TD rule pins
+ * to top, which is right for data tables but wrong here). */
+TABLE.infowarn TD	{
+			border: none;
+			vertical-align: middle;
+				}
+
 DIV.spacer	{ 	
 			margin-top: 12pt;
 			margin-bottom: 12pt;
@@ -195,8 +206,9 @@ H3		{
  *            -sOutputFile=JACLGuide-print-cmyk.pdf JACLGuide-print.pdf
  *   - No bleed declared (no full-bleed images). Add `bleed: 3mm` to
  *     the @page rules below if a full-bleed cover image ever lands.
- *   - front.jpg is 460x405 -- about 64 DPI at 7" wide. Replace with
- *     at least a 2100x1850 source before final upload.
+ *   - The cover image (front.png) is referenced from title.html. The
+ *     legacy front.jpg is kept in the repo for history but no longer
+ *     used in the build.
  * --------------------------------------------------------------------- */
 
 @media print-book {

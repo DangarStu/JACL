@@ -2,20 +2,20 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Tutorial for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
 
 <h1><a class="title" name="tutorial0">Tutorial Game</a></h1>
 
-<P>JACL is a language for writing interactive fiction. By providing short definitions for objects and locations you will rapidly build your virtual world. By associating small amounts of simple code with these objects and locations you will bring your world to life. During the course of this tutorial you will see the construction of a small text-only game from beginning to end. The full <a href="tutorialsource.html">source code</a> for this tutorial game is included in Appendix D and in the <b>games</b> subdirectory of your JACL distribution. 
+<P>JACL is a language for writing interactive fiction. By providing short definitions for objects and locations you will rapidly build your virtual world. By associating small amounts of simple code with these objects and locations you will bring your world to life. During the course of this tutorial you will see the construction of a small text-only game from beginning to end. The full <a href="tutorialsource.html">source code</a> for this tutorial game is included in Appendix C and in the <b>projects</b> subdirectory of your JACL distribution. 
 
 <h2><a class="section" name="tutorial1">Language Syntax</a></h2>
 
-<p>JACL is an interpreted language. This means that the interpreter directly reads your program source code and executes it without the need for it to be compiled first. Each JACL command or definition must be on a line of its own and no single line may not exceed 1024 characters in length. Any single parameter that includes spaces, commas, colons or tabs must be contained within double quotes, as these are all considered to be white space. If a command accepts parameters, each parameter must be separated by white space.
+<p>JACL is an interpreted language. This means that the interpreter directly reads your program source code and executes it without the need for it to be compiled first. Each JACL command or definition must be on a line of its own and no single line may exceed 1024 characters in length. Any single parameter that includes spaces, commas, colons or tabs must be contained within double quotes, as these are all considered to be white space. If a command accepts parameters, each parameter must be separated by white space.
 
-<p>Any text that appears between a hash (<b>#</b>) or a semicolon (<b>;</b>) and the end of the line is considered a comment and has no affect on the program's execution. Comments are useful to explain the purpose of your code to other authors or to refresh your own memory when returning to old code. 
+<p>Any text that appears between a hash (<b>#</b>) or a semicolon (<b>;</b>) and the end of the line is considered a comment and has no effect on the program's execution. Comments are useful to explain the purpose of your code to other authors or to refresh your own memory when returning to old code. 
 
 <p>One special use of comments is to tell the command shell the location of the interpreter that can execute your program. The first line of most JACL programs will be something like:
 
@@ -67,7 +67,7 @@ Other than comments, the only text that can appear outside a function is one of 
 
 <P>Now open <B>game.jacl</B>, the beginnings of our tutorial game, with your favourite text editor. The name <B>game.jacl</B> has been chosen for the purpose of this tutorial, your game file can be given any name you like.
 
-<p>At the top of this file you will find four constants. These constants are used to store bibliographical information about your game that can be directly read by cataloguing tools. For this reason the names of these constants, including the case, must be left unchanged which their values changed as appropriate. For information visit <a href="http://babel.ifarchive.org/">The Treaty of Babel</a>.
+<p>At the top of this file you will find four constants. These constants are used to store bibliographical information about your game that can be directly read by cataloguing tools. For this reason the names of these constants, including the case, must be left unchanged with their values changed as appropriate. For information visit <a href="http://babel.ifarchive.org/">The Treaty of Babel</a>.
 
 <h2><a class="section" name="tutorial4">Locations</a></h2>
 
@@ -90,7 +90,7 @@ location bedroom: master bedroom
 
 <p><b>short</b> is a two-value property used to supply a short description of the location. This description is used by the library code when referring to the location in a sentence. The first parameter after the keyword <B>short</B> is its indefinite article, the second is its description. The supplied indefinite article is used to prefix the description when the <B>{list}</B> macro is used. This would normally be <B>a</B> or <B>an</B>. 
 
-<p>The <b>{list}</b> macro is used as a parameter of a <b>write</b> command as a way of outputing text that refers to an object. It is normally used when referring to an object or location in a list of several objects or locations. The most common example of this is a list of objects that are inside another object or held by another object, such as a desk drawer or the player's inventory. Below is an example of the <b>{list}</b> macro:
+<p>The <b>{list}</b> macro is used as a parameter of a <b>write</b> command as a way of outputting text that refers to an object. It is normally used when referring to an object or location in a list of several objects or locations. The most common example of this is a list of objects that are inside another object or held by another object, such as a desk drawer or the player's inventory. Below is an example of the <b>{list}</b> macro:
 
 <pre>
 write "The house you are in has " bedroom{list} ".^"
@@ -136,7 +136,7 @@ There is nothing special about the master bedroom.
 
 <p>A function can be associated with an <B>object</B>, a <B>location</B> or be global. Functions are defined by starting a line with an opening curly brace (<b>{</b>) followed directly by the function's name. Any function whose name does not begin with a plus sign is automatically associated with the last <B>object</B> or <B>location</B> defined above it in the game file. Any function whose name does begin with a plus sign is said to be global. A global function is in no way associated with a particular <B>object</B> or <B>location</B>. A function definition is finished by placing a closing curly brace (<b>}</b>) on a line of its own. More information about functions and how they are associated with items is provided in the chapter on <a href="functions.html">Functions</a>. 
 
-<P>Below is the code for the <B>look</B> function to be added directly beneath the definition for the location <B>bedroom</B>. This function simply outputs plain text and therefore makes use of the <b>print</b> command instead of the <b>write</b> command we used earlier. This command takes no parameters and starts outputing all text from the following line until it reaches a line that has a period (<b>.</b>) as its first non-whitespace character.
+<P>Below is the code for the <B>look</B> function to be added directly beneath the definition for the location <B>bedroom</B>. This function simply outputs plain text and therefore makes use of the <b>print</b> command instead of the <b>write</b> command we used earlier. This command takes no parameters and starts outputting all text from the following line until it reaches a line that has a period (<b>.</b>) as its first non-whitespace character.
 
 <pre>
 {look
@@ -161,19 +161,18 @@ location bathroom: bathroom
 
 {look
 print:
-   You are in the bathroom. The only
-   exit from here is back east to the bedroom.
+   You are in the bathroom. The only exit
+   from here is back east into the bedroom.^
 .
 }
 
 {movement
 if compass = east : compass = out
-   write "You bang your head as you walk "
-   write "through the doorway.^"
+   write "You bang your head as you walk through the "
+   write "doorway.^^"
    return false
 endif
-write "The only exit from here is to the "
-write "east.^"
+write "The only exit from here is to the east.^"
 }
 </pre>
 
@@ -192,10 +191,10 @@ write "east.^"
 
 <pre>
 object kryten: myself self me
+ has        ANIMATE
  short      name "yourself"
- has        ANIMATE; FEMALE
  capacity   42
- parent     ;SPECIFY STARTING LOCATION HERE
+ parent     ;PUT THE LABEL OF THE STARTING LOCATION HERE
  player
 </pre>
 
@@ -211,11 +210,17 @@ object kryten: myself self me
 <td>In JACL, a colon is treated as white space (as is a comma and tab). I simply use a colon in preference to a space in certain places to make the code more readable.</TD>
 </tr></table>
 
-<p>The second line contains a <b>short</b> keyword. This has the same purpose as the <b>short</b> keyword associated with bedroom above. In the case of our object <B>kryten</B>, however, the word <B>name</B> appears as the indefinite article. When using a <b>{list}</b> or <b>{the}</b> macro, anything other than the word <B>name</B> is printed verbatim. When <B>name</B> is specified, the JACL interpreter will not prefix the <B>short</B> description text with anything. For example, when <b>noun1</b> points to the object <b>kryten</b>, the following code:
+<p>The second line of the object definition starts with the keyword <B>has</B> followed by the attribute <B>ANIMATE</B>. Both objects and locations may have as many or as few of the available attributes as required. Attributes are simply boolean flags that can be given to and taken from objects and locations at any stage during the game. They are frequently tested for by code in <b>verbs.library</b>.
+For example, the standard function to open an object will first check that it doesn't have the attribute <B>LOCKED</B> before taking away the attribute <B>CLOSED</B>, thus resulting in it becoming open. The attribute <B>ANIMATE</B> is tested for by functions associated with actions such as talking.
+If the player attempts to talk to an object that does not have the attribute <B>ANIMATE</B>, they are informed that the action is not logically possible. For more information, see the chapter on <a href="attributes.html">Attributes</a>.
+
+<P>If the protagonist is female, add the <B>FEMALE</B> attribute alongside <B>ANIMATE</B>. This causes the verbs in <b>verbs.library</b> to refer to the player using feminine pronouns.
+
+<p>The third line contains a <b>short</b> keyword. This has the same purpose as the <b>short</b> keyword associated with bedroom above. In the case of our object <B>kryten</B>, however, the word <B>name</B> appears as the indefinite article. When using a <b>{list}</b> or <b>{the}</b> macro, anything other than the word <B>name</B> is printed verbatim. When <B>name</B> is specified, the JACL interpreter will not prefix the <B>short</B> description text with anything. For example, when <b>noun1</b> points to the object <b>kryten</b>, the following code:
 
 <pre>
 write "You can't take " noun1{the} .^
-write "You can't take " noun1{list} .^ 
+write "You can't take " noun1{list} .^
 </pre>
 
 <p>will produce the output:
@@ -224,12 +229,6 @@ write "You can't take " noun1{list} .^
 You can't take yourself.
 You can't take yourself.
 </pre>
-
-<P>The third line of the object definition starts with the keyword <B>has</B> followed by the attribute <B>ANIMATE</B>. Both objects and locations may have as many or as few of the available attributes as required. Attributes are simply boolean flags that can be given to and taken from objects and locations at any stage during the game. They are frequently tested for by code in <b>verbs.library</b>.
-For example, the standard function to open an object will first check that it doesn't have the attribute <B>LOCKED</B> before taking away the attribute <B>CLOSED</B>, thus resulting in it becoming open. The attribute <B>ANIMATE</B> is tested for by functions associated with actions such as talking.
-If the player attempts to talk to an object that does not have the attribute <B>ANIMATE</B>, they are informed that the action is not logically possible. For a more information, see the chapter on <a href="attributes.html">Attributes</a>.
-
-<P>Following the attribute <B>ANIMATE</B>, you will see a semicolon then the attribute <B>FEMALE</B>. A semicolon (or hash symbol) signifies that all text following it, until the end of the line, is a comment. Comments have no effect on a game, they are only there to serve as notes for the author's benefit. In this case, deleting the semicolon will mean that the extra attribute will no longer be ignored. This will cause the player to be referred to in the feminine by all code in <b>verbs.library</b>.
 
 <P>The fourth line, beginning with the keyword <B>capacity</B>, indicates how many <b>mass</b> units the object can hold. In the case of an object with the attribute <B>ANIMATE</B> (such as this object representing the player), it indicates how much they can carry. In the case of an object with the attribute <B>CONTAINER</B>, it indicates how much can be placed inside it, while in the case of an object with the attribute <B>SURFACE</B>, it indicates how much can be placed on top of it.
 
@@ -241,7 +240,7 @@ parent    bedroom
 
 <p>If an object doesn't have a <b>parent</b> property explicitly defined it will start the game with its <b>parent</b> property set to the nearest location defined above it in the game file.
 
-<P>The final line has the keyword <b>player</b>. This keyword tells the interpreter to set the interger variable <b>player</b> to point to the object <b>kryten</b> before the game begins. Only one object should have the keyword <b>player</b> defined, although the object pointer <b>player</b> can be changed to point to another object at any stage during the game if desired.
+<P>The final line has the keyword <b>player</b>. This keyword tells the interpreter to set the integer variable <b>player</b> to point to the object <b>kryten</b> before the game begins. Only one object should have the keyword <b>player</b> defined, although the object pointer <b>player</b> can be changed to point to another object at any stage during the game if desired.
 
 <P>The properties that are associated with an <B>object</B> definition may be placed in any order. There are other properties that can be associated with an object that we have not set here, as the defaults used when they are absent are valid for our purposes. All of the possible properties are discussed in the chapter <a href="definitions.html">Definitions in Detail</a>.
 
@@ -277,11 +276,11 @@ look
 }
 </pre>
 
-<p>This function begins by using the <b>style</b> command to set the font to <b>bold</b> and then printing the value of the string constant <b>game_title</b>. This will be whatever string you set it to at the top of your game file. Next the font style is set back to <b>normal</b> and the value of the string constant <b>game_author</b> is output. The author's name is followed by three newline character to insert two blank lines. For more information on these commands see the chapter on <a href="screendisplay.html">Screen Display</a>.
+<p>This function begins by using the <b>style</b> command to set the font to <b>bold</b> and then printing the value of the string constant <b>game_title</b>. This will be whatever string you set it to at the top of your game file. Next the font style is set back to <b>normal</b> and the value of the string constant <b>game_author</b> is output. The author's name is followed by three newline characters to insert two blank lines. For more information on these commands see the chapter on <a href="screendisplay.html">Screen Display</a>.
 
 <p>After the title header, a game-specific print block outputs the introductory text for this game. This is the text that should set the scene for the player and introduce them to the game character they are playing.
 
-<p>The next block of code moves all the wall objects to the current location if the current location doesn't have the attribute <b>OUTDOORS</b>. These objects are defined in the file <b>frame.jacl</b> and should be moved to the current location each time the player moves to a location that doesn't have the attribute <b>OUTDOORS</b>. This is done using a similar block of code placed in the global function <b>+movement</b>. When the function <b>+intro</b> is executed, the current location will always be the starting location. For this reason, the <b>if</b> statement is not strictly necessary, but it is a good safeguard none the less. 
+<p>The next block of code moves all the wall objects to the current location if the current location doesn't have the attribute <b>OUTDOORS</b>. These objects are defined in the file <b>frame.jacl</b> and should be moved to the current location each time the player moves to a location that doesn't have the attribute <b>OUTDOORS</b>. This is done using a similar block of code placed in the global function <b>+movement</b>. When the function <b>+intro</b> is executed, the current location will always be the starting location. For this reason, the <b>if</b> statement is not strictly necessary, but it is a good safeguard nonetheless. 
 
 <p>The final line of the function contains a <b>look</b> command. This command prints the description of the current location and objects that are in this location.
 
@@ -322,13 +321,13 @@ here is back east into the bedroom.
 You are empty-handed.
 
 &gt;smell
-Nothing strikes you as out of the ordinary.
+You don't smell anything out of the ordinary.
 
 &gt;listen
 You don't hear anything out of the ordinary.
 
 &gt;sit
-You plonk yourself down for a moments rest.
+You plonk yourself down for a moment's rest.
 
 &gt;examine north wall
 There is nothing special about the north wall.
@@ -374,7 +373,7 @@ write noun1{the}
 
 <P>The final line, a <B>capacity</B> property, indicates how many <b>mass</b> units the box can hold. In this case it is set to 20. This means that other objects may be placed inside this object (due to it having the <B>CONTAINER</B> attribute) until the total of their <B>mass</B> properties equals 20.
 
-<P>As this new object has no <b>parent</b> property, it will start the game in the bathroom. This is because the bathroom is the nearest location defined above it in the game file. Any objects with no <b>parent</b> property will begin in the nearest location above it regardless of the number of object or function definitions inbetween.
+<P>As this new object has no <b>parent</b> property, it will start the game in the bathroom. This is because the bathroom is the nearest location defined above it in the game file. Any objects with no <b>parent</b> property will begin in the nearest location above it regardless of the number of object or function definitions in between.
 
 <P>Before we play the game again, we will add a second object by putting the following code beneath the definition for the box.
 
@@ -386,7 +385,7 @@ object note: orange note
  mass     5
 </pre>
 
-<P>As you can see, the note's <B>parent</B> property is followed by the label of the box object. This indicates that the note is to start the game inside the box. If this <B>parent</B> property where to be omitted, the note would begin in the bathroom along with the box, as this is the last location defined above it in the game file.
+<P>As you can see, the note's <B>parent</B> property is followed by the label of the box object. This indicates that the note is to start the game inside the box. If this <B>parent</B> property were to be omitted, the note would begin in the bathroom along with the box, as this is the last location defined above it in the game file.
 
 <P>If the box object had the attribute <B>SURFACE</B> rather than <B>CONTAINER</B>, the note would start the game on top of it. If the box object had the attribute <B>ANIMATE</B>, the note would start the game being carried by it.
 
@@ -419,16 +418,16 @@ write "There is nothing on " noun1{the} " to read.^"
 <P>Since we have not associated a <B>read</B> function with our <B>note</B> object, when the player attempts to read it the global function <B>+read</B> will be executed. If you try this you will see that the default action for the read verb is very simple, but appropriate for most objects. The default function <B>+read</B> is not an appropriate, however, for our note object. We will therefore replace it by adding a function called <B>read</B> that is associated with the object <B>note</B>. This function is even simpler:
 
 <pre>
-{read
-write "Welcome to Jamaica and have a nice day.^"
+{read : examine
+write "The note reads, ~Welcome to Jamaica and have a nice day.~^"
 }
 </pre>
 
-<P>We associate this function with the note object by typing it directly after the note object's definition. For clarity, you can of course leave a blank line or two in between the note definition and read function. This local <B>read</B> function will now be executed in place of <B>+read </B>whenever the player types the command <B>read note</B>, provided the note is visible to the player.
+<P>We associate this function with the note object by typing it directly after the note object's definition. For clarity, you can of course leave a blank line or two in between the note definition and read function. This local function will now be executed whenever the player reads or examines the note. The function has been given two names by placing the second name after the first, separated by a colon. Any function may have as many names as can fit in a single line of JACL code.
 
 <table class="infowarn"><tr>
 <td><img src="info.png" alt="Information"></td>
-<td>The <B>read</B> function above should really be given two names. This is done by placing the second name after the first, such as <B>{read : examine</B>. This means that both reading and examining the note will lead to the same code being executed. Any function may have as many names as can fit in a single line of JACL code.</td>
+<td>Double quotes are used to enclose any command parameter that contains spaces, so to print a literal double quote we use a tilde character (<b>~</b>) and the interpreter substitutes it at output time.</td>
 </tr></table>
 
 <h2><a class="section" name="tutorial9">Overriding Functions</a></h2>
@@ -447,14 +446,14 @@ if +reach&lt;noun1 = true
    return true
 endif
 if noun1 hasnt CLOSABLE
-  write "You can't close " noun1{the} .^
-  set time = false
-  return
+   write "You can't close " noun1{the} .^
+   set time = false
+   return true
 endif
 if noun1 has CLOSED
-  write  noun1{The} noun1{is} " already closed.^"
-  set time = false
-  return
+   write noun1{The} " " noun1{is} " already closed.^"
+   set time = false
+   return true
 endif
 override
 write "You close " noun1{the} .^
@@ -484,7 +483,7 @@ ensure box has CLOSED
 
 <h2><a class="section" name="tutorial10">Doors</a></h2>
 
-<P>We will now add a third and final location. This location will be a living room and will be placed south of the bedroom. We are also going to place a door between the bedroom and living room. Doors are common in interactive fiction, implemented using a regular object, and yet in some ways odd and out of the ordinary. The thing that makes a doors different to most of the other objects in your game is that they live between two locations, rather than inside one, and need to be accessible from both locations. 
+<P>We will now add a third and final location. This location will be a living room and will be placed south of the bedroom. We are also going to place a door between the bedroom and living room. Doors are common in interactive fiction, implemented using a regular object, and yet in some ways odd and out of the ordinary. The thing that makes doors different to most of the other objects in your game is that they live between two locations, rather than inside one, and need to be accessible from both locations. 
 
 <p>Before we move onto the door itself, add the following location definition beneath the <B>close_override</B> function that is associated with the box:
 
@@ -539,7 +538,7 @@ return false
 }
 </pre>
 
-<p>The above code defines an object for the door that has the attributes <b>CLOSABLE</b> and <b>CLOSED</b>. These attributes allow the verbs in the library to manipulate the door appropriately. Like the box, the outcome of the <b>close</b> verb is overriden, as is the outcome of the <b>open</b> verb. Unlike the box, the override functions for the door both end with a <b>return false</b> command. 
+<p>The above code defines an object for the door that has the attributes <b>CLOSABLE</b> and <b>CLOSED</b>. These attributes allow the verbs in the library to manipulate the door appropriately. Like the box, the outcome of the <b>close</b> verb is overridden, as is the outcome of the <b>open</b> verb. Unlike the box, the override functions for the door both end with a <b>return false</b> command. 
 
 <p>As discussed above, when the interpreter encounters the <b>override</b> command in the global function <b>+close</b>, it will look for the function <b>close_override</b> that is associated with the object being closed. If this function does not exist, or returns <b>false</b>, execution will continue from the first line after the <b>override</b> command. As we have defined an associated <b>close_override</b> function, it will be executed at this point. It is possible, however, for the override function to issue a <b>return false</b> after a test has determined that the default outcome is sufficient in a particular instance. If this happens, the <b>close_override</b> function simply provides some code to execute <i>in addition</i> to the default outcome. In other words, the default outcome will occur as if the override function did not exist at all if the override function returns <b>false</b>.
 
@@ -551,7 +550,7 @@ move door to here
 }
 </pre>
 
-<p>It is possible to give a function more than one name by supplying a list of names separated by white space. This is a very common technique for making several possible moves by the player cause the same outcome. For example, in <i>The Unholy Grail</i>, the message for examining the rod for opening and closing the blinds is exactly the same as the one for attemting to take it:
+<p>It is possible to give a function more than one name by supplying a list of names separated by white space. This is a very common technique for making several possible moves by the player cause the same outcome. For example, in <i>The Unholy Grail</i>, the message for examining the rod for opening and closing the blinds is exactly the same as the one for attempting to take it:
 
 <pre>
 {examine : take
@@ -608,7 +607,7 @@ ensure self has EXAMINED
 object rick: son boy teenager rick
  has     ANIMATE
  short   name &quot;Rick&quot;
- long    &quot;Rick is here, watching television.&quot;
+ long    &quot;Rick is here, watching television.^&quot;
  mass    heavy
 
 {examine
@@ -626,7 +625,7 @@ endif
 
 <p>Before the object definitions is the definition of a user attribute called <b>EXAMINED</b>. Up to 32 user attributes can be defined, and like the system attributes <b>CLOSABLE</b> and <b>CLOSED</b>, they don't have a value, they are simply flags that an object either has or hasn't. The <b>examine</b> function for the television makes use of this attribute to test if the television has already been examined before. Unlike defining a constant as a synonym for one of an object's integer properties (see the section on The Passing of Time below), user attributes are not synonyms for system attributes, they are an entirely separate set of 32 attributes.
 
-<p>The <b>examine</b> function for Rick achieves a similar result using an entirely different mechanism. When the JACL interpreter executes a function it automatically creates and increments a counter that records how many times that function has been called. This counter is referred to in code as an at sign (<b>@</b>) followed by the name of the function. For example, the number of times the function called when examining Rick has been called can be checked from any other code by examining the contents of the container <b>@examine_rick</b>. When an at sign is referred to on its own, such as in the example above, it is taken to refer to the call count of function that is currently running.
+<p>The <b>examine</b> function for Rick achieves a similar result using an entirely different mechanism. When the JACL interpreter executes a function it automatically creates and increments a counter that records how many times that function has been called. This counter is referred to in code as an at sign (<b>@</b>) followed by the name of the function. For example, the number of times the function called when examining Rick has been called can be checked from any other code by examining the contents of the container <b>@examine_rick</b>. When an at sign is referred to on its own, such as in the example above, it is taken to refer to the call count of the function that is currently running.
 
 <P>To make both Rick and the television respond to the player's commands, we will be required to associate more functions with each of them. This process of creating objects and associating functions with them is the essence of writing text adventure games using JACL. 
 
@@ -636,7 +635,7 @@ endif
 {talk_to
 print:
    ~Uh, yeah, I'll do it in a minute,~
-   Rick mumbles with out looking up. You have
+   Rick mumbles without looking up. You have
    quite a strong suspicion that he didn't
    really hear a word you said.^
 .
@@ -659,21 +658,21 @@ object rick: son boy teenager rick
 {ask_about_note
 print:
    ~I don't know nothing about no note,~ Rick says 
-   looking at your blankly.^
+   looking at you blankly.^
 .
 }
 </pre>
 
 <p>This gives a custom response when the player asks Rick about the note, but what if we want to give the same custom response no matter what object Rick is asked about? The hard way would be to associate a function for each and every object that prints your required response. The easy way is to write a <B>+default_ask_about</B> function and test whether the person being asked is Rick. Any <b>+default</b> function can be thought of as a replacement for the code that comes after the <b>override</b> command. If you search through the <b>verbs.library</b> for <b>override</b> commands you will see that they occur at the point in a verb's global function where it has been decided that the verb should be successful. This allows a <b>+default</b> function to override the default outcome of a verb without needing to repeat all the preliminary checks. The global <B>default</B> function for any given action is called when an <B>override</B> command is reached and a specific override function for the object or objects in question does not exist. The order that functions are called in and the precedence they have over each other is fully detailed in the chapter on <a href="functions.html">Functions</a>.
 
-<p>This is <b>+default</b> function is a global function (as indicated by the leading plus sign), so it doesn't matter where you put it in the code. Here is the code to create a default response for whenever Rick is asked about an object:
+<p>This <b>+default</b> function is a global function (as indicated by the leading plus sign), so it doesn't matter where you put it in the code. Here is the code to create a default response for whenever Rick is asked about an object:
 
 <pre>
 {+default_ask_about
 if noun1 = rick
    print:
-      Rick blinks several times then
-      pokes out his bottom lip. This, you have
+      Rick pokes out his bottom lip then
+      blinks several times. This, you have
       figured out over the years, translates to,
       ~Not a clue.~^
    .
@@ -688,7 +687,34 @@ return false
 <td>If both this function and the specific <b>ask_about_note</b> function exist, the <b>ask_about_note</b> function will be executed if player types <b>ask rick about note</b> in preference over this function. </td>
 </tr></table>
 
-<P>The first thing this function does is test the current value of <B>noun1</B>. As disscussed above, <b>noun1</b> and <b>noun2</b> are object pointers that point to the first and second objects referred to in the player's move. If this is currently set to <B>rick</B>, our new default message will be displayed. If <b>noun1</b> is not set to <B>rick</B>, a <B>return false</B> command is executed. This command causes the interpreter to do whatever it would have normally done had this function not existed at all. In this case, the result would be to perform the original default action specified in the library. 
+<P>The first thing this function does is test the current value of <B>noun1</B>. As discussed above, <b>noun1</b> and <b>noun2</b> are object pointers that point to the first and second objects referred to in the player's move. If this is currently set to <B>rick</B>, our new default message will be displayed. If <b>noun1</b> is not set to <B>rick</B>, a <B>return false</B> command is executed. This command causes the interpreter to do whatever it would have normally done had this function not existed at all. In this case, the result would be to perform the original default action specified in the library.
+
+<p>For richer dialogue, the standard library ships a small menu helper in <b>menu.library</b>. Rather than answering <b>talk to rick</b> with a single line, we can present the player with a list of questions and statements to choose from. The tutorial game uses this pattern: a custom <b>yack to</b> grammar shows the menu, and a <b>talk_to</b> function that takes no action of its own builds the option list every time the menu is opened.
+
+<pre>
+grammar yack to *present     &gt;yack_to
+
+{yack_to
+set MENU_MODAL = true
+execute "+menu_prompt&lt;talk_to_rick"
+}
+
+{talk_to
+execute "+menu_clear_options"
+execute "+menu_add_option&lt;Ask Rick about the television.&lt;ask rick about television"
+if guide(parent) != limbo
+   execute "+menu_add_option&lt;Tell Rick you found the TV guide.&lt;tell rick about guide"
+endif
+if @tell_about_kryten_rick = false
+   execute "+menu_add_option&lt;Tell Rick your life story.&lt;tell rick about myself"
+endif
+execute "+menu_add_option&lt;Ask Rick how he is going.&lt;ask rick about rick"
+}
+</pre>
+
+<p>Each <b>+menu_add_option</b> call takes two fields separated by a less-than sign: the line of text to display in the menu, and the command to submit on the player's behalf if that line is chosen. The library code in <b>menu.library</b> then feeds that command through the normal parser, so the matching <b>tell_about_guide</b>, <b>tell_about_kryten</b>, <b>ask_about_television</b> and <b>ask_about_rick</b> functions on Rick will fire as if the player had typed them. Options can be hidden conditionally — in the example above the &quot;you found it&quot; option only appears once the guide has been moved out of <b>limbo</b>, and the &quot;your life story&quot; option disappears after Rick has heard it once (using the call counter <b>@tell_about_kryten_rick</b>). The reusable container <b>MENU_MODAL</b> tells the library to block normal input while the menu is on screen. For more detail see the chapter on <a href="menu.html">Menus</a>.
+
+<p>If a generic fallback <b>talk_to</b> function is also defined on Rick, it will be used whenever the player types the bare command <b>talk to rick</b> rather than going through the menu — useful as a hint that there's a richer interaction available.
 
 <h2><a class="section" name="tutorial12">The Passing of Time</a></h2>
 
@@ -699,7 +725,7 @@ return false
 <P>To demonstrate, we will make Rick take a sip from his drink every five turns, regardless of what the player does. As this would happen regardless of whether the player is in the room or not, we will put the code to handle this in the global <b>eachturn</b> function:
 
 <pre>
-constant turns_since_last_sip      5
+constant turns_since_last_sip      9
 
 {+eachturn
 set rick(turns_since_last_sip) + 1
@@ -709,15 +735,15 @@ if rick(turns_since_last_sip) = 5
    endif
    set rick(turns_since_last_sip) = 0
 endif
-}  
+}
 </pre>
 
-<P>Each object has sixteen integer properties that can be set and tested. The properties <b>parent</b>, <b>capacity</b> and <b>mass</b> are three of these integer properties that you have already seen. For a complete listing, see the chapter <a class="chapter" href="definitions.html#definitions0">Definitions in Detail</a>. These sixteen properties are stored in an array, with <b>parent</b>, <b>capacity</b> and <b>mass</b> being the first three integers, stored in the order starting at index 0. This means that the following code will print the number 25 twice:
+<P>Each object has sixteen integer properties that can be set and tested. The properties <b>parent</b>, <b>capacity</b> and <b>mass</b> are three of these integer properties that you have already seen. For a complete listing, see the chapter <a class="chapter" href="definitions.html#definitions0">Definitions in Detail</a>. These sixteen properties are stored in an array starting at index 0, with <b>parent</b>, <b>capacity</b> and <b>mass</b> being the first three. This means that the following code will print the number 25 twice:
 
 <pre>
 object cube : timber cube
- short	a "timber cube"
- mass		25
+ short    a "timber cube"
+ mass     25
 
 {+some_function
 ...
@@ -726,10 +752,10 @@ write cube(2) ^
 ...
 }
 </pre>
- 
-<p>As the <b>parent</b> property is an integer property, only the index of the parent object is stored. When objects are defined in your game, there are given a sequential integer index starting with 1. As objects and location are both stored internally as objects, this numbering system makes no distinction between the two. This means that if a location representing a forest is the first object or location defined in the game, setting any other objects <b>parent</b> property to 1 will place it in the forest. Although potentially dangerous if you rearrange your game code, this also allows you to test if the player is in a certain section of your game world by testing if the value of <b>here</b> (an internally defined synonym for <b>player(parent)</b>) is within a certain range of values.
 
-<p>The <B>status</B> property of an object is set and tested in the same way as the <B>parent</B> property. The <B>status</B> property, however, has no pre-determined use so we are free to use it as our counter. In order to make our code more readable and self-commenting, before the <b>+eachturn</b> definition, is a constant definition with the name <b>turns_since_last_sip</b> with a value of 5. The <b>status</b> property is the sixth integer property and therefore has an index of 5. By creating this constant we are able to use an object's <b>status</b> property through a more appropriate synonym. The code in the <B>+eachturn</B> function increments this property by one after each successful move made. When it equals 5 a message is displayed (if the player is in the living room) and it is set back to zero. The process will then loop over and over again.
+<p>As the <b>parent</b> property is an integer property, only the index of the parent object is stored. When objects are defined in your game, they are given a sequential integer index starting with 1. As objects and locations are both stored internally as objects, this numbering system makes no distinction between the two. This means that if a location representing a forest is the first object or location defined in the game, setting any other object's <b>parent</b> property to 1 will place it in the forest. Although potentially dangerous if you rearrange your game code, this also allows you to test if the player is in a certain section of your game world by testing if the value of <b>here</b> (an internally defined synonym for <b>player(parent)</b>) is within a certain range of values.
+
+<p>The <B>status</B> property of an object is set and tested in the same way as the <B>parent</B> property. The <B>status</B> property, however, has no pre-determined use so we are free to use it as our counter. In order to make our code more readable and self-commenting, the <b>+eachturn</b> definition is preceded by a constant definition with the name <b>turns_since_last_sip</b> and a value of 9. The <B>status</B> property is the tenth integer property and therefore has an index of 9. By creating this constant we are able to refer to an object's <b>status</b> property through a more appropriate synonym. The code in the <B>+eachturn</B> function increments this property by one after each successful move. When it equals 5 a message is displayed (if the player is in the living room) and it is reset to zero. The process then loops over and over again.
 
 <h2><a class="section" name="tutorial13">Winning and Losing the Game</a></h2>
 
@@ -743,32 +769,30 @@ print:
    As you reach over and switch off the
    television, you get quite a shock to see Rick
    rapidly growing a coat of hair and foaming at
-   the mouth. The shock of this is only surpassed 
-   by that of him sinking his newly
-   acquired fangs into your throat.^^
+   the mouth. The shock of this is only surpassed
+   by that of him sinking his newly-acquired fangs
+   into your throat.^
 .
 execute "+game_over"
 }
 </pre>
 
-<P>Okay, so killing the player without any real warning is grossly unfair, but is serves as a demonstration of how to handle the player dying. The last line of the above function is an <b>execute</b> command that calls another function with the name <b>+game_over</b>. This function is included in the file <b>verbs.library</b> and looks like this:
+<P>Okay, so killing the player without any real warning is grossly unfair, but it serves as a demonstration of how to handle the player dying. The last line of the above function is an <b>execute</b> command that calls another function with the name <b>+game_over</b>. This function is included in the file <b>verbs.library</b> and looks like this:
 
 <pre>
 {+game_over
 write "^"
 execute "+score"
-loop
-   if noun3(parent) = player
-      set noun3(parent) = limbo
-   endif
-endloop
-set player(parent) = prologue
+select player
+   set noun3(parent) = limbo
+endselect
+set player(parent) = epilogue
 write "^"
 execute "+look_around"
 }
 </pre>
 
-<p>This function uses two other <b>execute</b> commands to call two other functions: one to display the player's score and another that displays the contents of the location <b>prologue</b>. 
+<p>This function uses two other <b>execute</b> commands to call two other functions: one to display the player's score and another that displays the contents of the location <b>epilogue</b>.
 
 <P>Before we move on to winning the game, it is worth mentioning that the default response for turning an object on is to say that this cannot be done. In the case of the television, it would be important to add a <B>turn_on</B> function stating that the television is already on.
 
@@ -794,13 +818,12 @@ write "You don't find anything else.^"
 
 object guide: television tv tele guide
  short     a "television guide"
- long      "The television guide is here."
+ long      "The television guide is here.^"
  parent    limbo
  mass      5
 
-{examine : read : look_in
-write "It contains a listing of this "
-write "week's programmes.^"
+{examine : read
+write "It contains a listing of this week's programmes.^"
 }
 </pre>
 
@@ -809,21 +832,21 @@ write "week's programmes.^"
 <td>It is important with objects that share names, such as the television and the television guide to be aware of which object has the most names. If only shared names are used, the object with the lowest number of names will be selected. For more information, see the chapter on <a href="resolution.html">Object Resolution</a>.</td>
 </tr></table>
 
-<P>Now, when the player looks under the bed, the guide will be moved from its initial location, <B>limbo</B>, to the bedroom. Once this has been done, the player will be able to take it. The <B>points</B> command will increase the player's score by 50%. The <B>if</B> statement in this function ensures that this can only be done once.
+<P>Now, when the player looks under the bed, the guide will be moved from its initial location, <B>limbo</B>, to the bedroom. Once this has been done, the player will be able to take it. The <B>points</B> command will increase the player's score by 50. The <B>if</B> statement in this function ensures that this can only be done once.
 
 <P>We will now associate a <B>give_to_rick</B> function with the guide. This will be the winning move and should look like this:
 
 <pre>
-{give_to_rick
+{give_to_rick : show_to_rick
 print:
    ~Cool!~ Rick exclaims as he
-   snatches the guide from your hands.^^
+   snatches it from your hands.^^
    Satisfied that you have achieved
    at least one thing today, you decide to
    go back to bed.^
 .
 points 50
-execute +game_over
+execute "+game_over"
 }
 </pre>
 
@@ -839,7 +862,7 @@ object sofa : sofa
    has      NOT_IMPORTANT		
 </pre>
 
-<p>No anytime the player attempts to refer to the sofa they will receive the message:
+<p>Now anytime the player attempts to refer to the sofa they will receive the message:
 
 <pre>
 The sofa is not important, you don't need to worry about that.
@@ -848,6 +871,6 @@ The sofa is not important, you don't need to worry about that.
 <p>Although not a large or complex game, this tutorial game does demonstrate most of the elements of JACL that you will need to create a more complete piece of interactive fiction. The rest of this guide contains a complete reference description of every feature of the JACL language and interpreters. It is recommended that you at least skim through these chapters in order to gain an awareness of the features at your disposal.
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body>
 </html>

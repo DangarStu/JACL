@@ -2,7 +2,7 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -25,7 +25,7 @@ When referring to a CSV file using any of the commands detailed in this section,
 <b>projects/data/contacts-data.csv</b>
 </pre>
 
-<p>This system ensures that no two JACL programs can overwrite each others data or access arbitrary files from the filesystem of the webserver.</p>
+<p>This system ensures that no two JACL programs can overwrite each other's data or access arbitrary files from the filesystem of the webserver.</p>
 
 <p><b>Global files</b> &mdash; supply a filename that includes the <b>.csv</b> extension, enclosed in double quotes. The file is accessed directly from the data directory without any program name prefix:
 
@@ -55,7 +55,7 @@ enditerate
 <b>enditerate</b>
 </pre>
 
-<P>The <B>iterate</B> and <b>enditerate</b> commands mark a looping block of code. The block of code is run once for each row in the file specified directly after the <b>iterate</b> command. For example, the <b>+intro</b> function of the program <b>contacts.jacl</b> loops through the file <b>data</b> and looks for the last (highest) ID already assigned to a contact. This number is stored so that the next contact created can be given an ID that one higher, and therefore unqiue:
+<P>The <B>iterate</B> and <b>enditerate</b> commands mark a looping block of code. The block of code is run once for each row in the file specified directly after the <b>iterate</b> command. For example, the <b>+intro</b> function of the program <b>contacts.jacl</b> loops through the file <b>data</b> and looks for the last (highest) ID already assigned to a contact. This number is stored so that the next contact created can be given an ID that one higher, and therefore unique:
 
 <pre>
 # GET THE LAST ID
@@ -66,7 +66,7 @@ iterate data
 enditerate
 </pre>
 
-<p>Each column of the currect row being read is loaded into a string array called <b>field</b>. In the case of <b>contacts.jacl</b>, the ID is stored in the first column, or field.</p>
+<p>Each column of the current row being read is loaded into a string array called <b>field</b>. In the case of <b>contacts.jacl</b>, the ID is stored in the first column, or field.</p>
 
 <p>Below is another example of the <b>iterate</b> command, this time it is used to display the entire contents of the file <b>data</b>:
 
@@ -187,6 +187,6 @@ enditerate
 <p>In this example, <b>append_fc</b> starts the row with three fixed columns. The <b>iterate</b> loop then adds a variable number of observation columns using <b>append_nt</b>, with the final column being written using <b>append_lc</b> to close the line.
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body>
 </html>

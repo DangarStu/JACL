@@ -1,8 +1,8 @@
 <html>
 <head>
 	<title>The JACL Author's Guide</title>
-	<meta name="description" content="Documention for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,programming,programmers,guide,manual,documention,instructions">
+	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
+	<meta name="keywords" content="JACL,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -13,17 +13,31 @@
 
 <p>So what does all this mean? The Glk specification defines a set of multimedia functionality that the native console version of JACL does not provide. In the standard Unix distribution, the JACL interpreter is compiled with GlkTerm, a Glk library written by Andrew Plotkin using ncurses. GlkTerm does not support graphics or sound, so the multimedia commands detailed in this chapter are ignored without error by the console interpreter. Multimedia is fully supported by the web interpreters (<b>cgijacl</b> and <b>fcgijacl</b>) which deliver images and sounds through HTML.
 
-<p>If you would like to have your game behave differently is certain Glk features are supported by the interpreter, you can test whether the integer constants <b>graphics_supported</b>, <b>sound_supported</b> and <b>timer_supported</b> are set to <b>true</b> or <b>false</b>.
+<p>If you would like to have your game behave differently if certain Glk features are supported by the interpreter, you can test whether the integer constants <b>graphics_supported</b>, <b>sound_supported</b> and <b>timer_supported</b> are set to <b>true</b> or <b>false</b>.
 
 <p>Graphics, sounds and timers can also be turned off from within your game by setting the integer variables <b>graphics_enabled</b>, <b>sound_enabled</b> and <b>timer_enabled</b> to <b>false</b>.
 
 <p>Some of the text for this chapter has been cheerfully stolen from the Glk specification. The full Glk Specification can be read at <a href="http://www.eblong.com/zarf/glk/">http://www.eblong.com/zarf/glk/</a>.
 
-<h2><a class="section" name="multimedia1">Blorb Files and the bjorb Utility</a></h2>
+<h2><a class="section" name="multimedia1">Blorb Files (Glk) and Media Files (Web)</a></h2>
 
-<p>All sound and image files are made available to a Glk interpreter by placing them in a Blorb file with the same base name as the game. For example, the game <b>grail.jacl</b> will look in the file <b>grail.blorb</b> for any sounds or images required.
+<p>Under Glk, all sound and image files are made available to the interpreter by placing them in a Blorb file with the same base name as the game. For example, the game <b>grail.jacl</b> will look in the file <b>grail.blorb</b> for any sounds or images required.
 
-<p>Blorb is a second specification written by Andrew Plotkin specification for a common format for storing resources associated with interactive fiction games. There are many tools available for creating Blorb files. A program called <b>bjorb</b> is included in the JACL package that is a slightly modified version of the utility <b>blc</b>. <b>blc</b> is part of the iBlorb suite developed by Ross Raszewski. Many thanks to Ross for both his original development effort and the permission to include this program in the JACL package. Information about iBlorb can be found at <a href="http://www.trenchcoatsoft.com/projects.html">http://www.trenchcoatsoft.com/projects.html</a>. The full Blorb Specification can be read at <a href="http://www.eblong.com/zarf/blorb/">http://www.eblong.com/zarf/blorb/</a>.
+<p>Under the web interpreters (<b>cgijacl</b> and <b>fcgijacl</b>) the equivalent is a plain-text <i>media manifest</i> with the same base name as the game and the extension <b>.media</b>. The interpreter consults this file to map HTTP requests under the game's URL space to filesystem paths and MIME types. Each non-blank line has three whitespace-separated fields:
+
+<pre>
+&lt;URL path&gt;  &lt;MIME type&gt;  &lt;filesystem path&gt;
+</pre>
+
+<p>For example, an entry of:
+
+<pre>
+/images/title.png  image/png  images/title.png
+</pre>
+
+<p>tells the interpreter that a request for <b>/images/title.png</b> should be served as <b>image/png</b> from the relative path <b>images/title.png</b> beneath the <b>projects</b> directory. The same manifest is used for HTML, CSS, JavaScript, fonts, images, and audio &mdash; everything the page needs alongside the game text. Because the web interpreter references resources by URL rather than by Blorb index, the <b>image</b> and <b>sound</b> opcodes take a URL string and a MIME type instead of a numeric index (see below).
+
+<p>Blorb is a second specification written by Andrew Plotkin for a common format for storing resources associated with interactive fiction games. There are many tools available for creating Blorb files. A program called <b>bjorb</b> is included in the JACL package that is a slightly modified version of the utility <b>blc</b>. <b>blc</b> is part of the iBlorb suite developed by Ross Raszewski. Many thanks to Ross for both his original development effort and the permission to include this program in the JACL package. Information about iBlorb can be found at <a href="http://www.trenchcoatsoft.com/projects.html">http://www.trenchcoatsoft.com/projects.html</a>. The full Blorb Specification can be read at <a href="http://www.eblong.com/zarf/blorb/">http://www.eblong.com/zarf/blorb/</a>.
 
 <p>The utility <b>bjorb</b> creates a blorb file with the help of a <b>.blc</b> control file. This control file is a plain text file that specifies the sounds and images to include in the blorb file. Each line in a <b>.blc</b> control file describes one chunk of the Blorb file, and has the following format:
 
@@ -86,20 +100,23 @@ bjorb example.blc example.blorb
 
 <h2><a class="section" name="multimedia2">The IMAGE Command</a></h2>
 
-<p>The <b>image</b> command is used to display one of the images stored in the game's blorb file. The image to display is specified using its index in the blorb file. The index can be supplied either as a literal integer or any JACL container that resolves to an integer. The index of the image can optionally be followed by an alignment. The possible alignments are:
+<p>The <b>image</b> command takes a different form depending on which interpreter is running.
 
-<table>
-<tr><th width=15%>Alignment</th><th>Description</th></tr>
-<tr><td><b>up</b></td><td>The image appears at the current point in the text, sticking up. That is, the bottom edge of the image is aligned with the baseline of the line of text.</td></tr>
-<tr><td><b>down</b></td><td>The image appears at the current point, and the top edge is aligned with the top of the line of text.</td></tr>
-<tr><td><b>centre</b></td><td>The image appears at the current point, and it is centered between the top and baseline of the line of text. If the image is taller than the line of text, it will stick up and down equally.</td></tr>
-<tr><td><b>left</b></td><td>The image appears in the left margin. Subsequent text will be displayed to the right of the image, and will flow around it -- that is, it will be left-indented for as many lines as it takes to pass the image.</td></tr>
-<tr><td><b>right</b></td><td>The image appears in the right margin, and subsequent text will flow around it on the left.</td></tr>
-</table>
+<p>Under Glk, the form is:
 
-<p>&nbsp;
+<pre>
+image &lt;blorb_index&gt;
+</pre>
 
-<p>The two "margin" alignments require some care. To allow proper positioning, images using <b>left</b> and <b>right</b> must be placed at the beginning of a line. That is, you may only call <b>image</b> (with these two alignments) if you have just printed a newline, or if the screen is entirely empty. If you margin-align an image in a line where text has already be printed, no image will appear at all.
+<p>The image is drawn at the current point in the text using Glk's inline-down alignment (the top edge of the image aligns with the top of the current line of text). The Glk-side <b>image</b> opcode in earlier versions of JACL accepted an alignment keyword (<b>up</b>, <b>down</b>, <b>centre</b>, <b>left</b>, <b>right</b>) but the current interpreter ignores any alignment argument and always uses inline-down. If you need margin-aligned images, lay them out using <b>stylehint</b> declarations and surrounding text rather than per-image alignment keywords.
+
+<p>Under the web interpreters, the form is:
+
+<pre>
+image "&lt;url&gt;" ["&lt;css_class&gt;"]
+</pre>
+
+<p>The first argument is the URL of the image (a path that must appear in your <b>.media</b> manifest). The optional second argument is a CSS class applied to the rendered <b>&lt;img&gt;</b> element. With no class the interpreter emits <b>&lt;img src="..."&gt;</b>; with a class it emits <b>&lt;img class="..." src="..."&gt;</b>. Use the class to position or size the image via your stylesheet.
 
 <p>The following code demonstrates the <b>image</b> command:
 
@@ -107,23 +124,45 @@ bjorb example.blc example.blorb
 constant IMAGE_house 4
 
 {+display_image
-# DISPLAY IMAGE 4 WITH THE TOP OF IMAGE LEVEL WITH TOP OF THE TEXT
-image IMAGE_house
-
-# DISPLAY IMAGE 6 WITH THE BOTTOM OF IMAGE LEVEL WITH TOP OF THE TEXT
-image 6 up
+if interpreter = GLK
+   # GLK: refer to the image by its index in the blorb file.
+   image IMAGE_house
+else
+   # WEB: refer to the image by URL (as declared in the .media manifest).
+   image "/images/house.png" "scene"
+endif
 }
 </pre>
 
 <h2><a class="section" name="multimedia3">The SOUND Command</a></h2>
 
-<p>The <b>sound</b> command is used to play one of the sounds stored in the game's blorb file. The sound to play is specified using its index in the blorb file. The index can be supplied either as a literal integer or any JACL container that resolves to an integer. 
+<p>Like <b>image</b>, the <b>sound</b> command takes a different form on each interpreter.
 
-<p>The index of the sound can optionally be followed by a channel to play the sound on. There are eight available channels numbered 0 through 7. If no channel is specified, channel 0 is used as the default.
+<p>Under Glk:
 
-<p>If a channel is specified, it can be followed by the number of times to repeat the sound. If <b>-1</b> is specified as the number of times to repeat the sound, the sound will keep playing until it is manually stopped using the <b>stop</b> command. If no number of times to repeat the sound is specified it is played once.
+<pre>
+sound &lt;blorb_index&gt; [&lt;channel&gt;] [&lt;repeats&gt;]
+</pre>
 
-<p>The following code demonstrates the <b>sound</b> command:
+<p>The sound to play is identified by its index in the game's Blorb file. There are eight available channels numbered 0 through 7 (default 0). <b>repeats</b> is the number of times to play the sound (default 1); <b>-1</b> loops indefinitely until <b>stop</b> is issued.
+
+<p>Under the web interpreters:
+
+<pre>
+sound "&lt;url&gt;" "&lt;mime&gt;" [&lt;channel&gt;] [loop]
+</pre>
+
+<p>The first argument is the URL of the audio file (which must appear in the <b>.media</b> manifest); the second is its MIME type (for example <b>"audio/ogg"</b> or <b>"audio/mpeg"</b>). The optional third argument is the logical channel. The literal word <b>loop</b> &mdash; defined in the standard libraries as a constant with the value <b>-1</b> &mdash; requests indefinite playback. The interpreter emits an <b>&lt;audio&gt;</b> element annotated with <b>data-jacl-channel</b> and <b>data-jacl-pending</b>; the front-end JavaScript replaces any existing audio on the same channel (with a brief cross-fade) when the new sound becomes ready.
+
+<p>The web build also overloads <b>sound</b> for the stop case:
+
+<pre>
+sound 0 &lt;channel&gt;
+</pre>
+
+<p>When the first argument is unquoted, the interpreter treats the call as a stop request and emits a <b>&lt;jacl-sound-stop data-jacl-channel="N"&gt;</b> marker the front-end uses to silence the channel. Under Glk, use the <b>stop</b> opcode instead (see below).
+
+<p>The following code demonstrates the <b>sound</b> command on both interpreters:
 
 <pre>
 constant SOUND_rain    6
@@ -131,17 +170,17 @@ constant SOUND_thunder 7
 integer  AUDIO_CHANNEL 2
 
 {+play_sound
-# PLAY SOUND 7 ON CHANNEL 0 ONCE ONLY
-sound SOUND_thunder
-
-# PLAY SOUND 6 ON CHANNEL 2 ONCE ONLY
-sound SOUND_rain AUDIO_CHANNEL
-
-# PLAY SOUND 6 ON CHANNEL 3 FOUR TIMES
-sound 6 3 4
-
-# PLAY SOUND 6 ON CHANNEL 3 INDEFINITELY
-sound SOUND_rain 3 -1 
+if interpreter = GLK
+   # GLK: play blorb index 7 on channel 0 once.
+   sound SOUND_thunder
+   # GLK: play blorb index 6 on channel 2 indefinitely.
+   sound SOUND_rain AUDIO_CHANNEL -1
+else
+   # WEB: play /sounds/thunder.ogg on channel 0 once.
+   sound "/sounds/thunder.ogg" "audio/ogg"
+   # WEB: play /sounds/rain.ogg on channel 2 indefinitely.
+   sound "/sounds/rain.ogg" "audio/ogg" 2 loop
+endif
 }
 </pre>
 
@@ -163,9 +202,9 @@ volume 50 2
 
 <h2><a class="section" name="multimedia5">The STOP Command</a></h2>
 
-<p>The <b>stop</b> command simply stops the sound being played on the specified sound channel. The channel to stop is specified as an integer between 0 and 7 (matching the eight channels available to <b>sound</b>). If no channel is specified channel 0 is stopped by default.
+<p>Under Glk, the <b>stop</b> command stops the sound being played on the specified sound channel. The channel to stop is specified as an integer between 0 and 7 (matching the eight channels available to <b>sound</b>). If no channel is specified channel 0 is stopped by default.
 
-<p>The following code demonstrates the <b>stop</b> command:
+<p>The following code demonstrates the <b>stop</b> command under Glk:
 
 <pre>
 {+stop_sound
@@ -175,6 +214,16 @@ stop
 # STOP THE SOUND PLAYING ON CHANNEL 2
 stop 2
 }
+</pre>
+
+<p>Under the web interpreters there is no separate <b>stop</b> opcode; the <b>sound</b> opcode's stop form (<b>sound 0 channel</b>) covers the same case. Code that needs to work under both should branch:
+
+<pre>
+if interpreter = GLK
+   stop 2
+else
+   sound 0 2
+endif
 </pre>
 
 <h2><a class="section" name="multimedia6">The TIMER Command</a></h2>
@@ -200,7 +249,7 @@ timer 10000
 if here has OUTDOORS
    # PLAY THE THUNDER SOUND ON CHANNEL 3 SO
    # IT DOESN'T INTERFERE WITH OTHER SOUNDS
-   play SOUND_thunder 3
+   sound SOUND_thunder 3
 endif
 }
 </pre>
@@ -355,13 +404,13 @@ stylehint &lt;style&gt; &lt;attribute&gt; &lt;value&gt;
 constant status_window 3
 </pre>
 
-<p>The status window is always created using a fixed-width font and its current dimensions can be read at any time using the values of <b>status_width</b> and <b>status_height</b>. Although <b>status_height</b> will most often be equal to <b>status_window</b> (unless <b>status_window</b> exceeded the available space), <b>status_width</b> will change as the player's resizes the game window.
+<p>The status window is always created using a fixed-width font and its current dimensions can be read at any time using the values of <b>status_width</b> and <b>status_height</b>. Although <b>status_height</b> will most often be equal to <b>status_window</b> (unless <b>status_window</b> exceeded the available space), <b>status_width</b> will change as the player resizes the game window.
 
 <p>If a status window is created, the interpreter will attempt to call the global function <b>+update_status_window</b>. If this function exists, it will be executed and must contain code to draw the contents of the status window. If this function doesn't exist, the interpreter will use internal code to generate a standard interactive fiction status line. This consists of a single line with the name of the current location against the left side and the number of moves and current score against the right. 
 
 <p>If the function <b>+update_status_window</b> does exist, the current Glk stream is set to that window before it is called so all <b>write</b> or <b>print</b> commands will output to it. The window is also first cleared of all previous contents and the cursor is positioned in the top left corner.
 
-<p>The location at which to start printing text within the status window is changed using the <b>cursor</b> command. The <b>cursor</b> command is passed two integer parameters, the row and column to move the cursor to. Counting starts in the top left corner at 0, 0. For example, to move the cursor to the far right hand column of the second row, use the command:
+<p>The location at which to start printing text within the status window is changed using the <b>cursor</b> command. The <b>cursor</b> command is passed two integer parameters, the column and row to move the cursor to. Counting starts in the top left corner at 0, 0. For example, to move the cursor to the far right hand column of the second row, use the command:
 
 <pre>
 cursor status_width 1
@@ -458,5 +507,5 @@ write status_text
 </tr></table>
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body></html>

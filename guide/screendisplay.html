@@ -1,8 +1,8 @@
-<html
+<html>
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 	<meta HTTP-EQUIV=~Content-Type~ CONTENT=~text/html; charset=UTF-8~>
 </head>
@@ -100,7 +100,7 @@ Your score is 0% in 0 moves.
 write "The dial is set to " dial(status) "Mhz.^"
 </pre>
 
-<P>The elements of each object and location are stored in a sixteen element array (0-15). A number between 0 and 15 can be used between the brackets as an index to the object element rather than it's name. For a mapping of default element names to index numbers, see the chapter <a href="definitions.html">Definitions in Detail</a>. Constants can also be defined as a way of renaming any given element to a name that more clearly indicates its purpose. For example:
+<P>The elements of each object and location are stored in a sixteen element array (0-15). A number between 0 and 15 can be used between the brackets as an index to the object element rather than its name. For a mapping of default element names to index numbers, see the chapter <a href="definitions.html">Definitions in Detail</a>. Constants can also be defined as a way of renaming any given element to a name that more clearly indicates its purpose. For example:
 
 <pre>
 constant fuel_left	2
@@ -197,10 +197,10 @@ write noun1{The} " is no good to eat.^"
 </tr>
 <tr>
 <td><i>object_label</I><B>{sub}</B></TD>
-<td>Prints the word <b>you</b> if the object is the current player, <b>he</b> if the object has the attribute <b>ANIMATE</b>, <b>she</b> if the object has both the <b>ANIMATE</b> and the <b>FEMALE</b> attribute, <b>it</b> if the object has neither the <b>ANIMATE</b> nor the <b>FEMALE</b> attribute or the word <b>they</b> if the object being refered to has the attribute <b>PLURAL</b>.</td>
+<td>Prints the word <b>you</b> if the object is the current player, <b>he</b> if the object has the attribute <b>ANIMATE</b>, <b>she</b> if the object has both the <b>ANIMATE</b> and the <b>FEMALE</b> attribute, <b>it</b> if the object has neither the <b>ANIMATE</b> nor the <b>FEMALE</b> attribute or the word <b>they</b> if the object being referred to has the attribute <b>PLURAL</b>.</td>
 </tr><tr>
 <td><i>object_label</I><B>{obj}</B></TD>
-<td>Prints the word <b>yourself</b> if the object is the current player, <b>him</b> if the object has the attribute <b>ANIMATE</b>, <b>her</b> if the object has both the <b>ANIMATE</b> and the <b>FEMALE</b> attribute, <b>it</b> if the object has neither the <b>ANIMATE</b> nor the <b>FEMALE</b> attribute or the word <b>them</b> if the object being refered to has the attribute <b>PLURAL</b>.</td>
+<td>Prints the word <b>yourself</b> if the object is the current player, <b>him</b> if the object has the attribute <b>ANIMATE</b>, <b>her</b> if the object has both the <b>ANIMATE</b> and the <b>FEMALE</b> attribute, <b>it</b> if the object has neither the <b>ANIMATE</b> nor the <b>FEMALE</b> attribute or the word <b>them</b> if the object being referred to has the attribute <b>PLURAL</b>.</td>
 </table>
 </center>
 
@@ -303,20 +303,25 @@ output welcome_text
 <table class="infowarn">
 <tr>
 <td><img src="info.png" alt="Information"></td>
-<td>If the player has set the game to verbose mode (<b>DISPLAY_MODE</b> = 1), locations will not be given the attribute <b>VISITED</b>.</td>
+<td>In verbose mode (<b>display_mode</b> = <b>true</b>) the long-form description fires every time, even on a re-visit. Internally the library strips <b>VISITED</b> just before calling the location's <b>look</b> function and re-sets it immediately after, so the attribute is still set after every look &mdash; it is just briefly cleared so the long form runs.</td>
 </tr></table>
 
-<p>The very first thing the <B>look</B> command will do is remove the attribute <b>VISITED</b> from the current location. It will then execute the global function <B>+before_look</B>. If this function exists, and returns <b>true</b>, nothing more is done. If it does not exist, or returns <b>false</b>, the function <b>+title</b> will be executed. This function is an opportunity to print extra information that is potentially relevant to all locations. For example, the <b>+title</b> function in <b>frame.jacl</b> tests if the player is currently sitting down and displays the text "(sitting)". It is also common to add the following line to the top of <b>+title</b> to give each location description a title:
+<p>The very first thing the <B>look</B> command will do is remove the attribute <b>VISITED</b> from the current location, then call <b>+display_location</b> to do the actual work. The flow is:
+
+<ol>
+<li>Execute <b>+before_look</b> (then the location-specific <b>here.before_look</b>). If either returns <b>true</b>, nothing more is done.</li>
+<li>If the location has the attribute <b>DARKNESS</b>, execute <b>+no_light</b> and return.</li>
+<li>Call <b>+title</b>. This is an opportunity to print extra information relevant to every location. For example, the <b>+title</b> function in <b>frame.jacl</b> tests if the player is currently sitting down and displays the text "(sitting)". It is also common to add the following line to the top of <b>+title</b> to give each location description a title:
 
 <pre>
 write here{The} ^
 </pre>
-
-<p> Next the <B>look</B> function associated with the current location is executed. After this has finished, the interpreter will display the text supplied by the <B>long</B> property for each object that is in the current location and doesn't have a <B>mass</B> of <B>scenery</B>.
-
-<p>If the <b>long</b> property of an object is set to <b>function</b>, that function will be executed. This is useful for descriptions that are either too long to fit in a single line of code or change during the course of the game. If the <b>long</b> property is not set to <b>function</b>, the property text is displayed verbatim. 
-
-<P>The final step in the process is that the global function <B>+after_look </B>is executed.
+</li>
+<li>Execute the location's <b>look</b> function (or the global <b>+look</b> if the location has none).</li>
+<li>Ensure the current location has the attributes <b>KNOWN</b>, <b>VISITED</b> and <b>MAPPED</b>.</li>
+<li>Execute <b>+object_descriptions</b> to display the <b>long</b> text for each object in the current location that doesn't have a <b>mass</b> of <b>scenery</b>. If an object's <b>long</b> property is set to <b>function</b>, the interpreter calls a function named <b>long_<i>label</i></b> (where <i>label</i> is the object's label) instead of printing literal text. This is useful for descriptions that are too long to fit on a single line, or that change during the course of the game.</li>
+<li>Execute the location's <b>after_look</b> function and the global <b>+after_look</b>.</li>
+</ol>
 
 <P>It is a convention to have a <B>look</B> command at the end of the <B>+intro </B>function so the player can see where they are and what objects are nearby when the game begins.
 
@@ -329,6 +334,6 @@ write here{The} ^
 </pre>
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </BODY>
 </HTML>

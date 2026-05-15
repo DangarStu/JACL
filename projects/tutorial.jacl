@@ -6,7 +6,7 @@ constant game_version     1
 constant ifid             "JACL-141"
 constant game_publish     true
 
-constant turns_since_last_sip     5
+constant turns_since_last_sip     9
 
 attribute EXAMINED
 
@@ -51,7 +51,6 @@ object bed: bed
  mass          scenery
 
 {look_under
-write "VERB: " verb_function ^
 if guide(parent) = limbo
    write "Hidden under the bed you find this week's "
    write "television guide.^"
@@ -270,7 +269,7 @@ print:
 {talk_to
 print:
    ~Uh, yeah, I'll do it in a minute,~ Rick mumbles
-   with out looking up. You have quite a strong
+   without looking up. You have quite a strong
    suspicion that he didn't really hear a word
    you said.^
 .

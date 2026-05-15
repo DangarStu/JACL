@@ -2,7 +2,7 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -35,7 +35,7 @@
 <td><b>status_width</b></td>
 <td>Set to the number of columns the status window is currently displaying.</td>
 </tr><tr>
-<td><b>status_depth</b></td>
+<td><b>status_height</b></td>
 <td>Set to the number of rows the status window is currently displaying.</td>
 </tr><tr>
 <td><b>objects</b></td>
@@ -64,13 +64,13 @@
 <td>Will cause the JACL interpreter to ask the user if they are sure, restarting the game from the beginning if they answer <B>yes</B>, returning to the game if they answer <B>no</B>.</TD>
 </tr>
 <tr><td valign="top"><B>info</B></TD>
-<td>Will display the version information of the JACL interpreter that you are running and the maximum number of items it was compiled to handle. This limit may be increased by changing the <B>MAX_OBJECTS</B> define statement in the file <B>jacl.h</B> then re-compiling the interpreter.</TD>
+<td>Will display the version information of the JACL interpreter that you are running and the maximum number of items it was compiled to handle. This limit may be increased by changing the <B>MAX_OBJECTS</B> define statement in the file <B>constants.h</B> then re-compiling the interpreter. The synonym <b>version</b> is also accepted.</TD>
 </tr>
 <tr><td valign="top"><B>oops</B>&nbsp;[<i>ReplacementWord</i>]</TD>
 <td>Replaces the most likely incorrect word in the player's last command with the supplied replacement word.</td>
 </tr>
 <tr><td valign="top"><B>script</b></TD>
-<td>Will cause the current game session to be recorded to the file specified at the ensuing prompt.</TD>
+<td>Will cause the current game session to be recorded to the file specified at the ensuing prompt. The synonym <b>transcript</b> is also accepted.</TD>
 </TR>
 <TR><td valign="top"><B>unscript</b></TD>
 <td>Stop a previously started transcript.</TD>
@@ -86,5 +86,5 @@
 </tr></table>
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body></html>

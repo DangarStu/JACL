@@ -2,14 +2,14 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
 
 <h1><a class="title" name="definitions0">Definitions in Detail</a></h1>
 
-<P>A JACL game file consists of two fundamental components: code and data. This chapter focuses on the data and provides a detailed break down of all the possible elements that may be defined. In the case of objects and locations, all their associated properties are also listed.
+<P>A JACL game file consists of two fundamental components: code and data. This chapter focuses on the data and provides a detailed breakdown of all the possible elements that may be defined. In the case of objects and locations, all their associated properties are also listed.
 
 <h2><a class="section" name="definitions1">Objects</a></h2>
 
@@ -77,7 +77,7 @@
 
 <p>The properties <b>bearing</b>, <b>velocity</b>, <b>x</b> and <b>y</b> are used by the special-purpose commands <b>position</b>, <b>bearing</b> and <b>distance</b>. See the chapter on <a href="special.html#special0">Special-Purpose Commands</a> for more information.
 
-<P>The properties <B>next</B>, <B>previous</B>, <b>child</b>, <B>index</B>, <B>status</B>, <B>state</B>, <B>counter</B>, <B>points</B> and <b>class</b> have no pre-determined meaning for objects. You are free to set and test these values as required.
+<P>The properties <B>next</B>, <B>previous</B>, <b>child</b>, <B>index</B>, <B>status</B>, <B>timer</B>, <B>counter</B>, <B>points</B> and <b>class</b> have no pre-determined meaning for objects. You are free to set and test these values as required.
 
 <P>When a command requires a numerical value as a parameter, the following object elements can be referred to:
 
@@ -88,11 +88,11 @@
 <td><I>object_label</I><B>(parent)</B></td><td>0</td>
 <td><I>object_label</I><B>(index)</B></td><td>8</td>
 </TR><TR>
-<td><I>object_label</I><B>(capacity)</B></td><td>1</td>
+<td><I>object_label</I><B>(capacity)</B> / <B>(quantity)</B></td><td>1</td>
 <td><I>object_label</I><B>(status)</B></td><td>9</td>
 </TR><TR>
 <td><I>object_label</I><B>(mass)</B></td><td>2</td>
-<td><I>object_label</I><B>(state)</B></td><td>10</td>
+<td><I>object_label</I><B>(timer)</B></td><td>10</td>
 </TR><TR>
 <td><I>object_label</I><B>(bearing)</B></td><td>3</td>
 <td><I>object_label</I><B>(counter)</B></td><td>11</td>
@@ -112,6 +112,7 @@
 <td colspan=4><hr></td>
 </tr>
 </table>
+</CENTER>
 
 <p> These elements can be referred to by name or index number. For example, the following two commands are equivalent:
 
@@ -182,7 +183,7 @@
 <td>Internally, objects and locations are both stored using the same data-structure. In fact, once the game is running, the only difference between the two is that a location has the attribute <B>LOCATION</B>.</td>
 </tr></table>
 
-<P>A <B>short</B> property must be followed by two parameters: the location's indefinite article and short description. The <I>ShortDescription</I> text, prefixed by the specified <I>IndefiniteArticle</I>, is displayed using the location's <B>{list}</B> macro in conjunction with a <B>write</B> command. When using the location's <B>{the}</B> macro, the <I>ShortDescription</I> text will normally be displayed prefixed with the word <B>the</B> or the specified definite article. If the word <B>name</B> is specified as the <I>IndefiniteArticle</I>, the <I>ShortDescription</I> text is not prefixed with anything, such as in the case of a proper noun. This applies to both the <B>{list}</B> and <B>{the}</B> macros. If the <I>ShortDescription</I> text is plural, the location should be given the attribute <B>PLURAL</B> to ensure the it is referred to appropriately by code in the library. If the <b>short</b> property is omitted, the <i>IndefiniteArticle</i> will be set to <B>the</B> and the <i>ShortDescription</i> will be set to the location's label. 
+<P>A <B>short</B> property must be followed by two parameters: the location's indefinite article and short description. The <I>ShortDescription</I> text, prefixed by the specified <I>IndefiniteArticle</I>, is displayed using the location's <B>{list}</B> macro in conjunction with a <B>write</B> command. When using the location's <B>{the}</B> macro, the <I>ShortDescription</I> text will normally be displayed prefixed with the word <B>the</B> or the specified definite article. If the word <B>name</B> is specified as the <I>IndefiniteArticle</I>, the <I>ShortDescription</I> text is not prefixed with anything, such as in the case of a proper noun. This applies to both the <B>{list}</B> and <B>{the}</B> macros. If the <I>ShortDescription</I> text is plural, the location should be given the attribute <B>PLURAL</B> to ensure that it is referred to appropriately by code in the library. If the <b>short</b> property is omitted, the <i>IndefiniteArticle</i> will be set to <B>the</B> and the <i>ShortDescription</i> will be set to the location's label. 
 
 <P>The directions the player can travel in from this location are defined by the properties <B>north</B>, <B>northeast</B>, <B>northwest</B>, <B>south</B>, <B>southeast</B>, <B>southwest</B>, <B>east</B>, <B>west</B>, <B>up</B>, <B>down</B>, <B>in</B> and <B>out</B>. 
 
@@ -224,6 +225,7 @@ A direction property must be followed by the label of the location that the dire
 </tr><tr>
 <td colspan=4><hr></td>
 </tr></table>
+</CENTER>
 
 <p> These elements can be referred to by name or number. For example, the following two commands are equivalent:
 
@@ -301,7 +303,6 @@ integer MOTOR_POWER       DEFAULT_POWER
 <td>When set to <b>true</b> the player will be notified of any increase in their score when the <b>points</b> command is used.</td>
 </tr>
 </TABLE>
-</center>
 
 <!-- NEW PAGE -->
 
@@ -313,7 +314,7 @@ integer MOTOR_POWER       DEFAULT_POWER
 string menu_title	"Options:"
 </pre>
 
-<p>Once defined, the value of a string can be output by passing the name of the variable as a parameter to a <b>write</b> statement. Strings have a maximum length of 256 bytes.
+<p>Once defined, the value of a string can be output by passing the name of the variable as a parameter to a <b>write</b> statement. Strings have a maximum length of 1024 bytes.
 
 <h2><a class="section" name="definitions6">Arrays</a></h2>
 
@@ -527,7 +528,7 @@ grammar set *held to $integer        &gt;set_to
 grammar type $string on *present     &gt;type_on
 </pre>
 
-<P>The first statement says that if the player types the word <b>take</b>, followed by one or more objects that are in the current location, then the function <B>take</B> should be executed. The second states that if the player types the word <b>insert</b>, followed by one or more objects that are being held, followed by the word <b>in</b>, followed by an object that is either being held or is in the current location, then the function <B>insert_in</B> should be executed. The third states that if the word <b>set</b> followed by a single object that is being held, followed by the word <b>to</b>, followed by an integer then execute the function <b>set_to</b>. Feel free to add extra <b>grammar</b> statements that map to library functions into your program. Keeping these extra <b>grammar</b> statements within the game-specific part of your code means that you can upgrade the library at a later date without needing to re-enter your additions. The exact way in which these functions are executed is detailed in the section on <a href="functions.html#functions3">Responding to Player's Moves</a>.
+<P>The first statement says that if the player types the word <b>take</b>, followed by one or more objects that are in the current location, then the function <B>take</B> should be executed. The second states that if the player types the word <b>insert</b>, followed by one or more objects that are being held, followed by the word <b>in</b>, followed by an object that is either being held or is in the current location, then the function <B>insert_in</B> should be executed. The third states that if the word <b>set</b> followed by a single object that is being held, followed by the word <b>to</b>, followed by an integer then execute the function <b>set_to</b>. Feel free to add extra <b>grammar</b> statements that map to library functions into your program. Keeping these extra <b>grammar</b> statements within the game-specific part of your code means that you can upgrade the library at a later date without needing to re-enter your additions. The exact way in which these functions are executed is detailed in the section on <a href="functions.html#functions5">Responding to the Player's Moves</a>.
 
 <p>When using the tokens <b>$integer</b> and <b>$string</b> the values entered by the player will be placed into constants of the same name. If a command contains two or more of the same token an array of constants will be created. For example:
 
@@ -562,7 +563,7 @@ write "Sending " $string[0] " to " $string[1] "^."
 <B>parameter</B> <I>ParameterName</I> [<I>Container</I>] [<I>LowestValue HighestValue</I>]
 </pre>
 
-<p>A <b>parameter</b> is a connection between an HTML form parameter and a JACL container or string. When a defined parameter is passed, its value is copied into the specified container or string before the player's move is processed. A group of two integers may also be specified after the container in the parameter definition. These numbers indicate the parameter's range bounds if it the container is for storing integers. The first integer is the lowest possible value for the parameter, the second is its highest. When a parameter is updated, it will automatically be adjusted to fall within the supplied bounds if required. If no low and high range bounds are specified, they are set to -65535 and 65535 respectively.
+<p>A <b>parameter</b> is a connection between an HTML form parameter and a JACL container or string. When a defined parameter is passed, its value is copied into the specified container or string before the player's move is processed. A group of two integers may also be specified after the container in the parameter definition. These numbers indicate the parameter's range bounds if the container is for storing integers. The first integer is the lowest possible value for the parameter, the second is its highest. When a parameter is updated, it will automatically be adjusted to fall within the supplied bounds if required. If no low and high range bounds are specified, they are set to -65535 and 65535 respectively.
 
 <p>Below is a complete JACL program demonstrating the use of <b>parameter</b> statement in combination with an HTML form.
 
@@ -616,9 +617,9 @@ grammar blankjacl &gt;form
 <p><img src="forms.png">
 </center>
 
-<p>Selecting one of the radio buttons and entering text in the password input field then clicking the submit button will cause the value of <b>kryten(status)</b> and <b>password</b> to be updated before the player's command is processed. As there is no move to process, a <b>blankjacl</b> command is proxied on the players behalf. This command has been mapped to the <b>form</b> function, which re-displays the form.
+<p>Selecting one of the radio buttons and entering text in the password input field then clicking the submit button will cause the value of <b>kryten(status)</b> and <b>password</b> to be updated before the player's command is processed. As there is no move to process, a <b>blankjacl</b> command is proxied on the player's behalf. This command has been mapped to the <b>form</b> function, which re-displays the form.
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body>
 </html>

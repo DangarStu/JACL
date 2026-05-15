@@ -1,8 +1,8 @@
 <html>
 <head>
 	<title>The JACL Author's Guide</title>
-	<meta name="description" content="Documention for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,programming,programmers,guide,manual,documention,instructions">
+	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
+	<meta name="keywords" content="JACL,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -24,7 +24,7 @@ endif
 ...
 </pre>
 
-<p>Another possibility is to define "put" as an actual <b>synonym</b> of "insert". There are potential dangers with this method that are described in the section on <a href="definitions.html#definitions6">Synonyms</a>.
+<p>Another possibility is to define "put" as an actual <b>synonym</b> of "insert". There are potential dangers with this method that are described in the section on <a href="definitions.html#definitions8">Synonyms</a>.
 
 <P>Now for a few general rules. Each verb that involves touching an object should check that the object does not have the attribute <B>OUT_OF_REACH</B> before allowing the player to manipulate it. This, of course, does not apply to verbs that can only be performed on objects that are being held. The following line of code is an example from the top of the <B>+take</B> function:
 
@@ -140,9 +140,9 @@ give sword to troll
 You can't use the word &quot;to&quot; in that context.
 </pre>
 
-<P>This is because <B>sword</B> is a match for <B>*present</B>, therefore causing the parser to branch down a path that only allows to word <B>grief</B> to be used next. This is obviously not the desired effect. Using <b>$text</b> in a <b>grammar</b> statement is equally dangerous. As an extreme example, using <b>$text</b> as the first word of the first <b>grammar</b> statement will prevent any others from ever matching. It is therefore important to bare in mind that <b>grammar</b> statements are tested in the order they appear in the game file, starting from the top. To have a <b>grammar</b> statement checked last, add it to your game file after the line including <b>verbs.library</b>.
+<P>This is because <B>sword</B> is a match for <B>*present</B>, therefore causing the parser to branch down a path that only allows to word <B>grief</B> to be used next. This is obviously not the desired effect. Using <b>$text</b> in a <b>grammar</b> statement is equally dangerous. As an extreme example, using <b>$text</b> as the first word of the first <b>grammar</b> statement will prevent any others from ever matching. It is therefore important to bear in mind that <b>grammar</b> statements are tested in the order they appear in the game file, starting from the top. To have a <b>grammar</b> statement checked last, add it to your game file after the line including <b>verbs.library</b>.
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body>
 </html>
