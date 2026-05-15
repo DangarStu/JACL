@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>JACL Author's Guide -- Lulu cover wrap</title>
+<style>
+  /* Lulu cover wrap for Executive 7x10 trim, 246-page spine.
+     Total document size with bleed: 14.864in x 10.25in.
+     Layout left-to-right when laid flat:
+       0.000 - 0.125in : left bleed
+       0.125 - 7.125in : back cover (7in trim)
+       7.125 - 7.739in : spine (0.614in)
+       7.739 - 14.739in: front cover (7in trim)
+       14.739 - 14.864 : right bleed
+     Safety margin: 0.5in inside the trim edge on every side. */
+
+  @page {
+    size: 14.864in 10.25in;
+    margin: 0;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 14.864in;
+    height: 10.25in;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #111;
+  }
+
+  /* --------- Back cover (left of spine) --------- */
+  .back {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 7.125in;       /* trim + left bleed */
+    height: 10.25in;
+    box-sizing: border-box;
+    /* Content padding measured from page edges, so 0.125in bleed
+       + 0.5in safety = 0.625in on outer edges; 0.5in safety on
+       the binding side (spine boundary at x=7.125in). */
+    padding: 0.625in 0.5in 0.625in 0.625in;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .back h1 {
+    font-size: 22pt;
+    margin: 0 0 6mm 0;
+    line-height: 1.15;
+  }
+
+  .back .subtitle {
+    font-style: italic;
+    font-size: 13pt;
+    margin: 0 0 12mm 0;
+    color: #444;
+  }
+
+  .back .blurb {
+    font-size: 11pt;
+    line-height: 1.45;
+    flex: 1;
+  }
+
+  .back .blurb p {
+    margin: 0 0 4mm 0;
+  }
+
+  .back .footer {
+    margin-top: auto;
+    font-size: 9pt;
+    color: #444;
+    line-height: 1.4;
+  }
+
+  .back .footer .author {
+    font-size: 11pt;
+    font-weight: bold;
+    color: #111;
+    margin-bottom: 2mm;
+  }
+
+  /* --------- Spine --------- */
+  .spine {
+    position: absolute;
+    left: 7.125in;
+    top: 0;
+    width: 0.614in;
+    height: 10.25in;
+    background: #2b3e52;
+    color: #ffffff;
+    overflow: hidden;
+  }
+
+  /* Spine text rotated to read top-to-bottom (US/UK convention --
+     tilt your head right to read it on a shelf). The text element
+     starts as a horizontal block sized to the spine's *length*,
+     then rotates 90deg clockwise about its top-left corner and
+     gets translated back into the spine column. */
+  .spine .text {
+    position: absolute;
+    top: 0.625in;                  /* 0.5 safety + 0.125 bleed */
+    left: 0.614in;                 /* will sit at right edge then rotate in */
+    width: 9in;                    /* available spine length: 10.25 - 2*0.625 */
+    height: 0.614in;
+    transform-origin: top left;
+    transform: rotate(90deg) translateY(-0.614in);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4mm;
+    box-sizing: border-box;
+    font-weight: bold;
+    font-size: 13pt;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  .spine .title { }
+  .spine .author { font-weight: normal; font-size: 11pt; letter-spacing: 0.04em; }
+
+  /* --------- Front cover (right of spine) --------- */
+  .front {
+    position: absolute;
+    left: 7.739in;        /* right edge of spine */
+    top: 0;
+    width: 7.125in;       /* trim + right bleed */
+    height: 10.25in;
+    overflow: hidden;
+  }
+
+  .front img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;    /* fills the full bleed area, cropping if aspect differs */
+    object-position: center;
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<div class="back">
+  <h1>The JACL Author's Guide</h1>
+  <div class="subtitle">Seventh Edition</div>
+
+  <div class="blurb">
+    <p>JACL is a programming language for writing interactive fiction &mdash; the kind of text adventure where the player types commands and reads what happens next.</p>
+
+    <p>This book is the reference for authors. It walks through writing a complete game from scratch, then takes a chapter-by-chapter tour of every language feature: objects, locations, attributes, grammar, flow control, the standard library of verbs, the menu system, the web interface, multimedia, and the JACL-to-HTML pipeline used by the <b>cgijacl</b> and <b>fcgijacl</b> interpreters.</p>
+
+    <p>Three appendices give the complete attribute table, the full set of 216 library verbs, and the source code for the tutorial game.</p>
+  </div>
+
+  <div class="footer">
+    <div class="author">Stuart Allen</div>
+    JACL Interpreter v4.7 &middot; copyright 1992&ndash;2026 Stuart Allen<br>
+    <a href="https://github.com/DangarStu/JACL">github.com/DangarStu/JACL</a> &middot; dangarstu@gmail.com<br>
+    Distributed under the GNU General Public License, version 2 or later.
+  </div>
+</div>
+
+<div class="spine">
+  <div class="text">
+    <span class="title">The JACL Author's Guide</span>
+    <span class="author">Stuart Allen</span>
+  </div>
+</div>
+
+<div class="front">
+  <img src="front.png" alt="">
+</div>
+
+</body>
+</html>
