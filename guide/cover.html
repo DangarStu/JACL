@@ -37,50 +37,63 @@
     width: 7.125in;       /* trim + left bleed */
     height: 10.25in;
     box-sizing: border-box;
-    /* Content padding measured from page edges, so 0.125in bleed
-       + 0.5in safety = 0.625in on outer edges; 0.5in safety on
-       the binding side (spine boundary at x=7.125in). */
-    padding: 0.625in 0.5in 0.625in 0.625in;
+    /* 0.125in bleed + 0.5in safety = 0.625in on the outer/top/bottom
+       edges; 0.5in safety on the binding side (spine boundary). */
+    padding: 0.75in 0.625in 0.75in 0.625in;
     background: #ffffff;
     display: flex;
     flex-direction: column;
   }
 
-  .back h1 {
+  .back .tagline {
     font-size: 22pt;
-    margin: 0 0 6mm 0;
     line-height: 1.15;
-  }
-
-  .back .subtitle {
-    font-style: italic;
-    font-size: 13pt;
-    margin: 0 0 12mm 0;
-    color: #444;
+    font-weight: bold;
+    margin: 0 0 6mm 0;
+    color: #2b3e52;
   }
 
   .back .blurb {
     font-size: 11pt;
-    line-height: 1.45;
-    flex: 1;
+    line-height: 1.5;
+    margin: 0 0 6mm 0;
   }
 
   .back .blurb p {
     margin: 0 0 4mm 0;
   }
 
-  .back .footer {
-    margin-top: auto;
-    font-size: 9pt;
-    color: #444;
-    line-height: 1.4;
+  .back h2 {
+    font-size: 11pt;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 3mm 0;
+    color: #2b3e52;
   }
 
-  .back .footer .author {
-    font-size: 11pt;
-    font-weight: bold;
-    color: #111;
-    margin-bottom: 2mm;
+  .back ul {
+    font-size: 10.5pt;
+    line-height: 1.45;
+    margin: 0 0 6mm 0;
+    padding-left: 5mm;
+  }
+  .back ul li {
+    margin-bottom: 1.5mm;
+  }
+
+  .back .author-bio {
+    font-size: 10.5pt;
+    line-height: 1.5;
+    margin: 0 0 6mm 0;
+  }
+
+  .back .footer {
+    margin-top: auto;
+    border-top: 0.5pt solid #999;
+    padding-top: 4mm;
+    font-size: 8.5pt;
+    color: #555;
+    line-height: 1.5;
   }
 
   /* --------- Spine --------- */
@@ -95,32 +108,53 @@
     overflow: hidden;
   }
 
-  /* Spine text rotated to read top-to-bottom (US/UK convention --
-     tilt your head right to read it on a shelf). The text element
-     starts as a horizontal block sized to the spine's *length*,
-     then rotates 90deg clockwise about its top-left corner and
-     gets translated back into the spine column. */
+  /* Rotated spine text. The .text block is laid out as a horizontal
+     row sized to the spine's *length* (10.25in - safety margins),
+     positioned so its top-left corner sits at the right edge of
+     the spine column, then rotated 90deg clockwise about that
+     corner so the rotated block falls back into the spine column
+     reading top-to-bottom (US/UK convention: tilt head right on a
+     shelf). */
   .spine .text {
     position: absolute;
-    top: 0.625in;                  /* 0.5 safety + 0.125 bleed */
-    left: 0.614in;                 /* will sit at right edge then rotate in */
-    width: 9in;                    /* available spine length: 10.25 - 2*0.625 */
-    height: 0.614in;
+    top: 0.625in;                  /* 0.5in safety + 0.125in bleed */
+    left: 0.614in;                 /* right edge of spine before rotation */
+    width: 9in;                    /* spine length minus safety on both ends */
+    height: 0.614in;               /* spine width */
     transform-origin: top left;
-    transform: rotate(90deg) translateY(-0.614in);
+    transform: rotate(90deg);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 4mm;
+    padding: 0 6mm;
     box-sizing: border-box;
-    font-weight: bold;
-    font-size: 13pt;
-    letter-spacing: 0.05em;
     white-space: nowrap;
   }
 
-  .spine .title { }
-  .spine .author { font-weight: normal; font-size: 11pt; letter-spacing: 0.04em; }
+  .spine .edition {
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #c8d4df;
+    width: 1.5in;
+  }
+
+  .spine .title {
+    font-size: 16pt;
+    font-weight: bold;
+    letter-spacing: 0.04em;
+    flex: 1;
+    text-align: center;
+  }
+
+  .spine .author {
+    font-size: 11pt;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #c8d4df;
+    width: 1.5in;
+    text-align: right;
+  }
 
   /* --------- Front cover (right of spine) --------- */
   .front {
@@ -135,7 +169,7 @@
   .front img {
     width: 100%;
     height: 100%;
-    object-fit: cover;    /* fills the full bleed area, cropping if aspect differs */
+    object-fit: cover;
     object-position: center;
     display: block;
   }
@@ -144,27 +178,37 @@
 <body>
 
 <div class="back">
-  <h1>The JACL Author's Guide</h1>
-  <div class="subtitle">Seventh Edition</div>
+  <div class="tagline">Build text adventures that play in a terminal, a browser, or anywhere in&nbsp;between.</div>
 
   <div class="blurb">
-    <p>JACL is a programming language for writing interactive fiction &mdash; the kind of text adventure where the player types commands and reads what happens next.</p>
+    <p>JACL is a small, interpreted programming language for writing interactive fiction. Its standard library does the heavy lifting &mdash; the parser, the world model, 216 ready-built verbs &mdash; so the author can focus on the writing.</p>
 
-    <p>This book is the reference for authors. It walks through writing a complete game from scratch, then takes a chapter-by-chapter tour of every language feature: objects, locations, attributes, grammar, flow control, the standard library of verbs, the menu system, the web interface, multimedia, and the JACL-to-HTML pipeline used by the <b>cgijacl</b> and <b>fcgijacl</b> interpreters.</p>
+    <p>This is the authoritative reference, taking you from your first room to a finished game ready to publish online.</p>
+  </div>
 
-    <p>Three appendices give the complete attribute table, the full set of 216 library verbs, and the source code for the tutorial game.</p>
+  <h2>Inside</h2>
+  <ul>
+    <li>A complete tutorial game, walked through step by step</li>
+    <li>The full object, location, attribute and grammar reference</li>
+    <li>The web interface library for browser play &mdash; with auto-save, voice synthesis and a clickable command bar</li>
+    <li>Multimedia, menus, CSV-backed data and timed events</li>
+    <li>Three appendices: every attribute, every library verb, and the source code for the tutorial game</li>
+  </ul>
+
+  <h2>About the author</h2>
+  <div class="author-bio">
+    Stuart Allen has been writing and maintaining JACL since 1992. The interpreter and its libraries are free software, distributed under the GNU General Public License.
   </div>
 
   <div class="footer">
-    <div class="author">Stuart Allen</div>
-    JACL Interpreter v4.7 &middot; copyright 1992&ndash;2026 Stuart Allen<br>
-    <a href="https://github.com/DangarStu/JACL">github.com/DangarStu/JACL</a> &middot; dangarstu@gmail.com<br>
-    Distributed under the GNU General Public License, version 2 or later.
+    JACL Interpreter v4.7 &middot; <a href="https://github.com/DangarStu/JACL">github.com/DangarStu/JACL</a><br>
+    Copyright 1992&ndash;2026 Stuart Allen &middot; dangarstu@gmail.com
   </div>
 </div>
 
 <div class="spine">
   <div class="text">
+    <span class="edition">Seventh Edition</span>
     <span class="title">The JACL Author's Guide</span>
     <span class="author">Stuart Allen</span>
   </div>

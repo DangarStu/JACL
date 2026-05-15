@@ -58,6 +58,10 @@ Ave, Cambridge, MA 02139, USA.
 <li><a href="#installation0">Installation</a>
 <ol>
 	<li><a href="#installation1">Compilation</a>
+	<ol>
+		<li><a href="#installation1a">Configure Options</a>
+		<li><a href="#installation1b">Optional Google Sign-In Dependencies</a>
+	</ol>
 	<li><a href="#installation2">Playing the Sample Games</a>
 	<li><a href="#installation3">cgijacl and fcgijacl</a>
 	<li><a href="#installation4">Playing the Sample Games in a Browser</a>
@@ -351,36 +355,87 @@ git clone https://github.com/DangarStu/JACL.git
 
 <h2><a class="section" name="installation1">Compilation</a></h2>
 
-<p>The <b>src</b> directory contains the C source code to the JACL interpreter. Also included is the source to <b>glkterm</b>, a Glk implementation by Andrew Plotkin based on ncursesw, and the <b>bjorb</b> utility.
+<p>The <b>src</b> directory contains the C source code for the JACL interpreters. The bundled subdirectories <b>glkterm</b> and <b>CheapGlk</b> hold Andrew Plotkin's Glk implementations that the console interpreters link against, and <b>bjorb</b> is included for packaging multimedia resources.
+
+<p>Each interpreter has its own dependency profile. The configure script detects what is available on your system and only builds the ones it can:
 
 <center>
-<table width=85%><tr>
-<th width=20%>&nbsp;Interpreter&nbsp;</th>
-<th>&nbsp;Required Libraries&nbsp;</th>
+<table width=85%>
 <tr>
-<td><b>jacl</b> (Posix)</td>
-<td>GlkTerm by Andrew Plotkin (included) and ncursesw.
-</td>
-</tr><tr>
+<th width=20%>&nbsp;Binary&nbsp;</th>
+<th>&nbsp;Required Libraries&nbsp;</th>
+</tr>
+<tr>
+<td><b>jacl</b></td>
+<td>GlkTerm (included) and <b>ncursesw</b>. Built only when <b>ncurses</b> is detected.</td>
+</tr>
+<tr>
+<td><b>cjacl</b></td>
+<td>CheapGlk (included). No external libraries; always built.</td>
+</tr>
+<tr>
 <td><b>cgijacl</b></td>
-<td>No special libraries are required to compile <b>cgijacl</b>, however a POSIX compliant system is needed.
-</tr><tr>
+<td>None for basic operation. The optional Google Sign-In flow needs <b>libcurl</b>, <b>jansson</b> and <b>openssl</b> (see below). Always built.</td>
+</tr>
+<tr>
 <td><b>fcgijacl</b></td>
-<td>FastCGI development library and Apache module:
+<td>FastCGI development library:
 <pre>
-sudo apt install libfcgi-dev libapache2-mod-fcgid
+sudo apt install libfcgi-dev
 </pre>
-
+Built only when <b>libfcgi</b> is detected.</td>
+</tr>
+<tr>
+<td><b>bjorb</b></td>
+<td>None. Always built.</td>
+</tr>
 </table>
 </center>
 
-<p>To compile the source for the JACL interpreters and the <b>bjorb</b> under Linux simply change to the <b>src</b> subdirectory and type the following command:
+<p>Compilation is a two-step process. From the <b>src</b> subdirectory:
 
 <pre>
+./configure
 make install
 </pre>
 
-<p>This will compile all the relevant programs and copy the executable binaries into the <b>bin</b> subdirectory, as well as installing the binaries, libraries, and configuration files to <b>/usr/local/jacl/</b>.
+<p>The <b>./configure</b> step detects which libraries are available and writes a Makefile that builds the supported interpreters. At the end it prints a summary listing each interpreter as <b>yes</b> or <b>no</b>, so it is easy to see what will be built and why anything is being skipped. If your distribution does not ship the <b>configure</b> script in the source tarball, regenerate it once with <b>autoconf</b> and it will then be present for every subsequent build.
+
+<p>The <b>make install</b> step compiles everything <b>configure</b> approved, copies the binaries into the <b>bin</b> subdirectory of the JACL source tree (so you can run them from there during development), installs the binaries into <b>/usr/local/bin/</b>, and lays out the libraries, sample data and configuration template under <b>/usr/local/jacl/</b>. An existing <b>/etc/cgijacl.conf</b> is preserved; the freshly-installed template is written alongside it as <b>/etc/cgijacl.conf.example</b> so administrator edits (such as <b>google_client_id</b> or <b>session_secret</b>) survive a reinstall.
+
+<h3><a class="section" name="installation1a">Configure Options</a></h3>
+
+<p>The configure script accepts a small set of arguments. The most important is the language selector:
+
+<pre>
+./configure --with-language=LANG
+</pre>
+
+<p>where <i>LANG</i> is one of <b>english</b> (the default), <b>french</b>, <b>german</b>, <b>indonesian</b> or <b>spanish</b>. The chosen language is baked into the build &mdash; both the interpreter's parser strings and the standard library are switched together. To switch languages later, re-run <b>./configure</b> with the new value and <b>make install</b> again.
+
+<p>Standard autoconf flags (<b>--prefix</b>, <b>--bindir</b>, <b>CFLAGS</b>, etc.) work as expected. For example:
+
+<pre>
+./configure --with-language=french CFLAGS="-O3 -march=native"
+</pre>
+
+<h3><a class="section" name="installation1b">Optional Google Sign-In Dependencies</a></h3>
+
+<p>The web interpreters (<b>cgijacl</b> and <b>fcgijacl</b>) support an optional Google Sign-In flow that binds a player's auto-save to their verified Google account. This feature requires three additional libraries at build time: <b>libcurl</b>, <b>jansson</b> and <b>openssl</b>. The configure script probes for all three via <b>pkg-config</b>; if any of them is missing the web interpreters still build, but they link against an <b>auth_stub.c</b> that provides no-op entry points and only the anonymous flow is available at runtime.
+
+<p>On Debian and Ubuntu:
+
+<pre>
+sudo apt install libcurl4-openssl-dev libjansson-dev libssl-dev
+</pre>
+
+<p>On macOS with Homebrew:
+
+<pre>
+brew install curl jansson openssl pkg-config
+</pre>
+
+<p>See the chapter on <a href="#http_auth">Google Sign-In Authentication</a> for the runtime configuration and the corresponding <b>cgijacl.conf</b> directives.
 
 <p>In the <b>projects</b> directory you will find several JACL games. A JACL game consists of one or more <b>.jacl</b> files and an optional <b>.blorb</b> file that contains multimedia resources used by the game. If a JACL game consists of more than one <b>.jacl</b> file, the other file will be one of the library files from the <b>include</b> directory.
 
