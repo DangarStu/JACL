@@ -151,6 +151,9 @@ resolve_yes_or_no(const char *input)
     return -1;
 }
 
+void            web_emit_status_bar(void);
+extern int      web_status_emit_count;
+
 char            include_directory[81] = "\0";
 char            temp_directory[81] = "\0";
 char            data_directory[81] = "\0";
@@ -776,6 +779,7 @@ main(int argc, char *argv[])
 
         /* RESET GLOBAL VARIABLES THAT ARE INTERNAL TO THE INTERPRETER */
         style_index = 0;
+        web_status_emit_count = 0;
 
         /* If the JS sent a measured 'status_cols' (the actual character
          * width of the rendered #statuswin element on the client), use
@@ -871,6 +875,12 @@ main(int argc, char *argv[])
 
                 if (!strcmp(cgi_val(entries, "rpc"), "timer")) {
                     execute("+timer");
+                } else if (!strcmp(cgi_val(entries, "rpc"), "resize")) {
+                    /* Client viewport resized: re-render the status
+                     * bar at the new column count (already applied to
+                     * status_window_width from &status_cols= above).
+                     * No turn state mutation -- just the bar. */
+                    web_emit_status_bar();
                 } else if (!strcmp(cgi_val(entries, "rpc"), "ajax")) {
                     execute("+ajax");
                 } else if (!strcmp(cgi_val(entries, "rpc"), "eachturn")) {
@@ -1125,6 +1135,19 @@ skip_command:
                     execute("+eachturn");
                 }
             }
+        }
+
+        /* If the command processed this request didn't call updatestatus
+         * (e.g. look/inventory/examine -- verbs that set TIME=false and
+         * skip +system_eachturn), emit one now. Keeps the status bar
+         * grid in sync with the latest &status_cols= even on non-turn
+         * commands, so a browser resize followed by any command refreshes
+         * the bar's width. Skipped for full-page (non-ajax) loads, which
+         * already render the bar via the +intro path. */
+        if (web_status_emit_count == 0
+            && cgi_val(entries, "ajax") != NULL
+            && !strcmp(cgi_val(entries, "ajax"), "true")) {
+            web_emit_status_bar();
         }
 
         /* DISPLAY THE FOOTER OF THE HTML PAGE */
@@ -1528,6 +1551,13 @@ static int  web_status_x = 0;
 static int  web_status_y = 0;
 static int  web_status_w = 80;
 static int  web_status_h = 1;
+/* Counter incremented each time web_emit_status_bar() runs. The
+ * request handler resets it to 0 at the start of each request and
+ * checks it at the end -- if still 0 (no updatestatus fired during
+ * the command, e.g. a TIME=false verb like look/inventory) it emits
+ * one anyway so the bar always tracks the latest grid width sent
+ * via &status_cols=. */
+int         web_status_emit_count = 0;
 static char web_status_grid[WEB_STATUS_MAX_ROWS][WEB_STATUS_MAX_COLS + 1];
 
 void
@@ -1615,6 +1645,79 @@ web_status_end(void)
         }
         row_html[p] = 0;
         write_text(row_html);
+    }
+}
+
+/* Emit a <jacl-status>...</jacl-status> block at the current
+ * status_window_width. Used by the JACL `updatestatus` opcode (the
+ * call site lives in interpreter.c so the GLK build keeps using
+ * status_line()) and by the rpc=resize handler, which re-renders the
+ * bar at a new column count without advancing turn state. */
+void
+web_emit_status_bar(void)
+{
+    struct integer_type *sw = integer_resolve("status_window");
+    struct integer_type *sww;
+    struct integer_type *tm;
+    int                  cols;
+    int                  saved_tm;
+
+    if (sw == NULL || sw->value <= 0) return;
+
+    sww  = integer_resolve("status_window_width");
+    cols = (sww != NULL && sww->value > 0) ? sww->value : 80;
+
+    /* Clamp TOTAL_MOVES to >= 0 for the duration of bar emission. The
+     * loader starts it at -1 ("TIME PASSES BEFORE THE FIRST PROMPT"),
+     * so a status bar rendered during +intro -- before eachturn() has
+     * bumped it to 0 -- would otherwise show 'Moves: -1'. */
+    tm       = integer_resolve("total_moves");
+    saved_tm = (tm != NULL) ? tm->value : 0;
+    if (tm != NULL && tm->value < 0) {
+        tm->value = 0;
+    }
+
+    sprintf(temp_buffer,
+            "<jacl-status data-lines=~%d~ style=~display:none~>",
+            sw->value);
+    write_text(temp_buffer);
+    web_status_begin(sw->value, cols);
+    web_status_emit_count++;
+
+    /* Try a web-specific override first, then the GLK function name
+     * (so games that already have +update_status_window can share it
+     * across targets via the grid emulation), then a sensible default. */
+    if (execute("+update_status_window_web") == FALSE
+        && execute("+update_status_window") == FALSE) {
+        char defstr[64];
+        int  len, pad, j;
+        int  here_idx = HERE;
+        if (here_idx > 0 && here_idx <= objects
+            && object[here_idx] != NULL) {
+            const char *here_text = sentence_output(here_idx, TRUE);
+            if (here_text != NULL) {
+                web_status_cursor(1, 0);
+                for (j = 0; here_text[j] && j + 2 < cols; j++) {
+                    web_status_putchar((unsigned char)here_text[j]);
+                }
+            }
+        }
+        sprintf(defstr, "Score: %d  Moves: %d",
+                SCORE->value, TOTAL_MOVES->value);
+        len = (int) strlen(defstr);
+        pad = cols - len - 1;
+        if (pad < 0) pad = 0;
+        web_status_cursor(pad, 0);
+        for (j = 0; defstr[j]; j++) {
+            web_status_putchar((unsigned char)defstr[j]);
+        }
+    }
+
+    web_status_end();
+    write_text("</jacl-status>");
+
+    if (tm != NULL) {
+        tm->value = saved_tm;
     }
 }
 

@@ -745,8 +745,35 @@ print:
        * wider, the right-aligned segment sits short of the edge until^
        * the next updatestatus call (typically the first command). */^
       window.jaclStatusCols = jaclMeasureStatusCols();^
+      /* Recompute on resize and ask the engine for a fresh status bar^
+       * at the new column count. Without the rpc=resize fetch, the^
+       * grid stays at the width sent on the last command/timer tick^
+       * so right-aligned text floats away from the viewport edge^
+       * until the player types something. Debounced so dragging a^
+       * window edge does not spam the server. */^
+      var jaclResizeTimer = null;^
       window.addEventListener('resize', function() {^
          window.jaclStatusCols = jaclMeasureStatusCols();^
+         if (jaclResizeTimer) clearTimeout(jaclResizeTimer);^
+         jaclResizeTimer = setTimeout(function() {^
+            jaclResizeTimer = null;^
+            var statusBar = document.getElementById('statuswin');^
+            if (!statusBar || statusBar.innerHTML.length === 0) return;^
+            var url = window.location.pathname + '?ajax=true&rpc=resize&status_cols=' + window.jaclStatusCols;^
+            var p = fetch(url, { credentials: 'same-origin' });^
+            p = p.then(function(r) { return r.text(); });^
+            p = p.then(function(data) {^
+               var holder = document.createElement('div');^
+               holder.innerHTML = data;^
+               var statusUpdate = holder.querySelector('jacl-status');^
+               if (!statusUpdate) return;^
+               var lines = parseInt(statusUpdate.getAttribute('data-lines') || '1', 10);^
+               if (isNaN(lines) || lines < 1) lines = 1;^
+               document.body.style.setProperty('--status-lines', lines);^
+               statusBar.innerHTML = statusUpdate.innerHTML;^
+            });^
+            p.catch(function() {});^
+         }, 200);^
       });^
       /* Pick up any <jacl-timer> the initial +intro emitted, in case^
        * a game starts a timer right at game launch. */^
