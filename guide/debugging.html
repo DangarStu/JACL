@@ -1,8 +1,8 @@
 <html>
 <head>
 	<title>The JACL Author's Guide</title>
-	<meta name="description" content="Documention for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,programming,programmers,guide,manual,documention,instructions">
+	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
+	<meta name="keywords" content="JACL,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -16,7 +16,7 @@
 
 <p>The <b>walkthru</b> command allows you to specify the name of a text file that contains a list of moves to process as though they were typed by the player. The text file must contain one command per line and may contain as many commands as you would like. The default name for a walkthru file is <i>GameName</i><b>.walkthru</b>. It is common for this default file to issue all the commands required to get from the beginning of the game to end. This can vary from the most direct path using the minimum commands to the most thorough path visiting every part of the game along the way. Other shorter walkthru files may also be created that take the player from one specific point in the game to another.
 
-<p>Walkthru files have two advantages over saved game files. The first is that as soon as you add or remove an object or variable to a game, saved game files made using a previous version of the game can no longer be loaded. This means that without the use of a walkthru file, play testing the end of the game would involve tediously playing the beginning of the game over and over again as it grows. The second advantage is that a walkthru file shows all the output from every command rather than just instantly teleporting you to a future (or past) point in the game. This makes walkthru files useful for regression testing. By running through a walkthru file after changing some code in your game, you are able to test that everything that previously works still works as expected by quickly scanning the transcript. 
+<p>Walkthru files have two advantages over saved game files. The first is that as soon as you add or remove an object or variable to a game, saved game files made using a previous version of the game can no longer be loaded. This means that without the use of a walkthru file, play testing the end of the game would involve tediously playing the beginning of the game over and over again as it grows. The second advantage is that a walkthru file shows all the output from every command rather than just instantly teleporting you to a future (or past) point in the game. This makes walkthru files useful for regression testing. By running through a walkthru file after changing some code in your game, you are able to test that everything that previously worked still works as expected by quickly scanning the transcript. 
 
 <p>When a walkthru script is running, no <b>[MORE]</b> prompts will be displayed, including those explicitly displayed by a <b>more</b> command. Below is a sample of a walkthru file, being the top ten lines from <b>grail.walkthru</b>:
 
@@ -59,7 +59,7 @@ Comment ignored.
 
 <h2><a class="section" name="debugging4">The INSPECT Command</a></h2>
 
-<p>The <b>inspect</b> command displays the label, attribute and element values of the object passed as a parameter. Two special verbs in <b>debug.library</b> allows an object to be inspected while playing a game, these are <b>inspect</b> and <b>inspectobj</b>. Below is some sample output of the <b>inspect</b> verb from <i>The Unholy Grail</i>:
+<p>The <b>inspect</b> command displays the label, attribute and element values of the object passed as a parameter. Two special verbs in <b>debug.library</b> allow an object to be inspected while playing a game, these are <b>inspect</b> and <b>inspectobj</b>. Below is some sample output of the <b>inspect</b> verb from <i>The Unholy Grail</i>:
 
 <pre>
 &gt;inspect drawer
@@ -76,6 +76,7 @@ previous: 0
 child: 0
 index: 0
 status: 0
+timer: 0
 counter: 0
 points: 0
 class: 0
@@ -85,7 +86,7 @@ y: 0
 
 <p>The above output is a dump of the current values of all of the object's properties, including attributes. The object chosen by the <b>inspect</b> verb is determined using the standard rules for object resolution based on the names provided. In this case, the single name <b>drawer</b> has uniquely identified an object with the label <b>compartment</b>.
 
-<p>It is also possible to use the command <b>inspectobj</b> to give the same details as above for whichever object an expression resolves to. For example, the follow two commands will show the detail of the player's current location:
+<p>It is also possible to use the command <b>inspectobj</b> to give the same details as above for whichever object an expression resolves to. For example, the following two commands will show the detail of the player's current location:
 
 <pre>
 &gt;inspectobj player(parent)
@@ -104,18 +105,54 @@ report(parent) = 44
 
 <h2><a class="section" name="debugging6">The Verb FETCH</a></h2>
 
-<p>Where the verb <b>inspect</b> is a way of accessing the JACL command <b>inspect</b> during game play, <b>fetch</b> is simply a convenience verb to move an object to the current location and remove the attribute <b>OUT_OF_REACH</b> from that object should it have it. The verb is handy when you need to test a puzzle that involves the use or one or move objects that are time consuming to obtain manually. 
+<p>Where the verb <b>inspect</b> is a way of accessing the JACL command <b>inspect</b> during game play, <b>fetch</b> is simply a convenience verb to move an object to the current location and remove the attribute <b>OUT_OF_REACH</b> from that object should it have it. The verb is handy when you need to test a puzzle that involves the use of one or more objects that are time consuming to obtain manually. 
 
 <p>For thorough testing it is preferable to use the <b>walkthru</b> verb to test all the steps normally taken to obtain the object or objects, but <b>fetch</b> can still be of use when testing small parts of your game in isolation.
 
-<h2><a class="section" name="debugging7">Releasing Your Game</a></h2>
+<h2><a class="section" name="debugging7">Other Debug Verbs</a></h2>
 
-<p>Once you have completed your game and all known bugs are fixed you will want to release it to the public to be played. Although it is possible to simply distribute the <b>.jacl</b> file you have been working on (presuming only standard JACL libraries are used), it is often preferable to distribute the <b>.j2</b> file. This file is created in the <b>temp</b> subdirectory when the game is run. This file can be thought of a statically-linked version of your game, with all <b>#included</b> files appended to the game file. In addition to appending all the required library files, unnecessary whitespace is removed from the beginning of each line to reduce file size and improve run-time performance.
+<p><b>debug.library</b> ships several other commands that are convenient during development. Type <b>dlhelp</b> in-game for a live summary; the verbs are also listed below.
+
+<table width=100%><tr>
+<th width=30%>Command</th>
+<th>Description</th>
+</tr><tr>
+<td><b>teleport</b> <i>location</i></td>
+<td>Move the player directly into the named location, bypassing any movement guards.</td>
+</tr><tr>
+<td><b>stepto</b> <i>location</i></td>
+<td>Walk the player one step toward the named location along the shortest known path. Useful for tracing path-finding logic.</td>
+</tr><tr>
+<td><b>locationof</b> <i>object</i></td>
+<td>Print the name of the location currently containing the named object (regardless of how deeply nested it is in containers).</td>
+</tr><tr>
+<td><b>grandof</b> <i>object</i></td>
+<td>Print the chain of parent objects from the named object up to its enclosing location.</td>
+</tr><tr>
+<td><b>is</b> <i>object</i> <b>grandof</b> <i>object</i></td>
+<td>Test whether the second object is anywhere inside the first (at any depth).</td>
+</tr><tr>
+<td><b>intarray</b> <i>name</i></td>
+<td>Dump the current values of an integer array.</td>
+</tr><tr>
+<td><b>strarray</b> <i>name</i></td>
+<td>Dump the current values of a string array.</td>
+</tr><tr>
+<td><b>dlstats</b></td>
+<td>Show summary statistics about the loaded game (object count, attribute count, etc.).</td>
+</tr><tr>
+<td><b>dlhelp</b></td>
+<td>List the verbs provided by <b>debug.library</b>.</td>
+</tr></table>
+
+<h2><a class="section" name="debugging8">Releasing Your Game</a></h2>
+
+<p>Once you have completed your game and all known bugs are fixed you will want to release it to the public to be played. Although it is possible to simply distribute the <b>.jacl</b> file you have been working on (presuming only standard JACL libraries are used), it is often preferable to distribute the <b>.j2</b> file. This file is created in the <b>temp</b> subdirectory when the game is run. This file can be thought of as a statically-linked version of your game, with all <b>#included</b> files appended to the game file. In addition to appending all the required library files, unnecessary whitespace is removed from the beginning of each line to reduce file size and improve run-time performance.
 
 <p>Although a <b>.j2</b> file is created each time your game is run, it is possible to use the <b>-release</b> argument when running jacl to produce a file more suitable for distribution. The argument will cause the <b>.j2</b> to be encrypted (mildly), and to only contain files included with the <b>#include</b> directive, not the <b>#debug</b> directive.
 
 <p>If you wish to create a <b>.j2</b> file that does not include the <b>#debug</b> files, but is not encrypted, you can supply the arguments <b>-release -noencrypt</b>.
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body></html>

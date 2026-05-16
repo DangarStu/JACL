@@ -1,8 +1,8 @@
 <html>
 <head>
 <title>The JACL Author's Guide</title>
-<meta name="description" content="Documention for the JACL Adventure Creation Language.">
-<meta name="keywords" content="JACL,programming,programmers,guide,manual,documention,instructions">
+<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
+<meta name="keywords" content="JACL,programming,programmers,guide,manual,documentation,instructions">
 <link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -18,8 +18,18 @@
 <li><a class="chapter" href="installation.html#installation0">Installation</a>
 <ol>
 	<li><a href="installation.html#installation1">Compilation</a>
-	<li><a href="installation.html#installation5">Playing the Sample Games</a>
+	<ol>
+		<li><a href="installation.html#installation1a">Configure Options</a>
+		<li><a href="installation.html#installation1b">Optional Google Sign-In Dependencies</a>
 	</ol>
+	<li><a href="installation.html#installation2">Playing the Sample Games</a>
+	<li><a href="installation.html#installation3">cgijacl and fcgijacl</a>
+	<li><a href="installation.html#installation4">Playing the Sample Games in a Browser</a>
+	<li><a href="installation.html#installation5">Using JACL with FastCGI and Apache</a>
+	<li><a href="installation.html#installation6">Automated Setup</a>
+	<li><a href="installation.html#installation7">Manual Setup</a>
+	<li><a href="installation.html#installation8">Troubleshooting</a>
+</ol>
 
 <li><a class="chapter" href="playing.html#playing0">Playing Interactive Fiction</a>
 <ol>
@@ -49,11 +59,13 @@
 <li><a class="chapter" href="debugging.html#debugging0">Testing, Debugging and Releasing</a>
 <ol>
 	<li><a href="debugging.html#debugging1">The WALKTHRU Command</a>
-	<li><a href="debugging.html#debugging2">The DEBUG Command</a>
-	<li><a href="debugging.html#debugging3">The INSPECT Command</a>
+	<li><a href="debugging.html#debugging2">Transcripts</a>
+	<li><a href="debugging.html#debugging3">The Debug Library</a>
+	<li><a href="debugging.html#debugging4">The INSPECT Command</a>
 	<li><a href="debugging.html#debugging5">The Verb VALUEOF</a>
 	<li><a href="debugging.html#debugging6">The Verb FETCH</a>
-	<li><a href="debugging.html#debugging7">Releasing Your Game</a>
+	<li><a href="debugging.html#debugging7">Other Debug Verbs</a>
+	<li><a href="debugging.html#debugging8">Releasing Your Game</a>
 </ol>
 
 <li><a class="chapter" href="screendisplay.html#screendisplay0">Screen Display</a>
@@ -63,10 +75,10 @@
 		<li><a href="screendisplay.html#screendisplay2">Special Characters</a>
 		<li><a href="screendisplay.html#screendisplay3">Printing the Value of Variables</a>
 		<li><a href="screendisplay.html#screendisplay4">Printing the Value of Item Elements</a>
-		<li><a href="screendisplay.html#screendisplay5">Printing the Names and descriptions of Objects</a>
+		<li><a href="screendisplay.html#screendisplay5">Printing the Names and Descriptions of Objects</a>
 		<li><a href="screendisplay.html#screendisplay6">Sentences Referring to Varying Objects</a>
 		<li><a href="screendisplay.html#screendisplay7">Custom Macros</a>
-		<li><a href="screendisplay.html#screendisplay8">Printing the Value of String Constants</a>
+		<li><a href="screendisplay.html#screendisplay8">Printing the Value of Strings</a>
 	</ol>
 	<li><a href="screendisplay.html#screendisplay9">The PRINT Command</a>
 	<li><a href="screendisplay.html#screendisplay10">The OUTPUT Command</a>
@@ -75,17 +87,17 @@
 </ol>
 
 <li><a class="chapter" href="multimedia.html#multimedia0">Glk and Multimedia</a>
-
 <ol>
-	<li><a href="multimedia.html#multimedia1">Blorb Files and BLC</a></h2>
-	<li><a href="multimedia.html#multimedia2">The IMAGE Command</a></h2>
-	<li><a href="multimedia.html#multimedia3">The SOUND Command</a></h2>
-	<li><a href="multimedia.html#multimedia4">The VOLUME Command</a></h2>
-	<li><a href="multimedia.html#multimedia5">The STOP Command</a></h2>
-	<li><a href="multimedia.html#multimedia6">The TIMER Command</a></h2>
-	<li><a href="multimedia.html#multimedia7">The STYLE Command</a></h2>
-	<li><a href="multimedia.html#multimedia8">The Status Window</a></h2>
-	<li><a href="multimedia.html#multimedia9">The UPDATESTATUS Command</a></h2>
+	<li><a href="multimedia.html#multimedia1">Blorb Files (Glk) and Media Files (Web)</a>
+	<li><a href="multimedia.html#multimedia2">The IMAGE Command</a>
+	<li><a href="multimedia.html#multimedia3">The SOUND Command</a>
+	<li><a href="multimedia.html#multimedia4">The VOLUME Command</a>
+	<li><a href="multimedia.html#multimedia5">The STOP Command</a>
+	<li><a href="multimedia.html#multimedia6">The TIMER Command</a>
+	<li><a href="multimedia.html#multimedia7">The STYLE Command</a>
+	<li><a href="multimedia.html#stylehint">The STYLEHINT Declaration</a>
+	<li><a href="multimedia.html#multimedia8">The Status Window</a>
+	<li><a href="multimedia.html#multimedia9">The UPDATESTATUS Command</a>
 </ol>
 
 <li><a class="chapter" href="http.html#http0">HTTP and HTML</a>
@@ -101,16 +113,21 @@
 	<li><a href="http.html#http9">The OPTION Command</a>
 	<li><a href="http.html#http10">The GETENV Command</a>
 	<li><a href="http.html#http11">The IMAGE Command</a>
+	<li><a href="http.html#http_auth">Google Sign-In Authentication</a>
 	<li><a href="http.html#http12">The Media File</a>
 </ol>
 
 <li><a class="chapter" href="webinterface.html#webinterface0">GUI Web Interface</a>
 <ol>
 	<li><a href="webinterface.html#webinterface1">Using the Interface</a>
+	<li><a href="webinterface.html#webinterface2">The Link Bar</a>
+	<li><a href="webinterface.html#webinterface3">DOM Contract</a>
+	<li><a href="webinterface.html#webinterface4">Pending-Question Prompts</a>
+	<li><a href="webinterface.html#webinterface5">Voice (Text-to-Speech)</a>
+	<li><a href="webinterface.html#webinterface6">Authorial Scaffolding</a>
 </ol>
 
 <li><a class="chapter" href="flowcontrol.html#flowcontrol0">Flow Control</a>
-
 <ol>
 	<li><a href="flowcontrol.html#flowcontrol1">The IF, IFALL, ENDIF and ENDALL Commands</a>
 	<li><a href="flowcontrol.html#flowcontrol2">The IFSTRING Command</a>
@@ -120,8 +137,9 @@
 	<li><a href="flowcontrol.html#flowcontrol6">The SELECT and ENDSELECT Commands</a>
 	<li><a href="flowcontrol.html#flowcontrol7">The REPEAT, UNTIL and UNTILALL Commands</a>
 	<li><a href="flowcontrol.html#flowcontrol8">The WHILE, WHILEALL and ENDWHILE Commands</a>
+	<li><a href="flowcontrol.html#flowcontrol9">The ITERATE, ENDITERATE, UPDATE and ENDUPDATE Commands</a>
 	<li><a href="flowcontrol.html#flowcontrol10">The BREAK Command</a>
-	<li><a href="flowcontrol.html#flowcontrol9">The RETURN Command</a>
+	<li><a href="flowcontrol.html#flowcontrol11">The RETURN Command</a>
 </ol>
 
 <li><a class="chapter" href="set.html#set0">Changing Data</a>
@@ -134,7 +152,6 @@
 </ol>
 
 <li><a class="chapter" href="movement.html#movement0">Movement</a>
-
 <ol>
 	<li><a href="movement.html#movement1">The MOVE Command</a>
 	<li><a href="movement.html#movement2">The TRAVEL Command</a>
@@ -143,7 +160,6 @@
 </ol>
 
 <li><a class="chapter" href="special.html#special0">Special-Purpose Commands</a>
-
 <ol>
 	<li><a href="special.html#special1">The POINTS Command</a>
 	<li><a href="special.html#special2">The PROXY Command</a>
@@ -157,14 +173,12 @@
 	<li><a href="special.html#special8">The GETSTRING Command</a>
 	<li><a href="special.html#special9">The GETYESORNO Command</a>
 	<li><a href="special.html#special10">The SAVEGAME and RESTOREGAME Commands</a>
-	<li><a href="special.html#special14">The FLUSH Command</a>
+	<li><a href="special.html#special11">The FLUSH Command</a>
 	<li><a href="special.html#special12">The TERMINATE Command</a>
 	<li><a href="special.html#special13">The UNDOMOVE Command</a>
-
 </ol>
 
 <li><a class="chapter" href="attributes.html#attributes0">Attributes</a>
-
 <ol>
 	<li><a href="attributes.html#attributes1">The ENSURE Command</a>
 	<li><a href="attributes.html#attributes2">Object Attributes</a>
@@ -173,40 +187,33 @@
 </ol>
 
 <li><a class="chapter" href="functions.html#functions0">Functions</a>
-
 <ol>
 	<li><a href="functions.html#functions1">The EXECUTE and CALL Commands</a>
-
 	<ol>
 		<li><a href="functions.html#functions2">Passing Arguments to a Function</a>
 	</ol>
-
 	<li><a href="functions.html#functions3">The function-call count</a>
 	<li><a href="functions.html#functions4">The RETURN Command</a>
 	<li><a href="functions.html#functions5">Responding to the Player's Moves</a>
-
 	<li><a href="functions.html#functions6">Special Functions</a>
 	<li><a href="functions.html#functions7">Utility Functions</a>
-
 </ol>
 
 <li><a class="chapter" href="library.html#library0">Creating New Verbs</a>
-<li><a class="chapter" href="pointers.html#pointers0">Pointers</a>
 
+<li><a class="chapter" href="pointers.html#pointers0">Pointers</a>
 <ol>
 	<li><a href="pointers.html#pointers1">Object Pointers</a>
 	<li><a href="pointers.html#pointers2">Location Pointers</a>
 </ol>
 
 <li><a class="chapter" href="resolution.html#resolution0">Object Resolution</a>
-
 <ol>
 	<li><a href="resolution.html#resolution1">Object Naming</a>
-	<li><a href="resolution.html#resolution2">Disambiguation</a>
+	<li><a href="resolution.html#resolution2">Resolving Ambiguity</a>
 </ol>
 
 <li><a class="chapter" href="definitions.html#definitions0">Definitions in Detail</a>
-
 <ol>
 	<li><a href="definitions.html#definitions1">Objects</a>
 	<li><a href="definitions.html#definitions2">Locations</a>
@@ -225,7 +232,6 @@
 </ol>
 
 <li><a class="chapter" href="internals.html#internals0">Internals</a>
-
 <ol>
 	<li><a href="internals.html#internals1">Constants and Random</a>
 	<li><a href="internals.html#internals2">Internal Commands</a>

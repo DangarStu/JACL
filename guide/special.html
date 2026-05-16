@@ -2,7 +2,7 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -59,7 +59,7 @@ proxy "look at " noun2{names} " through " noun1{names} ; This will cause
 }
 </pre>
 
-<p>When the second syntax is used by the player, the only action is to execute a a <b>proxy</b> command. This issues a command on the player's behalf that matches the first syntax, therefore arriving at the main function with <b>noun1</b> and <b>noun2</b> pointing to the correct objects.
+<p>When the second syntax is used by the player, the only action is to execute a <b>proxy</b> command. This issues a command on the player's behalf that matches the first syntax, therefore arriving at the main function with <b>noun1</b> and <b>noun2</b> pointing to the correct objects.
 
 <p>The macro <b>{names}</b> is almost exclusively used with the <b>proxy</b> command and outputs all of the names of the object separated by spaces. For example, the following code will issue the command "set safe dial to 42":
 
@@ -124,7 +124,7 @@ write ship{the} ": " INDEX ^
 
 <p>The above code calculates the distance between the object <b>lighthouse</b> and the object <b>ship</b> and stores the result in the variable <b>INDEX</b>. This calculation is based on the current values of <b>lighthouse(x)</b> and <b>lighthouse(y)</b> relative to the current values of <b>ship(x)</b> and <b>ship(y)</b>. 
 
-<h2><a class="section" name="special7">The ASKNUMBER AND GETNUMBER Commands</a></h2> 
+<h2><a class="section" name="special7">The ASKNUMBER and GETNUMBER Commands</a></h2> 
 <p>The commands <b>asknumber</b> and <b>getnumber</b> prompt the player to input a number between a particular range and wait for a response. The only difference between the two commands is that <b>getnumber</b> will continue to ask the player for a valid response, only returning when a number between the upper and lower limit is entered. Both of these commands use the following syntax:
 <pre>
 <b>asknumber</b> <i>StorageVariable LowerLimit UpperLimit</i>
@@ -214,9 +214,10 @@ if save_timer = 0
    addstring filename ".sav"
    savegame RETURN_CODE filename
 endif
+}
 </pre>
 
-<h2><a class="section" name="special14">The FLUSH Command</a></h2>
+<h2><a class="section" name="special11">The FLUSH Command</a></h2>
 
 <p>The <b>flush</b> command forces the display buffer to be flushed to the screen. This command takes no parameters:
 
@@ -235,6 +236,6 @@ flush
 <p>The <b>undomove</b> command will take the game back to the state it was in prior to the player's last command.
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body>
 </html>

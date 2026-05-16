@@ -2,7 +2,7 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -29,7 +29,7 @@ object ball_3: big red ball
 
 <P>Presuming all these objects were in the current location, if the player referred to <B>ball</B>, then <B>ball_1</B> would be selected. This is because the JACL interpreter divides the number of names an object has by the number of names supplied to come up with a best match. Although all three objects have the name <b>ball</b>, <B>ball_1 </B>matches 100% while <B>ball_2 </B>and <B>ball_3 </B>only match 33%. If the player referred to <B>red ball</B>, then <B>ball_1</B> would automatically be excluded, as it does not have the name red. On the other hand, both <B>ball_2 </B>and <B>ball_3 </B>have the names red ball, and both would match 66%. In this case, a message would be displayed stating that the reference was ambiguous. If the player referred to <B>big</B>, then <B>ball_3 </B>would automatically be selected as neither of the other two objects have the name <b>big</b> at all.
 
-<P>It is important to be aware of the number of names that you give each object, and how they relate to each other. It is generally best to have two similar objects have the same number of names, although in some cases you may wish to nominate one to be the default by giving it less names.
+<P>It is important to be aware of the number of names that you give each object, and how they relate to each other. It is generally best to have two similar objects have the same number of names, although in some cases you may wish to nominate one to be the default by giving it fewer names.
 
 <P>For example, in <B>The Unholy Grail</B> there are two objects: <B>beige agar </B>and <B>brown agar</B>. To avoid problems when looking up agar in the encyclopedia, a third object named simply agar was added. This object stays permanently in <B>limbo</B> and therefore does not affect any physical manipulation of the two real agar objects. It does, however, get selected when using commands such as <B>ask_about</B> that accept objects that are <B>*anywhere</B>.
 
@@ -46,47 +46,13 @@ object ball_3: big red ball
 
 <p>If during the game the player was to type the command <b>take balls</b>, all of the above objects would be selected and three separate take commands would be issued. It is the use of the plural name that tells the parser that a reference to multiple objects was intended and that the reference is not ambiguous. It is also possible to further qualify a reference to a plural name by using one or more regular name. For example, the command <b>take red balls</b> would result in only the small red ball and the large red ball being taken.
 
-<h2><a class="section" name="resolution2">Disambiguation</a></h2>
+<h2><a class="section" name="resolution2">Resolving Ambiguity</a></h2>
 
-<p>It is also possible for each object to have the associated function <b>disambiguate</b> to assist in the process of disambiguation. The parser will attempt to call this function on every object that is a possible result for an ambiguous reference that needs to be resolved to a single object. 
+<p>When the parser can't narrow an ambiguous reference to a single object on its own, the best places to nudge it toward the right answer are the object's <b>name</b> list and the <b>grammar</b> lines that introduce the verb. Make the intended object the one with the most matching names (or the only one with a particular name), or scope the <b>grammar</b> line with <b>*held</b>, <b>*present</b>, <b>*here</b> or <b>*inside</b> so that out-of-context objects are excluded before the disambiguation step is reached. See the section on <a href="definitions.html#definitions10">Grammar Statements</a> for the full list of scope keywords.
 
-<p>When called, this function will be passed a single argument being the context in which the ambiguous reference was made. The possible values for this argument are:
-
-<table width=100%>
-<tr><th width=20%>Value&nbsp;&nbsp;</th><th width=80%>Description</th></tr>
-<tr><td>0&nbsp;&nbsp;</td><td>The list of objects for <b>noun1</b>.</td></tr>
-<tr><td>1&nbsp;&nbsp;</td><td>The list of objects for <b>noun2</b>.</td></tr>
-<tr><td>2&nbsp;&nbsp;</td><td>Exceptions to the list of objects for <b>noun1</b>.</td></tr>
-<tr><td>3&nbsp;&nbsp;</td><td>Exceptions to the list of objects for <b>noun2</b>.</td></tr>
-<tr><td>4&nbsp;&nbsp;</td><td>The list of objects <b>noun1</b> should be from.</td></tr>
-<tr><td>5&nbsp;&nbsp;</td><td>The list of objects <b>noun2</b> should be from.</td></tr>
-<tr><td>6&nbsp;&nbsp;</td><td>The list of objects <b>noun1</b>'s exceptions should be from.</td></tr>
-<tr><td>7&nbsp;&nbsp;</td><td>The list of objects <b>noun2</b>'s exceptions should be from.</td></tr>
-</table>
-
-<p>To demonstrate, consider a game that had two objects, a red ball and a red book. The following <b>disambiguate</b> function could be added to the book in order to allow the commands <b>read red</b> and <b>look in red</b> to prefer the book to the ball instead of displaying the usual &quot;ambiguous reference&quot; message:
-
-<pre>
-object red_book : red book
-
-{disambiguate
-if arg = 0
-   ifstring command = "read"
-      return true
-   endif
-   ifstringall command[0] = "look" : command[1] = "in"
-      return true
-   endif
-endif
-return false
-}
-</pre>
-
-<p>This function makes use of the <b>command</b> array to look at the words used so far in the player's command. Unfortunately as the command has not been fully processed the single resultant action is not yet known. This function communicates its decision to the parser via its return code. If this function returns <b>false</b> (or doesn't exist), the object will be included in the list of possible objects and processing will continue as normal. If this function returns <b>true</b> this object will be instantly selected as the object the player was referring to. If this function returns <b>-1</b> this object will be excluded from contention and processing will continue as normal. If all objects exclude themselves from contention the first will be selected.
-
-<p>It is important to keep in mind that this function is only called when an ambiguous reference is made. The command <b>read ball</b> will still attempt to read the ball, it is only a command like <b>read red</b> that results in an ambiguous reference that will cause these functions to be called. It is also advisable to use this facility sparingly as it departs from the regular disambiguation rules and may lead to confusion for the player. Used appropriately, however, it can help to solve a frustrating disambiguation problem that has been identified during play testing.
+<p>If two equally-named objects remain after scope filtering, the interpreter prints an &quot;ambiguous reference&quot; message and asks the player to be more specific. There is no per-object callback for overriding this decision in the current build; the parser source contains the skeleton of a planned <b>disambiguate</b> hook but it is not active.
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body>
 </html>

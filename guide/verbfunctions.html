@@ -2,164 +2,242 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
 <h1><a class="title" name="verbfunctions0">Appendix B: Library Verb Functions</a></h1>
 
-<P>Below is a list of all the functions that are associated with <B>grammar</B> statements in <b>verbs.library</b>. It is not, however, a complete list of all the possible command constructs the player can use. Although each function is only listed here once, in most cases there are many <B>grammar</B> statements mapping to that function. For example, consider the function <B>+cut</B>: 
+<p>Below is a list of all the functions that are associated with <b>grammar</b> statements in <b>verbs.library</b>. It is not, however, a complete list of all the possible command constructs the player can use. Although each function is only listed here once, in most cases there are many <b>grammar</b> statements mapping to that function. For example, consider the function <b>+cut</b>:
 
 <pre>
-grammar cut *present  &gt;cut
-grammar chop *present &gt;cut
-grammar stab *present &gt;cut
+grammar cut *present     &gt;cut
+grammar chop *present    &gt;cut
+grammar stab *present    &gt;cut
 </pre>
 
-<P>As you can see, the function <B>cut</B> has three <B>grammar</B> statements that map to it. The list below, however, will only show the first <B>grammar</B> statement that maps to the function. To see all the commands that will cause any one of the below functions to be called, search for the function name in the <B>verbs.library</B> file.
+<p>As you can see, the function <b>cut</b> has three <b>grammar</b> statements that map to it. The list below shows only the first <b>grammar</b> statement that maps to each function. To see every command that will trigger a given function, search for the function name in the <b>verbs.library</b> file.
 
 <pre>
-shake *held                             &gt;shake
-xyzzy                                   &gt;xyzzy
-verbose                                 &gt;verbose
-brief                                   &gt;brief
-help *present                           &gt;help_other
-hint one                                &gt;first_hint
-hint two                                &gt;second_hint
-hint three                              &gt;third_hint
-hint four                               &gt;fourth_hint
-help                                    &gt;help
-help games                              &gt;help_games
-hug *present                            &gt;hug
-kiss *present                           &gt;kiss
-pick *present with *held                &gt;pick_with
-rub *present                            &gt;rub
-rub *held on *present                   &gt;rub_on
-rub *present with *held                 &gt;rub_with
-lick *present                           &gt;lick
-pull *present                           &gt;pull
-cut *present                            &gt;cut
-cut *present with *held                 &gt;cut_with
-break *present                          &gt;break
-clean *present                          &gt;clean
-clean *present with *held               &gt;clean_with
-yell at *present                        &gt;yell_at
-pay *present                            &gt;pay
-order *carried                          &gt;order
-knock on *present                       &gt;knock_on
-play *present                           &gt;play
-take *here with *held                   &gt;take_with
-fill *held from *present                &gt;fill_from
-fill *held with *present                &gt;fill_with
-fill *present                           &gt;fill
-stand                                   &gt;stand
-lie on *present                         &gt;lie_on
-sit                                     &gt;sit
-sit on *here                            &gt;sit_on
-drop *held                              &gt;drop
-take *here                              &gt;take
-insert *held on *present                &gt;insert_on
-insert *held in *present                &gt;insert_in
-ask *present for *carried               &gt;ask_for
-tell *present about *carried            &gt;tell_about
-ask *present about *carried             &gt;ask_about
-give *held to *present                  &gt;give_to
-move *present                           &gt;move
-read *present                           &gt;read
-look down                               &gt;look_down
-look up *anywhere in *present           &gt;look_up_in
-consult *present about *anywhere        &gt;consult
-feel *present                           &gt;feel
-smell                                   &gt;smell
-smell *present                          &gt;sniff
-taste *present                          &gt;taste
-look in *present                        &gt;look_in
-examine *present                        &gt;examine
-i                                       &gt;inventory
-inv                                     &gt;list_inventory
-sorry                                   &gt;sorry
-thanks                                  &gt;thankyou
-score                                   &gt;score
-open *present                           &gt;open
-close *present                          &gt;close
-lock *present                           &gt;lock
-lock *present with *held                &gt;lock_with
-unlock *present                         &gt;unlock
-unlock *present with *held              &gt;unlock_with
-show *held to *present                  &gt;show_to
-untie *present                          &gt;untie
-tie *held                               &gt;tie
-tie *held to *present                   &gt;tie_to
-attack *present                         &gt;attack
-attack *present with *held              &gt;attack_with
-wave                                    &gt;wave
-wave to *present                        &gt;wave_to
-jump on *here                           &gt;jump_on
-jump over *here                         &gt;jump_over
-jump                                    &gt;jump
-yes                                     &gt;yes
-no                                      &gt;no
-why                                     &gt;why?
-blow *held at *here                     &gt;blow_at
-throw *held at *here                    &gt;throw_at
-remove *present from *present           &gt;remove_from
-remove *present                         &gt;remove
-wear *held                              &gt;wear
-talk to *present                        &gt;talk_to
-eat *present                            &gt;eat
-drink from *present                     &gt;drink_from
-drink *present                          &gt;drink
-flick *present                          &gt;flick
-press *present                          &gt;press
-light *present with *held               &gt;light_with
-light *present                          &gt;light
-extinguish *present                     &gt;extinguish
-swim west                               &gt;swim_west
-west                                    &gt;west
-swim east                               &gt;swim_east
-east                                    &gt;east
-swim south                              &gt;swim_south
-south                                   &gt;south
-swim southeast                          &gt;swim_southeast
-southeast                               &gt;southeast
-swim southwest                          &gt;swim_southwest
-southwest                               &gt;southwest
-swim north                              &gt;swim_north
-north                                   &gt;north
-swim northeast                          &gt;swim_northeast
-northeast                               &gt;northeast
-swim northwest                          &gt;swim_northwest
-northwest                               &gt;northwest
-climb up *here                          &gt;climb_up
-climb down *here                        &gt;climb_down
-enter *here                             &gt;enter
-climb *here                             &gt;climb
-swim in                                 &gt;swim_in
-in                                      &gt;in
-swim out                                &gt;swim_out
-out                                     &gt;out
-swim up                                 &gt;swim_up
-up                                      &gt;up
-swim down                               &gt;swim_down
-down                                    &gt;down
-look                                    &gt;look_around
-look under *present                     &gt;look_under
-look behind *present                    &gt;look_behind
-look through *present                   &gt;look_through
-look through *held at *present          &gt;look_through_at
-look at *present through *held          &gt;look_at_through
-wait                                    &gt;wait
-listen                                  &gt;listen
-listen to *present                      &gt;listen_to
-use *present                            &gt;use
-turn *present                           &gt;turn
-turn on *present                        &gt;turn_on
-turn off *present                       &gt;turn_off
-pour *present                           &gt;pour
-tip *present on *present                &gt;pour_on
+about                                    &gt;about
+exits                                    &gt;exits
+shake                                    &gt;shake_only
+shake *held                              &gt;shake
+say xyzzy                                &gt;xyzzy
+save $string                             &gt;named_save
+restore $string                          &gt;named_restore
+save                                     &gt;save_game
+restore                                  &gt;restore_game
+status on                                &gt;status_on
+status off                               &gt;status_off
+sound on                                 &gt;sound_on
+sound off                                &gt;sound_off
+graphics on                              &gt;graphics_on
+graphics off                             &gt;graphics_off
+timer on                                 &gt;timer_on
+timer off                                &gt;timer_off
+verbose                                  &gt;verbose
+brief                                    &gt;brief
+voice                                    &gt;voice
+silence                                  &gt;unvoice
+voices                                   &gt;voices_list
+voice $integer                           &gt;voice_select
+quit                                     &gt;quit_info
+help *present                            &gt;help_other
+hint *present                            &gt;hint_nonum
+hint $integer *present                   &gt;hint
+help games                               &gt;help_games
+lookup $string                           &gt;lookup_word
+hug                                      &gt;hug_only
+hug *present                             &gt;hug
+kiss                                     &gt;kiss_only
+kiss *present                            &gt;kiss
+dig *present                             &gt;dig_in
+dig                                      &gt;dig
+pick                                     &gt;pick_only
+pick *present                            &gt;pick_one
+pick *present with *held                 &gt;pick_with
+rub *present                             &gt;rub
+rub *held on *present                    &gt;rub_on
+rub *present with *held                  &gt;rub_with
+lick *present                            &gt;lick
+pull **present                           &gt;pull
+cut *present                             &gt;cut
+cut *present with *held                  &gt;cut_with
+peel *present                            &gt;peel
+break *present                           &gt;break
+clean *present                           &gt;clean
+clean *present with *held                &gt;clean_with
+yell at *present                         &gt;yell_at
+yell                                     &gt;yell
+pay *present                             &gt;pay
+order *anywhere                          &gt;order
+knock on *present                        &gt;knock_on
+smoke *present                           &gt;smoke
+play *present                            &gt;play
+play *present with *held                 &gt;play_with
+pump *present                            &gt;pump
+unload *here                             &gt;empty
+extract **here with *held                &gt;take_with
+fill *held from *present                 &gt;fill_from
+fill *held with *present                 &gt;fill_with
+fill *held                               &gt;fill
+stand                                    &gt;stand
+sleep                                    &gt;sleep
+lie on *present                          &gt;lie_on
+sit                                      &gt;sit
+sit *here                                &gt;sit_on
+kick *present                            &gt;kick
+throw *held                              &gt;throw
+drop                                     &gt;drop_only
+drop **held                              &gt;drop
+take                                     &gt;take_only
+take **here                              &gt;take
+insert **held on *present                &gt;insert_on
+insert **held under *present             &gt;insert_under
+insert **held in *present                &gt;insert_in
+ask *present for **inside                &gt;ask_for
+tell *present about *anywhere            &gt;tell_about
+ask *present about *anywhere             &gt;ask_about
+offer *held to *present                  &gt;give_to
+offer *held                              &gt;give_only
+wiggle *present                          &gt;move
+read *present                            &gt;read
+look down                                &gt;look_down
+look up                                  &gt;look_up
+look up *anywhere in *present            &gt;look_up_in
+consult *present about *anywhere         &gt;consult
+feel *present                            &gt;feel
+smell                                    &gt;sniff
+smell *present                           &gt;smell
+taste *present                           &gt;taste
+look in *present                         &gt;look_in
+search *present                          &gt;search
+look *present                            &gt;examine
+i                                        &gt;list_inventory
+inventory                                &gt;inventory
+sorry                                    &gt;sorry
+thanks                                   &gt;thankyou
+notify                                   &gt;notify
+notify on                                &gt;notify_on
+notify off                               &gt;notify_off
+debug                                    &gt;debug
+debug on                                 &gt;debug_on
+debug off                                &gt;debug_off
+score                                    &gt;score_command
+loosen                                   &gt;open_only
+loosen *present                          &gt;open
+tighten                                  &gt;close_only
+tighten *present                         &gt;close
+lock *present                            &gt;lock
+lock *present with *held                 &gt;lock_with
+unlock                                   &gt;unlock_only
+unlock *present                          &gt;unlock
+unlock *present with *held               &gt;unlock_with
+show *held                               &gt;show
+show *held to *present                   &gt;show_to
+untie                                    &gt;untie_only
+untie *present                           &gt;untie
+tie *held                                &gt;tie
+fix *present                             &gt;repair
+tie *held to *present                    &gt;tie_to
+attack *present                          &gt;attack
+attack *present with *held               &gt;attack_with
+wave                                     &gt;wave
+wave to *present                         &gt;wave_to
+salute                                   &gt;salute
+salute *present                          &gt;salute_at
+jump on to *here                         &gt;jump_on
+jump over *here                          &gt;jump_over
+jump                                     &gt;jump
+say yes                                  &gt;yes
+say no                                   &gt;no
+say yes to *present                      &gt;say_yes
+say no to *present                       &gt;say_no
+say *anywhere                            &gt;say_object
+say *anywhere to *present                &gt;say_object_to
+why                                      &gt;why
+blow *held at *present                   &gt;blow_at
+point *held at *present                  &gt;point_at
+throw *held in *here                     &gt;throw_at
+remove **held                            &gt;remove
+wear **held                              &gt;wear
+talk                                     &gt;talk_only
+talk *present                            &gt;talk_to
+consume *present                         &gt;eat
+eat                                      &gt;eat_only
+drink from *present                      &gt;drink_from
+drink *present                           &gt;drink
+drink                                    &gt;drink_only
+flick **present                          &gt;flick
+press **present                          &gt;press
+light *present with *held                &gt;light_with
+set *present to $integer                 &gt;set_to_integer
+set *present to $integer with *held      &gt;set_to_integer_with
+burn *present                            &gt;light
+extinguish *present                      &gt;extinguish
+swim                                     &gt;swim_only
+swim west                                &gt;swim_west
+west                                     &gt;west
+swim east                                &gt;swim_east
+east                                     &gt;east
+swim south                               &gt;swim_south
+south                                    &gt;south
+swim southeast                           &gt;swim_southeast
+southeast                                &gt;southeast
+swim southwest                           &gt;swim_southwest
+southwest                                &gt;southwest
+swim north                               &gt;swim_north
+north                                    &gt;north
+swim northeast                           &gt;swim_northeast
+northeast                                &gt;northeast
+swim northwest                           &gt;swim_northwest
+northwest                                &gt;northwest
+climb *here                              &gt;climb_up
+climb down *here                         &gt;climb_down
+enter *present                           &gt;enter
+follow *anywhere                         &gt;follow
+go back                                  &gt;go_back
+head to *location                        &gt;go_to
+swim in                                  &gt;swim_in
+go in                                    &gt;in
+swim out                                 &gt;swim_out
+get out                                  &gt;out
+surface                                  &gt;swim_up
+up                                       &gt;up
+swim down                                &gt;swim_down
+down                                     &gt;down
+look around                              &gt;look_around
+look under *present                      &gt;look_under
+look behind *present                     &gt;look_behind
+look through *present                    &gt;look_through
+look through *held at *present           &gt;look_through_at
+look at *present through *held           &gt;look_at_through
+wait                                     &gt;wait
+listen                                   &gt;listen
+listen to *present                       &gt;listen_to
+use *present                             &gt;use
+rotate *present                          &gt;turn
+rotate *present clockwise                &gt;turn_clockwise
+rotate *present anticlockwise            &gt;turn_anticlockwise
+engage *present                          &gt;turn_on
+turn off *present                        &gt;turn_off
+pour *present                            &gt;pour
+type $string on *present                 &gt;type_on
+list objects                             &gt;list_objs
+tip *present on *present                 &gt;pour_on
+blankjacl                                &gt;blankjacl
+instructions                             &gt;instructions
+*present comma press *present            &gt;tell_to_press
+*present comma who are you               &gt;who?
+*present comma sorry                     &gt;apologise
+*present comma thanks                    &gt;thank
+hi *present                              &gt;greet
+*present comma *anywhere                 &gt;object_object
+*present                                 &gt;noun_only
 </pre>
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body>
 </html>

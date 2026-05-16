@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>JACL Chordal Keyboard</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin: 0;
+    color: #111;
+  }
+  h1 {
+    font-size: 22pt;
+    text-align: center;
+    margin: 0 0 10mm 0;
+  }
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8mm 4mm;
+    justify-items: center;
+    align-items: center;
+  }
+  .board > div { text-align: center; }
+  .cluster {
+    width: 32mm;
+    height: 32mm;
+  }
+  .cluster svg { width: 100%; height: 100%; }
+  .pair {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1mm;
+    font-size: 11pt;
+    font-weight: bold;
+  }
+  .pair .row { display: flex; align-items: center; gap: 1.5mm; }
+  .pair svg { width: 9mm; height: 9mm; }
+  .pair .label { font-size: 11pt; font-weight: bold; }
+  .select-bar {
+    margin: 8mm 0 6mm 0;
+    text-align: center;
+    font-size: 12pt;
+    letter-spacing: 0.04em;
+  }
+  .select-bar .key {
+    display: inline-block;
+    border: 1.2pt solid #111;
+    padding: 0.5mm 3mm;
+    margin: 0 1mm;
+    font-weight: bold;
+    border-radius: 1mm;
+  }
+  .numpad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4mm;
+    justify-items: center;
+    align-items: center;
+  }
+  .bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1mm;
+  }
+  .bar .key {
+    width: 18mm;
+    height: 7mm;
+    border: 1.2pt solid #111;
+    border-radius: 1mm;
+  }
+  .ring {
+    width: 32mm;
+    height: 32mm;
+    position: relative;
+  }
+  .ring .btn {
+    position: absolute;
+    width: 9mm;
+    height: 9mm;
+    border-radius: 50%;
+    background: #d9d9d9;
+    border: 1pt solid #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 11pt;
+  }
+  .ring .btn.n { top: 0;             left: 50%; transform: translateX(-50%); }
+  .ring .btn.e { top: 50%;           right: 0;  transform: translateY(-50%); }
+  .ring .btn.s { bottom: 0;          left: 50%; transform: translateX(-50%); }
+  .ring .btn.w { top: 50%;           left: 0;   transform: translateY(-50%); }
+  .tips {
+    page-break-before: always;
+    max-width: 16cm;
+    margin: 0 auto;
+    font-size: 11pt;
+    line-height: 1.45;
+  }
+  .tips h2 {
+    font-size: 14pt;
+    margin-top: 8mm;
+  }
+  .tips p { margin: 0 0 3mm 0; }
+  .tips ul { padding-left: 5mm; }
+  .tips li { margin-bottom: 1.5mm; }
+</style>
+</head>
+<body>
+
+<h1>JACL Chordal Keyboard</h1>
+
+<!-- Reusable plus-cluster SVG. The font sizes / coordinates match a
+     32mm box rendered into a 100×100 viewBox. Center text is the
+     modifier name; cardinal text is the typed character. -->
+
+<div class="board">
+
+  <!-- Row 1: L shoulder, L+R, R shoulder -->
+  <div class="cluster">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 35,10 L 65,10 L 65,35 L 90,35 L 90,65 L 65,65 L 65,90 L 35,90 L 35,65 L 10,65 L 10,35 L 35,35 Z" fill="none" stroke="#111" stroke-width="1.4"/>
+      <text x="50" y="27" text-anchor="middle" font-size="14" font-family="Helvetica">m</text>
+      <text x="20" y="58" text-anchor="middle" font-size="14" font-family="Helvetica">w</text>
+      <text x="50" y="60" text-anchor="middle" font-size="16" font-weight="bold" font-family="Helvetica">L</text>
+      <text x="80" y="58" text-anchor="middle" font-size="14" font-family="Helvetica">z</text>
+      <text x="50" y="83" text-anchor="middle" font-size="14" font-family="Helvetica">v</text>
+    </svg>
+  </div>
+
+  <div class="cluster">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 35,10 L 65,10 L 65,35 L 90,35 L 90,65 L 65,65 L 65,90 L 35,90 L 35,65 L 10,65 L 10,35 L 35,35 Z" fill="none" stroke="#111" stroke-width="1.4"/>
+      <text x="50" y="27" text-anchor="middle" font-size="16" font-family="Helvetica">&#x201C;</text>
+      <text x="20" y="58" text-anchor="middle" font-size="16" font-family="Helvetica">&#x2019;</text>
+      <text x="50" y="60" text-anchor="middle" font-size="14" font-weight="bold" font-family="Helvetica">L+R</text>
+      <text x="80" y="58" text-anchor="middle" font-size="16" font-family="Helvetica">,</text>
+      <text x="50" y="83" text-anchor="middle" font-size="16" font-family="Helvetica">.</text>
+    </svg>
+  </div>
+
+  <div class="cluster">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 35,10 L 65,10 L 65,35 L 90,35 L 90,65 L 65,65 L 65,90 L 35,90 L 35,65 L 10,65 L 10,35 L 35,35 Z" fill="none" stroke="#111" stroke-width="1.4"/>
+      <text x="50" y="27" text-anchor="middle" font-size="14" font-family="Helvetica">k</text>
+      <text x="20" y="58" text-anchor="middle" font-size="14" font-family="Helvetica">x</text>
+      <text x="50" y="60" text-anchor="middle" font-size="16" font-weight="bold" font-family="Helvetica">R</text>
+      <text x="80" y="58" text-anchor="middle" font-size="14" font-family="Helvetica">j</text>
+      <text x="50" y="83" text-anchor="middle" font-size="14" font-family="Helvetica">f</text>
+    </svg>
+  </div>
+
+  <!-- Row 2: D-Pad alone, X-modifier, X+A Backspace -->
+  <div class="cluster">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 35,10 L 65,10 L 65,35 L 90,35 L 90,65 L 65,65 L 65,90 L 35,90 L 35,65 L 10,65 L 10,35 L 35,35 Z" fill="none" stroke="#111" stroke-width="1.4"/>
+      <text x="50" y="27" text-anchor="middle" font-size="14" font-family="Helvetica">a</text>
+      <text x="20" y="58" text-anchor="middle" font-size="14" font-family="Helvetica">o</text>
+      <text x="80" y="58" text-anchor="middle" font-size="14" font-family="Helvetica">e</text>
+      <text x="50" y="83" text-anchor="middle" font-size="14" font-family="Helvetica">i</text>
+    </svg>
+  </div>
+
+  <div class="cluster">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 35,10 L 65,10 L 65,35 L 90,35 L 90,65 L 65,65 L 65,90 L 35,90 L 35,65 L 10,65 L 10,35 L 35,35 Z" fill="none" stroke="#111" stroke-width="1.4"/>
+      <circle cx="50" cy="50" r="9" fill="#d9d9d9" stroke="#111" stroke-width="0.8"/>
+      <text x="50" y="27" text-anchor="middle" font-size="14" font-family="Helvetica">c</text>
+      <text x="20" y="58" text-anchor="middle" font-size="14" font-family="Helvetica">l</text>
+      <text x="50" y="54" text-anchor="middle" font-size="11" font-weight="bold" font-family="Helvetica">X</text>
+      <text x="80" y="58" text-anchor="middle" font-size="14" font-family="Helvetica">r</text>
+      <text x="50" y="83" text-anchor="middle" font-size="14" font-family="Helvetica">e</text>
+    </svg>
+  </div>
+
+  <div class="pair">
+    <div class="row">
+      <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="14" fill="#d9d9d9" stroke="#111" stroke-width="1"/>
+        <text x="20" y="25" text-anchor="middle" font-size="14" font-weight="bold" font-family="Helvetica">X</text>
+      </svg>
+      <span class="label">Backspace</span>
+      <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="14" fill="#d9d9d9" stroke="#111" stroke-width="1"/>
+        <text x="20" y="25" text-anchor="middle" font-size="14" font-weight="bold" font-family="Helvetica">A</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Row 3: Y-modifier, A-modifier, (placeholder) -->
+  <div class="cluster">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 35,10 L 65,10 L 65,35 L 90,35 L 90,65 L 65,65 L 65,90 L 35,90 L 35,65 L 10,65 L 10,35 L 35,35 Z" fill="none" stroke="#111" stroke-width="1.4"/>
+      <circle cx="50" cy="50" r="9" fill="#d9d9d9" stroke="#111" stroke-width="0.8"/>
+      <text x="50" y="27" text-anchor="middle" font-size="14" font-family="Helvetica">p</text>
+      <text x="20" y="58" text-anchor="middle" font-size="14" font-family="Helvetica">g</text>
+      <text x="50" y="54" text-anchor="middle" font-size="11" font-weight="bold" font-family="Helvetica">Y</text>
+      <text x="80" y="58" text-anchor="middle" font-size="14" font-family="Helvetica">b</text>
+      <text x="50" y="83" text-anchor="middle" font-size="14" font-family="Helvetica">y</text>
+    </svg>
+  </div>
+
+  <div class="cluster">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 35,10 L 65,10 L 65,35 L 90,35 L 90,65 L 65,65 L 65,90 L 35,90 L 35,65 L 10,65 L 10,35 L 35,35 Z" fill="none" stroke="#111" stroke-width="1.4"/>
+      <circle cx="50" cy="50" r="9" fill="#d9d9d9" stroke="#111" stroke-width="0.8"/>
+      <text x="50" y="27" text-anchor="middle" font-size="14" font-family="Helvetica">n</text>
+      <text x="20" y="58" text-anchor="middle" font-size="14" font-family="Helvetica">t</text>
+      <text x="50" y="54" text-anchor="middle" font-size="11" font-weight="bold" font-family="Helvetica">A</text>
+      <text x="80" y="58" text-anchor="middle" font-size="14" font-family="Helvetica">h</text>
+      <text x="50" y="83" text-anchor="middle" font-size="14" font-family="Helvetica">s</text>
+    </svg>
+  </div>
+
+  <div></div>
+
+  <!-- Row 4: X+B Space, B-modifier, A+B Enter -->
+  <div class="pair">
+    <div class="row">
+      <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="14" fill="#d9d9d9" stroke="#111" stroke-width="1"/>
+        <text x="20" y="25" text-anchor="middle" font-size="14" font-weight="bold" font-family="Helvetica">X</text>
+      </svg>
+      <span class="label">Space</span>
+      <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="14" fill="#d9d9d9" stroke="#111" stroke-width="1"/>
+        <text x="20" y="25" text-anchor="middle" font-size="14" font-weight="bold" font-family="Helvetica">B</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="cluster">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 35,10 L 65,10 L 65,35 L 90,35 L 90,65 L 65,65 L 65,90 L 35,90 L 35,65 L 10,65 L 10,35 L 35,35 Z" fill="none" stroke="#111" stroke-width="1.4"/>
+      <circle cx="50" cy="50" r="9" fill="#d9d9d9" stroke="#111" stroke-width="0.8"/>
+      <text x="50" y="27" text-anchor="middle" font-size="14" font-family="Helvetica">u</text>
+      <text x="20" y="58" text-anchor="middle" font-size="14" font-family="Helvetica">q</text>
+      <text x="50" y="54" text-anchor="middle" font-size="11" font-weight="bold" font-family="Helvetica">B</text>
+      <text x="80" y="58" text-anchor="middle" font-size="14" font-family="Helvetica">e</text>
+      <text x="50" y="83" text-anchor="middle" font-size="14" font-family="Helvetica">d</text>
+    </svg>
+  </div>
+
+  <div class="pair">
+    <div class="row">
+      <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="14" fill="#d9d9d9" stroke="#111" stroke-width="1"/>
+        <text x="20" y="25" text-anchor="middle" font-size="14" font-weight="bold" font-family="Helvetica">A</text>
+      </svg>
+      <span class="label">Enter</span>
+      <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="14" fill="#d9d9d9" stroke="#111" stroke-width="1"/>
+        <text x="20" y="25" text-anchor="middle" font-size="14" font-weight="bold" font-family="Helvetica">B</text>
+      </svg>
+    </div>
+  </div>
+
+</div>
+
+<div class="select-bar">
+  <span class="key">SELECT</span> TO TOGGLE <span class="key">NUMPAD</span> MODE
+</div>
+
+<div class="numpad">
+  <div class="bar">
+    <div class="key"></div>
+    <span style="font-weight:bold;">0</span>
+  </div>
+
+  <div class="cluster">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 35,10 L 65,10 L 65,35 L 90,35 L 90,65 L 65,65 L 65,90 L 35,90 L 35,65 L 10,65 L 10,35 L 35,35 Z" fill="none" stroke="#111" stroke-width="1.4"/>
+      <text x="50" y="27" text-anchor="middle" font-size="14" font-family="Helvetica">3</text>
+      <text x="20" y="58" text-anchor="middle" font-size="14" font-family="Helvetica">2</text>
+      <text x="80" y="58" text-anchor="middle" font-size="14" font-family="Helvetica">4</text>
+      <text x="50" y="83" text-anchor="middle" font-size="14" font-family="Helvetica">5</text>
+    </svg>
+  </div>
+
+  <div class="ring">
+    <div class="btn n">7</div>
+    <div class="btn w">6</div>
+    <div class="btn e">8</div>
+    <div class="btn s">9</div>
+  </div>
+
+  <div class="bar">
+    <div class="key"></div>
+    <span style="font-weight:bold;">1</span>
+  </div>
+</div>
+
+<!-- Page 2 — tips -->
+
+<div class="tips">
+<h1 style="font-size:18pt; margin-top:0;">JACL Chordal Keyboard</h1>
+<h2>Tip for using and learning the keyboard</h2>
+
+<p>Only use the keyboard when you need to. Clicking on any word adds it to your command.</p>
+
+<p>Only the D-Pad outputs characters; all other keys are used as modifiers. The only exception is that <b>X + B</b> outputs a space.</p>
+
+<p>Given this system, it is best to learn the keyboard in groups of four (up, down, left, right on the D-Pad), starting with the D-Pad on its own without a modifier key. Once these characters have been memorised, move on to learn the next set of four using one of the modifier keys.</p>
+
+<p>Characters have been assigned to keys based on frequency in the English language and ease of memorising. Below are some tips for remembering the positions:</p>
+
+<ul>
+  <li><b>N</b>, <b>S</b>, <b>E</b> (unmodified) and <b>W</b> are placed in their respective compass directions.</li>
+  <li><b>U</b> and <b>D</b> are in the up and down positions.</li>
+  <li><b>L</b>, <b>C</b> and <b>R</b> are in the left, centre and right positions.</li>
+  <li><b>Q</b> and <b>U</b> are together with the same modifier.</li>
+  <li><b>T</b> and <b>H</b> are together with the same modifier.</li>
+  <li><b>P</b>, <b>B</b> and <b>Y</b> run down the right side &mdash; think of the plane.</li>
+  <li><b>X</b> and <b>J</b> read left to right &mdash; think of the Jaguar car.</li>
+  <li><b>V</b> is on the bottom as it points down.</li>
+  <li><b>A</b> is on the top as it points up.</li>
+</ul>
+</div>
+
+</body>
+</html>

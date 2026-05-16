@@ -2,7 +2,7 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -12,20 +12,26 @@
 <pre>
 #!../bin/jacl
 
-constant game_version		1
-constant game_title			"Tutorial Game"
-constant game_author		"Stuart Allen"
-constant ifid				"JACL-512"
+constant game_title       &quot;Tutorial Game&quot;
+constant game_author      &quot;Stuart Allen&quot;
+constant game_version     1
+constant ifid             &quot;JACL-141&quot;
+constant game_publish     true
 
-string 	 command_prompt		"^What do you want to do now? "
-
-constant turns_since_last_sip		5
+constant turns_since_last_sip     9
 
 attribute EXAMINED
 
+grammar change $integer     &gt;change
+
+{+change
+set status_window = $integer
+write &quot;Status window set to &quot; $integer .^
+}
+
 location bedroom : master bedroom
- west		bathroom
- south		nowhere
+ west          bathroom
+ south         nowhere
 
 {look
 print:
@@ -33,19 +39,19 @@ print:
    in the centre of the room while a doorway to the
    west leads into the bathroom.
 .
-write "To the south there is " 
+write &quot;To the south there is &quot; 
 if door has CLOSED
-   write "closed"
+   write &quot;closed&quot;
 else
-   write "open"
+   write &quot;open&quot;
 endif
-write " door.^"
+write &quot; door.^&quot;
 }
 
 {movement
 if compass = south
    if destination = nowhere
-      write "The bedroom door is closed.^"
+      write &quot;The bedroom door is closed.^&quot;
       return true
    endif
 endif
@@ -53,28 +59,28 @@ return false
 }
 
 object bed: bed
-  short		a "bed"
-  mass		scenery
+ short         a &quot;bed&quot;
+ mass          scenery
 
 {look_under
 if guide(parent) = limbo
-   write "Hidden under the bed you find this week's "
-   write "television guide.^"
+   write &quot;Hidden under the bed you find this week&#x27;s &quot;
+   write &quot;television guide.^&quot;
    set guide(parent) = here
    points 50
    return
 endif
-write "You don't find anything else.^"
+write &quot;You don&#x27;t find anything else.^&quot;
 }
 
 object guide: television tv tele guide
-  short		a "television guide"
-  long		"The television guide is here."
-  parent	limbo
-  mass		5
+ short         a &quot;television guide&quot;
+ long          &quot;The television guide is here.^&quot;
+ parent        limbo
+ mass          5
 
 {examine : read
-write "It contains a listing of this week's programmes.^"
+write &quot;It contains a listing of this week&#x27;s programmes.^&quot;
 }
 
 {give_to_rick : show_to_rick
@@ -85,12 +91,12 @@ print:
    today, you decide to go back to bed.^
 .
 points 50
-execute "+game_over"
+execute &quot;+game_over&quot;
 }
 
 object door : bedroom door
- short		the "bedroom door"
- has		CLOSABLE CLOSED
+ short         the &quot;bedroom door&quot;
+ has           CLOSABLE CLOSED
 
 {open_override
 set bedroom(south) = living_room
@@ -105,7 +111,7 @@ return false
 }
 
 location bathroom : bathroom
- east		bedroom
+ east          bedroom
 
 {look
 print:
@@ -116,62 +122,62 @@ print:
 
 {movement
 if compass = east : compass = out
-   write "You bang your head as you walk through the "
-   write "doorway.^^"
+   write &quot;You bang your head as you walk through the &quot;
+   write &quot;doorway.^^&quot;
    return false
 endif
-write "The only exit from here is to the east.^"
+write &quot;The only exit from here is to the east.^&quot;
 }
 
 object box: small wooden box
-  has		CONTAINER CLOSABLE CLOSED
-  short		a "small wooden box"
-  long		"There is a small wooden box here."
-  mass		25
-  quantity	20
+ has           CONTAINER CLOSABLE CLOSED
+ short         a &quot;small wooden box&quot;
+ long          &quot;There is a small wooden box here.^&quot;
+ mass          25
+ quantity      20
 
 {close_override
-write "The lid creaks as you push it closed.^"
+write &quot;The lid creaks as you push it closed.^&quot;
 ensure box has CLOSED
 }
 
 object note: orange note
-  short		an "orange note"
-  long		"An orange note rests on the ground."
-  parent 	box
-  mass		5
+ short         an &quot;orange note&quot;
+ long          &quot;An orange note rests on the ground.^&quot;
+ parent        box
+ mass          5
 
 {read : examine
-write "The note reads, ~Welcome to Jamaica and have a nice day.~^"
+write &quot;The note reads, ~Welcome to Jamaica and have a nice day.~^&quot;
 }
 
 location living_room: living room
-  short		the "living room"
-  north		nowhere
+ short         the &quot;living room&quot;
+ north         nowhere
 
 {look
 if here has VISITED
-   write "You have returned to the living room.^"
+   write &quot;You have returned to the living room.^&quot;
 else
    print:
       You are in the living room. There is a small
       television perched on a low-lying table in front
       of a sofa.
    .
-   write "To the north there is " 
+   write &quot;To the north there is &quot; 
    if door has CLOSED
-      write "closed"
+      write &quot;closed&quot;
    else
-      write "open"
+      write &quot;open&quot;
    endif
-   write " door.^"
+   write &quot; door.^&quot;
 endif
 }
 
 {movement
 if compass = north
    if destination = nowhere
-      write "The bedroom door is closed.^"
+      write &quot;The bedroom door is closed.^&quot;
       return true
    endif
 endif
@@ -183,16 +189,16 @@ move door to here
 }
 
 object television: television tv tele
-  short		a "television"
-  mass		scenery
+ short         a &quot;television&quot;
+ mass          scenery
 
 {examine
 if self has EXAMINED
-   write "It's Rick who is the TV addict, not you.^"
+   write &quot;It&#x27;s Rick who is the TV addict, not you.^&quot;
    return
 endif
-write "There is currently a cartoon showing on the "
-write "television.^"
+write &quot;There is currently a cartoon showing on the &quot;
+write &quot;television.^&quot;
 ensure self has EXAMINED
 }
 
@@ -204,21 +210,48 @@ print:
    of this is only surpassed by that of him sinking
    his newly-acquired fangs into your throat.^
 .
-execute "+game_over"
+execute &quot;+game_over&quot;
 }
 
 {turn_on
-write "The television is already on."
+write &quot;The television is already on.&quot;
 }
 
 object rick: son boy teenager rick
-  has		ANIMATE
-  short		name "Rick"
-  long		"Rick is here, watching television."
-  mass		heavy
+ has           ANIMATE
+ short         name &quot;Rick&quot;
+ long          &quot;Rick is here, watching television.^&quot;
+ mass          heavy
 
 {examine
-write "Rick is staring blankly at the television screen.^"
+if @ = 1
+   print:
+      Rick is staring blankly at the television screen.^
+   .
+else
+   print:
+      Rick is still gazing into the television&#x27;s screen.^
+   .
+endif
+}
+
+grammar yack to *present     &gt;yack_to
+
+{yack_to
+set MENU_MODAL = true
+execute &quot;+menu_prompt&lt;talk_to_rick&quot;
+}
+
+{talk_to
+execute &quot;+menu_clear_options&quot;
+execute &quot;+menu_add_option&lt;Ask Rick about the television.&lt;ask rick about television&quot;
+if guide(parent) != limbo
+   execute &quot;+menu_add_option&lt;Tell Rick you found the TV guide.&lt;tell rick about guide&quot;
+endif
+if @tell_about_kryten_rick = false
+   execute &quot;+menu_add_option&lt;Tell Rick your life story.&lt;tell rick about myself&quot;
+endif
+execute &quot;+menu_add_option&lt;Ask Rick how he is going.&lt;ask rick about rick&quot;
 }
 
 {tell_about_guide
@@ -235,7 +268,7 @@ print:
 
 {ask_about_rick
 print:
-   ~My life is all but ruined until you find the TV guide.^
+   ~My life is all but ruined until you find the TV guide.~^
 .
 }
 
@@ -247,12 +280,16 @@ print:
 
 {talk_to
 print:
-   ~Uh, yeah, I'll do it in a minute,~ Rick mumbles
-   with out looking up. You have quite a strong
-   suspicion that he didn't really hear a word
+   ~Uh, yeah, I&#x27;ll do it in a minute,~ Rick mumbles
+   without looking up. You have quite a strong
+   suspicion that he didn&#x27;t really hear a word
    you said.^
 .
 }
+
+object sofa : sofa
+ short         a &quot;sofa&quot;
+ has           NOT_IMPORTANT
 
 #-----------------------------------------------------------------------------
 # GLOBAL FUNCTIONS 
@@ -262,7 +299,7 @@ print:
 set rick(turns_since_last_sip) + 1
 if rick(turns_since_last_sip) = 5
    if here = living_room
-      write "Rick takes a sip from his drink.^"
+      write &quot;Rick takes a sip from his drink.^&quot;
   endif
   set rick(turns_since_last_sip) = 0
 endif
@@ -282,62 +319,67 @@ return false
 
 {+intro
 style bold
-write "^^" game_title
+write &quot;^^&quot; game_title
 style normal
-write " by " game_author "^^"
+write &quot; by &quot; game_author &quot;^^&quot;
 
 print:
    Your alarm rings and you climb out of bed.
    Monday morning again so soon. Oh well, at least
-   your house doesn't have a front door so you have
+   your house doesn&#x27;t have a front door so you have
    a good excuse for not going to work.^^
 .
 
 if here hasnt OUTDOORS
-  set north_wall(parent) = here
-  set south_wall(parent) = here
-  set east_wall(parent) = here
-  set west_wall(parent) = here
+   move north_wall to here
+   move south_wall to here
+   move east_wall to here
+   move west_wall to here
 endif
+
 set ground(parent) = here
 look
 }
 
+{+movement
+ifall destination != nowhere : destination hasnt OUTDOORS
+   move north_wall to destination
+   move south_wall to destination
+   move east_wall to destination
+   move west_wall to destination
+endif
+return false
+}
+
 object kryten: myself self me
- has		ANIMATE
- short		name "yourself"
- quantity	42
- parent		bedroom
+ has           ANIMATE
+ short         name &quot;yourself&quot;
+ quantity      42
+ parent        bedroom
  player
 
 {examine
-write "As beautiful as ever.^"
-execute "+inventory"
+write &quot;As beautiful as ever.^&quot;
+execute &quot;+inventory&quot;
 }
 
-grammar about &gt;about
+grammar about     &gt;about
 
 {+about
-write "This is the game from the tutorial section of the JACL Author's Guide."
-write "See the appendix for the full source to this program.^"
+write &quot;This is the game from the tutorial section of the JACL Author&#x27;s Guide.&quot;
+write &quot;See the appendix for the full source to this program.^&quot;
 }
 
 integer OFFSET
 integer INDEX
-string status_text "temp"
-constant status_window 3
+string status_text     &quot;temp&quot;
+integer status_window     3
 
-{+update_status_window
+{+update_status_window 
+execute &quot;+reverse_window&quot;
 style reverse
-padstring status_text " " status_width
-write status_text
-cursor 0 1
-write status_text
-cursor 0 2
-write status_text
-cursor 1 1
 write here{The}
-setstring status_text "Score: " score " Moves: " total_moves
+setstring status_text &quot;Score: &quot; score &quot; Moves: &quot; total_moves
 set OFFSET = status_width
 length INDEX status_text
 set OFFSET - INDEX
@@ -347,35 +389,70 @@ write status_text
 style normal
 }
 
+parameter TEST  kryten(status)          1       4
+parameter PASSWORD password
+
+integer INDEX
+string password
+
+grammar form     &gt;form
+
+{+form
+write &quot;STATUS: &quot; kryten(status) ^
+write &quot;PASSWORD: &quot; password ^
+write &quot;&lt;hr&gt;&quot;
+write &quot;&lt;form&gt;&quot;
+hidden
+
+set INDEX = 1
+repeat
+   write &quot;&lt;input type=radio name=TEST value=~&quot; INDEX ~
+   if INDEX = kryten(status)
+      write &quot; checked&quot;
+   endif
+   write &quot;&gt;&quot; INDEX
+   set INDEX + 1
+   write &quot;^&quot;
+until INDEX = 5
+
+write &quot;&lt;p&gt;&lt;input type=~password~ name=~PASSWORD~&gt;^&quot;
+write &quot;&lt;input type=~submit~ name=~command~ value=~processform~&gt;&quot;
+
+write &quot;&lt;/form&gt;^&quot;
+}
+
+grammar processform     &gt;processform
+
+{+processform
+write &quot;Updating user file to now use ~&quot; password &quot;~.^&quot;
+}
+
 object north_wall: north north wall
- has			NO_TAB
- short          the "north wall"
+ has           NO_TAB
+ short         the &quot;north wall&quot;
 
 object south_wall: south southern wall
- has			NO_TAB
- short          the "south wall"
+ has           NO_TAB
+ short         the &quot;south wall&quot;
 
 object east_wall: east eastern wall
- has			NO_TAB
- short          the "east wall"
+ has           NO_TAB
+ short         the &quot;east wall&quot;
 
 object west_wall: west western wall
- has			NO_TAB
- short          the "west wall"
+ has           NO_TAB
+ short         the &quot;west wall&quot;
 
 object ground: ground floor
- has            SURFACE NO_TAB
- short          the "ground"
+ has           SURFACE NO_TAB
+ short         the &quot;ground&quot;
 
-#debug "debug.library"
-#include "webinterface.library"
-#include "webinterface.css"
-#include "npc.library"
-#include "utils.library"
-#include "verbs.library"
+#include &quot;utils.library&quot;
+#include &quot;menu.library&quot;
+#include &quot;verbs.library&quot;
 </pre>
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body>
 </html>

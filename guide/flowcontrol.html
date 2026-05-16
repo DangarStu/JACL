@@ -2,7 +2,7 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -96,7 +96,7 @@
 <td>This tests if the object hasn't the specified attribute set</TD>
 </tr></table>
 
-<P>The following are the possible tests that can be used with an <B>if</B> command when the left value is an object and the right value is one of the words <B>*here</B>, <B>*held</B>, <B>*present </B>or <B>*anywhere</B>. These words have the same meanings when used in an <b>if</b> statement as in a <B>grammar</B> statement. For more information see the section on <a href="definitions.html#definitions11">Grammar Statements</a>.
+<P>The following are the possible tests that can be used with an <B>if</B> command when the left value is an object and the right value is one of the words <B>*here</B>, <B>*held</B>, <B>*present </B>or <B>*anywhere</B>. These words have the same meanings when used in an <b>if</b> statement as in a <B>grammar</B> statement. For more information see the section on <a href="definitions.html#definitions10">Grammar Statements</a>.
 
 <table width=100%>
 <TR>
@@ -222,29 +222,24 @@ else
 endif
 </pre>
 
-<P>Nested <B>if</B> commands may also make use of the <B>else</B> command. This is demonstrated in the following section of code taken from the <B>+take_all</B> function: 
+<P>Nested <B>if</B> commands may also make use of the <B>else</B> command. The fragment below sketches a hand-rolled "take all visible" routine that walks every child of the player's current location, applying the same weight and liquid checks the library's <B>+take</B> function uses:
 
 <pre>
 loop
-   if noun3 childof noun1 
+   if noun3 childof here
       if noun3(mass) &lt; heavy
          if noun3 hasnt LIQUID
-            if noun3(mass) &lt;= player(info)
-               if TURN_WORKED = true
-                  set TOTAL_MOVES + 1
-                  execute "+eachturn"
-               endif
-               execute "+take_routine"
-               set INDEX + 1
+            if noun3(mass) &lt;= player(quantity)
+               move noun3 to player
+               ensure noun3 has TOUCHED
+               write "You take " noun3{the} .^
             else
                write "You are carrying too much to take "
                write noun3{the} .^
-               set INDEX + 1
             endif
          else
             write noun3{The} " run" noun3{s} " through "
             write "your fingers.^"
-            set INDEX + 1
          endif
       endif
    endif
@@ -254,7 +249,7 @@ endloop
 <p>In the above code, the block of code after the first <b>else</b> command is executed if the matching <b>if</b> command above it:
 
 <pre>
-if noun3(mass) &lt;= player(info)
+if noun3(mass) &lt;= player(quantity)
 </pre>
 
 <p>is false. This line of code will not get executed, however, if the line:
@@ -352,7 +347,7 @@ return false
 <table class="infowarn"><tr>
 <td><img src="warning.png" alt="Warning"></td>
 <td>
-Becareful not to use the default iteration container <b>noun3</b> more than once when using nested <b>select</b> loops. As it is a global variable the loops will intefere with each other if it is shared. 
+Be careful not to use the default iteration container <b>noun3</b> more than once when using nested <b>select</b> loops. As it is a global variable the loops will interfere with each other if it is shared. 
 <td>
 </td></tr></table>
 
@@ -362,13 +357,13 @@ The following scopes can be used with the <b>select</b> command:
 <tr><th>Scope</th>
 <th width=80%>Description</th>
 </tr><tr>
-<td><b>*held</b>&nbsp;&nbsp;</td><td>All objects held by the player.</td>
+<td><b>*held</b></td><td>All objects held by the player.</td>
 </tr><tr>
-<td><b>*here</b>&nbsp;&nbsp;</td><td>All objects in the current location.</td>
+<td><b>*here</b></td><td>All objects in the current location.</td>
 </tr><tr>
-<td><b>*present</b>&nbsp;&nbsp;</td><td>All objects either in the current location or currently held.</td>
+<td><b>*present</b></td><td>All objects either in the current location or currently held.</td>
 </tr><tr>
-<td><b>*anywhere</b>&nbsp;&nbsp;</td><td>All objects in the game (use <b>loop</b> command instead).</td>
+<td><b>*anywhere</b></td><td>All objects in the game (use <b>loop</b> command instead).</td>
 </tr></table>
 
 <table class="infowarn">
@@ -447,7 +442,7 @@ whileall counter &lt; 10 : status = 1
 endwhile
 </pre>
 
-<h2><a class="section" name="flowcontrol_iterate">The ITERATE, ENDITERATE, UPDATE and ENDUPDATE Commands</a></h2>
+<h2><a class="section" name="flowcontrol9">The ITERATE, ENDITERATE, UPDATE and ENDUPDATE Commands</a></h2>
 
 <p>JACL has two additional loop constructs that walk an external data source row-by-row rather than iterating over the in-memory object table. They share a syntax and only differ in how each row is supplied to the body.
 
@@ -478,7 +473,7 @@ endwhile
 
 <p>In the above code, if <b>counter</b> reaches 50, the <b>break</b> command will exit the <b>while</b> loop immediately and execution will continue from after the <b>endwhile</b> command.
 
-<h2><a class="section" name="flowcontrol9">The RETURN Command</a></h2>
+<h2><a class="section" name="flowcontrol11">The RETURN Command</a></h2>
 
 <P><b>return</B> or <B>return true</B><br>
 The command <B>return</B> will stop execution of the current function and return to the next line after the corresponding <B>execute</B> command in the calling function. If the function containing the <b>return</b> command  was called internally by the JACL interpreter, processing will continue, eventually returning to the command prompt for the player's next move.
@@ -504,6 +499,6 @@ write "~I'm glad you asked...~^"
 <p>This is a common technique in JACL games. Once the player has typed a command that refers to an object, the interpreter will attempt to execute the appropriate function that is associated with that object. For example, if the player was to type <b>ask bond about the bomb</b>, the interpreter would attempt to execute the function <b>ask_about_bomb</b> that is associated with the object <b>bond</b> (the function above). If this function does not exist, the function <b>+ask_about</b> will be called instead. When a <b>return false</b> command executed, the interpreter will behave as though the local function containing the <b>return false</b> does not exist. In essence, this allows a function to override the default result of a verb under some conditions and accept it under others.
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </BODY>
 </HTML>

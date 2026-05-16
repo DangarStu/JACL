@@ -2,7 +2,7 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -11,101 +11,206 @@
 
 <table cellpadding=10 width=100%>
 <tr><th width=20%>Term</th><th width=80%>Definition</th></tr>
-<TR><td valign=top><B>association</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>A function is said to be associated with the nearest object or location that is defined above it in the game file. An underscore and the label of the item it is associated with is appended to the function name specified in the code to form the function's full internal name.</TD>
-</TR>
-<TR><td valign=top><B>attribute</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>An attribute is a boolean value, or flag, that can be set on or off (using the <B>ensure</B> command) for any given item.</TD>
-</TR>
-<TR><td valign=top><B>child</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>An object is said to be a child of whichever other item its <B>parent</B> element is currently set to. This indicates that the child object is somehow contained within or possessed by the parent item.</TD>
-</TR>
-<TR><td valign=top><B>command</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>A command is one of the basic actions that can be performed within a function.</TD>
-</TR>
-<TR><td valign=top><B>container</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>A container is any expression that can have its value <B>set</B> to an integer. These are item elements, item pointers and integer variables.</TD>
-</TR>
-<TR><td valign=top><B>current location</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>The current location is whichever location the <B>parent</B> element of the object representing the player is set to. The object that represents the current player is specified by the current value of the object pointer <B>player</B>.</TD>
-</TR>
-<TR><td valign=top><B>directive</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>A directive is a setting that may be placed in the interpreter's configuration file.</TD>
-</TR>
-<TR><td valign=top><B>element</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>An element is any of the properties of an item that can be set to hold an integer value.</TD>
-</TR>
-<TR><td valign=top><B>expression</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>An expression is a group of three parameters that may be used with an <B>if</B> command. All expressions evaluate to either <B>true</B> or <B>false</B>.</TD>
-</TR>
-<TR><td valign=top><B>filter</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>A <B>filter</B> is any word that has been specified to be removed from the player's move before it is processed by the interpreter.</TD>
-</TR>
-<TR><td valign=top><B>full internal name</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>If a function's name begins with a plus sign, it is global and the name specified in the code will also be its full internal name. If not, the name that appears after a function's opening curly brace, followed by an underscore then the label of the item that the function is associated with will be its full internal name.</TD>
-</TR>
-<TR><td valign=top><B>grammar</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>A <B>grammar</B> statement is the definition of a command construct that may be used by the player during the game and the function that should be called when that move is made.</TD>
-</TR>
-<TR><td valign=top><B>grand parent</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>The grand parent of an object is the last object in the chain of possession. For example, if a coin is inside a purse that is in turn inside a bag, the bag is said to be the grand parent of the coin, while the purse is its parent.</TD>
-</TR>
-<TR><td valign=top><B>integer</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>An integer is a 32 bit signed whole number. It can range between -2147483648 and 2147483647.</TD>
-</TR>
-<TR><td valign=top><B>item</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>Item is the group term for objects and locations.</TD>
-</TR>
-<TR><td valign=top><B>keyword</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>Keywords are any of the terms that define the nine basic data elements in a game. They are <B>object</B>, <B>location</B>, <B>filter</B>, <B>synonym</B>, <B>variable</B>, <B>grammar</B>, <b>constant</b>, <b>string</b> and <b>parameter</b>.</TD>
-</TR>
-<TR><td valign=top><B>label</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>A label is the internal name given to an object, location or variable. No two labels can be the same.</TD>
-</TR>
-<TR><td valign=top><B>location</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>A location is an item that the player may be inside. All locations have the attribute <B>LOCATION </B>and are defined using the keyword <B>location</B>.</TD>
-</TR>
-<TR><td valign=top><B>name</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>All items must have one or more names. These are the names that the player may use to refer to that item during the course of the game.</TD>
-</TR>
-<TR><td valign=top><B>object</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>An object is an item that represents any aspect of the game that the player must be able to refer to, but not be inside.</TD>
-</TR>
-<TR><td valign=top><B>parameter</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>The term parameter refers to one of two things. Firstly a parameter is any information that follows a JACL command, keyword or property. If multiple parameters are specified, they must be separated by white space.</TD>
-</TR>
-<TR><td valign=top><B>parent</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>An object's parent is the item that it is currently inside or possessed by. The parent of the object that represents the player is the location they are currently in.</TD>
-</TR>
-<TR><td valign=top><B>pointer</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>A pointer is a special type of variable that may be used anywhere an item label can be. When used, it will be substituted for the label of the item that it is currently set to.</TD>
-</TR>
-<TR><td valign=top><B>indefinite article</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>An indefinite article is used before singular nouns that refer to any member of a group. In English these are <b>a</b> or <b>an</b>. An item's indefinite article is defined using the first parameter of a <b>short</b> property. This article will be displayed when using a <B>{list}</B> macro.</TD>
-</TR>
-<TR><td valign=top><B>definite article</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>A definite article is used before singular nouns that refer to a particular member of a group. In English this is <b>the</b>. An item's indefinite article defaults to <b>the</b> unless otherwise specified by supplying a <b>definite</b> property. This article will be displayed when using a <B>{the}</B> macro.</TD>
-</TR>
-<TR><td valign=top><B>property</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>A property is one of the elements of an object or location that can be defined at start-up.</TD>
-</TR>
-<TR><td valign=top><B>scope</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>Scope describes the position of an object relative to the player. The scope indicators are <B>*present</B>, <B>*here</B>, <B>*held</B> and <B>*anywhere</B>.</TD>
-</TR>
-<TR><td valign=top><B>statement</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>A statement is a command, keyword or property along with all of its parameters.</TD>
-</TR>
-<TR><td valign=top><B>synonym</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>A <B>synonym</B> is any word that has been specified to be swapped for another word in all moves typed by the player.</TD>
-</TR>
-<TR><td valign=top><a name="value"><B>value</B></a>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>A value is an integer, or anything that resolves to an integer such as: an object label, an object element, an object pointer, a variable, <B>true</B> (1), <B>false</B> (0), <B>scenery</B> (100), <B>heavy</B>(99), <B>nowhere</B> (0), <B>lines</B> (the number of lines the screen can display) or <B>random</B>. For more information on constants and <B>random</B> see the chapter on <a href="internals.html">Internals</a>.</TD>
-</TR>
-<TR><td valign=top><B>white space</B>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-<td valign=top>White space is any tab, space, comma or colon that occurs outside double quotes</TD>
-</tr></table>
+
+<tr><td valign=top><b>association</b></td>
+<td valign=top>A function is said to be associated with the nearest object or location that is defined above it in the game file. An underscore and the label of the item it is associated with is appended to the function name specified in the code to form the function's full internal name.</td>
+</tr>
+
+<tr><td valign=top><b>attribute</b></td>
+<td valign=top>An attribute is a boolean value, or flag, that can be set on or off (using the <b>ensure</b> command) for any given item.</td>
+</tr>
+
+<tr><td valign=top><b>blorb</b></td>
+<td valign=top>A Blorb file is a resource bundle defined by Andrew Plotkin for storing images and sounds alongside an interactive fiction game. The Glk interpreters look in <i>game</i><b>.blorb</b> for any media the game references by index. The web interpreters use a <b>media file</b> instead. Generated by the <b>bjorb</b> utility from a <b>.blc</b> control file.</td>
+</tr>
+
+<tr><td valign=top><b>cgijacl</b></td>
+<td valign=top>The standalone web interpreter. Listens on an HTTP port directly and serves the game to a browser, suitable for development and small-traffic deployments. Pairs with a <b>media file</b> for resources and reads configuration from <b>cgijacl.conf</b>.</td>
+</tr>
+
+<tr><td valign=top><b>child</b></td>
+<td valign=top>An object is said to be a child of whichever other item its <b>parent</b> element is currently set to. This indicates that the child object is somehow contained within or possessed by the parent item.</td>
+</tr>
+
+<tr><td valign=top><b>cjacl</b></td>
+<td valign=top>A console interpreter built against CheapGlk that streams game output to standard output rather than a Glk window. Handy for piping a transcript through other tools or running games from a script.</td>
+</tr>
+
+<tr><td valign=top><b>command</b></td>
+<td valign=top>A command is one of the basic actions that can be performed within a function.</td>
+</tr>
+
+<tr><td valign=top><b>container</b></td>
+<td valign=top>A container is any expression that can have its value <b>set</b> to an integer. These are item elements, item pointers and integer variables.</td>
+</tr>
+
+<tr><td valign=top><b>current location</b></td>
+<td valign=top>The current location is whichever location the <b>parent</b> element of the object representing the player is set to. The object that represents the current player is specified by the current value of the object pointer <b>player</b>.</td>
+</tr>
+
+<tr><td valign=top><b>default function</b></td>
+<td valign=top>A global function named <b>+default_</b><i>verb</i> that the interpreter looks for when a verb's <b>override</b> opcode fires and no per-object override is found. Lets you customise a verb's outcome for many objects in one place without rewriting the verb's preliminary checks.</td>
+</tr>
+
+<tr><td valign=top><b>definite article</b></td>
+<td valign=top>A definite article is used before singular nouns that refer to a particular member of a group. In English this is <b>the</b>. An item's definite article defaults to <b>the</b> unless otherwise specified by supplying a <b>definite</b> property. This article will be displayed when using a <b>{the}</b> macro.</td>
+</tr>
+
+<tr><td valign=top><b>directive</b></td>
+<td valign=top>A directive is a setting that may be placed in the interpreter's configuration file.</td>
+</tr>
+
+<tr><td valign=top><b>element</b></td>
+<td valign=top>An element is any of the properties of an item that can be set to hold an integer value.</td>
+</tr>
+
+<tr><td valign=top><b>expression</b></td>
+<td valign=top>An expression is a group of three parameters that may be used with an <b>if</b> command. All expressions evaluate to either <b>true</b> or <b>false</b>.</td>
+</tr>
+
+<tr><td valign=top><b>fcgijacl</b></td>
+<td valign=top>The FastCGI variant of the web interpreter. Designed to be fronted by a production webserver such as Apache via <b>mod_fcgid</b>; processes are kept alive between requests for low per-move latency.</td>
+</tr>
+
+<tr><td valign=top><b>filter</b></td>
+<td valign=top>A <b>filter</b> is any word that has been specified to be removed from the player's move before it is processed by the interpreter.</td>
+</tr>
+
+<tr><td valign=top><b>full internal name</b></td>
+<td valign=top>If a function's name begins with a plus sign, it is global and the name specified in the code will also be its full internal name. If not, the name that appears after a function's opening curly brace, followed by an underscore then the label of the item that the function is associated with will be its full internal name.</td>
+</tr>
+
+<tr><td valign=top><b>function-call counter</b></td>
+<td valign=top>An automatically maintained integer container, accessed as <b>@</b><i>function_name</i>, that records how many times a given function has been called. Inside the function itself the bare token <b>@</b> refers to the running function's own counter. Useful for gating first-time behaviour without declaring a user attribute.</td>
+</tr>
+
+<tr><td valign=top><b>Glk</b></td>
+<td valign=top>A portable application programming interface for text-based games, written by Andrew Plotkin. JACL targets Glk for the console interpreter (<b>jacl</b>, built on GlkTerm) so the same game runs unchanged under any Glk implementation, including Gargoyle and WinGlk.</td>
+</tr>
+
+<tr><td valign=top><b>grammar</b></td>
+<td valign=top>A <b>grammar</b> statement is the definition of a command construct that may be used by the player during the game and the function that should be called when that move is made.</td>
+</tr>
+
+<tr><td valign=top><b>grand parent</b></td>
+<td valign=top>The grand parent of an object is the last object in the chain of possession. For example, if a coin is inside a purse that is in turn inside a bag, the bag is said to be the grand parent of the coin, while the purse is its parent.</td>
+</tr>
+
+<tr><td valign=top><b>here</b></td>
+<td valign=top>An internally defined pointer that always resolves to the player's current location. Equivalent to <b>player(parent)</b> but easier to read.</td>
+</tr>
+
+<tr><td valign=top><b>hyperlink</b></td>
+<td valign=top>Under the web interpreters, the <b>hyperlink</b> opcode emits a clickable HTML anchor that submits a typed command on the player's behalf. Used by <b>webinterface.library</b> to build the link bar (Instructions, Map, About, etc.). Degrades to plain text under Glk.</td>
+</tr>
+
+<tr><td valign=top><b>indefinite article</b></td>
+<td valign=top>An indefinite article is used before singular nouns that refer to any member of a group. In English these are <b>a</b> or <b>an</b>. An item's indefinite article is defined using the first parameter of a <b>short</b> property. This article will be displayed when using a <b>{list}</b> macro.</td>
+</tr>
+
+<tr><td valign=top><b>integer</b></td>
+<td valign=top>An integer is a 32 bit signed whole number. It can range between -2147483648 and 2147483647.</td>
+</tr>
+
+<tr><td valign=top><b>item</b></td>
+<td valign=top>Item is the group term for objects and locations.</td>
+</tr>
+
+<tr><td valign=top><b>jacl</b></td>
+<td valign=top>The flagship console interpreter, built against the GlkTerm library. Reads a <b>.jacl</b> game file (or its preprocessed <b>.j2</b> form) and presents it in a text-only window with a Glk status bar.</td>
+</tr>
+
+<tr><td valign=top><b>keyword</b></td>
+<td valign=top>Keywords are any of the terms that define the nine basic data elements in a game. They are <b>object</b>, <b>location</b>, <b>filter</b>, <b>synonym</b>, <b>integer</b>, <b>grammar</b>, <b>constant</b>, <b>string</b>, <b>attribute</b> and <b>parameter</b>.</td>
+</tr>
+
+<tr><td valign=top><b>label</b></td>
+<td valign=top>A label is the internal name given to an object, location or variable. No two labels can be the same.</td>
+</tr>
+
+<tr><td valign=top><b>library</b></td>
+<td valign=top>The standard set of include files distributed with JACL, found in <b>projects/include/</b>. The main file is <b>verbs.library</b>, which provides default implementations of every standard verb; companions such as <b>menu.library</b>, <b>webinterface.library</b>, <b>npc.library</b> and the language-specific files extend the base library with optional functionality.</td>
+</tr>
+
+<tr><td valign=top><b>location</b></td>
+<td valign=top>A location is an item that the player may be inside. All locations have the attribute <b>LOCATION </b>and are defined using the keyword <b>location</b>.</td>
+</tr>
+
+<tr><td valign=top><b>macro</b></td>
+<td valign=top>A token enclosed in curly braces that resolves at output time to text derived from an object. The most common macros are <b>{list}</b> (indefinite-article form), <b>{the}</b> (definite-article form), <b>{long}</b> (long description), <b>{sub}</b>/<b>{obj}</b> (pronouns) and <b>{is}</b>/<b>{has}</b>/<b>{s}</b> (verb agreement). Macros work on object labels and on integer variables that hold an object index.</td>
+</tr>
+
+<tr><td valign=top><b>media file</b></td>
+<td valign=top>A plain-text manifest with the same base name as the game and a <b>.media</b> suffix, consulted by <b>cgijacl</b> and <b>fcgijacl</b> to serve images, sounds and other static assets. Each line maps a request URL to a MIME type and a filesystem path.</td>
+</tr>
+
+<tr><td valign=top><b>name</b></td>
+<td valign=top>All items must have one or more names. These are the names that the player may use to refer to that item during the course of the game.</td>
+</tr>
+
+<tr><td valign=top><b>noun1, noun2, noun3, noun4</b></td>
+<td valign=top>Built-in object pointers used by the parser and the library. <b>noun1</b> is set to the first object referred to in the player's command and <b>noun2</b> to the second; <b>noun3</b> is the conventional iteration variable for the <b>loop</b> command and <b>noun4</b> is a free pointer for game code to populate. The standard library calls verb functions with these pointers already set, so a function such as <b>+take</b> can refer to its target as <b>noun1</b>.</td>
+</tr>
+
+<tr><td valign=top><b>object</b></td>
+<td valign=top>An object is an item that represents any aspect of the game that the player must be able to refer to, but not be inside.</td>
+</tr>
+
+<tr><td valign=top><b>override</b></td>
+<td valign=top>An opcode used inside a global verb function to delegate the verb's outcome to a per-object hook. When <b>override</b> runs the interpreter looks for a function named <i>verb</i><b>_override_</b><i>label</i> on the noun and executes it in place of the rest of the global function. If no such hook exists, the interpreter falls back to <b>+default_</b><i>verb</i>; if that also doesn't exist the rest of the global function runs as written. Allows authors to change a verb's outcome for a specific object without re-implementing all the preliminary checks.</td>
+</tr>
+
+<tr><td valign=top><b>parameter</b></td>
+<td valign=top>The term parameter refers to one of two things. Firstly a parameter is any information that follows a JACL command, keyword or property. If multiple parameters are specified, they must be separated by white space.</td>
+</tr>
+
+<tr><td valign=top><b>parent</b></td>
+<td valign=top>An object's parent is the item that it is currently inside or possessed by. The parent of the object that represents the player is the location they are currently in.</td>
+</tr>
+
+<tr><td valign=top><b>pointer</b></td>
+<td valign=top>A pointer is a special type of variable that may be used anywhere an item label can be. When used, it will be substituted for the label of the item that it is currently set to.</td>
+</tr>
+
+<tr><td valign=top><b>property</b></td>
+<td valign=top>A property is one of the elements of an object or location that can be defined at start-up.</td>
+</tr>
+
+<tr><td valign=top><b>proxy</b></td>
+<td valign=top>The <b>proxy</b> opcode submits a string as if the player had typed it, running it through the normal parser. Used to redirect one player command to another (for example, mapping a custom verb onto an existing one) and to let the menu library run option choices through the same path as typed input.</td>
+</tr>
+
+<tr><td valign=top><b>scope</b></td>
+<td valign=top>Scope describes the position of an object relative to the player. The scope indicators are <b>*present</b>, <b>*here</b>, <b>*held</b>, <b>*inside</b> and <b>*anywhere</b>.</td>
+</tr>
+
+<tr><td valign=top><b>self</b></td>
+<td valign=top>An internally maintained pointer that refers to the object whose function is currently executing. Inside an associated function such as <b>{examine</b>, <b>self</b> always equals the object the function is attached to, so <b>ensure self has TOUCHED</b> works regardless of whether the player typed the object's name directly or used a pronoun.</td>
+</tr>
+
+<tr><td valign=top><b>statement</b></td>
+<td valign=top>A statement is a command, keyword or property along with all of its parameters.</td>
+</tr>
+
+<tr><td valign=top><b>synonym</b></td>
+<td valign=top>A <b>synonym</b> is any word that has been specified to be swapped for another word in all moves typed by the player.</td>
+</tr>
+
+<tr><td valign=top><a name="value"><b>value</b></a></td>
+<td valign=top>A value is an integer, or anything that resolves to an integer such as: an object label, an object element, an object pointer, a variable, <b>true</b> (1), <b>false</b> (0), <b>scenery</b> (100), <b>heavy</b> (99), <b>nowhere</b> (0), <b>lines</b> (the number of lines the screen can display) or <b>random</b>. For more information on constants and <b>random</b> see the chapter on <a href="internals.html">Internals</a>.</td>
+</tr>
+
+<tr><td valign=top><b>walkthru</b></td>
+<td valign=top>A plain-text file listing one in-game command per line. Fed to the <b>walkthru</b> command, it replays the commands as if typed by the player, with no [MORE] prompts. Used during development to fast-forward to a particular point in the game and as a regression test &mdash; running an existing walkthru after editing the game should produce the same transcript.</td>
+</tr>
+
+<tr><td valign=top><b>white space</b></td>
+<td valign=top>White space is any tab, space, comma or colon that occurs outside double quotes.</td>
+</tr>
+
+</table>
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body>
 </html>

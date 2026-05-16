@@ -2,7 +2,7 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -18,7 +18,7 @@
 
 <h2><a class="section" name="http1">Document Structure</a></h2>
 
-<p>A complete HTML page must be returned by your game in response to each of the player's moves. To assist with this, if you do not define your own custom header and footer functions (<b>+header</b> and <b>+footer</b>), the <b>cgijacl</b> interpreter will insert template headers and footers to mimick a standard interactive fiction interface. If a <b>+header</b> function is supplied, it is the very first thing to be executed. The default header looks like this:
+<p>A complete HTML page must be returned by your game in response to each of the player's moves. To assist with this, if you do not define your own custom header and footer functions (<b>+header</b> and <b>+footer</b>), the <b>cgijacl</b> interpreter will insert template headers and footers to mimic a standard interactive fiction interface. If a <b>+header</b> function is supplied, it is the very first thing to be executed. The default header looks like this:
 
 <pre> 
 &lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -76,7 +76,7 @@
             padding-bottom: 20px;
             padding-left: 50px;
             padding-right: 50px;
-            font-size: 12px;
+            font-size: 12pt;
             overflow: auto; }
     --&gt; &lt;/style&gt; 
     &lt;/head&gt;&lt;body onLoad="putFocus(0, 0);"&gt; 
@@ -106,7 +106,7 @@
 &lt;/html&gt; 
 </pre>
 
-<p>There are two significant aspects to this footer. The first is that it contains the input field where the player will type their commands. This input field must have the name <b>command</b> as this is where the interpreter will looks for the player's command when the form is submitted. The second is the hidden input that contains the <b>user_id</b> for the player. 
+<p>There are two significant aspects to this footer. The first is that it contains the input field where the player will type their commands. This input field must have the name <b>command</b> as this is where the interpreter will look for the player's command when the form is submitted. The second is the hidden input that contains the <b>user_id</b> for the player. 
 
 <table class="infowarn"><tr>
 <td><img src="info.png"></td>
@@ -115,13 +115,13 @@
 
 <h2><a class="section" name="http2">Linebreaks</a></h2>
 
-<p>In order to avoid the need to fill a standard interactive fiction game or the standard library with HTML tags the caret newline character (<b>^</b>) is output by the <b>cgijacl</b> interpreters as <b>&lt;br&gt;</b> followed by a newline. This behaviour can be turned off by setting the JACL variable <b>linebreaks</b> to <b>false</b>. This is usually desireable in section such as the header and footer where code is only executed by the web-based interpreters and can therefore contain any amount of custom HTML you require.
+<p>In order to avoid the need to fill a standard interactive fiction game or the standard library with HTML tags the caret newline character (<b>^</b>) is output by the <b>cgijacl</b> interpreters as <b>&lt;br&gt;</b> followed by a newline. This behaviour can be turned off by setting the JACL variable <b>linebreaks</b> to <b>false</b>. This is usually desirable in sections such as the header and footer where code is only executed by the web-based interpreters and can therefore contain any amount of custom HTML you require.
 
 <h2><a class="section" name="http3">The Player's User ID</a></h2>
 
-<p>HTTP is a stateless protocol. This means that each request received by the web server is completely independent of any that came before it. The <b>cgijacl</b> interpreters, however, need to know which player each request has come from, and more specificly, what state the game world was in at the end of their previous move. For this reason, a unique user ID must be sent with each of the player's commands. Failure to do so at any time will result in the game restarting from the beginning and a new user ID being assigned automatically.
+<p>HTTP is a stateless protocol. This means that each request received by the web server is completely independent of any that came before it. The <b>cgijacl</b> interpreters, however, need to know which player each request has come from, and more specifically, what state the game world was in at the end of their previous move. For this reason, a unique user ID must be sent with each of the player's commands. Failure to do so at any time will result in the game restarting from the beginning and a new user ID being assigned automatically.
 
-<p>To propogate the player's user ID, it must be passed as the HTML parameter <b>user_id</b>. This is done by including it as a hidden field in any forms, or as a URL parameter in any hyperlinks. The token <b>$user_id</b> maybe be used in any <b>write</b> statement to output the automatically generated ID. Below are two examples of its use:
+<p>To propagate the player's user ID, it must be passed as the HTML parameter <b>user_id</b>. This is done by including it as a hidden field in any forms, or as a URL parameter in any hyperlinks. The token <b>$user_id</b> may be used in any <b>write</b> statement to output the automatically generated ID. Below are two examples of its use:
 
 <pre>
 write "&lt;a href=~" $url "?user_id=" $user_id 
@@ -149,7 +149,7 @@ hidden ;adds the player's user ID as a hidden form field.
 write "&lt;/form&gt;"
 </pre>
 
-<p>As you can see, there is nothing difficult about using the <b>hidden</b> command. The second related command is <b>prompt</b>. This command outputs a text input box and the player's user ID. Using <b>prompt</b>, the above code snipet would look like this:
+<p>As you can see, there is nothing difficult about using the <b>hidden</b> command. The second related command is <b>prompt</b>. This command outputs a text input box and the player's user ID. Using <b>prompt</b>, the above code snippet would look like this:
 
 <pre>
 write "&lt;form&gt;"
@@ -175,13 +175,21 @@ write "&lt;/form&gt;"
 
 <p>Using standard Javascript techniques (see the default header or <b>webinterface.library</b> for an example), it is possible to request the JACL interpreter to process a command without refreshing the whole browser window. Once the command has been processed Javascript must be used once again to manually insert any output returned into the appropriate HTML element. When performing these types of requests, there are two special URL parameters to be aware of.
 
-<p>The first is the <b>ajax</b> parameter. If this parameter has the value <b>true</b> the header and footer functions will not be called, leaving the interpreter to return only the output produced directly by the command being processed. 
+<p>The first is the <b>ajax</b> parameter. If this parameter has the value <b>true</b> the header and footer functions will not be called, leaving the interpreter to return only the output produced directly by the command being processed.
 
-<p>The second is the <b>function</b> parameter. This parameter allows the game author to specify a function to execute as opposed to the usual process of interpreting a command entered by the player. The value of the <b>function</b> parameter is the name of the function to execute. For security purposes, the acceptable values for this parameter are resistricted to a set number of functions: <b>+timer</b>, <b>+ajax</b> and <b>eachturn</b>. The first two options simply call the function of the same name and return any output. The third will call both the global function <b>+eachturn</b> and the eachturn function that is associated with the current location.
+<p>The second is the <b>rpc</b> parameter. This parameter allows the game author to specify a function to execute as opposed to the usual process of interpreting a command entered by the player. Three values are handled specially:
+
+<ul>
+<li><b>rpc=timer</b> &mdash; calls the global function <b>+timer</b>.</li>
+<li><b>rpc=ajax</b> &mdash; calls the global function <b>+ajax</b>.</li>
+<li><b>rpc=eachturn</b> &mdash; calls the global function <b>+eachturn</b> followed by the <b>eachturn</b> function associated with the current location.</li>
+</ul>
+
+<p>Any other value falls through to the global function <b>+rpc</b> with the requested name (prefixed with a plus sign) stored in <b>rpc_function_name</b>. This gives you a single dispatch point for arbitrary background calls while keeping the set of directly-callable function names under your control &mdash; the request never gets to invoke an arbitrary JACL function by name.
 
 <table class="infowarn"><tr>
 <td><img src="info.png"></td>
-<td>The <b>+ajax</b> function serves no predetermined purpose, it is simply a function that can be called by the game author to handle any special-case situations that arise.</td>
+<td>The <b>+ajax</b> function serves no predetermined purpose, it is simply a function that can be called by the game author to handle any special-case situations that arise. <b>+rpc</b> works the same way but covers everything else: read <b>rpc_function_name</b> inside <b>+rpc</b> to decide what to do.</td>
 </tr></table>
 <h2><a class="section" name="http6">The BUTTON Command</a></h2>
 
@@ -269,7 +277,7 @@ parameter destination SOME_VARIABLE
 &lt;/form&gt;
 </pre>
 
-<p>When this form is submitted, the <b>cgijacl</b> interpreter will look for the parameter <b>destination</b>, as it has been defined using a <b>parameter</b> statement. This parameter will contain the internal number of the object that was selected and this number will be copied into the location specified by the <b>parameter</b> statement. In this case, a variable called <b>SOME_VARIABLE</b>. For more information see the section on <a href="definitions.html#definitions10">parameters</a>.
+<p>When this form is submitted, the <b>cgijacl</b> interpreter will look for the parameter <b>destination</b>, as it has been defined using a <b>parameter</b> statement. This parameter will contain the internal number of the object that was selected and this number will be copied into the location specified by the <b>parameter</b> statement. In this case, a variable called <b>SOME_VARIABLE</b>. For more information see the section on <a href="definitions.html#definitions12">parameters</a>.
 
 <h2><a class="section" name="http10">The GETENV Command</a></h2>
 
@@ -292,19 +300,20 @@ write "&lt;p&gt;Welcome, " current_user "!&lt;/p&gt;"
 
 <h2><a class="section" name="http11">The IMAGE Command</a></h2>
 
-<p>The <b>image</b> command is used to display an image &mdash; no surprise there. It requires three parameters using the following syntax:
-	
+<p>Under the web interpreters, the <b>image</b> command takes one or two parameters:
+
 <pre>
-image <i>URL</i> <i>Alignment</i> <i>AlternateText</i>
+image "<i>URL</i>" ["<i>CSSClass</i>"]
 </pre>
 
 <p>For example:
 
 <pre>
-image "/images/view.jpg" left "[View from the balcony]"
+image "/images/view.jpg"
+image "/images/view.jpg" "scene"
 </pre>
 
-<p>This command displays the image <b>/images/view.jpg</b> aligned to the left. If the picture is not found, or is displayed in a text-only browser such as Lynx, the text <b>[View from the balcony]</b> will be displayed instead. This is also the text that will be displayed by most graphical browsers when the cursor is held over the image.
+<p>The first form emits <b>&lt;img src="/images/view.jpg"&gt;</b>; the second adds <b>class="scene"</b>. The URL must be served by your <b>.media</b> manifest or by the webserver's document root. There is no alignment keyword or alt-text argument &mdash; use the CSS class and your stylesheet to position the image. See the <a href="multimedia.html#multimedia2">Multimedia chapter</a> for the corresponding Glk form and a fuller treatment.
 
 <h2><a class="section" name="http_auth">Google Sign-In Authentication</a></h2>
 
@@ -400,9 +409,9 @@ endif
 /grail.jpg image/jpeg images/grail.jpg
 </pre>
 
-<p>Each line of a media file has three columns separated by white space. The first column is the URL of the file as specified in the HTML of your game. The second column is the file's MIME type. The third column is the name of file on the local system to send when this file is requested. Files not beginning with a forward slash are relative to the directory containing the gamefile.
+<p>Each line of a media file has three columns separated by white space. The first column is the URL of the file as specified in the HTML of your game. The second column is the file's MIME type. The third column is the name of the file on the local system to send when this file is requested. Files not beginning with a forward slash are relative to the directory containing the gamefile.
 
-<p>If <b>awk</b> is installed on your system, the media file can be automatically generated from the <b>.jacl</b> game file using the <b>build-media-file</b> script in the <b>bin</b> directory of the JACL distribution. This script accepts the name of the game file as its only parameter and sends its output to standard out. It also asumes that all files live in an <b>images</b> directory beneath the directory containing the game file. <b>build-media-file</b> is used with a command like:
+<p>If <b>awk</b> is installed on your system, the media file can be automatically generated from the <b>.jacl</b> game file using the <b>build-media-file</b> script in the <b>bin</b> directory of the JACL distribution. This script accepts the name of the game file as its only parameter and sends its output to standard out. It also assumes that all files live in an <b>images</b> directory beneath the directory containing the game file. <b>build-media-file</b> is used with a command like:
 
 <pre>
  build-media-file grail.jacl > grail.media
@@ -411,6 +420,6 @@ endif
 <p>JACL games played using the <b>fcgijacl</b> interpreter and a full webserver do not require a <b>.media</b> file. The path to the image specified in the HTML of your game will be looked for in the document root of your webserver.
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body>
 </html>

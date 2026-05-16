@@ -1,4 +1,38 @@
-BODY	{	
+/* CSS Paged Media rules for WeasyPrint. htmldoc ignored these; the
+ * legacy guide.book carried equivalent settings on the command line.
+ * Match the prior htmldoc defaults: A4-ish page, 1.0in inside margin,
+ * 0.5in elsewhere, page number bottom-centre, chapter title in the
+ * top-right running header. */
+@page {
+	size: A4;
+	margin: 1.5cm 1.5cm 1.5cm 2.5cm;
+	@top-right {
+		content: string(chapter-title);
+		font-family: Helvetica, Arial, sans-serif;
+		font-size: 9pt;
+		color: #555;
+	}
+	@bottom-center {
+		content: counter(page);
+		font-family: Helvetica, Arial, sans-serif;
+		font-size: 10pt;
+	}
+}
+
+/* Suppress the running header on the title page and on each chapter's
+ * first page (htmldoc had --header1 ... for this). */
+@page :first {
+	@top-right { content: ""; }
+	@bottom-center { content: ""; }
+}
+
+/* The chapter title is set by H1 elements and picked up by the @page
+ * @top-right slot above. */
+H1 {
+	string-set: chapter-title content();
+}
+
+BODY	{
 			background-color: white;
 		}
  
@@ -29,6 +63,12 @@ A.title		{
 IMG		{
 			margin: 0.5cm;
 			margin-right: 2cm;
+			/* Scale any image down to the available content width
+			 * so a high-resolution screenshot doesn't run off the
+			 * page edge in print or off-screen on web. Aspect ratio
+			 * is preserved by `height: auto`. */
+			max-width: 100%;
+			height: auto;
 		}
 
 TABLE.infowarn	{
@@ -38,23 +78,39 @@ TABLE.infowarn	{
 			border-style: none;
 				}
 
+/* The info/warning callouts are icon-plus-text layouts using a
+ * table for positioning, not tabular data, so the generic TD
+ * border below (added for real data tables) shouldn't apply.
+ * vertical-align: middle so short callouts read as icon-beside-text
+ * rather than icon-floating-below-text (the generic TD rule pins
+ * to top, which is right for data tables but wrong here). */
+TABLE.infowarn TD	{
+			border: none;
+			vertical-align: middle;
+				}
+
 DIV.spacer	{ 	
 			margin-top: 12pt;
 			margin-bottom: 12pt;
 			}
 
-TABLE	{ 	
+TABLE	{
 			margin-top: 12pt;
 			margin-bottom: 12pt;
-			padding: 5px;
-			border-style: solid;
-			border-width: 1px;
+			border-collapse: collapse;
+			border: 1px solid #aaa;
 		}
 
 TD		{
 			font-family: Georgia;
 		 	font-size: 12pt;
 			vertical-align: top;
+			/* htmldoc ignored both cellpadding= and CSS padding on
+			 * TD; we used &nbsp; padding inside cells to compensate.
+			 * WeasyPrint honours this rule, so the &nbsp; hacks can
+			 * be removed from chapter HTML over time. */
+			padding: 5px 10px;
+			border: 1px solid #ddd;
 		}
 
 TH		{	
@@ -121,10 +177,140 @@ H2		{
 			margin-top: 2cm;
 		}
 
-H3		{	
+H3		{
 			font-family: Helvetica, Arial, Sans;
 		 	font-size: 18pt;
 			text-align: left;
 			margin-top: 2cm;
 			margin-bottom: 0.5cm
 		}
+
+/* ---------------------------------------------------------------------
+ * @media print-book: print-on-demand build overrides.
+ *
+ * Activated when WeasyPrint is invoked with `--media-type print-book`
+ * by generate-print.sh; not seen by the default screen-PDF build
+ * (which uses the default media type "print"). All rules below are
+ * AUTHOR CSS, so they cascade normally over the screen defaults --
+ * no !important required.
+ *
+ * Trim size: Executive 7"x10" (178x254mm), one of Lulu's standard
+ * paperback sizes. Asymmetric margins with the wider edge on the
+ * binding side, smaller body / code fonts, and chapters open on
+ * right-hand pages.
+ *
+ * Notes for the press:
+ *   - WeasyPrint emits RGB. Lulu accepts RGB (sRGB IEC61966-2.1 per
+ *     their book-creation guide). KDP also accepts RGB. IngramSpark
+ *     may request CMYK -- convert post-hoc via Ghostscript:
+ *         gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=pdfwrite \
+ *            -sColorConversionStrategy=CMYK \
+ *            -sOutputFile=JACLGuide-print-cmyk.pdf JACLGuide-print.pdf
+ *   - No bleed declared. The interior has no full-bleed images, so
+ *     we build at exact trim size and Lulu adds its 0.125"/3.175mm
+ *     bleed automatically (per the Lulu book-creation guide p.10).
+ *     If a full-bleed image ever lands, add `bleed: 3mm` to the
+ *     @page rules below and bump the @page size to 7.25x10.25in.
+ *   - Inside (binding-side) margin is 1in, which combined with the
+ *     0.5in safety zone gives Lulu's recommended 1in total inside
+ *     margin for the 151-400 page band.
+ *   - The cover image (front.png) is referenced from title.html for
+ *     the screen build. The print interior is built via
+ *     generate-print-interior.sh from title-interior.html, which
+ *     omits front.png so the cover can be supplied separately as a
+ *     wrap-cover upload.
+ *   - The legacy front.jpg is kept in the repo for history but no
+ *     longer used in any build.
+ * --------------------------------------------------------------------- */
+
+@media print-book {
+	@page {
+		size: 7in 10in;
+		margin: 0.625in 0.5in 0.625in 1in;
+	}
+	@page :right {
+		/* Recto: binding on the left, wider left margin. */
+		size: 7in 10in;
+		margin-left: 1in;
+		margin-right: 0.5in;
+		@top-right {
+			content: string(chapter-title);
+			font-family: Helvetica, Arial, sans-serif;
+			font-size: 8.5pt;
+			color: #555;
+		}
+		@bottom-right {
+			content: counter(page);
+			font-family: Helvetica, Arial, sans-serif;
+			font-size: 9pt;
+		}
+		@bottom-center { content: ""; }
+	}
+	@page :left {
+		/* Verso: binding on the right, wider right margin. */
+		size: 7in 10in;
+		margin-left: 0.5in;
+		margin-right: 1in;
+		@top-left {
+			content: string(chapter-title);
+			font-family: Helvetica, Arial, sans-serif;
+			font-size: 8.5pt;
+			color: #555;
+		}
+		@bottom-left {
+			content: counter(page);
+			font-family: Helvetica, Arial, sans-serif;
+			font-size: 9pt;
+		}
+		@bottom-center { content: ""; }
+		@top-right { content: ""; }
+	}
+	@page :first {
+		size: 7in 10in;
+		@top-left { content: ""; }
+		@top-right { content: ""; }
+		@bottom-left { content: ""; }
+		@bottom-right { content: ""; }
+		@bottom-center { content: ""; }
+	}
+
+	/* Chapters open on right-hand pages; a blank verso is inserted if
+	 * the previous chapter ended on a recto. */
+	H1 {
+		page-break-before: right;
+		font-size: 22pt;
+		margin-top: 0;
+		margin-bottom: 0.75cm;
+	}
+	H2 { font-size: 14pt;   margin-top: 1.2cm; }
+	H3 { font-size: 11.5pt; margin-top: 0.8cm; }
+
+	/* Don't orphan a heading at the bottom of a page. */
+	H1, H2, H3 { page-break-after: avoid; }
+
+	/* Body text smaller for print. */
+	BODY, P, LI, OL, UL, DL { font-size: 10.5pt; line-height: 1.35; }
+	TD, TH { font-size: 10pt; }
+
+	/* Code blocks: smaller monospace, keep together where possible,
+	 * wrap long lines rather than running off the trim edge. */
+	PRE {
+		font-size: 8.5pt;
+		line-height: 1.25;
+		page-break-inside: avoid;
+		white-space: pre-wrap;
+	}
+	CODE { font-size: 9.5pt; }
+
+	/* Try to keep small tables together on one page. WeasyPrint
+	 * falls back to row-by-row breaks if the table is too tall to
+	 * fit (the multi-page Glossary and Attributes tables, for
+	 * example), at which point the TR rule below keeps individual
+	 * rows from splitting too. The two rules together eliminate the
+	 * "table breaks with one row stranded on the next page" pattern
+	 * for any table small enough to fit on a single page. */
+	TABLE { page-break-inside: avoid; }
+	TR { page-break-inside: avoid; }
+
+	IMG { margin: 0.3cm; }
+}

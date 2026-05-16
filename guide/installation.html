@@ -2,7 +2,7 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -15,40 +15,93 @@
 git clone https://github.com/DangarStu/JACL.git
 </pre>
 
-<p>This will create a directory called <b>JACL</b> with several subdirectories. You will find the executable files in the <b>bin</b> subdirectory after compilation. In the Linux distribution you will find three interpreters: <b>jacl</b> is a console interpreter that uses the GlkTerm library by Andrew Plotkin, while <b>cgijacl</b> and <b>fcgijacl</b> are the two web-based interpreters. <b>cgijacl</b> can be run directly from the command line and is used more for development purposes while <b>fcgijacl</b> must be used with a FastCGI-enabled webserver such as Apache and is used more for production deployments. You will also find the program <b>bjorb</b>, a small utility (based on <b>blc</b> by Ross Raszewski) for creating the Blorb resource files that will contain any images and sounds you wish to use in your games.
+<p>This will create a directory called <b>JACL</b> with several subdirectories. You will find the executable files in the <b>bin</b> subdirectory after compilation. In the Linux distribution you will find four interpreters: <b>jacl</b> is a console interpreter that uses the GlkTerm library by Andrew Plotkin, <b>cjacl</b> is a CheapGlk build that streams to standard output (handy for piping or scripted runs), and <b>cgijacl</b> and <b>fcgijacl</b> are the two web-based interpreters. <b>cgijacl</b> can be run directly from the command line and is used more for development purposes while <b>fcgijacl</b> must be used with a FastCGI-enabled webserver such as Apache and is used more for production deployments. You will also find the program <b>bjorb</b>, a small utility (based on <b>blc</b> by Ross Raszewski) for creating the Blorb resource files that will contain any images and sounds you wish to use in your games.
 
 <h2><a class="section" name="installation1">Compilation</a></h2>
 
-<p>The <b>src</b> directory contains the C source code to the JACL interpreter. Also included is the source to <b>glkterm</b> a Glk implementation by Andrew Plotkin based on ncursesw, and the <b>bjorb</b> utility .
+<p>The <b>src</b> directory contains the C source code for the JACL interpreters. The bundled subdirectories <b>glkterm</b> and <b>CheapGlk</b> hold Andrew Plotkin's Glk implementations that the console interpreters link against, and <b>bjorb</b> is included for packaging multimedia resources.
+
+<p>Each interpreter has its own dependency profile. The configure script detects what is available on your system and only builds the ones it can:
 
 <center>
-<table width=85%><tr>
-<th width=20%>&nbsp;Interpreter&nbsp;</th>
-<th>&nbsp;Required Libraries&nbsp;</th>
+<table width=85%>
 <tr>
-<td><b>jacl</b> (Posix)</td>
-<td>GlkTerm by Andrew Plotkin (included) and ncursesw.
-</td>
-</tr><tr>
+<th width=20%>&nbsp;Binary&nbsp;</th>
+<th>&nbsp;Required Libraries&nbsp;</th>
+</tr>
+<tr>
+<td><b>jacl</b></td>
+<td>GlkTerm (included) and <b>ncursesw</b>. Built only when <b>ncurses</b> is detected.</td>
+</tr>
+<tr>
+<td><b>cjacl</b></td>
+<td>CheapGlk (included). No external libraries; always built.</td>
+</tr>
+<tr>
 <td><b>cgijacl</b></td>
-<td>No special libraries are required to compile <b>cgijacl</b>, however a POSIX compliant system is needed.
-</tr><tr>
+<td>None for basic operation. The optional Google Sign-In flow needs <b>libcurl</b>, <b>jansson</b> and <b>openssl</b> (see below). Always built.</td>
+</tr>
+<tr>
 <td><b>fcgijacl</b></td>
-<td>FastCGI development library and Apache module:
-<pre>
-sudo apt install libfcgi-dev libapache2-mod-fcgid
-</pre>
-
+<td><b>libfcgi</b> (the FastCGI development library). Built only when <b>libfcgi</b> is detected.</td>
+</tr>
+<tr>
+<td><b>bjorb</b></td>
+<td>None. Always built.</td>
+</tr>
 </table>
 </center>
 
-<p>To compile the source for the JACL interpreters and the <b>bjorb</b> under Linux simply change to the <b>src</b> subdirectory and type the following command:
+<p>On Debian and Ubuntu, both optional libraries can be installed in one go:
 
 <pre>
+sudo apt install libncursesw5-dev libfcgi-dev
+</pre>
+
+<p>Compilation is a two-step process. From the <b>src</b> subdirectory:
+
+<pre>
+./configure
 make install
 </pre>
 
-<p>This will compile all the relevant programs and copy the executable binaries into the <b>bin</b> subdirectory, as well as installing the binaries, libraries, and configuration files to <b>/usr/local/jacl/</b>.
+<p>The <b>./configure</b> step detects which libraries are available and writes a Makefile that builds the supported interpreters. At the end it prints a summary listing each interpreter as <b>yes</b> or <b>no</b>, so it is easy to see what will be built and why anything is being skipped. If your distribution does not ship the <b>configure</b> script in the source tarball, regenerate it once with <b>autoconf</b> and it will then be present for every subsequent build.
+
+<p>The <b>make install</b> step compiles everything <b>configure</b> approved, copies the binaries into the <b>bin</b> subdirectory of the JACL source tree (so you can run them from there during development), installs the binaries into <b>/usr/local/bin/</b>, and lays out the libraries, sample data and configuration template under <b>/usr/local/jacl/</b>. An existing <b>/etc/cgijacl.conf</b> is preserved; the freshly-installed template is written alongside it as <b>/etc/cgijacl.conf.example</b> so administrator edits (such as <b>google_client_id</b> or <b>session_secret</b>) survive a reinstall.
+
+<h3><a class="section" name="installation1a">Configure Options</a></h3>
+
+<p>The configure script accepts a small set of arguments. The most important is the language selector:
+
+<pre>
+./configure --with-language=LANG
+</pre>
+
+<p>where <i>LANG</i> is one of <b>english</b> (the default), <b>french</b>, <b>german</b>, <b>indonesian</b> or <b>spanish</b>. The chosen language is baked into the build &mdash; both the interpreter's parser strings and the standard library are switched together. To switch languages later, re-run <b>./configure</b> with the new value and <b>make install</b> again.
+
+<p>Standard autoconf flags (<b>--prefix</b>, <b>--bindir</b>, <b>CFLAGS</b>, etc.) work as expected. For example:
+
+<pre>
+./configure --with-language=french CFLAGS="-O3 -march=native"
+</pre>
+
+<h3><a class="section" name="installation1b">Optional Google Sign-In Dependencies</a></h3>
+
+<p>The web interpreters (<b>cgijacl</b> and <b>fcgijacl</b>) support an optional Google Sign-In flow that binds a player's auto-save to their verified Google account. This feature requires three additional libraries at build time: <b>libcurl</b>, <b>jansson</b> and <b>openssl</b>. The configure script probes for all three via <b>pkg-config</b>; if any of them is missing the web interpreters still build, but they link against an <b>auth_stub.c</b> that provides no-op entry points and only the anonymous flow is available at runtime.
+
+<p>On Debian and Ubuntu:
+
+<pre>
+sudo apt install libcurl4-openssl-dev libjansson-dev libssl-dev
+</pre>
+
+<p>On macOS with Homebrew:
+
+<pre>
+brew install curl jansson openssl pkg-config
+</pre>
+
+<p>See the chapter on <a href="http.html#http_auth">Google Sign-In Authentication</a> for the runtime configuration and the corresponding <b>cgijacl.conf</b> directives.
 
 <p>In the <b>projects</b> directory you will find several JACL games. A JACL game consists of one or more <b>.jacl</b> files and an optional <b>.blorb</b> file that contains multimedia resources used by the game. If a JACL game consists of more than one <b>.jacl</b> file, the other file will be one of the library files from the <b>include</b> directory.
 
@@ -77,7 +130,7 @@ make install
 
 <h3><a class="section" name="installation3">cgijacl and fcgijacl</a></h3>
 
-<p>When the <b>cgijacl</b> and <b>fcgijacl</b> interpreters start they will first look for their configuration file in the current directory. If this does not exist they will look for it in the <b>etc</b> directory that is at the same level as the <b>games</b> directory. In other words, from the directory the game file being run is in, the <b>jacl</b> interpreter will look for <b>../etc/cgijacl.conf</b>. If neither of these files is found, the <b>cgijacl</b> or <b>fcgijacl</b> interpreters will also look for the file <b>/etc/cgijacl.conf</b>.
+<p>When the <b>cgijacl</b> and <b>fcgijacl</b> interpreters start they will look for their configuration file in three places, in order: <b>./cgijacl.conf</b> (the current working directory), <b>../etc/cgijacl.conf</b> relative to the directory the game file is stored in, and finally <b>/etc/cgijacl.conf</b>. The first file found is used.
 
 <P>The configuration files for <b>cgijacl</b> and <b>fcgijacl</b> may contain any of the following lines: 
 
@@ -113,6 +166,14 @@ make install
 <td><b>session_max_age</b> <i>Seconds</i></td>
 <td>Lifetime of the <b>jacl_session</b> cookie in seconds. The cookie's HMAC includes this expiry, so a stale cookie can't be replayed past it.</td>
 <td><b>2592000</b> (30 days).</td>
+</tr><tr>
+<td><b>cookie_expiry</b> <i>Seconds</i></td>
+<td>Max-Age applied to the anonymous <b>user_id</b> cookie that pairs an in-progress player with their auto-saved game.</td>
+<td><b>21600</b> (6 hours).</td>
+</tr><tr>
+<td><b>prefer_remote_user</b> <b>true</b>|<b>false</b></td>
+<td>When <b>true</b> and the web server has populated the <b>REMOTE_USER</b> CGI variable (e.g. via HTTP basic auth or an SSO module), use that as the player identity in preference to the cookie-based <b>user_id</b>.</td>
+<td><b>true</b>.</td>
 </tr></table>
 
 <p style="page-break-before: always">Below is an example <b>cgijacl</b> configuration file:
@@ -132,9 +193,9 @@ google_client_id   "1234567890-abcdefg.apps.googleusercontent.com"
 session_secret     "long-random-string-known-only-to-this-server"
 </pre>
 
-<h2><a class="section" name="installation5">Playing the Sample Games</a></h2>
+<h2><a class="section" name="installation4">Playing the Sample Games in a Browser</a></h2>
 
-<p>Once you have compiled the JACL interpreters, try running one of the provided games by changing to the <b>bin</b> directory and typing the command:
+<p>To run a sample game through the web interpreter, change to the <b>bin</b> directory and type:
 
 <pre>
 ./cgijacl ../projects/desa.jacl
@@ -143,13 +204,12 @@ session_secret     "long-random-string-known-only-to-this-server"
 <p>This command will start the JACL interpreter on the default port of 4269, resulting in the following output:
 
 <pre>
-CGIJACL Interpreter v4.6.1
+CGIJACL Interpreter v4.7.0
 WebJACL: No port number specified (-p <number>), using default port 4269.
 WebJACL server configured on localhost:4269
 </pre>
 
-<p>To play this game, open your favourite web browser and navigate to the URL <b>http://localhost:4269</b>. When you do so, you should see something like the screen below. If not, see the section on <a href="troubleshooting.html">Trouble Shooting</a>.
-
+<p>To play this game, open your favourite web browser and navigate to the URL <b>http://localhost:4269</b>. When you do so, you should see something like the screen below. If not, see the section on <a href="#installation8">Troubleshooting</a>.
 
 <p>To play this same game from the console, try the following command from the <b>bin</b> directory:
 
@@ -157,13 +217,13 @@ WebJACL server configured on localhost:4269
 ./jacl ../projects/desa.jacl
 </pre>
 
-<h2><a class="section" name="installation6">Using JACL with FastCGI and Apache</a></h2>
+<h2><a class="section" name="installation5">Using JACL with FastCGI and Apache</a></h2>
 
 <p>While the <b>cgijacl</b> interpreter is able to respond to HTTP requests internally, the <b>fcgijacl</b> interpreter is designed to be used with a FastCGI-enabled webserver such as Apache. The <b>cgijacl</b> interpreter is very easy to use and is ideal for developing a new game or allowing a small number of users to play your completed games. The <b>fcgijacl</b> interpreter, when used with a production-quality web server such as Apache, is a better choice for situations where a high level of traffic is expected.
 
 <p>FastCGI is a system for interfacing a web server with an external binary program, in this case the JACL interpreter. With normal CGI, a program is started to handle each individual request. The program executes, produces some output then terminates. With FastCGI, programs are run once then wait in a loop, processing requests as they are made. This suits the JACL interpreter perfectly as it has a fair amount of processing to do when a game is first run, yet very little for an individual move made by a player.
 
-<h3><a class="section" name="installation7">Automated Setup</a></h3>
+<h3><a class="section" name="installation6">Automated Setup</a></h3>
 
 <p>The easiest way to set up <b>fcgijacl</b> with Apache is to use the provided <b>make apache</b> target. This requires Apache2 to be installed on an Ubuntu or Debian system. From the <b>src</b> directory, run:
 
@@ -184,7 +244,7 @@ sudo make apache
 
 <p>Once complete, your games will be available at <b>http://localhost/jacl/<i>gamename</i>.fcgi</b>.
 
-<h3><a class="section" name="installation8">Manual Setup</a></h3>
+<h3><a class="section" name="installation7">Manual Setup</a></h3>
 
 <p>If you prefer to configure Apache manually, or are using a non-Debian system, the steps below describe the process in detail.
 
@@ -195,34 +255,13 @@ sudo apt install apache2 libapache2-mod-fcgid
 sudo a2enmod fcgid
 </pre>
 
-<p>Next, create an Apache configuration file at <b>/etc/apache2/conf-available/jacl.conf</b> with the following contents:
+<p>Next, install the bundled Apache configuration. The repository ships a reference config at <b>etc/jacl-apache.conf</b> that you can copy straight in:
 
 <pre>
-&lt;IfModule mod_fcgid.c&gt;
-  FcgidMaxProcesses 10
-  FcgidMaxProcessesPerClass 1
-  FcgidIOTimeout 120
-  FcgidIdleTimeout 300
-  FcgidProcessLifeTime 3600
-
-  ScriptAlias /jacl/ "/usr/local/jacl/fcgi-bin/"
-
-  &lt;Directory "/usr/local/jacl/fcgi-bin"&gt;
-    SetHandler fcgid-script
-    Options +ExecCGI
-    Require all granted
-  &lt;/Directory&gt;
-
-  Alias /www/ "/usr/local/jacl/projects/www/"
-
-  &lt;Directory "/usr/local/jacl/projects/www"&gt;
-    Options -Indexes
-    Require all granted
-  &lt;/Directory&gt;
-&lt;/IfModule&gt;
+sudo cp etc/jacl-apache.conf /etc/apache2/conf-available/jacl.conf
 </pre>
 
-<p>The <b>ScriptAlias</b> directive maps URLs beginning with <b>/jacl/</b> to the wrapper scripts directory. The <b>FcgidMaxProcessesPerClass 1</b> setting ensures only one process runs per game, which is appropriate as <b>fcgijacl</b> handles multiple users via session cookies. The <b>FcgidIdleTimeout</b> keeps idle processes alive for 5 minutes to avoid the startup cost of reloading game files.
+<p>The reference config sets up <b>ScriptAlias /jacl/</b> mapping URLs to the wrapper scripts directory, plus aliases for <b>/www/</b>, <b>/include/</b> and <b>/images/</b> for game assets. The <b>FcgidMaxProcessesPerClass 1</b> setting ensures only one process runs per game, which is appropriate as <b>fcgijacl</b> handles multiple users via session cookies. The <b>FcgidIdleTimeout</b> keeps idle processes alive for 5 minutes to avoid the startup cost of reloading game files. A commented-out HTTPS vhost block at the bottom of the file shows the recipe for serving over TLS &mdash; this is required if you want to enable Google Sign-In.
 
 <p>Enable the configuration and restart Apache:
 
@@ -250,7 +289,7 @@ sudo chmod 775 /usr/local/jacl/projects/data
 sudo chmod 775 /usr/local/jacl/logs
 </pre>
 
-<h3><a class="section" name="installation9">Troubleshooting</a></h3>
+<h3><a class="section" name="installation8">Troubleshooting</a></h3>
 
 <p>If a game does not load, check the following log files for error messages:
 
@@ -262,6 +301,6 @@ sudo chmod 775 /usr/local/jacl/logs
 <p>Common issues include incorrect file permissions on the <b>temp</b> directory, a missing or misconfigured <b>cgijacl.conf</b> file, or the <b>fcgijacl</b> binary not being found at the path specified in the wrapper script.
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body>
 </html>

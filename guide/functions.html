@@ -2,7 +2,7 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -135,14 +135,14 @@ write noun1{The} " sails high in the air.^"
 }
 </pre>
 
-<p>The above function has three names, the first automatically associating it with the yellow ball in the normally fashion with the second two manually associating it with the objects <b>redball</b> and <b>blueball</b>. The order the names are defined in is not important.
+<p>The above function has three names, the first automatically associating it with the yellow ball in the normal fashion with the second two manually associating it with the objects <b>redball</b> and <b>blueball</b>. The order the names are defined in is not important.
 
 <table class="infowarn"><tr>
 <td><img src="warning.png" alt="Warning"></td>
 <td>When using the above technique to manually associate a function with an object, the label of the object must not contain an underscore. This is because the supplied function name is parsed from the right, with everything after the first underscore encountered being considered the object label. If a function was to be given the name <b>*kick_blue_ball</b>, the interpreter would attempt to associate the function <b>kick_blue</b> with the object <b>ball</b>.</td>
 </tr></table>
 
-<p>It is also possible to supply the name of the function to be executed in a string variable or constant. This technique allows strings to be used as function pointers and is used by the <b>menu.library</b> as a way of passing a call-back function to function in the library. See the chapter on the <a href="menu.html#menu0">menu.library</a> for an example.
+<p>It is also possible to supply the name of the function to be executed in a string variable or constant. This technique allows strings to be used as function pointers and is used by the <b>menu.library</b> as a way of passing a call-back function to a function in the library. See the chapter on the <a href="menu.html#menu0">menu.library</a> for an example.
 
 <p>A function will stop executing and return to the function that it was called from when it encounters a <b>return</b> command or arrives at the closing brace. If a function reaches its closing brace, an implicit <b>return true</b> is executed. 
 
@@ -197,11 +197,11 @@ arg[6]: 13   string_arg[6]: 13
 <p>To read a counter, use the at symbol (<b>@</b>):
 
 <table width=100%>
-<tr><td width=20%><b>@</b>&nbsp;&nbsp;</td><td>The counter for the currently executing function. The first call into a function returns <b>1</b> here, because the interpreter increments the counter <em>before</em> running the function body.</td></tr>
-<tr><td><b>@</b><i>funcname</i>&nbsp;&nbsp;</td><td>The counter for any function in the game, addressed by its <em>full internal name</em>. Use the auto-suffixed name for object-scoped functions (see below).</td></tr>
+<tr><td width=20%><b>@</b></td><td>The counter for the currently executing function. The first call into a function returns <b>1</b> here, because the interpreter increments the counter <em>before</em> running the function body.</td></tr>
+<tr><td><b>@</b><i>funcname</i></td><td>The counter for any function in the game, addressed by its <em>full internal name</em>. Use the auto-suffixed name for object-scoped functions (see below).</td></tr>
 </table>
 
-<p>The most common use is gating first-time behaviour. The example below is the same one used in the section <a href="attribute.html#attributes4">User Attributes<a>, but rewritten without the user attribute &mdash; the call counter does the same job for free:
+<p>The most common use is gating first-time behaviour. The example below is the same one used in the section <a href="attributes.html#attributes4">User Attributes</a>, but rewritten without the user attribute &mdash; the call counter does the same job for free:
 
 <pre>
 {open_override
@@ -251,10 +251,10 @@ endif
 <h3>Idiomatic patterns</h3>
 
 <table width=100%>
-<tr><td width=20%><tt>if @ = 1</tt>&nbsp;&nbsp;</td><td>Run this branch only on the first call.</td></tr>
-<tr><td><tt>if @ &lt; 4</tt>&nbsp;&nbsp;</td><td>Show a tutorial nudge for the first few calls, then go quiet.</td></tr>
-<tr><td><tt>if @+intro = 0</tt>&nbsp;&nbsp;</td><td>True only before <b>+intro</b> has ever fired.</td></tr>
-<tr><td><tt>if @ % 5 = 0</tt>&nbsp;&nbsp;</td><td>Trigger something every fifth time this function runs.</td></tr>
+<tr><td width=20%><tt>if @ = 1</tt></td><td>Run this branch only on the first call.</td></tr>
+<tr><td><tt>if @ &lt; 4</tt></td><td>Show a tutorial nudge for the first few calls, then go quiet.</td></tr>
+<tr><td><tt>if @+intro = 0</tt></td><td>True only before <b>+intro</b> has ever fired.</td></tr>
+<tr><td><tt>if @ % 5 = 0</tt></td><td>Trigger something every fifth time this function runs.</td></tr>
 </table>
 
 <p>Prefer these patterns over a hand-rolled <b>integer hint_X_shown</b> flag whenever the trigger is "has this function fired N times" rather than "has the world reached state X" &mdash; one fewer variable to declare, save and clear on restart.
@@ -294,7 +294,7 @@ return COUNTER
 
 <h2><a class="section" name="functions5">Responding to the Player's Moves</a></h2>
 
-<P>In this section you will learn more about the function calls made by the interpreter when the player types a move while playing a game. As the first step in processing the player's move, the interpreter attempts to find a <B>grammar</B> statement that matches the command typed. For more information see the section on <a href="definitions.html#definitions12">Grammar Statements</a>. 
+<P>In this section you will learn more about the function calls made by the interpreter when the player types a move while playing a game. As the first step in processing the player's move, the interpreter attempts to find a <B>grammar</B> statement that matches the command typed. For more information see the section on <a href="definitions.html#definitions10">Grammar Statements</a>. 
 
 If a match is found, the function after the greater-than symbol at the end of the <B>grammar</B> statement is used as the core name for a series of function calls. This mapping of the player's moves to functions through the use of <b>grammar</b> statements is one of the fundamental principles of writing a JACL game. 
 
@@ -329,7 +329,7 @@ return false ;continue as normal
 <p>If this function exists, it will be executed in place of the default global action for the <b>take</b> verb. If this function does not exist, or returns <b>false</b>, the global function <b>+take</b> will be executed. This function contains the default outcome for the <b>take</b> verb. Below is the <b>+take</b> function from the library:
 
 <pre>
-{+take         
+{+take
 if +important&lt;noun1 = true
    return true
 endif
@@ -339,23 +339,35 @@ endif
 if +reach&lt;noun1 = true
    return true
 endif
-if player has SITTING
-  write "You will have to stand up first.^"
-  set TIME = false
-  return
+if +possessed&lt;noun1 = true
+   return
 endif
-if noun1(mass) &gt;= heavy : noun1 has LOCATION
-  execute +move_scenery
-  return
-endif  
-if noun1(mass) &gt; player(capacity)
-  write "You are carrying too much to take " noun1{the} .^
-  set TIME = false
-  return
+if noun1 is *held
+   write "You are already holding " noun1{the} ".^"
+   set time = false
+   return
+endif
+if player has SITTING
+   write "You will have to stand up first.^"
+   set time = false
+   return true
+endif
+if noun1 has ANIMATE
+   write "I don't think " noun1{sub} " would appreciate that.^"
+   set time = false
+   return true
+endif
+if +move_scenery&lt;noun1 = true
+   return true
+endif
+if noun1(mass) &gt; player(quantity)
+   write "You are carrying too much to take " noun1{the} .^
+   set time = false
+   return true
 endif
 if noun1 has LIQUID
-  write noun1{The} " run" noun1{s} " through your fingers.^"
-  return
+   write  noun1{The} " run" noun1{s} " through your fingers.^"
+   return true
 endif
 override
 write "You take " noun1{the} .^
@@ -375,7 +387,7 @@ ensure noun1 has TOUCHED
 
 <p>If the <b>override</b> command in the function <b>+take</b> is reached, and neither a <b>take_override_pole</b> or <b>+default_take</b> function exists, execution will continue from the line after the <b>override</b> command.
 
-<p>The final stage in processing the player's move calls a series of <b>after</b> functions, regardless of the outcome of any preceding it. It is not important whether any <b>after</b> function executes a <b>return</b> or <b>return false</b> command, as all three <b>after</b> function will execute in order regardless of outcome of the one before. The first function to be called in this final stage is the local function <b>after_take</b> that is associcated with the object <b>pole</b>. This function provides the opportunity to perform any processing required after the move <b>take pole</b> is issued by the player, regardless of any previous outcome.
+<p>The final stage in processing the player's move calls a series of <b>after</b> functions, regardless of the outcome of any preceding it. It is not important whether any <b>after</b> function executes a <b>return</b> or <b>return false</b> command, as all three <b>after</b> functions will execute in order regardless of outcome of the one before. The first function to be called in this final stage is the local function <b>after_take</b> that is associated with the object <b>pole</b>. This function provides the opportunity to perform any processing required after the move <b>take pole</b> is issued by the player, regardless of any previous outcome.
 
 <p>The next function called is <b>+after_take</b>. This function provides the opportunity to display any additional text relevant only to the <b>take</b> verb, but independent of any objects referred to. Below is an example of this:
 
@@ -472,13 +484,13 @@ endif
 <td>This function is executed when a game is first run or restarted. It is used to display introductory text and set the starting values for any variables required.</td>
 </tr><tr>
 <td valign="top"><B>+header</B></td>
-<td>This function is the very first to be executed before the player's command is processed when playing with a CGI intepreter.</td>
+<td>This function is the very first to be executed before the player's command is processed when playing with a CGI interpreter.</td>
 </tr><tr>
 <td valign="top"><B>+footer</B></td>
-<td>This function is the very last to be executed after the player's command has been processed when playing with a CGI intepreter.</td>
+<td>This function is the very last to be executed after the player's command has been processed when playing with a CGI interpreter.</td>
 </tr><tr>
 <td valign="top"><B>+top</B></td>
-<td>This function is the very first to be executed before the player's command is processed when paying with a GLK interpreter.</td>
+<td>This function is the very first to be executed before the player's command is processed when playing with a GLK interpreter.</td>
 </tr><tr>
 <td valign="top"><B>+bottom</B></td>
 <td>This function is the very last to be executed after the player's command has been processed when playing with a GLK interpreter.</td>
@@ -532,7 +544,7 @@ endif
 
 <h2><a class="section" name="functions7">Utility Functions</a></h2>
 
-<p>The following are utility functions that are provided by <b>utils.library</b>:
+<p>The following are utility functions that are provided by <b>verbs.library</b>:
 
 <table width=100%><tr>
 <th width=20%>Function</th>
@@ -553,6 +565,6 @@ endif
 </table>
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body>
 </html>

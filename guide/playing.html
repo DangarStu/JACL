@@ -2,7 +2,7 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Instructions on how to play interactive fiction.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -23,19 +23,19 @@ discrete units called locations. Locations may be travelled between
 using the following commands:</p>
 
 <CENTER><TABLE WIDTH=40%>
-<TR><TH>Command&nbsp;&nbsp;</TH><TH>Direction</TH></TR>
-<TR><TD><b>n</b>&nbsp;&nbsp;</TD><TD>North</TD></TR>
-<TR><TD><b>s</b>&nbsp;&nbsp;</TD><TD>South</TD></TR>
-<TR><TD><b>e</b>&nbsp;&nbsp;</TD><TD>East</TD></TR>
-<TR><TD><b>w</b>&nbsp;&nbsp;</TD><TD>West</TD></TR>
-<TR><TD><b>ne</b>&nbsp;&nbsp;</TD><TD>Northeast</TD></TR>
-<TR><TD><b>nw</b>&nbsp;&nbsp;</TD><TD>Northwest</TD></TR>
-<TR><TD><b>se</b>&nbsp;&nbsp;</TD><TD>Southeast</TD></TR>
-<TR><TD><b>sw</b>&nbsp;&nbsp;</TD><TD>Southwest</TD></TR>
-<TR><TD><b>u</b>&nbsp;&nbsp;</TD><TD>Up</TD></TR>
-<TR><TD><b>d</b>&nbsp;&nbsp;</TD><TD>Down</TD></TR>
-<TR><TD><b>in</b>&nbsp;&nbsp;</TD><TD>In</TD></TR>
-<TR><TD><b>out</b>&nbsp;&nbsp;</TD><TD>Out</TD></TR>
+<TR><TH>Command</th><TH>Direction</TH></TR>
+<TR><TD><b>n</b></td><TD>North</TD></TR>
+<TR><TD><b>s</b></td><TD>South</TD></TR>
+<TR><TD><b>e</b></td><TD>East</TD></TR>
+<TR><TD><b>w</b></td><TD>West</TD></TR>
+<TR><TD><b>ne</b></td><TD>Northeast</TD></TR>
+<TR><TD><b>nw</b></td><TD>Northwest</TD></TR>
+<TR><TD><b>se</b></td><TD>Southeast</TD></TR>
+<TR><TD><b>sw</b></td><TD>Southwest</TD></TR>
+<TR><TD><b>u</b></td><TD>Up</TD></TR>
+<TR><TD><b>d</b></td><TD>Down</TD></TR>
+<TR><TD><b>in</b></td><TD>In</TD></TR>
+<TR><TD><b>out</b></td><TD>Out</TD></TR>
 </TABLE></CENTER>
 
 <p>The description of each location will tell you the directions in which you can travel from it. Be aware, however, that some exits may only be available under certain circumstances such as while a door is open or a bridge lowered.</p>
@@ -86,7 +86,7 @@ glass". Following is a list of some of the other actions that can be used to int
 
 <p>Where an object is expected, the words <b>it</b>, <b>them</b>, <b>him</b> and <b>her</b> can be used to indicate the last appropriate object referred to in one of your commands. The reflexive forms <b>itself</b>, <b>themselves</b>, <b>himself</b> and <b>herself</b> are accepted as equivalents (so <b>look at itself</b> is interpreted the same way as <b>look at it</b>). The plural form <b>ones</b> is also recognised as a synonym for <b>them</b>. With some commands it is possible to supply more than one object. Multiple objects can be specified in a multitude of ways. The words <b>all</b> or <b>everything</b> will tell the interpreter that you wish to perform the action on all the objects in the appropriate scope. For example, with the command <b>drop all</b>, the interpreter will perform the <b>drop</b> action for every object you are currently carrying. The optional filler word <b>of</b> is permitted after <b>all</b> (so <b>take all of chest</b> and <b>take all from chest</b> behave the same way).
 
-<p>Any object reference can be qualified by using the word <b>from</b>. Although this can be used at any time, it is most useful in conjunction with <b>all</b> to construct commands such as <b>take all from chest</b>. This command will perform the <b>take</b> action for every object that is currrently inside the chest.
+<p>Any object reference can be qualified by using the word <b>from</b>. Although this can be used at any time, it is most useful in conjunction with <b>all</b> to construct commands such as <b>take all from chest</b>. This command will perform the <b>take</b> action for every object that is currently inside the chest.
 
 <p>The word <b>except</b> (or its synonym <b>but</b>) can be used once per list of objects, with any object to the right of the word being removed from list of objects to the left. An optional filler word <b>for</b> may follow it (<b>take all except for the gem</b> reads the same way as <b>take all except the gem</b>). An example of this is the command <b>take all from chest except the gem</b>. The important thing to be aware of with the word <b>except</b> is that any objects supplied after the word <b>except</b> are objects the action is not to be performed on. With this in mind you can see how the two commands below have very different results.
 
@@ -95,7 +95,7 @@ glass". Following is a list of some of the other actions that can be used to int
 &gt;take all from chest except gem and sword
 </pre>
 
-<p>With the first command the sword will be taken, with the second command it will not. So in summary, any list of objects may use the word <b>from</b> many times, but <b>except</b> only once at most. Individual objects can be separated by the word <b>and</b> or a comma (<b>,</b>) while the word <b>then</b> or a period (<b>.</b>) is used to separate completely different commands. Below is a legal command that uses all of the forementioned functionality:
+<p>With the first command the sword will be taken, with the second command it will not. So in summary, any list of objects may use the word <b>from</b> many times, but <b>except</b> only once at most. Individual objects can be separated by the word <b>and</b> or a comma (<b>,</b>) while the word <b>then</b> or a period (<b>.</b>) is used to separate completely different commands. Below is a legal command that uses all of the aforementioned functionality:
 
 <pre>
 &gt;take sword, shield, all from chest and all from shelf except gem then go north
@@ -144,17 +144,17 @@ controlled characters. These characters may be interacted with using
 the following commands:
 
 <table border=0><tr>
-<td>&nbsp;&nbsp;&nbsp;</td><td><b>talk to</b> <i>character</i></td>
+<td></td><td><b>talk to</b> <i>character</i></td>
 </tr><tr>
-<td>&nbsp;&nbsp;&nbsp;</td><td><b>give</b> <i>object</i> <b>to</b> <i>character</i></td>
+<td></td><td><b>give</b> <i>object</i> <b>to</b> <i>character</i></td>
 </tr><tr>
-<td>&nbsp;&nbsp;&nbsp;</td><td><b>show</b> <i>object</i> <b>to</b> <i>character</i></td>
+<td></td><td><b>show</b> <i>object</i> <b>to</b> <i>character</i></td>
 </tr><tr>
-<td>&nbsp;&nbsp;&nbsp;</td><td><b>ask</b> <i>character</i> <b>for</b> <i>object</i></td>
+<td></td><td><b>ask</b> <i>character</i> <b>for</b> <i>object</i></td>
 </tr><tr>
-<td>&nbsp;&nbsp;&nbsp;</td><td><b>ask</b> <i>character</i> <b>about</b> <i>object</i></td>
+<td></td><td><b>ask</b> <i>character</i> <b>about</b> <i>object</i></td>
 </tr><tr>
-<td>&nbsp;&nbsp;&nbsp;</td><td><b>tell</b> <i>character</i> <b>about</b> <i>object</i></td>
+<td></td><td><b>tell</b> <i>character</i> <b>about</b> <i>object</i></td>
 </tr></table>
 
 <!-- NEW PAGE -->
@@ -163,39 +163,73 @@ the following commands:
 <p>There are also some special commands for interacting with the JACL interpreter 
 rather than the game world it is currently running:</p>
 <p><CENTER><TABLE WIDTH=80%><TR>
-<TH width=20%>Command&nbsp;&nbsp;</TH><TH>Action</TH>
+<TH width=20%>Command</th><TH>Action</TH>
 </TR><TR>
-<TD><b>verbose</b>&nbsp;&nbsp;</TD><TD>Always describe locations when visited.</TD>
+<TD><b>verbose</b></td><TD>Always describe locations when visited.</TD>
 </TR><TR>
-<TD><b>brief</b>&nbsp;&nbsp;</TD><TD>Only describe locations when being visited for the first time.</TD>
+<TD><b>brief</b></td><TD>Only describe locations when being visited for the first time.</TD>
 </TR><TR>
-<TD><b>restart</b>&nbsp;&nbsp;</TD><TD>Restart the game from the beginning.</TD>
+<TD><b>restart</b></td><TD>Restart the game from the beginning.</TD>
 </TR><TR>
-<TD><b>script</b>&nbsp;&nbsp;</TD><TD>Start recording a complete transcript of your game session.</TD>
+<TD><b>script</b></td><TD>Start recording a complete transcript of your game session.</TD>
 </TR><TR>
-<TD><b>unscript</b>&nbsp;&nbsp;</TD><TD>Stop recording a started transcript.</TD>
+<TD><b>unscript</b></td><TD>Stop recording a started transcript.</TD>
 </TR><TR>
-<TD><b>score</b>&nbsp;&nbsp;</TD><TD>Display your current score.</TD>
+<TD><b>score</b></td><TD>Display your current score.</TD>
 </TR><TR>
-<TD><b>look</b>&nbsp;&nbsp;</TD><TD>Display the description for the current location.</TD>
+<TD><b>look</b></td><TD>Display the description for the current location.</TD>
 </TR><TR>
-<TD><b>save</b>&nbsp;&nbsp;</TD><TD>Save the current game state.</TD>
+<TD><b>save</b></td><TD>Save the current game state.</TD>
 </TR><TR>
-<TD><b>restore</b>&nbsp;&nbsp;</TD><TD>Restore a saved game state.</TD>
+<TD><b>restore</b></td><TD>Restore a saved game state.</TD>
 </TR><TR>
-<TD><b>i</b>&nbsp;&nbsp;</TD><TD>Display a horizontal list of possessions.</TD>
+<TD><b>save</b> <i>name</i></td><TD>Save the current game state under the given name (no file dialog).</TD>
 </TR><TR>
-<TD><b>inv</b>&nbsp;&nbsp;</TD><TD>Display a vertical list of possessions.</TD>
+<TD><b>restore</b> <i>name</i></td><TD>Restore a previously named save.</TD>
 </TR><TR>
-<TD><b>oops</b> <i>NewWord</i>&nbsp;&nbsp;</TD><TD>Replace the erroneous word in the last command with the supplied new word.</TD>
+<TD><b>quit</b> / <b>q</b></td><TD>Quit the game.</TD>
 </TR><TR>
-<TD><b>undo</b>&nbsp;&nbsp;</TD><TD>Take back the last command issued.</TD>
+<TD><b>exits</b></td><TD>List the directions you can travel from the current location.</TD>
 </TR><TR>
-<TD><b>again</b>&nbsp;&nbsp;</TD><TD>Repeat the last command issued.</TD>
+<TD><b>wait</b> / <b>z</b></td><TD>Pass one turn without doing anything.</TD>
 </TR><TR>
-<TD><b>info</b>&nbsp;&nbsp;</TD><TD>Display interpreter version information.</TD>
+<TD><b>i</b></td><TD>Display a vertical list of possessions.</TD>
 </TR><TR>
-<TD><b>about</b>&nbsp;&nbsp;</TD><TD>Display game version information.</TD>
+<TD><b>inv</b></td><TD>Display a horizontal list of possessions.</TD>
+</TR><TR>
+<TD><b>oops</b> <i>NewWord</i></td><TD>Replace the erroneous word in the last command with the supplied new word.</TD>
+</TR><TR>
+<TD><b>undo</b></td><TD>Take back the last command issued.</TD>
+</TR><TR>
+<TD><b>again</b> / <b>g</b></td><TD>Repeat the last command issued.</TD>
+</TR><TR>
+<TD><b>help</b></td><TD>Show the game's help text.</TD>
+</TR><TR>
+<TD><b>hint</b></td><TD>Show a hint, where the author has provided one.</TD>
+</TR><TR>
+<TD><b>lookup</b> <i>word</i></td><TD>Look up a word in the game's dictionary.</TD>
+</TR><TR>
+<TD><b>notify on</b> / <b>notify off</b></td><TD>Turn score-change announcements on or off.</TD>
+</TR><TR>
+<TD><b>status on</b> / <b>status off</b></td><TD>Show or hide the status window.</TD>
+</TR><TR>
+<TD><b>sound on</b> / <b>sound off</b></td><TD>Enable or disable sound effects.</TD>
+</TR><TR>
+<TD><b>graphics on</b> / <b>graphics off</b></td><TD>Enable or disable graphics.</TD>
+</TR><TR>
+<TD><b>timer on</b> / <b>timer off</b></td><TD>Enable or disable timed events.</TD>
+</TR><TR>
+<TD><b>voice</b></td><TD>Enable text-to-speech (web interpreter only).</TD>
+</TR><TR>
+<TD><b>voice</b> <i>n</i></td><TD>Select text-to-speech voice number <i>n</i>.</TD>
+</TR><TR>
+<TD><b>voices</b></td><TD>List the available text-to-speech voices.</TD>
+</TR><TR>
+<TD><b>silence</b> / <b>mute</b></td><TD>Disable text-to-speech.</TD>
+</TR><TR>
+<TD><b>info</b> / <b>version</b></td><TD>Display interpreter version information.</TD>
+</TR><TR>
+<TD><b>about</b></td><TD>Display game version information.</TD>
 </TR></TABLE></CENTER>
 
 <p>You are now ready to embark on your first adventure into the 
@@ -207,5 +241,5 @@ refer to is a good idea, as is saving your position often. Well, good
 luck, and above all have fun!
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body></html>

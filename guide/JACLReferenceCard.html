@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>JACL Reference Card</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 12mm 10mm;
+  }
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 8.5pt;
+    line-height: 1.25;
+    color: #111;
+    margin: 0;
+  }
+  h1 {
+    font-size: 18pt;
+    margin: 0 0 4mm 0;
+    text-align: center;
+    border-bottom: 1.5pt solid #111;
+    padding-bottom: 2mm;
+  }
+  h2 {
+    font-size: 10pt;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 3mm 0 1.5mm 0;
+    padding-bottom: 0.5mm;
+    border-bottom: 0.5pt solid #888;
+    font-weight: bold;
+    break-after: avoid-column;
+  }
+  .columns {
+    column-count: 3;
+    column-gap: 5mm;
+    column-rule: 0.25pt solid #ccc;
+  }
+  section {
+    break-inside: avoid-column;
+    margin-bottom: 3mm;
+  }
+  code, .mono {
+    font-family: "SF Mono", Menlo, Consolas, "Courier New", monospace;
+    font-size: 8pt;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 8pt;
+  }
+  table.kv td {
+    padding: 0.4mm 1mm 0.4mm 0;
+    vertical-align: top;
+  }
+  table.kv td.key {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    white-space: nowrap;
+    padding-right: 2mm;
+  }
+  table.bits td {
+    padding: 0.3mm 0.5mm;
+    font-size: 7.5pt;
+    vertical-align: top;
+  }
+  table.bits td.num {
+    text-align: right;
+    color: #666;
+    width: 3mm;
+  }
+  table.bits td.attr {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 7pt;
+  }
+  dl.dispatch {
+    margin: 0;
+    padding: 0;
+  }
+  dl.dispatch dt {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 7.5pt;
+    margin-top: 1.5mm;
+    color: #333;
+  }
+  dl.dispatch dd {
+    margin: 0.5mm 0 0 0;
+    padding-left: 2mm;
+    font-size: 7.5pt;
+  }
+  dl.dispatch ol {
+    margin: 0;
+    padding-left: 3.5mm;
+  }
+  dl.dispatch ol li {
+    margin-bottom: 0.4mm;
+  }
+  .grid3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5mm 2mm;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 7.5pt;
+  }
+  .grid4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5mm 1mm;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 7.5pt;
+  }
+  footer {
+    margin-top: 5mm;
+    font-size: 7pt;
+    text-align: center;
+    color: #666;
+    column-span: all;
+  }
+  .note {
+    font-size: 7pt;
+    color: #555;
+    margin: 0.5mm 0 0 0;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<h1>JACL Reference Card</h1>
+
+<div class="columns">
+
+<section>
+<h2>Function Syntax</h2>
+<table class="kv">
+<tr><td class="key">{<i>name</i></td><td>Associated function (on the preceding object or location).</td></tr>
+<tr><td class="key">{+<i>name</i></td><td>Global function.</td></tr>
+<tr><td class="key">{*<i>name</i></td><td>Explicitly named function (no auto-suffix).</td></tr>
+<tr><td class="key">{<i>a</i> : <i>b</i> : <i>c</i></td><td>Multiple names for the same function.</td></tr>
+<tr><td class="key">}</td><td>Closes a function.</td></tr>
+<tr><td class="key">execute <i>fn</i>&lt;<i>arg0</i>&lt;<i>arg1</i>&hellip;</td><td>Run a function with arguments. Available inside as <code>arg[<i>n</i>]</code> (integer) and <code>string_arg[<i>n</i>]</code> (string).</td></tr>
+<tr><td class="key">call <i>fn</i></td><td>Like <b>execute</b>, but does not error if the function is missing.</td></tr>
+<tr><td class="key">return [<i>value</i>]</td><td>Exit the function. Default return is <b>true</b>.</td></tr>
+<tr><td class="key">@<i>fn</i></td><td>Call-count of <i>fn</i>. Bare <code>@</code> is the running function's own count.</td></tr>
+</table>
+</section>
+
+<section>
+<h2>Data Definitions</h2>
+<div class="mono">
+object <i>Label</i> : <i>Name1 Name2&hellip;</i><br>
+&nbsp;&nbsp;plural    <i>PluralName1&hellip;</i><br>
+&nbsp;&nbsp;has       <i>Attribute1 Attribute2&hellip;</i><br>
+&nbsp;&nbsp;short     <i>Article Description</i><br>
+&nbsp;&nbsp;definite  <i>DefiniteArticle</i><br>
+&nbsp;&nbsp;long      <i>Description</i> | function<br>
+&nbsp;&nbsp;parent    <i>ItemLabel</i><br>
+&nbsp;&nbsp;mass      <i>N</i> | heavy | scenery<br>
+&nbsp;&nbsp;capacity  <i>N</i><br>
+&nbsp;&nbsp;player<br>
+&nbsp;&nbsp;static<br>
+<br>
+location <i>Label</i> : <i>Name1 Name2&hellip;</i><br>
+&nbsp;&nbsp;&lt;direction&gt; <i>DestLabel</i><br>
+&nbsp;&nbsp;short     <i>Article Description</i><br>
+&nbsp;&nbsp;has       <i>Attribute1&hellip;</i><br>
+<br>
+integer    <i>Label</i> [<i>Value</i>]<br>
+string     <i>Label</i> [<i>"Value"</i>]<br>
+constant   <i>Label</i> <i>Value</i><br>
+attribute  <i>Label1</i> [<i>Label2&hellip;</i>]<br>
+grammar    <i>Syntax</i> &gt;<i>CoreFunction</i><br>
+synonym    <i>OldWord</i> <i>NewWord</i><br>
+filter     <i>Word</i><br>
+parameter  <i>Name</i> <i>Target</i> [<i>min</i> <i>max</i>]
+</div>
+<p class="note">Grammar scope tokens: <code>*held</code> *<code>here</code> <code>*present</code> <code>*inside</code> <code>*anywhere</code> (single noun); <code>**held</code> &hellip; <code>**anywhere</code> (multi-noun). <code>$integer</code> / <code>$string</code> / <code>$location</code> capture literal player input.</p>
+</section>
+
+<section>
+<h2>Function Dispatch</h2>
+<dl class="dispatch">
+<dt>grammar <i>verb</i> &gt;<i>fn</i></dt>
+<dd>
+<ol>
+<li><code>+before_<i>fn</i></code> &mdash; if it returns true, jump to step 7.</li>
+<li><code><i>fn</i>_<i>here</i></code> &mdash; associated with the current location.</li>
+<li>Otherwise <code>+<i>fn</i></code> &mdash; the global function.</li>
+<li>If <code>+<i>fn</i></code> hits <b>override</b>, look for <code><i>fn</i>_override_<i>here</i></code>.</li>
+<li>Otherwise <code>+default_<i>fn</i></code>.</li>
+<li>Otherwise the rest of <code>+<i>fn</i></code> after the override runs.</li>
+<li><code>+after_<i>fn</i></code>.</li>
+</ol>
+</dd>
+
+<dt>grammar <i>verb</i> *<i>Obj1</i> &gt;<i>fn</i></dt>
+<dd>
+<ol>
+<li><code>+before_<i>fn</i></code> (as above).</li>
+<li><code><i>fn</i>_<i>Obj1</i></code>.</li>
+<li>Otherwise <code>+<i>fn</i></code>.</li>
+<li>On override: <code><i>fn</i>_override_<i>Obj1</i></code>.</li>
+<li>Otherwise <code>+default_<i>fn</i></code>.</li>
+<li>Otherwise continue <code>+<i>fn</i></code>.</li>
+<li><code>+after_<i>fn</i></code>.</li>
+</ol>
+</dd>
+
+<dt>grammar <i>verb</i> *<i>Obj1</i> <i>prep</i> *<i>Obj2</i> &gt;<i>fn</i></dt>
+<dd>
+<ol>
+<li><code>+before_<i>fn</i></code>.</li>
+<li><code><i>fn</i>_<i>Obj2</i>_<i>Obj1</i></code>.</li>
+<li>Otherwise <code>+<i>fn</i></code>.</li>
+<li>On override: <code><i>fn</i>_<i>Obj2</i>_override_<i>Obj1</i></code>.</li>
+<li>Otherwise <code>+default_<i>fn</i></code>.</li>
+<li>Otherwise continue <code>+<i>fn</i></code>.</li>
+<li><code>+after_<i>fn</i></code>.</li>
+</ol>
+</dd>
+</dl>
+</section>
+
+<section>
+<h2>Text Macros</h2>
+<p class="note">Applied as <code><i>noun</i>{macro}</code>. Capitalise the macro name (e.g. <code>{The}</code>) for sentence-initial form.</p>
+<div class="grid3">
+<span>{list}</span>      <span>{plain}</span>     <span>{long}</span>
+<span>{the}</span>       <span>{label}</span>    <span>{names}</span>
+<span>{sub}</span>       <span>{obj}</span>      <span>{that}</span>
+<span>{it}</span>        <span>{is}</span>       <span>{isnt}</span>
+<span>{has}</span>       <span>{does}</span>     <span>{doesnt}</span>
+<span>{s}</span>
+</div>
+</section>
+
+<section>
+<h2>Object Elements</h2>
+<table class="bits">
+<tr><td class="num">0</td><td class="attr">parent</td>     <td class="num">8</td><td class="attr">index</td></tr>
+<tr><td class="num">1</td><td class="attr">capacity / quantity</td><td class="num">9</td><td class="attr">status</td></tr>
+<tr><td class="num">2</td><td class="attr">mass</td>       <td class="num">10</td><td class="attr">timer</td></tr>
+<tr><td class="num">3</td><td class="attr">bearing</td>    <td class="num">11</td><td class="attr">counter</td></tr>
+<tr><td class="num">4</td><td class="attr">velocity</td>   <td class="num">12</td><td class="attr">points</td></tr>
+<tr><td class="num">5</td><td class="attr">next</td>       <td class="num">13</td><td class="attr">class</td></tr>
+<tr><td class="num">6</td><td class="attr">previous</td>   <td class="num">14</td><td class="attr">x</td></tr>
+<tr><td class="num">7</td><td class="attr">child</td>      <td class="num">15</td><td class="attr">y</td></tr>
+</table>
+</section>
+
+<section>
+<h2>Object Attributes</h2>
+<table class="bits">
+<tr><td class="num">1</td><td class="attr">CLOSED</td>        <td class="num">17</td><td class="attr">BURNING</td></tr>
+<tr><td class="num">2</td><td class="attr">LOCKED</td>        <td class="num">18</td><td class="attr">LOCATION</td></tr>
+<tr><td class="num">3</td><td class="attr">DEAD</td>          <td class="num">19</td><td class="attr">ON</td></tr>
+<tr><td class="num">4</td><td class="attr">IGNITABLE</td>     <td class="num">20</td><td class="attr">DAMAGED</td></tr>
+<tr><td class="num">5</td><td class="attr">WORN</td>          <td class="num">21</td><td class="attr">FEMALE</td></tr>
+<tr><td class="num">6</td><td class="attr">CONCEALING</td>    <td class="num">22</td><td class="attr">POSSESSIVE</td></tr>
+<tr><td class="num">7</td><td class="attr">LUMINOUS</td>      <td class="num">23</td><td class="attr">OUT_OF_REACH</td></tr>
+<tr><td class="num">8</td><td class="attr">WEARABLE</td>      <td class="num">24</td><td class="attr">TOUCHED</td></tr>
+<tr><td class="num">9</td><td class="attr">CLOSABLE</td>      <td class="num">25</td><td class="attr">SCORED</td></tr>
+<tr><td class="num">10</td><td class="attr">LOCKABLE</td>     <td class="num">26</td><td class="attr">SITTING</td></tr>
+<tr><td class="num">11</td><td class="attr">ANIMATE</td>      <td class="num">27</td><td class="attr">NPC</td></tr>
+<tr><td class="num">12</td><td class="attr">LIQUID</td>       <td class="num">28</td><td class="attr">DONE</td></tr>
+<tr><td class="num">13</td><td class="attr">CONTAINER</td>    <td class="num">29</td><td class="attr">GAS</td></tr>
+<tr><td class="num">14</td><td class="attr">SURFACE</td>      <td class="num">30</td><td class="attr">NO_TAB</td></tr>
+<tr><td class="num">15</td><td class="attr">PLURAL</td>       <td class="num">31</td><td class="attr">NOT_IMPORTANT</td></tr>
+<tr><td class="num">16</td><td class="attr">FLAMMABLE</td>    <td class="num"></td><td class="attr"></td></tr>
+</table>
+</section>
+
+<section>
+<h2>Location Attributes</h2>
+<table class="bits">
+<tr><td class="num">1</td><td class="attr">VISITED</td>       <td class="num">9</td><td class="attr">POLLUTED</td></tr>
+<tr><td class="num">2</td><td class="attr">DARK</td>          <td class="num">10</td><td class="attr">SOLVED</td></tr>
+<tr><td class="num">3</td><td class="attr">ON_WATER</td>      <td class="num">11</td><td class="attr">MID_WATER</td></tr>
+<tr><td class="num">4</td><td class="attr">UNDER_WATER</td>   <td class="num">12</td><td class="attr">DARKNESS</td></tr>
+<tr><td class="num">5</td><td class="attr">WITHOUT_AIR</td>   <td class="num">13</td><td class="attr">MAPPED</td></tr>
+<tr><td class="num">6</td><td class="attr">OUTDOORS</td>      <td class="num">14</td><td class="attr">KNOWN</td></tr>
+<tr><td class="num">7</td><td class="attr">MID_AIR</td>       <td class="num">18</td><td class="attr">LOCATION</td></tr>
+<tr><td class="num">8</td><td class="attr">TIGHT_ROPE</td>    <td class="num"></td><td class="attr"></td></tr>
+</table>
+</section>
+
+<section>
+<h2>Pointers</h2>
+<table class="kv">
+<tr><td class="key">player</td>      <td>The object that is the player.</td></tr>
+<tr><td class="key">here</td>        <td>The player's current location.</td></tr>
+<tr><td class="key">noun1, noun2</td><td>First and second objects in the player's command.</td></tr>
+<tr><td class="key">noun3</td>       <td>Default <b>loop</b> iterator.</td></tr>
+<tr><td class="key">noun4</td>       <td>Free pointer.</td></tr>
+<tr><td class="key">self</td>        <td>Object the running function is associated with.</td></tr>
+<tr><td class="key">destination</td><td>Where the player is moving to (set before <b>+movement</b>).</td></tr>
+</table>
+</section>
+
+<section>
+<h2>Flow Control</h2>
+<table class="kv">
+<tr><td class="key">if <i>e1</i> [: <i>e2</i>&hellip;]</td><td>True if any expression is true.</td></tr>
+<tr><td class="key">ifall <i>e1</i> [: <i>e2</i>&hellip;]</td><td>True if all are true.</td></tr>
+<tr><td class="key">ifstring <i>e1</i> [: <i>e2</i>&hellip;]</td><td>String version of <b>if</b>.</td></tr>
+<tr><td class="key">ifexecute <i>fn</i></td><td>True if <i>fn</i> exists and returns true.</td></tr>
+<tr><td class="key">else / endif</td><td>Branch / close.</td></tr>
+<tr><td class="key">endall</td><td>Close every open <b>if</b>/<b>ifall</b> at once.</td></tr>
+<tr><td class="key">loop [<i>var</i>] &hellip; endloop</td><td>Iterate every defined object.</td></tr>
+<tr><td class="key">select <i>obj</i> &hellip; endselect</td><td>Iterate the children of an object.</td></tr>
+<tr><td class="key">repeat &hellip; until <i>e</i></td><td>Loop while <i>e</i> is false.</td></tr>
+<tr><td class="key">while <i>e</i> &hellip; endwhile</td><td>Loop while <i>e</i> is true.</td></tr>
+<tr><td class="key">iterate <i>csv</i> &hellip; enditerate</td><td>Walk a CSV file row by row.</td></tr>
+<tr><td class="key">update <i>csv</i> &hellip; endupdate</td><td>Walk a CSV file with write-back.</td></tr>
+<tr><td class="key">break</td><td>Exit the innermost loop.</td></tr>
+<tr><td class="key">return [<i>v</i>]</td><td>Exit the function.</td></tr>
+</table>
+</section>
+
+<section>
+<h2>Operators</h2>
+<table class="kv">
+<tr><td class="key">= == != &lt;&gt;</td><td>Integer equality / inequality.</td></tr>
+<tr><td class="key">&gt; &lt; &gt;= &lt;=</td><td>Numeric comparison.</td></tr>
+<tr><td class="key">has / hasnt</td>   <td>Attribute is / isn't set on an object.</td></tr>
+<tr><td class="key">is / isnt</td>     <td>Object is / isn't in a scope (<code>*held</code>, <code>*here</code>, etc.).</td></tr>
+<tr><td class="key">grandof / !grandof</td><td>Tests deep parent relationships.</td></tr>
+<tr><td class="key">locationof / !locationof</td><td>Left is the enclosing location of right.</td></tr>
+<tr><td class="key">childof / !childof</td><td>Left is a direct child of right.</td></tr>
+</table>
+</section>
+
+<section>
+<h2>Common Verb Functions</h2>
+<p class="note">Define <code>{<i>verb</i>_<i>label</i></code> for an object-specific response, or <code>{+default_<i>verb</i></code> for a global override. See Appendix B of the Author's Guide for the full list of 216 verb functions.</p>
+<div class="grid3">
+<span>examine</span><span>take</span><span>drop</span>
+<span>open</span><span>close</span><span>lock</span>
+<span>unlock</span><span>wear</span><span>remove</span>
+<span>insert_in</span><span>insert_on</span><span>look_in</span>
+<span>look_under</span><span>look_behind</span><span>look_through</span>
+<span>talk_to</span><span>ask_about</span><span>ask_for</span>
+<span>tell_about</span><span>give_to</span><span>show_to</span>
+<span>pull</span><span>push</span><span>move</span>
+<span>read</span><span>eat</span><span>drink_from</span>
+<span>turn_on</span><span>turn_off</span><span>use</span>
+<span>throw_at</span><span>break</span><span>cut</span>
+<span>listen_to</span><span>smell</span><span>taste</span>
+<span>climb</span><span>enter</span><span>jump</span>
+<span>light</span><span>extinguish</span><span>burn</span>
+<span>tie</span><span>untie</span><span>attack</span>
+</div>
+</section>
+
+<section>
+<h2>Command Summary</h2>
+<p class="note">Output / state</p>
+<div class="grid4">
+<span>set</span><span>ensure</span><span>move</span><span>write</span>
+<span>print</span><span>print:</span><span>style</span><span>cursor</span>
+<span>clear</span><span>more</span><span>flush</span><span>updatestatus</span>
+<span>setstring</span><span>addstring</span><span>padstring</span><span>length</span>
+<span>split</span><span>points</span><span>terminate</span><span>undomove</span>
+</div>
+<p class="note">Flow</p>
+<div class="grid4">
+<span>if</span><span>ifall</span><span>else</span><span>endif</span>
+<span>endall</span><span>ifstring</span><span>ifexecute</span><span>loop</span>
+<span>endloop</span><span>select</span><span>endselect</span><span>repeat</span>
+<span>until</span><span>untilall</span><span>while</span><span>endwhile</span>
+<span>iterate</span><span>enditerate</span><span>update</span><span>endupdate</span>
+<span>break</span><span>return</span><span>execute</span><span>call</span>
+</div>
+<p class="note">Special / I-O</p>
+<div class="grid4">
+<span>proxy</span><span>override</span><span>position</span><span>bearing</span>
+<span>distance</span><span>dir_to</span><span>npc_to</span><span>random</span>
+<span>asknumber</span><span>getnumber</span><span>getstring</span><span>getyesorno</span>
+<span>savegame</span><span>restoregame</span><span>timer</span><span>sound</span>
+<span>image</span><span>volume</span><span>stop</span><span>getenv</span>
+</div>
+<p class="note">Web (cgijacl / fcgijacl)</p>
+<div class="grid4">
+<span>hyperlink</span><span>hidden</span><span>prompt</span><span>button</span>
+<span>option</span><span>append</span><span>append_fc</span><span>append_nt</span>
+<span>append_lc</span><span>insert</span>
+</div>
+</section>
+
+<section>
+<h2>Library Hooks</h2>
+<table class="kv">
+<tr><td class="key">+intro</td>             <td>Runs once at game start (and re-runs while web-side pending questions are unresolved).</td></tr>
+<tr><td class="key">+eachturn</td>          <td>After every turn-consuming command.</td></tr>
+<tr><td class="key">eachturn</td>           <td>On a location, fires when the player is there.</td></tr>
+<tr><td class="key">+timer</td>             <td>Periodic, scheduled by the <b>timer</b> opcode.</td></tr>
+<tr><td class="key">+movement</td>          <td>Global pre-movement hook; return true to block.</td></tr>
+<tr><td class="key">movement</td>           <td>On a location, fires when the player tries to leave.</td></tr>
+<tr><td class="key">+title</td>             <td>Optional header printed before each <b>look</b>.</td></tr>
+<tr><td class="key">+before_look / +after_look</td><td>Wrap every <b>look</b> with custom content.</td></tr>
+<tr><td class="key">+no_light</td>          <td>Replaces output when the location has DARKNESS.</td></tr>
+<tr><td class="key">+update_status_window</td><td>Draw the status window (Glk grid &amp; web).</td></tr>
+<tr><td class="key">+rpc</td>               <td>Web only: catches arbitrary <code>?rpc=&hellip;</code> calls.</td></tr>
+<tr><td class="key">+game_intro</td>        <td>webinterface scaffold (calls <b>+game_dedication</b> and <b>+game_scene</b>).</td></tr>
+</table>
+</section>
+
+<footer>
+JACL 4.7 Reference Card &mdash; Stuart Allen, 2026. Built from the same source tree as the Author's Guide. See <code>guide/JACLReferenceCard.html</code>.
+</footer>
+
+</div>
+</body>
+</html>

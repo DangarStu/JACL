@@ -2,49 +2,141 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
 
 <h1><a class="title" name="webinterface0">GUI Web Interface</a></h1>
 
-<p>A set of library files are included with JACL to assist in the creation of a more visually pleasing and flexible web interface for your games. These libraries display an interface that operates in one of three modes. The first is the Ajax mode which is functionally equivalent to the default header and footer with the addition of control over colours and images and hyperlinked exits. The second is the Standard mode which does not use Ajax for the command submission and includes a compass rose in the footer. The third is the GUI mode which displays two list boxes, one for the objects being carried and one for the objects in the current location; a compass rose for moving around; and a set of action buttons that represent some of the common verbs. When this interface is used, a text command is constructed and processed by the interpreter as normal. The player is given the choice of swapping between these three modes.
+<p>The library file <b>webinterface.library</b> ships a complete web frontend for cgijacl-served games. The earlier three-mode swap (Ajax / Standard / GUI) has been retired in favour of a single hyperlinked layout: a maintext window above a status bar, with a directions strip and command prompt in the footer. Several library hooks and <b>&lt;jacl-*&gt;</b> DOM markers let the interpreter drive incremental updates without forcing a full page reload.
 
-<p>Below is a screen shot of the web interface running in GUI mode:
-<center>&nbsp;<br><img src="webinterface.png" alt="The Down Dragon running with the web interface"><br>&nbsp;<br></center>
+<p>Below is a screen shot of the web interface in use:
+<center>&nbsp;<br><img src="webinterface.png" alt="The JACL web interface"><br>&nbsp;<br></center>
 
 <table class="infowarn"><tr>
 <td><img src="warning.png"></td>
-<td>If you wish your game to be playable using this point-and-click interface you must be careful to design it to be solveable using only the verbs available.</td>
+<td>If you want your game to be playable using the link bar and command form alone, design each puzzle so it can be reached via the verbs the interface exposes — the link bar is a supplement to typed input, not a replacement for it.</td>
 </tr></table>
 
 <h2><a class="section" name="webinterface1">Using the Interface</a></h2>
 
-<p>To use this web interface you first need to include the appropriate library at the bottom of your game file with the line:
+<p>To use this web interface include the library at the bottom of your game file:
 
 <pre>
 #include "webinterface.library"
+#include "webinterface.css"
 </pre>
 
-<p>Once this library is included, certain string constants must be defined to provide information that is specific to your game. Here are the values from The Down Dragon, as show in the screenshot above:
+<p>Once included, define the appearance constants you want to override. Here are the values from <i>The Down Dragon</i>, as shown in the screenshot above:
 
 <pre>
-constant title_image "/images/dragon.png"
-constant footer_image "none"
-constant header_colour "#42596d"
-constant linkbar_colour "#3f3527"
-constant maintext_colour "#dddddd"
+constant title_image       "/images/dragon.png"
+constant footer_image      "none"
+constant header_colour     "#42596d"
+constant linkbar_colour    "#3f3527"
+constant maintext_colour   "#dddddd"
+constant title_colour      "black"
 </pre>
 
-<p>The value for <b>title_image</b> specifies which image to display in the top title bar. This image must be 85 pixels high and may be of any width. As browsers can be resized by the player, best results are achieved by having the right-hand edge of the image blend well with the background colour specified in <b>header_colour</b>. Note that this is also the colour used for the footer of the page. If <b>image_title</b> is set to <b>none</b>, the value of <b>game_title</b> is displayed instead.
+<ul>
+<li><b>title_image</b> &mdash; image displayed in the top title bar. Set to <b>"none"</b> to fall back to the value of <b>game_title</b> as plain text. The image must be 85 pixels high; any width works, but the right edge will normally blend into <b>header_colour</b>.</li>
+<li><b>footer_image</b> &mdash; optional image tiled behind the footer. Set to <b>"none"</b> to leave the footer flat.</li>
+<li><b>header_colour</b> &mdash; background of the title bar.</li>
+<li><b>linkbar_colour</b> &mdash; background of the link bar (Instructions / Map / About / Restart / Hint).</li>
+<li><b>maintext_colour</b> &mdash; background of the main game output.</li>
+<li><b>title_colour</b> &mdash; text colour used inside the title bar (when no <b>title_image</b> is set).</li>
+</ul>
 
-<p>Like the header it is also possible to choose an image to be displayed in the footer of the page. This image is displayed in the background behind the user interface itself. This image is set to repeat both horizontally and vertically.
+<p>Colours can use any value the CSS specification accepts; hexadecimal RGB gives the finest control over shade.
 
-<p>The value for <b>main_text</b> configures the background colour of the main window that contains the game's text output.
+<p>For per-scene background pictures, set the string <b>current_image</b> to a URL at any time during play. The footer's picture pane will display whatever <b>current_image</b> currently points to (use <b>"none"</b> to hide it).
 
-<p>Colours can be specified in any format acceptable to the HTML specification. For example, it is also valid to supply a plain text colour such as <b>blue</b>. The colours above are specified as hexadecimal RGB values to provided more fine-grained control over the exact shade of the colour.
+<h2><a class="section" name="webinterface2">The Link Bar</a></h2>
+
+<p>The library's <b>+header</b> function builds a left-to-right strip of buttons using the <b>hyperlink</b> opcode:
+
+<pre>
+hyperlink "Instructions" "instructions" "header"
+hyperlink "Map"          "map window"   "header"
+hyperlink "About"        "about"        "header"
+hyperlink "Restart"      "restart"      "header"
+hyperlink "Hint"         "hint"         "header"
+</pre>
+
+<p><b>hyperlink</b> <i>label</i> <i>command</i> <i>class</i> writes an anchor element that, when clicked, submits <i>command</i> through the game's normal parser. <i>class</i> is the CSS class applied to the link (the bundled stylesheet defines a <b>header</b> class for link-bar buttons, but you can use any class you like). You can call <b>hyperlink</b> from any function, not just <b>+header</b>, to embed clickable verbs anywhere in the output. Under Glk the opcode degrades gracefully &mdash; the label is written as plain text and the command argument is ignored.
+
+<p>The Google sign-in button is appended to the link bar automatically when <b>google_client_id</b> is configured (see the <a href="http.html">HTTP</a> chapter for the full Google Sign-In setup).
+
+<h2><a class="section" name="webinterface3">DOM Contract</a></h2>
+
+<p>The page emitted by <b>+header</b> and <b>+footer</b> exposes a fixed set of element IDs that the interpreter and ajax response handler rely on. If you customise the layout, keep these landmarks intact:
+
+<table class="infowarn">
+<tr><th>Element</th><th>Purpose</th></tr>
+<tr><td><b>#main</b></td><td>The scroll container.</td></tr>
+<tr><td><b>#maintext</b></td><td>The game's running text output. The interpreter writes here.</td></tr>
+<tr><td><b>#statuswin</b></td><td>The status bar (above maintext).</td></tr>
+<tr><td><b>#footer .directions</b></td><td>The exits list, refreshed after every turn.</td></tr>
+<tr><td><b>#commandForm</b></td><td>The form used to submit player input.</td></tr>
+<tr><td><b>#JACLCommandPrompt</b></td><td>The text input emitted by the <b>prompt</b> opcode.</td></tr>
+</table>
+
+<p>The interpreter emits a small set of marker elements that the front-end interprets out-of-band. They never appear in the visible text &mdash; the JavaScript handler strips them after acting on them.
+
+<table class="infowarn">
+<tr><th>Marker</th><th>Emitted by</th><th>Effect on the page</th></tr>
+<tr><td><b>&lt;jacl-clear&gt;</b></td><td>the <b>clear</b> opcode</td><td>Wipe everything in <b>#maintext</b> above this marker.</td></tr>
+<tr><td><b>&lt;jacl-timer data-ms="N"&gt;</b></td><td>the <b>timer N</b> opcode</td><td>Begin firing <b>?rpc=timer</b> ajax calls every N milliseconds. <b>timer 0</b> cancels.</td></tr>
+<tr><td><b>&lt;jacl-status data-lines="N"&gt;</b></td><td>status writes</td><td>Replace the contents of <b>#statuswin</b> with the marker's inner HTML.</td></tr>
+<tr><td><b>&lt;jacl-directions&gt;</b></td><td>the library's <b>+library_eachturn</b></td><td>Replace the exits strip in the footer.</td></tr>
+<tr><td><b>&lt;audio data-jacl-channel="N" data-jacl-pending="1"&gt;</b></td><td>the <b>sound</b> opcode</td><td>Start playing on logical channel N.</td></tr>
+<tr><td><b>&lt;jacl-sound-stop data-jacl-channel="N"&gt;</b></td><td><b>sound 0 N</b></td><td>Stop channel N.</td></tr>
+<tr><td><b>&lt;jacl-sound-volume data-jacl-channel data-jacl-level&gt;</b></td><td>volume changes</td><td>Set the gain on channel N.</td></tr>
+</table>
+
+<p>After every turn-consuming command, <b>verbs.library</b>'s <b>+system_eachturn</b> calls into <b>+library_eachturn</b>, which wraps the current exits in a <b>&lt;jacl-directions&gt;</b> marker. The ajax handler then swaps the marker's contents into the footer's directions strip so the bar stays current after movements, door opens and the like.
+
+<h2><a class="section" name="webinterface4">Pending-Question Prompts</a></h2>
+
+<p>The web build supports two opcodes for asking the player a one-off question without consuming a turn:
+
+<pre>
+getyesorno var
+getnumber var low high
+</pre>
+
+<p>When either runs, the interpreter records the question type in <b>pending_question_type</b> (and, for <b>getnumber</b>, the bounds in <b>pending_number_low</b> and <b>pending_number_high</b>) and the page enters a special input state in which the next command is parsed as the answer rather than as a verb. The library's <b>+game_intro</b> scaffold relies on this to ask the voice and sound preferences before the opening prose runs &mdash; your <b>+intro</b> re-enters after each answer until both questions have been resolved.
+
+<p>You can opt out of the voice / sound questions for utility games (life, blackjacl, etc.) by setting <b>skip_intro_preferences</b> to <b>true</b> in your <b>+intro</b> before calling <b>+game_intro</b>.
+
+<h2><a class="section" name="webinterface5">Voice (Text-to-Speech)</a></h2>
+
+<p>Browser SpeechSynthesis is used to read game output aloud. The player can enable it with <b>voice</b>, disable it with <b>silence</b> or <b>mute</b>, list the available voices with <b>voices</b>, and pick a specific one with <b>voice</b> <i>n</i>. The library tracks the current state in <b>voice_enabled</b>; the <b>+startup_preferences</b> hook in <b>+game_intro</b> asks the player up front whether they want it on.
+
+<h2><a class="section" name="webinterface6">Authorial Scaffolding</a></h2>
+
+<p><b>+game_intro</b> in <b>webinterface.library</b> provides a standard intro scaffold for web games. Provide two functions in your game:
+
+<ul>
+<li><b>{+game_dedication ... }</b> &mdash; credits / opening text shown <i>once</i> before the voice and sound questions are asked.</li>
+<li><b>{+game_scene ... }</b> &mdash; scene setup and opening prose shown <i>once</i> after both questions have been answered.</li>
+</ul>
+
+<p>Your <b>+intro</b> shrinks to whatever per-entry state your game needs plus <b>execute "+game_intro"</b>:
+
+<pre>
+{+intro
+set player = kryten
+execute "+game_intro"
+}
+</pre>
+
+<p>The web build re-enters <b>+intro</b> after every pending-question answer (<b>TOTAL_MOVES</b> is still 0 throughout this window), so the scaffold uses the guards <b>intro_dedication_shown</b> and <b>intro_scene_shown</b> to fire each block exactly once. Under Glk the scaffold runs straight through synchronously because <b>getyesorno</b> blocks for input.
+
+<p>By convention each game's <b>+game_scene</b> starts with <b>clear</b> so the opening prose appears at the top of a fresh window once the dedication and Q&amp;A have been answered. Doing the clear inside <b>+game_scene</b> keeps it gated by the same flag that protects the scene block.
+
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body>
 </html>

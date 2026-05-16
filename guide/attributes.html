@@ -2,7 +2,7 @@
 <head>
 	<title>The JACL Author's Guide</title>
 	<meta name="description" content="Documentation for the JACL Adventure Creation Language.">
-	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documention,instructions">
+	<meta name="keywords" content="JACL,tutorial,programming,programmers,guide,manual,documentation,instructions">
 	<link rel=stylesheet type="text/css" href="styles.css">
 </head>
 <body>
@@ -128,7 +128,7 @@ ensure lantern hasnt LUMINOUS
 <td>This attribute indicates that the object's names should not be included during tab completion. Tab completion is only used by the console interpreter.</td>
 </tr>
 <TR><td><B>NOT_IMPORTANT</B></TD>
-<td>This attribute is given to an object that is of no consequence game. It is usually used to implement nouns that are referred to in a location description but are not part of the game world the player needs to interact with. Verbs in the library will respond with <b>You don't need to worry about that.</b> when the player attempts to interact with an object that has this attribute.</TD>
+<td>This attribute is given to an object that is of no consequence to the game. It is usually used to implement nouns that are referred to in a location description but are not part of the game world the player needs to interact with. Verbs in the library will respond with <b>You don't need to worry about that.</b> when the player attempts to interact with an object that has this attribute.</TD>
 </TR>
 </TABLE>
 
@@ -141,7 +141,7 @@ ensure lantern hasnt LUMINOUS
 <th>Description</th>
 </tr><tr>
 <TD><b>VISITED<br>MAPPED</b></td>
-<td>When the player enters a location, it is automatically given the attributes <B>VISITED</B> and <b>MAPPED</b> after the <b>look</b>function is run. These attributes may be tested for to provide a shorter description on subsequent visits. When the JACL interpreter is set to verbose mode (the <B>DISPLAY_MODE</B> variable is set to 1), locations will have the attribute <B>VISITED</B> taken away from them before the <b>look</b> function is executed.</TD>
+<td>When the player enters a location, it is automatically given the attributes <B>VISITED</B> and <b>MAPPED</b> after the <b>look</b> function is run. These attributes may be tested for to provide a shorter description on subsequent visits. When the JACL interpreter is set to verbose mode (the <B>DISPLAY_MODE</B> variable is set to 1), locations will have the attribute <B>VISITED</B> taken away from them before the <b>look</b> function is executed.</TD>
 </tr><tr>
 <td><B>DARK</B></TD>
 <td>If a location has the attribute <B>DARK</B>, the player must be carrying an object that has the attribute <B>LUMINOUS</B> in order to enter it.</TD>
@@ -181,16 +181,7 @@ ensure lantern hasnt LUMINOUS
 </tr><tr>
 <td><B>KNOWN</B></TD>
 <td>Set by the standard library's <b>look_around</b> function when the player first enters a location. Used by neighbouring locations' direction-link rendering: if a destination has <B>KNOWN</B>, the exit list shows the destination's full name (<b>"north to the kitchen"</b>); otherwise just the direction (<b>"north"</b>).</TD>
-</tr><tr>
-<td><B>SCORED</B></TD>
-<td>Free for use by the author.</TD>
-</tr><tr>
-<td><b>NO_TAB</b></td>
-<td>This attribute indicates that the location's names should not be included during tab completion. Tab completion is only used by the console interpreter.</td>
 </tr>
-<TR><td><B>NOT_IMPORTANT</B></TD>
-<td>This attribute is given to a location that is of no consequence game. It is usually used to implement nouns that are referred to in a location description but are not part of the game world the player needs to interact with. Verbs in the library will respond with <b>You don't need to worry about that.</b> when the player attempts to interact with an object that has this attribute.</TD>
-</TR>
 </table>
 
 <h2><a class="section" name="attributes4">User Attributes</a></h2>
@@ -212,9 +203,9 @@ write "You open the door again.^"
 }
 </pre>
 
-<p>The above code creates a user attributes called <b>DOOR_OPENED</b> and gives the object <b>door</b> that attribute when it is first opened. It also tests whether the door already has this attribute before deciding which message to display.
+<p>The above code creates a user attribute called <b>DOOR_OPENED</b> and gives the object <b>door</b> that attribute when it is first opened. It also tests whether the door already has this attribute before deciding which message to display.
 
 <!-- END OF BODY -->
-<p><a href="index.html">Back to Contents</b>
+<p><a href="index.html">Back to Contents</a>
 </body>
 </html>
