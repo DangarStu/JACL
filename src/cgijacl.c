@@ -470,9 +470,12 @@ main(int argc, char *argv[])
     if (save_game(saved_start) == FALSE) {
         /* Treat CANT_SAVE as a plain message, not a format string -- a
          * game that overrides it with a "%n" or unmatched-arg cstring
-         * would otherwise hit a format-string vuln. The filename info
+         * would otherwise hit a format-string vuln. Precision specifiers
+         * cap each piece (cstrings are up to 1024 bytes, saved_start
+         * is up to 256) so the formatted output fits error_buffer
+         * without GCC -Wformat-truncation warnings. The filename info
          * is appended as a separate, engine-controlled line. */
-        snprintf(error_buffer, sizeof error_buffer, "%s [%s]",
+        snprintf(error_buffer, sizeof error_buffer, "%.700s [%.255s]",
                  cstring_resolve("CANT_SAVE")->value, saved_start);
         log_error(error_buffer, PLUS_STDERR);
     }
@@ -541,7 +544,7 @@ main(int argc, char *argv[])
              * back to restart_game() again -- wasted work, plus the
              * misleading log noise. */
             if (save_game(saved_start) == FALSE) {
-                snprintf(error_buffer, sizeof error_buffer, "%s [%s]",
+                snprintf(error_buffer, sizeof error_buffer, "%.700s [%.255s]",
                          cstring_resolve("CANT_SAVE")->value, saved_start);
                 log_error(error_buffer, PLUS_STDERR);
             }
@@ -1216,7 +1219,8 @@ skip_command:
              * the game-defined cstring as a plain message, append the
              * filename info via the engine-controlled "%s [%s/%s]"
              * template. */
-            snprintf(error_buffer, sizeof error_buffer, "%s [%s/%s]",
+            snprintf(error_buffer, sizeof error_buffer,
+                     "%.600s [%.80s/%.255s]",
                      cstring_resolve("CANT_SAVE")->value, prefix, temp_buffer);
             log_error(error_buffer, PLUS_STDOUT);
         }
