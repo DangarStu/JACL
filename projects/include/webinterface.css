@@ -59,7 +59,6 @@ print:
 write "        background-color: " linkbar_colour "cc; }^"
 print:
       #statuswin:empty { display: none; }
-      #statuswin .jacl-status-right { float: right; opacity: 0.85; }
       #main {
 		position:absolute;
 		left:0px;
@@ -98,9 +97,6 @@ print:
 		font-weight: bold;
 		margin-bottom: 2px;
                 font-size: 12pt; }^
-	input.dir_button {
-		margin-top: 0px;
-		margin-left: 0px; }^
 	div.links {
 		position: absolute;
 		top: 57px;
@@ -125,10 +121,6 @@ print:
 		border-style: solid;
 		border-width: 2px;
 		border-color: black; }^
-	img.inline { 
-		width: 40%;
-		float: right;
-		margin: 10px 0px 10px 20px; }^
 	div.picture {
 		position: absolute;
 		right: 0;
@@ -197,24 +189,11 @@ print:
 	@keyframes jaclMicPulse {
 		0%, 100% { box-shadow: 0 0 4px 2px rgba(221,51,51,0.35); }
 		50%      { box-shadow: 0 0 10px 5px rgba(221,51,51,0.7); } }^
-	div.prompt_text {
-		float: left;
-		width: 20%; 
-		padding-top: 25px;
-		text-align: right; }^
 	div.command_prompt {
 		float: left;
 		width: 95%;
         	text-align: center;
         	padding: 15px; }^
-	div.interface {
-		position: relative;
-		font-family: Merriweather, Verdana, Arial, Sanserif;
-		padding-top: 10px;
-		padding-left: 10px;
-		padding-right: 10px;
-		padding-bottom: 10px;			
-		float: left; }^
 	select {
 		width: 200px; }^
 	@media (max-width: 600px) {
@@ -239,8 +218,6 @@ print:
 			box-sizing: border-box;
 			width: 100%;
 			max-width: 100%; }^
-		div.prompt_text { display: none; }^
-		div.interface { padding: 4px; box-sizing: border-box; }^
 		select { width: 100%; box-sizing: border-box; }^
 	}^
      -->

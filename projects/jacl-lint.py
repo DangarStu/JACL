@@ -308,6 +308,13 @@ def main():
             print(f"{path}:{lineno}: odd quote count -- likely unclosed string: {snippet}",
                   file=sys.stderr)
             warned = True
+        # CSS files are CSS-in-JACL: the visual indent nesting in the
+        # source aids editing and the engine never sees it (jpp strips
+        # leading whitespace before the loader reads each line). Skip
+        # the formatter so we don't flatten that nesting; the quote
+        # check above still runs.
+        if path.suffix == ".css":
+            continue
         formatted = lint_text(original, args.column)
         if formatted != original:
             if args.check:
