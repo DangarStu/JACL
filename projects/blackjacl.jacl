@@ -429,7 +429,6 @@ if GAME_PHASE = players_turn
 endif
 write "<br><p>Bankroll: $" current_player(money) 
 write "</center>^"
-write "<a class=~logo~ href=~http://dangarstu.tumblr.com~><img src=~/images/Tumblr.png~></a>"
 write "</div>"
 write "</form>"
 write "</body></html>^"
@@ -439,15 +438,6 @@ write "</body></html>^"
 print:
 <style>
   <!--
-  a.logo {		position: absolute;
-        		bottom: 25px;
-        		right: 25px;
-        		border: none;
-        		border-width: 0px;
-        		margin-right: 0px;
-        		margin-bottom: 0px;
-        		margin-left: 0px;
-        		margin-top: 0px; 	}^
   P { 			font-family: Helvetica, Arial, Sans;
 				color: lightgrey; font-size: 14pt}^
   P.yellow { 	font-family: Helvetica, Arial, Sans;
