@@ -36,11 +36,10 @@ integer intro_scene_shown
 # to position text at the right/centre of the bar). cgijacl reads
 # &status_cols= off each ajax/hyperlink request and writes the
 # measured column count here, so the bar tracks viewport resizes.
-# Must be declared (integer_resolve returns NULL otherwise and the
-# cgijacl assignment silently no-ops); the first +intro render falls
-# back to status_width's 80-column default until the first ajax
-# request arrives with a measurement.
-integer status_window_width
+# The engine already creates the integer (loader.c, default 120) so
+# we do NOT redeclare it here -- a duplicate declaration trips the
+# integer-shadow warning and adds a second, dormant entry to the
+# integer table that save/restore writes for no reason.
 
 # Opt-out for utility / non-IF games (life, blackjacl, etc.). Set to
 # true in +intro before 'execute "+game_intro"' to skip the voice
