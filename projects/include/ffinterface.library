@@ -83,7 +83,7 @@ else
   write "<img class=~titleimage~ alt=~" game_title "~ src=~" title_image "~>"
 endif
 write "<form name=~JACLInterfaceForm~ method=get>^"
-write "<div class=~links~>
+write "<div class=~links~>"
 write "| "
 write "Interface: "
 write "Standard<input type=~radio~ name=~interface~ value=~1~"
@@ -122,7 +122,7 @@ set linebreaks = false
 write "</div>"
 write "</div>"
 write "<div id=~footer~>^"
-write "<div id=~stats~>^
+write "<div id=~stats~>^"
 write "<table>"
 write "<caption><em>Your stats</em></caption>"
 write "<th>Stat</th>"

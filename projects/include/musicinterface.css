@@ -101,10 +101,6 @@ print:
 		text-decoration: none;
 		color: black; 
         font-size: 12pt}^
-	a.control {	font-family: Verdana, Arial, Sanserif;
-		text-decoration: none;
-		color: #333333; 
-        font-size: 12pt}^
 	a.main {	font-family: Verdana, Arial, Sanserif;
 		color: black; 
         font-size: 12pt}^
@@ -121,10 +117,7 @@ print:
 	input.button {
 		margin-top: 7px;
 		margin-left: 5px; }^
-	input.dir_button {
-		margin-top: 0px;
-		margin-left: 0px; }^
-	div.links { 		
+	div.links {
 		opacity: 0.5;
 		position: absolute;
 		top: 65px;
@@ -145,48 +138,8 @@ print:
         margin-bottom: 0px;
         margin-left: 0px;
         margin-top: 0px; }^
-	img.main { 
-		width: 476px;
-		height: 376px; 
-		margin: 8px;
-		padding: 2px;
-		border-style: solid;
-		border-width: 2px;
-		border-color: black; }
-	div.picture {
-		position: absolute;
-		right: 0;
-		top: 87px;
-		width: 500px;
-		float: right;
-		bottom: 190px;
-.
-write " background-color: " maintext_colour "; }^"
-print:
-	div.directions { 		
-		opacity: 0.5;
-		right: 0px;
-		left: 0px;
-		height: 22px;
-		font-family: Verdana, Arial, Sanserif;
-		padding-right: 10px;
-		text-align: right;
-		color: white;
-.
-write " background-color: " linkbar_colour "; }^"
-print:
 	img.titleimage {
 		height: 87px; }^
-	a.logo { 
-        position: absolute;
-        bottom: 15px;
-        right: 475px; 
-		border: none;
-		border-width: 0px;
-		margin-right: 0px;
-		margin-bottom: 0px;
-		margin-left: 0px;
-		margin-top: 0px; }^
 	div.maintext {
      	font-family: Verdana, Arial, Sanserif;
 		color: #333333;
@@ -200,12 +153,6 @@ write " background-color: " maintext_colour "; }^"
 print:
 	#JACLCommandPrompt {
 		width: 95%; }^
-	div.prompt_text {
-		float: left;
-		width: 20%; 
-		color: white;
-		padding-top: 25px;
-		text-align: right;}^
 	div.section {
 		margin-top: 15px;
 		float: above; }^

@@ -19,7 +19,7 @@ endif
 
 {+header
 set linebreaks = false
-write "<html><head>
+write "<html><head>"
 write "<TITLE>" game_title "</TITLE>"
 execute "+styles"
 write "<script language=~JavaScript~>^"
@@ -37,7 +37,7 @@ ifstring title_image = "none"
 else
   write "<img class=~titleimage~ alt=~" game_title "~ src=~" title_image "~>"
 endif
-write "<div class=~links~>
+write "<div class=~links~>"
 write "| "
 hyperlink "Interface" "interface" "header"
 write " | "
@@ -58,7 +58,7 @@ set linebreaks = true
 {+footer
 set linebreaks = false
 write "</div>"
-   write "<div class=~picture~>
+   write "<div class=~picture~>"
    set linebreaks = true
    execute "+plan_view"
    set linebreaks = false

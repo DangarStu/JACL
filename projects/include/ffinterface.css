@@ -70,10 +70,7 @@ print:
      input.button {
             margin-top: 7px;
             margin-left: 5px; }^
-     input.dir_button {
-            margin-top: 0px;
-            margin-left: 0px; }^
-	div.links { 		
+	div.links {
 			opacity: 0.5;
 			position: absolute;
 			top: 66px;

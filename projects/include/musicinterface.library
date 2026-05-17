@@ -35,7 +35,7 @@ ifstring title_image = "none"
 else
   write "<img class=~titleimage~ alt=~" game_title "~ src=~" title_image "~>"
 endif
-write "<div class=~links~>
+write "<div class=~links~>"
 write "| "
 hyperlink "About" "about" "header"
 write " | "
