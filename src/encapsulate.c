@@ -123,8 +123,13 @@ command_encapsulate()
 
 	// QUOTED IS USED TO STORE WHETHER EACH WORD WAS ENCLOSED IN QUOTES
 	// IN THE PLAYERS COMMAND - RESET EACH WORD TO NO
+	// percented[] tracks the %-prefix repeat count used by macro
+	// resolution. encapsulate() also zeroes it but command_
+	// encapsulate() did not, so stale counts from the prior turn
+	// fired bogus value_of recursion on this turn.
     for (index = 0; index < MAX_WORDS; index++) {
 		quoted[index] = 0;
+		percented[index] = 0;
 	}
 
 	for (index = 0; index < length; index++) {

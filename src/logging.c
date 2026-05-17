@@ -66,16 +66,30 @@ log_error(const char *message, int console)
 {
 	FILE           *errorLog = fopen(error_log, "a");
 	time_t          tnow;
+	struct tm       tm_local;
+	char            timebuf[32];
 	char 			consoleMessage[256];
 	char 			temp_buffer[256];
 
 	time(&tnow);
+	/* ctime() returns a pointer into a static internal buffer that
+	 * is shared with localtime/gmtime; under fcgijacl with multiple
+	 * workers (or any future threaded build) one worker's strip_
+	 * return on that pointer can corrupt another worker's read.
+	 * Use the reentrant localtime_r + strftime instead. */
+	if (localtime_r(&tnow, &tm_local) != NULL) {
+		strftime(timebuf, sizeof timebuf,
+			"%a %b %d %H:%M:%S %Y", &tm_local);
+	} else {
+		snprintf(timebuf, sizeof timebuf, "%ld", (long) tnow);
+	}
+
 	/* Both destinations are 256B but `message` is typically
 	 * error_buffer[1024] and user_id / prefix are each up to 80
 	 * chars. The prior sprintfs could blow the 256B stack buffers by
 	 * ~1100 bytes on a long error string. snprintf truncates. */
 	snprintf(temp_buffer, sizeof(temp_buffer), "%s - %s - %s - %s\n",
-		strip_return(ctime(&tnow)), user_id, prefix, message);
+		timebuf, user_id, prefix, message);
 
 	snprintf(consoleMessage, sizeof(consoleMessage), "%s: %s", prefix, message);
 
@@ -84,7 +98,15 @@ log_error(const char *message, int console)
 			fputs(temp_buffer, errorLog);
 			fflush(errorLog);
 			fclose(errorLog);
-		} 
+		} else {
+			/* If the configured error log can't be opened (bad
+			 * path, no write permission on the dir, full disk),
+			 * fall back to stderr so the operator notices.
+			 * Previously the message vanished silently. */
+			fprintf(stderr, "[log_error: cannot open %s] %s",
+				error_log, temp_buffer);
+			fflush(stderr);
+		}
 	}
 
 	/* SEND THE MESSAGE TO STANDARD ERROR OR STANDARD OUT AS REQUIRED */
