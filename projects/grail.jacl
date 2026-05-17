@@ -22,9 +22,34 @@ string game_language       "en-US"
 constant image_unholygrail     1
 # -----------------------------------------------------------------------------
 
-# THESE ARE USER ATTRIBUTES TO REPLACE THE SYSTEM ATTRIBUTES THAT NO
-# LONG EXISTS IN JACL 2.1
+# Legacy generic flag bits from before user attributes existed.
+# Still used on objects whose CUSTOMn meaning is either too narrow
+# to justify its own bit (one-shot dialogue gates on minor NPCs,
+# bathroom-door knock states, etc.) or too entangled to rename
+# without risking semantic drift. The bulk of CUSTOM1..5 sites
+# below have been renamed to the named attributes that follow,
+# capped to fit JACL's 32-bit user-attribute table.
 attribute CUSTOM1 CUSTOM2 CUSTOM3 CUSTOM4 CUSTOM5
+
+# Named user attributes -- replace what used to be generic CUSTOMn
+# flags so the game's intent is visible at the call site.
+attribute INTRODUCED           ; NPC: first greeting / introductory line delivered
+attribute CASE_DISCUSSED       ; lisa: "why they called you in" speech given
+attribute AT_STANDOFF          ; lisa: pistol drawn on stranger
+attribute BOUND                ; lisa: bound and gagged on hangar floor
+attribute BIO_RECITED          ; lisa: silly self-description joke told
+attribute AWAITING_ANSWER      ; zuckerman: yes/no question awaiting reply
+attribute TESTS_ASKED          ; zuckerman / stranger: human-tests topic raised
+attribute RESEARCH_DISCUSSED   ; zuckerman: marine-tests / Rotenone explanation given
+attribute AMES_DISCUSSED       ; zuckerman: green-slide / clear-liquid lecture given
+attribute BRIEFED              ; hughes / petrescu: van-side ear-piece briefing done
+attribute DRUNK_FROM           ; liquid source / sample drunk by player
+attribute HAS_AIR_POCKET       ; syringe: flicked, air pocket at top
+attribute COATED_WITH_BACTERIA ; agar: bacteria spread on surface
+attribute INJECTED_WITH_LIQUID ; agar: clear liquid injected into agar
+attribute TIPPED_UP            ; rect_crate: standing on end
+attribute SLIDE_PLACED         ; writing_desk: green slide placed on desk
+attribute OCEAN                ; location: open-water (drives +ocean + swim-tire)
 
 location control_centre : control centre
  short         the "control centre"
@@ -35,18 +60,18 @@ location control_centre : control centre
  y             0
 
 {eachturn
-ifall screen has ON : lisa has CUSTOM4 : lisa(parent) = control_centre
+ifall screen has ON : lisa has INTRODUCED : lisa(parent) = control_centre
    write "^~What now, Alex?~ Lisa asks, flicking off the main screen "
    write "once again as you enter.^"
    ensure screen hasnt ON
    set SCREEN_FADE = 8
 endif
-if lisa hasnt CUSTOM4
+if lisa hasnt INTRODUCED
    write "^Lisa quickly flicks off the main screen of the control panel "
    write "as you enter the room. Shooting up out of her chair, " 
    write "she turns to face you. "
    set lisa(status) = 3
-   ensure lisa has CUSTOM4
+   ensure lisa has INTRODUCED
    set SCREEN_FADE = 8
    set LISAS_SCRIPT = 1 
    write "~You startled me,~ she blurts nervously.^"
@@ -405,7 +430,7 @@ write "~It's just a simple volume control,~ Lisa quips.^"
 }
 
 {untie
-if lisa has CUSTOM3
+if lisa has BOUND
    write "~Get away from her,~ the stranger "
    if stranger(parent) = hangar_north
       write "warns"
@@ -419,7 +444,7 @@ return false
 }
 
 {apologise
-if lisa has CUSTOM3
+if lisa has BOUND
    write "Lisa seems far from impressed by your attempts at reconciliation.^"
    return
 endif
@@ -431,7 +456,7 @@ write "~It's all right, just don't do it again,~ Lisa says with a smile.^"
 }
 
 {hug
-if lisa has CUSTOM3
+if lisa has BOUND
    write "Lisa seems far from impressed by your attempts at reconciliation.^"
    return
 endif
@@ -444,12 +469,12 @@ ensure kryten has CUSTOM3
 }
 
 {examine
-if lisa has CUSTOM3
+if lisa has BOUND
    write "Kneeling on the floor, bound and gagged, Lisa looks quite "
    write "understandably upset.^"
    return
 endif
-if lisa has CUSTOM2
+if lisa has AT_STANDOFF
    write "Barely breaking her gaze to blink, Lisa is standing with her "
    write "pistol pointed at the stranger.^"
    return
@@ -474,7 +499,7 @@ ensure lisa has DAMAGED
 }
 
 {ask_about_lisa
-if lisa hasnt CUSTOM5
+if lisa hasnt BIO_RECITED
    write "~Hi! My name is Lisa. I'm twenty eight years old, five foot "
    write "nine inches tall and weigh fifty nine kilograms. I enjoy eating out, "
    write "watching movies and going to the beach.~^^"
@@ -483,7 +508,7 @@ if lisa hasnt CUSTOM5
    write "your favourite farm animal...~^^"
    write "At this point neither of you can refrain from laughing, thus "
    write "ending your gruelling interrogation.^"
-   ensure lisa has CUSTOM5
+   ensure lisa has BIO_RECITED
    ensure lisa has DAMAGED
    return
 endall
@@ -531,7 +556,7 @@ write "long.~^"
 }
 
 {kiss
-if lisa has CUSTOM3
+if lisa has BOUND
    write "Lisa hollers a muffled curse.^"
    return
 endif 
@@ -586,7 +611,7 @@ ensure vial has CUSTOM3
 }
 
 {greet
-if lisa has CUSTOM3
+if lisa has BOUND
    write "Lisa is not exactly in a good position to respond right now.^"
    return
 endall
@@ -600,7 +625,7 @@ if lisa has BURNING
    write "here.~^"
    return
 endall
-if lisa has CUSTOM2
+if lisa has AT_STANDOFF
    write "~Come on, Alex,~ Lisa urges, ~take his gun.~^"
    return
 endall
@@ -609,7 +634,7 @@ write "few minutes,~ Lisa says with rather insulting smile.^"
 }
 
 {talk_to
-if lisa has CUSTOM3
+if lisa has BOUND
    write "Lisa is not exactly in a good position to respond right now.^"
    return
 endall
@@ -623,12 +648,12 @@ if lisa has BURNING
    write "here.~^"
    return
 endall
-if lisa has CUSTOM2
+if lisa has AT_STANDOFF
    write "~Come on, Alex,~ Lisa urges, ~take his gun.~^"
    return
 endall
 ensure lisa has DAMAGED
-if lisa hasnt CUSTOM1
+if lisa hasnt CASE_DISCUSSED
    write "You and Lisa get talking about your work here on the island.^^"
    write "~You know, it has always amazed me that you were called in to "
    write "investigate this case in the first place. I presume they were "
@@ -643,7 +668,7 @@ if lisa hasnt CUSTOM1
    write "than the findings of an internal investigation. I suppose they "
    write "just wanted to put an end to any negative public attention to the "
    write "work being done here at the base once and for all.~^"
-   ensure lisa has CUSTOM1
+   ensure lisa has CASE_DISCUSSED
    return
 endif
 write "You chat for a moment about nothing in particular.^"
@@ -658,7 +683,7 @@ write "You hear the faint sound of Lisa breathing.^"
 }
 
 {ask_for_m_pass
-if lisa has CUSTOM2
+if lisa has AT_STANDOFF
    write "~Take her gun, Alex, not her pass!~ the stranger exclaims.^"
    return
 endif
@@ -666,7 +691,7 @@ write "~I can't give you my pass!~ Lisa exclaims.^"
 }
 
 {ask_for_pistol
-if lisa has CUSTOM2
+if lisa has AT_STANDOFF
    write "Reluctantly you turn to Lisa and hold out your hand.^" 
    write "^~But Alex...~ Lisa whispers softly, an expression of confusion "
    write "coming over her face. Sensing your resolve, she places her pistol "
@@ -691,8 +716,8 @@ if lisa has CUSTOM2
    write "^~Anything that will shed further light on the exact nature of Dr "
    write "Zuckerman's experiments.~^"
    move pistol to stranger 
-   ensure lisa hasnt CUSTOM2
-   ensure lisa has CUSTOM3
+   ensure lisa hasnt AT_STANDOFF
+   ensure lisa has BOUND
    ensure stranger has POSSESSIVE
    set STRANGERS_SCRIPT = 1
    set stranger(status) = 1
@@ -710,7 +735,7 @@ ensure pistol has CUSTOM4
 }
 
 {attack
-if lisa has CUSTOM3
+if lisa has BOUND
    write "You would really attack a bound and gagged woman?^"
    return
 endif
@@ -751,7 +776,7 @@ object m_pass: lisas lisa's military identification pass id
  parent        lisa
 
 {take
-if lisa has CUSTOM2
+if lisa has AT_STANDOFF
    write "I don't think this is the right time to be playing with Lisa's "
    write "pass.^"
    set time = false
@@ -774,7 +799,7 @@ execute "tell_about_stranger_guard"
 }
 
 {show_to_guard : give_to_guard
-if lisa has CUSTOM3
+if lisa has BOUND
    write "You show Lisa's military identification pass to the guard and "
    write "inform him of the situtation inside the hangar. "
    proxy "tell guard about stranger"
@@ -1867,12 +1892,12 @@ write "Crystal clear.^"
 }
 
 {drink_override
-if r_water has CUSTOM4
+if r_water has DRUNK_FROM
    write "You've had quite enough water for now.^"
    return
 endall
 write "You drink a small amount of the water -- quite refreshing.^"
-ensure r_water has CUSTOM4
+ensure r_water has DRUNK_FROM
 }
 
 object sink: sink
@@ -2679,7 +2704,7 @@ if syringe has BUBBLES
    write "The liquid appears to be filled with many small bubbles.^"
    return
 endall
-if syringe has CUSTOM4
+if syringe has HAS_AIR_POCKET
    write "On closer examination you notice there is a large air pocket "
    write "at the top of the syringe.^"
 endall
@@ -2695,7 +2720,7 @@ if syringe has BUBBLES
    write "You flick the syringe, causing the small bubbles in the liquid to "
    write "dislodge and rise to the surface.^"
    ensure syringe hasnt BUBBLES
-   ensure syringe has CUSTOM4
+   ensure syringe has HAS_AIR_POCKET
    return
 endall
 write "Once was enough.^"
@@ -2706,11 +2731,11 @@ if +contains_liquid?<noun1 = false
    write "This achieves little.^"
    return
 endall
-if syringe has CUSTOM4
+if syringe has HAS_AIR_POCKET
    write "You shake the syringe, causing the small bubbles to form in the "
    write "liquid.^"
    ensure syringe has BUBBLES
-   ensure syringe hasnt CUSTOM4
+   ensure syringe hasnt HAS_AIR_POCKET
    return
 endif
 write "This achieves little.^"
@@ -2963,12 +2988,12 @@ write "You are going to need a bit more magnification than that.^"
 }
 
 {give_to_zuckerman
-if zuckerman hasnt CUSTOM5
+if zuckerman hasnt AMES_DISCUSSED
    move green_slide to zuckerman
    write "~What's on it?~ Dr Zuckerman asks.^"
    return
 endif
-if writing_desk has CUSTOM1
+if writing_desk has SLIDE_PLACED
    write "Dr Zuckerman glances briefly at the slide then places it on the "
    write "desk.^"
    move green_slide to writing_desk
@@ -2978,23 +3003,23 @@ write "~I would love to see the results of your investigation, Dr Meadows, "
 write "but I'm afraid there isn't a microscope anywhere in the building,~ Dr "
 write "Zuckerman informs you regretfully as he places the slide on the desk.^"
 move gleen_slide to writing_desk
-ensure writing_desk has CUSTOM1
+ensure writing_desk has SLIDE_PLACED
 set TOPICS_DISCUSSED + 1
 }
 
 {show_to_zuckerman
-if zuckerman hasnt CUSTOM5
+if zuckerman hasnt AMES_DISCUSSED
    write "~What is that?~ Dr Zuckerman asks.^"
    return
 endif
-if writing_desk has CUSTOM1
+if writing_desk has SLIDE_PLACED
    write "Dr Zuckerman nods.^"
    return
 endif
 write "~I would love to see the results of your investigation, Dr Meadows, "
 write "but I'm afraid there isn't a microscope anywhere in the building,~ Dr "
 write "Zuckerman informs you regretfully.^"
-ensure writing_desk has CUSTOM1
+ensure writing_desk has SLIDE_PLACED
 set TOPICS_DISCUSSED + 1
 }
 
@@ -3108,18 +3133,18 @@ object agar_1: solid gel quantity of brown agar agar-agar
 {examine
 write "The agar has been poured into the petri dish and set into a solid "
 write "surface on which to grow bacterial cultures. "
-if agar_1 has CUSTOM2;		HAS BEEN INJECTED WITH THE CLEAR FLUID 
-   if agar_1 hasnt CUSTOM1;	BUT NOT COATED WITH BACTERIA
+if agar_1 has INJECTED_WITH_LIQUID;		HAS BEEN INJECTED WITH THE CLEAR FLUID 
+   if agar_1 hasnt COATED_WITH_BACTERIA;	BUT NOT COATED WITH BACTERIA
       write "The agar's upper surface has been coated with the clear "
       write "liquid.^"
 endall
-if agar_1 has CUSTOM1;		HAS BEEN COATED WITH BACTERIA	
-   if agar_1 hasnt CUSTOM2;	BUT NOT INJECTED WITH CLEAR FLUID
+if agar_1 has COATED_WITH_BACTERIA;		HAS BEEN COATED WITH BACTERIA	
+   if agar_1 hasnt INJECTED_WITH_LIQUID;	BUT NOT INJECTED WITH CLEAR FLUID
       write "The bacteria you added to the agar is slowly dying due to "
       write "its dependence on exogenous histidine in its current form. "
 endall
-if agar_1 has CUSTOM1;		HAS BEEN COATED WITH BACTERIA
-   if agar_1 has CUSTOM2;		AND HAS BEEN INJECTED WITH CLEAR FLUID
+if agar_1 has COATED_WITH_BACTERIA;		HAS BEEN COATED WITH BACTERIA
+   if agar_1 has INJECTED_WITH_LIQUID;		AND HAS BEEN INJECTED WITH CLEAR FLUID
       write "The bacteria you added to the agar is slowly dying, indicating "
       write "that the clear liquid is not mutating it into a "
       write "non-histidine-requiring state. This tells you that it is highly "
@@ -3166,19 +3191,19 @@ object agar_2: solid gel quantity of beige agar agar-agar
 {examine
 write "The agar has been poured into the petri dish and set into a solid "
 write "surface on which to grow bacterial cultures. "
-if agar_2 has CUSTOM2;		HAS BEEN INJECTED WITH THE CLEAR FLUID 
-   if agar_2 hasnt CUSTOM1;	BUT NOT COATED WITH BACTERIA
+if agar_2 has INJECTED_WITH_LIQUID;		HAS BEEN INJECTED WITH THE CLEAR FLUID 
+   if agar_2 hasnt COATED_WITH_BACTERIA;	BUT NOT COATED WITH BACTERIA
       write "The agar's upper surface has been coated with the clear "
       write "liquid.^"
       return
 endall
-if agar_2 has CUSTOM1;		HAS BEEN COATED WITH BACTERIA	
-   if agar_2 hasnt CUSTOM2;	BUT NOT INJECTED WITH CLEAR FLUID
+if agar_2 has COATED_WITH_BACTERIA;		HAS BEEN COATED WITH BACTERIA	
+   if agar_2 hasnt INJECTED_WITH_LIQUID;	BUT NOT INJECTED WITH CLEAR FLUID
       write "The bacteria you added to the agar is slowly dying due to "
       write "its dependence on exogenous histidine in its current form. "
       return
    endif
-   if agar_2 has CUSTOM2;	AND HAS BEEN INJECTED WITH CLEAR FLUID
+   if agar_2 has INJECTED_WITH_LIQUID;	AND HAS BEEN INJECTED WITH CLEAR FLUID
       write "The bacteria you added to the agar is slowly dying, indicating "
       write "that the clear liquid is not mutating it into a "
       write "non-histidine-requiring state. This tells you that it is highly "
@@ -3420,7 +3445,7 @@ write "You arch over, standing with your hands on your knees, fighting "
 write "the increasing feeling of nausea. Closing your eyes, you attempt "
 write "to regain control of your heart rate"
 endall
-if syringe hasnt CUSTOM4
+if syringe hasnt HAS_AIR_POCKET
    if syringe hasnt BUBBLES
       write ", actively calming yourself until you begin to feel more "
       write "composed. Relieved, you stand up straight again, wipe an "
@@ -3443,7 +3468,7 @@ write "sweet.^"
 {drink_override
 set sample(parent) = limbo
 write "You drink the yellow liquid which is slightly sweet.^"
-ensure sample has CUSTOM4
+ensure sample has DRUNK_FROM
 }
 
 object microscope: zeiss phase contrast microscope scope
@@ -4623,7 +4648,7 @@ write "You arch over, standing with your hands on your knees, fighting "
 write "the increasing feeling of nausea. Closing your eyes, you attempt "
 write "to regain control of your heart rate"
 endall
-if syringe hasnt CUSTOM4
+if syringe hasnt HAS_AIR_POCKET
    if syringe hasnt CUSTOM5
       write ", actively calming yourself until you begin to feel more "
       write "composed. Relieved, you stand up straight again, wipe an "
@@ -5028,10 +5053,10 @@ write "You push the crate a short distance along the ground.^"
 }
 
 {turn : tip_up
-if rect_crate has CUSTOM4
+if rect_crate has TIPPED_UP
    write "You lean your weight against the crate and tip it back on to its "
    write "side"
-   ensure rect_crate hasnt CUSTOM4
+   ensure rect_crate hasnt TIPPED_UP
    set on_crate(up) = nowhere
    set roof_south(down) = nowhere
    execute "+contents_tumble"
@@ -5040,7 +5065,7 @@ endif
 write "Squeezing your fingers under the end of the crate, you manage to "
 write "tip it up on to its end"
 execute "+contents_tumble"
-ensure rect_crate has CUSTOM4
+ensure rect_crate has TIPPED_UP
 if rect_crate hasnt SCORED
    points 5
    ensure rect_crate has SCORED
@@ -5075,7 +5100,7 @@ write " to tumble on to the ground.^"
 }
 
 {examine
-if rect_crate hasnt CUSTOM4
+if rect_crate hasnt TIPPED_UP
    write "The crate is resting up against the back wall of the hangar and "
    write "is about six feet wide and three feet tall.^"
    return
@@ -5132,11 +5157,11 @@ if here has VISITED
    return
 endif
 write "You are standing on top of the rectangular crate with the ground "
-if rect_crate hasnt CUSTOM4
+if rect_crate hasnt TIPPED_UP
    write "three feet below. The back wall of the hangar looms beside you "
    write "another ten feet beyond the top of the crate.^"
 endif
-if rect_crate has CUSTOM4
+if rect_crate has TIPPED_UP
    write "six feet below. The back wall of the hangar stretches up another "
    write "seven feet taller than the top of the crate.^"
 endif
@@ -5154,7 +5179,7 @@ proxy "up"
 }
 
 {examine
-if rect_crate hasnt CUSTOM4
+if rect_crate hasnt TIPPED_UP
    write "The hangar looms tall above you, its roof still another four or "
    write "five feet above your head.^"
    return
@@ -5526,7 +5551,7 @@ write "over to avoid anyone noticing and thinking it suspicious.~^"
 }
 
 {examine
-if lisa has CUSTOM2
+if lisa has AT_STANDOFF
    write "The stranger is standing firm with his pistol pointed directly "
    write "at Lisa's head.^"
    return
@@ -5564,7 +5589,7 @@ execute "+game_over"
 }
 
 {ask_for_gun
-if lisa has CUSTOM2
+if lisa has AT_STANDOFF
    write "With Lisa covering you, you walk up to the stranger and hold out "
    write "your hand.^"
    write "~You're making a big mistake,~ he says as he hands over his pistol.^"
@@ -5572,7 +5597,7 @@ if lisa has CUSTOM2
    write "gun and get out of here before I call the guard in. Something tells "
    write "me you don't want have to explain to him what you are doing in "
    write "here.~^"
-   ensure lisa hasnt CUSTOM2
+   ensure lisa hasnt AT_STANDOFF
    ensure lisa has ON
    ensure lisa has POSSESSIVE
    set stranger(status) = 2
@@ -5633,7 +5658,7 @@ if fuel has SCORED
       write "of which we were fortunate enough to have the opportunity to "
       write "interview. Although neither could remember anything of the "
       write "tests themselves, both showed signs of accelerated aging.~^"
-      ensure stranger has CUSTOM1
+      ensure stranger has TESTS_ASKED
    endif
    points 5
    ensure stranger has TRUSTING 
@@ -5669,7 +5694,7 @@ if stranger has CUSTOM5
 endif
 write "~Over a year ago now, our department received information regarding "
 write "tests being performing by Dr Zuckerman here on the island. "
-if stranger hasnt CUSTOM1
+if stranger hasnt TESTS_ASKED
    write "Tests involving involuntary human guinea pigs. F"
 else
    write "As I was saying earlier, f"
@@ -5683,7 +5708,7 @@ ensure stranger has CUSTOM5
 }
 
 {talk_to
-if lisa has CUSTOM2
+if lisa has AT_STANDOFF
    write "~There'll be time to talk later,~ the stranger replies tensely.^"
    return
 endif
@@ -5700,7 +5725,7 @@ write "~What would you like to know, Dr Meadows?~ ^
 }
 
 {attack
-if lisa has CUSTOM2
+if lisa has AT_STANDOFF
    write "Why don't you just take his gun instead.^"
    return
 endif
@@ -5785,7 +5810,7 @@ if here = compound
    proxy "s"
    return
 endif
-if lisa has CUSTOM2
+if lisa has AT_STANDOFF
    write "You walk behind Lisa towards the access door."
    execute "+lisa_shoots"
    write "you and forces you on to the ground.^"
@@ -6408,13 +6433,13 @@ write "the shed, then on to the southeast towards the ocean.^"
 }
 
 {drink
-if stream has CUSTOM1
+if stream has DRUNK_FROM
    write "You are still feeling a bit on the waterlogged side.^"
    set time = false
    return
 endif
 write "You give it your best shot, but you are full before it is finished.^"
-ensure stream has CUSTOM1
+ensure stream has DRUNK_FROM
 }
 
 {drink_from
@@ -6670,12 +6695,12 @@ write "Didn't your mother warn you about hugging strange men with M16s?^"
 }
 
 {talk_to
-if guard hasnt CUSTOM4
+if guard hasnt INTRODUCED
    write "You inquire of the MP as to the possibility of taking a look "
    write "around the hangar, to which he replies, ~Only Dr Zuckerman, or "
    write "personnel personally signed in by Dr Zuckerman, may pass this "
    write "point.~^"
-   ensure guard has CUSTOM4
+   ensure guard has INTRODUCED
    return
 endif
 write "The MP stares blankly ahead, barely acknowledging your presence.^"
@@ -6704,7 +6729,7 @@ if lisa has BURNING
 endif
 write "The guard gives you wary look of disbelief, quietly unlocks the "
 write "door, opens it a crack, then peers through. "
-if lisa has CUSTOM3
+if lisa has BOUND
    write "Spying Lisa bound and gagged, he kicks open the door and enters the "
    write "hangar. Through the open doorway you see him, gun drawn, ordering "
    write "the stranger onto the ground. You almost hit your head against the "
@@ -6729,7 +6754,7 @@ execute "+game_over"
 }
 
 {tell_about_lisa
-if lisa has CUSTOM3
+if lisa has BOUND
    proxy "tell guard about stranger"
    return
 endif
@@ -7037,7 +7062,7 @@ write "up with one of the MPs,~ Colonel Wise replies.^"
 }
 
 {tell_about_lisa
-if lisa has CUSTOM3
+if lisa has BOUND
    proxy "tell wise about stranger"
    return
 endif
@@ -7253,7 +7278,7 @@ ensure ear_piece has CUSTOM4
 }
 
 {talk_to
-if hughes has CUSTOM1
+if hughes has INTRODUCED
    write "~There'll be time to talk later, Alex,~ Agent Hughes responds, "
    write "cutting you short.^"
    return
@@ -7263,7 +7288,7 @@ write "~Just be sure to talk to him one scientist to another - it's the only "
 write "way you are going to get him to open up. As I said earlier, once he "
 write "has divulged enough information about the project, I will let you "
 write "know and you can work on getting out of there.~^" 
-ensure hughes has CUSTOM1
+ensure hughes has INTRODUCED
 }
 
 {ask_about_petrescu
@@ -7371,7 +7396,7 @@ execute "ask_about_jacket_hughes"
 }
 
 {talk_to
-if petrescu has CUSTOM1
+if petrescu has INTRODUCED
    write "~If we keep talking, the conference will be over before you get "
    write "in there,~ Agent Petrescu says with a smile.^"
    return
@@ -7379,7 +7404,7 @@ endif
 write "~You're going to be fine,~ Agent Petrescu reassures you. ~Dr "
 write "Zuckerman, as unethical as he may be, poses no threat. Well, not to "
 write "you anyway.~^"
-ensure petrescu has CUSTOM1
+ensure petrescu has INTRODUCED
 }
   
 {ask_about_hughes
@@ -7796,7 +7821,7 @@ if concierge has CUSTOM2
    write "The concierge doesn't appear to have time for idle conversation.^"
    return
 endif
-if concierge has CUSTOM4
+if concierge has INTRODUCED
    write "~If you know of someone who could sign you in, just ask me to "
    write "page them for you,~ the concierge reaffirms politely.^" 
    return
@@ -7807,7 +7832,7 @@ write "your invitation and your identification.^^"
 write "~The best I can do is to have one of the other guests sign you "
 write "in. If there is anyone you know who would be willing to come down, I "
 write "would be happy page them for you,~ the concierge explains.^"
-ensure concierge has CUSTOM4
+ensure concierge has INTRODUCED
 }
  
 {ask_to_page_zuckerman_override
@@ -8323,10 +8348,10 @@ write "conversation.^"
 }
 
 {talk_to : greet
-if elderly_man hasnt CUSTOM4
+if elderly_man hasnt INTRODUCED
    write "Barely looking up at you, the elderly man grunts a terse "
    write "reply in a heavy Italian accent.^"
-   ensure elderly_man has CUSTOM4
+   ensure elderly_man has INTRODUCED
    return
 endif
 write "The elderly man ignores you.^"
@@ -8410,9 +8435,9 @@ write "be looking at the elderly man with much admiration.^"
 }
 
 {talk_to : greet
-if younger_man hasnt CUSTOM4
+if younger_man hasnt INTRODUCED
    write "The younger man looks up at you and smiles.^"
-   ensure younger_man has CUSTOM4
+   ensure younger_man has INTRODUCED
    return
 endif
 write "The younger man pretends to be listening so intently to the elderly "
@@ -9127,7 +9152,7 @@ location z_office : dr doctor zuckerman's zuckermans office
 if HUGHES_SCRIPT = 0
    set HUGHES_SCRIPT = 1
 endif
-if zuckerman hasnt CUSTOM4
+if zuckerman hasnt INTRODUCED
    write "^~Dr Alex Meadows,~ Dr Zuckerman says without looking away from "
    write "the window. ~I would have been disappointed if you hadn't come,~ "
    write "he continues, slowly turning around to face you. ~It was me who "
@@ -9142,7 +9167,7 @@ if zuckerman hasnt CUSTOM4
    write "truth -- that you would come and end the loneliness of my work. "
    write "I do hope my faith in you and your reputation was not "
    write "misplaced.~^"
-   ensure zuckerman has CUSTOM4
+   ensure zuckerman has INTRODUCED
    set zuckerman(status) = 2
 else
    if TOPICS_DISCUSSED = 0
@@ -9300,7 +9325,7 @@ write "Settle down.^"
 }
 
 {talk_to
-if zuckerman has CUSTOM1
+if zuckerman has AWAITING_ANSWER
    write "~Just answer the question, Alex: yes or no?~ Dr Zuckerman says "
    write "staring at you keenly.^"
    return
@@ -9403,7 +9428,7 @@ endall
 }
 
 {tell_about_ames : ask_about_green_slide : tell_about_green_slide
-if zuckerman has CUSTOM5
+if zuckerman has AMES_DISCUSSED
    write "Dr Zuckerman appears to ignore you.^"
    return
 endif
@@ -9414,7 +9439,7 @@ write "expected nothing less,~ Dr Zuckerman begins in reply. ~When an "
 write "organism is placed in contact with the clear liquid, its life force is "
 write "sapped at an amazing rate. Without following the correct procedure, "
 write "however, this energy will only dissipate to be lost forever.~^"
-ensure zuckerman has CUSTOM5 
+ensure zuckerman has AMES_DISCUSSED 
 set TOPICS_DISCUSSED + 1
 }
 
@@ -9490,7 +9515,7 @@ set TOPICS_DISCUSSED + 1
 }
 
 {ask_about_research
-if zuckerman has CUSTOM3
+if zuckerman has RESEARCH_DISCUSSED
    write "~You know enough for now,~ Dr Zuckerman responds.^"
    return
 endif
@@ -9499,7 +9524,7 @@ write "a large fish tank in a hangar on the south side of the island. It was "
 write "careless management by the military of the waste from those "
 write "experiments that led to the original deaths of marine life in the "
 write "waters surrounding the island, not the Rotenone.~^"
-ensure zuckerman has CUSTOM3
+ensure zuckerman has RESEARCH_DISCUSSED
 set TOPICS_DISCUSSED + 1
 }
 
@@ -9555,7 +9580,7 @@ write "exploited by men like Colonel Wise,~ Dr Zuckerman replies.^"
 }
 
 {ask_about_tests
-ensure zuckerman has CUSTOM2
+ensure zuckerman has TESTS_ASKED
 if TOPICS_DISCUSSED < 4
    write "Dr Zuckerman appears nervous about the directness of your "
    write "question and avoids commenting on the subject.^"
@@ -9625,7 +9650,7 @@ if jacket is *present
 endall
 write " scientists. It is our job to decide what can be done, not what may "
 write "be done. Don't you want to live forever?~^"
-ensure zuckerman has CUSTOM1
+ensure zuckerman has AWAITING_ANSWER
 set zuckerman(status) = 1
 }
 
@@ -9635,7 +9660,7 @@ if REPUTATION_CURRENT = true
    set REPUTATION_CURRENT = false
    return
 endif
-if zuckerman hasnt CUSTOM1
+if zuckerman hasnt AWAITING_ANSWER
    write "~Yes what?~ Dr Zuckerman asks with a puzzled expression.^"
    return
 endif
@@ -9671,7 +9696,7 @@ if REPUTATION_CURRENT = true
    set REPUTATION_CURRENT = false
    return
 endif
-if zuckerman hasnt CUSTOM1
+if zuckerman hasnt AWAITING_ANSWER
    write "~No what?~ Dr Zuckerman asks with a puzzled expression.^"
    return
 endif
@@ -11245,7 +11270,7 @@ if destination = street
       set VAN_ABSENCE = 1
 endall
 if destination = hangar_south
-   if lisa has CUSTOM2
+   if lisa has AT_STANDOFF
       write "Determined to escape the situation, you turn and head towards "
       write "the other end of the room."
       execute "+lisa_shoots"
@@ -11263,7 +11288,7 @@ if destination = hangar_south
    endif
 endall
 if destination = roof_north
-   if lisa has CUSTOM2
+   if lisa has AT_STANDOFF
       write "Determined to escape the situation, you head towards the rope "
       write "as begin to climb up."
       execute "+lisa_shoots"
@@ -11307,7 +11332,7 @@ if destination = hangar_north
          set time = false
          return
 endall
-if here has CUSTOM5
+if here has OCEAN
    if fins hasnt WORN
       if ENERGY_LEVEL = 1 
          write "Exhaustion undermines your will to go on.^"
@@ -11658,12 +11683,12 @@ if noun2 = guard
    return
 endif
 if noun2 = lisa
-   if lisa has CUSTOM2
+   if lisa has AT_STANDOFF
       write "Lisa is a little bit busy right now to pay any attention to "
       write "your offer.^"
       return
    endif
-   if lisa has CUSTOM3
+   if lisa has BOUND
       write "Lisa doesn't exactly have a free hand to accept your offer.^"
       return
    endif
@@ -11678,7 +11703,7 @@ if noun2 = lisa
       return
 endall
 if noun2 = stranger
-   if lisa has CUSTOM2
+   if lisa has AT_STANDOFF
       write "The stranger is a little bit busy right now to pay any "
       write "attention to your offer.^"
       return
@@ -11715,7 +11740,7 @@ if noun2 = zuckerman
    if HUGHES_SCRIPT = 0
       set HUGHES_SCRIPT = 1
    endif
-   if zuckerman has CUSTOM1
+   if zuckerman has AWAITING_ANSWER
       write "~Just answer the question, Alex: yes or no?~ Dr Zuckerman "
       write "says staring at you keenly.^"
       return
@@ -11725,12 +11750,12 @@ if noun1 = teeth
    return
 endif
 if noun2 = lisa
-   if lisa has CUSTOM2
+   if lisa has AT_STANDOFF
       write "Lisa is a little bit busy right now to pay any attention to "
       write "your offer.^"
       return
    endif
-   if lisa has CUSTOM3
+   if lisa has BOUND
       write "Lisa is far from impressed. Very, very far.^"
       return
    endif
@@ -11744,7 +11769,7 @@ if noun2 = lisa
       return
 endall
 if noun2 = stranger
-   if lisa has CUSTOM2
+   if lisa has AT_STANDOFF
       write "The stranger is a little bit busy right now to pay any "
       write "attention to your offer.^"
       return
@@ -11763,7 +11788,7 @@ return false
 
 {+before_ask_about
 if noun1 = lisa
-   if lisa has CUSTOM2
+   if lisa has AT_STANDOFF
       write "~Not now, Alex, just take his gun.~^" 
       return
    endif
@@ -11777,7 +11802,7 @@ if noun1 = lisa
       write "out of here.~^"
       return
    endif
-   if lisa has CUSTOM3
+   if lisa has BOUND
       write "Lisa is not exactly in a good position to respond right now.^"
       return
 endall
@@ -11792,13 +11817,13 @@ if noun1 = zuckerman
    if HUGHES_SCRIPT = 0
       set HUGHES_SCRIPT = 1
    endif
-   if zuckerman has CUSTOM1
+   if zuckerman has AWAITING_ANSWER
       write "~Just answer the question, Alex: yes or no?~ Dr Zuckerman says "
       write "staring at you keenly.^"
       return
 endall
 if noun1 = stranger
-   if lisa has CUSTOM2
+   if lisa has AT_STANDOFF
       write "~There'll be time for questions later,~ he replies tensely.^"
       return
    endif
@@ -11878,13 +11903,13 @@ if noun1 = zuckerman
    if HUGHES_SCRIPT = 0
       set HUGHES_SCRIPT = 1
    endif
-   if zuckerman has CUSTOM1
+   if zuckerman has AWAITING_ANSWER
       write "~Just answer the question, Alex: yes or no?~ Dr Zuckerman says "
       write "staring at you keenly.^"
       return
 endall
 if noun1 = lisa
-   if lisa has CUSTOM2
+   if lisa has AT_STANDOFF
       write "~Not now, Alex, just take his gun.~^"
       return
    endif
@@ -11898,12 +11923,12 @@ if noun1 = lisa
       write "out of here.~^"
       return
    endif
-   if lisa has CUSTOM3
+   if lisa has BOUND
       write "Lisa is not exactly in a good position to respond right now.^"
       return
 endall
 if noun1 = stranger
-   if lisa has CUSTOM2
+   if lisa has AT_STANDOFF
       write "~There'll be time to talk later,~ the stranger replies "
       write "tensely.^"
       return
@@ -12264,7 +12289,7 @@ if HUGHES_SCRIPT != 0
    set HUGHES_SCRIPT + 1
 endall
 if HUGHES_SCRIPT = 4
-   if zuckerman hasnt CUSTOM2
+   if zuckerman hasnt TESTS_ASKED
       if ear_piece has WORN
          write "^~Ask him about the project, about the human tests,~ Agent "
          write "Hughes voice says, emanating from the ear piece.^"
@@ -12370,8 +12395,8 @@ if sink_tap has CLOSED
    if WATER_LEVEL = 5
       set WATER_LEVEL = 4
 endall
-if petrescu has CUSTOM4
-   if hughes hasnt CUSTOM4
+if petrescu has BRIEFED
+   if hughes hasnt BRIEFED
       write "^~Can you hear me, Dr Meadows?~ you hear Agent Hughes's voice "
       write "ask, emanating from the ear piece.^^" 
       write "~Yes. Clearly,~ you reply with a nod.^^" 
@@ -12382,9 +12407,9 @@ if petrescu has CUSTOM4
       write "talking about his project. When we have enough information, we "
       write "will radio two undercover agents on the inside to make the "
       write "arrest. Oh yeah, and good luck.~^"
-      ensure hughes has CUSTOM4
+      ensure hughes has BRIEFED
 endall
-if petrescu hasnt CUSTOM4
+if petrescu hasnt BRIEFED
    if here = van
       write "^~The jacket you are wearing, Dr Meadows, has a small "
       write "microphone and transmitter sewn into the lining,~ Agent Petrescu "
@@ -12394,9 +12419,9 @@ if petrescu hasnt CUSTOM4
       write "ear piece.~^^" 
       write "Taking the ear piece from Agent Petrescu's hand you place "
       write "it in your ear.^"
-      ensure petrescu has CUSTOM4
+      ensure petrescu has BRIEFED
 endall
-if wise hasnt CUSTOM4
+if wise hasnt INTRODUCED
    if here = office
       write "^~I had been expecting you a lot sooner than this,"
       write "~ Colonel Wise grumbles as you enter. ~There's a "
@@ -12405,7 +12430,7 @@ if wise hasnt CUSTOM4
       write "you feel as uneasy as possible. ~Under no circumstances "
       write "do I want to go to sleep tonight without your report on my desk "
       write "and your butt on that helicopter. Understood?"
-      ensure wise has CUSTOM4
+      ensure wise has INTRODUCED
       execute "+wise_hassle"
 endall
 if mask hasnt CUSTOM5
@@ -12470,7 +12495,7 @@ endall
 if here = bathroom
    move bathroom_door to bathroom
 endall
-if here has CUSTOM5
+if here has OCEAN
    execute "+ocean"
 endall
 if recorder has ON
@@ -12485,7 +12510,7 @@ set NEEDS_LINEFEED = false
 
 {+stranger_encounter
 ensure stranger has ENCOUNTERED
-ensure lisa has CUSTOM2
+ensure lisa has AT_STANDOFF
 ensure lisa hasnt POSSESSIVE
 move lisa to here
 set LISAS_SCRIPT = 42
@@ -12995,10 +13020,10 @@ if syringe has CUSTOM5
    write "the ground.^"
    return
 endif
-if syringe has CUSTOM4
+if syringe has HAS_AIR_POCKET
    write "You depress the plunger until all the air is expelled and a small "
    write "amount of " CHILD{the} " squirts out of the syringe.^"
-   ensure syringe hasnt CUSTOM4
+   ensure syringe hasnt HAS_AIR_POCKET
    return
 endif
 write "A small portion of " CHILD{the} " squirts out of the syringe and on to "
