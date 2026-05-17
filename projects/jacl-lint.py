@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Align property lines within JACL location/object/player blocks.
+"""Align property lines within JACL location/object/player blocks, and
+warn about unclosed string literals.
 
 Inside a block like:
 
@@ -16,11 +17,19 @@ Lines that are blank, begin a code block ({+func, {look, etc.), or are
 comments are passed through unchanged. Lines outside of a block (e.g.
 top-level constants, function bodies) are also passed through.
 
+In addition, every line is scanned for an odd number of `"` characters
+outside of `print:` blocks and `;` comments. JACL string literals run
+until the parser sees a closing quote, possibly many lines later, so a
+missing close on a `write "<div ...>"` silently absorbs the next write
+into the literal. These are reported to stderr; --check exits non-zero
+if any are found.
+
 Usage:
     ./jacl-lint.py path/to/game.jacl [more.jacl ...]
     ./jacl-lint.py --check path/to/game.jacl    # exit 1 if changes needed
     ./jacl-lint.py --column 20 game.jacl        # custom alignment column
     ./jacl-lint.py projects/                    # recurse a directory
+                                                # (.jacl + .library)
 """
 
 from __future__ import annotations
@@ -217,8 +226,55 @@ def iter_jacl_paths(paths):
         p = Path(p)
         if p.is_dir():
             yield from sorted(p.rglob("*.jacl"))
+            yield from sorted(p.rglob("*.library"))
         else:
             yield p
+
+
+def check_unclosed_quotes(text: str, path: Path):
+    """Warn about lines with an odd number of `"` chars.
+
+    JACL string literals do not span lines in any well-formed code we
+    have seen — but the parser is permissive: an unclosed `"` runs
+    until the next `"` it finds (possibly many lines later), absorbing
+    intervening source as part of the string. The same pattern has bit
+    blackjacl.jacl, musicinterface.library, webapp.library and
+    webinterface.library; in each case the bug was a missing closing
+    quote on a `write "<div ...>` line, which silently corrupted the
+    rendered HTML.
+
+    Detection: outside of `print:` blocks and comments, every line that
+    contains any `"` characters should contain an even count. Returns
+    a list of (lineno, line) tuples for any odd-count line.
+    """
+    warnings = []
+    in_print = False
+    for lineno, line in enumerate(text.splitlines(), start=1):
+        if in_print:
+            if PRINT_END.match(line):
+                in_print = False
+            continue
+        if PRINT_START.match(line):
+            in_print = True
+            continue
+        stripped = line.lstrip(" \t")
+        if not stripped or stripped.startswith("#"):
+            continue
+        # Strip an inline `;` comment (JACL ignores tokens past the
+        # ones a keyword requires; convention is to start trailing
+        # notes with `;`). Only honour `;` outside a quote.
+        in_quote = False
+        cut = len(line)
+        for idx, ch in enumerate(line):
+            if ch == '"':
+                in_quote = not in_quote
+            elif ch == ';' and not in_quote:
+                cut = idx
+                break
+        scanned = line[:cut]
+        if scanned.count('"') % 2 != 0:
+            warnings.append((lineno, line.rstrip()))
+    return warnings
 
 
 def main():
@@ -238,6 +294,7 @@ def main():
     args = ap.parse_args()
 
     changed = []
+    warned = False
     for path in iter_jacl_paths(args.paths):
         try:
             # surrogateescape lets us round-trip non-UTF-8 bytes (e.g.
@@ -247,6 +304,10 @@ def main():
         except OSError as e:
             print(f"warning: cannot read {path}: {e}", file=sys.stderr)
             continue
+        for lineno, snippet in check_unclosed_quotes(original, path):
+            print(f"{path}:{lineno}: odd quote count -- likely unclosed string: {snippet}",
+                  file=sys.stderr)
+            warned = True
         formatted = lint_text(original, args.column)
         if formatted != original:
             if args.check:
@@ -258,9 +319,9 @@ def main():
                 changed.append(path)
                 print(f"reformatted {path}")
 
-    if args.check and changed:
+    if args.check and (changed or warned):
         sys.exit(1)
-    if not changed:
+    if not changed and not warned:
         print("no changes needed")
 
 
