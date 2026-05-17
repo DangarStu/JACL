@@ -316,8 +316,14 @@ jwks_fetch(void)
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
     /* Pin the wire protocol so a DNS-poisoning attacker can't trick
      * us into a downgrade by responding with an http:// URL anywhere
-     * a redirect or alt-svc could land. */
-#ifdef CURLPROTO_HTTPS
+     * a redirect or alt-svc could land. The string-form options
+     * replaced the bitmask ones in libcurl 7.85.0; the old names
+     * still work but emit a deprecation warning on modern Linux
+     * distros. */
+#if LIBCURL_VERSION_NUM >= 0x075500
+    curl_easy_setopt(curl, CURLOPT_PROTOCOLS_STR, "https");
+    curl_easy_setopt(curl, CURLOPT_REDIR_PROTOCOLS_STR, "https");
+#elif defined(CURLPROTO_HTTPS)
     curl_easy_setopt(curl, CURLOPT_PROTOCOLS, (long) CURLPROTO_HTTPS);
     curl_easy_setopt(curl, CURLOPT_REDIR_PROTOCOLS, (long) CURLPROTO_HTTPS);
 #endif
