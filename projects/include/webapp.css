@@ -112,21 +112,9 @@ else
 endif
 write "   background-color: " maintext_colour "; }^"
 print:
-   b.light {   font-family: Verdana, Arial, Sanserif;
-      color: #c0b098; font-size: 12pt}^
-
    a.tablink {   font-family: Verdana, Arial, Sanserif;
       text-decoration: none;
-      color: black; 
-      font-size: 12pt}^
-
-   a.control {   font-family: Verdana, Arial, Sanserif;
-      text-decoration: none;
-      color: #333333; 
-      font-size: 12pt}^
-
-   a.main {   font-family: Verdana, Arial, Sanserif;
-      color: black; 
+      color: black;
       font-size: 12pt}^
 
    a {   font-family: Verdana, Arial, Sanserif;
@@ -151,7 +139,7 @@ print:
 
    h1.title { margin-left: 20px; }^
 
-   h2 {       
+   h2 {
        font-family: Verdana, Arial, Sanserif;
        color: #333333; font-size: 18pt;
        font-weight: bold; }^
@@ -164,11 +152,7 @@ print:
       margin-top: 7px;
       margin-left: 5px; }^
 
-   input.dir_button {
-      margin-top: 0px;
-      margin-left: 0px; }^
-
-   div.links {       
+   div.links {
       position: relative;
       top: -48px;
       height: 23px;
@@ -188,34 +172,12 @@ print:
 .
 write "   background-color: " linkbar_colour "; }^"
 print:
-   img.right {
-      padding: 15px 5px 5px 5px;
-      float: right; }^
-
-   img.left {
-      padding: 15px 15px 5px 5px;
-      float: left; }^
-
    img.titleimage {
       margin: 0px;
       padding: 0px;
 .
 write "   height: " header_height "px; }^"
 print:
-   img.rightimage {
-      float: right;
-      height: 50px; }^
-   a.logo { 
-      position: absolute;
-      bottom: 15px;
-      right: 475px; 
-      border: none;
-      border-width: 0px;
-      margin-right: 0px;
-      margin-bottom: 0px;
-      margin-left: 0px;
-      margin-top: 0px; }^
-
    div.row {
       display: table-row; }^
 

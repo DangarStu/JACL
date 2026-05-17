@@ -44,7 +44,7 @@ ifstring title_image = "none"
 else
   write "<img class=~titleimage~ alt=~" game_title "~ src=~" title_image "~>"
 endif
-write "<div class=~links~>
+write "<div class=~links~>"
 call "+links_div"
 write "</div>^"
 write "</div>^"
@@ -58,7 +58,7 @@ if @tab_names > 1
 	      write "<div class=~tab~>"
 	      write "<a class=~tablink~ href=~" $url "?user_id=" $user_id 
 	      write "&command=change mode " WEBAPP_index "&mode=" WEBAPP_index "~>" tab_names[WEBAPP_index] "</a>"
-	      write "</div>
+	      write "</div>"
 	  endif
       set WEBAPP_index + 1
     endwhile

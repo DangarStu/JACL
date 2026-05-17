@@ -138,23 +138,14 @@ write " background-color: " maintext_colour "; }^"
 print:
 	p {	font-family: Verdana, Arial, Sanserif;
 		color: #333333; font-size: 12pt}^
-	b.light {	font-family: Verdana, Arial, Sanserif;
-		color: #c0b098; font-size: 12pt}^
 	a.tablink {	font-family: Verdana, Arial, Sanserif;
 		text-decoration: none;
-		color: black; 
-        font-size: 12pt}^
-	a.control {	font-family: Verdana, Arial, Sanserif;
-		text-decoration: none;
-		color: #333333; 
+		color: black;
         font-size: 12pt}^
 	a.title {	font-family: Verdana, Arial, Sanserif;
-		color: black; 
+		color: black;
 		font-weight: bold;^
         font-size: 18pt}^
-	a.main {	font-family: Verdana, Arial, Sanserif;
-		color: black; 
-        font-size: 12pt}^
 	a {	font-family: Verdana, Arial, Sanserif;
 		color: #4444bb; 
         font-size: 12pt}^
@@ -171,8 +162,7 @@ print:
 	h1 { font-family: Verdana, Arial, Sanserif;
 		 color: #c0b098; 
          font-size: 18pt}^
-	h1.title { margin-left: 20px; }^
-	h2 {	 	
+	h2 {
 		 font-family: Verdana, Arial, Sanserif;
 		 color: #333333; font-size: 18pt;
 		 font-weight: bold; }^
@@ -182,10 +172,7 @@ print:
 	input.button {
 		margin-top: 7px;
 		margin-left: 5px; }^
-	input.dir_button {
-		margin-top: 0px;
-		margin-left: 0px; }^
-	div.links { 		
+	div.links {
 		opacity: 0.7;
 		position: absolute;
 .
@@ -203,30 +190,10 @@ print:
 .
 write " background-color: " linkbar_colour "; }^"
 print:
-	img.centre {
-    		display: block;
-    		margin-left: auto;
-    		margin-right: auto }^
-	img.right {
-		padding: 15px 5px 5px 5px;
-		float: right; }^
-	img.left {
-		padding: 15px 15px 5px 5px;
-		float: left; }^
 	img.titleimage {
 .
 write "		height: " header_height "px; }^"
 print:
-	a.logo { 
-        position: absolute;
-        bottom: 15px;
-        right: 475px; 
-		border: none;
-		border-width: 0px;
-		margin-right: 0px;
-		margin-bottom: 0px;
-		margin-left: 0px;
-		margin-top: 0px; }^
 	div.row {
 		display: table-row; }^
 	div.label {
