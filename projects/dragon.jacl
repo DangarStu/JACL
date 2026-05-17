@@ -89,7 +89,7 @@ if @ = 4
 endif
 if @ = 5
    print:
-      ^~I've got a joke for you,~ the grubby-looing man says as he leans
+      ^~I've got a joke for you,~ the grubby-looking man says as he leans
       forward across the table. ~These three guys walk into a bar\
   .
   write ": "
@@ -348,7 +348,7 @@ if @ = 1
    return
 endif
 if @ = 2
-   print
+   print:
       This time you approach from a different side to give your other cheek
       a rest.^
    .
@@ -477,7 +477,7 @@ if sword hasnt TOUCHED
    return
 endif
 print:
-   You a find a patch floor similar to the floor on this side of the bar.^
+   You find a patch of floor similar to the floor on this side of the bar.^
 .
 }
 
@@ -2026,7 +2026,7 @@ execute "+look_around"
 {+rods
 if copper_rod(parent) = left_hole : copper_rod(parent) = right_hole
    if brass_rod(parent) = left_hole : brass_rod(parent) = right_hole
-      write "As you try to pull the lever, the rods being to protrude "
+      write "As you try to pull the lever, the rods begin to protrude "
       write "only to hit " noun3{the} ", preventing you from pulling the "
       write "lever any further.^"
       return
