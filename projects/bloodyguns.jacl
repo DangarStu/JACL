@@ -849,7 +849,7 @@ endif
 print:
    The floor of the gun emplacement is a circular concrete pad almost ten 
    metres in diameter. Sandbag revetments, back filled with earth on 
-   the outside, form the perimeter of the pit. The 3.7 inch Vickers 
+   the outside, from the perimeter of the pit. The 3.7 inch Vickers
    anti-aircraft gun stands bolted to the concrete, its barrel 
    protruding through fragments of camouflage netting suspended high 
    above your head. The only exit from the emplacement is a gap in the
@@ -2549,7 +2549,7 @@ ifall noun1 has ANIMATE : noun1 has DEAD
    return true
 endif
 if noun2 != your_rifle 
-   write "You are can't shoot anything with " noun2{the} .^
+   write "You can't shoot anything with " noun2{the} .^
    set time = false
    return true
 endif
@@ -2838,7 +2838,7 @@ object sand : sand
 {dig_in
 if here = snake_bay_east
    print:
-      The rudder is burried by too much sand to uncover.^
+      The rudder is buried by too much sand to uncover.^
    .
    set time = false
    return
@@ -2974,7 +2974,7 @@ write " and save me the effort of explaining the error of your ways.^"
 
 {+say_worried
 print:
-   ^~What are we doing here balana? This place making me worry.~^^
+   ^~What are we doing here balanda? This place making me worry.~^^
    ~Don't worry, Miki. We'll just take a look around and see if we can find
    the others. I don't see any sign of bombing here so maybe their radio just
    died.~^
@@ -3197,8 +3197,8 @@ if here = wharf
    return
 endif
 if miki is *present
-   print
-      ~I want to go home also, balanda, but we we've got job to be doing
+   print:
+      ~I want to go home also, balanda, but we've got job to be doing
       first,~ Miki says half-heartedly.^
    .
 else
@@ -3240,7 +3240,7 @@ endif
 if canoe is *here
    ifall script_stage >= rain_started : script_stage < day_two
       print:
-         The canoe floats nearby, jerking against the painter that sercures
+         The canoe floats nearby, jerking against the painter that secures
          it to a pile as the wind begins to whip the water of the bay into
          white caps.
       .
@@ -4859,7 +4859,7 @@ endif
 }
 
 {+automatic_message
-if radio hasn't FIRST
+if radio hasnt FIRST
    write "You tap out a short message on the morse key: "
    write "~ARRIVED AT HOUSE. NO SIGN OF PERSONNEL. INVESTIGATING. OVER.~^"
    write "^After a short pause a series of dits and dahs cut "
@@ -4890,13 +4890,14 @@ endif
 if generator hasnt ON : radio hasnt ON
    write "The radio isn't currently powered up.^"
 else
-if noun1 has REPORTED
-   write "You don't have anything new to say about " noun1{the} ".^"
-   set time = false
-   return
+   if noun1 has REPORTED
+      write "You don't have anything new to say about " noun1{the} ".^"
+      set time = false
+      return
+   endif
+   override
+   write "You can't think of anything important to report about " noun1{the} ".^"
 endif
-override
-write "You can't think of anything important to report about " noun1{the} ".^"
 }
 
 grammar send question about *anywhere     >send_question
@@ -4911,14 +4912,15 @@ if generator hasnt ON : radio hasnt ON
    write "The radio isn't currently powered up.^"
    return
 else
-if noun1 has ASKED
-   write "You have already asked about " noun1{the} ".^"
-   return
+   if noun1 has ASKED
+      write "You have already asked about " noun1{the} ".^"
+      return
+   endif
+   override
+   write "You ask about " noun1{the} " but they aren't able to tell you anything "
+   write "of relevance.^"
+   ensure noun1 has ASKED
 endif
-override
-write "You ask about " noun1{the} " but they aren't able to tell you anything "
-write "of relevance.^"
-ensure noun1 has ASKED
 }
 
 #object radio_log : radio transmitter transceiver log
@@ -5692,7 +5694,7 @@ if clutch has ON
       if +rope_tied_to<chapel_door_handle = true
       endif
       if +rope_tied_to<nowhere = true
-         write "^As the windlas continues to turn "
+         write "^As the windlass continues to turn "
          if rope is *held
             write "the rope is pulled out of your hands and the loose end"
             move rope to here
@@ -6462,7 +6464,7 @@ if $integer = 1
                write "You just need to start the generator now.^"
             else
                print:
-                  The generator will loose prime if you try to start it
+                  The generator will lose prime if you try to start it
                   with the bleed plug still open.^
                .
             endif
@@ -8017,10 +8019,10 @@ if INDEX = 0
    endif
 endif
 if INDEX = 2
-   write "^You surroundings darken as the evening sky turns slate-grey.^"
+   write "^Your surroundings darken as the evening sky turns slate-grey.^"
 endif
 if INDEX = 3
-   write "^The sun begins to set as flashes of lightening arc in the "
+   write "^The sun begins to set as flashes of lightning arc in the "
    write "distance.^"
 endif
 if INDEX = 5
@@ -8159,7 +8161,7 @@ endif
 print:
    ^^Your thoughts fall out of your control as you sink deeper down, closer to 
    sleep. In your mind's eye you see the dead soldier in his shallow grave, a 
-   ghost of flesh and stagnant blood. ~Wake up,~ you sliently urge -- you both 
+   ghost of flesh and stagnant blood. ~Wake up,~ you silently urge -- you both
    lay still in the darkness...^^
 .
 more
@@ -8172,7 +8174,7 @@ endif
 print:
    The sound of a rifle cocking jolts you awake. Your heart beats hard against
    your chest as you scan the darkness. At first you see nothing, then
-   a flash of lightening momentarily illuminates the figure of a man holding
+   a flash of lightning momentarily illuminates the figure of a man holding
    a rifle standing only feet from you.^^
    ~Who are you?~ he asks, his Australian accent laced with confusion and
    uncertainty.^^
@@ -8215,10 +8217,10 @@ print:
    rain, he is clearly confused and distressed. Dried blood on his leg remains 
    despite the downpour.^^
    ~You're hurt,~ you say finally.^^
-   ~Bugger shot me too,~ he replies as he draws a loud sip form his glass. 
+   ~Bugger shot me too,~ he replies as he draws a loud sip from his glass.
    ~Steve was up close though, he didn't miss Steve.~^^
    ~The dead man in the church yard?~ you ask.^^
-   ~Yeah, I burried him yesterday. Poor bastard, point blank I reckon,
+   ~Yeah, I buried him yesterday. Poor bastard, point blank I reckon,
    he never had a chance. The Jap, he fired at Dan and me so I 
    fired back and he ran. He got my leg so I was slow, but when I got to 
    Steve was he dead, gone already.~^^
