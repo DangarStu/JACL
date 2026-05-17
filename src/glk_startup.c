@@ -59,7 +59,10 @@ int glkunix_startup_code(glkunix_startup_t *data)
 		 * GLK WINDOWS TO DISPLAY THE ERROR MESSAGE IN */
 		return (TRUE);
 	} else {
-		strcpy(temp_buffer, arguments->argv[1]);
+		/* temp_buffer is 1024 bytes; argv[1] is a user-supplied path
+		 * that can easily exceed that on Linux (PATH_MAX is 4096).
+		 * Truncate cleanly instead of overflowing the global. */
+		snprintf(temp_buffer, 1024, "%s", arguments->argv[1]);
 
 		/* THERE IS AT LEAST ONE ARGUMENT, POSSIBLY JUST THE GAME FILE, BUT 
 		 * LOOK THROUGH THE LIST FOR ANYTHING THAT NEEDS ACTING ON */

@@ -17,6 +17,7 @@
 
 #include <ctype.h>
 #include <stdio.h>
+#include <string.h>
 
 static int32 get_story_file_IFID(void *s_file, int32 extent, char *output, int32 output_extent)
 {
@@ -25,9 +26,14 @@ static int32 get_story_file_IFID(void *s_file, int32 extent, char *output, int32
 
 	char *ifid;
 
-	/* TAKE A COPY OF THE FIRST 2000 BYTES THEN NULL-TERMINATE IT */
-	strncpy (current_line, (char*) s_file, 2000);
-	current_line[2000] = 0;
+	/* TAKE A COPY OF THE FIRST 2000 BYTES THEN NULL-TERMINATE IT.
+	 * Clamp to `extent` first: strncpy will happily read 2000 bytes
+	 * out of `s_file` even when the caller only guarantees `extent`
+	 * bytes are valid, which OOBs for short story files. */
+	int32 copy_len = (extent < 2000) ? extent : 2000;
+	if (copy_len < 0) copy_len = 0;
+	memcpy(current_line, (char*) s_file, copy_len);
+	current_line[copy_len] = 0;
 
 	ifid = strstr(current_line, "ifid:JACL-");
 	
@@ -47,9 +53,11 @@ static int32 claim_story_file(void *story_file, int32 extent)
 
 	char current_line[2048];
 
-	/* TAKE A COPY OF THE FIRST 2000 BYTES THEN NULL-TERMINATE IT */
-	strncpy (current_line, (char *) story_file, 2000);
-	current_line[2000] = 0;
+	/* See get_story_file_IFID above for the extent-clamp rationale. */
+	int32 copy_len = (extent < 2000) ? extent : 2000;
+	if (copy_len < 0) copy_len = 0;
+	memcpy(current_line, (char *) story_file, copy_len);
+	current_line[copy_len] = 0;
 
 	if (strstr(current_line, "processed:2")) {
   		return VALID_STORY_FILE_RV;
