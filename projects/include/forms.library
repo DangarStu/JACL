@@ -6,6 +6,15 @@ string FORMS_string
 string FORMS_error
 string FORMS_data
 
+# Scratch buffers for HTML-escaped reflections. Anything written into
+# `value=~...~`, option text, or the error div has to pass through
+# escapestring first — otherwise a user-submitted `~`, `<`, `&` etc.
+# in a sticky form value breaks the surrounding attribute. See cgijacl.c
+# (~ -> " in the output filter) and the audit in PR for context.
+string FORMS_escaped
+string FORMS_error_escaped
+string FORMS_label_escaped
+
 {+textarea
 # arg[0] = field name
 # arg[1] = columns
@@ -29,15 +38,18 @@ write "<div class=~label~>" string_arg[0] ":</div>"
 write "<div class=~input~>"
 if @arg = 4
    if errors = 0
-      write "<input type=~text~ name=~" string_arg[1] "~ value=~" string_arg[3] "~ class=~jaclform~ size=~" arg[2] "~ maxlength=~254~/>"
+      escapestring FORMS_escaped string_arg[3]
+      write "<input type=~text~ name=~" string_arg[1] "~ value=~" FORMS_escaped "~ class=~jaclform~ size=~" arg[2] "~ maxlength=~254~/>"
    else
-      write "<input type=~text~ name=~" string_arg[1] "~ value=~" %FORMS_data "~ class=~jaclform~ size=~" arg[2] "~ maxlength=~254~/>"
+      escapestring FORMS_escaped %FORMS_data
+      write "<input type=~text~ name=~" string_arg[1] "~ value=~" FORMS_escaped "~ class=~jaclform~ size=~" arg[2] "~ maxlength=~254~/>"
    endif
 else
    if errors = 0
       write "<input type=~text~ name=~" string_arg[1] "~ class=~jaclform~ size=~" arg[2] "~ maxlength=~254~/>"
    else
-      write "<input type=~text~ name=~" string_arg[1] "~ value=~" %FORMS_data "~ class=~jaclform~ size=~" arg[2] "~ maxlength=~254~/>"
+      escapestring FORMS_escaped %FORMS_data
+      write "<input type=~text~ name=~" string_arg[1] "~ value=~" FORMS_escaped "~ class=~jaclform~ size=~" arg[2] "~ maxlength=~254~/>"
    endif
 endif
 write "</div>"
@@ -45,7 +57,8 @@ ifstring function_name = "+text_submit"
    write "<div class=~input~><input type=~submit~></div>"
 endif
 ifstring %FORMS_error != ""
-   write "<div class=~error~>" %FORMS_error "</div>"
+   escapestring FORMS_error_escaped %FORMS_error
+   write "<div class=~error~>" FORMS_error_escaped "</div>"
 endif
 write "</div>"
 }
@@ -69,14 +82,16 @@ set FORMS_length = FORMS_string
 set FORMS_index = 0
 while FORMS_index < FORMS_length
    setstring FORMS_string string_arg[1] "_values[" FORMS_index "]"
+   escapestring FORMS_label_escaped %FORMS_string
    ifstring function_name = "+select_num"
       ifall @arg = 3 : FORMS_index = arg[2]
-         write "<option selected=~selected~ value=~" FORMS_index "~>" %FORMS_string "</option>^"
+         write "<option selected=~selected~ value=~" FORMS_index "~>" FORMS_label_escaped "</option>^"
       else
-         write "<option value=~" FORMS_index "~>" %FORMS_string "</option>^"
+         write "<option value=~" FORMS_index "~>" FORMS_label_escaped "</option>^"
       endif
    else
-      write "<option value=~" %FORMS_string "~>" %FORMS_string "</option>^"
+      escapestring FORMS_escaped %FORMS_string
+      write "<option value=~" FORMS_escaped "~>" FORMS_label_escaped "</option>^"
    endif
    set FORMS_index + 1
 endwhile
@@ -89,12 +104,14 @@ write "</div>"
 # arg[0] = field name
 # arg[1] = value
 
-write "<input type=~radio~ class=~jaclradio~ name=~" string_arg[0] "~/>" string_arg[1]
+escapestring FORMS_label_escaped string_arg[1]
+write "<input type=~radio~ class=~jaclradio~ name=~" string_arg[0] "~/>" FORMS_label_escaped
 }
 
 {+checkbox
 # arg[0] = field name
 # arg[1] = value
 
-write "<input type=~checkbox~ class=~jaclform~ name=~" string_arg[0] "~/>" string_arg[1]
+escapestring FORMS_label_escaped string_arg[1]
+write "<input type=~checkbox~ class=~jaclform~ name=~" string_arg[0] "~/>" FORMS_label_escaped
 }
