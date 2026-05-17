@@ -100,6 +100,13 @@ static char            			local_after_function[256];
 
 
 static int find_parent(int index);
+static int find_parent_impl(int index, int depth);
+/* Recursion-depth ceiling for the parent-chain walkers. Object
+ * containment in a real game rarely exceeds a handful of levels;
+ * 200 is comfortably above legitimate use and well below stack-
+ * smash territory. Hitting it means a cycle (A->B->A) the
+ * single-step self-parent guard would miss. */
+#define MAX_PARENT_DEPTH 200
 static int build_object_list(struct word_type *scope_word, int noun_number);
 static void call_functions(const char *base_name);
 static void add_to_list(int noun_number, int resolved_object);
@@ -1875,11 +1882,25 @@ scope(int index, const char *expected, int restricted)
 int
 find_parent(int index)
 {
-	/* THIS FUNCTION WILL SET THE GLOBAL VARIABLE parent TO 
+	return find_parent_impl(index, 0);
+}
+
+static int
+find_parent_impl(int index, int depth)
+{
+	/* THIS FUNCTION WILL SET THE GLOBAL VARIABLE parent TO
 	 * THE OBJECT THAT IS AT THE TOP OF THE POSSESSION TREE.
 	 * IT WILL RETURN TRUE IF THE OBJECT IS VISIBLE TO THE
 	 * PLAYER */
 	//printf("--- find parent of %s\n", object[index]->label);
+
+	if (depth >= MAX_PARENT_DEPTH) {
+		sprintf(error_buffer,
+		        "Object parent chain exceeded depth %d starting at '%s'; possible cycle.",
+		        MAX_PARENT_DEPTH, object[index]->label);
+		log_error(error_buffer, PLUS_STDOUT);
+		return (FALSE);
+	}
 
 	if (!(object[index]->attributes & LOCATION) &&
 			object[index]->PARENT != NOWHERE) {
@@ -1906,7 +1927,7 @@ find_parent(int index)
 				return (FALSE);
 			} else {
 				//printf("--- %s isnt a location, so recuse\n", object[parent]->label);
-				return (find_parent(parent));
+				return (find_parent_impl(parent, depth + 1));
 			}
 		}
 	} else {
@@ -1918,18 +1939,34 @@ find_parent(int index)
 	}
 }
 
+static int parent_of_impl(int parent, int child, int restricted, int depth);
+
 int
 parent_of(int parent, int child, int restricted)
+{
+	return parent_of_impl(parent, child, restricted, 0);
+}
+
+static int
+parent_of_impl(int parent, int child, int restricted, int depth)
 {
 	/* THIS FUNCTION WILL CLIMB THE OBJECT TREE STARTING AT 'CHILD' UNTIL
 	 * 'PARENT' IS REACHED (RETURN TRUE), OR THE TOP OF THE TREE OR A CLOSED
 	 * OR CONCEALING OBJECT IS REACHED (RETURN FALSE). */
-	
+
 	/* restricted ARGUMENT TELLS FUNCTION TO IGNORE OBJECT IF IT IS IN AN
-	 * OBJECT WITH A mass OF heavy OR LESS THAT IS NOT THE SUPPLIED 
+	 * OBJECT WITH A mass OF heavy OR LESS THAT IS NOT THE SUPPLIED
 	 * PARENT ie. DON'T ACCEPT OBJECTS IN SUB OBJECTS */
 
 	int             index;
+
+	if (depth >= MAX_PARENT_DEPTH) {
+		sprintf(error_buffer,
+		        "Object parent chain exceeded depth %d (parent=%d, child=%d); possible cycle.",
+		        MAX_PARENT_DEPTH, parent, child);
+		log_error(error_buffer, PLUS_STDOUT);
+		return (FALSE);
+	}
 
 	//printf("--- parent is %s, child is %s\n", object[parent]->label, object[child]->label);
 	if (child == parent) {
@@ -1965,7 +2002,7 @@ parent_of(int parent, int child, int restricted)
 			} else {
 				/* KEEP LOOKING UP THE TREE TILL THE CHILD HAS NO MORE
 				 * PARENTS */
-				return (parent_of(parent, index, restricted));
+				return (parent_of_impl(parent, index, restricted, depth + 1));
 			}
 		}
 	} else {

@@ -1325,7 +1325,7 @@ attribute_resolve(const char *attribute)
 	else if (!strcmp(attribute, "DONE"))
 		return (DONE);
 	else if (!strcmp(attribute, "GAS"))
-		return (MAPPED);
+		return (GAS);
 	else if (!strcmp(attribute, "NO_TAB"))
 		return (NO_TAB);
 	else if (!strcmp(attribute, "NOT_IMPORTANT"))
