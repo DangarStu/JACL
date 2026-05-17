@@ -41,12 +41,7 @@ A		{
 			color: black
 		}
 
-A.visited	{	
-			font-size: 12pt;
-			color: black
-		}
-
-A.section	{	
+A.section	{
 			font-size: 18pt;
 		    color: black;
 			font-weight: bold;
@@ -88,11 +83,6 @@ TABLE.infowarn TD	{
 			border: none;
 			vertical-align: middle;
 				}
-
-DIV.spacer	{ 	
-			margin-top: 12pt;
-			margin-bottom: 12pt;
-			}
 
 TABLE	{
 			margin-top: 12pt;
@@ -146,12 +136,7 @@ PRE		{
 			margin-bottom: 20pt;
 		}
 
-PRE.CODE	{	
-			font-family: Courier new, Monospace;
-		 	font-size: 12pt;
-			}
-
-OL		{	
+OL		{
 			font-family: Helvetica, Arial, Sans;
 		 	font-size: 12pt
 		}
