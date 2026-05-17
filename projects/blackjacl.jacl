@@ -2,7 +2,7 @@
 #!/usr/local/jacl/bin/fcgijacl
 #                                                                     BLACKJACL 
 # -----------------------------------------------------------------------------
-# Copyright (C) Stuart Allen 2001. All rights resevered.
+# Copyright (C) Stuart Allen 2001. All rights reserved.
 # -----------------------------------------------------------------------------
 
 constant game_publish     true
@@ -286,13 +286,13 @@ set linebreaks = false
 write "<html><head>^"
 write "<TITLE>BlackJACL</TITLE>^"
 write "<meta name=~description~ content=~A free web-based Blackjack game.~>^"
-write "<meta name=~keywords~ contents=~blackjack,jacl,free,game,free blackjack,web-based,broswer-based, web based,browser based,online,card game,open source~>^"
+write "<meta name=~keywords~ contents=~blackjack,jacl,free,game,free blackjack,web-based,browser-based, web based,browser based,online,card game,open source~>^"
 execute "+styles"
 write "</HEAD><BODY BGCOLOR=~#005500~>^"
 write "<FORM NAME=~GameForm~ METHOD=get>^"
 write "<div class=~header~>"
 write "<IMG ALT=~BlackJACL~ ALIGN=~top~ SRC=~/images/blackjack.png~>^"
-write "</div>
+write "</div>"
 write "<div class=~links~>"
 write "Basic strategy coach: "
 hyperlink "ON" "coach+on"
@@ -313,7 +313,7 @@ hyperlink "About" "about"
 write " | "
 hyperlink "Restart" "restart"
 write " | "
-write "</div>
+write "</div>"
 write "<div class=~main~>^"
 set PREVIOUS_GAME_PHASE = GAME_PHASE
 }
@@ -371,7 +371,7 @@ set SCORE = current_player(money)
 set linebreaks = false
 execute "+basic_strategy_check"
 write "</div>"
-write "<div class=~footer~>
+write "<div class=~footer~>"
 write "<center>^"
 if GAME_PHASE = place_bet
    write "<center>"
