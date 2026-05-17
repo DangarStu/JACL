@@ -177,13 +177,16 @@ write "&lt;/form&gt;"
 
 <p>The first is the <b>ajax</b> parameter. If this parameter has the value <b>true</b> the header and footer functions will not be called, leaving the interpreter to return only the output produced directly by the command being processed.
 
-<p>The second is the <b>rpc</b> parameter. This parameter allows the game author to specify a function to execute as opposed to the usual process of interpreting a command entered by the player. Three values are handled specially:
+<p>The second is the <b>rpc</b> parameter. This parameter allows the game author to specify a function to execute as opposed to the usual process of interpreting a command entered by the player. Four values are handled specially:
 
 <ul>
 <li><b>rpc=timer</b> &mdash; calls the global function <b>+timer</b>.</li>
 <li><b>rpc=ajax</b> &mdash; calls the global function <b>+ajax</b>.</li>
 <li><b>rpc=eachturn</b> &mdash; calls the global function <b>+eachturn</b> followed by the <b>eachturn</b> function associated with the current location.</li>
+<li><b>rpc=resize</b> &mdash; re-renders the status bar at the new column count supplied via <b>status_cols</b>. Used by <b>webinterface.library</b>'s debounced window-resize handler so the bar tracks the viewport without waiting for the player's next command. Does not advance turn state.</li>
 </ul>
+
+<p>Most ajax requests also carry a <b>status_cols</b> parameter measuring how many monospace characters fit across the rendered status bar. The interpreter copies this into <b>status_window_width</b> before processing the request so cursor-positioning opcodes line up with the actual viewport. Game source must not write to <b>status_window_width</b> directly.</p>
 
 <p>Any other value falls through to the global function <b>+rpc</b> with the requested name (prefixed with a plus sign) stored in <b>rpc_function_name</b>. This gives you a single dispatch point for arbitrary background calls while keeping the set of directly-callable function names under your control &mdash; the request never gets to invoke an arbitrary JACL function by name.
 

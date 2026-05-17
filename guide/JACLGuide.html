@@ -2026,6 +2026,14 @@ write noun1{The} " is no good to eat.^"
 
 <P>will display, &quot;The small wooden box is no good to eat.&quot;
 
+<P>If you need the object's description without any leading article, use <B>{plain}</B> (or <B>{Plain}</B> for the capitalised form). With <B>noun1</B> still set to the box object:
+
+<pre>
+write noun1{plain} " sits on the shelf.^"
+</pre>
+
+<P>would display, &quot;small wooden box sits on the shelf.&quot; The <B>{plain}</B> macro returns the noun phrase exactly as stored in the object's <B>inventory</B> slot &mdash; useful when you need to compose the article yourself, or when the object name is being used as a label rather than as part of a sentence.
+
 <h3><a class="section" name="screendisplay6">Sentences Referring to Varying Objects</a></h3>
 
 <P>There are several other macros that may be used with the <B>write</B> command to assist in constructing sentences that refer to different objects at different times. They are designed to simplify the process of displaying the correct text for objects based on whether they have the attributes <B>PLURAL</B>, <b>ANIMATE</b> or <b>FEMALE</b>. They are:
@@ -2611,6 +2619,11 @@ constant status_window 3
 
 <p>The status window is always created using a fixed-width font and its current dimensions can be read at any time using the values of <b>status_width</b> and <b>status_height</b>. Although <b>status_height</b> will most often be equal to <b>status_window</b> (unless <b>status_window</b> exceeded the available space), <b>status_width</b> will change as the player resizes the game window.
 
+<table class="infowarn"><tr>
+<td><img src="info.png" alt="Information"></td>
+<td>Under the web interpreter, the rendered bar height is clamped at 10 rows regardless of <b>status_window</b>, so a very tall value will not eat the whole viewport. <b>status_width</b> is set per request from the browser's measured <b>status_cols</b>; do not set <b>status_window_width</b> from game source.</td>
+</tr></table>
+
 <p>If a status window is created, the interpreter will attempt to call the global function <b>+update_status_window</b>. If this function exists, it will be executed and must contain code to draw the contents of the status window. If this function doesn't exist, the interpreter will use internal code to generate a standard interactive fiction status line. This consists of a single line with the name of the current location against the left side and the number of moves and current score against the right. 
 
 <p>If the function <b>+update_status_window</b> does exist, the current Glk stream is set to that window before it is called so all <b>write</b> or <b>print</b> commands will output to it. The window is also first cleared of all previous contents and the cursor is positioned in the top left corner.
@@ -2883,13 +2896,16 @@ write "&lt;/form&gt;"
 
 <p>The first is the <b>ajax</b> parameter. If this parameter has the value <b>true</b> the header and footer functions will not be called, leaving the interpreter to return only the output produced directly by the command being processed.
 
-<p>The second is the <b>rpc</b> parameter. This parameter allows the game author to specify a function to execute as opposed to the usual process of interpreting a command entered by the player. Three values are handled specially:
+<p>The second is the <b>rpc</b> parameter. This parameter allows the game author to specify a function to execute as opposed to the usual process of interpreting a command entered by the player. Four values are handled specially:
 
 <ul>
 <li><b>rpc=timer</b> &mdash; calls the global function <b>+timer</b>.</li>
 <li><b>rpc=ajax</b> &mdash; calls the global function <b>+ajax</b>.</li>
 <li><b>rpc=eachturn</b> &mdash; calls the global function <b>+eachturn</b> followed by the <b>eachturn</b> function associated with the current location.</li>
+<li><b>rpc=resize</b> &mdash; re-renders the status bar at the new column count supplied via <b>status_cols</b>. Used by <b>webinterface.library</b>'s debounced window-resize handler so the bar tracks the viewport without waiting for the player's next command. Does not advance turn state.</li>
 </ul>
+
+<p>Most ajax requests also carry a <b>status_cols</b> parameter measuring how many monospace characters fit across the rendered status bar. The interpreter copies this into <b>status_window_width</b> before processing the request so cursor-positioning opcodes line up with the actual viewport. Game source must not write to <b>status_window_width</b> directly.</p>
 
 <p>Any other value falls through to the global function <b>+rpc</b> with the requested name (prefixed with a plus sign) stored in <b>rpc_function_name</b>. This gives you a single dispatch point for arbitrary background calls while keeping the set of directly-callable function names under your control &mdash; the request never gets to invoke an arbitrary JACL function by name.
 
@@ -3217,6 +3233,14 @@ hyperlink "Hint"         "hint"         "header"
 
 <p>After every turn-consuming command, <b>verbs.library</b>'s <b>+system_eachturn</b> calls into <b>+library_eachturn</b>, which wraps the current exits in a <b>&lt;jacl-directions&gt;</b> marker. The ajax handler then swaps the marker's contents into the footer's directions strip so the bar stays current after movements, door opens and the like.
 
+<h3><a class="section" name="webinterface3a">Status-Bar Resize Round-Trip</a></h3>
+
+<p>The status bar is rendered into a virtual character grid sized by <b>status_window_width</b>. On the web, that width is set by the JavaScript front-end &mdash; on page load and on every browser-window resize event &mdash; via a <b>status_cols</b> URL parameter sent with each ajax request. When only the window has resized (no command typed), the library fires a debounced <b>?ajax=true&amp;rpc=resize&amp;status_cols=N</b> request that asks the engine to re-render the bar at the new width. The response carries a fresh <b>&lt;jacl-status&gt;</b> marker which the page applies to <b>#statuswin</b>. Stale resize responses (one arrived after a newer one or after a real command response) are detected via a monotonic token and discarded.
+
+<h3><a class="section" name="webinterface3b">In-flight Command Guard</a></h3>
+
+<p>The library sets <b>window.jaclSubmitInflight = true</b> when the player presses Enter and clears it when the server response arrives (success or error). The command input is disabled during the round-trip. Custom JavaScript that pokes <b>#JACLCommandPrompt</b> directly should check the flag before assuming the field is editable, and should respect it as a hint that another submit is pending.
+
 <h2><a class="section" name="webinterface4">Pending-Question Prompts</a></h2>
 
 <p>The web build supports two opcodes for asking the player a one-off question without consuming a turn:
@@ -3477,7 +3501,7 @@ endif
 
 <pre>
 loop
-   if noun3 childof here
+   if noun3(parent) = here
       if noun3(mass) &lt; heavy
          if noun3 hasnt LIQUID
             if noun3(mass) &lt;= player(quantity)
@@ -5164,7 +5188,7 @@ ensure noun1 has TOUCHED
 <P>If the verb performs any tests to check whether the move should be successfully completed under the current circumstances or not, an <B>override</B> command should be added directly before any effects are coded, such as in the example above. This allows <B>override</B> functions to be associated with objects in order to change the default outcome while still taking advantage of the tests you have coded. Below is an example of the types of tests that the default action for a verb should perform. Of course, the exacts tests you will require are specific to the nature of the verb you are coding.
 
 <pre>
-grammar ask *present for *carried             >ask_for
+grammar ask *present for **inside             >ask_for
 
 {+ask_for
 if here has UNDER_WATER
@@ -5643,7 +5667,36 @@ integer MOTOR_POWER       DEFAULT_POWER
 <tr><td><b>notify</b></td>
 <td>When set to <b>true</b> the player will be notified of any increase in their score when the <b>points</b> command is used.</td>
 </tr>
+<tr><td><b>linebreaks</b></td>
+<td>When <b>true</b> (the default), each <b>write</b> command appends a newline if the output does not already end with one. Set to <b>false</b> while emitting raw HTML markers (e.g. <b>&lt;jacl-directions&gt;</b>) so the engine does not insert breaks mid-element.</td>
+</tr>
+<tr><td><b>graphics_enabled</b>, <b>sound_enabled</b>, <b>timer_enabled</b></td>
+<td>Player or engine preference for whether graphics, sound, and timer events are active. The matching cintegers <b>graphics_supported</b>, <b>sound_supported</b>, <b>timer_supported</b> indicate whether the current interpreter is capable of them at all.</td>
+</tr>
+<tr><td><b>multi_prefix</b></td>
+<td>When set, the parser prefixes each line of a multi-object verb response with the matched object's short name (e.g. "the apple: Taken." instead of just "Taken.").</td>
+</tr>
+<tr><td><b>interrupted</b></td>
+<td>Set to <b>true</b> by a command (typically inside a loop or eachturn) to halt further processing of the current turn.</td>
+</tr>
+<tr><td><b>local</b>, <b>local_x</b>, <b>local_y</b>, <b>local_a</b></td>
+<td>Scratch integers for use inside functions. The engine does not touch them; they survive a function call only if you push them yourself.</td>
+</tr>
+<tr><td><b>pending_question_type</b>, <b>pending_number_low</b>, <b>pending_number_high</b></td>
+<td>Engine-managed flags that track an in-flight <b>getyesorno</b> or <b>getnumber</b>. Game code should generally not write these; the engine reads them at the start of the next turn to route the player's answer back to the right callback.</td>
+</tr>
+<tr><td><b>intro_answers</b></td>
+<td>Counter the web interpreter uses to track how many of the <b>+startup_preferences</b> questions a returning player has already answered. Lets the engine resume the intro chain after each ajax round-trip.</td>
+</tr>
+<tr><td><b>status_window_width</b></td>
+<td>Width (in characters) of the virtual status window grid. On the web interpreter this is updated automatically from the client's <b>?status_cols=N</b> parameter on every request; do not set it from game source. See <a href="screendisplay.html">Screen Display</a> for the grid layout.</td>
+</tr>
 </TABLE>
+
+<table class="infowarn"><tr>
+<td><img src="warning.png" alt="Warning"></td>
+<td>If a game declares an <b>integer</b> with a name the engine has already created (e.g. <code>integer score 0</code>), the loader emits a warning to stderr and the declaration creates a second entry in the integer table that <b>set</b> never sees but <b>save</b>/<b>restore</b> still writes. Always use a distinct name; if you need to override an engine variable's initial value, just <b>set</b> it inside <b>+bootstrap</b>.</td>
+</tr></table>
 
 <!-- NEW PAGE -->
 
@@ -5997,7 +6050,10 @@ grammar blankjacl &gt;form
 <td>Set to the number of objects defined in the game.</td>
 </tr><tr>
 <td><b>interpreter</b></td>
-<td>Set to the interpreter type that is currently running the game, either <b>GLK</b> or <b>CGI</b>.</td>
+<td>Set to the interpreter type that is currently running the game, one of <b>GLK</b> (Glk-windowed; bin/jacl and bin/cjacl), <b>CGI</b> (web; bin/cgijacl and bin/fcgijacl), or <b>NDS</b> (Nintendo DS build).</td>
+</tr><tr>
+<td><b>jacl_version</b>, <b>jacl_release</b>, <b>jacl_build</b></td>
+<td>Set to the major version, release and build numbers of the running interpreter. Useful in <b>+intro</b> for compatibility checks more precise than <b>internal_version</b>.</td>
 </tr><tr>
 <td><b>random</b></td>
 <td>Set to a random number between 1 and the current value of the variable <B>max_rand</B>. By default, <B>max_rand</B> is set to 100.</td>

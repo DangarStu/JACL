@@ -97,6 +97,14 @@ hyperlink "Hint"         "hint"         "header"
 
 <p>After every turn-consuming command, <b>verbs.library</b>'s <b>+system_eachturn</b> calls into <b>+library_eachturn</b>, which wraps the current exits in a <b>&lt;jacl-directions&gt;</b> marker. The ajax handler then swaps the marker's contents into the footer's directions strip so the bar stays current after movements, door opens and the like.
 
+<h3><a class="section" name="webinterface3a">Status-Bar Resize Round-Trip</a></h3>
+
+<p>The status bar is rendered into a virtual character grid sized by <b>status_window_width</b>. On the web, that width is set by the JavaScript front-end &mdash; on page load and on every browser-window resize event &mdash; via a <b>status_cols</b> URL parameter sent with each ajax request. When only the window has resized (no command typed), the library fires a debounced <b>?ajax=true&amp;rpc=resize&amp;status_cols=N</b> request that asks the engine to re-render the bar at the new width. The response carries a fresh <b>&lt;jacl-status&gt;</b> marker which the page applies to <b>#statuswin</b>. Stale resize responses (one arrived after a newer one or after a real command response) are detected via a monotonic token and discarded.
+
+<h3><a class="section" name="webinterface3b">In-flight Command Guard</a></h3>
+
+<p>The library sets <b>window.jaclSubmitInflight = true</b> when the player presses Enter and clears it when the server response arrives (success or error). The command input is disabled during the round-trip. Custom JavaScript that pokes <b>#JACLCommandPrompt</b> directly should check the flag before assuming the field is editable, and should respect it as a hint that another submit is pending.
+
 <h2><a class="section" name="webinterface4">Pending-Question Prompts</a></h2>
 
 <p>The web build supports two opcodes for asking the player a one-off question without consuming a turn:
