@@ -2650,12 +2650,11 @@ object syringe: syringe
  long          "A syringe rests at your feet.^"
  mass          2
 
-{insert_in_fask
-execute "liquid?<noun1"
-if INDEX = false
+{insert_in_flask
+if +contains_liquid?<noun1 = false
    proxy "fill syringe with flask"
    return
-endall
+endif
 proxy "inject flask with syringe"
 }
 
@@ -2675,7 +2674,7 @@ if +contains_liquid?<noun1 = false
    return
 endall
 write "The syringe appears even more sinister than ever now that it is filled "
-write "with " noun3 ". "
+write "with " CHILD{the} ". "
 if syringe has BUBBLES 
    write "The liquid appears to be filled with many small bubbles.^"
    return
@@ -3195,7 +3194,7 @@ write "a gelatine-like product of certain seaweeds used to solidify culture "
 write "medium.^"
 }
 
-object flask_label: concial flask label 
+object flask_label: conical flask label
  short         a "flask label"
  mass          scenery
  parent        flask
@@ -3417,7 +3416,7 @@ write "then you obviously don't want to know what will happen badly enough.^"
 write "You roll up your sleeve and inject the pale yellow liquid into a "
 write "vein in your arm. Withdrawing the needle, then applying a firm "
 write "pressure on the puncture, you begin to feel slightly dizzy. "
-write "You arch over, standing with you hands on your knees, fighting "
+write "You arch over, standing with your hands on your knees, fighting "
 write "the increasing feeling of nausea. Closing your eyes, you attempt "
 write "to regain control of your heart rate"
 endall
@@ -4201,7 +4200,7 @@ write "here is noticeably subdued.^"
 if LONGITUDE = 15
    if LATITUDE = 21
       if CURRENT_DEPTH = 20
-         write "You can see tall rock formation on the ocean floor.^"
+         write "You can see a tall rock formation on the ocean floor.^"
          return
 endall
 if CURRENT_DEPTH = 20
@@ -4620,7 +4619,7 @@ write ^
 write "You roll up your sleeve and inject the pale yellow liquid into a "
 write "vein in your arm. Withdrawing the needle, then applying a firm "
 write "pressure on the puncture, you begin to feel slightly dizzy. "
-write "You arch over, standing with you hands on your knees, fighting "
+write "You arch over, standing with your hands on your knees, fighting "
 write "the increasing feeling of nausea. Closing your eyes, you attempt "
 write "to regain control of your heart rate"
 endall
@@ -8203,7 +8202,7 @@ if SONG_PLAYED > 19
          if jacket is *present
             if ear_piece has WORN
                write "^~You must remember this, a kiss is just a kiss...~ "
-               write "your hear Agent Hughes sing horribly off key through "
+               write "you hear Agent Hughes sing horribly off key through "
                write "the earpiece.^"
                ensure hughes has CUSTOM5
 endall
@@ -9565,10 +9564,10 @@ endif
 if south_door hasnt CLOSED
    write "Glancing at you briefly, Dr Zuckerman walks across the room and "
    write "closes the door. "
-   ensure south_door hasnt CLOSED
-   set z_office(north) = backstage
-   set backstage(south) = z_office
-endif 
+   ensure south_door has CLOSED
+   set z_office(north) = nowhere
+   set backstage(south) = nowhere
+endif
 write "~All great advances demand sacrifice,~ Dr Zuckerman says sombrely. "
 write "~All the people who were used in the tests were volunteers, terminally "
 write "ill people who had their chance to make a difference before they died. "
@@ -9598,7 +9597,7 @@ write "   ~Come on, Dr Meadows, you and I are"
 if jacket is *present
    write "...~ Dr Zuckerman continues, stopping at the sound of footsteps "
    write "running down the hallway.^" 
-   write "   Neither you or Dr Zuckerman have the chance to react "
+   write "   Neither you nor Dr Zuckerman have the chance to react "
    write "before a man and a woman burst into the room, guns drawn. The woman "
    write "begins to read Dr Zuckerman his rights while the man keeps his gun "
    write "trained on him.^" 
@@ -9624,7 +9623,7 @@ if jacket is *present
    execute "+game_over"
    return
 endall
-write " scientists. It is our job to decided what can be done, not what may "
+write " scientists. It is our job to decide what can be done, not what may "
 write "be done. Don't you want to live forever?~^"
 ensure zuckerman has CUSTOM1
 set zuckerman(status) = 1
@@ -10080,7 +10079,7 @@ if syringe(parent) != player
 endall
 if +contains_liquid?<noun2 = true
    write  noun2{The} " already contains " CHILD{the} . " If you were to "
-   write "alse add " noun1{the} " they would mix together.^"
+   write "also add " noun1{the} " they would mix together.^"
    set time = false
    return
 endall
@@ -10320,7 +10319,7 @@ if mask hasnt CUSTOM5
       ensure mask has CUSTOM5
       return
 endall
-write ~^
+write "^"
 }
 
 {+wise_fashion
@@ -10932,7 +10931,7 @@ if diary has SCORED
          write "mind by an even more alarming thought: how did the stranger "
          write "escape the hangar after I left the rope untied? After several "
          write "hours of waiting, there is still no sign of your contact, a "
-         write "fact that leads you to believe that he did not escaped at "
+         write "fact that leads you to believe that he did not escape at "
          write "all.^"
          execute "+game_over"
          return
@@ -11054,6 +11053,7 @@ if noun2 = magnifying_glass
    if here has MID_WATER
       write "You can't see anything through the magnifying glass while "
       write "underwater.^"
+      return
    endif
    if noun1 has ANIMATE
       write "You don't think that might be a tad rude?^"
@@ -11484,8 +11484,8 @@ if noun2 = rect_crate
    set time = false
    return
 endall
-if noun2 hasnt SURFACE 
-   write "There isn't a flat surface on " noun2 .^
+if noun2 hasnt SURFACE
+   write "There isn't a flat surface on " noun2{the} .^
    set time = false
    return
 endall
@@ -11494,7 +11494,7 @@ if noun2 = microscope
    return
 endall
 if noun2 = rect_crate_2
-   proxy "drop" noun1{names}
+   proxy "drop " noun1{names}
    return
 endall
 if noun2 = ground
@@ -11922,8 +11922,13 @@ return false
 }
 
 {+sink_contents
-set INDEX = 0 
-loop noun1
+set INDEX = 0
+# select noun1 iterates objects whose parent = current noun1 (the
+# sink), with noun3 bound to each child. The prior code used `loop
+# noun1` (which iterates noun1 over all objects) closed with
+# `endselect` (which doesn't seek back), so the body ran at most
+# once with stale noun3.
+select noun1
   if noun3 != r_water
      set INDEX + 1
   endif
@@ -12986,17 +12991,17 @@ if +contains_liquid?<syringe = false
    return
 endall
 if syringe has CUSTOM5
-   write "A small portion of " noun3 " squirts out of the syringe and on to "
+   write "A small portion of " CHILD{the} " squirts out of the syringe and on to "
    write "the ground.^"
    return
-endall
+endif
 if syringe has CUSTOM4
    write "You depress the plunger until all the air is expelled and a small "
-   write "amount of " noun3 " squirts out of the syringe.^"
+   write "amount of " CHILD{the} " squirts out of the syringe.^"
    ensure syringe hasnt CUSTOM4
    return
-endall
-write "A small portion of " noun3 " squirts out of the syringe and on to "
+endif
+write "A small portion of " CHILD{the} " squirts out of the syringe and on to "
 write "the ground.^"
 }
 
