@@ -176,6 +176,12 @@ print:
    }^
 
    function speakText(text) {^
+      /* Flush queued utterances from prior turns before adding this^
+       * turn's text. Without this, a player who types several^
+       * commands quickly queues TTS that lags the visible scroll by^
+       * minutes; cancel() drops the queue so we speak only the^
+       * latest response. */^
+      if (window.speechSynthesis) speechSynthesis.cancel();^
       var doc = new DOMParser().parseFromString(text, 'text/html');^
       var html = doc.body.innerHTML;^
       html = html.replace(/<p\b.*?>/gi, '\n\n');^
@@ -233,6 +239,29 @@ print:
     * requests every N ms. N == 0 cancels. Each tick runs the game's^
     * +timer JACL function -- the web equivalent of Glk timer events. */^
    var jaclTimerHandle = null;^
+   var jaclTimerFailures = 0;^
+   /* Stop polling after this many consecutive ajax failures (network^
+    * loss, server restart, 5xx). Without this, a flaky connection^
+    * queues ticks that all retry forever. */^
+   var jaclTimerMaxFailures = 5;^
+
+   function jaclStopTimer() {^
+      if (jaclTimerHandle) {^
+         clearInterval(jaclTimerHandle);^
+         jaclTimerHandle = null;^
+      }^
+   }^
+
+   /* Pause the timer when the page is hidden (tab switched, screen^
+    * locked) or before navigating away. Without this, background^
+    * ticks pile up in mobile browsers and resume in bursts when the^
+    * tab is restored, occasionally re-firing every queued +timer at^
+    * once. */^
+   document.addEventListener('visibilitychange', function() {^
+      if (document.hidden) jaclStopTimer();^
+   });^
+   window.addEventListener('pagehide', jaclStopTimer);^
+
    function jaclProcessTimerMarker(scope) {^
       var root = scope || document.getElementById('maintext');^
       if (!root) return;^
@@ -240,10 +269,8 @@ print:
       if (!marker) return;^
       var ms = parseInt(marker.getAttribute('data-ms') || '0', 10);^
       marker.remove();^
-      if (jaclTimerHandle) {^
-         clearInterval(jaclTimerHandle);^
-         jaclTimerHandle = null;^
-      }^
+      jaclStopTimer();^
+      jaclTimerFailures = 0;^
       if (ms > 0) {^
          jaclTimerHandle = setInterval(function() {^
             var url = window.location.pathname + '?ajax=true&rpc=timer&status_cols=' + (typeof jaclMeasureStatusCols === 'function' ? jaclMeasureStatusCols() : 80);^
@@ -251,8 +278,12 @@ print:
              * line starts with a leading dot -- JACL's loader treats^
              * a column-0 '.' as the print-block terminator. */^
             var p = fetch(url, { credentials: 'same-origin' });^
-            p = p.then(function(r) { return r.text(); });^
+            p = p.then(function(r) {^
+               if (!r.ok) throw new Error('HTTP ' + r.status);^
+               return r.text();^
+            });^
             p = p.then(function(data) {^
+               jaclTimerFailures = 0;^
                var maintext = document.getElementById('maintext');^
                if (!maintext) return;^
                /* Buffer the response in a detached fragment so we can^
@@ -266,6 +297,7 @@ print:
                   if (statusBar) {^
                      var lines = parseInt(statusUpdate.getAttribute('data-lines') || '1', 10);^
                      if (isNaN(lines) || lines < 1) lines = 1;^
+                     if (lines > 10) lines = 10;^
                      document.body.style.setProperty('--status-lines', lines);^
                      statusBar.innerHTML = statusUpdate.innerHTML;^
                   }^
@@ -273,7 +305,12 @@ print:
                }^
                jaclProcessTimerMarker(holder);^
             });^
-            p.catch(function() {});^
+            p.catch(function() {^
+               jaclTimerFailures++;^
+               if (jaclTimerFailures >= jaclTimerMaxFailures) {^
+                  jaclStopTimer();^
+               }^
+            });^
          }, ms);^
       }^
    }^
@@ -743,6 +780,7 @@ print:
             if (statusBar) {^
                var lines = parseInt(initialStatus.getAttribute('data-lines') || '1', 10);^
                if (isNaN(lines) || lines < 1) lines = 1;^
+               if (lines > 10) lines = 10;^
                document.body.style.setProperty('--status-lines', lines);^
                statusBar.innerHTML = initialStatus.innerHTML;^
             }^
@@ -757,8 +795,50 @@ print:
        * wider, the right-aligned segment sits short of the edge until^
        * the next updatestatus call (typically the first command). */^
       window.jaclStatusCols = jaclMeasureStatusCols();^
+      /* Recompute on resize and ask the engine for a fresh status bar^
+       * at the new column count. Without the rpc=resize fetch, the^
+       * grid stays at the width sent on the last command/timer tick^
+       * so right-aligned text floats away from the viewport edge^
+       * until the player types something. Debounced so dragging a^
+       * window edge does not spam the server. */^
+      var jaclResizeTimer = null;^
+      /* Monotonic token incremented on every resize-driven fetch.^
+       * If a turn command or another resize lands a fresher status^
+       * bar while this fetch is still in flight, the late response^
+       * must NOT overwrite it. Compare token at apply time. */^
+      var jaclResizeToken = 0;^
       window.addEventListener('resize', function() {^
          window.jaclStatusCols = jaclMeasureStatusCols();^
+         if (jaclResizeTimer) clearTimeout(jaclResizeTimer);^
+         jaclResizeTimer = setTimeout(function() {^
+            jaclResizeTimer = null;^
+            /* Don't fire while a player command is being processed --^
+             * the command response carries a fresh bar at the current^
+             * status_cols anyway, and racing it would clobber. */^
+            if (window.jaclSubmitInflight) return;^
+            var statusBar = document.getElementById('statuswin');^
+            if (!statusBar || statusBar.innerHTML.length === 0) return;^
+            var myToken = ++jaclResizeToken;^
+            var url = window.location.pathname + '?ajax=true&rpc=resize&status_cols=' + window.jaclStatusCols;^
+            var p = fetch(url, { credentials: 'same-origin' });^
+            p = p.then(function(r) { return r.text(); });^
+            p = p.then(function(data) {^
+               /* If a newer resize / command has run since we sent^
+                * this fetch, our token is stale -- discard. */^
+               if (myToken !== jaclResizeToken) return;^
+               if (window.jaclSubmitInflight) return;^
+               var holder = document.createElement('div');^
+               holder.innerHTML = data;^
+               var statusUpdate = holder.querySelector('jacl-status');^
+               if (!statusUpdate) return;^
+               var lines = parseInt(statusUpdate.getAttribute('data-lines') || '1', 10);^
+               if (isNaN(lines) || lines < 1) lines = 1;^
+               if (lines > 10) lines = 10;^
+               document.body.style.setProperty('--status-lines', lines);^
+               statusBar.innerHTML = statusUpdate.innerHTML;^
+            });^
+            p.catch(function() {});^
+         }, 200);^
       });^
       /* Hyperlinks emitted by the `hyperlink` opcode are plain^
        * <a href=~?command=...&user_id=...~> anchors that cause a full^
@@ -787,10 +867,21 @@ print:
 .
 #include "ajax.library"
 print:
+   /* Set true while an ajax submit is in flight. Pressing Enter^
+    * twice on a slow network or while the server is restoring would^
+    * otherwise replay the same turn-consuming command. The flag is^
+    * cleared in +local_success and the ajax .catch path below. */^
+   window.jaclSubmitInflight = false;^
+
    function submitForm(e) {^
         e.preventDefault();^
+        if (window.jaclSubmitInflight) return false;^
+        var input = document.getElementById('JACLCommandPrompt');^
+        if (!input) return false;^
+        window.jaclSubmitInflight = true;^
+        input.disabled = true;^
         ajaxForm({^
-             command: document.getElementById('JACLCommandPrompt').value,^
+             command: input.value,^
              replace: false,^
              element: "#maintext"^
         });^
@@ -969,7 +1060,20 @@ print:
       var maintext = document.getElementById("maintext");^
       maintext.querySelectorAll('script').forEach(function(el) { el.remove(); });^
 
-      maintext.insertAdjacentHTML('beforeend', "<br><i class='jacl-command'>&gt;" + details.command + "</i><br>" + data);^
+      /* Echo the player's command via textContent on a freshly-^
+       * created node so a command like ~<img src=x onerror=alert(1)>~^
+       * lands as visible text, not executable HTML. Only the server^
+       * response (`data`) -- which the engine has already escaped --^
+       * is inserted as HTML. */^
+      var jaclBreakBefore = document.createElement('br');^
+      var jaclCmdEcho = document.createElement('i');^
+      jaclCmdEcho.className = 'jacl-command';^
+      jaclCmdEcho.textContent = '>' + details.command;^
+      var jaclBreakAfter = document.createElement('br');^
+      maintext.appendChild(jaclBreakBefore);^
+      maintext.appendChild(jaclCmdEcho);^
+      maintext.appendChild(jaclBreakAfter);^
+      maintext.insertAdjacentHTML('beforeend', data);^
       var cleared = jaclProcessClearMarker(maintext);^
 
       var main = document.getElementById("main");^
@@ -988,11 +1092,20 @@ print:
          }
       }
       document.JACLGameForm.command.value = "";^
+      /* Run every inline <script> in the response BEFORE processing^
+       * audio/timer markers. The old code:^
+       *   - took only the first matching script via querySelector^
+       *   - ran it after audio/timer markers had already started^
+       * which meant a `disableSound()` shipped alongside a `<jacl-^
+       * sound-volume>` marker could not suppress the audio it was^
+       * meant to mute. Iterating all scripts in document order and^
+       * running them up-front fixes both. */^
+      var jaclScripts = maintext.querySelectorAll('script');^
+      jaclScripts.forEach(function(s) {^
+         try { (new Function(s.text))(); } catch (e) {}^
+         s.remove();^
+      });^
       jaclProcessAudioMarkers();^
-      var jaclscript = maintext.querySelector('script');^
-      if (jaclscript != null) {^
-         (new Function(jaclscript.text))();
-      }^
       var jaclDirUpdate = maintext.querySelector('jacl-directions');^
       if (jaclDirUpdate) {^
          var dirBar = document.querySelector('.directions');^
@@ -1005,6 +1118,7 @@ print:
          if (statusBar) {^
             var lines = parseInt(jaclStatusUpdate.getAttribute('data-lines') || '1', 10);^
             if (isNaN(lines) || lines < 1) lines = 1;^
+            if (lines > 10) lines = 10;^
             document.body.style.setProperty('--status-lines', lines);^
             statusBar.innerHTML = jaclStatusUpdate.innerHTML;^
          }^
@@ -1016,7 +1130,15 @@ print:
          speakData = speakData.replace(/<jacl-status[\s\S]*?<\/jacl-status>/gi, '');^
          speakText(speakData);^
       }^
-      document.getElementById('JACLCommandPrompt').focus();
+      /* Re-enable the input and release the in-flight guard now^
+       * that the server has answered. The .catch in ajax.library^
+       * does the same on failure. */^
+      var jaclPromptEl = document.getElementById('JACLCommandPrompt');^
+      if (jaclPromptEl) {^
+         jaclPromptEl.disabled = false;^
+         jaclPromptEl.focus();^
+      }^
+      window.jaclSubmitInflight = false;^
       return false;
 .
 }

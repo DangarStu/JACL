@@ -226,7 +226,7 @@ endif
 
 <pre>
 loop
-   if noun3 childof here
+   if noun3(parent) = here
       if noun3(mass) &lt; heavy
          if noun3 hasnt LIQUID
             if noun3(mass) &lt;= player(quantity)

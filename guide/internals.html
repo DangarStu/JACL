@@ -42,7 +42,10 @@
 <td>Set to the number of objects defined in the game.</td>
 </tr><tr>
 <td><b>interpreter</b></td>
-<td>Set to the interpreter type that is currently running the game, either <b>GLK</b> or <b>CGI</b>.</td>
+<td>Set to the interpreter type that is currently running the game, one of <b>GLK</b> (Glk-windowed; bin/jacl and bin/cjacl), <b>CGI</b> (web; bin/cgijacl and bin/fcgijacl), or <b>NDS</b> (Nintendo DS build).</td>
+</tr><tr>
+<td><b>jacl_version</b>, <b>jacl_release</b>, <b>jacl_build</b></td>
+<td>Set to the major version, release and build numbers of the running interpreter. Useful in <b>+intro</b> for compatibility checks more precise than <b>internal_version</b>.</td>
 </tr><tr>
 <td><b>random</b></td>
 <td>Set to a random number between 1 and the current value of the variable <B>max_rand</B>. By default, <B>max_rand</B> is set to 100.</td>

@@ -74,7 +74,7 @@ char            walkthru[81] = "\0";
 
 char            function_name[81];
 
-char            override[81];
+char            override[256];
 
 char            temp_buffer[1024];
 char            error_buffer[1024];

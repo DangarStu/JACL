@@ -97,16 +97,16 @@ restore_game(const char *filename, int warn)
         return (FALSE);
     }
 
-	/* THIS IS READ FIRST TO HELP VALIDATE THE SAVED GAME 
+	/* THIS IS READ FIRST TO HELP VALIDATE THE SAVED GAME
 	 * BEFORE CONTINUING TO LOAD IT */
 	file_objects = read_integer(bookmark);
 	file_integers = read_integer(bookmark);
 	file_functions = read_integer(bookmark);
 	file_strings = read_integer(bookmark);
 
-	if (file_objects != objects 
-		|| file_integers != integers 
-		|| file_functions != functions 
+	if (file_objects != objects
+		|| file_integers != integers
+		|| file_functions != functions
 		|| file_strings != strings) {
 		if (warn == FALSE) {
 			log_error(cstring_resolve("BAD_SAVED_GAME")->value, PLUS_STDOUT);
@@ -154,6 +154,10 @@ restore_game(const char *filename, int warn)
         for (index = 0; index < 1024; index++) {
             current_string->value[index] = getc(bookmark);
         }
+        /* string_type::value is [1025] -- defensively NUL-terminate
+         * so subsequent strlen/strcpy on a truncated save file (where
+         * the last char is non-zero) doesn't read past the buffer. */
+        current_string->value[1024] = 0;
         current_string = current_string->next_string;
     }
 
@@ -161,8 +165,31 @@ restore_game(const char *filename, int warn)
         last_command[index] = getc(bookmark);
     }
 
-	player = read_integer(bookmark);
-	noun[3] = read_integer(bookmark);
+	{
+		int saved_player = read_integer(bookmark);
+		int saved_noun3  = read_integer(bookmark);
+
+		/* Validate player before assigning -- a corrupt or truncated
+		 * .auto would otherwise put nonsense into player, and
+		 * get_here() (utils.c) calls terminate(44) on an out-of-range
+		 * player, taking the cgi worker down. 0 is legal: cgijacl
+		 * writes saved_start before bootstrap has set player. noun[3]
+		 * is not bounds-checked here -- legitimate JACL values
+		 * include -1 ("no second noun") and 0 (FALSE), and parser/
+		 * verb code already guards before dereferencing. */
+		if (saved_player < 0 || saved_player > objects) {
+			if (warn == FALSE) {
+				sprintf(error_buffer,
+				        "Saved file has out-of-range player (%d, objects=%d); refusing restore.",
+				        saved_player, objects);
+				log_error(error_buffer, PLUS_STDOUT);
+			}
+			fclose(bookmark);
+			return (FALSE);
+		}
+		player  = saved_player;
+		noun[3] = saved_noun3;
+	}
 
 	/* CLOSE THE STREAM */
 	fclose (bookmark);

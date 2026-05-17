@@ -83,7 +83,7 @@ ensure noun1 has TOUCHED
 <P>If the verb performs any tests to check whether the move should be successfully completed under the current circumstances or not, an <B>override</B> command should be added directly before any effects are coded, such as in the example above. This allows <B>override</B> functions to be associated with objects in order to change the default outcome while still taking advantage of the tests you have coded. Below is an example of the types of tests that the default action for a verb should perform. Of course, the exacts tests you will require are specific to the nature of the verb you are coding.
 
 <pre>
-grammar ask *present for *carried             >ask_for
+grammar ask *present for **inside             >ask_for
 
 {+ask_for
 if here has UNDER_WATER

@@ -67,6 +67,9 @@ char *strcasestr(const char *s, const char *find)
 #ifdef __NDS__
 extern void jflush(void);
 #endif
+#ifndef GLK
+extern int web_status_emit_count;
+#endif
 
 #define MAX_TRY 10
 
@@ -301,7 +304,7 @@ static int exit_function(int return_code);
 static int select_next(void);
 static void new_position(double x1, double y1, double bearing, double velocity);
 static void pop_proxy(void);
-static void push_proxy(void);
+static int push_proxy(void);
 static void pop_stack(void);
 static int condition(void);
 static int and_condition(void);
@@ -352,19 +355,36 @@ static void
 build_proxy(void)
 {
     int             index;
+    size_t          used;
+    size_t          room;
+    const char     *piece;
 
     proxy_buffer[0] = 0;
+    used = 0;
 
     /* LOOP THROUGH ALL THE PARAMETERS OF THE PROXY COMMAND
-       AND BUILD THE MOVE TO BE ISSUED ON THE PLAYER'S BEHALF */
+       AND BUILD THE MOVE TO BE ISSUED ON THE PLAYER'S BEHALF.
+       Bounded concat: text_of_word can resolve to a 1024-byte
+       cstring value, and several args quickly overflow the
+       1024-byte proxy_buffer. */
     for (index = 1; word[index] != NULL; index++) {
-        strcat(proxy_buffer, text_of_word(index));
+        piece = text_of_word(index);
+        if (piece == NULL) continue;
+        room = (used + 1 < 1024)
+               ? (1024 - used - 1) : 0;
+        if (room == 0) break;
+        strncat(proxy_buffer, piece, room);
+        used += strlen(piece);
+        if (used >= 1024 - 1) {
+            used = 1024 - 1;
+            break;
+        }
     }
 
-    for (index = 0; index < strlen(proxy_buffer); index++) {
+    for (index = 0; index < (int) strlen(proxy_buffer); index++) {
         if (proxy_buffer[index] == '~') {
             proxy_buffer[index] = '\"';
-        } 
+        }
     }
 
     //printf("--- proxy buffer = \"%s\"\n", proxy_buffer);
@@ -430,13 +450,20 @@ execute(const char *funcname)
     long            before_command = 0;
 #endif
 
+    /* called_name is [1024]; strncpy(..., 1023) leaves [1023]
+     * un-NUL'd if the source fills the limit, so any subsequent
+     * strlen/strcmp on called_name reads past the buffer. Force a
+     * terminator after every copy. */
 #ifdef GLK
     strncpy (called_name, funcname, 1023);
+    called_name[1023] = 0;
 #else
     if (!strcmp(funcname, "+rpc")) {
-        strncpy (called_name, rpc_function_name, 80);
-    } else {    
+        strncpy (called_name, rpc_function_name, 1023);
+        called_name[1023] = 0;
+    } else {
         strncpy (called_name, funcname, 1023);
+        called_name[1023] = 0;
     }
 
 #endif
@@ -448,10 +475,18 @@ execute(const char *funcname)
         return (FALSE);
     }
 
+    /* If the call stack is full, bail out cleanly. The previous code
+     * called terminate(45) and killed the worker; now we surface the
+     * failure as "function not callable" so the caller can return up
+     * the chain. */
 #ifdef GLK
-    push_stack(glk_stream_get_position(game_stream));
+    if (push_stack(glk_stream_get_position(game_stream)) == FALSE) {
+        return (FALSE);
+    }
 #else
-    push_stack(ftell(file));
+    if (push_stack(ftell(file)) == FALSE) {
+        return (FALSE);
+    }
 #endif
 
     top_of_loop = 0;
@@ -659,7 +694,9 @@ execute(const char *funcname)
 
                     infile = fopen(temp_buffer, "rb");
 
-                    if (word[2] != NULL && !strcmp(word[2], "skip_header")) {
+                    if (infile != NULL
+                        && word[2] != NULL
+                        && !strcmp(word[2], "skip_header")) {
                         fgets(csv_buffer, 2048, infile);
                     }
                 }
@@ -1325,8 +1362,12 @@ execute(const char *funcname)
                 /* OUTPUT LINK TEXT AS PLAIN TEXT UNDER Glk */
                 if (word[2] == NULL) {
                     noproprun();
-                    pop_stack();
-                    return (TRUE);
+                    /* exit_function closes infile/outfile + releases
+                     * the read/write locks, then pops the stack. The
+                     * old pop_stack() alone leaked the CSV file
+                     * descriptor if any of these CGI opcodes was hit
+                     * inside an iterate block with too few args. */
+                    return (exit_function(TRUE));
                 } else {
                     write_text(text_of_word(1));
                 }
@@ -1469,8 +1510,12 @@ execute(const char *funcname)
                 /* OUTPUT LINK TEXT AS PLAIN TEXT UNDER Glk */
                 if (word[2] == NULL) {
                     noproprun();
-                    pop_stack();
-                    return (TRUE);
+                    /* exit_function closes infile/outfile + releases
+                     * the read/write locks, then pops the stack. The
+                     * old pop_stack() alone leaked the CSV file
+                     * descriptor if any of these CGI opcodes was hit
+                     * inside an iterate block with too few args. */
+                    return (exit_function(TRUE));
                 } else {
                     write_text(text_of_word(1));
                 }
@@ -1480,16 +1525,21 @@ execute(const char *funcname)
                 /* USED TO ADD AN OPTION TO AN HTML LIST */
                 if (word[1] == NULL) {
                     noproprun();
-                    pop_stack();
-                    return (TRUE);
+                    /* exit_function closes infile/outfile + releases
+                     * the read/write locks, then pops the stack. The
+                     * old pop_stack() alone leaked the CSV file
+                     * descriptor if any of these CGI opcodes was hit
+                     * inside an iterate block with too few args. */
+                    return (exit_function(TRUE));
                 } else {
                     index = value_of(word[1], 0);
                     if (word[2] != NULL) {
-                        sprintf(option_buffer, "<option value=\"%d\">",
-                                index);
+                        snprintf(option_buffer, sizeof option_buffer,
+                                 "<option value=\"%d\">", index);
                     } else {
                         object_names(index, temp_buffer);
-                        sprintf(option_buffer, "<option value=\"%s\">", temp_buffer);
+                        snprintf(option_buffer, sizeof option_buffer,
+                                 "<option value=\"%s\">", temp_buffer);
                     }
 
                     write_text(option_buffer);
@@ -1502,8 +1552,12 @@ execute(const char *funcname)
 
                 if (word[2] == NULL) {
                     noproprun();
-                    pop_stack();
-                    return (TRUE);
+                    /* exit_function closes infile/outfile + releases
+                     * the read/write locks, then pops the stack. The
+                     * old pop_stack() alone leaked the CSV file
+                     * descriptor if any of these CGI opcodes was hit
+                     * inside an iterate block with too few args. */
+                    return (exit_function(TRUE));
                 } else {
                     // GET A POINTER TO THE STRING BEING MODIFIED
                     if ((resolved_setstring = string_resolve(word[1])) == NULL) {
@@ -1522,30 +1576,46 @@ execute(const char *funcname)
                 /* USED TO CREATE AN HTML BUTTON */
                 if (word[1] == NULL) {
                     noproprun();
-                    pop_stack();
-                    return (TRUE);
+                    /* exit_function closes infile/outfile + releases
+                     * the read/write locks, then pops the stack. The
+                     * old pop_stack() alone leaked the CSV file
+                     * descriptor if any of these CGI opcodes was hit
+                     * inside an iterate block with too few args. */
+                    return (exit_function(TRUE));
                 } if (word[2] != NULL) {
-                    sprintf (option_buffer, "<input class=~button~ type=~image~ src=~%s~ name=~verb~ value=~", text_of_word(2));
-                    strcat (option_buffer, text_of_word(1));
-                    strcat (option_buffer, "~>");
+                    snprintf(option_buffer, sizeof option_buffer,
+                             "<input class=~button~ type=~image~ "
+                             "src=~%s~ name=~verb~ value=~%s~>",
+                             text_of_word(2), text_of_word(1));
                     write_text(option_buffer);
                 } else {
-                    sprintf (option_buffer, "<input class=~button~ type=~submit~ style=~width: 90px; margin: 5px;~ name=~verb~ value=~%s~>", text_of_word(1));
+                    snprintf(option_buffer, sizeof option_buffer,
+                             "<input class=~button~ type=~submit~ "
+                             "style=~width: 90px; margin: 5px;~ "
+                             "name=~verb~ value=~%s~>",
+                             text_of_word(1));
                     write_text(option_buffer);
                 }
             } else if (!strcmp(word[0], "hidden")) {
-                sprintf (temp_buffer, "<INPUT TYPE=\"hidden\" NAME=\"user_id\" VALUE=\"%s\">", user_id);
+                snprintf(temp_buffer, 1024,
+                         "<INPUT TYPE=\"hidden\" NAME=\"user_id\" VALUE=\"%s\">",
+                         user_id);
                 write_text(temp_buffer);
             } else if (!strcmp(word[0], "control")) {
                 /* USED TO CREATE A HYPERLINK THAT IS AN IMAGE */
                 if (word[2] == NULL) {
                     noproprun();
-                    pop_stack();
-                    return (TRUE);
+                    /* exit_function closes infile/outfile + releases
+                     * the read/write locks, then pops the stack. The
+                     * old pop_stack() alone leaked the CSV file
+                     * descriptor if any of these CGI opcodes was hit
+                     * inside an iterate block with too few args. */
+                    return (exit_function(TRUE));
                 } else {
-                    sprintf(option_buffer, "<a href=\"?command=%s&amp;user_id=%s\"><img border=0 SRC=\"", text_of_word(2), user_id);
-                    strcat(option_buffer, text_of_word(1));
-                    strcat(option_buffer, "\"></a>");
+                    snprintf(option_buffer, sizeof option_buffer,
+                             "<a href=\"?command=%s&amp;user_id=%s\">"
+                             "<img border=0 SRC=\"%s\"></a>",
+                             text_of_word(2), user_id, text_of_word(1));
                     write_text(option_buffer);
                 }
             } else if (!strcmp(word[0], "hyperlink") || !strcmp(word[0], "hyperlinkNE")) {
@@ -1554,8 +1624,12 @@ execute(const char *funcname)
                 /* USED TO CREATE A HYPERLINK WITH SESSION INFORMATION INCLUDED */
                 if (word[2] == NULL) {
                     noproprun();
-                    pop_stack();
-                    return (TRUE);
+                    /* exit_function closes infile/outfile + releases
+                     * the read/write locks, then pops the stack. The
+                     * old pop_stack() alone leaked the CSV file
+                     * descriptor if any of these CGI opcodes was hit
+                     * inside an iterate block with too few args. */
+                    return (exit_function(TRUE));
                 } else {
                     const char * encoded;
 
@@ -1571,21 +1645,26 @@ execute(const char *funcname)
 
                         if (word[3] == NULL) {
                             if (use_user_id) {
-                                sprintf (string_buffer, "<a href=\"?command=%s&amp;user_id=%s\">", encoded, user_id);
+                                snprintf(string_buffer, sizeof string_buffer,
+                                         "<a href=\"?command=%s&amp;user_id=%s\">%s</a>",
+                                         encoded, user_id, text_of_word(1));
                             } else {
-                                sprintf (string_buffer, "<a href=\"?command=%s\">", encoded);
+                                snprintf(string_buffer, sizeof string_buffer,
+                                         "<a href=\"?command=%s\">%s</a>",
+                                         encoded, text_of_word(1));
                             }
-                            strcat (string_buffer, text_of_word(1));
-                            strcat (string_buffer, "</a>");
                         } else {
-                            sprintf (string_buffer, "<a class=\"%s\" href=\"?command=", text_of_word(3));
-                            strcat (string_buffer, encoded);
                             if (use_user_id) {
-                                sprintf (option_buffer, "&amp;user_id=%s\">%s</a>", user_id, text_of_word(1));
+                                snprintf(string_buffer, sizeof string_buffer,
+                                         "<a class=\"%s\" href=\"?command=%s"
+                                         "&amp;user_id=%s\">%s</a>",
+                                         text_of_word(3), encoded, user_id,
+                                         text_of_word(1));
                             } else {
-                                sprintf (option_buffer, "\">%s</a>", text_of_word(1));
+                                snprintf(string_buffer, sizeof string_buffer,
+                                         "<a class=\"%s\" href=\"?command=%s\">%s</a>",
+                                         text_of_word(3), encoded, text_of_word(1));
                             }
-                            strcat (string_buffer, option_buffer);
                         }
                     }
 
@@ -1598,13 +1677,19 @@ execute(const char *funcname)
             } else if (!strcmp(word[0], "prompt")) {
                 /* USED TO OUTPUT A HTML INPUT CONTROL THAT CONTAINS SESSION INFORMATION */
                 if (word[1] != NULL) {
-                    sprintf(temp_buffer, "<input id=\"JACLCommandPrompt\" type=text name=~command~ onKeyPress=~%s~>\n", word[1]);
+                    snprintf(temp_buffer, 1024,
+                             "<input id=\"JACLCommandPrompt\" type=text "
+                             "name=~command~ onKeyPress=~%s~>\n", word[1]);
                     write_text(temp_buffer);
                 } else {
-                    sprintf(temp_buffer, "<input id=\"JACLCommandPrompt\" type=text name=~command~>\n");
+                    snprintf(temp_buffer, 1024,
+                             "<input id=\"JACLCommandPrompt\" type=text "
+                             "name=~command~>\n");
                     write_text(temp_buffer);
                 }
-                sprintf(temp_buffer, "<input type=hidden name=\"user_id\" value=\"%s\">", user_id);
+                snprintf(temp_buffer, 1024,
+                         "<input type=hidden name=\"user_id\" value=\"%s\">",
+                         user_id);
                 write_text(temp_buffer);
             } else if (!strcmp(word[0], "style")) {
                 /* THIS COMMAND IS USED TO OUTPUT ANSI CODES OR SET GLK
@@ -1867,17 +1952,30 @@ execute(const char *funcname)
                  * ALL STATE MUST BE SAVED SO THE CURRENT MOVE CAN CONTINUE
                  * ONCE THE PROXIED MOVE IS COMPLETE */
 #ifdef GLK
-                push_stack(glk_stream_get_position(game_stream));
+                if (push_stack(glk_stream_get_position(game_stream)) == FALSE) {
+                    return (exit_function(TRUE));
+                }
 #else
-                push_stack(ftell(file));
+                if (push_stack(ftell(file)) == FALSE) {
+                    return (exit_function(TRUE));
+                }
 #endif
-                push_proxy();
+                if (push_proxy() == FALSE) {
+                    /* push_stack succeeded but push_proxy didn't --
+                     * pop the stack we just pushed before bailing
+                     * so the caller's frame isn't leaked. */
+                    pop_stack();
+                    return (exit_function(TRUE));
+                }
 
                 build_proxy();
 
                 // TEXT BUFFER IS THE NORMAL ARRAY FOR HOLDING THE PLAYERS
-                // MOVE FOR PROCESSING
-                strncpy(text_buffer, proxy_buffer, 1024);
+                // MOVE FOR PROCESSING. proxy_buffer is also 1024; strncpy
+                // would skip the NUL if both ran to the wire, so force
+                // termination after the copy.
+                strncpy(text_buffer, proxy_buffer, 1023);
+                text_buffer[1023] = 0;
 
                 command_encapsulate();
 
@@ -2146,9 +2244,13 @@ execute(const char *funcname)
 #else
             } else if (!strcmp(word[0], "undomove")) {
             } else if (!strcmp(word[0], "updatestatus")) {
-                /* See web_render_status_bar() below -- the opcode body
-                 * lives there so utils.c's eachturn() can also invoke
-                 * it as a runtime-level belt-and-suspenders. */
+                /* Web build: render the status bar through a virtual
+                 * character grid so the same cursor X Y + write idiom
+                 * works as on a GLK TextGrid. The body lives in
+                 * web_render_status_bar() below; it is also invoked
+                 * from utils.c's eachturn() (runtime safety net for
+                 * games with older library copies) and from cgijacl.c
+                 * on rpc=resize / end-of-ajax. */
                 web_render_status_bar();
 #endif
             } else if (!strcmp(word[0], "split")) {
@@ -2163,8 +2265,14 @@ execute(const char *funcname)
                 char *match = NULL;
                 struct string_type *resolved_splitstring = NULL;
 
-                strcpy (split_buffer, text_of_word(2));
-                strcpy (delimiter, text_of_word(3));
+                /* text_of_word can resolve to a 1024-byte cstring;
+                 * strcpy into a 1024-byte buffer would skip the NUL
+                 * terminator at the boundary. Use strncpy + explicit
+                 * NUL to keep both buffers safely terminated. */
+                strncpy(split_buffer, text_of_word(2), sizeof split_buffer - 1);
+                split_buffer[sizeof split_buffer - 1] = 0;
+                strncpy(delimiter, text_of_word(3), sizeof delimiter - 1);
+                delimiter[sizeof delimiter - 1] = 0;
 
                 char *source = split_buffer;
 
@@ -2264,10 +2372,21 @@ execute(const char *funcname)
                         return (exit_function(TRUE));
                     }
 
-                    index = value_of(word[3], TRUE);    
+                    index = value_of(word[3], TRUE);
 
-                    for (counter = 0; counter < index; counter++) {
-                         strcat(setstring_buffer, text_of_word(2));
+                    {
+                        const char *pad   = text_of_word(2);
+                        size_t      plen  = (pad != NULL) ? strlen(pad) : 0;
+                        size_t      used  = 0;
+                        size_t      max   = sizeof setstring_buffer;
+                        if (plen > 0) {
+                            for (counter = 0; counter < index; counter++) {
+                                if (used + plen + 1 > max) break;
+                                memcpy(setstring_buffer + used, pad, plen);
+                                used += plen;
+                            }
+                            setstring_buffer[used] = 0;
+                        }
                     }
 
                     /* setstring_buffer IS NOW FILLED, COPY THE UP TO 1023 BYTES OF
@@ -2477,9 +2596,21 @@ execute(const char *funcname)
                                 } else
                                     *container = *container / counter;
                             } else if (!strcmp(word[mark], "locationof")) {
-                                *container = grand_of(counter, FALSE);
+                                /* grand_of dereferences object[counter];
+                                 * validate before calling so a stale
+                                 * pointer (-1, 0, or > objects) doesn't
+                                 * read out-of-bounds. */
+                                if (counter < 1 || counter > objects) {
+                                    badptrrun(word[mark + 1], counter);
+                                } else {
+                                    *container = grand_of(counter, FALSE);
+                                }
                             } else if (!strcmp(word[mark], "grandof")) {
-                                *container = grand_of(counter, TRUE);
+                                if (counter < 1 || counter > objects) {
+                                    badptrrun(word[mark + 1], counter);
+                                } else {
+                                    *container = grand_of(counter, TRUE);
+                                }
                             } else if (word[mark][0] == '=') {
                                 *container = counter; 
                             } else {
@@ -2649,7 +2780,7 @@ execute(const char *funcname)
                     }
                     object_1 = value_of(word[3], TRUE);
                     if (object_1 < 1 || object_1 > objects) {
-                        badptrrun(word[1], object_1);
+                        badptrrun(word[3], object_1);
                         return (exit_function(TRUE));
                     } else {
                         object[index]->PARENT = object_1;
@@ -2961,23 +3092,36 @@ set_arguments(const char *function_call)
             argument_buffer[index] = function_call[index];
             if (new_word) {
                 // THIS IS THE FIRST CHARACTER OF A NEW ARGUMENT SO STORE
-                // THE ADDRESS OF THIS CHARACTER IN THE ARGUMENT BUFFER
-                arg_ptr[position] = &argument_buffer[index];
-                new_word = FALSE;
-                if (position < MAX_WORDS)
+                // THE ADDRESS OF THIS CHARACTER IN THE ARGUMENT BUFFER.
+                // Gate the write inside the bounds check; the old form
+                // wrote arg_ptr[position] before bumping position, so
+                // a function call with MAX_WORDS+1 args wrote one
+                // pointer past the end of the local array.
+                if (position < MAX_WORDS) {
+                    arg_ptr[position] = &argument_buffer[index];
                     position++;
+                }
+                new_word = FALSE;
             }
         }
     }
 
     argument_buffer[index] = 0;
 
-    /* CLEAR THE NEXT ARGUMENT POINTER */
-    arg_ptr[position] = NULL;
+    /* CLEAR THE NEXT ARGUMENT POINTER (sentinel for the consumer
+     * loop below). If position already maxed out at MAX_WORDS the
+     * sentinel slot doesn't exist, but the iterating loop's bound
+     * check below also stops at MAX_WORDS, so the loop is safe. */
+    if (position < MAX_WORDS) {
+        arg_ptr[position] = NULL;
+    }
 
-    /* STORE THE INTEGER VALUE OF EACH ARGUMENT PASSED*/
+    /* STORE THE INTEGER VALUE OF EACH ARGUMENT PASSED. The index
+     * bound mirrors the writer's cap; without it, a function call
+     * that filled every slot above would walk past the sentinel
+     * into undefined memory. */
     index = 0;
-    while (arg_ptr[index] != NULL) {
+    while (index < MAX_WORDS && arg_ptr[index] != NULL) {
         //arg_value[index] = value_of(arg_ptr[index], TRUE);
 
         if ((resolved_integer = integer_resolve(arg_ptr[index])) != NULL) {
@@ -3109,10 +3253,10 @@ pop_stack()
 }
 
 #ifdef GLK
-void
+int
 push_stack(glsi32 file_pointer)
 #else
-void
+int
 push_stack(long file_pointer)
 #endif
 {
@@ -3121,8 +3265,16 @@ push_stack(long file_pointer)
     int counter = 0;
 
     if (stack == STACK_SIZE) {
-        log_error("Stack overflow.", PLUS_STDERR);
-        terminate(45);
+        /* Refuse to recurse further rather than killing the worker.
+         * The caller (execute or the proxy opcode handler) treats
+         * FALSE as "function not callable" and returns up the chain;
+         * the player sees an error and the next request handles
+         * cleanly. */
+        sprintf(error_buffer,
+                "Stack overflow at depth %d while trying to call '%s'; aborting this call.",
+                STACK_SIZE, called_name);
+        log_error(error_buffer, PLUS_STDERR);
+        return (FALSE);
     } else {
         backup[stack].infile = infile;
         infile = NULL;
@@ -3210,6 +3362,7 @@ push_stack(long file_pointer)
 
     // PUSH ON TO THE NEXT STACK FRAME
     stack++;
+    return (TRUE);
 }
 
 void
@@ -3257,7 +3410,7 @@ pop_proxy()
     last_exact = proxy_backup[proxy_stack].last_exact;
 }
 
-void
+int
 push_proxy()
 {
     /* COPY ALL THE CURRENT SYSTEM DATA ONTO THE STACK */
@@ -3270,8 +3423,14 @@ push_proxy()
     current_cstring = cstring_table;
 
     if (proxy_stack == STACK_SIZE) {
-        log_error("Stack overflow.", PLUS_STDERR);
-        terminate(45);
+        /* Same change-of-policy as push_stack: refuse to recurse
+         * rather than killing the worker. Callers handle FALSE by
+         * exiting the current function cleanly. */
+        sprintf(error_buffer,
+                "Proxy stack overflow at depth %d; aborting this call.",
+                STACK_SIZE);
+        log_error(error_buffer, PLUS_STDERR);
+        return (FALSE);
     } else {
         proxy_backup[proxy_stack].start_of_this_command = start_of_this_command;
         proxy_backup[proxy_stack].start_of_last_command = start_of_last_command;
@@ -3333,6 +3492,7 @@ push_proxy()
 
     // PUSH ON TO THE NEXT STACK FRAME
     proxy_stack++;
+    return (TRUE);
 }
 
 int
@@ -3482,9 +3642,12 @@ logic_test(int first)
             }
         }
     } else {
+        /* The operator slot is word[first + 1]; the old form quoted
+         * word[2], which was the operator of the FIRST triple in a
+         * compound condition, not the failing one. */
         sprintf(error_buffer,
                 "ERROR: In function \"%s\", illegal operator \"%s\".^",
-                executing_function->name, word[2]);
+                executing_function->name, word[first + 1]);
         write_text(error_buffer);
         return (FALSE);
     }
@@ -3678,7 +3841,12 @@ add_cstring(const char *name, const char *value)
         strncpy(new_string->name, name, 40);
         new_string->name[40] = 0;
         strncpy(new_string->value, value, 1023);
-        new_string->value[1024] = 0;
+        /* NUL goes at index 1023 (one past the 1023 chars strncpy
+         * may have written), not 1024. The struct is [1025] so
+         * writing [1024] was in bounds but left byte 1023
+         * potentially non-NUL, which would corrupt strlen/strcpy
+         * callers on a 1023+-char source. */
+        new_string->value[1023] = 0;
         new_string->next_string = NULL;
     }
 }
@@ -3937,6 +4105,11 @@ web_render_status_bar(void)
             sw->value);
     write_text(temp_buffer);
     web_status_begin(sw->value, cols);
+    /* Counter incremented each time the bar is emitted this request.
+     * cgijacl.c's end-of-ajax safety net checks it and emits one
+     * more if no updatestatus fired during the command -- catches
+     * TIME=false verbs like look / inventory that skip eachturn. */
+    web_status_emit_count++;
 
     /* Try a web-specific override first, then the GLK function name
      * (so games that already have +update_status_window can share it

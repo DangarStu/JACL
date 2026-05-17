@@ -769,7 +769,11 @@ macro_resolve(const char *testString)
 	int             delimiter = 0;
 	char            expression[84];
 
-	strncpy(expression, testString, 80);
+	/* strncpy(80) into [84] without explicit NUL would leave the
+	 * buffer unterminated when testString >= 80 chars, and the
+	 * following strlen would read past the buffer. */
+	strncpy(expression, testString, sizeof expression - 1);
+	expression[sizeof expression - 1] = 0;
 
 	counter = strlen(expression);
 
@@ -1097,7 +1101,9 @@ object_element_resolve(const char *testString)
 	struct integer_type *resolved_integer;
 	struct cinteger_type *resolved_cinteger;
 
-	strncpy(expression, testString, 80);
+	/* Same NUL-termination guard as macro_resolve above. */
+	strncpy(expression, testString, sizeof expression - 1);
+	expression[sizeof expression - 1] = 0;
 
 	//sprintf(temp_buffer, "incoming = %s^", testString);
 	//write_text (temp_buffer);
@@ -1319,7 +1325,7 @@ attribute_resolve(const char *attribute)
 	else if (!strcmp(attribute, "DONE"))
 		return (DONE);
 	else if (!strcmp(attribute, "GAS"))
-		return (MAPPED);
+		return (GAS);
 	else if (!strcmp(attribute, "NO_TAB"))
 		return (NO_TAB);
 	else if (!strcmp(attribute, "NOT_IMPORTANT"))

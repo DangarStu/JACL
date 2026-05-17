@@ -149,6 +149,14 @@ write noun1{The} " is no good to eat.^"
 
 <P>will display, &quot;The small wooden box is no good to eat.&quot;
 
+<P>If you need the object's description without any leading article, use <B>{plain}</B> (or <B>{Plain}</B> for the capitalised form). With <B>noun1</B> still set to the box object:
+
+<pre>
+write noun1{plain} " sits on the shelf.^"
+</pre>
+
+<P>would display, &quot;small wooden box sits on the shelf.&quot; The <B>{plain}</B> macro returns the noun phrase exactly as stored in the object's <B>inventory</B> slot &mdash; useful when you need to compose the article yourself, or when the object name is being used as a label rather than as part of a sentence.
+
 <h3><a class="section" name="screendisplay6">Sentences Referring to Varying Objects</a></h3>
 
 <P>There are several other macros that may be used with the <B>write</B> command to assist in constructing sentences that refer to different objects at different times. They are designed to simplify the process of displaying the correct text for objects based on whether they have the attributes <B>PLURAL</B>, <b>ANIMATE</b> or <b>FEMALE</b>. They are:

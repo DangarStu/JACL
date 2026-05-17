@@ -100,9 +100,9 @@ char* list_output(int index, int capital);
 char* long_output(int index);
 void terminate(int code);
 #ifdef GLK
-void push_stack(glsi32 file_pointer);
+int  push_stack(glsi32 file_pointer);
 #else
-void push_stack(long file_pointer);
+int  push_stack(long file_pointer);
 #endif
 void write_text(const char *string_buffer);
 void status_line(void);

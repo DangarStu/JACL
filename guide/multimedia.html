@@ -406,6 +406,11 @@ constant status_window 3
 
 <p>The status window is always created using a fixed-width font and its current dimensions can be read at any time using the values of <b>status_width</b> and <b>status_height</b>. Although <b>status_height</b> will most often be equal to <b>status_window</b> (unless <b>status_window</b> exceeded the available space), <b>status_width</b> will change as the player resizes the game window.
 
+<table class="infowarn"><tr>
+<td><img src="info.png" alt="Information"></td>
+<td>Under the web interpreter, the rendered bar height is clamped at 10 rows regardless of <b>status_window</b>, so a very tall value will not eat the whole viewport. <b>status_width</b> is set per request from the browser's measured <b>status_cols</b>; do not set <b>status_window_width</b> from game source.</td>
+</tr></table>
+
 <p>If a status window is created, the interpreter will attempt to call the global function <b>+update_status_window</b>. If this function exists, it will be executed and must contain code to draw the contents of the status window. If this function doesn't exist, the interpreter will use internal code to generate a standard interactive fiction status line. This consists of a single line with the name of the current location against the left side and the number of moves and current score against the right. 
 
 <p>If the function <b>+update_status_window</b> does exist, the current Glk stream is set to that window before it is called so all <b>write</b> or <b>print</b> commands will output to it. The window is also first cleared of all previous contents and the cursor is positioned in the top left corner.

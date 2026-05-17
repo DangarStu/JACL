@@ -66,8 +66,8 @@ char            walkthru[84] = "\0";
 char			clicked_word[34] = "\0";
 char            function_name[84];
 
-char            default_function[84];
-char            override[84];
+char            default_function[256];
+char            override[256];
 
 char            temp_buffer[1024];
 char            error_buffer[1024];

@@ -33,9 +33,9 @@ struct stack_type {
     char			str_arguments[MAX_WORDS][256];
 	char            text_buffer[1024];
 	char            called_name[1024];
-	char			override[84];
+	char			override[256];
 	char			scope_criterion[24];
-	char			default_function[84];
+	char			default_function[256];
 	const char		*word[MAX_WORDS];
 	int				quoted[MAX_WORDS];
 	int				wp;

@@ -302,7 +302,36 @@ integer MOTOR_POWER       DEFAULT_POWER
 <tr><td><b>notify</b></td>
 <td>When set to <b>true</b> the player will be notified of any increase in their score when the <b>points</b> command is used.</td>
 </tr>
+<tr><td><b>linebreaks</b></td>
+<td>When <b>true</b> (the default), each <b>write</b> command appends a newline if the output does not already end with one. Set to <b>false</b> while emitting raw HTML markers (e.g. <b>&lt;jacl-directions&gt;</b>) so the engine does not insert breaks mid-element.</td>
+</tr>
+<tr><td><b>graphics_enabled</b>, <b>sound_enabled</b>, <b>timer_enabled</b></td>
+<td>Player or engine preference for whether graphics, sound, and timer events are active. The matching cintegers <b>graphics_supported</b>, <b>sound_supported</b>, <b>timer_supported</b> indicate whether the current interpreter is capable of them at all.</td>
+</tr>
+<tr><td><b>multi_prefix</b></td>
+<td>When set, the parser prefixes each line of a multi-object verb response with the matched object's short name (e.g. "the apple: Taken." instead of just "Taken.").</td>
+</tr>
+<tr><td><b>interrupted</b></td>
+<td>Set to <b>true</b> by a command (typically inside a loop or eachturn) to halt further processing of the current turn.</td>
+</tr>
+<tr><td><b>local</b>, <b>local_x</b>, <b>local_y</b>, <b>local_a</b></td>
+<td>Scratch integers for use inside functions. The engine does not touch them; they survive a function call only if you push them yourself.</td>
+</tr>
+<tr><td><b>pending_question_type</b>, <b>pending_number_low</b>, <b>pending_number_high</b></td>
+<td>Engine-managed flags that track an in-flight <b>getyesorno</b> or <b>getnumber</b>. Game code should generally not write these; the engine reads them at the start of the next turn to route the player's answer back to the right callback.</td>
+</tr>
+<tr><td><b>intro_answers</b></td>
+<td>Counter the web interpreter uses to track how many of the <b>+startup_preferences</b> questions a returning player has already answered. Lets the engine resume the intro chain after each ajax round-trip.</td>
+</tr>
+<tr><td><b>status_window_width</b></td>
+<td>Width (in characters) of the virtual status window grid. On the web interpreter this is updated automatically from the client's <b>?status_cols=N</b> parameter on every request; do not set it from game source. See <a href="screendisplay.html">Screen Display</a> for the grid layout.</td>
+</tr>
 </TABLE>
+
+<table class="infowarn"><tr>
+<td><img src="warning.png" alt="Warning"></td>
+<td>If a game declares an <b>integer</b> with a name the engine has already created (e.g. <code>integer score 0</code>), the loader emits a warning to stderr and the declaration creates a second entry in the integer table that <b>set</b> never sees but <b>save</b>/<b>restore</b> still writes. Always use a distinct name; if you need to override an engine variable's initial value, just <b>set</b> it inside <b>+bootstrap</b>.</td>
+</tr></table>
 
 <!-- NEW PAGE -->
 

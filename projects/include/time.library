@@ -115,8 +115,9 @@ execute "+process_epoch<arg[0]"
 if TIME_hour < 10
    setstring return_value "0"
    addstring return_value TIME_hour
+else
+   setstring return_value TIME_hour
 endif
-setstring return_value TIME_hour
 }
 
 {+process_epoch
@@ -227,18 +228,23 @@ return TIME_year
 }
 
 {+is_leap_year?
+# The % 100 and % 4 checks previously read the GLOBAL TIME_year
+# instead of arg[0]. Calling +is_leap_year? with a year other
+# than "now" silently scored from the current year.
 set TIME_temp = arg[0]
 set TIME_temp % 400
 if TIME_temp = 0
    set TIME_leapyear = true
    return true
 endif
-set TIME_temp = TIME_year % 100
+set TIME_temp = arg[0]
+set TIME_temp % 100
 if TIME_temp = 0
    set TIME_leapyear = false
    return false
 endif
-set TIME_temp = TIME_year % 4
+set TIME_temp = arg[0]
+set TIME_temp % 4
 if TIME_temp = 0
    set TIME_leapyear = true
    return true
@@ -332,9 +338,12 @@ return TIME_minute_sec
 }
 
 {+parse_date
+# TIME_day is the day-of-week index, used by +macro_day to look up
+# a name in TIME_CONST_days. Don't reuse it for day-of-month --
+# the call below sets TIME_date as it should.
 split TIME_index string_arg[0] "/" "TIME_chunk"
-set TIME_day = TIME_chunk[0] - 1          # ZERO-BASED
+set TIME_date = TIME_chunk[0] - 1         # ZERO-BASED
 set TIME_month = TIME_chunk[1] - 1        # ZERO-BASED
 set TIME_year = TIME_chunk[2]
-return +get_seconds_for_date<TIME_day<TIME_month<TIME_year
+return +get_seconds_for_date<TIME_date<TIME_month<TIME_year
 }

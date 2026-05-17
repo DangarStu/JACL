@@ -151,6 +151,14 @@ resolve_yes_or_no(const char *input)
     return -1;
 }
 
+/* Defined in interpreter.c next to the updatestatus opcode handler. */
+void            web_render_status_bar(void);
+/* Counter incremented inside web_render_status_bar() so the end-of-
+ * ajax safety net below can tell whether a turn already emitted a
+ * status bar; reset to 0 at the top of every request. Definition
+ * lives further down with the other web_status_* state. */
+extern int      web_status_emit_count;
+
 char            include_directory[81] = "\0";
 char            temp_directory[81] = "\0";
 char            data_directory[81] = "\0";
@@ -160,7 +168,7 @@ char            access_log[81] = "\0";
 
 char            function_name[81];
 char            rpc_function_name[81];
-char            override[81];
+char            override[256];
 
 char            temp_buffer[1024];
 char            file_buffer[1024];
@@ -460,7 +468,12 @@ main(int argc, char *argv[])
     sprintf(saved_start, "%s%s-start.saved", temp_directory, prefix);
 
     if (save_game(saved_start) == FALSE) {
-        sprintf(error_buffer, cstring_resolve("CANT_SAVE")->value, saved_start);
+        /* Treat CANT_SAVE as a plain message, not a format string -- a
+         * game that overrides it with a "%n" or unmatched-arg cstring
+         * would otherwise hit a format-string vuln. The filename info
+         * is appended as a separate, engine-controlled line. */
+        snprintf(error_buffer, sizeof error_buffer, "%s [%s]",
+                 cstring_resolve("CANT_SAVE")->value, saved_start);
         log_error(error_buffer, PLUS_STDERR);
     }
 
@@ -519,6 +532,19 @@ main(int argc, char *argv[])
             }
 
             restart_game();
+
+            /* Re-save saved_start so it matches the freshly loaded
+             * object/integer/function/string counts. Without this,
+             * the next fresh-user request's restore_game(saved_start)
+             * sees the pre-reload count header and aborts with
+             * "incompatible saved-game file", falling all the way
+             * back to restart_game() again -- wasted work, plus the
+             * misleading log noise. */
+            if (save_game(saved_start) == FALSE) {
+                snprintf(error_buffer, sizeof error_buffer, "%s [%s]",
+                         cstring_resolve("CANT_SAVE")->value, saved_start);
+                log_error(error_buffer, PLUS_STDERR);
+            }
 
             previous_last_modified = current_last_modified;
         }
@@ -590,6 +616,12 @@ main(int argc, char *argv[])
                         ? " Secure;" : "";
                     printf("Status: 200 OK\r\n");
                     printf("Content-type: application/json\r\n");
+                    /* Mark the auth response uncacheable. The body
+                     * carries a Set-Cookie that's specific to this
+                     * one sign-in; a misbehaving intermediary that
+                     * cached the response would hand another user
+                     * that cookie. */
+                    printf("Cache-Control: no-store, private\r\n");
                     printf("Set-Cookie: jacl_session=%s; Path=/; HttpOnly;%s "
                            "SameSite=Lax; Max-Age=%ld\r\n",
                            pending_session_cookie, secure_flag,
@@ -601,7 +633,8 @@ main(int argc, char *argv[])
                             credential ? err : "no credential");
                     log_error(error_buffer, LOG_ONLY);
                     printf("Status: 401 Unauthorized\r\n");
-                    printf("Content-type: application/json\r\n\r\n");
+                    printf("Content-type: application/json\r\n");
+                    printf("Cache-Control: no-store, private\r\n\r\n");
                     printf("{\"ok\":false}\n");
                 }
                 list_clear(&entries);
@@ -613,6 +646,7 @@ main(int argc, char *argv[])
                     ? " Secure;" : "";
                 printf("Status: 200 OK\r\n");
                 printf("Content-type: application/json\r\n");
+                printf("Cache-Control: no-store, private\r\n");
                 printf("Set-Cookie: jacl_session=; Path=/; HttpOnly;%s "
                        "SameSite=Lax; Max-Age=0\r\n", secure_flag);
                 printf("\r\n{\"ok\":true}\n");
@@ -630,10 +664,24 @@ main(int argc, char *argv[])
             if (session != NULL &&
                 auth_verify_session_cookie(session, google_sub,
                                            sizeof(google_sub)) == 0) {
+                /* google_sub comes out of a JWT verified against
+                 * Google's JWKS, so its charset should already be
+                 * Google's stable [0-9A-Za-z._-]. Re-validate the
+                 * composed user_id anyway -- it lands in file paths
+                 * and Set-Cookie headers, and the cost is trivial
+                 * compared to the blast radius if a future change
+                 * loosens the upstream check. */
                 snprintf(user_id, sizeof(user_id), "google_%s", google_sub);
-                cookie_read_successfully = TRUE;
-                returning_player = TRUE;
-                REMOTE_USER_USED->value = TRUE;
+                if (is_safe_user_id(user_id, sizeof(user_id))) {
+                    cookie_read_successfully = TRUE;
+                    returning_player = TRUE;
+                    REMOTE_USER_USED->value = TRUE;
+                } else {
+                    log_error("Rejected Google session: composed user_id failed safe-charset check.",
+                              LOG_ONLY);
+                    user_id[0] = 0;
+                    google_sub[0] = 0;
+                }
             }
         }
 
@@ -776,6 +824,7 @@ main(int argc, char *argv[])
 
         /* RESET GLOBAL VARIABLES THAT ARE INTERNAL TO THE INTERPRETER */
         style_index = 0;
+        web_status_emit_count = 0;
 
         /* If the JS sent a measured 'status_cols' (the actual character
          * width of the rendered #statuswin element on the client), use
@@ -871,6 +920,12 @@ main(int argc, char *argv[])
 
                 if (!strcmp(cgi_val(entries, "rpc"), "timer")) {
                     execute("+timer");
+                } else if (!strcmp(cgi_val(entries, "rpc"), "resize")) {
+                    /* Client viewport resized: re-render the status
+                     * bar at the new column count (already applied to
+                     * status_window_width from &status_cols= above).
+                     * No turn state mutation -- just the bar. */
+                    web_render_status_bar();
                 } else if (!strcmp(cgi_val(entries, "rpc"), "ajax")) {
                     execute("+ajax");
                 } else if (!strcmp(cgi_val(entries, "rpc"), "eachturn")) {
@@ -885,8 +940,13 @@ main(int argc, char *argv[])
                     // IT PREVENTS ANY FUNCTION BEING CALLED AT WILL, BUT
                     // PROVIDES A CLEAN INTERFACE FOR THE PURPOSE OF THE CALL
                     // TO BE HANDLED INSIDE +rpc
-                    strcpy(rpc_function_name, "+");
-                    strncat(rpc_function_name, cgi_val(entries, "rpc"), 80);
+                    /* snprintf bounds the combined "+" + rpc-arg copy
+                     * to rpc_function_name's full capacity. The prior
+                     * strcpy("+") + strncat(..., 80) wrote up to 82
+                     * bytes into the 81-byte buffer when the HTTP
+                     * ?rpc= value reached 80 chars. */
+                    snprintf(rpc_function_name, sizeof rpc_function_name,
+                             "+%s", cgi_val(entries, "rpc"));
                     execute("+rpc");
                 }
             } else {
@@ -1127,6 +1187,19 @@ skip_command:
             }
         }
 
+        /* If the command processed this request didn't call updatestatus
+         * (e.g. look/inventory/examine -- verbs that set TIME=false and
+         * skip +system_eachturn), emit one now. Keeps the status bar
+         * grid in sync with the latest &status_cols= even on non-turn
+         * commands, so a browser resize followed by any command refreshes
+         * the bar's width. Skipped for full-page (non-ajax) loads, which
+         * already render the bar via the +intro path. */
+        if (web_status_emit_count == 0
+            && cgi_val(entries, "ajax") != NULL
+            && !strcmp(cgi_val(entries, "ajax"), "true")) {
+            web_render_status_bar();
+        }
+
         /* DISPLAY THE FOOTER OF THE HTML PAGE */
         if (cgi_val(entries, "rpc") == NULL &&
             (cgi_val(entries, "ajax") == NULL || strcmp(cgi_val(entries, "ajax"), "true"))) {
@@ -1139,7 +1212,12 @@ skip_command:
            RESTORED BEFORE THE PLAYER'S NEXT MOVE */
         sprintf(temp_buffer, "%s%s-%s.auto", temp_directory, prefix, user_id);
         if (save_game(temp_buffer) == FALSE) {
-            sprintf(error_buffer, cstring_resolve("CANT_SAVE")->value, prefix, temp_buffer);
+            /* See the earlier CANT_SAVE site for the rationale: treat
+             * the game-defined cstring as a plain message, append the
+             * filename info via the engine-controlled "%s [%s/%s]"
+             * template. */
+            snprintf(error_buffer, sizeof error_buffer, "%s [%s/%s]",
+                     cstring_resolve("CANT_SAVE")->value, prefix, temp_buffer);
             log_error(error_buffer, PLUS_STDOUT);
         }
 
@@ -1528,6 +1606,13 @@ static int  web_status_x = 0;
 static int  web_status_y = 0;
 static int  web_status_w = 80;
 static int  web_status_h = 1;
+/* Counter incremented each time web_render_status_bar() (defined in
+ * interpreter.c) runs. The request handler resets it to 0 at the
+ * start of each request and checks it at the end -- if still 0 (no
+ * updatestatus fired during the command, e.g. a TIME=false verb
+ * like look/inventory) it emits one anyway so the bar always tracks
+ * the latest grid width sent via &status_cols=. */
+int         web_status_emit_count = 0;
 static char web_status_grid[WEB_STATUS_MAX_ROWS][WEB_STATUS_MAX_COLS + 1];
 
 void
@@ -1617,6 +1702,10 @@ web_status_end(void)
         write_text(row_html);
     }
 }
+
+/* web_render_status_bar() is defined in interpreter.c next to the
+ * updatestatus opcode handler; the prototype lives in prototypes.h.
+ * The call sites in this file go through that single definition. */
 
 void
 write_text(const char *tout_buffer)
