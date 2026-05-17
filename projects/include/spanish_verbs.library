@@ -1182,7 +1182,6 @@ endif
 override
 if noun1 has ANIMATE
    proxy "attack " noun1{names}
-   endif
 endif
 if noun1 has LIQUID
    write "Una mano mojada es tu unica recompensa.^"
@@ -3137,7 +3136,7 @@ ifall noun1 has ANIMATE : noun1 has DEAD
    set time = false
    return true
 endif
-if +worn<noun1 = true
+if +worn<noun2 = true
    return true
 endif
 override
@@ -4685,6 +4684,7 @@ if noun1 = noun2
       write "si mismos.^"
    else
       write "si mismo.^"
+   endif
    set time = false
    return true
 endif
@@ -5362,7 +5362,7 @@ integer candidate
 set INDEX = 0
 set candidate = 0
 select *present
-  ifall noun3 has ANIMATE noun3 != player
+  ifall noun3 has ANIMATE : noun3 != player
      set candidate = noun3
      set INDEX + 1
   endif
@@ -5536,9 +5536,10 @@ write "^"
 if here has WITHOUT_AIR
    if tank hasnt WORN
       write "(conteniendo la respiracion)^"
-endall
+   endif
+endif
 if player has SITTING
-      write "(sentado)^"
+   write "(sentado)^"
 endif
 }
 
