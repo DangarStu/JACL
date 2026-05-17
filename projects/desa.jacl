@@ -1594,6 +1594,11 @@ object kryten : aku diri sendiri saya
  parent        rumah
  player
 
+{examine
+write "Kamu merasa sehat dan siap untuk memulai hari.^"
+execute "+inventory"
+}
+
 object uang : uang rupiah duit
  short         name "uang"
  long          "Ada uang di sakumu.^"
@@ -1636,11 +1641,6 @@ write "Kamu membuka payung.^"
 {close_override
 ensure payung has CLOSED
 write "Kamu menutup payung.^"
-}
-
-{examine
-write "Kamu merasa sehat dan siap untuk memulai hari.^"
-execute "+inventory"
 }
 
 # -----------------------------------------------------------------------------
