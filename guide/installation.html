@@ -300,6 +300,22 @@ sudo chmod 775 /usr/local/jacl/logs
 
 <p>Common issues include incorrect file permissions on the <b>temp</b> directory, a missing or misconfigured <b>cgijacl.conf</b> file, or the <b>fcgijacl</b> binary not being found at the path specified in the wrapper script.
 
+<h2><a class="section" name="installation9">Editor Support</a></h2>
+
+<p>JACL ships with a Visual Studio Code extension that provides syntax highlighting and bracket/comment configuration for <b>.jacl</b> and <b>.library</b> files. The source lives in the <b>editors/vscode-jacl</b> directory of the repository, alongside a pre-built <b>jacl-0.1.0.vsix</b> bundle.
+
+<p>To install from the pre-built package, run:
+
+<pre>
+code --install-extension editors/vscode-jacl/jacl-0.1.0.vsix
+</pre>
+
+<p>VS Code will then automatically apply JACL highlighting whenever you open a file with the <b>.jacl</b> or <b>.library</b> extension. The highlighter recognises every keyword listed in the <a href="JACLReferenceCard.html">Reference Card</a>, every direction and attribute constant declared by the interpreter, and the <b>{name</b> / <b>+name</b> function syntax, as well as JACL's string-with-tilde HTML attribute convention.
+
+<p>To rebuild the <b>.vsix</b> after modifying the grammar, install the <b>vsce</b> packaging tool (<b>npm install -g @vscode/vsce</b>) and run <b>vsce package</b> inside the <b>editors/vscode-jacl</b> directory.
+
+<p>If your editor of choice is something other than VS Code, the TextMate grammar at <b>editors/vscode-jacl/syntaxes/jacl.tmLanguage.json</b> is portable to any editor that consumes that format (Sublime Text, Atom forks, and several JetBrains IDEs through plugins).
+
 <!-- END OF BODY -->
 <p><a href="index.html">Back to Contents</a>
 </body>

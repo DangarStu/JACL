@@ -69,6 +69,7 @@ Ave, Cambridge, MA 02139, USA.
 	<li><a href="#installation6">Automated Setup</a>
 	<li><a href="#installation7">Manual Setup</a>
 	<li><a href="#installation8">Troubleshooting</a>
+	<li><a href="#installation9">Editor Support</a>
 </ol>
 
 <li><a href="#playing0">Playing Interactive Fiction</a>
@@ -106,6 +107,7 @@ Ave, Cambridge, MA 02139, USA.
 	<li><a href="#debugging6">The Verb FETCH</a>
 	<li><a href="#debugging7">Other Debug Verbs</a>
 	<li><a href="#debugging8">Releasing Your Game</a>
+	<li><a href="#debugging9">Linting Source with jacl-lint.py</a>
 </ol>
 
 <li><a href="#screendisplay0">Screen Display</a>
@@ -635,6 +637,22 @@ sudo chmod 775 /usr/local/jacl/logs
 </ul>
 
 <p>Common issues include incorrect file permissions on the <b>temp</b> directory, a missing or misconfigured <b>cgijacl.conf</b> file, or the <b>fcgijacl</b> binary not being found at the path specified in the wrapper script.
+
+<h2><a class="section" name="installation9">Editor Support</a></h2>
+
+<p>JACL ships with a Visual Studio Code extension that provides syntax highlighting and bracket/comment configuration for <b>.jacl</b> and <b>.library</b> files. The source lives in the <b>editors/vscode-jacl</b> directory of the repository, alongside a pre-built <b>jacl-0.1.0.vsix</b> bundle.
+
+<p>To install from the pre-built package, run:
+
+<pre>
+code --install-extension editors/vscode-jacl/jacl-0.1.0.vsix
+</pre>
+
+<p>VS Code will then automatically apply JACL highlighting whenever you open a file with the <b>.jacl</b> or <b>.library</b> extension. The highlighter recognises every keyword listed in the <a href="JACLReferenceCard.html">Reference Card</a>, every direction and attribute constant declared by the interpreter, and the <b>{name</b> / <b>+name</b> function syntax, as well as JACL's string-with-tilde HTML attribute convention.
+
+<p>To rebuild the <b>.vsix</b> after modifying the grammar, install the <b>vsce</b> packaging tool (<b>npm install -g @vscode/vsce</b>) and run <b>vsce package</b> inside the <b>editors/vscode-jacl</b> directory.
+
+<p>If your editor of choice is something other than VS Code, the TextMate grammar at <b>editors/vscode-jacl/syntaxes/jacl.tmLanguage.json</b> is portable to any editor that consumes that format (Sublime Text, Atom forks, and several JetBrains IDEs through plugins).
 
 
 
@@ -1883,6 +1901,25 @@ report(parent) = 44
 <p>Although a <b>.j2</b> file is created each time your game is run, it is possible to use the <b>-release</b> argument when running jacl to produce a file more suitable for distribution. The argument will cause the <b>.j2</b> to be encrypted (mildly), and to only contain files included with the <b>#include</b> directive, not the <b>#debug</b> directive.
 
 <p>If you wish to create a <b>.j2</b> file that does not include the <b>#debug</b> files, but is not encrypted, you can supply the arguments <b>-release -noencrypt</b>.
+
+<h2><a class="section" name="debugging9">Linting Source with jacl-lint.py</a></h2>
+
+<p>The <b>projects</b> directory ships a small Python tool, <b>jacl-lint.py</b>, that performs two passes over JACL source files. It is safe to run repeatedly &mdash; it is purely a formatter and reporter and never alters game logic.
+
+<p>The first pass is a formatter: inside any <b>location</b>, <b>object</b> or <b>player</b> block, it rewrites property lines so their values line up at a consistent column. It also normalises whitespace on top-level <b>constant</b>, <b>integer</b>, <b>string</b> and <b>grammar</b> declaration groups, and re-indents <b>print:</b> block bodies. Padding is always plain spaces, so the result looks identical regardless of an editor's tab-width setting.
+
+<p>The second pass scans for an odd number of <b>&quot;</b> characters on any line outside of a <b>print:</b> block, which almost always indicates a missing closing quote on a <b>write</b> statement. JACL string literals run until the parser sees a closing quote, possibly many lines later, so an unclosed <b>write &quot;&lt;div ...&gt;</b> silently absorbs the next <b>write</b> into the literal and corrupts the rendered output. Hits are printed to standard error with the offending line number and snippet.
+
+<p>Typical invocations:
+
+<pre>
+./jacl-lint.py path/to/game.jacl              # reformat one file in place
+./jacl-lint.py --check path/to/game.jacl      # report only, exit 1 if dirty
+./jacl-lint.py --column 20 game.jacl          # custom alignment column
+./jacl-lint.py projects/                      # recurse a whole tree
+</pre>
+
+<p>When passed a directory, the tool recurses into it and processes every <b>.jacl</b> and <b>.library</b> file beneath. The <b>--check</b> flag is intended for use in CI: it prints what would change and what quote problems were found, but does not write to any file, and exits non-zero if either category produced output. This makes it suitable as a pre-commit or build-pipeline gate.
 
 
 
