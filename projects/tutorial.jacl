@@ -27,7 +27,7 @@ print:
    in the centre of the room while a doorway to the
    west leads into the bathroom.
 .
-write "To the south there is " 
+write "To the south there is a " 
 if door has CLOSED
    write "closed"
 else
