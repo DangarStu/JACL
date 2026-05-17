@@ -30,6 +30,18 @@ integer voice_enabled
 integer intro_dedication_shown
 integer intro_scene_shown
 
+# Status-bar character grid width on the web build. Purely a runtime
+# value -- never set in game source. resolvers.c surfaces it as the
+# JACL `status_width` symbol (used by +print_right and +print_centred
+# to position text at the right/centre of the bar). cgijacl reads
+# &status_cols= off each ajax/hyperlink request and writes the
+# measured column count here, so the bar tracks viewport resizes.
+# Must be declared (integer_resolve returns NULL otherwise and the
+# cgijacl assignment silently no-ops); the first +intro render falls
+# back to status_width's 80-column default until the first ajax
+# request arrives with a measurement.
+integer status_window_width
+
 # Opt-out for utility / non-IF games (life, blackjacl, etc.). Set to
 # true in +intro before 'execute "+game_intro"' to skip the voice
 # and sound questions, which don't make sense for them.
@@ -828,6 +840,26 @@ print:
             p.catch(function() {});^
          }, 200);^
       });^
+      /* Hyperlinks emitted by the `hyperlink` opcode are plain^
+       * <a href=~?command=...&user_id=...~> anchors that cause a full^
+       * page reload. Unlike the AJAX form path, they don't carry^
+       * &status_cols= in the URL, so a resize wouldn't propagate to^
+       * the engine on the next hyperlink click and +print_right would^
+       * keep landing at the old column. Intercept those clicks at the^
+       * document level and append a fresh measurement to the href^
+       * before navigation -- modifying this.href in a click handler^
+       * is honoured by browsers as the destination URL. */^
+      document.addEventListener('click', function(e) {^
+         var a = e.target && e.target.closest ? e.target.closest('a') : null;^
+         if (!a) return;^
+         var href = a.getAttribute('href');^
+         if (!href) return;^
+         if (href.indexOf('command=') === -1) return;^
+         if (href.indexOf('status_cols=') !== -1) return;^
+         var cols = (typeof jaclMeasureStatusCols === 'function') ? jaclMeasureStatusCols() : (window.jaclStatusCols || 80);^
+         var sep = (href.indexOf('?') !== -1) ? '&' : '?';^
+         a.setAttribute('href', href + sep + 'status_cols=' + cols);^
+      }, true);^
       /* Pick up any <jacl-timer> the initial +intro emitted, in case^
        * a game starts a timer right at game launch. */^
       jaclProcessTimerMarker(maintext);^

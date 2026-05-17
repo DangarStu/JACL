@@ -24,6 +24,7 @@ void web_status_end(void);
 void web_status_cursor(int x, int y);
 void web_status_putchar(int c);
 int  web_status_active(void);
+void web_render_status_bar(void);
 #endif
 
 void default_footer(void);

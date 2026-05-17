@@ -68,7 +68,7 @@ char *strcasestr(const char *s, const char *find)
 extern void jflush(void);
 #endif
 #ifndef GLK
-extern void web_emit_status_bar(void);
+extern int web_status_emit_count;
 #endif
 
 #define MAX_TRY 10
@@ -96,6 +96,7 @@ static int            write_fd;
 #ifndef GLK
 static char *url_encode(const char *str);
 static char to_hex(char code);
+void web_render_status_bar(void);
 #endif
 
 static const char * const location_attributes[] = {
@@ -2245,10 +2246,12 @@ execute(const char *funcname)
             } else if (!strcmp(word[0], "updatestatus")) {
                 /* Web build: render the status bar through a virtual
                  * character grid so the same cursor X Y + write idiom
-                 * works as on a GLK TextGrid. The helper lives in
-                 * cgijacl.c next to the grid plumbing and is shared
-                 * with the rpc=resize handler. */
-                web_emit_status_bar();
+                 * works as on a GLK TextGrid. The body lives in
+                 * web_render_status_bar() below; it is also invoked
+                 * from utils.c's eachturn() (runtime safety net for
+                 * games with older library copies) and from cgijacl.c
+                 * on rpc=resize / end-of-ajax. */
+                web_render_status_bar();
 #endif
             } else if (!strcmp(word[0], "split")) {
 
@@ -4063,6 +4066,91 @@ select_next()
 }
 
 #ifndef GLK
+/* Render the web status bar through the virtual character grid, then
+ * emit it wrapped in a <jacl-status> marker for the JS to relocate
+ * into #statuswin. status_window holds the row count;
+ * status_window_width (default 80) the column count.
+ *
+ * Factored out of the `updatestatus` opcode handler in `execute()`
+ * above so that utils.c's eachturn() can also invoke it directly --
+ * gives the runtime a belt-and-suspenders guarantee that the status
+ * bar reflects the latest status_window_width after every player
+ * command, even if the game's library copy predates the
+ * `if interpreter = CGI: updatestatus` block in +system_eachturn
+ * (verbs.library, commit 248b2e9, 2026-05-04). */
+void
+web_render_status_bar(void)
+{
+    struct integer_type *sw = integer_resolve("status_window");
+    if (sw == NULL || sw->value <= 0) return;
+
+    struct integer_type *sww = integer_resolve("status_window_width");
+    int cols = (sww != NULL && sww->value > 0) ? sww->value : 80;
+
+    /* Clamp TOTAL_MOVES to >= 0 for the duration of the bar emission.
+     * The loader starts it at -1 ("TIME PASSES BEFORE THE FIRST
+     * PROMPT") so a status bar rendered during +intro -- before
+     * eachturn() has bumped it to 0 -- would otherwise show
+     * 'Moves: -1'. Restore the original value after so other JACL
+     * code (e.g. Eria.jacl which checks total_moves = -1) keeps
+     * working. */
+    struct integer_type *tm = integer_resolve("total_moves");
+    int saved_tm = (tm != NULL) ? tm->value : 0;
+    if (tm != NULL && tm->value < 0) {
+        tm->value = 0;
+    }
+
+    sprintf(temp_buffer,
+            "<jacl-status data-lines=~%d~ style=~display:none~>",
+            sw->value);
+    write_text(temp_buffer);
+    web_status_begin(sw->value, cols);
+    /* Counter incremented each time the bar is emitted this request.
+     * cgijacl.c's end-of-ajax safety net checks it and emits one
+     * more if no updatestatus fired during the command -- catches
+     * TIME=false verbs like look / inventory that skip eachturn. */
+    web_status_emit_count++;
+
+    /* Try a web-specific override first, then the GLK function name
+     * (so games that already have +update_status_window can share it
+     * between targets thanks to the grid emulation), then fall back
+     * to a sensible default. */
+    if (execute("+update_status_window_web") == FALSE
+        && execute("+update_status_window") == FALSE) {
+        /* Default: location title left-justified, 'Score: N
+         * Moves: N' right-justified. Skipped when HERE doesn't
+         * resolve to a real object (e.g. utility games like life.jacl
+         * whose player has no parent). */
+        char defstr[64];
+        int len, pad, j;
+        int here_idx = HERE;
+        if (here_idx > 0 && here_idx <= objects
+            && object[here_idx] != NULL) {
+            const char *here_text = sentence_output(here_idx, TRUE);
+            if (here_text != NULL) {
+                web_status_cursor(1, 0);
+                for (j = 0; here_text[j] && j + 2 < cols; j++) {
+                    web_status_putchar((unsigned char) here_text[j]);
+                }
+            }
+        }
+        sprintf(defstr, "Score: %d  Moves: %d",
+                SCORE->value, TOTAL_MOVES->value);
+        len = (int) strlen(defstr);
+        pad = cols - len - 1;
+        if (pad < 0) pad = 0;
+        web_status_cursor(pad, 0);
+        for (j = 0; defstr[j]; j++) {
+            web_status_putchar((unsigned char) defstr[j]);
+        }
+    }
+    web_status_end();
+    write_text("</jacl-status>");
+    if (tm != NULL) {
+        tm->value = saved_tm;
+    }
+}
+
 /* Converts an integer value to its hex character*/
 char to_hex(char code) {
     static char hex[] = "0123456789abcdef";

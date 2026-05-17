@@ -26,11 +26,25 @@ eachturn()
 	strcat(function_name, object[HERE]->label);
 	execute(function_name);
 	execute("+system_eachturn");
-	
+
+#ifndef GLK
+	/* Runtime guarantee for web/CGI: re-emit the status bar at the
+	 * end of every turn so the latest status_window_width (which the
+	 * frontend reports on every AJAX request via &status_cols=) is
+	 * reflected. verbs.library has done this since commit 248b2e9
+	 * (2026-05-04) via `if interpreter = CGI: updatestatus` inside
+	 * +system_eachturn, but a game running against an older library
+	 * copy -- or a game that overrides +system_eachturn -- would
+	 * otherwise keep an outdated bar. Re-emitting twice in the same
+	 * response is harmless: the JS extracts whichever <jacl-status>
+	 * marker arrives last and patches it into #statuswin. */
+	web_render_status_bar();
+#endif
+
 	/* SET TIME TO FALSE SO THAT NO MORE eachturn FUNCTIONS ARE EXECUTED
 	 * UNTIL EITHER THE COMMAND PROMPT IS RETURNED TO (AND TIME IS SET
 	 * TO TRUE AGAIN, OR IT IS MANUALLY SET TO TRUE BY A VERB THAT CALLS
-	 * MORE THAN ONE proxy COMMAND. THIS IS BECAUSE OTHERWISE A VERB THAT 
+	 * MORE THAN ONE proxy COMMAND. THIS IS BECAUSE OTHERWISE A VERB THAT
 	 * USES A proxy COMMAND TO TRANSLATE THE VERB IS RESULT IN TWO MOVES
 	 * (OR MORE) HAVING PASSED FOR THE ONE ACTION. */
 	TIME->value = FALSE;
