@@ -628,9 +628,9 @@ main(int argc, char *argv[])
                            auth_session_max_age());
                     printf("\r\n{\"ok\":true,\"sub\":\"%s\"}\n", sub);
                 } else {
-                    sprintf(error_buffer,
-                            "Google ID token verify failed: %s",
-                            credential ? err : "no credential");
+                    snprintf(error_buffer, sizeof error_buffer,
+                             "Google ID token verify failed: %s",
+                             credential ? err : "no credential");
                     log_error(error_buffer, LOG_ONLY);
                     printf("Status: 401 Unauthorized\r\n");
                     printf("Content-type: application/json\r\n");

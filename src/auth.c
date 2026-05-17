@@ -63,6 +63,18 @@ auth_configure(const char *google_client_id,
     if (session_secret != NULL) {
         strncpy(cfg_session_secret, session_secret, sizeof(cfg_session_secret) - 1);
         cfg_session_secret[sizeof(cfg_session_secret) - 1] = 0;
+        /* A short HMAC key is no key. Refuse to honour anything
+         * obviously below brute-force resistance; auth_is_enabled()
+         * will then return 0 and the rest of the codebase treats
+         * the deployment as anonymous-only. 32 ASCII bytes is the
+         * minimum reasonable shared secret. */
+        if (strlen(cfg_session_secret) < 32) {
+            fprintf(stderr,
+                    "auth: session_secret is %zu chars (< 32); "
+                    "auth disabled. Set a longer secret in cgijacl.conf.\n",
+                    strlen(cfg_session_secret));
+            cfg_session_secret[0] = 0;
+        }
     } else {
         cfg_session_secret[0] = 0;
     }
@@ -87,6 +99,34 @@ long
 auth_session_max_age(void)
 {
     return cfg_session_max_age;
+}
+
+/* ---------- Helpers -------------------------------------------- */
+
+/* Tight allow-list for the Google `sub` claim: per spec it's a
+ * stable opaque identifier <=255 chars; in practice Google issues
+ * digits-only IDs. We accept the slightly broader [0-9A-Za-z_-]
+ * because some IdPs (and Google's own internal proxies) have
+ * occasionally returned underscores. Critically we REJECT '.'
+ * because the session-cookie format is `<sub>.<expiry>.<hex_mac>`,
+ * split rightwards on `.` -- a sub containing `.` would misparse
+ * and could lead to a cookie that round-trips to a different sub
+ * than the one the JWT actually authorised. */
+static int
+is_safe_sub(const char *sub)
+{
+    size_t i;
+    if (sub == NULL || sub[0] == 0) return 0;
+    for (i = 0; sub[i] != 0; i++) {
+        unsigned char c = (unsigned char) sub[i];
+        if (!((c >= '0' && c <= '9') ||
+              (c >= 'A' && c <= 'Z') ||
+              (c >= 'a' && c <= 'z') ||
+              c == '_' || c == '-')) {
+            return 0;
+        }
+    }
+    return 1;
 }
 
 /* ---------- Base64url ------------------------------------------ */
@@ -265,7 +305,22 @@ jwks_fetch(void)
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write_cb);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buf);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
-    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    /* No redirects: the JWKS URL is pinned to Google, so any 3xx
+     * response is either a config error or a MITM redirecting us
+     * (potentially to http://) -- safer to fail. */
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 0L);
+    /* Belt and suspenders even though libcurl defaults are already
+     * on; some distro builds disable them. Verify the server cert
+     * chain (1L) and require the hostname to match (2L). */
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
+    /* Pin the wire protocol so a DNS-poisoning attacker can't trick
+     * us into a downgrade by responding with an http:// URL anywhere
+     * a redirect or alt-svc could land. */
+#ifdef CURLPROTO_HTTPS
+    curl_easy_setopt(curl, CURLOPT_PROTOCOLS, (long) CURLPROTO_HTTPS);
+    curl_easy_setopt(curl, CURLOPT_REDIR_PROTOCOLS, (long) CURLPROTO_HTTPS);
+#endif
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "fcgijacl/1.0");
 
     if (curl_easy_perform(curl) != CURLE_OK) goto out;
@@ -377,15 +432,38 @@ auth_verify_id_token(const char *id_token,
     }
     strcpy(buf, id_token);
 
+    /* Find the last '.' BEFORE splitting so we can preserve a view
+     * of the signed input ("header.payload") without an extra copy.
+     * jwt_split overwrites the dots with NULs, which would otherwise
+     * force a snprintf("%s.%s", h, p) that silently truncates for
+     * tokens near MAX_TOKEN_BYTES. */
+    char *last_dot = strrchr(buf, '.');
+    if (last_dot == NULL) {
+        if (err_out) snprintf(err_out, err_size, "malformed JWT");
+        return -1;
+    }
+    size_t signing_input_len = (size_t) (last_dot - buf);
+
     if (jwt_split(buf, &h, &p, &s) != 0) {
         if (err_out) snprintf(err_out, err_size, "malformed JWT");
         return -1;
     }
 
-    /* The signed input is "header.payload" in the *original* token. */
+    /* signing_input points into buf at the now-NUL-separated header,
+     * but EVP_DigestVerifyUpdate sees a contiguous length-bounded
+     * span so the embedded NULs would break the verify. Reconstruct
+     * the dot in a separate buffer sized to fit. */
     char signing_input[MAX_TOKEN_BYTES];
-    snprintf(signing_input, sizeof(signing_input), "%s.%s", h, p);
-    size_t signing_input_len = strlen(signing_input);
+    if (signing_input_len >= sizeof(signing_input)) {
+        if (err_out) snprintf(err_out, err_size, "signing input too long");
+        return -1;
+    }
+    memcpy(signing_input, buf, signing_input_len);
+    signing_input[signing_input_len] = 0;
+    /* The dot at position (h-len) was overwritten by jwt_split; put
+     * it back in our local copy so the byte stream matches what
+     * Google signed. */
+    signing_input[strlen(h)] = '.';
 
     /* Decode header to find kid + alg. */
     unsigned char header_buf[1024];
@@ -410,8 +488,15 @@ auth_verify_id_token(const char *id_token,
         return -1;
     }
     char kid_local[128];
-    strncpy(kid_local, kid, sizeof(kid_local) - 1);
-    kid_local[sizeof(kid_local) - 1] = 0;
+    /* Reject overlong kids outright rather than truncating to 127.
+     * Two distinct long kids that share a 127-char prefix would
+     * otherwise collide on the cache lookup. */
+    if (strlen(kid) >= sizeof(kid_local)) {
+        json_decref(header);
+        if (err_out) snprintf(err_out, err_size, "kid too long");
+        return -1;
+    }
+    strcpy(kid_local, kid);
     json_decref(header);
 
     /* Decode signature. */
@@ -423,11 +508,23 @@ auth_verify_id_token(const char *id_token,
     }
 
     /* Find the signing key, refreshing JWKS once if it's a miss or
-     * stale. */
+     * stale. If the refresh fails AND our cache is stale beyond a
+     * grace window, refuse to verify -- otherwise a revoked key
+     * keeps minting sessions through the next outage. */
     EVP_PKEY *pkey = jwks_lookup(kid_local);
     time_t now = time(NULL);
-    if (pkey == NULL || (now - jwks_cache_ts) > JWKS_CACHE_TTL) {
-        jwks_fetch();
+    int stale = (now - jwks_cache_ts) > JWKS_CACHE_TTL;
+    if (pkey == NULL || stale) {
+        int fetch_rc = jwks_fetch();
+        if (fetch_rc != 0
+            && stale
+            && (now - jwks_cache_ts) > (2 * JWKS_CACHE_TTL)) {
+            /* JWKS truly unreachable and cache is doubly stale --
+             * stop trusting it. */
+            if (err_out) snprintf(err_out, err_size,
+                                  "JWKS unreachable, cache too stale");
+            return -1;
+        }
         pkey = jwks_lookup(kid_local);
     }
     if (pkey == NULL) {
@@ -485,8 +582,25 @@ auth_verify_id_token(const char *id_token,
         json_decref(payload);
         return -1;
     }
+    /* Google ID tokens live for ~1 hour; defence in depth against a
+     * forged token with an absurd `exp` that the signature happens
+     * to cover. Reject anything with a lifetime > 24h. */
+    if (iat != 0 && exp - iat > 86400) {
+        if (err_out) snprintf(err_out, err_size, "implausible token lifetime");
+        json_decref(payload);
+        return -1;
+    }
     if (sub == NULL || strlen(sub) == 0 || strlen(sub) >= sub_size) {
         if (err_out) snprintf(err_out, err_size, "missing sub");
+        json_decref(payload);
+        return -1;
+    }
+    if (!is_safe_sub(sub)) {
+        /* Reject before the value lands in a file path / Set-Cookie
+         * header / cookie body. Google's sub is normally digits, so
+         * a non-safe value here almost certainly means a forged or
+         * malformed token. */
+        if (err_out) snprintf(err_out, err_size, "unsafe sub charset");
         json_decref(payload);
         return -1;
     }
@@ -532,14 +646,22 @@ hex_decode(const char *in, unsigned char *out, size_t out_size)
     return (int) (len / 2);
 }
 
-static void
+/* Returns 0 on success, -1 on failure. Callers must check -- a
+ * silent failure here would leave `out` uninitialised, and the
+ * downstream constant-time compare would lose its security
+ * meaning (comparing two pieces of stack garbage). */
+static int
 hmac_sha256(const char *secret, const char *data, unsigned char *out)
 {
     unsigned int outlen = 0;
-    HMAC(EVP_sha256(),
-         (const unsigned char *) secret, (int) strlen(secret),
-         (const unsigned char *) data, strlen(data),
-         out, &outlen);
+    if (HMAC(EVP_sha256(),
+             (const unsigned char *) secret, (int) strlen(secret),
+             (const unsigned char *) data, strlen(data),
+             out, &outlen) == NULL) {
+        return -1;
+    }
+    if (outlen != 32) return -1;
+    return 0;
 }
 
 int
@@ -547,13 +669,18 @@ auth_make_session_cookie(const char *sub,
                          char *cookie_out, size_t cookie_size)
 {
     if (!auth_is_enabled() || sub == NULL) return -1;
+    /* Belt and suspenders: every call site today passes a Google
+     * sub that already went through is_safe_sub() via
+     * auth_verify_id_token, but a future caller might not, and a
+     * sub containing '.' would silently corrupt cookie parsing. */
+    if (!is_safe_sub(sub)) return -1;
     long expiry = (long) time(NULL) + cfg_session_max_age;
     char body[AUTH_SUB_MAX + 32];
     int n = snprintf(body, sizeof(body), "%s.%ld", sub, expiry);
     if (n < 0 || (size_t) n >= sizeof(body)) return -1;
     unsigned char mac[32];
     char mac_hex[65];
-    hmac_sha256(cfg_session_secret, body, mac);
+    if (hmac_sha256(cfg_session_secret, body, mac) != 0) return -1;
     hex_encode(mac, sizeof(mac), mac_hex);
     n = snprintf(cookie_out, cookie_size, "%s.%s", body, mac_hex);
     if (n < 0 || (size_t) n >= cookie_size) return -1;
@@ -586,7 +713,7 @@ auth_verify_session_cookie(const char *cookie,
 
     unsigned char expected[32];
     unsigned char given[32];
-    hmac_sha256(cfg_session_secret, body, expected);
+    if (hmac_sha256(cfg_session_secret, body, expected) != 0) return -1;
     if (hex_decode(mac_hex, given, sizeof(given)) != 32) return -1;
 
     /* Constant-time compare. */
