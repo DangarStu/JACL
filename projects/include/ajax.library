@@ -5,7 +5,10 @@ if remote_user = false
 endif
 write " + ~&status_cols=~ + (typeof jaclMeasureStatusCols === 'function' ? jaclMeasureStatusCols() : (window.jaclStatusCols || 80));^"
 write "fetch(url_string)^"
-write "  .then(function(response) { return response.text(); })^"
+write "  .then(function(response) {^"
+write "    if (!response.ok) throw new Error('HTTP ' + response.status);^"
+write "    return response.text();^"
+write "  })^"
 write "  .then(function(data) {^"
 ifexecute "+local_success"
 	# RESULT HANDLED BY LOCAL APPLICATION
@@ -19,6 +22,23 @@ print:
 			}^
 .
 endif
+write "  })^"
+# A failed fetch (network down, HTTP 5xx, server restart) used to vanish
+# silently -- the input stayed disabled and the player saw no feedback.
+# Now the input gets re-enabled, the inflight guard cleared, and a
+# transient hint is shown.
+write "  .catch(function(err) {^"
+write "    var input = document.getElementById('JACLCommandPrompt');^"
+write "    if (input) input.disabled = false;^"
+write "    window.jaclSubmitInflight = false;^"
+write "    var main = document.getElementById('maintext');^"
+write "    if (main) {^"
+write "      var notice = document.createElement('p');^"
+write "      notice.style.color = '#933';^"
+write "      notice.style.fontStyle = 'italic';^"
+write "      notice.textContent = '(Network error: ' + err.message + '. Try again.)';^"
+write "      main.appendChild(notice);^"
+write "    }^"
 write "  });^"
 write "}^"
 write "function ajaxRequest(details) {^"
@@ -28,7 +48,10 @@ if remote_user = false
 endif
 write " + ~&status_cols=~ + (typeof jaclMeasureStatusCols === 'function' ? jaclMeasureStatusCols() : (window.jaclStatusCols || 80));^"
 write "fetch(url_string)^"
-write "  .then(function(response) { return response.text(); })^"
+write "  .then(function(response) {^"
+write "    if (!response.ok) throw new Error('HTTP ' + response.status);^"
+write "    return response.text();^"
+write "  })^"
 write "  .then(function(data) {^"
 ifexecute "+local_success"
 	# RESULT HANDLED BY LOCAL APPLICATION
@@ -42,5 +65,13 @@ else
 			}^
    .
 endif
+write "  })^"
+# Match ajaxForm's error handler -- ajaxRequest is used for non-form
+# triggers (direction clicks, hyperlinks) and equally needs to release
+# the inflight guard when the server doesn't respond.
+write "  .catch(function(err) {^"
+write "    var input = document.getElementById('JACLCommandPrompt');^"
+write "    if (input) input.disabled = false;^"
+write "    window.jaclSubmitInflight = false;^"
 write "  });^"
 write "}^"
