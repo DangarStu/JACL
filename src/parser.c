@@ -68,13 +68,35 @@ static const char				*from_word;
 
 static int						object_expected = FALSE;
 
-char							default_function[84];
-static char						object_name[84];
+char							default_function[256];
+/* Sized to fit any concatenation of words from the 1024-byte
+ * player command plus single-space separators (worst case ~1535
+ * for alternating 1-char words). The prior 84-byte sizing
+ * overflowed for long noun phrases like "get the small wooden
+ * crate from beneath the table". */
+static char						object_name[2048];
 
-static char				        base_function[84];
-static char            			before_function[84];
-static char            			after_function[84];
-static char            			local_after_function[84];
+/* Bounded append: copies as many bytes of src as fit in dst (which
+ * has total capacity max), always NUL-terminates, never overruns.
+ * Used in the noun-resolution loop where words from the player
+ * command get accumulated. */
+static void
+parser_strcat(char *dst, const char *src, size_t max)
+{
+	size_t used = strlen(dst);
+	size_t room = (used < max) ? (max - used - 1) : 0;
+	if (room == 0) return;
+	strncat(dst, src, room);
+}
+
+/* Enlarged from 84 to 256 to accommodate worst-case 2-noun
+ * function names: prefix(80) + label(43) + "_" + label(43) +
+ * "override_"(9) leaves the old 84-byte buffer 90+ bytes short.
+ * 256 covers any realistic verb/noun combination. */
+static char				        base_function[256];
+static char            			before_function[256];
+static char            			after_function[256];
+static char            			local_after_function[256];
 
 
 static int find_parent(int index);
@@ -374,16 +396,14 @@ call_functions(const char *base_name)
 	 * PASS. IF THE COMMAND FAILS, 'TIME' WILL BE SET TO FALSE */
 	TIME->value = TRUE;
 
-	strncpy(base_function, base_name + 1, 80);
-	strcat(base_function, "_");
-
-	strncpy(override, base_function, 80);
-
-	strcpy(before_function, "+before_");
-	strcat(before_function, base_name + 1);
-
-	strcpy(after_function, "+after_");
-	strcat(after_function, base_name + 1);
+	/* snprintf bounds the verb name copy and always NUL-terminates;
+	 * the prior strncpy(..., 80) into a 256-byte buffer would skip
+	 * the NUL when base_name was longer than the limit, leaving
+	 * subsequent strcat reading past the buffer. */
+	snprintf(base_function,   sizeof base_function,   "%s_", base_name + 1);
+	snprintf(override,        256,                    "%s",  base_function);
+	snprintf(before_function, sizeof before_function, "+before_%s", base_name + 1);
+	snprintf(after_function,  sizeof after_function,  "+after_%s",  base_name + 1);
 
 	strcpy(local_after_function, "after_");
 	strcat(local_after_function, base_name + 1);
@@ -1141,10 +1161,12 @@ noun_resolve(struct word_type *scope_word, int finding_from, int noun_number)
 				return_limit = 1;
 			}
 
-			object_expected = TRUE;	
-			strcpy(object_name, word[wp]);
-			strcat(object_name, " ");
-			strcat(object_name, cstring_resolve("OF_WORD")->value);
+			object_expected = TRUE;
+			object_name[0] = 0;
+			parser_strcat(object_name, word[wp], sizeof object_name);
+			parser_strcat(object_name, " ", sizeof object_name);
+			parser_strcat(object_name, cstring_resolve("OF_WORD")->value,
+			              sizeof object_name);
 
 			/* MOVE THE WORD POINTER TO AFTER THE 'OF' */
 			wp = wp + 2;
@@ -1160,10 +1182,10 @@ noun_resolve(struct word_type *scope_word, int finding_from, int noun_number)
 	while (word[wp] != NULL) {
 		// ADD THE WORDS USED TO error_buffer FOR POSSIBLE USE
 		// IN A DISABMIGUATE EMESSAGE
-		if (first_word == FALSE) {		
-			strcat(error_buffer, " ");
+		if (first_word == FALSE) {
+			parser_strcat(error_buffer, " ", 1024);
 		}
-		strcat(error_buffer, word[wp]);	
+		parser_strcat(error_buffer, word[wp], 1024);
 		first_word = FALSE;
 
 		/* LOOP THROUGH WORDS IN THE PLAYER'S INPUT */
@@ -1214,13 +1236,13 @@ noun_resolve(struct word_type *scope_word, int finding_from, int noun_number)
 
 		//puts("--- passed checking for a terminator");
 
-		/* ADD THE CURRENT WORD TO THE NAME OF THE OBJECT THE PLAYER 
+		/* ADD THE CURRENT WORD TO THE NAME OF THE OBJECT THE PLAYER
 		 * IS TRYING TO REFER TO FOR USE IN AN ERROR MESSAGE IF
 		 * LATER REQUIRED */
 		if (object_name[0] != 0)
-			strcat(object_name, " ");
+			parser_strcat(object_name, " ", sizeof object_name);
 
-		strcat(object_name, word[wp]);
+		parser_strcat(object_name, word[wp], sizeof object_name);
 
 		if (!strcmp("everything", word[wp])) {
 			/* ALL THIS NEEDS TO SIGNIFY IS THAT IT IS OKAY TO RETURN MULTIPLE 

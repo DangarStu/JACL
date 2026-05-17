@@ -354,19 +354,36 @@ static void
 build_proxy(void)
 {
     int             index;
+    size_t          used;
+    size_t          room;
+    const char     *piece;
 
     proxy_buffer[0] = 0;
+    used = 0;
 
     /* LOOP THROUGH ALL THE PARAMETERS OF THE PROXY COMMAND
-       AND BUILD THE MOVE TO BE ISSUED ON THE PLAYER'S BEHALF */
+       AND BUILD THE MOVE TO BE ISSUED ON THE PLAYER'S BEHALF.
+       Bounded concat: text_of_word can resolve to a 1024-byte
+       cstring value, and several args quickly overflow the
+       1024-byte proxy_buffer. */
     for (index = 1; word[index] != NULL; index++) {
-        strcat(proxy_buffer, text_of_word(index));
+        piece = text_of_word(index);
+        if (piece == NULL) continue;
+        room = (used + 1 < 1024)
+               ? (1024 - used - 1) : 0;
+        if (room == 0) break;
+        strncat(proxy_buffer, piece, room);
+        used += strlen(piece);
+        if (used >= 1024 - 1) {
+            used = 1024 - 1;
+            break;
+        }
     }
 
-    for (index = 0; index < strlen(proxy_buffer); index++) {
+    for (index = 0; index < (int) strlen(proxy_buffer); index++) {
         if (proxy_buffer[index] == '~') {
             proxy_buffer[index] = '\"';
-        } 
+        }
     }
 
     //printf("--- proxy buffer = \"%s\"\n", proxy_buffer);
@@ -432,13 +449,20 @@ execute(const char *funcname)
     long            before_command = 0;
 #endif
 
+    /* called_name is [1024]; strncpy(..., 1023) leaves [1023]
+     * un-NUL'd if the source fills the limit, so any subsequent
+     * strlen/strcmp on called_name reads past the buffer. Force a
+     * terminator after every copy. */
 #ifdef GLK
     strncpy (called_name, funcname, 1023);
+    called_name[1023] = 0;
 #else
     if (!strcmp(funcname, "+rpc")) {
-        strncpy (called_name, rpc_function_name, 80);
-    } else {    
+        strncpy (called_name, rpc_function_name, 1023);
+        called_name[1023] = 0;
+    } else {
         strncpy (called_name, funcname, 1023);
+        called_name[1023] = 0;
     }
 
 #endif
@@ -661,7 +685,9 @@ execute(const char *funcname)
 
                     infile = fopen(temp_buffer, "rb");
 
-                    if (word[2] != NULL && !strcmp(word[2], "skip_header")) {
+                    if (infile != NULL
+                        && word[2] != NULL
+                        && !strcmp(word[2], "skip_header")) {
                         fgets(csv_buffer, 2048, infile);
                     }
                 }
@@ -1487,11 +1513,12 @@ execute(const char *funcname)
                 } else {
                     index = value_of(word[1], 0);
                     if (word[2] != NULL) {
-                        sprintf(option_buffer, "<option value=\"%d\">",
-                                index);
+                        snprintf(option_buffer, sizeof option_buffer,
+                                 "<option value=\"%d\">", index);
                     } else {
                         object_names(index, temp_buffer);
-                        sprintf(option_buffer, "<option value=\"%s\">", temp_buffer);
+                        snprintf(option_buffer, sizeof option_buffer,
+                                 "<option value=\"%s\">", temp_buffer);
                     }
 
                     write_text(option_buffer);
@@ -1527,16 +1554,23 @@ execute(const char *funcname)
                     pop_stack();
                     return (TRUE);
                 } if (word[2] != NULL) {
-                    sprintf (option_buffer, "<input class=~button~ type=~image~ src=~%s~ name=~verb~ value=~", text_of_word(2));
-                    strcat (option_buffer, text_of_word(1));
-                    strcat (option_buffer, "~>");
+                    snprintf(option_buffer, sizeof option_buffer,
+                             "<input class=~button~ type=~image~ "
+                             "src=~%s~ name=~verb~ value=~%s~>",
+                             text_of_word(2), text_of_word(1));
                     write_text(option_buffer);
                 } else {
-                    sprintf (option_buffer, "<input class=~button~ type=~submit~ style=~width: 90px; margin: 5px;~ name=~verb~ value=~%s~>", text_of_word(1));
+                    snprintf(option_buffer, sizeof option_buffer,
+                             "<input class=~button~ type=~submit~ "
+                             "style=~width: 90px; margin: 5px;~ "
+                             "name=~verb~ value=~%s~>",
+                             text_of_word(1));
                     write_text(option_buffer);
                 }
             } else if (!strcmp(word[0], "hidden")) {
-                sprintf (temp_buffer, "<INPUT TYPE=\"hidden\" NAME=\"user_id\" VALUE=\"%s\">", user_id);
+                snprintf(temp_buffer, 1024,
+                         "<INPUT TYPE=\"hidden\" NAME=\"user_id\" VALUE=\"%s\">",
+                         user_id);
                 write_text(temp_buffer);
             } else if (!strcmp(word[0], "control")) {
                 /* USED TO CREATE A HYPERLINK THAT IS AN IMAGE */
@@ -1545,9 +1579,10 @@ execute(const char *funcname)
                     pop_stack();
                     return (TRUE);
                 } else {
-                    sprintf(option_buffer, "<a href=\"?command=%s&amp;user_id=%s\"><img border=0 SRC=\"", text_of_word(2), user_id);
-                    strcat(option_buffer, text_of_word(1));
-                    strcat(option_buffer, "\"></a>");
+                    snprintf(option_buffer, sizeof option_buffer,
+                             "<a href=\"?command=%s&amp;user_id=%s\">"
+                             "<img border=0 SRC=\"%s\"></a>",
+                             text_of_word(2), user_id, text_of_word(1));
                     write_text(option_buffer);
                 }
             } else if (!strcmp(word[0], "hyperlink") || !strcmp(word[0], "hyperlinkNE")) {
@@ -1573,21 +1608,26 @@ execute(const char *funcname)
 
                         if (word[3] == NULL) {
                             if (use_user_id) {
-                                sprintf (string_buffer, "<a href=\"?command=%s&amp;user_id=%s\">", encoded, user_id);
+                                snprintf(string_buffer, sizeof string_buffer,
+                                         "<a href=\"?command=%s&amp;user_id=%s\">%s</a>",
+                                         encoded, user_id, text_of_word(1));
                             } else {
-                                sprintf (string_buffer, "<a href=\"?command=%s\">", encoded);
+                                snprintf(string_buffer, sizeof string_buffer,
+                                         "<a href=\"?command=%s\">%s</a>",
+                                         encoded, text_of_word(1));
                             }
-                            strcat (string_buffer, text_of_word(1));
-                            strcat (string_buffer, "</a>");
                         } else {
-                            sprintf (string_buffer, "<a class=\"%s\" href=\"?command=", text_of_word(3));
-                            strcat (string_buffer, encoded);
                             if (use_user_id) {
-                                sprintf (option_buffer, "&amp;user_id=%s\">%s</a>", user_id, text_of_word(1));
+                                snprintf(string_buffer, sizeof string_buffer,
+                                         "<a class=\"%s\" href=\"?command=%s"
+                                         "&amp;user_id=%s\">%s</a>",
+                                         text_of_word(3), encoded, user_id,
+                                         text_of_word(1));
                             } else {
-                                sprintf (option_buffer, "\">%s</a>", text_of_word(1));
+                                snprintf(string_buffer, sizeof string_buffer,
+                                         "<a class=\"%s\" href=\"?command=%s\">%s</a>",
+                                         text_of_word(3), encoded, text_of_word(1));
                             }
-                            strcat (string_buffer, option_buffer);
                         }
                     }
 
@@ -1600,13 +1640,19 @@ execute(const char *funcname)
             } else if (!strcmp(word[0], "prompt")) {
                 /* USED TO OUTPUT A HTML INPUT CONTROL THAT CONTAINS SESSION INFORMATION */
                 if (word[1] != NULL) {
-                    sprintf(temp_buffer, "<input id=\"JACLCommandPrompt\" type=text name=~command~ onKeyPress=~%s~>\n", word[1]);
+                    snprintf(temp_buffer, 1024,
+                             "<input id=\"JACLCommandPrompt\" type=text "
+                             "name=~command~ onKeyPress=~%s~>\n", word[1]);
                     write_text(temp_buffer);
                 } else {
-                    sprintf(temp_buffer, "<input id=\"JACLCommandPrompt\" type=text name=~command~>\n");
+                    snprintf(temp_buffer, 1024,
+                             "<input id=\"JACLCommandPrompt\" type=text "
+                             "name=~command~>\n");
                     write_text(temp_buffer);
                 }
-                sprintf(temp_buffer, "<input type=hidden name=\"user_id\" value=\"%s\">", user_id);
+                snprintf(temp_buffer, 1024,
+                         "<input type=hidden name=\"user_id\" value=\"%s\">",
+                         user_id);
                 write_text(temp_buffer);
             } else if (!strcmp(word[0], "style")) {
                 /* THIS COMMAND IS USED TO OUTPUT ANSI CODES OR SET GLK
@@ -1878,8 +1924,11 @@ execute(const char *funcname)
                 build_proxy();
 
                 // TEXT BUFFER IS THE NORMAL ARRAY FOR HOLDING THE PLAYERS
-                // MOVE FOR PROCESSING
-                strncpy(text_buffer, proxy_buffer, 1024);
+                // MOVE FOR PROCESSING. proxy_buffer is also 1024; strncpy
+                // would skip the NUL if both ran to the wire, so force
+                // termination after the copy.
+                strncpy(text_buffer, proxy_buffer, 1023);
+                text_buffer[1023] = 0;
 
                 command_encapsulate();
 
@@ -2167,8 +2216,14 @@ execute(const char *funcname)
                 char *match = NULL;
                 struct string_type *resolved_splitstring = NULL;
 
-                strcpy (split_buffer, text_of_word(2));
-                strcpy (delimiter, text_of_word(3));
+                /* text_of_word can resolve to a 1024-byte cstring;
+                 * strcpy into a 1024-byte buffer would skip the NUL
+                 * terminator at the boundary. Use strncpy + explicit
+                 * NUL to keep both buffers safely terminated. */
+                strncpy(split_buffer, text_of_word(2), sizeof split_buffer - 1);
+                split_buffer[sizeof split_buffer - 1] = 0;
+                strncpy(delimiter, text_of_word(3), sizeof delimiter - 1);
+                delimiter[sizeof delimiter - 1] = 0;
 
                 char *source = split_buffer;
 
@@ -2268,10 +2323,21 @@ execute(const char *funcname)
                         return (exit_function(TRUE));
                     }
 
-                    index = value_of(word[3], TRUE);    
+                    index = value_of(word[3], TRUE);
 
-                    for (counter = 0; counter < index; counter++) {
-                         strcat(setstring_buffer, text_of_word(2));
+                    {
+                        const char *pad   = text_of_word(2);
+                        size_t      plen  = (pad != NULL) ? strlen(pad) : 0;
+                        size_t      used  = 0;
+                        size_t      max   = sizeof setstring_buffer;
+                        if (plen > 0) {
+                            for (counter = 0; counter < index; counter++) {
+                                if (used + plen + 1 > max) break;
+                                memcpy(setstring_buffer + used, pad, plen);
+                                used += plen;
+                            }
+                            setstring_buffer[used] = 0;
+                        }
                     }
 
                     /* setstring_buffer IS NOW FILLED, COPY THE UP TO 1023 BYTES OF

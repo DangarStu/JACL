@@ -154,6 +154,10 @@ restore_game(const char *filename, int warn)
         for (index = 0; index < 1024; index++) {
             current_string->value[index] = getc(bookmark);
         }
+        /* string_type::value is [1025] -- defensively NUL-terminate
+         * so subsequent strlen/strcpy on a truncated save file (where
+         * the last char is non-zero) doesn't read past the buffer. */
+        current_string->value[1024] = 0;
         current_string = current_string->next_string;
     }
 
@@ -161,8 +165,30 @@ restore_game(const char *filename, int warn)
         last_command[index] = getc(bookmark);
     }
 
-	player = read_integer(bookmark);
-	noun[3] = read_integer(bookmark);
+	{
+		int saved_player = read_integer(bookmark);
+		int saved_noun3  = read_integer(bookmark);
+
+		/* Validate indices read off disk before assigning -- a corrupt
+		 * or truncated .auto would otherwise put nonsense into player
+		 * and noun[3], and get_here() (utils.c) calls terminate(44) on
+		 * an out-of-range player, taking the cgi worker down. 0 is
+		 * legal for both: cgijacl writes saved_start before bootstrap
+		 * has set player, and noun[3]=0 means "no second noun this
+		 * turn". Reject only obviously corrupt values (negative or
+		 * past the object table). */
+		if (saved_player < 0 || saved_player > objects
+		    || saved_noun3 < 0 || saved_noun3 > objects) {
+			if (warn == FALSE) {
+				log_error(cstring_resolve("BAD_SAVED_GAME")->value,
+				          PLUS_STDOUT);
+			}
+			fclose(bookmark);
+			return (FALSE);
+		}
+		player   = saved_player;
+		noun[3]  = saved_noun3;
+	}
 
 	/* CLOSE THE STREAM */
 	fclose (bookmark);

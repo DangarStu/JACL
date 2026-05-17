@@ -163,7 +163,7 @@ char            access_log[81] = "\0";
 
 char            function_name[81];
 char            rpc_function_name[81];
-char            override[81];
+char            override[256];
 
 char            temp_buffer[1024];
 char            file_buffer[1024];
@@ -463,7 +463,12 @@ main(int argc, char *argv[])
     sprintf(saved_start, "%s%s-start.saved", temp_directory, prefix);
 
     if (save_game(saved_start) == FALSE) {
-        sprintf(error_buffer, cstring_resolve("CANT_SAVE")->value, saved_start);
+        /* Treat CANT_SAVE as a plain message, not a format string -- a
+         * game that overrides it with a "%n" or unmatched-arg cstring
+         * would otherwise hit a format-string vuln. The filename info
+         * is appended as a separate, engine-controlled line. */
+        snprintf(error_buffer, sizeof error_buffer, "%s [%s]",
+                 cstring_resolve("CANT_SAVE")->value, saved_start);
         log_error(error_buffer, PLUS_STDERR);
     }
 
@@ -895,8 +900,13 @@ main(int argc, char *argv[])
                     // IT PREVENTS ANY FUNCTION BEING CALLED AT WILL, BUT
                     // PROVIDES A CLEAN INTERFACE FOR THE PURPOSE OF THE CALL
                     // TO BE HANDLED INSIDE +rpc
-                    strcpy(rpc_function_name, "+");
-                    strncat(rpc_function_name, cgi_val(entries, "rpc"), 80);
+                    /* snprintf bounds the combined "+" + rpc-arg copy
+                     * to rpc_function_name's full capacity. The prior
+                     * strcpy("+") + strncat(..., 80) wrote up to 82
+                     * bytes into the 81-byte buffer when the HTTP
+                     * ?rpc= value reached 80 chars. */
+                    snprintf(rpc_function_name, sizeof rpc_function_name,
+                             "+%s", cgi_val(entries, "rpc"));
                     execute("+rpc");
                 }
             } else {
@@ -1162,7 +1172,12 @@ skip_command:
            RESTORED BEFORE THE PLAYER'S NEXT MOVE */
         sprintf(temp_buffer, "%s%s-%s.auto", temp_directory, prefix, user_id);
         if (save_game(temp_buffer) == FALSE) {
-            sprintf(error_buffer, cstring_resolve("CANT_SAVE")->value, prefix, temp_buffer);
+            /* See the earlier CANT_SAVE site for the rationale: treat
+             * the game-defined cstring as a plain message, append the
+             * filename info via the engine-controlled "%s [%s/%s]"
+             * template. */
+            snprintf(error_buffer, sizeof error_buffer, "%s [%s/%s]",
+                     cstring_resolve("CANT_SAVE")->value, prefix, temp_buffer);
             log_error(error_buffer, PLUS_STDOUT);
         }
 
