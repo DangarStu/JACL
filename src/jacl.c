@@ -940,8 +940,16 @@ status_line()
 	if (execute("+update_status_window") == FALSE) {
 		glk_set_style(style_User1);
 
-		/* DISPLAY THE INVERSE STATUS LINE AT THE TOP OF THE SCREEN */
-		for (index = 0; index < status_width; index++) {
+		/* DISPLAY THE INVERSE STATUS LINE AT THE TOP OF THE SCREEN.
+		 * Clamp the fill width to temp_buffer's capacity: status_width
+		 * is a glui32 from Glk and on a very wide window (Gargoyle
+		 * resized full-screen on a hi-DPI display) it can exceed
+		 * 1024, overrunning temp_buffer. */
+		glui32 fill_width = status_width;
+		if (fill_width >= sizeof(temp_buffer)) {
+			fill_width = sizeof(temp_buffer) - 1;
+		}
+		for (index = 0; index < (int) fill_width; index++) {
 			temp_buffer[index] = ' ';
 		}
 		temp_buffer[index] = 0;
@@ -955,8 +963,18 @@ status_line()
 		temp_buffer[0] = 0;
 		sprintf (temp_buffer, "Score: %d  Moves: %d", SCORE->value, TOTAL_MOVES->value);
 
-		cursor = status_width - strlen(temp_buffer);
-		cursor--;
+		/* Compute right-justified cursor; if the score/moves string
+		 * is wider than the window, fall back to column 0 rather
+		 * than letting (status_width - strlen) underflow into a
+		 * huge glui32. */
+		{
+			size_t tb_len = strlen(temp_buffer);
+			if (tb_len + 1 < status_width) {
+				cursor = status_width - tb_len - 1;
+			} else {
+				cursor = 0;
+			}
+		}
 		glk_window_move_cursor(statuswin, cursor, 0);
 		write_text(temp_buffer);
 	}
@@ -1599,12 +1617,18 @@ add_word(const char * word)
 void 
 convert_to_utf8(glui32 *text, int len) {
 	int i, k;
+	/* command_buffer is 1024 bytes; a 4-byte UTF-8 sequence plus the
+	 * trailing NUL means we can't safely write past index
+	 * sizeof - 5. Without this cap, a long input of high-codepoint
+	 * characters would overflow (e.g. 256 emoji = 1024 output bytes
+	 * + NUL = one-byte overrun). */
+	const int cap = (int) sizeof(command_buffer) - 5;
 
 	i = 0;
 	k = 0;
 
 	/*convert UTF-32 to UTF-8 */
-	while (i < len) {
+	while (i < len && k < cap) {
 		if (text[i] < 0x80) {
 			command_buffer[k] = text[i];
 			k++;

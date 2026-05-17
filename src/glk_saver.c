@@ -172,19 +172,48 @@ restore_game(frefid_t saveref, int warn)
 
     while (current_string != NULL) {
 		for (index = 0; index < 1024; index++) {
-    		current_string->value[index] = glk_get_char_stream(bookmark);
+			glsi32 c = glk_get_char_stream(bookmark);
+			/* Truncated save returns -1 on EOF; without this check
+			 * the value field gets filled with 0xFF for the whole
+			 * 1024 bytes and the rest of the read goes haywire. */
+			if (c < 0) c = 0;
+			current_string->value[index] = (char) c;
 		}
+		/* string_type::value is [1025]; defensively NUL-terminate so
+		 * subsequent strlen on a string whose last byte happens to
+		 * be non-zero doesn't walk past the buffer end. */
+		current_string->value[1024] = 0;
         current_string = current_string->next_string;
     }
 
 	/* Matches the save side: pull last_command back so 'again' still
 	 * has a target after the restore. */
 	for (index = 0; index < 1024; index++) {
-		last_command[index] = glk_get_char_stream(bookmark);
+		glsi32 c = glk_get_char_stream(bookmark);
+		if (c < 0) c = 0;
+		last_command[index] = (char) c;
 	}
 
-	player = read_integer(bookmark);
-	noun[3] = read_integer(bookmark);
+	{
+		int saved_player = read_integer(bookmark);
+		int saved_noun3  = read_integer(bookmark);
+		/* Same defence as saver.c: refuse a player value past the
+		 * end of the object table. 0 is allowed (legitimate "no
+		 * player yet" state). noun[3] is unchecked because -1
+		 * ("no second noun") and 0 (FALSE) are both legal. */
+		if (saved_player < 0 || saved_player > objects) {
+			if (warn == FALSE) {
+				sprintf(error_buffer,
+				        "Saved file has out-of-range player (%d, objects=%d); refusing restore.",
+				        saved_player, objects);
+				log_error(error_buffer, PLUS_STDOUT);
+			}
+			glk_stream_close(bookmark, NULL);
+			return (FALSE);
+		}
+		player  = saved_player;
+		noun[3] = saved_noun3;
+	}
 
 	/* RESTORE THE CURRENT VOLUME OF EACH OF THE SOUND CHANNELS */
 	for (index = 0; index < 8; index++) {
