@@ -528,6 +528,19 @@ main(int argc, char *argv[])
 
             restart_game();
 
+            /* Re-save saved_start so it matches the freshly loaded
+             * object/integer/function/string counts. Without this,
+             * the next fresh-user request's restore_game(saved_start)
+             * sees the pre-reload count header and aborts with
+             * "incompatible saved-game file", falling all the way
+             * back to restart_game() again -- wasted work, plus the
+             * misleading log noise. */
+            if (save_game(saved_start) == FALSE) {
+                snprintf(error_buffer, sizeof error_buffer, "%s [%s]",
+                         cstring_resolve("CANT_SAVE")->value, saved_start);
+                log_error(error_buffer, PLUS_STDERR);
+            }
+
             previous_last_modified = current_last_modified;
         }
 #endif
@@ -598,6 +611,12 @@ main(int argc, char *argv[])
                         ? " Secure;" : "";
                     printf("Status: 200 OK\r\n");
                     printf("Content-type: application/json\r\n");
+                    /* Mark the auth response uncacheable. The body
+                     * carries a Set-Cookie that's specific to this
+                     * one sign-in; a misbehaving intermediary that
+                     * cached the response would hand another user
+                     * that cookie. */
+                    printf("Cache-Control: no-store, private\r\n");
                     printf("Set-Cookie: jacl_session=%s; Path=/; HttpOnly;%s "
                            "SameSite=Lax; Max-Age=%ld\r\n",
                            pending_session_cookie, secure_flag,
@@ -609,7 +628,8 @@ main(int argc, char *argv[])
                             credential ? err : "no credential");
                     log_error(error_buffer, LOG_ONLY);
                     printf("Status: 401 Unauthorized\r\n");
-                    printf("Content-type: application/json\r\n\r\n");
+                    printf("Content-type: application/json\r\n");
+                    printf("Cache-Control: no-store, private\r\n\r\n");
                     printf("{\"ok\":false}\n");
                 }
                 list_clear(&entries);
@@ -621,6 +641,7 @@ main(int argc, char *argv[])
                     ? " Secure;" : "";
                 printf("Status: 200 OK\r\n");
                 printf("Content-type: application/json\r\n");
+                printf("Cache-Control: no-store, private\r\n");
                 printf("Set-Cookie: jacl_session=; Path=/; HttpOnly;%s "
                        "SameSite=Lax; Max-Age=0\r\n", secure_flag);
                 printf("\r\n{\"ok\":true}\n");
@@ -638,10 +659,24 @@ main(int argc, char *argv[])
             if (session != NULL &&
                 auth_verify_session_cookie(session, google_sub,
                                            sizeof(google_sub)) == 0) {
+                /* google_sub comes out of a JWT verified against
+                 * Google's JWKS, so its charset should already be
+                 * Google's stable [0-9A-Za-z._-]. Re-validate the
+                 * composed user_id anyway -- it lands in file paths
+                 * and Set-Cookie headers, and the cost is trivial
+                 * compared to the blast radius if a future change
+                 * loosens the upstream check. */
                 snprintf(user_id, sizeof(user_id), "google_%s", google_sub);
-                cookie_read_successfully = TRUE;
-                returning_player = TRUE;
-                REMOTE_USER_USED->value = TRUE;
+                if (is_safe_user_id(user_id, sizeof(user_id))) {
+                    cookie_read_successfully = TRUE;
+                    returning_player = TRUE;
+                    REMOTE_USER_USED->value = TRUE;
+                } else {
+                    log_error("Rejected Google session: composed user_id failed safe-charset check.",
+                              LOG_ONLY);
+                    user_id[0] = 0;
+                    google_sub[0] = 0;
+                }
             }
         }
 

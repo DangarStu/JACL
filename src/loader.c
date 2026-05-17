@@ -629,14 +629,31 @@ read_gamefile()
                         create_integer (word[1], default_value);
                     }
                 }
-            } else if (!strcmp(word[0], "integer") 
+            } else if (!strcmp(word[0], "integer")
 		    || !strcmp(word[0], "variable")) {
                 if (word[1] == NULL) {
                     noproperr(line);
                     errors++;
-                } else if (legal_label_check(word[1], line, INT_TYPE)) {    
+                } else if (legal_label_check(word[1], line, INT_TYPE)) {
                     errors++;
                 } else {
+                    /* Warn if this name already exists as an integer.
+                     * legal_label_check intentionally skips the
+                     * integer-table scan so the legacy multi-value
+                     * array syntax (`integer X 1 2 3`) can add slots
+                     * to the same name. But a `integer score 0` in
+                     * game source unintentionally shadows the system
+                     * `score` integer -- two entries end up in
+                     * integer_table, integer_resolve returns the
+                     * first (the original), and saves/restores treat
+                     * them as separate slots. Surface the shadow so
+                     * the author sees it. */
+                    if (integer_resolve(word[1]) != NULL) {
+                        sprintf(error_buffer,
+                                "Line %d: integer '%s' shadows an existing integer of the same name.",
+                                line, word[1]);
+                        log_error(error_buffer, PLUS_STDERR);
+                    }
                     create_integer (word[1], 0);
 
                     /* CHECK IF MORE THAN ONE VALUE IS SUPPLIED AND CREATE
