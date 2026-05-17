@@ -2,7 +2,7 @@
 
 #                                                                     BLACKJACL 
 # -----------------------------------------------------------------------------
-# Copyright (C) Stuart Allen 2001. All rights resevered.
+# Copyright (C) Stuart Allen 2001. All rights reserved.
 # -----------------------------------------------------------------------------
 
 constant game_publish     false
@@ -17,7 +17,6 @@ integer cardC
 integer CHECK_STRATEGY     0
 
 integer OFFSET
-integer INDEX
 string status_text     "temp"
 
 {+update_status_window # THIS MIMICS THE INTERNALLY GENERATED STATUS LINE
@@ -180,7 +179,7 @@ print:
    their face value. An Ace is treated as 11 unless it would put your
    hand over 21, in which case it is treated as 1.^^
 
-   There are two phases to the game of Blackjack. Firstly your must
+   There are two phases to the game of Blackjack. Firstly you must
    place your bet, then you must playout the hand you are dealt.
    When you are playing your hand, the commands available to you will be
    displayed based on the current game situation. Unless your hand has
@@ -199,7 +198,7 @@ print:
    Be sure to pay attention to the indicator at the bottom of the screen
    telling you which card you are currently playing.^^
 
-   If the first two card of any hand total 9, 10 or 11, you will be
+   If the first two cards of any hand total 9, 10 or 11, you will be
    given the opportunity to 'double'. In this case your initial bet will
    be doubled and you will receive one more card only.^^
 .
@@ -617,7 +616,7 @@ if noun4(result) = 1
    return
 endif
 if noun4(result) = 2
-   write "The hands a draw.^"
+   write "The hands are a draw.^"
    return
 endif
 if noun4(result) = 3
