@@ -114,7 +114,12 @@ create_paths(char *full_path)
 	/* GET A POINTER TO THE LAST SLASH IN THE FULL PATH */
 	last_slash = strrchr(full_path, DIR_SEPARATOR);
 
-	for (index = strlen(full_path); index >= 0; index--) {
+	/* Walk back from the last real character (not the NUL); the prior
+	 * `index = strlen(full_path)` started one past the end and on the
+	 * very first iteration read the NUL byte itself. Harmless because
+	 * NUL is neither '.' nor a separator, but a true out-of-bounds
+	 * read by one. */
+	for (index = (int) strlen(full_path) - 1; index >= 0; index--) {
 		if (full_path[index] == DIR_SEPARATOR){
 			/* NO '.' WAS FOUND BEFORE THE LAST SLASH WAS REACHED,
 			 * THERE IS NO FILE EXTENSION */
@@ -132,13 +137,17 @@ create_paths(char *full_path)
 		game_path[0] = 0;
 
 		/* THIS ADDITION OF ./ TO THE FRONT OF THE GAMEFILE IF IT IS IN THE
-		 * CURRENT DIRECTORY IS REQUIRED TO KEEP Gargoyle HAPPY. */
+		 * CURRENT DIRECTORY IS REQUIRED TO KEEP Gargoyle HAPPY.
+		 * temp_buffer is 1024; game_file is 256. snprintf into the
+		 * smaller of the two to avoid the legacy strcpy walking off
+		 * the end of game_file. */
 #ifdef __NDS__
-		sprintf (temp_buffer, "%c%s", DIR_SEPARATOR, game_file);
+		snprintf (temp_buffer, 256, "%c%s", DIR_SEPARATOR, game_file);
 #else
-		sprintf (temp_buffer, ".%c%s", DIR_SEPARATOR, game_file);
+		snprintf (temp_buffer, 256, ".%c%s", DIR_SEPARATOR, game_file);
 #endif
-		strcpy (game_file, temp_buffer);
+		strncpy (game_file, temp_buffer, 255);
+		game_file[255] = 0;
 	} else {
 		/* STORE THE DIRECTORY THE GAME FILE IS IN WITH THE TRAILING
 		 * SLASH IF THERE IS ONE */
@@ -149,37 +158,39 @@ create_paths(char *full_path)
 	}
 
 #ifdef GLK
-	/* SET DEFAULT WALKTHRU FILE NAME */
-	sprintf(walkthru, "%s.walkthru", prefix);
-
-	/* SET DEFAULT SAVED GAME FILE NAME */
-	sprintf(bookmark, "%s.bookmark", prefix);
-
-	/* SET DEFAULT BLORB FILE NAME */
+	/* walkthru / bookmark / blorb are 81-84 bytes; prefix is 81.
+	 * Without the snprintf cap, a max-length prefix plus ".walkthru"
+	 * (9 bytes) would overflow. */
+	snprintf(walkthru, 81, "%s.walkthru", prefix);
+	snprintf(bookmark, 81, "%s.bookmark", prefix);
 #ifdef GARGLK
-	// Gargoyle uses glkunix_stream_open_pathname to open this file, but
-	// it's not (necessarily) going to be in the current working directory,
-	// so provide the full path.
-	sprintf(blorb, "%s/%s.blorb", game_path, prefix);
+	/* Gargoyle uses glkunix_stream_open_pathname to open the blorb,
+	 * which doesn't necessarily live in the cwd, so include the
+	 * full game_path. blorb is 81 bytes; game_path is 256, so this
+	 * is the buffer most likely to truncate. snprintf returns the
+	 * unbounded length, which we ignore -- truncation is the right
+	 * response for a path that wouldn't have fit anyway. */
+	snprintf(blorb, 81, "%s/%s.blorb", game_path, prefix);
 #else
-	sprintf(blorb, "%s.blorb", prefix);
+	snprintf(blorb, 81, "%s.blorb", prefix);
 #endif
 #endif
 
-	/* SET DEFAULT FILE LOCATIONS IF NOT SET BY THE USER IN CONFIG */
+	/* SET DEFAULT FILE LOCATIONS IF NOT SET BY THE USER IN CONFIG.
+	 * include / temp / data directories are 81 bytes; game_path is
+	 * 256. The legacy strcpy + strcat would overrun include_directory
+	 * any time game_path was longer than ~72 chars -- easy to hit
+	 * with a deeper install layout. snprintf truncates instead. */
 	if (include_directory[0] == 0) {
-		strcpy(include_directory, game_path);
-		strcat(include_directory, INCLUDE_DIR);
+		snprintf(include_directory, 81, "%s%s", game_path, INCLUDE_DIR);
 	}
 
 	if (temp_directory[0] == 0) {
-		strcpy(temp_directory, game_path);
-		strcat(temp_directory, TEMP_DIR);
+		snprintf(temp_directory, 81, "%s%s", game_path, TEMP_DIR);
 	}
 
 	if (data_directory[0] == 0) {
-		strcpy(data_directory, game_path);
-		strcat(data_directory, DATA_DIR);
+		snprintf(data_directory, 81, "%s%s", game_path, DATA_DIR);
 	}
 }
 
@@ -247,18 +258,12 @@ jacl_obfuscate(char *string)
 	}
 }
 
+/* XOR is self-inverse so deobfuscate is just obfuscate again; kept
+ * as a separate symbol so callers read intent-side, not transform-
+ * side. */
 void
 jacl_deobfuscate(char *string)
 {
-	int index, length;
-
-	length = strlen(string);
-
-	for (index = 0; index < length; index++) {
-		if (string[index] == '\n' || string[index] == '\r') {
-			return;
-		}
-		string[index] = string[index] ^ 255;
-	}
+	jacl_obfuscate(string);
 }
 

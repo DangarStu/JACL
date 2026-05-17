@@ -51,10 +51,15 @@ qIsEmpty(Queue *q)
 	return (q->head == NULL);
 }
 
-static void
+/* Returns 0 on success, -1 on OOM. The pathfinder treats an OOM as
+ * "no route" and falls through. Without the NULL check the prior
+ * code dereferenced a NULL `node` -> SIGSEGV on memory-exhausted
+ * CGI workers. */
+static int
 qAppend(Queue *q, int val, int val2)
 {
 	QueueNode *node = (QueueNode*) malloc(sizeof(QueueNode));
+	if (node == NULL) return -1;
 	node->val = val;
 	node->val2 = val2;
 	node->next = NULL;
@@ -68,6 +73,7 @@ qAppend(Queue *q, int val, int val2)
 		q->tail->next = node;
 		q->tail = node;
 	}
+	return 0;
 }
 
 static void
@@ -142,7 +148,8 @@ setHash(int val)
 	return abs(val) % SET_HASHSIZE;
 }
 
-static void
+/* Returns 0 on success / already-present, -1 on OOM. */
+static int
 setAdd(Set *set, int val)
 {
 	SetNode *node;
@@ -152,13 +159,15 @@ setAdd(Set *set, int val)
 
 	for (node = set->node[n];node != NULL;node = node->next)
 	{
-		if (node->val == val) { return; }
+		if (node->val == val) { return 0; }
 	}
 
 	node = (SetNode*) malloc(sizeof(SetNode));
+	if (node == NULL) return -1;
 	node->val = val;
 	node->next = set->node[n];
 	set->node[n] = node;
+	return 0;
 }
 
 /* returns 1 if the set contains val, otherwise returns 0 */
@@ -184,8 +193,17 @@ setContains(Set *set, int val)
 int
 find_route(int fromRoom, int toRoom, int known)
 {
-	// KNOWN INDICATES WHETHER THE LOCATION MUST HAVE BEEN 
+	// KNOWN INDICATES WHETHER THE LOCATION MUST HAVE BEEN
 	// VISITED PREVIOUSLY. THIS IS NOT REQUIRED FOR NPCS.
+
+	/* Refuse impossible inputs up-front. Without this the BFS reads
+	 * `object[fromRoom]` on the first iteration with no validity
+	 * check, which OOBs for fromRoom outside [1, objects]. The same
+	 * could happen for toRoom via the n==toRoom equality check. */
+	if (fromRoom < 1 || fromRoom > objects || object[fromRoom] == NULL)
+		return DIR_NONE;
+	if (toRoom < 1 || toRoom > objects || object[toRoom] == NULL)
+		return DIR_NONE;
 
 	// CREATE AND INITIALISE THE QUEUE OF LOCATION TO PROCESS
 	Queue q;
@@ -200,7 +218,10 @@ find_route(int fromRoom, int toRoom, int known)
 	int result = DIR_NONE;
 
 	// ADD THE STARTING LOCATION TO THE QUEUE FOR PROCESSING
-	qAppend(&q, fromRoom, DIR_NONE);
+	if (qAppend(&q, fromRoom, DIR_NONE) != 0) {
+		setDelete(&visited);
+		return DIR_NONE;
+	}
 
 	// ADD THE STARTING LOCATION TO THE SET OF VISITED LOCATIONS
 	setAdd(&visited, fromRoom);

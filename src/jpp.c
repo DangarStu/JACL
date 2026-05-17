@@ -30,6 +30,14 @@ static FILE   	    *inputFile = NULL;
 
 static char			*stripped_line;
 
+/* #include depth ceiling. Real games chain ~8 deep at most
+ * (game.jacl -> verbs.library -> none); 32 is comfortably above
+ * legitimate use. Without this, a circular include
+ * (`#include "a"` in a, or a -> b -> a) recurses until process
+ * stack exhaustion / SIGSEGV. */
+#define JPP_MAX_INCLUDE_DEPTH 32
+static int			include_depth = 0;
+
 /* INDICATES THAT THE CURRENT '.j2' FILE BEING WORKED 
  * WITH BEING PREPARED FOR RELEASE (DON'T INCLUDE DEBUG LIBARIES) */
 short int			release = FALSE;
@@ -68,7 +76,7 @@ jpp()
 			if (strstr(text_buffer, "#processed")) {
 				/* THE GAME FILE IS ALREADY A PROCESSED FILE, JUST USE IT
 				 * DIRECTLY */
-				if (sscanf(text_buffer, "#processed:%d", &game_version)) {
+				if (sscanf(text_buffer, "#processed:%d", &game_version) == 1) {
 					if (INTERPRETER_VERSION < game_version) {
 						sprintf (error_buffer, OLD_INTERPRETER, game_version);
 						return (FALSE);
@@ -92,13 +100,15 @@ jpp()
 		return (FALSE);
 	}
 
-	/* SAVE A TEMPORARY FILENAME INTO PROCESSED_FILE */
-	sprintf(processed_file, "%s%s.j2", temp_directory, prefix);
+	/* SAVE A TEMPORARY FILENAME INTO PROCESSED_FILE. processed_file
+	 * is 256 bytes (jacl.c globals); temp_directory + prefix could
+	 * approach that, so snprintf instead of sprintf. */
+	snprintf(processed_file, 256, "%s%s.j2", temp_directory, prefix);
 
 	/* ATTEMPT TO OPEN THE PROCESSED FILE IN THE TEMP DIRECTORY */
 	if ((outputFile = fopen(processed_file, "w")) == NULL) {
 		/* NO LUCK, TRY OPEN THE PROCESSED FILE IN THE CURRENT DIRECTORY */
-		sprintf(processed_file, "%s.j2", prefix);
+		snprintf(processed_file, 256, "%s.j2", prefix);
 		if ((outputFile = fopen(processed_file, "w")) == NULL) {
 			/* NO LUCK, CAN'T CONTINUE */
 			sprintf(error_buffer, CANT_OPEN_PROCESSED, processed_file);
@@ -123,6 +133,16 @@ process_file(const char *sourceFile1, const char *sourceFile2)
 	char            temp_buffer2[1025];
 	FILE           *inputFile = NULL;
 	char           *includeFile = NULL;
+
+	/* Reject circular / runaway includes. The caller manages
+	 * include_depth around the recursive call; here we just
+	 * refuse to descend further. */
+	if (include_depth >= JPP_MAX_INCLUDE_DEPTH) {
+		snprintf(error_buffer, 1024,
+			"Include depth exceeded %d while processing '%s'; possible cycle.",
+			JPP_MAX_INCLUDE_DEPTH, sourceFile1);
+		return (FALSE);
+	}
 
 	/* THIS FUNCTION WILL CREATE A PROCESSED FILE THAT HAS HAD ALL
 	 * LEADING AND TRAILING WHITE SPACE REMOVED AND ALL INCLUDED
@@ -150,7 +170,7 @@ process_file(const char *sourceFile1, const char *sourceFile2)
 
 	while (!feof(inputFile) || *text_buffer != 0) {
 		if (!strncmp(text_buffer, "#include", 8) ||
-		   (!strncmp(text_buffer, "#debug", 6) & !release)) {
+		   (!strncmp(text_buffer, "#debug", 6) && !release)) {
 			includeFile = strrchr(text_buffer, '"');
 
 			if (includeFile != NULL)
@@ -168,10 +188,13 @@ process_file(const char *sourceFile1, const char *sourceFile2)
 					 "%s%s", game_path, includeFile + 1);
 				snprintf(temp_buffer2, sizeof(temp_buffer2),
 					 "%s%s", include_directory, includeFile + 1);
+				include_depth++;
 				if (process_file(temp_buffer1, temp_buffer2) == FALSE) {
+					include_depth--;
 					fclose(inputFile);
 					return (FALSE);
 				}
+				include_depth--;
 			} else {
 				sprintf (error_buffer, BAD_INCLUDE);
 				fclose(inputFile);
@@ -181,7 +204,7 @@ process_file(const char *sourceFile1, const char *sourceFile2)
 			/* STRIP WHITESPACE FROM LINE BEFORE WRITING TO OUTPUTFILE. */
 			stripped_line = stripwhite(text_buffer);
 
-			if (!encrypting && *stripped_line != '#' && *stripped_line != '\0' && do_encrypt & release) {
+			if (!encrypting && *stripped_line != '#' && *stripped_line != '\0' && do_encrypt && release) {
 				/* START ENCRYPTING FROM THE FIRST NON-COMMENT LINE IN
 				 * THE SOURCE FILE */
 				fputs("#encrypted\n", outputFile);
