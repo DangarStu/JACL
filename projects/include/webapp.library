@@ -79,9 +79,9 @@ else
 endif
 call "+header_links"
 write "</div>"
-write "<div class=~linkbar~>
+write "<div class=~linkbar~>"
 write "</div>^"
-write "<div class=~links~>
+write "<div class=~links~>"
 call "+links_div"
 write "</div>"
 write "</div>^"
@@ -98,7 +98,7 @@ if @tab_names > 1
 	      write "user_id=" $user_id "&"
         endif
 	   write "mode=" WEBAPP_index "~>" tab_names[WEBAPP_index] "</a>"
-	   write "</div>
+	   write "</div>"
      endif
      set WEBAPP_index + 1
    endwhile

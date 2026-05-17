@@ -57,7 +57,7 @@ integer MUSIC_note
 
 constant interval_names     "Root" "Minor second" "Major second" "Minor third" "Major third"
 constant interval_names     "Perfect fourth" "Diminished fifth" "Perfect fifth" "Augmented fifth"
-constant interval_names     "Major sixth" "Minor seventh" Major seventh" "Octave"
+constant interval_names     "Major sixth" "Minor seventh" "Major seventh" "Octave"
 constant interval_names     "Minor ninth" "Major ninth" "Minor tenth" "Major tenth" "Perfect eleventh"
 constant interval_names     "Diminished twelfth" "Perfect twelfth"
 constant interval_names     "Minor thirteenth" "Major thirteenth" "Minor fourteenth" "Major fourteenth"
@@ -156,13 +156,13 @@ string chord_names           "Major"
 string chord_short_names     ""
 integer chord_position     1
 
-constant MAJOR2STINV     9
+constant MAJOR2STINV     10
 integer chord_intervals     0 3 8 -1 -1 -1 -1
 string chord_names           "Major"
 string chord_short_names     ""
 integer chord_position     2
 
-constant ADD4     10
+constant ADD4     11
 integer chord_intervals     0 4 5 7 -1 -1 -1
 string chord_names           "add4"
 string chord_short_names     "add4"
@@ -385,7 +385,7 @@ if interpreter = CGI
    write "</div>"
    write "</div>"
 else
-   write MUSIC_chord_roots[0]{note} " " MUSIC_chord_types[1]{chordtype} "^"
+   write MUSIC_chord_roots[0]{note} " " MUSIC_chord_types[0]{chordtype} "^"
    write "(" MUSIC_chord[0]{note} " " MUSIC_chord[1]{note} " " MUSIC_chord[2]{note} ")"
 endif
 }
@@ -634,7 +634,7 @@ else
 endif
 }
 
-# DELTE THE NOTE FROM THE SONG OR CHORD
+# DELETE THE NOTE FROM THE SONG OR CHORD
 
 {+delete_note
 if MUSIC_mode = SCALE

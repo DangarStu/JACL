@@ -48,9 +48,9 @@ if MUSIC_mode = SCALE
    write "<div class=~selectedtab~>Scale mode</div>"
 else
    write "<div class=~tab~>"
-   write "<a class=~tablink~ href=~" $url "?user_id=" $user_id 
+   write "<a class=~tablink~ href=~" $url "?user_id=" $user_id
    write "&command=scale mode&mode=2~>Scale mode</a>"
-   write "</div>
+   write "</div>"
 endif
 if MUSIC_mode = CHORD
    write "<div class=~selectedtab~>Chord mode</div>"
@@ -58,7 +58,7 @@ else
    write "<div class=~tab~>"
    write "<a class=~tablink~ href=~" $url "?user_id=" $user_id
    write "&command=chord mode&mode=1~>Chord mode</a>"
-   write "</div>
+   write "</div>"
 endif
 if MUSIC_mode = INSTRUCTIONS
    write "<div class=~selectedtab~>Instructions</div>"
@@ -66,7 +66,7 @@ else
    write "<div class=~tab~>"
    write "<a class=~tablink~ href=~" $url "?user_id=" $user_id
    write "&command=instructions mode&mode=4~>Instructions</a>"
-   write "</div>
+   write "</div>"
 endif
 write "</div>"
 write "<div id=~main~>^"
