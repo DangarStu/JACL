@@ -2356,6 +2356,70 @@ execute(const char *funcname)
                         strncat (resolved_setstring->value, setstring_buffer, counter);
                     }
                 }
+            } else if (!strcmp(word[0], "escapestring")) {
+                /* HTML-escape concatenated source tokens into a
+                 * destination string. Used by forms.library (and any
+                 * other code reflecting untrusted input) to prevent
+                 * a tilde-or-tag in user input from breaking out of
+                 * an HTML attribute. cgijacl's output filter swaps
+                 * `~` -> `"` on the way out, so a raw tilde in the
+                 * source is the dangerous case here. */
+                char setstring_buffer[2048] = "";
+                struct string_type *resolved_setstring = NULL;
+
+                if (word[2] == NULL) {
+                    noproprun();
+                    return (exit_function(TRUE));
+                } else {
+                    if ((resolved_setstring = string_resolve(var_text_of_word(1))) == NULL) {
+                        unkstrrun(word[1]);
+                        return (exit_function(TRUE));
+                    }
+
+                    for (counter = 2; word[counter] != NULL && counter < MAX_WORDS; counter++) {
+                        strncat(setstring_buffer, text_of_word(counter),
+                                sizeof(setstring_buffer) - strlen(setstring_buffer) - 1);
+                    }
+
+                    /* Write into the destination, escaping as we go.
+                     * resolved_setstring->value is 1024 bytes; reserve
+                     * one for NUL. If the next entity wouldn't fit, we
+                     * stop before writing a partial entity. */
+                    char       *dst       = resolved_setstring->value;
+                    const char *dst_end   = resolved_setstring->value + 1023;
+                    const char *src       = setstring_buffer;
+                    while (*src != 0) {
+                        const char *entity = NULL;
+                        switch (*src) {
+                            case '&':  entity = "&amp;";  break;
+                            case '<':  entity = "&lt;";   break;
+                            case '>':  entity = "&gt;";   break;
+                            case '"':  entity = "&quot;"; break;
+                            case '\'': entity = "&#39;";  break;
+                            /* JACL uses `~` inside string literals as a
+                             * stand-in for `"`, and cgijacl's output
+                             * filter (cgijacl.c:1726, :1770) swaps
+                             * tildes back to quotes on the way out.
+                             * A user-supplied `~` would therefore
+                             * close an attribute delimiter; emit a
+                             * literal &quot; entity to short-circuit
+                             * the swap. */
+                            case '~':  entity = "&quot;"; break;
+                            default:   break;
+                        }
+                        if (entity != NULL) {
+                            size_t elen = strlen(entity);
+                            if (dst + elen > dst_end) break;
+                            memcpy(dst, entity, elen);
+                            dst += elen;
+                        } else {
+                            if (dst + 1 > dst_end) break;
+                            *dst++ = *src;
+                        }
+                        src++;
+                    }
+                    *dst = 0;
+                }
             } else if (!strcmp(word[0], "padstring")) {
                 char setstring_buffer[2048] = "";
                 struct string_type *resolved_setstring = NULL;
