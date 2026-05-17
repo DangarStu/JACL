@@ -3256,6 +3256,7 @@ if noun1 = noun2
     write "sich selbst betrachten.^"
   else
     write "sich selbst betrachten.^"
+  endif
   set time = false
   break
 endif
