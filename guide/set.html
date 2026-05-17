@@ -139,9 +139,26 @@ setstring buffer "You are currently in " here{the} " on turn " total_moves ".^"
 }
 </pre>
 
-<p>The <b>addstring</b> command works in a similar way except it does not erase the current contents of the string being written to. 
+<p>The <b>addstring</b> command works in a similar way except it does not erase the current contents of the string being written to.
 
-<h2><a class="section" name="set4">The PADSTRING Command</a></h2>
+<h2><a class="section" name="set4">The ESCAPESTRING Command</a></h2>
+
+<p>The <b>escapestring</b> command is identical to <b>setstring</b> in shape &mdash; it concatenates all of its arguments into the destination string &mdash; but as it copies it replaces the characters <b>&amp;</b>, <b>&lt;</b>, <b>&gt;</b>, <b>&quot;</b>, <b>'</b> and <b>~</b> with their HTML entity equivalents (<b>&amp;amp;</b>, <b>&amp;lt;</b>, <b>&amp;gt;</b>, <b>&amp;quot;</b>, <b>&amp;#39;</b>, <b>&amp;quot;</b>). It exists for the <b>cgijacl</b> web build: any value that originates from an HTTP query parameter, cookie or form submission must be passed through <b>escapestring</b> before being written into an HTML attribute or element body, or a hostile user can break out of the surrounding markup.
+
+<p>The tilde (<b>~</b>) is included in the escape set because the <b>cgijacl</b> output filter swaps tildes back to double quotes on the way out; an un-escaped tilde inside a value attribute will therefore close the attribute delimiter and let the attacker inject arbitrary HTML and JavaScript.
+
+<pre>
+string FORMS_escaped
+
+{+text
+escapestring FORMS_escaped %FORMS_data
+write "&lt;input type=~text~ name=~" string_arg[1] "~ value=~" FORMS_escaped "~/&gt;"
+}
+</pre>
+
+<p>If the destination string is too small to hold the fully-escaped result, the copy stops on an entity boundary rather than emitting a partial <b>&amp;am</b>.
+
+<h2><a class="section" name="set5">The PADSTRING Command</a></h2>
 
 <p>The <b>padstring</b> command takes three parameters. The label of the string to fill, the text to fill the string with and an integer specifying the number of times to copy the text into the string. This command primarily exists to assist with presentation within the status window. For example, to print a blank line in the status window, the text that will by copied is a single space in quotes (&quot; &quot;) and it will be copied <b>status_width</b> times. The code below demonstrates creating a string called <b>status_text</b> that contains enough spaces to fill a line in the status window: 
 
@@ -153,7 +170,7 @@ padstring status_text " " status_width
 }
 </pre>
 
-<h2><a class="section" name="set5">The SPLIT Command</a></h2>
+<h2><a class="section" name="set6">The SPLIT Command</a></h2>
 
 <p>The <b>split</b> command accepts a string and splits it into one or more substrings which are stored in the specified string array. The number of strings the original string is split into is stored into an integer variable specified as the first parameter of the command. The second argument is the string to split, the third is the delimiter to split on and the final parameter is the array to store the results in.
 
