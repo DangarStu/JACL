@@ -18,7 +18,7 @@ if gui_mode = STANDARD
 endif
 if gui_mode = GUI
    write "Setting interface to Standard mode.^"
-   set gui_mode = GUI
+   set gui_mode = STANDARD
    set time = false
    return
 endif

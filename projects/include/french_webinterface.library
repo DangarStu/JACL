@@ -49,7 +49,12 @@ if gui_mode = STANDARD : gui_mode = MOBILE
          .then(function(response) { return response.text(); })^
          .then(function(data) {^
             var maintext = document.getElementById("maintext");^
-            maintext.innerHTML += "<br><b>&gt;" + command + "</b><br>" + data;^
+            /* Escape the typed command before splicing into innerHTML;^
+               a hostile user typing <img src=x onerror=...> would^
+               otherwise execute as HTML. data is server-emitted and^
+               already controlled. */^
+            var safeCommand = command.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");^
+            maintext.innerHTML += "<br><b>&gt;" + safeCommand + "</b><br>" + data;^
             var main = document.getElementById("main");^
             main.scrollTop = main.scrollHeight;^
             document.JACLGameForm.command.value = "";^
