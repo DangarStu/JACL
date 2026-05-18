@@ -100,3 +100,12 @@ constant BACK_REFERENCE_END         "~.^"
 constant WHEN_YOU_SAY               "When you say ~"
 constant MUST_SPECIFY               "~, you must specify whether you mean "
 constant OR_WORD                    " or "
+
+# WEB UI LABELS -- header link bar and mic button in webinterface.library.
+constant LINK_INSTRUCTIONS          "Instructions"
+constant LINK_MAP                   "Map"
+constant LINK_ABOUT                 "About"
+constant LINK_RESTART               "Restart"
+constant LINK_HINT                  "Hint"
+constant MIC_TOOLTIP                "Click to speak a command. Pause when you are done and it will be submitted for you. Click again while recording to cancel."
+constant MIC_LABEL                  "Speak a command"

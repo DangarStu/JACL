@@ -103,3 +103,12 @@ constant BACK_REFERENCE_END         "~.^"
 constant WHEN_YOU_SAY               "Ketika Anda mengatakan ~"
 constant MUST_SPECIFY               "~, Anda harus menentukan apakah yang Anda maksud "
 constant OR_WORD                    " atau "
+
+# WEB UI LABELS -- header link bar and mic button in webinterface.library.
+constant LINK_INSTRUCTIONS          "Panduan"
+constant LINK_MAP                   "Peta"
+constant LINK_ABOUT                 "Tentang"
+constant LINK_RESTART               "Mulai Ulang"
+constant LINK_HINT                  "Petunjuk"
+constant MIC_TOOLTIP                "Klik untuk mengucapkan perintah. Berhenti sejenak setelah selesai dan perintah akan dikirim secara otomatis. Klik lagi saat merekam untuk membatalkan."
+constant MIC_LABEL                  "Ucapkan perintah"

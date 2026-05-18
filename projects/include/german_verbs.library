@@ -1,6 +1,8 @@
 # --- JACL INCLUDE FILE: verbs.library
 # Release 15, Copyright (C) Stuart Allen 1990-2002.
 
+#include "german.library"
+
 filter eine
 filter ein
 filter der
