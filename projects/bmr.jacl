@@ -579,7 +579,7 @@ print
 You unstrap the shield from your back, and hold it nervously between your hands.^
 "Whatever you say, Billy..." you tell him, letting your voice shake a little, "It's yours. Just don't hurt us, all right?"^
 Billy throws back his head and laughs...^
-"Of course, Martine whatever you say..."^ ...and the heavy, metal shield you sent flying across the graveyard like a discos smashes into Billy-Boys teeth with the force of a hammer blow.^
+"Of course, Martine whatever you say..."^ ...and the heavy, metal shield you sent flying across the graveyard like a discus smashes into Billy-Boy's teeth with the force of a hammer blow.^
 Jakob's body thinks faster than his brain - his face is still slack and vacant, but he's dropping to his knees and slamming an elbow into the gut of the bearded guy. The guy crumples, Jak draws his sword and...^
  Billy's other henchman's gaping open mouthed at his screaming boss, and turns round just in time to meet your machete head on...^
 Wrenching the blade free, you round on the howling Billy-Boy, but he's not too keen on head on confrontation, it seems. He leaps past you, kicks you into the mud and races off to freedom... only that blow from the shield must have messed up his head a little, because he runs straight into the stone coffer, pivots forward and vanishes from sight with a squeal...^
@@ -916,7 +916,7 @@ location section28:28
 
 {look
 print
-Not with out some difficulty, you wrench the sword out from it's moorings and hold it in front of you like a lance. Vladimir's having trouble near his coffin - it looks like he's got his foot caught in something under the water. Whooping, you race forward with the sword held aloft in front of you, and run Ol' Vlad clean through, screaming with rage.^
+Not without some difficulty, you wrench the sword out from its moorings and hold it in front of you like a lance. Vladimir's having trouble near his coffin - it looks like he's got his foot caught in something under the water. Whooping, you race forward with the sword held aloft in front of you, and run Ol' Vlad clean through, screaming with rage.^
  Vladimir looks down at the handle of the sword jutting from his belly. He blinks. He growls and then starts to stagger towards you...^
 You decide that discretion is the greater part of staying alive, and race off down the corridor.^
 .
@@ -1603,7 +1603,7 @@ look
 object kryten: kryten
  has           ANIMATE
  short         name "yourself"
- long          "Odly, you see yourself standing here."
+ long          "Oddly, you see yourself standing here."
  capacity      42
  parent        section1
  damage        2

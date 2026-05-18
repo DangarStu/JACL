@@ -89,7 +89,7 @@ endif
 if girl(parent) = here
 write "The girl glares at you as you go towards the bed, not paying attention to her questions.^"
 else
-write "You sit on the bed, turning slightly to the right and lifting your feet off the ground, leaning your weight on your left elbow. As soon as your feet are off the ground, the squeeking bed finally gives out, the mattress under you tilting backward, dropping you head-first "
+write "You sit on the bed, turning slightly to the right and lifting your feet off the ground, leaning your weight on your left elbow. As soon as your feet are off the ground, the squeaking bed finally gives out, the mattress under you tilting backward, dropping you head-first "
 if bed_position = 0
 if @bed.pull = 0
 write "into a pit you had never spotted before with a muted, metallic thud!^"
@@ -399,7 +399,7 @@ write "~Me?~, the girl says, smirking, as if finding the idea incredulous and st
 getyesorno yes_or_no
 if yes_or_no = 1
 write "~Yes.~, you say, frowning at her.^"
-write "The girl chuckles and shakes his head, with an expression that seems to almost be of amusement.^"
+write "The girl chuckles and shakes her head, with an expression that seems to almost be of amusement.^"
 else
 write "~No...~, you say in a small voice.^"
 write "A strange expression of what seems to be admiration, or maybe, sorrow, fleets through her face, chased by a stony, expressionless mask. ~Well at least you know that much.~, she declares, with no hint of what you thought showed on her face.^"
