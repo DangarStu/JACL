@@ -235,7 +235,7 @@ print
 As soon as you take one step towards it, the cadaver jerks into life, and staggers uncertainly across the room. You pull out your machete and ready yourself, thinking carefully - a few clean chops at it's legs'll send it crashing to the floor, where you'll be able to finish it off easily...^^
 .
 style note
-write "[The zombie's hammer is big enough to cause three points of damage with each hit.]^
+write "[The zombie's hammer is big enough to cause three points of damage with each hit.]^"
 style normal
 set CombatBonus[0] = DoubleBonus
 set VictoryPage = section46

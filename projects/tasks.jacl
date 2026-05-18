@@ -117,7 +117,7 @@ execute "+text_submit<Status<status<30<field[6]"
 
 write "<input type=~hidden~ name=~command~ value=~update " field[0] "~/>"
 hidden
-write "</form>
+write "</form>"
 }
 
 grammar update $integer     >update
@@ -223,7 +223,7 @@ execute "+text_submit<Due date<duedate<30<field[5]"
 
 write "<input type=~hidden~ name=~command~ value=~add~/>"
 hidden
-write "</form>
+write "</form>"
 }
 
 grammar add     >add_task

@@ -5714,14 +5714,14 @@ if lisa has AT_STANDOFF
 endif
 if lisa has ON
    write "Lisa butts in, ~Don't talk to him, Alex. Just give me the gun "
-   write "then get out of here.~ ^
+   write "then get out of here.~ ^"
    return
 endif
 if lisa has BURNING
-   write "Lisa butts in, ~Don't talk to him, Alex. Just get out of here.~ ^
+   write "Lisa butts in, ~Don't talk to him, Alex. Just get out of here.~ ^"
    return
 endif
-write "~What would you like to know, Dr Meadows?~ ^
+write "~What would you like to know, Dr Meadows?~ ^"
 }
 
 {attack
@@ -9741,7 +9741,7 @@ if +reach<noun1 = true
    return true
 endif
 if noun1(mass) => heavy
-   write "You can't turn " noun1{the} " over.^
+   write "You can't turn " noun1{the} " over.^"
 else
    write "That won't get you far.^"
 endif
@@ -9766,7 +9766,7 @@ write "100%.^^"
 if score = 0
    return
 endif
-execute "+score_breakdown
+execute "+score_breakdown"
 }
 
 {+score_breakdown
@@ -11829,7 +11829,7 @@ if noun1 = stranger
    endif
    if lisa has ON
       write "Lisa butts in, ~Don't talk to him, Alex. Just give me the gun "
-      write "then get the hell out of here.~ ^
+      write "then get the hell out of here.~ ^"
       return
    endif
    if lisa has BURNING
@@ -11934,7 +11934,7 @@ if noun1 = stranger
       return
    if lisa has ON
       write "Lisa butts in, ~Don't talk to him, Alex, just give me the gun "
-      write "then get out of here.~ ^
+      write "then get out of here.~ ^"
       return
    endif
    if lisa has BURNING
@@ -12604,8 +12604,8 @@ if LISAS_SCRIPT = 27
       endif
    endif
    if bathroom_door has LOCKED
-      write "A sharp rap on the bathroom door startles you. ~" 
-      write "Hey! Hurry up in there will you,~ Lisa calls from the 
+      write "A sharp rap on the bathroom door startles you. ~"
+      write "Hey! Hurry up in there will you,~ Lisa calls from the "
       write "other side.^"
       ensure bathroom_door has CUSTOM4
       return

@@ -286,11 +286,11 @@ grammar delete **anywhere     >delete
 
 {+delete
 if noun1(class) = CHORD
-   execute "+delete_note<noun1(rootnote)
+   execute "+delete_note<noun1(rootnote)"
    return
 endif
 if noun1(class) = NOTE
-   execute "+delete_note<noun1(rootnote)
+   execute "+delete_note<noun1(rootnote)"
    return
 endif
 }
@@ -443,7 +443,7 @@ grammar add to song     >add_to_song
 set INDEX = 0
 while INDEX < MUSIC_chord_index
   set MUSIC_temp = MUSIC_chord[INDEX] % 12
-  execute "+add_to_set<MUSIC_scale<MUSIC_temp
+  execute "+add_to_set<MUSIC_scale<MUSIC_temp"
   set INDEX + 1
 endwhile
 execute "+determine_key"

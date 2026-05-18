@@ -3495,7 +3495,7 @@ write "Der Raum, den Du erkundest, ist in einzelne Einheiten unterteilt, die "
 write "Orte genannt werden. Zwischen Orten bewegst Du Dich über die "
 write "~Du kannst gehen:~-Verknüpfungen oder die folgenden Befehle...^"
 write ""
-write "BefehlRichtungBefehlRichtung
+write "BefehlRichtungBefehlRichtung"
 write ""
 
 write "NNordenSSüden"
@@ -3530,7 +3530,7 @@ write "~silberner schlüssel~ meinen. Ist Deine Eingabe mehrdeutig, etwa "
 write "~schlüssel~ wenn ein silberner und ein goldener Schlüssel am gleichen "
 write "Ort liegen, wirst Du gebeten, genauer zu sein.^"
 
-write "
+write ""
 write "Das nächste wichtige Konzept der interaktiven Fiktion ist die Art, wie "
 write "Du mit den Gegenständen an den Orten umgehst. Der entscheidende "
 write "Punkt bei der Befehlseingabe ist der Umfang, also wie viel sich mit "
@@ -3617,7 +3617,7 @@ write "ERZÄHLE &lt;figur&gt; VON &lt;objekt&gt;" ^
 
 write "Es gibt zudem einige Sonderbefehle, um mit dem Programm selbst und "
 write "nicht mit der simulierten Welt zu interagieren...^"
-write "
+write ""
 write "BefehlWirkung"
 write ""
 write "VERBOSEimmer ausführliche Ortsbeschreibungen"

@@ -102,7 +102,7 @@ write "<td><a href=~/downloads/stems/Immortality.zip~>Download individual tracks
 write "</tr><tr>"
 write "<td>The Invisible Woman</td>"
 write "<td><a href=~/downloads/stems/TheInvisibleWoman.zip~>Download individual tracks</a></td>"
-write "</tr></table>
+write "</tr></table>"
 }
 
 {+display_about
@@ -196,7 +196,7 @@ write "</tr><tr>"
 write "<td>The Invisible Woman</td>"
 write "<td><a href=~/cgi-bin/webchord.pl?chordpro=TheInvisibleWoman.pro~ target=~_blank~>Lyrics and chords</a></td>"
 write "<td><a href=~/downloads/chordpro/TheInvisibleWoman.pro~>Download ChordPro file</a></td>"
-write "</tr></table>
+write "</tr></table>"
 }
 
 {+display_songs

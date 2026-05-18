@@ -91,7 +91,7 @@ execute "+textarea<comment<80<3"
 write "^^<input type=~submit~>"
 write "^^<input type=~hidden~ name=~command~ value=~register " event{names} "~/>"
 hidden
-write "</form>
+write "</form>"
 }
 
 integer gmt

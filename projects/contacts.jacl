@@ -102,12 +102,12 @@ execute "+text<Mobile phone<mobile_phone<50<field[5]"
 execute "+text<Address<address<50<field[6]"
 
 write "<div class=~row~>"
-write "<div class=~label~>&nbsp;</div>
+write "<div class=~label~>&nbsp;</div>"
 write "<div class=~input~><input type=~submit~></div>"
-write "</div>
+write "</div>"
 write "<input type=~hidden~ name=~command~ value=~update " field[0] "~/>"
 hidden
-write "</form>
+write "</form>"
 }
 
 grammar update $integer     >update
@@ -197,7 +197,7 @@ write "</div>"
 
 write "^^<input type=~hidden~ name=~command~ value=~add~/>"
 hidden
-write "</form>
+write "</form>"
 }
 
 grammar add     >add_record

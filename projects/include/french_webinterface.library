@@ -121,7 +121,7 @@ else
 endif
 if gui_mode != MOBILE
    write "<form name=~JACLInterfaceForm~ method=get>^"
-   write "<div class=~links~>
+   write "<div class=~links~>"
    write "| "
    write "Interface: "
    write "Standard<input type=~radio~ name=~interface~ value=~1~"

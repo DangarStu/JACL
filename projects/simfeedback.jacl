@@ -119,12 +119,12 @@ execute "+select_num<Gender<gender<gender_data"
 execute "+select_num<Role<role<role_data"
 
 write "<div class=~row~>"
-write "<div class=~label~>&nbsp;</div>
+write "<div class=~label~>&nbsp;</div>"
 write "<div class=~input~><input type=~submit~></div>"
-write "</div>
+write "</div>"
 write "<input type=~hidden~ name=~command~ value=~update~/>"
 hidden
-write "</form>
+write "</form>"
 }
 
 {+display_observations

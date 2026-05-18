@@ -64,7 +64,7 @@ enditerate
 
 {+display_question
 if field_count < 3 : field_count > 7
-   write "Bad question in CSV file.^
+   write "Bad question in CSV file.^"
    return
 endif
 

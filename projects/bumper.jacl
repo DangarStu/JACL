@@ -152,7 +152,7 @@ execute "+text_submit<Due date<duedate<30<field[5]"
 
 write "<input type=~hidden~ name=~command~ value=~add~/>"
 hidden
-write "</form>
+write "</form>"
 }
 
 grammar add     >add_sticker

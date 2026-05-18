@@ -3916,9 +3916,9 @@ object hatch : square hatch
 {open_override
 write "You swing open the hatch allowing access "
 if here = foredeck
-   write "down into the forepeak.^
+   write "down into the forepeak.^"
 else
-   write "up to the foredeck.^
+   write "up to the foredeck.^"
 endif
 set foredeck(down) = forepeak
 set foredeck(in) = forepeak

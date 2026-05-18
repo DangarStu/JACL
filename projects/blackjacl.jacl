@@ -209,7 +209,7 @@ write "</center>^"
 
 
 {+hand_finished
-execute "+determine_winner<hand_one
+execute "+determine_winner<hand_one"
 if current_player(hands) = 2
    execute "+determine_winner<hand_two"
 endif

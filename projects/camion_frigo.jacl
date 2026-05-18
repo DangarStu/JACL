@@ -1064,7 +1064,7 @@ if planche(parent) = here : planche(parent) = player
       return
    else
       write "Lucien regarde la planche à roulette et vous félicite pour votre trouvaille.^"
-      write "« Il ne reste plus qu'à glisser le démodulateur sur la planche pour le faire rouler jusqu'à la camionnette. Ce n'est pas une affaire facile, mais ce n'est pas si compliqué en fin de compte. »^
+      write "« Il ne reste plus qu'à glisser le démodulateur sur la planche pour le faire rouler jusqu'à la camionnette. Ce n'est pas une affaire facile, mais ce n'est pas si compliqué en fin de compte. »^"
       write "^"
       write "Au bout d'un moment, vous vous retrouvez près du camion chargé.^"
       points 30

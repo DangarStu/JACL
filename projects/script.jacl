@@ -40,7 +40,7 @@ if interpreter = CGI
         document.querySelector('h1').textContent = "Button has been pressed";
      </script>
    .
-write "You press the ~Change Title~ button.^
+write "You press the ~Change Title~ button.^"
 setstring game_title "Button has been pressed"
 }
 

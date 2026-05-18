@@ -2120,8 +2120,8 @@ if noun2 has WORN
    ensure noun2 hasnt WORN
    return true
 endif
-write  noun1{The} " vous donne"  noun1{nt} 
-write " noun2{the}.^
+write  noun1{The} " vous donne"  noun1{nt}
+write " " noun2{the} ".^"
 }
 
 
