@@ -159,7 +159,11 @@ interpreter mode. Default for v1: **pure Glk presentation.**
 - [x] **XcodeGen `project.yml`; builds & runs on the iPad simulator (iOS 26.5)**
 - [x] Game titles on the shelf (plain & encrypted `.j2`)
 - [x] Input round-trip verified (scripted commands advance the game)
-- [ ] Graphics + sound (Glk blorb resources) through the bridge
+- [x] Graphics: blorb images render (bridge fetches pixels via giblorb;
+      needs `<prefix>.blorb` imported alongside the `.j2`)
+- [ ] ~~Sound~~ — descoped: RemGlk has no sound support, and games' audio is
+      web-oriented. The `ios` flag skips the sound question; `sound_enabled`
+      stays off.
 - [ ] Measure the real monospace cell for exact grid (status-line) metrics
 - [ ] Autosave / restore on background (core save path is ready)
 - [ ] `.jaclgame` package (zip of `.j2`+`.blorb`) + exported UTI in Info.plist

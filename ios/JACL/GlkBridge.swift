@@ -24,6 +24,7 @@ struct RenderedSpan: Identifiable {
     let text: String
     let style: String
     let hyperlink: Int?
+    let image: Int?          // blorb image resource number, if this span is an image
 }
 
 struct RenderedParagraph: Identifiable {
@@ -174,7 +175,8 @@ final class GlkBridge: ObservableObject {
     private func render(_ span: GlkSpan) -> RenderedSpan {
         RenderedSpan(text: span.text ?? "",
                      style: span.style ?? "normal",
-                     hyperlink: span.hyperlink)
+                     hyperlink: span.hyperlink,
+                     image: span.special == "image" ? span.image : nil)
     }
 
     // MARK: Metrics

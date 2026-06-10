@@ -30,6 +30,7 @@
 
 #include "jacl.h"
 #include "glk.h"
+#include "gi_blorb.h"
 #include "glkstart.h"
 #include "language.h"
 #include "prototypes.h"
@@ -119,9 +120,28 @@ jacl_ios_prepare(const char *path)
 		return (TRUE);
 	}
 
-	/* Saves and the blorb (opened via fileref_create_by_name) resolve
-	 * relative to this file -- i.e. the sandbox directory holding the .j2. */
+	/* Saves resolve relative to this file -- i.e. the sandbox directory
+	 * holding the .j2 (with -gamefiledir, see jacl_bridge.c). */
 	glkunix_set_base_file(game_file);
+
+	/* Open the game's blorb (graphics) here, during start-up, where
+	 * glkunix_stream_open_pathname() is valid under RemGlk. We can't leave
+	 * this to jacl.c's glk_fileref_create_by_name() path: RemGlk appends a
+	 * usage suffix (".glkdata") to by-name filerefs (rgfref.c), so
+	 * "<prefix>.blorb" would never be found. Opening the full sandbox path
+	 * sidesteps that; jacl.c then finds no suffixed file and leaves this map
+	 * in place. */
+	{
+		char    blorb_path[1024];
+		strid_t bs;
+
+		snprintf(blorb_path, sizeof(blorb_path), "%s%s.blorb", game_path, prefix);
+		bs = glkunix_stream_open_pathname(blorb_path, FALSE, 0);
+		if (bs) {
+			blorb_stream = bs;
+			giblorb_set_resource_map(bs);
+		}
+	}
 
 	return (TRUE);
 }

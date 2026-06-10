@@ -6,6 +6,25 @@
 //  spans render as a placeholder for now (blorb resource wiring is later).
 
 import SwiftUI
+import UIKit
+
+/// Decodes and caches blorb images by resource number. RemGlk sends the image
+/// number/size in its JSON; the pixels come from the game's blorb via the C
+/// bridge (jacl_bridge_image). Accessed on the main thread during rendering;
+/// the terp is blocked on input at that point, so it isn't touching the blorb.
+final class BlorbImageCache {
+    static let shared = BlorbImageCache()
+    private var store: [Int: UIImage] = [:]
+
+    func image(_ num: Int) -> UIImage? {
+        if let cached = store[num] { return cached }
+        var len: UInt32 = 0
+        guard let ptr = jacl_bridge_image(UInt32(num), &len), len > 0 else { return nil }
+        let img = UIImage(data: Data(bytes: ptr, count: Int(len)))
+        store[num] = img
+        return img
+    }
+}
 
 struct GameView: View {
     let gamePath: String
@@ -89,7 +108,7 @@ struct GameView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(paras) { para in
-                        paragraphText(para)
+                        paragraphView(para)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .id(para.id)
                     }
@@ -138,6 +157,31 @@ struct GameView: View {
 
     private func paragraphText(_ para: RenderedParagraph) -> Text {
         para.spans.reduce(Text("")) { $0 + styled($1) }
+    }
+
+    /// A buffer paragraph. If it contains an image span, lay the spans out
+    /// vertically (images become Image views); otherwise take the fast path of
+    /// a single concatenated Text.
+    @ViewBuilder
+    private func paragraphView(_ para: RenderedParagraph) -> some View {
+        if para.spans.contains(where: { $0.image != nil }) {
+            VStack(alignment: .leading, spacing: 6) {
+                ForEach(para.spans) { span in
+                    if let num = span.image {
+                        if let img = BlorbImageCache.shared.image(num) {
+                            Image(uiImage: img)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        }
+                    } else if !span.text.isEmpty {
+                        styled(span)
+                    }
+                }
+            }
+        } else {
+            paragraphText(para)
+        }
     }
 
     /// Map a Glk style name to SwiftUI text styling.
