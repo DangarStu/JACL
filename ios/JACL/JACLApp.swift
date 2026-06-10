@@ -2,12 +2,9 @@
 //  App entry + the game shelf. Games are imported from Files into the app
 //  sandbox (Documents/) and played from there.
 //
-//  Info.plist for the target should declare iPad-only (UIDeviceFamily=[2]),
-//  LSSupportsOpeningDocumentsInPlace=YES, UIFileSharingEnabled=YES, and a
-//  document type / exported UTI for the .j2 (and later .jaclgame) extension
-//  so games can be opened from Files / the share sheet.
-//
-//  STATUS: v0 scaffold. Assemble in Xcode; not yet compiled.
+//  Info.plist (generated from project.yml) declares iPad-only, file sharing,
+//  open-in-place, and the .j2 document type / exported UTI so games can be
+//  opened from Files and the share sheet.
 
 import SwiftUI
 import UniformTypeIdentifiers
@@ -23,7 +20,7 @@ struct JACLApp: App {
             // builds) show the shelf.
             if ProcessInfo.processInfo.arguments.contains("-autoplay"),
                let game = GameLibrary.games().first {
-                GameView(gamePath: game.path)
+                GameView(gamePath: game.url.path)
             } else {
                 GameShelfView()
             }
@@ -37,7 +34,7 @@ struct JACLApp: App {
 // MARK: - Shelf
 
 struct GameShelfView: View {
-    @State private var games: [URL] = GameLibrary.games()
+    @State private var games: [Game] = GameLibrary.games()
     @State private var importing = false
 
     var body: some View {
@@ -49,9 +46,9 @@ struct GameShelfView: View {
                         systemImage: "books.vertical",
                         description: Text("Tap + to import a JACL game (.j2) from Files."))
                 } else {
-                    List(games, id: \.self) { url in
-                        NavigationLink(url.deletingPathExtension().lastPathComponent) {
-                            GameView(gamePath: url.path)
+                    List(games) { game in
+                        NavigationLink(game.title) {
+                            GameView(gamePath: game.url.path)
                         }
                     }
                 }
@@ -74,6 +71,13 @@ struct GameShelfView: View {
 
 // MARK: - Sandbox game storage
 
+/// An imported game: its file plus the display title read from the `.j2`.
+struct Game: Identifiable, Hashable {
+    let url: URL
+    let title: String
+    var id: URL { url }
+}
+
 enum GameLibrary {
     /// The UTI to import. Falls back to plain data until the exported type is
     /// declared in Info.plist.
@@ -83,8 +87,8 @@ enum GameLibrary {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
 
-    /// Imported `.j2` games, newest first.
-    static func games() -> [URL] {
+    /// Imported `.j2` games, newest first, each with its title resolved.
+    static func games() -> [Game] {
         let keys: [URLResourceKey] = [.contentModificationDateKey]
         let urls = (try? FileManager.default.contentsOfDirectory(
             at: documents, includingPropertiesForKeys: keys)) ?? []
@@ -95,6 +99,8 @@ enum GameLibrary {
                 let db = (try? b.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
                 return da > db
             }
+            .map { Game(url: $0,
+                        title: title(of: $0) ?? $0.deletingPathExtension().lastPathComponent) }
     }
 
     /// Copy a picked file into Documents/ so the terp has persistent,
@@ -111,5 +117,46 @@ enum GameLibrary {
         }
         try FileManager.default.copyItem(at: url, to: dest)
         return dest
+    }
+
+    // MARK: Title extraction
+
+    /// Read `constant game_title "..."` from a `.j2`. Release files XOR-
+    /// obfuscate every line after the `#encrypted` marker (JACL's
+    /// jacl_obfuscate is a byte-wise ^0xFF), so those are de-obfuscated before
+    /// matching. Returns nil if no title line is found. Scans only until the
+    /// title line, which sits near the top of the game source.
+    static func title(of url: URL) -> String? {
+        guard let data = try? Data(contentsOf: url, options: .mappedIfSafe) else { return nil }
+        let marker = Array("#encrypted".utf8)
+        var encrypted = false
+        var lineStart = 0
+        let count = data.count
+        var i = 0
+        while i < count {
+            if data[i] != 0x0A { i += 1; continue }
+            var line = [UInt8](data[lineStart..<i])
+            lineStart = i + 1
+            i += 1
+            if encrypted {
+                for j in line.indices { line[j] ^= 0xFF }
+            } else if line.starts(with: marker) {
+                encrypted = true
+                continue
+            }
+            if let t = titleInLine(line) { return t }
+        }
+        return nil
+    }
+
+    /// Extract the title from a (decoded) `constant game_title "..."` line.
+    private static func titleInLine(_ bytes: [UInt8]) -> String? {
+        guard let line = String(bytes: bytes, encoding: .utf8) else { return nil }
+        let parts = line.split(whereSeparator: { $0 == " " || $0 == "\t" })
+        guard parts.count >= 2, parts[0] == "constant", parts[1] == "game_title" else { return nil }
+        guard let a = line.firstIndex(of: "\"") else { return nil }
+        let after = line.index(after: a)
+        guard let b = line[after...].firstIndex(of: "\"") else { return nil }
+        return String(line[after..<b])
     }
 }
