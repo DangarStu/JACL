@@ -177,6 +177,17 @@ read_gamefile()
 #endif
 #endif
 
+    /* The native iOS app is a GLK build, so it reports interpreter = GLK and
+     * inherits all GLK behaviour. This separate flag marks it as the native
+     * app so the library can skip console setup questions (e.g. the sound
+     * prompt -- sound is an in-app setting there). 0 on every other build so
+     * games can branch on `ios` without ifdefs. */
+#ifdef JACL_IOS_EMBED
+    create_cinteger ("ios", 1);
+#else
+    create_cinteger ("ios", 0);
+#endif
+
     /* TEST FOR AVAILABLE FUNCTIONALITY BEFORE EXECUTING ANY JACL CODE */
 
 #ifdef GLK
