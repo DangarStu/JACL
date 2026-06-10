@@ -28,6 +28,14 @@ all: $(BUILD_TARGETS)
 bjorb: bjorb.c
 	$(CC) $(CFLAGS) -o bjorb bjorb.c
 
+# Jpp target (standalone JACL preprocessor utility). Shares the real
+# preprocessing engine (jpp.c) but links no Glk library -- it only needs
+# glk.h from $(GLKTERM_DIR) for the shared type declarations, never opens
+# a window or a terminal. Built fresh, so its #processed version stamp is
+# always current. Used by etc/build-jaclgames.sh to make release .j2s.
+jpp: jppmain.c jpp.c
+	$(CC) $(CFLAGS) -DGLK jppmain.c jpp.c -I$(GLKTERM_DIR) -o jpp
+
 # Jacl target (GlkTerm console, requires ncurses)
 jacl: libglkterm.a
 	$(CC) $(CFLAGS) -DGLK jacl.c glk_startup.c $(COMMON_SRC) glk_saver.c -I$(GLKTERM_DIR) -L$(GLKTERM_DIR) -lglkterm -lm $(NCURSES_LIBS) -o jacl
@@ -108,7 +116,7 @@ apache: install
 	@cp -r ../guide/* /var/www/html/guide/
 	@echo "Building .jaclgame download packages for iPad..."
 	@mkdir -p /var/www/html/games
-	@sh ../etc/build-jaclgames.sh /usr/local/jacl/projects /var/www/html/games cjacl || true
+	@sh ../etc/build-jaclgames.sh /usr/local/jacl/projects /var/www/html/games "$$PWD/jpp" || true
 	@echo "Building landing-page index.html..."
 	@sh ../etc/gen-landing.sh /usr/local/jacl/projects /var/www/html/games > /var/www/html/index.html
 	@echo "Installing Apache configuration..."

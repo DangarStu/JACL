@@ -229,8 +229,8 @@ fi
 # -----------------------------------------------------------
 # Build the target list
 # -----------------------------------------------------------
-BUILD_TARGETS="bjorb cgijacl"
-INSTALL_CMDS="cp bjorb cgijacl ../bin/; install bjorb cgijacl /usr/local/bin/"
+BUILD_TARGETS="bjorb jpp cgijacl"
+INSTALL_CMDS="cp bjorb jpp cgijacl ../bin/; install bjorb jpp cgijacl /usr/local/bin/"
 
 if test "$HAVE_NCURSES" = "yes"; then
     BUILD_TARGETS="$BUILD_TARGETS jacl"
@@ -259,6 +259,7 @@ echo "JACL $PACKAGE_VERSION configured."
 echo ""
 echo "  Interpreters to build:"
 echo "    bjorb         yes (utility)"
+echo "    jpp           yes (preprocessor utility)"
 echo "    cgijacl       yes (CGI web)"
 if test "$HAVE_NCURSES" = "yes"; then
 echo "    jacl          yes (GlkTerm console)"
