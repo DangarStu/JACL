@@ -94,6 +94,23 @@
     font-size: 8.5pt;
     color: #555;
     line-height: 1.5;
+    padding-right: 2in;       /* clear space for the ISBN barcode */
+  }
+
+  .back .isbn {
+    position: absolute;
+    right: 0.625in;
+    bottom: 0.625in;
+    width: 1.8in;
+    background: #ffffff;
+    padding: 3mm;
+    box-sizing: border-box;
+    border: 0.5pt solid #ddd;
+  }
+  .back .isbn img {
+    display: block;
+    width: 100%;
+    height: auto;
   }
 
   /* --------- Spine --------- */
@@ -204,11 +221,15 @@
     JACL Interpreter v4.7 &middot; <a href="https://github.com/DangarStu/JACL">github.com/DangarStu/JACL</a><br>
     Copyright 1992&ndash;2026 Stuart Allen &middot; dangarstu@gmail.com
   </div>
+
+  <div class="isbn">
+    <img src="978-1-291-67599-3.png" alt="ISBN 978-1-291-67599-3">
+  </div>
 </div>
 
 <div class="spine">
   <div class="text">
-    <span class="edition">Seventh Edition</span>
+    <span class="edition">Eighth Edition</span>
     <span class="title">The JACL Author's Guide</span>
     <span class="author">Stuart Allen</span>
   </div>

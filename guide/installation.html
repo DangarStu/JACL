@@ -171,9 +171,13 @@ brew install curl jansson openssl pkg-config
 <td>Max-Age applied to the anonymous <b>user_id</b> cookie that pairs an in-progress player with their auto-saved game.</td>
 <td><b>21600</b> (6 hours).</td>
 </tr><tr>
-<td><b>prefer_remote_user</b> <b>true</b>|<b>false</b></td>
-<td>When <b>true</b> and the web server has populated the <b>REMOTE_USER</b> CGI variable (e.g. via HTTP basic auth or an SSO module), use that as the player identity in preference to the cookie-based <b>user_id</b>.</td>
-<td><b>true</b>.</td>
+<td><b>data</b> <i>Directory</i></td>
+<td>This indicates the directory the CSV loader will look in for data files referenced by an <b>iterate</b> or <b>update</b> block.</td>
+<td>A directory called <b>data</b> beneath the directory the game file is stored in.</td>
+</tr><tr>
+<td><b>prefer_remote_user</b></td>
+<td>Bare directive (no argument). When present, and the web server has populated the <b>REMOTE_USER</b> CGI variable (e.g. via HTTP basic auth or an SSO module), <b>REMOTE_USER</b> is used as the player identity in preference to the cookie-based <b>user_id</b>. The directive <b>ignore_remote_user</b> is the opposite and forces the cookie to win.</td>
+<td>On (<b>REMOTE_USER</b> takes precedence when set).</td>
 </tr></table>
 
 <p style="page-break-before: always">Below is an example <b>cgijacl</b> configuration file:
