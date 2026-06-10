@@ -13,6 +13,8 @@
  */
 
 #include <unistd.h>
+#include "glk.h"
+#include "gi_blorb.h"
 #include "jacl_ios.h"
 #include "jacl_bridge.h"
 
@@ -33,14 +35,42 @@ int jacl_bridge_run(const char *gamepath, int io_fd)
 	if (dup2(io_fd, STDIN_FILENO)  < 0) return -1;
 	if (dup2(io_fd, STDOUT_FILENO) < 0) return -1;
 
-	/* Declare the input features the SwiftUI front-end can deliver. RemGlk
-	 * parses these as library options, so they are NOT forwarded to
+	/* RemGlk library options (parsed by remglk_main, NOT forwarded to
 	 * glkunix_startup_code -- startdata stays argc==1 and our shim falls
-	 * back to the game path set above. */
-	char *argv[] = { "jacl", "-support", "hyperlinks", "-support", "graphics", NULL };
+	 * back to the game path set above):
+	 *  -gamefiledir : make glkunix_set_base_file() actually set the fileref
+	 *                 working dir (rgfref.c gates it on this), so the blorb
+	 *                 and save files resolve next to the .j2 in the sandbox
+	 *                 rather than against the process cwd.
+	 *  -support …   : input/graphics features the SwiftUI front-end provides. */
+	char *argv[] = { "jacl", "-gamefiledir", "yes",
+	                 "-support", "hyperlinks", "-support", "graphics", NULL };
 	int   argc   = (int)(sizeof(argv) / sizeof(argv[0])) - 1;
 
 	/* Runs the game to completion. Under JACL_IOS_EMBED glk_exit() calls
 	 * pthread_exit(), so on a normal quit this never returns. */
 	return remglk_main(argc, argv);
+}
+
+const void *jacl_bridge_image(unsigned int num, unsigned int *len)
+{
+	giblorb_result_t res;
+	giblorb_map_t *map;
+
+	*len = 0;
+
+	/* jacl.c calls giblorb_set_resource_map() when the game's blorb opens;
+	 * this returns NULL if the game has no blorb. */
+	map = giblorb_get_resource_map();
+	if (map == NULL) {
+		return NULL;
+	}
+
+	if (giblorb_load_resource(map, giblorb_method_Memory, &res,
+	                          giblorb_ID_Pict, num) != giblorb_err_None) {
+		return NULL;
+	}
+
+	*len = (unsigned int) res.length;
+	return res.data.ptr;
 }

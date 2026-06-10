@@ -25,6 +25,14 @@ extern "C" {
  */
 int jacl_bridge_run(const char *gamepath, int io_fd);
 
+/* Return a pointer to image resource `num` from the game's blorb (or NULL if
+ * there is no blorb open or no such image), with its byte length in *len. The
+ * bytes are the raw image file (PNG/JPEG) as packaged in the blorb. The
+ * pointer is owned by the blorb layer -- copy the bytes if you need to keep
+ * them. RemGlk sends the image number/size in its JSON; this resolves the
+ * number to actual pixels (see ios/README.md, graphics). */
+const void *jacl_bridge_image(unsigned int num, unsigned int *len);
+
 #ifdef __cplusplus
 }
 #endif
