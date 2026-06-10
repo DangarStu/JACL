@@ -46,10 +46,9 @@ int             jpp_error = FALSE;
  * in the desktop build and we are its replacement). */
 strid_t         blorb_stream;
 
-/* Vestigial in the .j2 path: only the desktop -noencrypt flag ever wrote
- * it, and nothing in the core reads it. Defined so the symbol exists if a
- * future translation unit references it, matching glk_startup.c. */
-short int       encrypt;
+/* (glk_startup.c also defines a vestigial `short int encrypt;` here, but it
+ * is omitted on purpose: nothing in the iOS build reads it, and the name
+ * collides with POSIX encrypt() from <unistd.h> on the iOS SDK.) */
 
 /* The game file the host app wants us to run. Set by the app shell before
  * the interpreter thread starts; read by glkunix_startup_code() when a
