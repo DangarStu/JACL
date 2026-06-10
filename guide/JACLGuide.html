@@ -18,7 +18,7 @@
 <p>&nbsp;
 <center>
 	<a href="index.html"><img border=0 src="front.png"></a><br>
-	<p><i>Seventh Edition</i>
+	<p><i>Eighth Edition</i>
 </center>
 	<p style="page-break-before: always">JACL Interpreter v4.7<br>
 	<a href="https://github.com/DangarStu/JACL">https://github.com/DangarStu/JACL</a><br>
@@ -509,9 +509,13 @@ brew install curl jansson openssl pkg-config
 <td>Max-Age applied to the anonymous <b>user_id</b> cookie that pairs an in-progress player with their auto-saved game.</td>
 <td><b>21600</b> (6 hours).</td>
 </tr><tr>
-<td><b>prefer_remote_user</b> <b>true</b>|<b>false</b></td>
-<td>When <b>true</b> and the web server has populated the <b>REMOTE_USER</b> CGI variable (e.g. via HTTP basic auth or an SSO module), use that as the player identity in preference to the cookie-based <b>user_id</b>.</td>
-<td><b>true</b>.</td>
+<td><b>data</b> <i>Directory</i></td>
+<td>This indicates the directory the CSV loader will look in for data files referenced by an <b>iterate</b> or <b>update</b> block.</td>
+<td>A directory called <b>data</b> beneath the directory the game file is stored in.</td>
+</tr><tr>
+<td><b>prefer_remote_user</b></td>
+<td>Bare directive (no argument). When present, and the web server has populated the <b>REMOTE_USER</b> CGI variable (e.g. via HTTP basic auth or an SSO module), <b>REMOTE_USER</b> is used as the player identity in preference to the cookie-based <b>user_id</b>. The directive <b>ignore_remote_user</b> is the opposite and forces the cookie to win.</td>
+<td>On (<b>REMOTE_USER</b> takes precedence when set).</td>
 </tr></table>
 
 <p style="page-break-before: always">Below is an example <b>cgijacl</b> configuration file:
@@ -3387,13 +3391,19 @@ execute "+game_intro"
 <th width=80%>Description</th>
 </TR><TR>
 <td><B>locationof</B></TD>
-<td>This tests if the left value is the location of the right object.</TD>
+<td>This tests if the left value is the location of the right object (the location reached by walking the right object's parent chain up to the first <B>LOCATION</B>).</TD>
 </TR><TR>
 <td><B>!locationof</B></TD>
 <td>This tests if the left value is not the location of the right object.</TD>
 </tr></table>
 
-<p>The difference between <b>grandof</b> and <b>locationof</b> is that, for example, if a key is put on a keyring, which is put in a box, which is put into a bag, and the bag is in a room called "beach", '<b>locationof key</b>' would refer to the beach, but '<b>grandof key</b>' would refer to the bag.</p>
+<p>The word <b>locationof</b> is also valid as a value-expression keyword on the right-hand side of a <b>set</b>:
+
+<pre>
+set dl_index = locationof noun1
+</pre>
+
+<p>The difference between <b>grandof</b> and <b>locationof</b> is that, for example, if a key is put on a keyring, which is put in a box, which is put into a bag, and the bag is in a room called "beach", <b>locationof key</b> would resolve to the beach, but <b>grandof key</b> would resolve to the bag.
 
 <P>The following are the possible tests that can be used with an <B>if</B> command when the left value is an object and the right value is an attribute. For more information see the chapter on <a href="attributes.html">Attributes</a>.
 
@@ -6716,7 +6726,7 @@ print:
    in the centre of the room while a doorway to the
    west leads into the bathroom.
 .
-write &quot;To the south there is &quot; 
+write &quot;To the south there is a &quot;
 if door has CLOSED
    write &quot;closed&quot;
 else
@@ -7245,7 +7255,7 @@ object ground: ground floor
 </tr>
 
 <tr><td valign=top><b>keyword</b></td>
-<td valign=top>Keywords are any of the terms that define the nine basic data elements in a game. They are <b>object</b>, <b>location</b>, <b>filter</b>, <b>synonym</b>, <b>integer</b>, <b>grammar</b>, <b>constant</b>, <b>string</b>, <b>attribute</b> and <b>parameter</b>.</td>
+<td valign=top>Keywords are any of the terms that define a top-level declaration in a game. They are <b>object</b>, <b>location</b>, <b>filter</b>, <b>synonym</b>, <b>integer</b> (and <b>integer_array</b>), <b>grammar</b>, <b>constant</b>, <b>string</b> (and <b>string_array</b>), <b>attribute</b>, <b>parameter</b> and <b>stylehint</b>.</td>
 </tr>
 
 <tr><td valign=top><b>label</b></td>

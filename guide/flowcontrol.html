@@ -74,13 +74,19 @@
 <th width=80%>Description</th>
 </TR><TR>
 <td><B>locationof</B></TD>
-<td>This tests if the left value is the location of the right object.</TD>
+<td>This tests if the left value is the location of the right object (the location reached by walking the right object's parent chain up to the first <B>LOCATION</B>).</TD>
 </TR><TR>
 <td><B>!locationof</B></TD>
 <td>This tests if the left value is not the location of the right object.</TD>
 </tr></table>
 
-<p>The difference between <b>grandof</b> and <b>locationof</b> is that, for example, if a key is put on a keyring, which is put in a box, which is put into a bag, and the bag is in a room called "beach", '<b>locationof key</b>' would refer to the beach, but '<b>grandof key</b>' would refer to the bag.</p>
+<p>The word <b>locationof</b> is also valid as a value-expression keyword on the right-hand side of a <b>set</b>:
+
+<pre>
+set dl_index = locationof noun1
+</pre>
+
+<p>The difference between <b>grandof</b> and <b>locationof</b> is that, for example, if a key is put on a keyring, which is put in a box, which is put into a bag, and the bag is in a room called "beach", <b>locationof key</b> would resolve to the beach, but <b>grandof key</b> would resolve to the bag.
 
 <P>The following are the possible tests that can be used with an <B>if</B> command when the left value is an object and the right value is an attribute. For more information see the chapter on <a href="attributes.html">Attributes</a>.
 

@@ -3705,6 +3705,29 @@ logic_test(int first)
                     return (TRUE);
             }
         }
+    } else if (!strcmp(word[first + 1], "locationof")) {
+        /* LOCATIONOF SAYS THAT THE LEFT VALUE IS THE LOCATION REACHED
+         * BY WALKING THE RIGHT OBJECT'S PARENT CHAIN UP TO THE FIRST
+         * LOCATION. Mirrors the value-expression form used by `set`. */
+        if (index < 1 || index > objects) {
+            unkobjrun(first);
+            return (FALSE);
+        } else if (compare < 1 || compare > objects) {
+            unkobjrun(first + 2);
+            return (FALSE);
+        } else {
+            return (grand_of(compare, FALSE) == index);
+        }
+    } else if (!strcmp(word[first + 1], "!locationof")) {
+        if (index < 1 || index > objects) {
+            unkobjrun(first);
+            return (FALSE);
+        } else if (compare < 1 || compare > objects) {
+            unkobjrun(first + 2);
+            return (FALSE);
+        } else {
+            return (grand_of(compare, FALSE) != index);
+        }
     } else {
         /* The operator slot is word[first + 1]; the old form quoted
          * word[2], which was the operator of the FIRST triple in a
