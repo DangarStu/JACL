@@ -36,6 +36,10 @@ targets:
         excludes:
           - "Info.plist"
 
+      # Games bundled with the app (.jaclgame packages copied into Resources;
+      # seeded into Documents on first launch by installBundledStarters()).
+      - path: StarterGames
+
       # iOS-only C: startup shim + Swift<->RemGlk bridge.
       - path: ios_startup.c
       - path: jacl_bridge.c
