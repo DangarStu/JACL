@@ -192,6 +192,77 @@ interpreter mode. Default for v1: **pure Glk presentation.**
 4. Drop in the `JACL/*.swift` files.
 5. Build & run on an iPad simulator; import a `.j2` via Files.
 
+## Run on a real iPad
+
+The simulator needs no code signing; a device does. One-time, with a **free**
+Apple ID (good enough for your own iPad — the signature expires after 7 days,
+just re-run from Xcode to refresh; games in Documents survive):
+
+1. `cd ios && xcodegen generate && open JACL.xcodeproj`
+2. JACL target → **Signing & Capabilities** → tick **Automatically manage
+   signing** → **Team** → add/select your Apple ID. Bundle id
+   `au.com.famecapital.JACL` is a domain you own, so there's no collision.
+3. iPad: plug in, **Trust This Computer**, then enable **Settings → Privacy &
+   Security → Developer Mode** (iPadOS 16+; the toggle appears once the device
+   has talked to Xcode) and restart.
+4. Pick the iPad in Xcode's destination menu → **⌘R**.
+5. First launch is blocked as "Untrusted Developer": on the iPad,
+   **Settings → General → VPN & Device Management → [your Apple ID] → Trust**,
+   then reopen the app.
+
+Needs **iPadOS 17.0+** (the deployment target). For no expiry, sharing,
+TestFlight, or the App Store you need the paid **Apple Developer Program**
+($99/yr) — see below.
+
+## Submitting to the App Store
+
+Requires the paid **Apple Developer Program** ($99/yr). The build is in decent
+shape already: the bundled games clear the minimum-functionality bar (4.2) and
+let a reviewer test offline; no data is collected; the terp ends with
+`pthread_exit`, not `exit()`. Open items before a first submission:
+
+- [x] **App icon** — catalog scaffolded at `JACL/Assets.xcassets` (single 1024
+  master, wired via `ASSETCATALOG_COMPILER_APPICON_NAME` in `project.yml`) with
+  a placeholder. **Replace** `AppIcon.appiconset/icon-1024.png` with real
+  1024×1024 art (no alpha, no rounded corners) — that's the only art left.
+- [x] **`ITSAppUsesNonExemptEncryption = false`** — set in `project.yml` (the
+  `.j2` XOR-obfuscation isn't non-exempt crypto); skips the export prompt.
+- [x] **Privacy policy URL** — live at
+  <https://jacl.dangarmarine.com.au/privacy.html> (source `etc/privacy.html`,
+  deployed by `make apache`). Still to do *in App Store Connect*: set the
+  **App Privacy** label to *Data Not Collected* (a form, not a URL).
+- [ ] **Store name** — "JACL" alone is cryptic; e.g. "JACL Interactive Fiction"
+  (the bundle id stays the same).
+- [ ] **Screenshots** at the required iPad size (currently 13-inch, 2048×2732).
+- [ ] **Age rating** questionnaire — assess the bundled games' content.
+- [ ] Bump `CFBundleShortVersionString` to `1.0`.
+- [x] **In-app privacy link** — a Settings sheet (gear on the shelf) links to
+  the hosted policy. Not required here (no accounts, no data collection), but
+  it's wired (`JACL/SettingsView.swift`) and builds.
+
+### App Review notes (paste into the submission's "Notes" field)
+
+> JACL is an interpreter for interactive fiction (text adventures) written in
+> the open JACL language — the same kind of app as Frotz (Z-machine) or Hunky
+> Punk (TADS), which interpret story files.
+>
+> • Games are data/content files (.j2 / .jaclgame) interpreted by the app. They
+>   are not native or executable code and do not change the app's behaviour or
+>   functionality.
+> • The app has no accounts and no sign-in of any kind — it does not use Sign in
+>   with Google, Sign in with Apple, or any other login service.
+> • The app collects no data and makes no network connections; everything runs
+>   on-device.
+> • Two complete games ship bundled (The Unholy Grail, The Down Dragon), so the
+>   full experience can be tested offline immediately — no download or account
+>   needed.
+>
+> Privacy policy: https://jacl.dangarmarine.com.au/privacy.html
+
+That one note pre-empts both the 2.5.2 / 4.7 (downloadable content) and 4.8
+(Sign in with Apple) questions. IF interpreters (Frotz, Hunky Punk) have long
+App Store precedent.
+
 ## Source manifest (what the Xcode target compiles)
 
 `ios_startup.c` + `jacl_bridge.c` + `../src/jacl.c` + the shared core

@@ -40,6 +40,7 @@ struct JACLApp: App {
 struct GameShelfView: View {
     @State private var games: [Game] = GameLibrary.games()
     @State private var importing = false
+    @State private var showingSettings = false
 
     var body: some View {
         NavigationStack {
@@ -59,8 +60,16 @@ struct GameShelfView: View {
             }
             .navigationTitle("JACL")
             .toolbar {
-                Button { importing = true } label: { Image(systemName: "plus") }
+                ToolbarItem(placement: .topBarLeading) {
+                    Button { showingSettings = true } label: { Image(systemName: "gearshape") }
+                        .accessibilityLabel("Settings")
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { importing = true } label: { Image(systemName: "plus") }
+                        .accessibilityLabel("Import game")
+                }
             }
+            .sheet(isPresented: $showingSettings) { SettingsView() }
             .fileImporter(isPresented: $importing,
                           allowedContentTypes: GameLibrary.gameTypes,
                           allowsMultipleSelection: true) { result in
