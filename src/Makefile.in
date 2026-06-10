@@ -106,78 +106,11 @@ apache: install
 	@echo "Deploying JACL Guide to /var/www/html/guide/..."
 	@mkdir -p /var/www/html/guide
 	@cp -r ../guide/* /var/www/html/guide/
+	@echo "Building .jaclgame download packages for iPad..."
+	@mkdir -p /var/www/html/games
+	@sh ../etc/build-jaclgames.sh /usr/local/jacl/projects /var/www/html/games cjacl || true
 	@echo "Building landing-page index.html..."
-	@mkdir -p /var/www/html
-	@{ \
-	  printf '%s\n' '<!DOCTYPE html>'; \
-	  printf '%s\n' '<html lang="en">'; \
-	  printf '%s\n' '<head>'; \
-	  printf '%s\n' '  <meta charset="UTF-8">'; \
-	  printf '%s\n' '  <meta name="viewport" content="width=device-width, initial-scale=1">'; \
-	  printf '%s\n' '  <title>JACL Interactive Fiction</title>'; \
-	  printf '%s\n' '  <style>'; \
-	  printf '%s\n' '    :root { --accent: #42596d; --accent-dark: #2c3e50; --bg: #f5f1ea; --card: #fff; --muted: #6b6b6b; }'; \
-	  printf '%s\n' '    * { box-sizing: border-box; }'; \
-	  printf '%s\n' '    body { font-family: Georgia, Palatino, Times, serif; margin: 0; padding: 0; color: #2c2c2c; line-height: 1.6; background: var(--bg); }'; \
-	  printf '%s\n' '    header.hero { background: linear-gradient(135deg, var(--accent-dark), var(--accent)); color: #fff; padding: 3em 1em 2em; text-align: center; }'; \
-	  printf '%s\n' '    header.hero h1 { margin: 0 0 0.3em; font-size: 2.4em; letter-spacing: 0.02em; }'; \
-	  printf '%s\n' '    header.hero p { margin: 0; opacity: 0.9; font-style: italic; font-size: 1.05em; }'; \
-	  printf '%s\n' '    nav.topnav { background: #2c3e50; text-align: center; padding: 0.5em; }'; \
-	  printf '%s\n' '    nav.topnav a { color: #fff; text-decoration: none; margin: 0 1em; font-size: 0.95em; }'; \
-	  printf '%s\n' '    nav.topnav a:hover { text-decoration: underline; }'; \
-	  printf '%s\n' '    main { max-width: 760px; margin: 2em auto; padding: 0 1em; }'; \
-	  printf '%s\n' '    section.intro { background: var(--card); padding: 1.5em 1.8em; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 2em; }'; \
-	  printf '%s\n' '    section.intro p { margin: 0 0 0.8em; }'; \
-	  printf '%s\n' '    section.intro p:last-child { margin-bottom: 0; }'; \
-	  printf '%s\n' '    h2 { color: var(--accent-dark); border-bottom: 2px solid var(--accent); padding-bottom: 0.3em; margin-top: 0; }'; \
-	  printf '%s\n' '    ul.games { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.9em; }'; \
-	  printf '%s\n' '    ul.games li { background: var(--card); border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); transition: transform 0.1s, box-shadow 0.1s; }'; \
-	  printf '%s\n' '    ul.games li:hover { transform: translateY(-2px); box-shadow: 0 3px 8px rgba(0,0,0,0.12); }'; \
-	  printf '%s\n' '    ul.games a { display: block; padding: 0.9em 1.1em; text-decoration: none; color: var(--accent); font-weight: bold; font-size: 1.05em; }'; \
-	  printf '%s\n' '    ul.games .lang { color: var(--muted); font-weight: normal; font-size: 0.88em; margin-left: 0.3em; }'; \
-	  printf '%s\n' '    footer { margin: 3em 1em 2em; color: var(--muted); font-size: 0.85em; text-align: center; }'; \
-	  printf '%s\n' '    footer a { color: var(--accent); }'; \
-	  printf '%s\n' '  </style>'; \
-	  printf '%s\n' '</head>'; \
-	  printf '%s\n' '<body>'; \
-	  printf '%s\n' '  <header class="hero">'; \
-	  printf '%s\n' '    <h1>JACL Interactive Fiction</h1>'; \
-	  printf '%s\n' '    <p>Text adventures by Stuart Allen, written in JACL</p>'; \
-	  printf '%s\n' '  </header>'; \
-	  printf '%s\n' '  <nav class="topnav">'; \
-	  printf '%s\n' '    <a href="/guide/">Guide</a>'; \
-	  printf '%s\n' '    <a href="https://github.com/DangarStu/JACL">Source</a>'; \
-	  printf '%s\n' '  </nav>'; \
-	  printf '%s\n' '  <main>'; \
-	  printf '%s\n' '    <section class="intro">'; \
-	  printf '%s\n' '      <p><strong>Interactive fiction</strong> is a genre of text-based computer games where you read a description of a scene and type simple commands (for example <em>go north</em>, <em>take lamp</em>, or <em>examine desk</em>) to move through a story and solve its puzzles.</p>'; \
-	  printf '%s\n' '      <p>It is a direct descendant of the text adventures of the 1970s and 80s &mdash; titles like <em>Zork</em>, <em>Adventure</em>, and <em>The Hitchhiker&rsquo;s Guide to the Galaxy</em> &mdash; and has a thriving modern community of authors and players.</p>'; \
-	  printf '%s\n' '      <p>Want to write your own? The <a href="/guide/">JACL Guide</a> walks you through the language.</p>'; \
-	  printf '%s\n' '      <p>The interpreter source code &mdash; for running JACL locally or contributing &mdash; is on <a href="https://github.com/DangarStu/JACL">GitHub</a>.</p>'; \
-	  printf '%s\n' '    </section>'; \
-	  printf '%s\n' '    <h2>Play a game</h2>'; \
-	  printf '%s\n' '    <ul class="games">'; \
-	  for game in /usr/local/jacl/projects/*.jacl; do \
-	    [ -e "$$game" ] || continue; \
-	    name=$$(basename "$$game" .jacl); \
-	    grep -q '^constant[[:space:]]\+game_publish[[:space:]]\+true' "$$game" 2>/dev/null || continue; \
-	    title_line=$$(grep -E '^constant[[:space:]]+game_title[[:space:]]' "$$game" 2>/dev/null | head -1); \
-	    title=$$(echo "$$title_line" | sed -E 's/.*"([^"]+)".*/\1/'); \
-	    if [ -z "$$title" ] || [ "$$title" = "$$title_line" ]; then \
-	      title="$$name"; \
-	    fi; \
-	    if grep -q '^#include "indonesian_verbs.library"' "$$game"; then lang="Indonesian"; \
-	    elif grep -q '^#include "spanish_verbs.library"' "$$game"; then lang="Spanish"; \
-	    elif grep -q '^#include "french_verbs.library"\|^#include "french_webinterface.library"' "$$game"; then lang="French"; \
-	    elif grep -q '^#include "german_verbs.library"' "$$game"; then lang="German"; \
-	    else lang="English"; fi; \
-	    printf '      <li><a href="/jacl/%s.fcgi">%s <span class="lang">(%s)</span></a></li>\n' "$$name" "$$title" "$$lang"; \
-	  done; \
-	  printf '%s\n' '    </ul>'; \
-	  printf '%s\n' '  </main>'; \
-	  printf '%s\n' '  <footer>Served by JACL. Each game runs via the fcgijacl interpreter. <a href="/guide/">Read the Guide</a> to write your own.</footer>'; \
-	  printf '%s\n' '</body></html>'; \
-	} > /var/www/html/index.html
+	@sh ../etc/gen-landing.sh /usr/local/jacl/projects /var/www/html/games > /var/www/html/index.html
 	@echo "Installing Apache configuration..."
 	cp ../etc/jacl-apache.conf /etc/apache2/conf-available/jacl.conf
 	a2enconf jacl
