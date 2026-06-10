@@ -154,20 +154,21 @@ interpreter mode. Default for v1: **pure Glk presentation.**
       patches (`JACL_IOS_EMBED`, guarded) — all syntax-checked
 - [x] Codable models for the JSON (`JACL/RemGlkProtocol.swift`) — from the
       captured output
-- [x] `JACL/GlkBridge.swift` — terp thread + socketpair + JSON pump  *(v0, unbuilt)*
-- [x] SwiftUI buffer/grid/input views (`JACL/ContentView.swift`)  *(v0, unbuilt)*
-- [x] Files import → `Documents/` + game shelf (`JACL/JACLApp.swift`)  *(v0, unbuilt)*
-- [ ] **Assemble the Xcode project; build & run on the iPad simulator** ← next
-- [ ] Measure the real monospace cell for exact grid (status-line) metrics
+- [x] `JACL/GlkBridge.swift` — terp thread + socketpair + JSON pump
+- [x] SwiftUI buffer/grid/input views + Files import + game shelf
+- [x] **XcodeGen `project.yml`; builds & runs on the iPad simulator (iOS 26.5)**
+- [x] Game titles on the shelf (plain & encrypted `.j2`)
+- [x] Input round-trip verified (scripted commands advance the game)
 - [ ] Graphics + sound (Glk blorb resources) through the bridge
+- [ ] Measure the real monospace cell for exact grid (status-line) metrics
 - [ ] Autosave / restore on background (core save path is ready)
 - [ ] `.jaclgame` package (zip of `.j2`+`.blorb`) + exported UTI in Info.plist
 - [ ] App Store review hardening (data-not-code framing; bundled samples)
 
-> The four `JACL/*.swift` files are a **v0 scaffold written without Xcode** —
-> the JSON models are solid (built from real captured output); the bridge and
-> views need a Mac/Xcode session to compile, wire to a bridging header, and
-> iterate. They are a head start, not finished code.
+> The SwiftUI front-end builds and runs on the iPad simulator: a real game
+> renders (status grid + transcript), takes line input that advances the game,
+> and lists on the shelf by title (plain & encrypted `.j2`). Remaining
+> front-end work is graphics/sound, autosave, and polish.
 
 ## Xcode assembly (next session, on the Mac)
 

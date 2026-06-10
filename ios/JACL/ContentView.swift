@@ -14,6 +14,11 @@ struct GameView: View {
     @State private var inputText = ""
     @State private var started = false
 
+    // DEBUG-only scripted input (via `-autocommands "no;look;…"`), used to
+    // exercise the bridge's input round-trip headlessly. Empty in release.
+    @State private var autoCommands: [String] = GameView.parsedAutoCommands()
+    @State private var autoIndex = 0
+
     var body: some View {
         GeometryReader { geo in
             VStack(spacing: 0) {
@@ -35,8 +40,30 @@ struct GameView: View {
                 bridge.start(gamePath: gamePath, size: geo.size)
             }
             .onChange(of: geo.size) { _, newSize in bridge.resize(to: newSize) }
+            .onChange(of: bridge.pendingInput) { _, input in
+                // Replay the next scripted command when the terp asks for a
+                // line. No-op in release (autoCommands is empty).
+                guard let input, input.type == "line", autoIndex < autoCommands.count else { return }
+                let cmd = autoCommands[autoIndex]
+                autoIndex += 1
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    inputText = cmd
+                    submit()
+                }
+            }
         }
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    /// Parse `-autocommands "no;look;…"` from the launch args (DEBUG only).
+    private static func parsedAutoCommands() -> [String] {
+        #if DEBUG
+        let args = ProcessInfo.processInfo.arguments
+        guard let i = args.firstIndex(of: "-autocommands"), i + 1 < args.count else { return [] }
+        return args[i + 1].split(separator: ";").map { $0.trimmingCharacters(in: .whitespaces) }
+        #else
+        return []
+        #endif
     }
 
     // MARK: Grid window (status line / game board) — fixed monospaced rows
