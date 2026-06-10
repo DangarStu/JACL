@@ -74,7 +74,7 @@ struct GlkSpan: Decodable {
 }
 
 /// A pending input request on a window.
-struct GlkInput: Decodable {
+struct GlkInput: Decodable, Equatable {
     let id: Int
     let gen: Int?
     let type: String              // "line" | "char"
