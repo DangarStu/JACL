@@ -1,0 +1,18 @@
+# Desktop simulator binaries
+iosjacl-sim
+iosjacl-cheap
+iosjacl-remglk
+
+# Vendored RemGlk build artifacts (the .c/.h source IS tracked)
+remglk/*.o
+remglk/*.a
+remglk/Make.remglk
+
+# Xcode / XcodeGen (generated from project.yml)
+*.xcodeproj/
+JACL/Info.plist
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.swiftpm/

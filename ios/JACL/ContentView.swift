@@ -1,0 +1,133 @@
+//  ContentView.swift
+//  The in-game screen: grid (status / board) windows on top, buffer
+//  (transcript) windows below, and an input bar.
+//
+//  STATUS: v0 scaffold. Assemble in Xcode; not yet compiled. Graphics/sound
+//  spans render as a placeholder for now (blorb resource wiring is later).
+
+import SwiftUI
+
+struct GameView: View {
+    let gamePath: String
+
+    @StateObject private var bridge = GlkBridge()
+    @State private var inputText = ""
+    @State private var started = false
+
+    var body: some View {
+        GeometryReader { geo in
+            VStack(spacing: 0) {
+                ForEach(bridge.windows.filter { $0.type == "grid" }) { w in
+                    gridView(id: w.id)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color(.secondarySystemBackground))
+                }
+
+                ForEach(bridge.windows.filter { $0.type == "buffer" }) { w in
+                    bufferView(id: w.id)
+                }
+
+                inputBar
+            }
+            .onAppear {
+                guard !started else { return }
+                started = true
+                bridge.start(gamePath: gamePath, size: geo.size)
+            }
+            .onChange(of: geo.size) { _, newSize in bridge.resize(to: newSize) }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    // MARK: Grid window (status line / game board) — fixed monospaced rows
+
+    private func gridView(id: Int) -> some View {
+        let rows = bridge.grids[id] ?? []
+        return VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+                rowText(row)
+                    .font(.system(.body, design: .monospaced))
+                    .lineLimit(1)
+            }
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+    }
+
+    // MARK: Buffer window (scrolling transcript), auto-scrolled to bottom
+
+    private func bufferView(id: Int) -> some View {
+        let paras = bridge.buffers[id] ?? []
+        return ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(paras) { para in
+                        paragraphText(para)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .id(para.id)
+                    }
+                }
+                .padding()
+            }
+            .onChange(of: paras.count) { _, _ in
+                if let last = paras.last {
+                    withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
+                }
+            }
+        }
+    }
+
+    // MARK: Input
+
+    @ViewBuilder private var inputBar: some View {
+        if let req = bridge.pendingInput, req.type == "line" {
+            HStack {
+                TextField("…", text: $inputText)
+                    .textFieldStyle(.roundedBorder)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+                    .onSubmit(submit)
+                Button("Enter", action: submit)
+            }
+            .padding(8)
+        } else if bridge.finished {
+            Text("The game has ended.")
+                .foregroundColor(.secondary)
+                .padding(8)
+        }
+    }
+
+    private func submit() {
+        let line = inputText
+        inputText = ""
+        bridge.submitLine(line)
+    }
+
+    // MARK: Styled-text helpers
+
+    private func rowText(_ spans: [RenderedSpan]) -> Text {
+        spans.reduce(Text("")) { $0 + styled($1) }
+    }
+
+    private func paragraphText(_ para: RenderedParagraph) -> Text {
+        para.spans.reduce(Text("")) { $0 + styled($1) }
+    }
+
+    /// Map a Glk style name to SwiftUI text styling.
+    private func styled(_ span: RenderedSpan) -> Text {
+        var t = Text(span.text)
+        switch span.style {
+        case "header", "subheader":      t = t.bold()
+        case "emphasized", "note":       t = t.italic()
+        case "alert":                    t = t.foregroundColor(.red)
+        case "input":                    t = t.foregroundColor(.accentColor)
+        case "preformatted", "user1", "user2":
+            t = t.font(.system(.body, design: .monospaced))
+        default:                         break
+        }
+        if span.hyperlink != nil {
+            t = t.foregroundColor(.accentColor).underline()
+        }
+        return t
+    }
+}
