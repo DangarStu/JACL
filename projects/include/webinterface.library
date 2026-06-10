@@ -123,10 +123,16 @@ if interpreter = CGI
    endif
    write "^"
 else
-   # GLK: getyesorno is synchronous, no state guards needed. TTS is
-   # browser-only so only the sound question is asked.
-   write "^" SOUND_QUESTION "^"
-   getyesorno sound_enabled
+   if ios = true
+      # No sound on iOS (the native Glk backend has no sound support), so
+      # don't ask the question -- leave sound effects off.
+      set sound_enabled = false
+   else
+      # GLK console: getyesorno is synchronous, no state guards needed.
+      # TTS is browser-only so only the sound question is asked.
+      write "^" SOUND_QUESTION "^"
+      getyesorno sound_enabled
+   endif
 endif
 }
 

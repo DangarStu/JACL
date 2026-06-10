@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>RemGlk: remote-procedure-call implementation of the Glk IF API</title>
+
+<style type="text/css">
+
+body {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+h2 {
+  font-family: Gill Sans, Helvetica, Arial, sans-serif;
+  font-weight: normal;
+}
+
+h3 {
+  font-family: Gill Sans, Helvetica, Arial, sans-serif;
+  font-weight: normal;
+}
+
+h4 {
+  font-family: Gill Sans, Helvetica, Arial, sans-serif;
+  font-weight: normal;
+}
+
+h2 a {
+  border-bottom: 1px dotted #AAA;
+}
+
+h3 a {
+  border-bottom: 1px dotted #AAA;
+}
+
+h4 a {
+  border-bottom: 1px dotted #AAA;
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 24px;
+}
+
+ul.WrapIndent {
+  padding-left: 48px;
+  text-indent: -24px;
+}
+
+li {
+  margin-top: 2px;
+}
+
+dt {
+  margin-top: 4px;
+}
+
+.ContentTop > li > a {
+  border-left: 2px solid #AAA;
+  padding-left: 8px;
+}
+
+.ContentTop > li > ul {
+  border-left: 2px dotted #DDD;
+}
+
+.Def {
+  margin-left: 4px;
+  background: #D0F8D4;
+  border-left: 4px solid #98E0A0;
+  padding: 4px 0px 4px 8px;
+}
+
+.Sample {
+  margin-left: 20px;
+  margin-right: 30px;
+  background: #E0F0C0;
+  padding: 4px 0px 4px 8px;
+}
+
+.Huge {
+  margin-left: 20px;
+  background: #E0F0C0;
+  max-width: 90%;
+  height: 300px;
+  overflow: scroll;
+  padding: 4px 4px 4px 8px;
+}
+
+.Diagram {
+  margin-left: 20px;
+  margin-right: 30px;
+  background: #F8E8C0;
+  padding: 4px 0px 4px 8px;
+}
+
+.Inline {
+  background: #E0F0C0;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+</style>
+
+</head>
+<body>
+
+<h1>RemGlk: remote-procedure-call implementation of the Glk IF API</h1>
+
+<em>RemGlk version 0.3.2</em><br>
+
+<em>Designed by Andrew Plotkin (erkyrath@eblong.com)<br>
+<a href="http://eblong.com/zarf/glk/index.html">(Glk home page)</a></em>
+<p>
+
+The RemGlk library is copyright 2012-2025 by Andrew Plotkin. The
+GiDispa, and GiBlorb libraries, as well as the glk.h header file, are
+copyright 1998-2025 by Andrew Plotkin. They are distributed under the
+<a href="LICENSE">MIT license</a>.
+<p>
+
+This documentation is licensed under a 
+<a href="http://creativecommons.org/licenses/by-nc-sa/4.0">Creative
+Commons Attribution-Noncommercial-ShareAlike 4.0 International License</a>.
+<p>
+
+<hr>
+
+<h2>What is RemGlk?</h2>
+
+RemGlk is a C library which implements the <a href="http://eblong.com/zarf/glk/index.html">Glk API</a>. You can compile a Glk application and link it with this library.
+<p>
+
+RemGlk does not provide a user interface. Instead, it wraps up the application's output as a <a href="http://json.org/">JSON data structure</a> and sends it to stdout. It then waits for input to arrive from stdin; the input data must also be encoded as JSON.
+<p>
+
+RemGlk is therefore like CheapGlk, in that it works entirely through input and output streams, and can easily be attached to a bot or web service. However, unlike CheapGlk, RemGlk supports multiple Glk windows and most Glk I/O features. Whatever it's attached to just has to decode the structured output and display it appropriately.
+<p>
+
+RemGlk was designed to complement the <a href="http://eblong.com/zarf/glk/glkote.html">GlkOte</a> Javascript library. GlkOte more or less implements the other half of the job: it accepts game output (as Javascript objects), displays it, and then returns the player's commands in the same format. It is possible to connect an IF interpreter, RemGlk, and GlkOte to build a complete IF web service. (See <a href="https://github.com/erkyrath/remote-if-demo">an experimental implementation of this idea</a>.) Since RemGlk supports autosave/autorestore, it is practical to create a service which fires up a RemGlk process momentarily to process each player command.
+<p>
+
+RemGlk is also used by the <a href="http://eblong.com/zarf/plotex/regtest.html">RegTest</a> testing framework. In this setup, the "display layer" does not actually display anything. It is a Python script which generates test input and verifies the game's output.
+<p>
+
+<h2>Using RemGlk</h2>
+
+<h3>Starting up</h3>
+
+Once you have compiled your application, run it as usual. For glulxe, this probably looks like:
+<p>
+
+<pre class="Sample">
+glulxe Advent.ulx
+</pre>
+<p>
+
+If you do this, you will see nothing at first. The application is waiting for an initial input which describes the display and font sizes. Try typing this, exactly:
+<p>
+
+<pre class="Sample">
+{ "type": "init", "gen": 0, "metrics": { "width":80, "height":24 } }
+</pre>
+<p>
+
+This tells RemGlk that it has an 80x24 "screen" to work with. The default "font size" is 1, so this gives the effect of an 80x24 terminal window.
+<p>
+
+If you instead entered:
+
+<pre class="Sample">
+{ "type": "init", "gen": 0, "metrics": { "width":400, "height":600,
+  "charwidth":12, "charheight":14 } }
+</pre>
+<p>
+
+...you would get a layout for a 400x600 pixel window, assuming a 14-point font with 12-pixel-wide characters.
+<p>
+
+(The font size is only critical for grid (status) windows. You can approximate the measurements for buffer (story) windows; these typically have proportional fonts and perhaps various font sizes as well.)
+<p>
+
+The metrics object also allows you to specify margins and border spacing, which improve the layout behavior. See below for details.
+<p>
+
+You can also include information about what optional features you are prepared to support. (RemGlk needs to know this in order to set appropriate gestalt flags for the game.)
+<p>
+
+<pre class="Sample">
+{ "type": "init", "gen": 0, "metrics": { "width":80, "height":24 },
+  "support": [ "timer", "hyperlinks" ] }
+</pre>
+<p>
+
+The support field is a list of strings. Currently the recognized values are:
+<p>
+
+<ul class="WrapIndent">
+<li><code>"timer"</code>: gestalt_Timer will be set; the library will support glk_request_timer_events().
+<li><code>"hyperlinks"</code>: gestalt_Hyperlinks and gestalt_HyperlinkInput will be set; the library will support glk_set_hyperlink() and glk_request_hyperlink_event().
+<li><code>"graphics"</code>: gestalt_Graphics and gestalt_GraphicsTransparency will be set. (Support for transparent PNGs is taken for granted.) gestalt_DrawImage will return true for text-buffer windows. The library will support all image functions (except glk_image_draw_scaled_ext(); see below).
+<li><code>"graphicswin"</code>: graphics windows can be opened; gestalt_DrawImage will return true for graphics windows.
+<li><code>"graphicsext"</code>: The library will support glk_image_draw_scaled_ext(). gestalt_DrawImageScale will return true for buffer windows and (with <code>"graphicswin"</code>) graphics windows as well.
+</ul>
+
+<h3>Starting up with no init event</h3>
+
+For some scenarios, often including debugging, you want the application to <em>not</em> wait for an <code>init</code> event. You can request this with the <code>-fixmetrics</code> (or <code>-fm</code>) flag. You can also specify basic layout information on the command line. If you type:
+
+<pre class="Sample">
+glulxe -fm -width 80 -height 50 Advent.ulx
+</pre>
+<p>
+
+...then the game will start immediately (with an 80x50 "terminal window"), and send its first screenful of output. Your first reply will then be a player command; see below.
+<p>
+
+In <code>-fm</code> mode, you must specify optional features on the command line. Use the <code>-support</code> argument with one of the support strings listed above (<code>-support timer</code>, <code>-support hyperlinks</code>, etc.).
+<p>
+
+<h3>The first screen of output</h3>
+
+For <em>Adventure</em>, the initial output looks something like:
+
+<pre class="Sample">
+{"type":"update", "gen":1,
+ "windows":[
+ { "id":25, "type":"grid", "rock":202,
+   "gridwidth":80, "gridheight":1,
+   "left":0, "top":0, "width":80, "height":1 },
+ { "id":22, "type":"buffer", "rock":201,
+   "left":0, "top":1, "width":80, "height":49 } ],
+ "content":[
+ {"id":25, "lines": [
+  { "line":0, "content":[{ "style":"normal", "text":" At End Of Road
+     Score: 36    Moves: 1      "}]}
+ ] },
+ {"id":22, "clear":true, "text": [
+  {"append":true},
+  {}, {}, {}, {}, {},
+  {"content":[{ "style":"normal", "text":"Welcome to Adventure!"}]},
+  {},
+  {"content":[{ "style":"header", "text":"ADVENTURE"}]},
+  {"content":[{ "style":"normal", "text":"The Interactive Original"}]},
+  {"content":[{ "style":"normal", "text":"By Will Crowther (1973)
+     and Don Woods (1977)"}]},
+  {"content":[{ "style":"normal", "text":"Reconstructed in three steps by:"}]},
+  {"content":[{ "style":"normal", "text":"Donald Ekman, David M. Baggett (1993)
+     and Graham Nelson (1994)"}]},
+  {"content":[{ "style":"normal", "text":"[In memoriam Stephen Bishop
+     (1820?-1857): GN]"}]},
+  {"content":[{ "style":"normal", "text":"Release 5 / Serial number
+     961209 / Inform v6.21(G0.33) Library 6/10 "}]},
+  {},
+  {"content":[{ "style":"subheader", "text":"At End Of Road"}]},
+  {"content":[{ "style":"normal", "text":"You are standing at the end of
+     a road before a small brick building. Around you is a forest. A small
+     stream flows out of the building and down a gully."}]},
+  {},
+  {"content":[{ "style":"normal", "text":"&gt;"}]}
+ ] } ],
+ "input":[
+ {"id":22, "gen":1, "type":"line", "maxlen":256 }
+ ]}
+</pre>
+<p>
+
+This is just to give you a feel for what's going on. Roughly, this says:
+<p>
+
+<ul>
+<li>First update.
+<li>Two windows have been opened:
+<ul>
+<li>A grid (status) window, ID number 25, 80 characters wide, 1 line high;
+<li>A buffer (story) window, ID number 22.
+</ul>
+<li>Both windows were updated this cycle:
+<ul>
+<li>Window 25 (the status window), line zero, contains the room name and score.
+<li>Window 22 (the story window) contains the initial game text.
+<ul>
+<li>(Each line contains some content, in some style. It so happens that we don't see any mid-line style changes, although they're perfectly possible. {} is a blank line.)
+</ul>
+</ul>
+<li>One window is requesting input this cycle:
+<ul>
+<li>Window 22 (the story window) requests line input, up to 256 characters' worth.
+</ul>
+</ul>
+
+(The window ID numbers will vary from run to run, by the way. Window rock numbers are consistent for a given game, but may vary from game to game.)
+<p>
+
+<h3>The first input</h3>
+
+A human types "go east" into some user interface, which then passes the following input to RemGlk:
+<p>
+
+<pre class="Sample">
+{ "type":"line", "gen":1, "window":22, "value":"go east" }
+</pre>
+<p>
+
+The library accepts this, mulls it, and generates a new output update. So it goes.
+<p>
+
+<h3>Referring to image resources</h3>
+
+RemGlk supports Blorb-packaged games which include images. (Sound support is on the to-do list.) However, it does not try to encode the image data in the JSON output. Instead, it assumes that the display library (GlkOte) has access to the same images. When the game draws an image, RemGlk sends a JSON stanza which includes the image number and size. (See the <a href="http://eblong.com/zarf/glk/glkote/docs.html">GlkOte documentation</a>.) The display library is then responsible for finding the image with that number.
+<p>
+
+To make this easier, you can configure RemGlk to include an image URL in the stanza.
+Do this with the <code>-resourceurl</code> (or <code>-ru</code>) flag:
+<p>
+
+<pre class="Sample">
+glulxe -ru http://example.com/datadir/ game.gblorb
+</pre>
+<p>
+
+The URL should end with a slash, and should refer to a directory containing image files. RemGlk will send URLs with the format <code>http://example.com/datadir/pict-1.png</code>, <code>http://example.com/datadir/pict-2.jpeg</code>. (Note lower-case, and "jpeg" has an "e".) (This is the same filename convention used by <a href="https://github.com/erkyrath/glk-dev/blob/master/blorbtool.py">blorbtool.py</a> with the <code>giload</code> command.)
+<p>
+
+You may also specify a local pathname with the <code>-resourcedir</code> (or <code>-rd</code>) flag:
+
+<pre class="Sample">
+glulxe -rd path/dir game.gblorb
+</pre>
+<p>
+
+RemGlk will convert the pathname to a <code>file:</code> URL and send it as above.
+<p>
+
+<h3>Referring to data resources</h3>
+
+RemGlk also supports data resources (read using the glk_stream_open_resource() function).
+<p>
+
+Data resources in a Blorb-packaged game are no problem; the game can always access these. However, if the game <em>isn't</em> Blorbed, you must supply the filename for each (numbered) resource.
+<p>
+
+<pre class="Sample">
+glulxe -dataresource 3:path/file game.gblorb
+</pre>
+<p>
+
+Use <code>-dataresource</code> or <code>-dataresourcebin</code> for a binary file; <code>-dataresourcetext</code> for a text file. (In a Blorb, the chunk type says whether it's binary or text. Outside of a Blorb, it's too dark to read, so you have to specify. Note that the default is binary.)
+<p>
+
+<h2>The Data Format</h2>
+
+<em>I have not written out this documentation in detail. Please refer to the <a href="http://eblong.com/zarf/glk/glkote/docs.html">GlkOte documentation</a>. Input what GlkOte outputs, and vice versa.</em>
+<p>
+
+Prior to version 0.2.1, this library used <code>contents</code> and <code>inputs</code> as the names of the top-level data fields, rather than the correct <code>content</code> and <code>input</code>. The prior version also omitted the <code>xpos</code> and <code>ypos</code> fields for grid window input.
+<p>
+
+As of version 0.2.2, the library accepts noninteger numbers. If the field expects an integer, the values will be rounded (towards zero). As of 0.2.4, some of the fields in the metrics object expect non-integer numbers.
+<p>
+
+As of version 0.2.6, the library accepts <code>debuginput</code> events. They are passed along to the game (interpreter) via the gi_debug.h interface.
+<p>
+
+As of version 0.3.0, the library accepts noninteger values in the <code>metrics</code> object. (GlkOte can send fractional values when the browser zoom is changed.) Window positioning will always be in integers, rounded so that everything fits properly.
+<p>
+
+As of version 0.3.1, the library accepts exponential notation for numerical values. If an integer is expected (i.e., everywhere except the <code>metrics</code> object), noninteger values are rounded to the nearest integer. Note that the library does not <em>send</em> exponential notation in its JSON output.
+<p>
+
+As of version 0.3.2, the library adds <code>"exit":true</code> to the update when the game exits.
+<p>
+
+A note on <a href="http://json.org/">JSON</a>: this is a strict (in both senses) subset of Javascript's data literal format. The biggest differences are: you always use double quotes, never single quotes; strings are always quoted, but numbers never are; an object (dictionary) always has quotes around its keys.
+<p>
+
+All input and output is UTF-8.
+<p>
+
+When generating output, a complete update JSON update will be followed by a blank line (two newlines in a row). You can use this as a hint for breaking the output stream into stanzas. (But RemGlk does not require you to follow this convention when sending it input JSON objects.)
+<p>
+
+<h3>Autosave/autorestore</h3>
+
+Autosave and autorestore are available as of version 0.3.0.
+
+If the interpreter implements autosave, it will use RemGlk's facilities to store a library serialization dump every turn (before each <code>glk_select()</code> call). This state dump is JSON, but it does <em>not</em> follow the GlkOte format specification. It contains more detailed information, including the "live" state of every window and stream.
+<p>
+
+The autosave format is deliberately not documented; it is specific to the implementation of RemGlk. It is not meant to be transferred between platforms or between interpreters. Use the interpreter's normal <code>.glksave</code> save files for that.
+<p>
+
+<hr>
+Last updated June 2, 2025.
+<p>
+
+<em><a href="http://eblong.com/zarf/glk/index.html">Glk home page</a></em>
+<p>
+
+</body>
+</html>
