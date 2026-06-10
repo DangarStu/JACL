@@ -16,7 +16,20 @@ import UniformTypeIdentifiers
 struct JACLApp: App {
     var body: some Scene {
         WindowGroup {
+            #if DEBUG
+            // Debug-only hook: `simctl launch … -autoplay` opens the first
+            // imported game straight into the game view, so the RemGlk bridge
+            // can be exercised headlessly. Normal launches (and all release
+            // builds) show the shelf.
+            if ProcessInfo.processInfo.arguments.contains("-autoplay"),
+               let game = GameLibrary.games().first {
+                GameView(gamePath: game.path)
+            } else {
+                GameShelfView()
+            }
+            #else
             GameShelfView()
+            #endif
         }
     }
 }

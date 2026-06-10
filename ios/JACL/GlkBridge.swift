@@ -48,6 +48,10 @@ final class GlkBridge: ObservableObject {
     private var generation = 0
     private var splitter = JSONObjectStream()
     private let readerQueue = DispatchQueue(label: "jacl.remglk.reader")
+    // Writes MUST be on their own queue: the reader queue is occupied forever
+    // by a blocking read() loop, so a write dispatched there would never run
+    // (the init event would never reach the terp -> blank screen / deadlock).
+    private let writerQueue = DispatchQueue(label: "jacl.remglk.writer")
 
     // MARK: Lifecycle
 
@@ -117,7 +121,7 @@ final class GlkBridge: ObservableObject {
     private func send(_ event: GlkEvent) {
         let data = event.jsonData()
         let fd = appFD
-        readerQueue.async {                                // serialize writes off the UI thread
+        writerQueue.async {                                // own queue, NOT the blocked reader queue
             data.withUnsafeBytes { raw in
                 _ = write(fd, raw.baseAddress, raw.count)
             }
