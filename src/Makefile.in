@@ -120,6 +120,8 @@ apache: install
 	@sh ../etc/build-jaclgames.sh /usr/local/jacl/projects /var/www/html/games "$$PWD/jpp" || true
 	@echo "Building landing-page index.html..."
 	@sh ../etc/gen-landing.sh /usr/local/jacl/projects /var/www/html/games > /var/www/html/index.html
+	@echo "Deploying privacy policy to /var/www/html/privacy.html..."
+	@cp ../etc/privacy.html /var/www/html/privacy.html
 	@echo "Installing Apache configuration..."
 	cp ../etc/jacl-apache.conf /etc/apache2/conf-available/jacl.conf
 	a2enconf jacl

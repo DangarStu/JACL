@@ -126,6 +126,6 @@ cat <<'TAIL'
       </ul>
     </div>
   </main>
-  <footer>Served by JACL. Online games run via the fcgijacl interpreter. <a href="/guide/">Read the Guide</a> to write your own.</footer>
+  <footer>Served by JACL. Online games run via the fcgijacl interpreter. <a href="/guide/">Read the Guide</a> to write your own. &middot; <a href="/privacy.html">Privacy</a></footer>
 </body></html>
 TAIL
