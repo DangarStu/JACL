@@ -11,6 +11,10 @@ import UniformTypeIdentifiers
 
 @main
 struct JACLApp: App {
+    init() {
+        GameLibrary.installBundledStarters()
+    }
+
     var body: some Scene {
         WindowGroup {
             #if DEBUG
@@ -157,6 +161,21 @@ enum GameLibrary {
             if ext == "j2" { game = dest }
         }
         return game
+    }
+
+    /// Copy the games bundled with the app into Documents on first launch.
+    /// Tracks which starters have been seeded (by filename) so deleting one
+    /// doesn't bring it back, while a new starter shipped in an app update
+    /// still seeds once.
+    static func installBundledStarters() {
+        let key = "seededStarters"
+        var seeded = Set(UserDefaults.standard.stringArray(forKey: key) ?? [])
+        let bundled = Bundle.main.urls(forResourcesWithExtension: "jaclgame", subdirectory: nil) ?? []
+        for url in bundled where !seeded.contains(url.lastPathComponent) {
+            try? importGame(from: url)
+            seeded.insert(url.lastPathComponent)
+        }
+        UserDefaults.standard.set(Array(seeded), forKey: key)
     }
 
     // MARK: Title extraction

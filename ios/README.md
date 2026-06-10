@@ -169,9 +169,11 @@ interpreter mode. Default for v1: **pure Glk presentation.**
       import unpacks via `MiniZip` (no zip dependency); exported UTI registered
 - [x] "Open in JACL" — `.onOpenURL` imports `.jaclgame`/`.j2` from Files /
       AirDrop / Mail / Safari (and the picker accepts all three types)
+- [x] Bundled starter games — Grail + The Down Dragon ship in the app bundle
+      (release `.jaclgame`s in `StarterGames/`), seeded into `Documents` on
+      first launch by `installBundledStarters()`
 - [ ] Autosave / restore on background (core save path is ready)
-- [ ] Bundled starter games (so a fresh install isn't empty) + optional
-      in-app catalog
+- [ ] Optional in-app catalog (download more games from a URL)
 - [ ] App Store review hardening (data-not-code framing; bundled samples)
 
 > The SwiftUI front-end builds and runs on the iPad simulator: a real game
