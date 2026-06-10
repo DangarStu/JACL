@@ -115,6 +115,7 @@ apache: install
 	@mkdir -p /var/www/html/guide
 	@cp -r ../guide/* /var/www/html/guide/
 	@echo "Building .jaclgame download packages for iPad..."
+	@command -v zip >/dev/null 2>&1 || { echo "Installing 'zip' for .jaclgame packaging..."; apt-get install -y zip 2>&1 | tail -2 || true; }
 	@mkdir -p /var/www/html/games
 	@sh ../etc/build-jaclgames.sh /usr/local/jacl/projects /var/www/html/games "$$PWD/jpp" || true
 	@echo "Building landing-page index.html..."

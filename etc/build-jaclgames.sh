@@ -29,6 +29,23 @@ if ! command -v "$jpp" >/dev/null 2>&1; then
     exit 1
 fi
 
+# Pick a zip implementation up front. A .jaclgame is a flat ZIP the app's
+# MiniZip reader unpacks. Prefer zip(1); fall back to python3's zipfile
+# module (present on essentially every Ubuntu) so a minimal server without
+# the 'zip' package can still build packages -- both write the same flat
+# DEFLATE archive. Checking here turns a missing archiver into one clear
+# message instead of a set -e abort partway through the first game.
+#   mkzip ARCHIVE FILE...   (run from the directory holding FILEs)
+if command -v zip >/dev/null 2>&1; then
+    mkzip() { zip -j -q "$@"; }
+elif command -v python3 >/dev/null 2>&1; then
+    mkzip() { python3 -m zipfile -c "$@"; }
+else
+    echo "build-jaclgames: need 'zip' or 'python3' to build .jaclgame packages." >&2
+    echo "  install one, e.g.: apt-get install -y zip" >&2
+    exit 1
+fi
+
 mkdir -p "$out"
 n=0
 for game in "$projects"/*.jacl; do
@@ -54,9 +71,9 @@ for game in "$projects"/*.jacl; do
     cp "$j2" "$tmp/$name.j2"
     if [ -f "$projects/$name.blorb" ]; then
         cp "$projects/$name.blorb" "$tmp/$name.blorb"
-        ( cd "$tmp" && zip -j -q "$name.jaclgame" "$name.j2" "$name.blorb" )
+        ( cd "$tmp" && mkzip "$name.jaclgame" "$name.j2" "$name.blorb" )
     else
-        ( cd "$tmp" && zip -j -q "$name.jaclgame" "$name.j2" )
+        ( cd "$tmp" && mkzip "$name.jaclgame" "$name.j2" )
     fi
     mv "$tmp/$name.jaclgame" "$pkg"
     rm -rf "$tmp"
