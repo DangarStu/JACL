@@ -58,12 +58,31 @@ struct GameShelfView: View {
                 Button { importing = true } label: { Image(systemName: "plus") }
             }
             .fileImporter(isPresented: $importing,
-                          allowedContentTypes: [GameLibrary.gameType],
+                          allowedContentTypes: GameLibrary.gameTypes,
                           allowsMultipleSelection: true) { result in
                 if case .success(let urls) = result {
                     for url in urls { try? GameLibrary.importGame(from: url) }
                     games = GameLibrary.games()
                 }
+            }
+            .onOpenURL { url in
+                // "Open in JACL" from Files / AirDrop / Mail / Safari, or a
+                // .jaclgame / .j2 tapped anywhere on the device.
+                try? GameLibrary.importGame(from: url)
+                games = GameLibrary.games()
+            }
+            .onAppear {
+                #if DEBUG
+                // Debug: `simctl launch … -importpack grail.jaclgame` imports a
+                // package already sitting in Documents (openurl can't drive the
+                // share-sheet path on the simulator headlessly).
+                let args = ProcessInfo.processInfo.arguments
+                if let i = args.firstIndex(of: "-importpack"), i + 1 < args.count {
+                    let url = GameLibrary.documents.appendingPathComponent(args[i + 1])
+                    try? GameLibrary.importGame(from: url)
+                    games = GameLibrary.games()
+                }
+                #endif
             }
         }
     }
@@ -79,9 +98,11 @@ struct Game: Identifiable, Hashable {
 }
 
 enum GameLibrary {
-    /// The UTI to import. Falls back to plain data until the exported type is
-    /// declared in Info.plist.
-    static var gameType: UTType { UTType(filenameExtension: "j2") ?? .data }
+    /// Types the importer accepts: a bare `.j2`, a `.jaclgame` package (zip of
+    /// .j2 [+ .blorb]), or a `.blorb` to sit beside an imported `.j2`.
+    static var gameTypes: [UTType] {
+        ["j2", "jaclgame", "blorb"].compactMap { UTType(filenameExtension: $0) }
+    }
 
     static var documents: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -103,20 +124,39 @@ enum GameLibrary {
                         title: title(of: $0) ?? $0.deletingPathExtension().lastPathComponent) }
     }
 
-    /// Copy a picked file into Documents/ so the terp has persistent,
-    /// seekable access (and a place beside it for saves). The picker hands
-    /// us a transient security-scoped URL, so copy under scoped access.
+    /// Import a picked or opened file into Documents/. A `.jaclgame` (or `.zip`)
+    /// is unpacked into its `.j2` + `.blorb`; a bare `.j2`/`.blorb` is copied.
+    /// The picker/share-sheet hands us a transient security-scoped URL, so we
+    /// read under scoped access. Returns the playable `.j2`, if one resulted.
     @discardableResult
-    static func importGame(from url: URL) throws -> URL {
+    static func importGame(from url: URL) throws -> URL? {
         let scoped = url.startAccessingSecurityScopedResource()
         defer { if scoped { url.stopAccessingSecurityScopedResource() } }
 
-        let dest = documents.appendingPathComponent(url.lastPathComponent)
-        if FileManager.default.fileExists(atPath: dest.path) {
-            try FileManager.default.removeItem(at: dest)
+        let ext = url.pathExtension.lowercased()
+        if ext == "jaclgame" || ext == "zip" {
+            return try unpack(url)
         }
+        let dest = documents.appendingPathComponent(url.lastPathComponent)
+        try? FileManager.default.removeItem(at: dest)
         try FileManager.default.copyItem(at: url, to: dest)
-        return dest
+        return ext == "j2" ? dest : nil
+    }
+
+    /// Unpack a `.jaclgame` (zip of `.j2` [+ `.blorb`]) into Documents/.
+    private static func unpack(_ url: URL) throws -> URL? {
+        let entries = try MiniZip.entries(of: Data(contentsOf: url))
+        var game: URL?
+        for entry in entries {
+            let name = (entry.name as NSString).lastPathComponent
+            let ext = (name as NSString).pathExtension.lowercased()
+            guard ext == "j2" || ext == "blorb" else { continue }   // ignore stray files
+            let dest = documents.appendingPathComponent(name)
+            try? FileManager.default.removeItem(at: dest)
+            try entry.data.write(to: dest)
+            if ext == "j2" { game = dest }
+        }
+        return game
     }
 
     // MARK: Title extraction

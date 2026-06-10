@@ -112,6 +112,7 @@ targets:
             LSHandlerRank: Owner
             LSItemContentTypes:
               - au.com.famecapital.jacl.j2
+              - au.com.famecapital.jacl.jaclgame
         UTExportedTypeDeclarations:
           - UTTypeIdentifier: au.com.famecapital.jacl.j2
             UTTypeDescription: JACL Game
@@ -120,3 +121,10 @@ targets:
             UTTypeTagSpecification:
               public.filename-extension:
                 - j2
+          - UTTypeIdentifier: au.com.famecapital.jacl.jaclgame
+            UTTypeDescription: JACL Game Package
+            UTTypeConformsTo:
+              - public.zip-archive
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - jaclgame

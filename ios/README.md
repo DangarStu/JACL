@@ -165,8 +165,13 @@ interpreter mode. Default for v1: **pure Glk presentation.**
       web-oriented. The `ios` flag skips the sound question; `sound_enabled`
       stays off.
 - [ ] Measure the real monospace cell for exact grid (status-line) metrics
+- [x] `.jaclgame` package (zip of `.j2`+`.blorb`) — `mkjaclgame.sh` packs it;
+      import unpacks via `MiniZip` (no zip dependency); exported UTI registered
+- [x] "Open in JACL" — `.onOpenURL` imports `.jaclgame`/`.j2` from Files /
+      AirDrop / Mail / Safari (and the picker accepts all three types)
 - [ ] Autosave / restore on background (core save path is ready)
-- [ ] `.jaclgame` package (zip of `.j2`+`.blorb`) + exported UTI in Info.plist
+- [ ] Bundled starter games (so a fresh install isn't empty) + optional
+      in-app catalog
 - [ ] App Store review hardening (data-not-code framing; bundled samples)
 
 > The SwiftUI front-end builds and runs on the iPad simulator: a real game
