@@ -221,10 +221,9 @@ shape already: the bundled games clear the minimum-functionality bar (4.2) and
 let a reviewer test offline; no data is collected; the terp ends with
 `pthread_exit`, not `exit()`. Open items before a first submission:
 
-- [x] **App icon** — catalog scaffolded at `JACL/Assets.xcassets` (single 1024
-  master, wired via `ASSETCATALOG_COMPILER_APPICON_NAME` in `project.yml`) with
-  a placeholder. **Replace** `AppIcon.appiconset/icon-1024.png` with real
-  1024×1024 art (no alpha, no rounded corners) — that's the only art left.
+- [x] **App icon** — final art in `JACL/Assets.xcassets/AppIcon.appiconset/icon-1024.png`
+  (1024², no alpha, full-bleed; gold "JACL" + compass rose on navy leather),
+  wired via `ASSETCATALOG_COMPILER_APPICON_NAME`. Verified with `actool`.
 - [x] **`ITSAppUsesNonExemptEncryption = false`** — set in `project.yml` (the
   `.j2` XOR-obfuscation isn't non-exempt crypto); skips the export prompt.
 - [x] **Privacy policy URL** — live at
