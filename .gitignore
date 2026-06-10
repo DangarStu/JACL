@@ -25,6 +25,7 @@ src/cgijacl
 src/cjacl
 src/fcgijacl
 src/jacl
+src/jpp
 
 # editor / tool local config
 .claude/

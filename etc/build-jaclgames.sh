@@ -2,10 +2,16 @@
 # build-jaclgames.sh -- build .jaclgame download packages for the iPad app,
 # one per published game (constant game_publish true).
 #
-#   build-jaclgames.sh [PROJECTS_DIR] [OUT_DIR] [CJACL]
+#   build-jaclgames.sh [PROJECTS_DIR] [OUT_DIR] [JPP]
 #
 # Defaults: PROJECTS_DIR=../projects  OUT_DIR=$PROJECTS_DIR/jaclgames
-#           CJACL=../bin/cjacl
+#           JPP=jpp  (the standalone preprocessor; resolved from PATH)
+#
+# JPP is the jpp(1) preprocessor utility, not a full interpreter: it just
+# writes the release .j2 and exits, so there is no Glk/ncurses/tty to hang
+# on and no game is loaded. It is a first-class build target (configure +
+# make), so it is always rebuilt from the current core -- the #processed
+# version stamp can never go stale the way a prebuilt cjacl does.
 #
 # Each package is a zip (flat entries) of the game's release .j2 plus its
 # .blorb, if any. The app imports it via "Open in JACL" and unpacks it.
@@ -14,11 +20,12 @@ set -e
 
 projects="${1:-../projects}"
 out="${2:-$projects/jaclgames}"
-cjacl="${3:-cjacl}"   # resolved from PATH (the deploy box installs it to /usr/local/bin)
+jpp="${3:-jpp}"   # resolved from PATH (make install puts it in /usr/local/bin)
 
-if ! command -v "$cjacl" >/dev/null 2>&1; then
-    echo "build-jaclgames: console interpreter '$cjacl' not found in PATH." >&2
-    echo "  It builds the release .j2 files; install cjacl or pass its path as arg 3." >&2
+if ! command -v "$jpp" >/dev/null 2>&1; then
+    echo "build-jaclgames: preprocessor '$jpp' not found in PATH." >&2
+    echo "  It writes the release .j2 files; run 'make jpp' / 'make install'" >&2
+    echo "  or pass the path to the jpp binary as arg 3." >&2
     exit 1
 fi
 
@@ -30,9 +37,11 @@ for game in "$projects"/*.jacl; do
 
     name=$(basename "$game" .jacl)
 
-    # Build the release (debug-free, obfuscated) .j2 -- written to the temp
-    # dir beside the game source.
-    "$cjacl" "$game" -release </dev/null >/dev/null 2>&1 || true
+    # Preprocess the release (debug-free, obfuscated) .j2 -- written to the
+    # temp dir beside the game source. jpp prints the output path on stdout;
+    # let its stderr through so a real failure is visible (the no-.j2 check
+    # below then skips the game cleanly).
+    "$jpp" "$game" -release >/dev/null || true
     j2="$projects/temp/$name.j2"
     if [ ! -f "$j2" ]; then
         echo "  skip $name (no .j2 produced)"
