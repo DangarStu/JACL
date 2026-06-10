@@ -197,7 +197,11 @@ void gli_display_error(char *msg)
     }
     printf("\n"); /* blank line after stanza */
     fflush(stdout);
+#ifdef JACL_IOS_EMBED
+    pthread_exit(NULL);   /* a fatal ends the terp thread, not the whole app */
+#else
     exit(1);
+#endif
 }
 
 #ifdef NO_MEMMOVE

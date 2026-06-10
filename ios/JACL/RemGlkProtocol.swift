@@ -126,6 +126,26 @@ enum GlkEvent {
         }
     }
 
+    var isArrange: Bool {
+        if case .arrange = self { return true }
+        return false
+    }
+
+    /// A copy with the generation stamped to `gen`. Every outgoing event must
+    /// carry the generation of the most recently received update, or RemGlk
+    /// aborts with "Input generation number does not match." (`init` is always
+    /// generation 0, so it is returned unchanged.)
+    func restamped(gen: Int) -> GlkEvent {
+        switch self {
+        case .initialize:             return self
+        case let .arrange(_, m):      return .arrange(gen: gen, metrics: m)
+        case let .line(_, w, v):      return .line(gen: gen, window: w, value: v)
+        case let .char(_, w, v):      return .char(gen: gen, window: w, value: v)
+        case let .hyperlink(_, w, v): return .hyperlink(gen: gen, window: w, value: v)
+        case .redraw:                 return .redraw(gen: gen)
+        }
+    }
+
     /// JSON bytes for this event, newline-terminated. RemGlk reads one
     /// balanced JSON object per event (rgdata.c: data_raw_blockread).
     func jsonData() -> Data {

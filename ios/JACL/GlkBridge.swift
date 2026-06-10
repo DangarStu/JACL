@@ -16,6 +16,7 @@
 
 import Foundation
 import Darwin
+import UIKit
 
 // MARK: - Rendered display model (what ContentView draws)
 
@@ -47,6 +48,11 @@ final class GlkBridge: ObservableObject {
 
     private var appFD: Int32 = -1
     private var generation = 0
+    /// RemGlk requires exactly one event per update. `awaiting` is true between
+    /// sending an event and receiving the update it triggers; further events
+    /// queue (with consecutive arranges coalesced) until then.
+    private var awaiting = false
+    private var outQueue: [GlkEvent] = []
     private var splitter = JSONObjectStream()
     private let readerQueue = DispatchQueue(label: "jacl.remglk.reader")
     // Writes MUST be on their own queue: the reader queue is occupied forever
@@ -76,27 +82,27 @@ final class GlkBridge: ObservableObject {
         terp.start()
 
         startReader()
-        send(.initialize(metrics: metrics(for: size),
-                         support: ["timer", "hyperlinks", "graphics"]))
+        enqueue(.initialize(metrics: metrics(for: size),
+                            support: ["timer", "hyperlinks", "graphics"]))
     }
 
     /// Submit a line of input for the window currently awaiting it.
     func submitLine(_ value: String) {
         guard let req = pendingInput, req.type == "line" else { return }
-        send(.line(gen: generation, window: req.id, value: value))
+        enqueue(.line(gen: generation, window: req.id, value: value))
         pendingInput = nil
     }
 
     /// Submit a single character (for char input).
     func submitChar(_ value: String) {
         guard let req = pendingInput, req.type == "char" else { return }
-        send(.char(gen: generation, window: req.id, value: value))
+        enqueue(.char(gen: generation, window: req.id, value: value))
         pendingInput = nil
     }
 
-    /// Tell the terp the display resized (e.g. rotation, split view).
+    /// Tell the terp the display resized (e.g. rotation, split view, keyboard).
     func resize(to size: CGSize) {
-        send(.arrange(gen: generation, metrics: metrics(for: size)))
+        enqueue(.arrange(gen: generation, metrics: metrics(for: size)))
     }
 
     // MARK: Reader
@@ -119,7 +125,28 @@ final class GlkBridge: ObservableObject {
         }
     }
 
-    private func send(_ event: GlkEvent) {
+    /// Queue an outgoing event. Consecutive arranges are coalesced (the
+    /// keyboard animation fires a burst of resizes); the queue then drains one
+    /// event per received update.
+    private func enqueue(_ event: GlkEvent) {
+        if event.isArrange, let last = outQueue.last, last.isArrange {
+            outQueue[outQueue.count - 1] = event
+        } else {
+            outQueue.append(event)
+        }
+        pump()
+    }
+
+    /// Send the next queued event if we're not already waiting for an update.
+    /// The event is restamped with the current generation at send time, so a
+    /// stale queued event never trips RemGlk's generation check.
+    private func pump() {
+        guard !awaiting, !outQueue.isEmpty else { return }
+        awaiting = true
+        rawSend(outQueue.removeFirst().restamped(gen: generation))
+    }
+
+    private func rawSend(_ event: GlkEvent) {
         let data = event.jsonData()
         let fd = appFD
         writerQueue.async {                                // own queue, NOT the blocked reader queue
@@ -132,6 +159,11 @@ final class GlkBridge: ObservableObject {
     // MARK: Apply an update to the model
 
     private func apply(_ update: GlkUpdate) {
+        // RemGlk sends one update per event. This update frees the queue to
+        // send the next event -- after `generation` is updated below, so the
+        // next event carries the right generation.
+        defer { awaiting = false; pump() }
+
         if update.type == "error" {
             NSLog("RemGlk error: %@", update.message ?? "?")
             return
@@ -185,10 +217,20 @@ final class GlkBridge: ObservableObject {
     /// cell guess; TODO: measure the actual font the UI uses so the grid
     /// (status line) columns line up exactly.
     private func metrics(for size: CGSize) -> GlkMetrics {
-        GlkMetrics(width: Double(size.width),
-                   height: Double(size.height),
-                   charwidth: 9.0,
-                   charheight: 18.0)
+        // The status line is a fixed-width grid: the game lays it out to
+        // width/charwidth columns and we render it monospaced, so charwidth
+        // must match the glyph we actually draw or the bar overflows the
+        // screen. Measure the real monospaced .body glyph. Height is reported
+        // very tall so the game never pauses with a "[MORE]" prompt -- the
+        // transcript scrolls instead, the right model for a touch UI. The 16pt
+        // accounts for the status line's horizontal padding.
+        let mono = UIFont.monospacedSystemFont(
+            ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize, weight: .regular)
+        let cw = ("0" as NSString).size(withAttributes: [.font: mono]).width
+        return GlkMetrics(width: Double(size.width) - 16,
+                          height: 100_000,
+                          charwidth: Double(cw),
+                          charheight: Double(mono.lineHeight))
     }
 }
 

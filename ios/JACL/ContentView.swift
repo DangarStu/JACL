@@ -32,6 +32,7 @@ struct GameView: View {
     @StateObject private var bridge = GlkBridge()
     @State private var inputText = ""
     @State private var started = false
+    @FocusState private var inputFocused: Bool
 
     // DEBUG-only scripted input (via `-autocommands "no;look;…"`), used to
     // exercise the bridge's input round-trip headlessly. Empty in release.
@@ -60,8 +61,9 @@ struct GameView: View {
             }
             .onChange(of: geo.size) { _, newSize in bridge.resize(to: newSize) }
             .onChange(of: bridge.pendingInput) { _, input in
-                // Replay the next scripted command when the terp asks for a
-                // line. No-op in release (autoCommands is empty).
+                // Put the cursor in the command line whenever the game asks for
+                // one (so you can just type), and replay any scripted command.
+                inputFocused = (input?.type == "line")
                 guard let input, input.type == "line", autoIndex < autoCommands.count else { return }
                 let cmd = autoCommands[autoIndex]
                 autoIndex += 1
@@ -94,6 +96,7 @@ struct GameView: View {
                 rowText(row)
                     .font(.system(.body, design: .monospaced))
                     .lineLimit(1)
+                    .minimumScaleFactor(0.5)   // never let the status bar overflow
             }
         }
         .padding(.horizontal, 8)
@@ -132,9 +135,18 @@ struct GameView: View {
                     .textFieldStyle(.roundedBorder)
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
+                    .focused($inputFocused)
                     .onSubmit(submit)
                 Button("Enter", action: submit)
             }
+            .padding(8)
+        } else if bridge.pendingInput?.type == "char" {
+            // A "press any key" / "[MORE]" pause. Rare now that the buffer is
+            // reported tall, but handle it so the game can't get stuck.
+            Button { bridge.submitChar(" ") } label: {
+                Text("Tap to continue").frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
             .padding(8)
         } else if bridge.finished {
             Text("The game has ended.")

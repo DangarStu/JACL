@@ -68,6 +68,9 @@ void gli_initialize_windows()
     Also singleturn mode, after processing the single input.
     It doesn't pause and wait for a keypress, and it calls the Glk interrupt
     handler. Otherwise it's the same as glk_exit(). */
+#ifdef JACL_IOS_EMBED
+#include <pthread.h>
+#endif
 void gli_fast_exit()
 {
     if (gli_interrupt_handler) {
@@ -75,7 +78,11 @@ void gli_fast_exit()
     }
 
     gli_streams_close_all();
+#ifdef JACL_IOS_EMBED
+    pthread_exit(NULL);   /* end the terp thread, not the whole app */
+#else
     exit(0);
+#endif
 }
 
 static void compute_content_box(grect_t *box)
