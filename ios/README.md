@@ -201,7 +201,7 @@ just re-run from Xcode to refresh; games in Documents survive):
 1. `cd ios && xcodegen generate && open JACL.xcodeproj`
 2. JACL target → **Signing & Capabilities** → tick **Automatically manage
    signing** → **Team** → add/select your Apple ID. Bundle id
-   `au.com.famecapital.JACL` is a domain you own, so there's no collision.
+   `au.com.dangarmarine.JACL` is a domain you own, so there's no collision.
 3. iPad: plug in, **Trust This Computer**, then enable **Settings → Privacy &
    Security → Developer Mode** (iPadOS 16+; the toggle appears once the device
    has talked to Xcode) and restart.
