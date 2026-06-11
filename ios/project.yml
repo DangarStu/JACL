@@ -96,6 +96,12 @@ targets:
           - "-Wno-unused-result"
           - "-Wno-unused-but-set-variable"
           - "-Wno-deprecated-declarations"
+          # The JACL C core + vendored RemGlk/libcsv trip clang's stricter
+          # checks (the desktop gcc build tolerates them). Quiet the noise in
+          # the iOS build; a real 64->32 truncation audit is a separate job.
+          - "-Wno-shorten-64-to-32"
+          - "-Wno-comma"
+          - "-Wno-macro-redefined"
 
     info:
       path: JACL/Info.plist

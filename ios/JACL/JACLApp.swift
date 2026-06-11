@@ -80,14 +80,14 @@ struct GameShelfView: View {
                           allowedContentTypes: GameLibrary.gameTypes,
                           allowsMultipleSelection: true) { result in
                 if case .success(let urls) = result {
-                    for url in urls { try? GameLibrary.importGame(from: url) }
+                    for url in urls { _ = try? GameLibrary.importGame(from: url) }
                     games = GameLibrary.games()
                 }
             }
             .onOpenURL { url in
                 // "Open in JACL" from Files / AirDrop / Mail / Safari, or a
                 // .jaclgame / .j2 tapped anywhere on the device.
-                try? GameLibrary.importGame(from: url)
+                _ = try? GameLibrary.importGame(from: url)
                 games = GameLibrary.games()
             }
             .onAppear {
@@ -98,7 +98,7 @@ struct GameShelfView: View {
                 let args = ProcessInfo.processInfo.arguments
                 if let i = args.firstIndex(of: "-importpack"), i + 1 < args.count {
                     let url = GameLibrary.documents.appendingPathComponent(args[i + 1])
-                    try? GameLibrary.importGame(from: url)
+                    _ = try? GameLibrary.importGame(from: url)
                     games = GameLibrary.games()
                 }
                 #endif
@@ -187,7 +187,7 @@ enum GameLibrary {
         var seeded = Set(UserDefaults.standard.stringArray(forKey: key) ?? [])
         let bundled = Bundle.main.urls(forResourcesWithExtension: "jaclgame", subdirectory: nil) ?? []
         for url in bundled where !seeded.contains(url.lastPathComponent) {
-            try? importGame(from: url)
+            _ = try? importGame(from: url)
             seeded.insert(url.lastPathComponent)
         }
         UserDefaults.standard.set(Array(seeded), forKey: key)
