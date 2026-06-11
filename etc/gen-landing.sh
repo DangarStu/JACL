@@ -7,8 +7,9 @@
 # GAMES_DIR:    where built .jaclgame packages live; the "Get it for iPad"
 #               tab lists only games that have one.
 #
-# Two CSS-only tabs (no JavaScript): "Play Online" (fcgijacl links) and
-# "Get it for iPad" (.jaclgame downloads).
+# Two CSS-only tabs: "Play Online" (fcgijacl links) and "Get it for iPad"
+# (.jaclgame downloads). Tab switching is pure CSS; a small script at the end
+# adds one enhancement -- opening the page as .../#get selects the iPad tab.
 
 projects="${1:-../projects}"
 games="${2:-$projects/jaclgames}"
@@ -127,5 +128,14 @@ cat <<'TAIL'
     </div>
   </main>
   <footer>Served by JACL. Online games run via the fcgijacl interpreter. <a href="/guide/">Read the Guide</a> to write your own. &middot; <a href="/privacy.html">Privacy</a></footer>
+  <script>
+    /* Deep-link: opening the page as .../#get (e.g. the JACL iPad app's
+       "Get more games" link) selects the "Get it for iPad" tab directly.
+       Pure enhancement -- without JS the page just shows the default tab. */
+    if (location.hash === '#get') {
+      var g = document.getElementById('tab-get');
+      if (g) g.checked = true;
+    }
+  </script>
 </body></html>
 TAIL

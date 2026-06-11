@@ -54,6 +54,16 @@ for game in "$projects"/*.jacl; do
 
     name=$(basename "$game" .jacl)
 
+    # Skip web-only games (constant game_web_only true) -- they need the web
+    # HTML interface (e.g. blackjacl renders its cards in HTML), so they don't
+    # run on the Glk-based iPad/console interpreters. Don't build a package, and
+    # drop any stale one so it disappears from the iPad downloads tab.
+    if grep -qE '^constant[[:space:]]+game_web_only[[:space:]]+true' "$game"; then
+        rm -f "$out/$name.jaclgame"
+        echo "  skip $name (web-only)"
+        continue
+    fi
+
     # Preprocess the release (debug-free, obfuscated) .j2 -- written to the
     # temp dir beside the game source. jpp prints the output path on stdout;
     # let its stderr through so a real failure is visible (the no-.j2 check
