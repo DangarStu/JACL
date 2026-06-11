@@ -53,6 +53,13 @@ void gli_initialize_windows()
     srandom(time(NULL));
     tagcounter = (random() % 15) + 16;
     gli_rootwin = NULL;
+    /* Reset the window-list head too, not just the root. The iOS app runs
+     * remglk_main once per game in one long-lived process (JACL_IOS_EMBED);
+     * without this the next game inherits the previous game's window list and
+     * renders nothing (black screen). On a fresh process this is already NULL,
+     * so it's harmless elsewhere. (The old windows are orphaned -- a small
+     * per-game-switch leak, acceptable vs. the alternative.) */
+    gli_windowlist = NULL;
     
     /* Build a convenient array of spaces. */
     for (ix=0; ix<NUMSPACES; ix++)
