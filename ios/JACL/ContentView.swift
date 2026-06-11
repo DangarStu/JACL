@@ -59,6 +59,13 @@ struct GameView: View {
                 started = true
                 bridge.start(gamePath: gamePath, size: geo.size)
             }
+            .onDisappear {
+                // Leaving the game (back to the shelf): stop this terp so its
+                // thread exits and frees the shared JACL/RemGlk globals before
+                // another game starts. Without this, swapping games leaves two
+                // interpreters running in one process and the app hangs/crashes.
+                bridge.stop()
+            }
             .onChange(of: geo.size) { _, newSize in bridge.resize(to: newSize) }
             .onChange(of: bridge.pendingInput) { _, input in
                 // Put the cursor in the command line whenever the game asks for
@@ -109,7 +116,12 @@ struct GameView: View {
         let paras = bridge.buffers[id] ?? []
         return ScrollViewReader { proxy in
             ScrollView {
-                VStack(alignment: .leading, spacing: 8) {
+                // LazyVStack, not VStack: a long transcript in a plain VStack
+                // lays out every paragraph eagerly and the content layer grows
+                // past CoreAnimation's max backing-store size ("Failed to create
+                // image slot"), stalling the main thread (the swap-time hang).
+                // Lazy only realises the visible paragraphs.
+                LazyVStack(alignment: .leading, spacing: 8) {
                     ForEach(paras) { para in
                         paragraphView(para)
                             .frame(maxWidth: .infinity, alignment: .leading)

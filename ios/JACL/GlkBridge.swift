@@ -86,6 +86,31 @@ final class GlkBridge: ObservableObject {
                             support: ["timer", "hyperlinks", "graphics"]))
     }
 
+    /// Stop the interpreter and let its thread exit. Closing the app end of the
+    /// socketpair gives the terp EOF on stdin, so it winds down through
+    /// glk_exit (which closes its Glk windows) and pthread_exit; the shutdown
+    /// also wakes the reader's blocked read(). This MUST run when leaving a
+    /// game: JACL and RemGlk keep process-global state, so only one terp may
+    /// run at a time. The next game's read_gamefile() (clear_game_data) and
+    /// RemGlk's gli_initialize_windows() reset that state for a clean start --
+    /// which is only safe because the previous terp has been stopped first.
+    func stop() {
+        let fd = appFD
+        guard fd >= 0 else { return }
+        appFD = -1
+        shutdown(fd, SHUT_RDWR)
+        close(fd)
+        finished = true
+    }
+
+    deinit {
+        let fd = appFD
+        if fd >= 0 {
+            shutdown(fd, SHUT_RDWR)
+            close(fd)
+        }
+    }
+
     /// Submit a line of input for the window currently awaiting it.
     func submitLine(_ value: String) {
         guard let req = pendingInput, req.type == "line" else { return }

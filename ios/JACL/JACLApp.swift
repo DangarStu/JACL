@@ -8,10 +8,16 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
+import Darwin
 
 @main
 struct JACLApp: App {
     init() {
+        // The terp talks to the app over a socketpair. When a game closes we
+        // close our end; the terp's final writes (its glk_exit flush) would
+        // otherwise raise SIGPIPE and kill the whole app. Ignore it process-
+        // wide so those writes just fail with EPIPE instead.
+        signal(SIGPIPE, SIG_IGN)
         GameLibrary.installBundledStarters()
     }
 
