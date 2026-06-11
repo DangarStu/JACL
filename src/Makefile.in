@@ -124,6 +124,7 @@ apache: install
 	@cp ../etc/privacy.html /var/www/html/privacy.html
 	@echo "Installing Apache configuration..."
 	cp ../etc/jacl-apache.conf /etc/apache2/conf-available/jacl.conf
+	@a2enmod headers >/dev/null 2>&1 || true   # for the .jaclgame Content-Disposition
 	a2enconf jacl
 	@echo "Installing logrotate config..."
 	cp ../etc/jacl-logrotate.conf /etc/logrotate.d/jacl
