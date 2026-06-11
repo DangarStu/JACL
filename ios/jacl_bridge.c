@@ -46,6 +46,22 @@ int jacl_bridge_run(const char *gamepath, int io_fd)
 	if (dup2(io_fd, STDIN_FILENO)  < 0) return -1;
 	if (dup2(io_fd, STDOUT_FILENO) < 0) return -1;
 
+	/* stdin/stdout are process-global FILE*s that persist across games in this
+	 * single process. The previous game's terp died when its socket closed:
+	 * getc() hit EOF (setting stdin's *sticky* EOF flag) and gli_fatal_error()
+	 * tried to fflush() a final error stanza onto the now-closed socket -- EPIPE,
+	 * so that text is left stuck in stdout's buffer. dup2() above only swaps the
+	 * kernel fd; it does NOT touch these userspace stdio flags/buffers. Without
+	 * this reset the new terp's first getc(stdin) returns EOF immediately (the
+	 * stale sticky flag) and dies before drawing anything -- a black screen --
+	 * and the leftover stdout bytes would corrupt this game's opening JSON.
+	 * Clear the EOF/error flags and drop any buffered leftover so each game
+	 * starts from clean stdio. */
+	clearerr(stdin);
+	clearerr(stdout);
+	fpurge(stdin);
+	fpurge(stdout);
+
 	/* RemGlk library options (parsed by remglk_main, NOT forwarded to
 	 * glkunix_startup_code -- startdata stays argc==1 and our shim falls
 	 * back to the game path set above):
