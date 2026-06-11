@@ -937,6 +937,18 @@ status_line()
 	jacl_set_window(statuswin);
 	glk_window_clear(statuswin);
 
+	/* total_moves starts at -1 (loader: "time passes before the first
+	 * prompt") and eachturn() bumps it to 0. A status line drawn during
+	 * +intro -- before that first eachturn() -- would otherwise show
+	 * "Moves: -1". Clamp to >= 0 for the render and restore afterwards, so
+	 * the GLK status matches the web frontend (web_render_status_bar does
+	 * the same) while game code that tests total_moves = -1 (e.g. Eria)
+	 * keeps seeing the real value. */
+	int saved_total_moves = (TOTAL_MOVES != NULL) ? TOTAL_MOVES->value : 0;
+	if (TOTAL_MOVES != NULL && TOTAL_MOVES->value < 0) {
+		TOTAL_MOVES->value = 0;
+	}
+
 	if (execute("+update_status_window") == FALSE) {
 		glk_set_style(style_User1);
 
@@ -977,6 +989,10 @@ status_line()
 		}
 		glk_window_move_cursor(statuswin, cursor, 0);
 		write_text(temp_buffer);
+	}
+
+	if (TOTAL_MOVES != NULL) {
+		TOTAL_MOVES->value = saved_total_moves;
 	}
 
     jacl_set_window(mainwin);
