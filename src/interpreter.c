@@ -3316,6 +3316,20 @@ pop_stack()
 
 }
 
+/* Return the interpreter's recursion guards to their pristine state. JACL was
+ * written to run one game per process and let exit() reclaim everything, so
+ * `stack` / `proxy_stack` are never otherwise zeroed between games. When a
+ * process is reused (the iOS app, long-lived FastCGI) and the previous game's
+ * terp died mid-call, they stay non-zero, and the next game trips the
+ * STACK_SIZE guard ("stack overflow ... while trying to call ...") on its first
+ * nested call. clear_game_data() calls this so every load starts at depth 0. */
+void
+reset_interpreter_stacks(void)
+{
+    stack = 0;
+    proxy_stack = 0;
+}
+
 #ifdef GLK
 int
 push_stack(glsi32 file_pointer)

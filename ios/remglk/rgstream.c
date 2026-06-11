@@ -30,6 +30,12 @@ stream_t *gli_currentstr = NULL; /* the current output stream */
 void gli_initialize_streams()
 {
     tagcounter = (random() % 15) + 32;
+    /* Reset the stream-list head for re-entry. gli_streams_close_all (called
+     * from glk_exit when a game ends) only finalizes *file* streams, so the
+     * window/memory streams stay on this list; the iOS app's next remglk_main
+     * would otherwise inherit the previous game's streams. See the matching
+     * note in gli_initialize_windows(). */
+    gli_streamlist = NULL;
 }
 
 stream_t *glkunix_stream_find_by_updatetag(glui32 tag)

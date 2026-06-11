@@ -33,6 +33,11 @@ int jacl_bridge_run(const char *gamepath, int io_fd);
  * number to actual pixels (see ios/README.md, graphics). */
 const void *jacl_bridge_image(unsigned int num, unsigned int *len);
 
+/* The JACL interpreter version, "J_VERSION.J_RELEASE.J_BUILD" (e.g. "4.7.0"),
+ * from version.h. The app shows it next to this build's link time so you can
+ * confirm at a glance which build is actually running. */
+const char *jacl_interpreter_version(void);
+
 #ifdef __cplusplus
 }
 #endif

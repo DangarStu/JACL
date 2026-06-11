@@ -12,19 +12,33 @@
  * Compiled only into the iOS app target (JACL_IOS_EMBED). See jacl_bridge.h.
  */
 
+#include <stdio.h>
 #include <unistd.h>
 #include "glk.h"
 #include "gi_blorb.h"
 #include "jacl_ios.h"
 #include "jacl_bridge.h"
+#include "version.h"
 
 /* RemGlk's main() is renamed to remglk_main() under JACL_IOS_EMBED (see
  * remglk/main.c) so it doesn't collide with SwiftUI's generated main().
  * We call it as an ordinary function once stdio is redirected. */
 extern int remglk_main(int argc, char *argv[]);
 
+/* J_VERSION.J_RELEASE.J_BUILD from version.h -- shown in the app's shelf so
+ * you can confirm which interpreter build is running. */
+const char *jacl_interpreter_version(void)
+{
+    static char buf[32];
+    snprintf(buf, sizeof(buf), "%d.%d.%d", J_VERSION, J_RELEASE, J_BUILD);
+    return buf;
+}
+
 int jacl_bridge_run(const char *gamepath, int io_fd)
 {
+	fprintf(stderr, "JDBG jacl_bridge_run gamepath=%s io_fd=%d\n",
+	        gamepath ? gamepath : "(null)", io_fd);
+
 	/* Tell the start-up shim which .j2 to open. glkunix_startup_code()
 	 * reads this back via ios_gamepath (see ios_startup.c). */
 	jacl_ios_set_gamepath(gamepath);
@@ -34,6 +48,22 @@ int jacl_bridge_run(const char *gamepath, int io_fd)
 	 * fds is all that's needed. */
 	if (dup2(io_fd, STDIN_FILENO)  < 0) return -1;
 	if (dup2(io_fd, STDOUT_FILENO) < 0) return -1;
+
+	/* stdin/stdout are process-global FILE*s that persist across games in this
+	 * single process. The previous game's terp died when its socket closed:
+	 * getc() hit EOF (setting stdin's *sticky* EOF flag) and gli_fatal_error()
+	 * tried to fflush() a final error stanza onto the now-closed socket -- EPIPE,
+	 * so that text is left stuck in stdout's buffer. dup2() above only swaps the
+	 * kernel fd; it does NOT touch these userspace stdio flags/buffers. Without
+	 * this reset the new terp's first getc(stdin) returns EOF immediately (the
+	 * stale sticky flag) and dies before drawing anything -- a black screen --
+	 * and the leftover stdout bytes would corrupt this game's opening JSON.
+	 * Clear the EOF/error flags and drop any buffered leftover so each game
+	 * starts from clean stdio. */
+	clearerr(stdin);
+	clearerr(stdout);
+	fpurge(stdin);
+	fpurge(stdout);
 
 	/* RemGlk library options (parsed by remglk_main, NOT forwarded to
 	 * glkunix_startup_code -- startdata stays argc==1 and our shim falls

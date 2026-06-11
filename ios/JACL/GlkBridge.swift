@@ -65,6 +65,7 @@ final class GlkBridge: ObservableObject {
     /// Launch `gamePath` (an absolute .j2 path in the sandbox) and send the
     /// initial metrics for a display of `size` points.
     func start(gamePath: String, size: CGSize) {
+        NSLog("JDBG GlkBridge.start path=%@", (gamePath as NSString).lastPathComponent)
         var fds: [Int32] = [0, 0]
         guard socketpair(AF_UNIX, SOCK_STREAM, 0, &fds) == 0 else {
             NSLog("GlkBridge: socketpair failed")
@@ -96,6 +97,7 @@ final class GlkBridge: ObservableObject {
     /// which is only safe because the previous terp has been stopped first.
     func stop() {
         let fd = appFD
+        NSLog("JDBG GlkBridge.stop appFD=%d", fd)
         guard fd >= 0 else { return }
         appFD = -1
         shutdown(fd, SHUT_RDWR)

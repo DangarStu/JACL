@@ -55,6 +55,8 @@ struct GameView: View {
                 inputBar
             }
             .onAppear {
+                NSLog("JDBG GameView.onAppear started=%@ path=%@",
+                      String(started), (gamePath as NSString).lastPathComponent)
                 guard !started else { return }
                 started = true
                 bridge.start(gamePath: gamePath, size: geo.size)

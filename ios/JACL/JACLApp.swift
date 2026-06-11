@@ -18,7 +18,9 @@ struct JACLApp: App {
         // otherwise raise SIGPIPE and kill the whole app. Ignore it process-
         // wide so those writes just fail with EPIPE instead.
         signal(SIGPIPE, SIG_IGN)
-        GameLibrary.installBundledStarters()
+        // NB: do NOT seed bundled games here -- installBundledStarters() unzips
+        // on first launch and would block the main thread before any UI paints
+        // (a ~10s black screen on a fresh install). The shelf does it in .task.
     }
 
     var body: some Scene {
@@ -44,27 +46,70 @@ struct JACLApp: App {
 // MARK: - Shelf
 
 struct GameShelfView: View {
-    @State private var games: [Game] = GameLibrary.games()
+    @State private var games: [Game] = []
+    @State private var loaded = false
     @State private var importing = false
     @State private var showingSettings = false
+
+    /// Interpreter version (from version.h via the C bridge) and this build's
+    /// link time, shown so you can confirm at a glance which build is running.
+    private static let interpreterVersion = String(cString: jacl_interpreter_version())
+    private static let buildStamp: String = {
+        guard let url = Bundle.main.executableURL,
+              let date = try? url.resourceValues(
+                forKeys: [.contentModificationDateKey]).contentModificationDate
+        else { return "?" }
+        let f = DateFormatter()
+        f.dateFormat = "MMM d HH:mm:ss"
+        return f.string(from: date)
+    }()
 
     var body: some View {
         NavigationStack {
             Group {
-                if games.isEmpty {
+                if !loaded {
+                    ProgressView("Loading…")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if games.isEmpty {
                     ContentUnavailableView(
                         "No games yet",
                         systemImage: "books.vertical",
                         description: Text("Tap + to import a JACL game (.j2) from Files."))
                 } else {
+                    // Value-based navigation: each pushed GameView is keyed to a
+                    // distinct Game, so its @StateObject bridge / @State started
+                    // are fresh per game. The older `NavigationLink { GameView }`
+                    // form let SwiftUI share one destination's state across games.
                     List(games) { game in
-                        NavigationLink(game.title) {
-                            GameView(gamePath: game.url.path)
-                        }
+                        NavigationLink(game.title, value: game)
+                            .listRowBackground(Color.clear)
+                    }
+                    .scrollContentBackground(.hidden)   // let the artwork show through
+                    .navigationDestination(for: Game.self) { game in
+                        GameView(gamePath: game.url.path)
                     }
                 }
             }
-            .navigationTitle("JACL")
+            .background {
+                // The app artwork as a muted watermark behind the shelf.
+                Image("ShelfArtwork")
+                    .resizable()
+                    .scaledToFill()
+                    .opacity(0.15)
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
+            }
+            .navigationTitle("JACL v\(Self.interpreterVersion)")
+            .safeAreaInset(edge: .bottom) {
+                // Build stamp: interpreter version + this build's link time, so
+                // you can verify on-device that you're running the latest build.
+                Text("v\(Self.interpreterVersion) · built \(Self.buildStamp)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 4)
+                    .background(.bar)
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button { showingSettings = true } label: { Image(systemName: "gearshape") }
@@ -102,6 +147,19 @@ struct GameShelfView: View {
                     games = GameLibrary.games()
                 }
                 #endif
+            }
+            .task {
+                guard !loaded else { return }
+                // First launch seeds the bundled starters (a zip unpack) and the
+                // title scan reads every .j2. Do both off the main thread so the
+                // shelf paints immediately (ProgressView) instead of a ~10s black
+                // screen, then publish the result.
+                let result = await Task.detached(priority: .userInitiated) { () -> [Game] in
+                    GameLibrary.installBundledStarters()
+                    return GameLibrary.games()
+                }.value
+                games = result
+                loaded = true
             }
         }
     }

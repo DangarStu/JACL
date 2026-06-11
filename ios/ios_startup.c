@@ -64,6 +64,17 @@ jacl_ios_set_gamepath(const char *path)
 	} else {
 		snprintf(ios_gamepath, sizeof(ios_gamepath), "%s", path);
 	}
+
+	/* A new game is being requested into this reused process. game_stream and
+	 * blorb_stream are process globals that outlive the previous game's terp --
+	 * it exits via pthread_exit() without Glk teardown, leaving these strids
+	 * dangling. jacl_ios_prepare() below treats a non-NULL game_stream as
+	 * "already loaded" and short-circuits, which would run the PREVIOUS game
+	 * again (you pick a new title and the old one loads). Drop the dangling
+	 * handles so the new path is actually loaded. The old stream objects are
+	 * already orphaned by the abrupt exit; we just release our pointers. */
+	game_stream = NULL;
+	blorb_stream = NULL;
 }
 
 const char *
@@ -75,6 +86,9 @@ jacl_ios_gamepath(void)
 int
 jacl_ios_prepare(const char *path)
 {
+	fprintf(stderr, "JDBG jacl_ios_prepare path=%s game_stream=%p\n",
+	        path ? path : "(null)", (void *)game_stream);
+
 	/* Idempotent: if we already opened a game stream, a second call (e.g.
 	 * the app calling us directly AND the backend running
 	 * glkunix_startup_code) is a no-op rather than a double-load. */
