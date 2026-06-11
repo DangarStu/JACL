@@ -48,6 +48,19 @@ struct GameShelfView: View {
     @State private var importing = false
     @State private var showingSettings = false
 
+    /// Interpreter version (from version.h via the C bridge) and this build's
+    /// link time, shown so you can confirm at a glance which build is running.
+    private static let interpreterVersion = String(cString: jacl_interpreter_version())
+    private static let buildStamp: String = {
+        guard let url = Bundle.main.executableURL,
+              let date = try? url.resourceValues(
+                forKeys: [.contentModificationDateKey]).contentModificationDate
+        else { return "?" }
+        let f = DateFormatter()
+        f.dateFormat = "MMM d HH:mm:ss"
+        return f.string(from: date)
+    }()
+
     var body: some View {
         NavigationStack {
             Group {
@@ -64,7 +77,17 @@ struct GameShelfView: View {
                     }
                 }
             }
-            .navigationTitle("JACL")
+            .navigationTitle("JACL v\(Self.interpreterVersion)")
+            .safeAreaInset(edge: .bottom) {
+                // Build stamp: interpreter version + this build's link time, so
+                // you can verify on-device that you're running the latest build.
+                Text("v\(Self.interpreterVersion) · built \(Self.buildStamp)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 4)
+                    .background(.bar)
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button { showingSettings = true } label: { Image(systemName: "gearshape") }

@@ -12,16 +12,27 @@
  * Compiled only into the iOS app target (JACL_IOS_EMBED). See jacl_bridge.h.
  */
 
+#include <stdio.h>
 #include <unistd.h>
 #include "glk.h"
 #include "gi_blorb.h"
 #include "jacl_ios.h"
 #include "jacl_bridge.h"
+#include "version.h"
 
 /* RemGlk's main() is renamed to remglk_main() under JACL_IOS_EMBED (see
  * remglk/main.c) so it doesn't collide with SwiftUI's generated main().
  * We call it as an ordinary function once stdio is redirected. */
 extern int remglk_main(int argc, char *argv[]);
+
+/* J_VERSION.J_RELEASE.J_BUILD from version.h -- shown in the app's shelf so
+ * you can confirm which interpreter build is running. */
+const char *jacl_interpreter_version(void)
+{
+    static char buf[32];
+    snprintf(buf, sizeof(buf), "%d.%d.%d", J_VERSION, J_RELEASE, J_BUILD);
+    return buf;
+}
 
 int jacl_bridge_run(const char *gamepath, int io_fd)
 {
