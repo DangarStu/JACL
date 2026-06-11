@@ -119,6 +119,7 @@ void clear_cstring(const char *name);
 void add_cinteger(const char *name, int value);
 void clear_cinteger(const char *name);
 void restart_game(void);
+void clear_game_data(void);
 int read_gamefile(void);
 void unkvalerr(int line, int wordno);
 void totalerrs(int errors);

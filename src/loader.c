@@ -78,6 +78,16 @@ read_gamefile()
 
     char            function_name[81];
 
+    /* iOS (and long-lived FastCGI) reuse the process across games, so the
+     * previous game's tables are still live on entry. read_gamefile() assumes
+     * empty tables -- create_string/create_cstring/create_attribute/... all
+     * dereference a "current" tail pointer once the list is non-empty, which
+     * crashes when that pointer is stale from a prior game. Tear down any
+     * prior game's data first. A no-op on the very first load (all tables
+     * NULL, objects == 0); this is the per-load equivalent of the
+     * restart_game() the desktop/web paths already run between games. */
+    clear_game_data();
+
     // CREATE SOME SYSTEM VARIABLES
 
     // THIS IS USED BY JACL FUNCTIONS TO PASS STRING VALUES BACK
@@ -1277,8 +1287,14 @@ legal_label_check(const char *word, int line, int type)
     return (FALSE);
 }
 
+/* Free every game data table and reset its head to NULL, leaving the
+ * interpreter in the same clean state as a freshly-started process. Called at
+ * the top of read_gamefile() so each load starts fresh, and indirectly by
+ * restart_game(). Safe to call before any game has loaded (all tables NULL,
+ * objects == 0). Must NOT touch runtime-only state such as SOUND_SUPPORTED or
+ * the volume cintegers -- those don't exist on a fresh process. */
 void
-restart_game()
+clear_game_data()
 {
     int             index;
 
@@ -1297,21 +1313,6 @@ restart_game()
     struct cinteger_type *previous_cinteger;
     struct filter_type *current_filter;
     struct filter_type *previous_filter;
-
-#ifdef GLK
-    if (SOUND_SUPPORTED->value) {
-        /* STOP ALL SOUNDS AND SET VOLUMES BACK TO 100% */
-        for (index = 0; index < 4; index++) {
-            glk_schannel_stop(sound_channel[index]);
-            glk_schannel_set_volume(sound_channel[index], 65535);
-
-            /* STORE A COPY OF THE CURRENT VOLUME FOR ACCESS
-             * FROM JACL CODE */
-            sprintf(temp_buffer, "volume[%d]", index);
-            cinteger_resolve(temp_buffer)->value = 100;
-        }
-    }
-#endif
 
     /* FREE ALL OBJECTS */
     for (index = 1; index <= objects; index++) {
@@ -1480,7 +1481,32 @@ restart_game()
 
     free_from(grammar_table);
     grammar_table = NULL;
+}
 
+void
+restart_game()
+{
+#ifdef GLK
+    int             index;
+
+    /* Stop any playing sounds and reset volumes before the running game is
+     * torn down. Kept here rather than in clear_game_data() because it reads
+     * SOUND_SUPPORTED and the volume cintegers, which only exist once a game
+     * has loaded -- clear_game_data() must stay safe on a fresh process. */
+    if (SOUND_SUPPORTED->value) {
+        for (index = 0; index < 4; index++) {
+            glk_schannel_stop(sound_channel[index]);
+            glk_schannel_set_volume(sound_channel[index], 65535);
+
+            /* STORE A COPY OF THE CURRENT VOLUME FOR ACCESS FROM JACL CODE */
+            sprintf(temp_buffer, "volume[%d]", index);
+            cinteger_resolve(temp_buffer)->value = 100;
+        }
+    }
+#endif
+
+    /* read_gamefile() now clears all game data first, so this reloads from a
+     * clean state -- the teardown that used to live inline here. */
     if (read_gamefile()) {
         log_error("Game reload failed due to errors, keeping previous state.", PLUS_STDERR);
     }
