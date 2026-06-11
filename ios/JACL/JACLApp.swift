@@ -82,11 +82,22 @@ struct GameShelfView: View {
                     // form let SwiftUI share one destination's state across games.
                     List(games) { game in
                         NavigationLink(game.title, value: game)
+                            .listRowBackground(Color.clear)
                     }
+                    .scrollContentBackground(.hidden)   // let the artwork show through
                     .navigationDestination(for: Game.self) { game in
                         GameView(gamePath: game.url.path)
                     }
                 }
+            }
+            .background {
+                // The app artwork as a muted watermark behind the shelf.
+                Image("ShelfArtwork")
+                    .resizable()
+                    .scaledToFill()
+                    .opacity(0.15)
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
             }
             .navigationTitle("JACL v\(Self.interpreterVersion)")
             .safeAreaInset(edge: .bottom) {
