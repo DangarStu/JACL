@@ -48,6 +48,7 @@ struct JACLApp: App {
 struct GameShelfView: View {
     @State private var games: [Game] = []
     @State private var loaded = false
+    @State private var navPath: [Game] = []
     @State private var importing = false
     @State private var showingSettings = false
 
@@ -65,7 +66,7 @@ struct GameShelfView: View {
     }()
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navPath) {
             Group {
                 if !loaded {
                     ProgressView("Loading…")
@@ -160,9 +161,40 @@ struct GameShelfView: View {
                 }.value
                 games = result
                 loaded = true
+                #if DEBUG
+                runSwapTestIfRequested()
+                #endif
             }
         }
     }
+
+    #if DEBUG
+    /// `simctl launch … -swaptest`: drive a game swap headlessly so the JDBG
+    /// trace can be read off the Simulator console. Push games[0], wait, pop
+    /// back to the shelf, then push games[1] -- reproducing "open one game,
+    /// go back, open another" without a human tapping.
+    private func runSwapTestIfRequested() {
+        guard ProcessInfo.processInfo.arguments.contains("-swaptest"), games.count >= 2 else { return }
+        // Alternate the two games several times, popping to the shelf between
+        // each, to confirm every swap loads the *right* game (not the first one
+        // again) and that each previous terp exits (no accumulation/slowdown).
+        let sequence = [games[0], games[1], games[0], games[1]]
+        func step(_ i: Int) {
+            guard i < sequence.count else {
+                NSLog("JDBG SWAPTEST done; exiting")
+                exit(0)   // ends --console-pipe so the captured trace closes
+            }
+            NSLog("JDBG SWAPTEST push #%d %@", i + 1, sequence[i].title)
+            navPath = [sequence[i]]
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                NSLog("JDBG SWAPTEST pop")
+                navPath = []
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) { step(i + 1) }
+            }
+        }
+        step(0)
+    }
+    #endif
 }
 
 // MARK: - Sandbox game storage

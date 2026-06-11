@@ -86,6 +86,7 @@ void gli_fast_exit()
 
     gli_streams_close_all();
 #ifdef JACL_IOS_EMBED
+    fprintf(stderr, "JDBG terp_exit (fast_exit)\n");
     pthread_exit(NULL);   /* end the terp thread, not the whole app */
 #else
     exit(0);
