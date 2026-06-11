@@ -1481,6 +1481,13 @@ clear_game_data()
 
     free_from(grammar_table);
     grammar_table = NULL;
+
+    /* Return the interpreter's recursion guards to depth 0. The freed tables
+     * above are the obvious per-game state, but `stack` / `proxy_stack` are
+     * just as game-scoped: if the previous game's terp died mid-call (e.g. the
+     * iOS app tearing it down to load another game) they are left non-zero, and
+     * the next game would overflow on its first nested call. */
+    reset_interpreter_stacks();
 }
 
 void
