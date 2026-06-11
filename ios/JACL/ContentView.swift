@@ -116,7 +116,12 @@ struct GameView: View {
         let paras = bridge.buffers[id] ?? []
         return ScrollViewReader { proxy in
             ScrollView {
-                VStack(alignment: .leading, spacing: 8) {
+                // LazyVStack, not VStack: a long transcript in a plain VStack
+                // lays out every paragraph eagerly and the content layer grows
+                // past CoreAnimation's max backing-store size ("Failed to create
+                // image slot"), stalling the main thread (the swap-time hang).
+                // Lazy only realises the visible paragraphs.
+                LazyVStack(alignment: .leading, spacing: 8) {
                     ForEach(paras) { para in
                         paragraphView(para)
                             .frame(maxWidth: .infinity, alignment: .leading)
