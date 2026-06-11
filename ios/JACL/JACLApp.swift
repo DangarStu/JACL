@@ -18,7 +18,9 @@ struct JACLApp: App {
         // otherwise raise SIGPIPE and kill the whole app. Ignore it process-
         // wide so those writes just fail with EPIPE instead.
         signal(SIGPIPE, SIG_IGN)
-        GameLibrary.installBundledStarters()
+        // NB: do NOT seed bundled games here -- installBundledStarters() unzips
+        // on first launch and would block the main thread before any UI paints
+        // (a ~10s black screen on a fresh install). The shelf does it in .task.
     }
 
     var body: some Scene {
@@ -44,7 +46,8 @@ struct JACLApp: App {
 // MARK: - Shelf
 
 struct GameShelfView: View {
-    @State private var games: [Game] = GameLibrary.games()
+    @State private var games: [Game] = []
+    @State private var loaded = false
     @State private var importing = false
     @State private var showingSettings = false
 
@@ -64,16 +67,24 @@ struct GameShelfView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if games.isEmpty {
+                if !loaded {
+                    ProgressView("Loading…")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if games.isEmpty {
                     ContentUnavailableView(
                         "No games yet",
                         systemImage: "books.vertical",
                         description: Text("Tap + to import a JACL game (.j2) from Files."))
                 } else {
+                    // Value-based navigation: each pushed GameView is keyed to a
+                    // distinct Game, so its @StateObject bridge / @State started
+                    // are fresh per game. The older `NavigationLink { GameView }`
+                    // form let SwiftUI share one destination's state across games.
                     List(games) { game in
-                        NavigationLink(game.title) {
-                            GameView(gamePath: game.url.path)
-                        }
+                        NavigationLink(game.title, value: game)
+                    }
+                    .navigationDestination(for: Game.self) { game in
+                        GameView(gamePath: game.url.path)
                     }
                 }
             }
@@ -125,6 +136,19 @@ struct GameShelfView: View {
                     games = GameLibrary.games()
                 }
                 #endif
+            }
+            .task {
+                guard !loaded else { return }
+                // First launch seeds the bundled starters (a zip unpack) and the
+                // title scan reads every .j2. Do both off the main thread so the
+                // shelf paints immediately (ProgressView) instead of a ~10s black
+                // screen, then publish the result.
+                let result = await Task.detached(priority: .userInitiated) { () -> [Game] in
+                    GameLibrary.installBundledStarters()
+                    return GameLibrary.games()
+                }.value
+                games = result
+                loaded = true
             }
         }
     }

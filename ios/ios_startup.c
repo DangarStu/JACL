@@ -86,6 +86,9 @@ jacl_ios_gamepath(void)
 int
 jacl_ios_prepare(const char *path)
 {
+	fprintf(stderr, "JDBG jacl_ios_prepare path=%s game_stream=%p\n",
+	        path ? path : "(null)", (void *)game_stream);
+
 	/* Idempotent: if we already opened a game stream, a second call (e.g.
 	 * the app calling us directly AND the backend running
 	 * glkunix_startup_code) is a no-op rather than a double-load. */

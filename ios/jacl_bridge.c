@@ -36,6 +36,9 @@ const char *jacl_interpreter_version(void)
 
 int jacl_bridge_run(const char *gamepath, int io_fd)
 {
+	fprintf(stderr, "JDBG jacl_bridge_run gamepath=%s io_fd=%d\n",
+	        gamepath ? gamepath : "(null)", io_fd);
+
 	/* Tell the start-up shim which .j2 to open. glkunix_startup_code()
 	 * reads this back via ios_gamepath (see ios_startup.c). */
 	jacl_ios_set_gamepath(gamepath);
