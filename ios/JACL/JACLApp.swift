@@ -99,9 +99,11 @@ struct GameShelfView: View {
                 // (which a low opacity over the light system background gives).
                 ZStack {
                     Color.black
+                    // Fit the square artwork to the width (full image, centred),
+                    // leaving black gaps above and below rather than cropping it.
                     Image("ShelfArtwork")
                         .resizable()
-                        .scaledToFill()
+                        .scaledToFit()
                         .opacity(0.55)
                     Color.black.opacity(0.4)
                 }
