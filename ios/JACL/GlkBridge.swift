@@ -64,12 +64,20 @@ final class GlkBridge: ObservableObject {
     /// at a time; starting a new game force-stops this one first.
     static weak var active: GlkBridge?
 
+    /// The game this bridge is running (for JDBG logging).
+    private var gameLabel = "?"
+
     // MARK: Lifecycle
 
     /// Launch `gamePath` (an absolute .j2 path in the sandbox) and send the
     /// initial metrics for a display of `size` points.
     func start(gamePath: String, size: CGSize) {
-        NSLog("JDBG GlkBridge.start path=%@", (gamePath as NSString).lastPathComponent)
+        gameLabel = (gamePath as NSString).lastPathComponent
+        NSLog("JDBG GlkBridge.start path=%@", gameLabel)
+        // Drop the previous game's cached blorb images -- the cache is keyed by
+        // resource number, so this game's image 1 would otherwise show the last
+        // game's image 1 (grail rendering the Down Dragon banner).
+        BlorbImageCache.shared.clear()
         // Force-stop whatever terp was running before this one. GameView's
         // onDisappear normally does it, but that's unreliable on a navigation
         // pop (the view lives inside a GeometryReader), which would leave the
@@ -211,6 +219,13 @@ final class GlkBridge: ObservableObject {
             return
         }
         if let gen = update.gen { generation = gen }
+
+        let snippet = (update.content ?? []).flatMap { c -> [String] in
+            ((c.text ?? []).flatMap { ($0.content ?? []).compactMap { $0.text } })
+            + ((c.lines ?? []).flatMap { ($0.content ?? []).compactMap { $0.text } })
+        }.joined(separator: " ")
+        NSLog("JDBG apply bridge=%@ wins=%d txt='%@'", gameLabel,
+              update.windows?.count ?? -1, String(snippet.prefix(70)))
 
         if let ws = update.windows {
             windows = ws

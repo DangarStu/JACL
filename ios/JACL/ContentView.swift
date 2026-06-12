@@ -24,6 +24,12 @@ final class BlorbImageCache {
         store[num] = img
         return img
     }
+
+    /// Drop all cached images. MUST be called when switching games: the cache
+    /// is keyed by blorb resource number only, and every game numbers its title
+    /// image #1 etc., so without this the new game's "draw image 1" returns the
+    /// PREVIOUS game's cached image (e.g. grail showing the Down Dragon banner).
+    func clear() { store.removeAll() }
 }
 
 struct GameView: View {

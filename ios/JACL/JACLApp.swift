@@ -175,24 +175,21 @@ struct GameShelfView: View {
     /// go back, open another" without a human tapping.
     private func runSwapTestIfRequested() {
         guard ProcessInfo.processInfo.arguments.contains("-swaptest"), games.count >= 2 else { return }
-        // Alternate the two games several times, popping to the shelf between
-        // each, to confirm every swap loads the *right* game (not the first one
-        // again) and that each previous terp exits (no accumulation/slowdown).
-        let sequence = [games[0], games[1], games[0], games[1]]
-        func step(_ i: Int) {
-            guard i < sequence.count else {
-                NSLog("JDBG SWAPTEST done; exiting")
-                exit(0)   // ends --console-pipe so the captured trace closes
-            }
-            NSLog("JDBG SWAPTEST push #%d %@", i + 1, sequence[i].title)
-            navPath = [sequence[i]]
-            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                NSLog("JDBG SWAPTEST pop")
-                navPath = []
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2) { step(i + 1) }
+        // Reproduce the failing swap -- dragon, back, grail -- then SETTLE on
+        // grail (no exit) so a screenshot can confirm grail shows grail's title
+        // image, not the cached Down Dragon banner.
+        let dragon = games.first { $0.url.lastPathComponent.hasPrefix("dragon") } ?? games[0]
+        let grail  = games.first { $0.url.lastPathComponent.hasPrefix("grail") }  ?? games[1]
+        NSLog("JDBG SWAPTEST push dragon")
+        navPath = [dragon]
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+            NSLog("JDBG SWAPTEST pop")
+            navPath = []
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                NSLog("JDBG SWAPTEST push grail (settling for screenshot)")
+                navPath = [grail]
             }
         }
-        step(0)
     }
     #endif
 }
