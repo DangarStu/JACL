@@ -38,6 +38,9 @@ struct GameView: View {
     @StateObject private var bridge = GlkBridge()
     @State private var inputText = ""
     @State private var started = false
+    /// True if a `*_words.csv` dictionary is bundled next to this game, which
+    /// enables tap-a-word lookup. Computed once on appear.
+    @State private var hasDictionary = false
     @FocusState private var inputFocused: Bool
 
     // DEBUG-only scripted input (via `-autocommands "no;look;…"`), used to
@@ -63,6 +66,10 @@ struct GameView: View {
             .onAppear {
                 guard !started else { return }
                 started = true
+                // A dictionary lives at <gameDir>/data/<lang>_words.csv.
+                let dataDir = (gamePath as NSString).deletingLastPathComponent + "/data"
+                hasDictionary = ((try? FileManager.default.contentsOfDirectory(atPath: dataDir)) ?? [])
+                    .contains { $0.hasSuffix("_words.csv") }
                 bridge.start(gamePath: gamePath, size: geo.size)
             }
             .onDisappear {
@@ -132,28 +139,15 @@ struct GameView: View {
                .trimmingCharacters(in: .whitespacesAndNewlines).count <= 2 {
             paras.removeLast()
         }
-        return ScrollViewReader { proxy in
-            ScrollView {
-                // LazyVStack, not VStack: a long transcript in a plain VStack
-                // lays out every paragraph eagerly and the content layer grows
-                // past CoreAnimation's max backing-store size ("Failed to create
-                // image slot"), stalling the main thread (the swap-time hang).
-                // Lazy only realises the visible paragraphs.
-                LazyVStack(alignment: .leading, spacing: 8) {
-                    ForEach(paras) { para in
-                        paragraphView(para)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .id(para.id)
-                    }
-                }
-                .padding()
-            }
-            .onChange(of: paras.count) { _, _ in
-                if let last = paras.last {
-                    withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
-                }
-            }
-        }
+        // A UITextView (not SwiftUI Text) so the transcript can be selected and
+        // copied, and so a tap can resolve to the word under it for dictionary
+        // lookup. Lookup is enabled only when the game bundles a dictionary and
+        // we're at a command prompt; UITextView also handles long transcripts
+        // efficiently (TextKit), so it sidesteps the old backing-store overflow.
+        return TranscriptTextView(
+            paragraphs: paras,
+            lookupEnabled: hasDictionary && bridge.pendingInput?.type == "line",
+            onLookup: { bridge.lookUp($0) })
     }
 
     // MARK: Input
@@ -202,36 +196,8 @@ struct GameView: View {
         spans.reduce(Text("")) { $0 + styled($1) }
     }
 
-    private func paragraphText(_ para: RenderedParagraph) -> Text {
-        para.spans.reduce(Text("")) { $0 + styled($1) }
-    }
-
-    /// A buffer paragraph. If it contains an image span, lay the spans out
-    /// vertically (images become Image views); otherwise take the fast path of
-    /// a single concatenated Text.
-    @ViewBuilder
-    private func paragraphView(_ para: RenderedParagraph) -> some View {
-        if para.spans.contains(where: { $0.image != nil }) {
-            VStack(alignment: .leading, spacing: 6) {
-                ForEach(para.spans) { span in
-                    if let num = span.image {
-                        if let img = BlorbImageCache.shared.image(num) {
-                            Image(uiImage: img)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(maxWidth: .infinity, alignment: .center)
-                        }
-                    } else if !span.text.isEmpty {
-                        styled(span)
-                    }
-                }
-            }
-        } else {
-            paragraphText(para)
-        }
-    }
-
-    /// Map a Glk style name to SwiftUI text styling.
+    /// Map a Glk style name to SwiftUI text styling (used by the grid window;
+    /// the buffer transcript renders via TranscriptTextView).
     private func styled(_ span: RenderedSpan) -> Text {
         var t = Text(span.text)
         switch span.style {
@@ -247,5 +213,121 @@ struct GameView: View {
             t = t.foregroundColor(.accentColor).underline()
         }
         return t
+    }
+}
+
+// MARK: - Transcript (UITextView: selection/copy + tap-to-lookup)
+
+/// The scrolling game transcript, in a UITextView so it can be selected and
+/// copied, and (for dictionary games) so a tap resolves to the word under it.
+/// UITextView/TextKit also paginates long transcripts efficiently.
+struct TranscriptTextView: UIViewRepresentable {
+    let paragraphs: [RenderedParagraph]
+    let lookupEnabled: Bool
+    let onLookup: (String) -> Void
+
+    func makeUIView(context: Context) -> UITextView {
+        let tv = UITextView()
+        tv.isEditable = false
+        tv.isSelectable = true
+        tv.backgroundColor = .clear
+        tv.textContainerInset = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
+        tv.alwaysBounceVertical = true
+        let tap = UITapGestureRecognizer(target: context.coordinator,
+                                         action: #selector(Coordinator.handleTap(_:)))
+        tap.cancelsTouchesInView = false   // don't swallow selection or scrolling
+        tv.addGestureRecognizer(tap)
+        return tv
+    }
+
+    func updateUIView(_ tv: UITextView, context: Context) {
+        context.coordinator.lookupEnabled = lookupEnabled
+        context.coordinator.onLookup = onLookup
+        // Rebuild only when the text actually changed, so an in-progress
+        // selection isn't dropped by an unrelated SwiftUI update.
+        let lastLen = paragraphs.last?.spans.reduce(0) { $0 + $1.text.count } ?? 0
+        let sig = "\(paragraphs.count)|\(lastLen)"
+        guard sig != context.coordinator.lastSig else { return }
+        context.coordinator.lastSig = sig
+        tv.attributedText = Self.attributed(paragraphs,
+                                            baseFont: UIFont.preferredFont(forTextStyle: .body))
+        DispatchQueue.main.async {
+            guard tv.attributedText.length > 0 else { return }
+            tv.scrollRangeToVisible(NSRange(location: tv.attributedText.length - 1, length: 1))
+        }
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
+    final class Coordinator: NSObject {
+        var lookupEnabled = false
+        var onLookup: (String) -> Void = { _ in }
+        var lastSig = ""
+
+        @objc func handleTap(_ g: UITapGestureRecognizer) {
+            guard lookupEnabled, let tv = g.view as? UITextView else { return }
+            if let sel = tv.selectedTextRange, !sel.isEmpty { return }   // selecting -> leave it
+            let pt = g.location(in: tv)
+            guard let pos = tv.closestPosition(to: pt) else { return }
+            for dir in [UITextDirection.storage(.forward), UITextDirection.storage(.backward)] {
+                if let range = tv.tokenizer.rangeEnclosingPosition(pos, with: .word, inDirection: dir),
+                   let word = tv.text(in: range), !word.isEmpty {
+                    onLookup(word)
+                    return
+                }
+            }
+        }
+    }
+
+    private static func attributed(_ paragraphs: [RenderedParagraph],
+                                   baseFont: UIFont) -> NSAttributedString {
+        let out = NSMutableAttributedString()
+        let maxImageW = UIScreen.main.bounds.width - 24
+        for (i, para) in paragraphs.enumerated() {
+            if i > 0 { out.append(NSAttributedString(string: "\n\n")) }
+            for span in para.spans {
+                if let num = span.image, let img = BlorbImageCache.shared.image(num) {
+                    let att = NSTextAttachment()
+                    att.image = img
+                    let scale = min(1, maxImageW / max(1, img.size.width))
+                    att.bounds = CGRect(x: 0, y: 0,
+                                        width: img.size.width * scale,
+                                        height: img.size.height * scale)
+                    out.append(NSAttributedString(attachment: att))
+                } else if !span.text.isEmpty {
+                    out.append(span.attributedString(baseFont: baseFont))
+                }
+            }
+        }
+        return out
+    }
+}
+
+private extension RenderedSpan {
+    /// NSAttributedString form of GameView.styled (Glk style -> text attributes).
+    func attributedString(baseFont: UIFont) -> NSAttributedString {
+        var font = baseFont
+        var color = UIColor.label
+        var underline = false
+        switch style {
+        case "header", "subheader": font = baseFont.withTraits(.traitBold)
+        case "emphasized", "note":  font = baseFont.withTraits(.traitItalic)
+        case "alert":               color = .systemRed
+        case "input":               color = .tintColor
+        case "preformatted", "user1", "user2":
+            font = .monospacedSystemFont(ofSize: baseFont.pointSize, weight: .regular)
+        default: break
+        }
+        if hyperlink != nil { color = .tintColor; underline = true }
+        var attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: color]
+        if underline { attrs[.underlineStyle] = NSUnderlineStyle.single.rawValue }
+        return NSAttributedString(string: text, attributes: attrs)
+    }
+}
+
+private extension UIFont {
+    func withTraits(_ traits: UIFontDescriptor.SymbolicTraits) -> UIFont {
+        guard let d = fontDescriptor.withSymbolicTraits(traits) else { return self }
+        return UIFont(descriptor: d, size: pointSize)
     }
 }
