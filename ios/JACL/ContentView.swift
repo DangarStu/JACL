@@ -62,6 +62,15 @@ struct GameView: View {
                 bridge.start(gamePath: gamePath, size: geo.size)
             }
             .onDisappear {
+                #if DEBUG
+                // `-noOnDisappearStop` reproduces the real-tap failure (where
+                // this back-pop onDisappear doesn't fire) so the force-stop in
+                // GlkBridge.start() can be verified as the actual safety net.
+                if ProcessInfo.processInfo.arguments.contains("-noOnDisappearStop") {
+                    NSLog("JDBG onDisappear stop SUPPRESSED (test)")
+                    return
+                }
+                #endif
                 // Leaving the game (back to the shelf): stop this terp so its
                 // thread exits and frees the shared JACL/RemGlk globals before
                 // another game starts. Without this, swapping games leaves two

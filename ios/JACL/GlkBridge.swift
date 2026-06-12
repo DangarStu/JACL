@@ -60,12 +60,27 @@ final class GlkBridge: ObservableObject {
     // (the init event would never reach the terp -> blank screen / deadlock).
     private let writerQueue = DispatchQueue(label: "jacl.remglk.writer")
 
+    /// The terp that currently owns the shared stdin/stdout. Only one may run
+    /// at a time; starting a new game force-stops this one first.
+    static weak var active: GlkBridge?
+
     // MARK: Lifecycle
 
     /// Launch `gamePath` (an absolute .j2 path in the sandbox) and send the
     /// initial metrics for a display of `size` points.
     func start(gamePath: String, size: CGSize) {
         NSLog("JDBG GlkBridge.start path=%@", (gamePath as NSString).lastPathComponent)
+        // Force-stop whatever terp was running before this one. GameView's
+        // onDisappear normally does it, but that's unreliable on a navigation
+        // pop (the view lives inside a GeometryReader), which would leave the
+        // previous game's terp alive to hijack this game's shared stdin/stdout
+        // -- "running grail but showing dragon". The C-side gate then makes this
+        // terp wait until that one has actually exited.
+        if let prev = GlkBridge.active, prev !== self {
+            NSLog("JDBG GlkBridge.start force-stopping previous terp")
+            prev.stop()
+        }
+        GlkBridge.active = self
         var fds: [Int32] = [0, 0]
         guard socketpair(AF_UNIX, SOCK_STREAM, 0, &fds) == 0 else {
             NSLog("GlkBridge: socketpair failed")

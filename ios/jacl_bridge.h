@@ -38,6 +38,11 @@ const void *jacl_bridge_image(unsigned int num, unsigned int *len);
  * confirm at a glance which build is actually running. */
 const char *jacl_interpreter_version(void);
 
+/* Called from every terp exit path (glk_exit / fatal / fast_exit) just before
+ * pthread_exit(), to release the one-terp-at-a-time gate so the next game's
+ * jacl_bridge_run() may proceed. See jacl_bridge.c. */
+void jacl_bridge_mark_terp_exited(void);
+
 #ifdef __cplusplus
 }
 #endif
