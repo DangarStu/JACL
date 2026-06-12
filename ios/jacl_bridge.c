@@ -63,14 +63,10 @@ void jacl_bridge_mark_terp_exited(void)
 	terp_live = 0;
 	pthread_cond_broadcast(&terp_gone);
 	pthread_mutex_unlock(&terp_gate);
-	fprintf(stderr, "JDBG terp gate: released\n");
 }
 
 int jacl_bridge_run(const char *gamepath, int io_fd)
 {
-	fprintf(stderr, "JDBG jacl_bridge_run gamepath=%s io_fd=%d\n",
-	        gamepath ? gamepath : "(null)", io_fd);
-
 	/* Wait for any previous terp to fully exit before claiming the shared
 	 * stdin/stdout below -- otherwise two terps race on the same fds and the
 	 * older one hijacks this game's window. Bounded so a stuck terp can't
@@ -80,10 +76,8 @@ int jacl_bridge_run(const char *gamepath, int io_fd)
 		struct timespec deadline;
 		clock_gettime(CLOCK_REALTIME, &deadline);
 		deadline.tv_sec += 3;
-		fprintf(stderr, "JDBG terp gate: waiting for previous terp\n");
 		while (terp_live) {
 			if (pthread_cond_timedwait(&terp_gone, &terp_gate, &deadline) != 0) {
-				fprintf(stderr, "JDBG terp gate: TIMEOUT, proceeding\n");
 				break;
 			}
 		}

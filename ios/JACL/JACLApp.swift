@@ -48,7 +48,6 @@ struct JACLApp: App {
 struct GameShelfView: View {
     @State private var games: [Game] = []
     @State private var loaded = false
-    @State private var navPath: [Game] = []
     @State private var importing = false
     @State private var showingSettings = false
 
@@ -66,7 +65,7 @@ struct GameShelfView: View {
     }()
 
     var body: some View {
-        NavigationStack(path: $navPath) {
+        NavigationStack {
             Group {
                 if !loaded {
                     ProgressView("Loading…")
@@ -161,37 +160,9 @@ struct GameShelfView: View {
                 }.value
                 games = result
                 loaded = true
-                #if DEBUG
-                runSwapTestIfRequested()
-                #endif
             }
         }
     }
-
-    #if DEBUG
-    /// `simctl launch … -swaptest`: drive a game swap headlessly so the JDBG
-    /// trace can be read off the Simulator console. Push games[0], wait, pop
-    /// back to the shelf, then push games[1] -- reproducing "open one game,
-    /// go back, open another" without a human tapping.
-    private func runSwapTestIfRequested() {
-        guard ProcessInfo.processInfo.arguments.contains("-swaptest"), games.count >= 2 else { return }
-        // Reproduce the failing swap -- dragon, back, grail -- then SETTLE on
-        // grail (no exit) so a screenshot can confirm grail shows grail's title
-        // image, not the cached Down Dragon banner.
-        let dragon = games.first { $0.url.lastPathComponent.hasPrefix("dragon") } ?? games[0]
-        let grail  = games.first { $0.url.lastPathComponent.hasPrefix("grail") }  ?? games[1]
-        NSLog("JDBG SWAPTEST push dragon")
-        navPath = [dragon]
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-            NSLog("JDBG SWAPTEST pop")
-            navPath = []
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                NSLog("JDBG SWAPTEST push grail (settling for screenshot)")
-                navPath = [grail]
-            }
-        }
-    }
-    #endif
 }
 
 // MARK: - Sandbox game storage

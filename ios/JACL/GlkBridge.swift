@@ -64,16 +64,11 @@ final class GlkBridge: ObservableObject {
     /// at a time; starting a new game force-stops this one first.
     static weak var active: GlkBridge?
 
-    /// The game this bridge is running (for JDBG logging).
-    private var gameLabel = "?"
-
     // MARK: Lifecycle
 
     /// Launch `gamePath` (an absolute .j2 path in the sandbox) and send the
     /// initial metrics for a display of `size` points.
     func start(gamePath: String, size: CGSize) {
-        gameLabel = (gamePath as NSString).lastPathComponent
-        NSLog("JDBG GlkBridge.start path=%@", gameLabel)
         // Drop the previous game's cached blorb images -- the cache is keyed by
         // resource number, so this game's image 1 would otherwise show the last
         // game's image 1 (grail rendering the Down Dragon banner).
@@ -85,7 +80,6 @@ final class GlkBridge: ObservableObject {
         // -- "running grail but showing dragon". The C-side gate then makes this
         // terp wait until that one has actually exited.
         if let prev = GlkBridge.active, prev !== self {
-            NSLog("JDBG GlkBridge.start force-stopping previous terp")
             prev.stop()
         }
         GlkBridge.active = self
@@ -120,7 +114,6 @@ final class GlkBridge: ObservableObject {
     /// which is only safe because the previous terp has been stopped first.
     func stop() {
         let fd = appFD
-        NSLog("JDBG GlkBridge.stop appFD=%d", fd)
         guard fd >= 0 else { return }
         appFD = -1
         shutdown(fd, SHUT_RDWR)
@@ -219,13 +212,6 @@ final class GlkBridge: ObservableObject {
             return
         }
         if let gen = update.gen { generation = gen }
-
-        let snippet = (update.content ?? []).flatMap { c -> [String] in
-            ((c.text ?? []).flatMap { ($0.content ?? []).compactMap { $0.text } })
-            + ((c.lines ?? []).flatMap { ($0.content ?? []).compactMap { $0.text } })
-        }.joined(separator: " ")
-        NSLog("JDBG apply bridge=%@ wins=%d txt='%@'", gameLabel,
-              update.windows?.count ?? -1, String(snippet.prefix(70)))
 
         if let ws = update.windows {
             windows = ws
