@@ -77,6 +77,7 @@ void glk_exit()
     /* The terp runs on a background thread; exit() would kill the whole app.
      * End just this thread -- GlkBridge sees the socket close and tears down.
      * Desktop sims don't define JACL_IOS_EMBED, so they exit() as before. */
+    { extern void jacl_bridge_mark_terp_exited(void); jacl_bridge_mark_terp_exited(); }
     pthread_exit(NULL);
 #else
     exit(0);
@@ -198,6 +199,7 @@ void gli_display_error(char *msg)
     printf("\n"); /* blank line after stanza */
     fflush(stdout);
 #ifdef JACL_IOS_EMBED
+    { extern void jacl_bridge_mark_terp_exited(void); jacl_bridge_mark_terp_exited(); }
     pthread_exit(NULL);   /* a fatal ends the terp thread, not the whole app */
 #else
     exit(1);

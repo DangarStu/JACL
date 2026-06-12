@@ -86,18 +86,29 @@ struct GameShelfView: View {
                     }
                     .scrollContentBackground(.hidden)   // let the artwork show through
                     .navigationDestination(for: Game.self) { game in
+                        // Keep the in-game transcript on the light theme; only
+                        // the shelf goes dark for the watermark.
                         GameView(gamePath: game.url.path)
+                            .preferredColorScheme(.light)
                     }
                 }
             }
             .background {
-                // The app artwork as a muted watermark behind the shelf.
-                Image("ShelfArtwork")
-                    .resizable()
-                    .scaledToFill()
-                    .opacity(0.15)
-                    .ignoresSafeArea()
-                    .allowsHitTesting(false)
+                // App artwork as a dark, muted watermark behind the shelf: the
+                // full image dimmed under a black scrim, rather than a pale wash
+                // (which a low opacity over the light system background gives).
+                ZStack {
+                    Color.black
+                    // Fit the square artwork to the width (full image, centred),
+                    // leaving black gaps above and below rather than cropping it.
+                    Image("ShelfArtwork")
+                        .resizable()
+                        .scaledToFit()
+                        .opacity(0.55)
+                    Color.black.opacity(0.4)
+                }
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
             }
             .navigationTitle("JACL v\(Self.interpreterVersion)")
             .safeAreaInset(edge: .bottom) {
@@ -162,6 +173,7 @@ struct GameShelfView: View {
                 loaded = true
             }
         }
+        .preferredColorScheme(.dark)   // light text on the dark shelf watermark
     }
 }
 

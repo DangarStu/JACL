@@ -86,6 +86,7 @@ void gli_fast_exit()
 
     gli_streams_close_all();
 #ifdef JACL_IOS_EMBED
+    { extern void jacl_bridge_mark_terp_exited(void); jacl_bridge_mark_terp_exited(); }
     pthread_exit(NULL);   /* end the terp thread, not the whole app */
 #else
     exit(0);

@@ -14,6 +14,8 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <pthread.h>
+#include <time.h>
 #include "glk.h"
 #include "gi_blorb.h"
 #include "jacl_ios.h"
@@ -34,10 +36,54 @@ const char *jacl_interpreter_version(void)
     return buf;
 }
 
+/* ---- one-terp-at-a-time gate --------------------------------------------
+ *
+ * JACL + RemGlk keep all state in process globals and share the one pair of
+ * stdin/stdout the terp dup2()s its socket onto, so only ONE terp may run at a
+ * time. The terp ends via pthread_exit() (never returns; the app can't join a
+ * glk_exit), and the Swift onDisappear that closes the old socket is
+ * unreliable on a navigation pop -- so the previous game's terp can still be
+ * alive when the next starts. It then reads the NEW game's socket off the
+ * shared fd and renders the OLD game into the new window (the bug: "running
+ * grail but showing dragon").
+ *
+ * This gate closes the hole: jacl_bridge_mark_terp_exited() is called from
+ * every terp exit path (rgmisc.c glk_exit / fatal, rgwindow.c fast_exit), and
+ * jacl_bridge_run() blocks until the previous terp signals exit before it
+ * touches the shared stdio. The wait is bounded so a wedged terp can't hang
+ * the app. Combined with the Swift side force-stopping the previous terp when
+ * a new game starts, the old terp is guaranteed gone before the new one runs. */
+static pthread_mutex_t terp_gate = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t  terp_gone = PTHREAD_COND_INITIALIZER;
+static int             terp_live = 0;
+
+void jacl_bridge_mark_terp_exited(void)
+{
+	pthread_mutex_lock(&terp_gate);
+	terp_live = 0;
+	pthread_cond_broadcast(&terp_gone);
+	pthread_mutex_unlock(&terp_gate);
+}
+
 int jacl_bridge_run(const char *gamepath, int io_fd)
 {
-	fprintf(stderr, "JDBG jacl_bridge_run gamepath=%s io_fd=%d\n",
-	        gamepath ? gamepath : "(null)", io_fd);
+	/* Wait for any previous terp to fully exit before claiming the shared
+	 * stdin/stdout below -- otherwise two terps race on the same fds and the
+	 * older one hijacks this game's window. Bounded so a stuck terp can't
+	 * black-hole the app. */
+	pthread_mutex_lock(&terp_gate);
+	if (terp_live) {
+		struct timespec deadline;
+		clock_gettime(CLOCK_REALTIME, &deadline);
+		deadline.tv_sec += 3;
+		while (terp_live) {
+			if (pthread_cond_timedwait(&terp_gone, &terp_gate, &deadline) != 0) {
+				break;
+			}
+		}
+	}
+	terp_live = 1;
+	pthread_mutex_unlock(&terp_gate);
 
 	/* Tell the start-up shim which .j2 to open. glkunix_startup_code()
 	 * reads this back via ios_gamepath (see ios_startup.c). */
