@@ -80,9 +80,15 @@ struct GameShelfView: View {
                     // distinct Game, so its @StateObject bridge / @State started
                     // are fresh per game. The older `NavigationLink { GameView }`
                     // form let SwiftUI share one destination's state across games.
-                    List(games) { game in
-                        NavigationLink(game.title, value: game)
-                            .listRowBackground(Color.clear)
+                    List {
+                        ForEach(games) { game in
+                            NavigationLink(game.title, value: game)
+                                .listRowBackground(Color.clear)
+                        }
+                        .onDelete { offsets in
+                            offsets.map { games[$0] }.forEach(GameLibrary.delete)
+                            games.remove(atOffsets: offsets)
+                        }
                     }
                     .scrollContentBackground(.hidden)   // let the artwork show through
                     .navigationDestination(for: Game.self) { game in
@@ -129,6 +135,9 @@ struct GameShelfView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { importing = true } label: { Image(systemName: "plus") }
                         .accessibilityLabel("Import game")
+                }
+                if !games.isEmpty {
+                    ToolbarItem(placement: .topBarTrailing) { EditButton() }
                 }
             }
             .sheet(isPresented: $showingSettings) { SettingsView() }
@@ -232,15 +241,37 @@ enum GameLibrary {
         return ext == "j2" ? dest : nil
     }
 
+    /// Delete a game: its `.j2` and matching `.blorb`. Shared dictionaries in
+    /// data/ are left alone -- other games of the same language may use them.
+    /// (To *update* a game, just re-import the new .jaclgame: the importer
+    /// overwrites the same-named .j2/.blorb and adds any new data/ files.)
+    static func delete(_ game: Game) {
+        let fm = FileManager.default
+        try? fm.removeItem(at: game.url)
+        try? fm.removeItem(at: game.url.deletingPathExtension().appendingPathExtension("blorb"))
+    }
+
     /// Unpack a `.jaclgame` (zip of `.j2` [+ `.blorb`]) into Documents/.
     private static func unpack(_ url: URL) throws -> URL? {
         let entries = try MiniZip.entries(of: Data(contentsOf: url))
         var game: URL?
         for entry in entries {
-            let name = (entry.name as NSString).lastPathComponent
-            let ext = (name as NSString).pathExtension.lowercased()
-            guard ext == "j2" || ext == "blorb" else { continue }   // ignore stray files
-            let dest = documents.appendingPathComponent(name)
+            let base = (entry.name as NSString).lastPathComponent
+            let ext = (base as NSString).pathExtension.lowercased()
+            let dest: URL
+            switch ext {
+            case "j2", "blorb":
+                dest = documents.appendingPathComponent(base)   // flat at the sandbox root
+            case "csv":
+                // A dictionary for the click-to-define feature. The interpreter
+                // opens it as `data/<lang>_words.csv` under the game dir, so it
+                // must land in Documents/data/, not the root.
+                let dataDir = documents.appendingPathComponent("data", isDirectory: true)
+                try? FileManager.default.createDirectory(at: dataDir, withIntermediateDirectories: true)
+                dest = dataDir.appendingPathComponent(base)
+            default:
+                continue   // ignore stray files
+            }
             try? FileManager.default.removeItem(at: dest)
             try entry.data.write(to: dest)
             if ext == "j2" { game = dest }
