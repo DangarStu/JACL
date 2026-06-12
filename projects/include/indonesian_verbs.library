@@ -693,7 +693,7 @@ iterate "indonesian_words.csv" skip_header
    endif
 enditerate
 if kata_ditemukan = false
-   write "Kata ~" $string "~ tidak ditemukan.^"
+   write "The word ~" $string "~ is not in the dictionary.^"
 endif
 set time = false
 }
