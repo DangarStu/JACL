@@ -233,10 +233,7 @@ struct TranscriptTextView: UIViewRepresentable {
         tv.backgroundColor = .clear
         tv.textContainerInset = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
         tv.alwaysBounceVertical = true
-        let tap = UITapGestureRecognizer(target: context.coordinator,
-                                         action: #selector(Coordinator.handleTap(_:)))
-        tap.cancelsTouchesInView = false   // don't swallow selection or scrolling
-        tv.addGestureRecognizer(tap)
+        tv.delegate = context.coordinator   // adds the "Define" edit-menu item
         return tv
     }
 
@@ -259,23 +256,22 @@ struct TranscriptTextView: UIViewRepresentable {
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
-    final class Coordinator: NSObject {
+    final class Coordinator: NSObject, UITextViewDelegate {
         var lookupEnabled = false
         var onLookup: (String) -> Void = { _ in }
         var lastSig = ""
 
-        @objc func handleTap(_ g: UITapGestureRecognizer) {
-            guard lookupEnabled, let tv = g.view as? UITextView else { return }
-            if let sel = tv.selectedTextRange, !sel.isEmpty { return }   // selecting -> leave it
-            let pt = g.location(in: tv)
-            guard let pos = tv.closestPosition(to: pt) else { return }
-            for dir in [UITextDirection.storage(.forward), UITextDirection.storage(.backward)] {
-                if let range = tv.tokenizer.rangeEnclosingPosition(pos, with: .word, inDirection: dir),
-                   let word = tv.text(in: range), !word.isEmpty {
-                    onLookup(word)
-                    return
-                }
-            }
+        // Long-press selects a word and opens the edit menu; for dictionary
+        // games, add a "Define" item next to Copy that looks up the selection.
+        func textView(_ textView: UITextView, editMenuForTextIn range: NSRange,
+                      suggestedActions: [UIMenuElement]) -> UIMenu? {
+            guard lookupEnabled, range.length > 0 else { return nil }
+            let sel = (textView.text as NSString).substring(with: range)
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            // Only a single word is a valid lookup (matches the web).
+            guard !sel.isEmpty, !sel.contains(" ") else { return nil }
+            let define = UIAction(title: "Define") { [weak self] _ in self?.onLookup(sel) }
+            return UIMenu(children: [define] + suggestedActions)
         }
     }
 
