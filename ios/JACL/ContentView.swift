@@ -130,7 +130,19 @@ struct GameView: View {
     // MARK: Buffer window (scrolling transcript), auto-scrolled to bottom
 
     private func bufferView(id: Int) -> some View {
-        let paras = bridge.buffers[id] ?? []
+        var paras = bridge.buffers[id] ?? []
+        // While the game waits for a command, JACL has already written its bare
+        // prompt ("> ") as the trailing paragraph. Hide it: the input bar below
+        // is the live prompt, and the command is echoed back ("> look") on
+        // submit. Only drop a genuinely-short trailing line, so real output (or
+        // an already-echoed "> look") is never removed.
+        if bridge.pendingInput?.type == "line",
+           let last = paras.last,
+           last.spans.allSatisfy({ $0.image == nil }),
+           last.spans.map(\.text).joined()
+               .trimmingCharacters(in: .whitespacesAndNewlines).count <= 2 {
+            paras.removeLast()
+        }
         return ScrollViewReader { proxy in
             ScrollView {
                 // LazyVStack, not VStack: a long transcript in a plain VStack
@@ -158,17 +170,22 @@ struct GameView: View {
     // MARK: Input
 
     @ViewBuilder private var inputBar: some View {
-        if let req = bridge.pendingInput, req.type == "line" {
-            HStack {
-                TextField("…", text: $inputText)
-                    .textFieldStyle(.roundedBorder)
+        if bridge.pendingInput?.type == "line" {
+            // Console-style prompt: you type beside a ">", and the command is
+            // echoed into the transcript on submit (the bare ">" there is hidden
+            // by bufferView until then).
+            HStack(spacing: 6) {
+                Text(">").foregroundColor(.secondary)
+                TextField("", text: $inputText)
+                    .textFieldStyle(.plain)
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
                     .focused($inputFocused)
                     .onSubmit(submit)
                 Button("Enter", action: submit)
             }
-            .padding(8)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
         } else if bridge.pendingInput?.type == "char" {
             // A "press any key" / "[MORE]" pause. Rare now that the buffer is
             // reported tall, but handle it so the game can't get stuck.
