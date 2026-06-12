@@ -64,9 +64,12 @@ extern int			jpp_error;
 struct	string_type	*resolved_string;
 #endif
 
-char            include_directory[81] = "\0";
-char            temp_directory[81] = "\0";
-char            data_directory[81] = "\0";
+/* 512, not 81: these are game_path (256) + a subdir suffix. On a sandboxed
+ * iOS install game_path alone is ~135 chars, so 81 truncated data_directory
+ * mid-path and CSV/data lookups (iterate "x.csv") failed to open. */
+char            include_directory[512] = "\0";
+char            temp_directory[512] = "\0";
+char            data_directory[512] = "\0";
 char            special_prompt[81] = "\n: \0";
 char            file_prompt[5] = ": \0";
 char            bookmark[81] = "\0";
