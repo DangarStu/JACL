@@ -36,8 +36,11 @@ fi
 # DEFLATE archive. Checking here turns a missing archiver into one clear
 # message instead of a set -e abort partway through the first game.
 #   mkzip ARCHIVE FILE...   (run from the directory holding FILEs)
+# Paths are preserved (NOT junked): the .j2/.blorb are bare names at the root,
+# but a bundled dictionary lives at data/<lang>_words.csv and must keep that
+# prefix so the interpreter finds it under the game's data/ dir.
 if command -v zip >/dev/null 2>&1; then
-    mkzip() { zip -j -q "$@"; }
+    mkzip() { zip -q -X "$@"; }
 elif command -v python3 >/dev/null 2>&1; then
     mkzip() { python3 -m zipfile -c "$@"; }
 else
@@ -79,15 +82,29 @@ for game in "$projects"/*.jacl; do
     rm -f "$pkg"
     tmp=$(mktemp -d)
     cp "$j2" "$tmp/$name.j2"
+    files="$name.j2"
     if [ -f "$projects/$name.blorb" ]; then
         cp "$projects/$name.blorb" "$tmp/$name.blorb"
-        ( cd "$tmp" && mkzip "$name.jaclgame" "$name.j2" "$name.blorb" )
-    else
-        ( cd "$tmp" && mkzip "$name.jaclgame" "$name.j2" )
+        files="$files $name.blorb"
     fi
+
+    # Bundle the matching language dictionary for click-to-define. A game that
+    # includes <lang>_verbs.library runs `iterate "<lang>_words.csv"`, which the
+    # interpreter opens under the game's data/ dir -- so package the CSV at
+    # data/<lang>_words.csv. (french / german / spanish / indonesian.)
+    for lang in french german spanish indonesian; do
+        if grep -qE "#include[[:space:]]+\"?${lang}_verbs\.library" "$game" \
+           && [ -f "$projects/data/${lang}_words.csv" ]; then
+            mkdir -p "$tmp/data"
+            cp "$projects/data/${lang}_words.csv" "$tmp/data/${lang}_words.csv"
+            files="$files data/${lang}_words.csv"
+        fi
+    done
+
+    ( cd "$tmp" && mkzip "$name.jaclgame" $files )
     mv "$tmp/$name.jaclgame" "$pkg"
     rm -rf "$tmp"
     n=$((n + 1))
-    echo "  $name.jaclgame"
+    echo "  $name.jaclgame${files#$name.j2}"
 done
 echo "build-jaclgames: $n package(s) in $out"

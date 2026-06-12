@@ -136,6 +136,15 @@ final class GlkBridge: ObservableObject {
         pendingInput = nil
     }
 
+    /// Look up `word` in the game's bundled dictionary by submitting the game's
+    /// `lookup <word>` verb (same path the web uses on a word selection). The
+    /// definition is printed into the transcript. Only fires at a line prompt.
+    func lookUp(_ word: String) {
+        let clean = word.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        guard !clean.isEmpty else { return }
+        submitLine("lookup \(clean)")
+    }
+
     /// Submit a single character (for char input).
     func submitChar(_ value: String) {
         guard let req = pendingInput, req.type == "char" else { return }

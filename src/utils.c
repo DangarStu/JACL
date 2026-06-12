@@ -182,15 +182,15 @@ create_paths(char *full_path)
 	 * any time game_path was longer than ~72 chars -- easy to hit
 	 * with a deeper install layout. snprintf truncates instead. */
 	if (include_directory[0] == 0) {
-		snprintf(include_directory, 81, "%s%s", game_path, INCLUDE_DIR);
+		snprintf(include_directory, 512, "%s%s", game_path, INCLUDE_DIR);
 	}
 
 	if (temp_directory[0] == 0) {
-		snprintf(temp_directory, 81, "%s%s", game_path, TEMP_DIR);
+		snprintf(temp_directory, 512, "%s%s", game_path, TEMP_DIR);
 	}
 
 	if (data_directory[0] == 0) {
-		snprintf(data_directory, 81, "%s%s", game_path, DATA_DIR);
+		snprintf(data_directory, 512, "%s%s", game_path, DATA_DIR);
 	}
 }
 
