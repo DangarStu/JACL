@@ -698,7 +698,7 @@ iterate "spanish_words.csv" skip_header
    endif
 enditerate
 if palabra_encontrada = false
-   write "La palabra ~" $string "~ no se encontró.^"
+   write "The word ~" $string "~ is not in the dictionary.^"
 endif
 set time = false
 }

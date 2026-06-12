@@ -777,7 +777,7 @@ iterate "french_words.csv" skip_header
    endif
 enditerate
 if mot_trouve = false
-   write "Le mot ~" $string "~ n'est pas trouvé.^"
+   write "The word ~" $string "~ is not in the dictionary.^"
 endif
 set time = false
 }

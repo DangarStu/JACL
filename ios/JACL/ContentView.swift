@@ -32,15 +32,52 @@ final class BlorbImageCache {
     func clear() { store.removeAll() }
 }
 
+/// The bundled language glossary for a game: every `data/*_words.csv` merged
+/// into one lookup, loaded once for native long-press "Define". Keys are
+/// lowercased words/phrases; values are the English gloss. Matches the
+/// interpreter's CSV shape -- field[0] is the word (never quoted), field[1] the
+/// definition, which may be quoted because it can hold commas (e.g.
+/// `acara,"event, program"`).
+struct GameDictionary {
+    private let entries: [String: String]
+    var isEmpty: Bool { entries.isEmpty }
+
+    init(dataDir: String) {
+        var map: [String: String] = [:]
+        let files = ((try? FileManager.default.contentsOfDirectory(atPath: dataDir)) ?? [])
+            .filter { $0.hasSuffix("_words.csv") }
+        for file in files {
+            guard let text = try? String(contentsOfFile: "\(dataDir)/\(file)", encoding: .utf8)
+            else { continue }
+            var isHeader = true
+            for line in text.split(whereSeparator: \.isNewline) {
+                if isHeader { isHeader = false; continue }     // skip header row
+                guard let comma = line.firstIndex(of: ",") else { continue }
+                let key = line[..<comma].trimmingCharacters(in: .whitespaces).lowercased()
+                guard !key.isEmpty else { continue }
+                var def = line[line.index(after: comma)...].trimmingCharacters(in: .whitespaces)
+                if def.count >= 2, def.hasPrefix("\""), def.hasSuffix("\"") {
+                    def = String(def.dropFirst().dropLast())   // unquote a comma-bearing gloss
+                }
+                map[key] = def
+            }
+        }
+        entries = map
+    }
+
+    /// The gloss for `word` (case-insensitive), or nil if it isn't in any CSV.
+    func define(_ word: String) -> String? { entries[word.lowercased()] }
+}
+
 struct GameView: View {
     let gamePath: String
 
     @StateObject private var bridge = GlkBridge()
     @State private var inputText = ""
     @State private var started = false
-    /// True if a `*_words.csv` dictionary is bundled next to this game, which
-    /// enables tap-a-word lookup. Computed once on appear.
-    @State private var hasDictionary = false
+    /// The bundled language glossary (merged `data/*_words.csv`), if this game
+    /// ships one -- enables native long-press "Define". Loaded once on appear.
+    @State private var dictionary: GameDictionary?
     @FocusState private var inputFocused: Bool
 
     // DEBUG-only scripted input (via `-autocommands "no;look;…"`), used to
@@ -66,10 +103,11 @@ struct GameView: View {
             .onAppear {
                 guard !started else { return }
                 started = true
-                // A dictionary lives at <gameDir>/data/<lang>_words.csv.
+                // A dictionary lives at <gameDir>/data/<lang>_words.csv; load it
+                // once for native long-press "Define" (no command, no turn).
                 let dataDir = (gamePath as NSString).deletingLastPathComponent + "/data"
-                hasDictionary = ((try? FileManager.default.contentsOfDirectory(atPath: dataDir)) ?? [])
-                    .contains { $0.hasSuffix("_words.csv") }
+                let dict = GameDictionary(dataDir: dataDir)
+                dictionary = dict.isEmpty ? nil : dict
                 bridge.start(gamePath: gamePath, size: geo.size)
             }
             .onDisappear {
@@ -140,14 +178,12 @@ struct GameView: View {
             paras.removeLast()
         }
         // A UITextView (not SwiftUI Text) so the transcript can be selected and
-        // copied, and so a tap can resolve to the word under it for dictionary
-        // lookup. Lookup is enabled only when the game bundles a dictionary and
-        // we're at a command prompt; UITextView also handles long transcripts
-        // efficiently (TextKit), so it sidesteps the old backing-store overflow.
-        return TranscriptTextView(
-            paragraphs: paras,
-            lookupEnabled: hasDictionary && bridge.pendingInput?.type == "line",
-            onLookup: { bridge.lookUp($0) })
+        // copied, and so long-pressing a word can define it from the bundled
+        // glossary (a native popover -- no command echo, no turn, and it works
+        // any time, not just at a prompt). UITextView/TextKit also paginates
+        // long transcripts efficiently, sidestepping the old backing-store
+        // overflow.
+        return TranscriptTextView(paragraphs: paras, dictionary: dictionary)
     }
 
     // MARK: Input
@@ -223,8 +259,7 @@ struct GameView: View {
 /// UITextView/TextKit also paginates long transcripts efficiently.
 struct TranscriptTextView: UIViewRepresentable {
     let paragraphs: [RenderedParagraph]
-    let lookupEnabled: Bool
-    let onLookup: (String) -> Void
+    let dictionary: GameDictionary?
 
     func makeUIView(context: Context) -> UITextView {
         let tv = UITextView()
@@ -238,8 +273,7 @@ struct TranscriptTextView: UIViewRepresentable {
     }
 
     func updateUIView(_ tv: UITextView, context: Context) {
-        context.coordinator.lookupEnabled = lookupEnabled
-        context.coordinator.onLookup = onLookup
+        context.coordinator.dictionary = dictionary
         // Rebuild only when the text actually changed, so an in-progress
         // selection isn't dropped by an unrelated SwiftUI update.
         let lastLen = paragraphs.last?.spans.reduce(0) { $0 + $1.text.count } ?? 0
@@ -256,22 +290,62 @@ struct TranscriptTextView: UIViewRepresentable {
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
-    final class Coordinator: NSObject, UITextViewDelegate {
-        var lookupEnabled = false
-        var onLookup: (String) -> Void = { _ in }
+    final class Coordinator: NSObject, UITextViewDelegate, UIPopoverPresentationControllerDelegate {
+        var dictionary: GameDictionary?
         var lastSig = ""
 
-        // Long-press selects a word and opens the edit menu; for dictionary
-        // games, add a "Define" item next to Copy that looks up the selection.
+        // Long-press selects text and opens the edit menu; when the game ships a
+        // glossary, add a "Define" item next to Copy. Tapping it shows the gloss
+        // in a popover anchored to the selection -- no command, no turn, and it
+        // works any time (even mid-game), unlike the old `lookup` verb path.
         func textView(_ textView: UITextView, editMenuForTextIn range: NSRange,
                       suggestedActions: [UIMenuElement]) -> UIMenu? {
-            guard lookupEnabled, range.length > 0 else { return nil }
-            let sel = (textView.text as NSString).substring(with: range)
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-            // Only a single word is a valid lookup (matches the web).
-            guard !sel.isEmpty, !sel.contains(" ") else { return nil }
-            let define = UIAction(title: "Define") { [weak self] _ in self?.onLookup(sel) }
+            guard dictionary != nil, range.length > 0 else { return nil }
+            // Fold the selection into a lookup key: trim and collapse internal
+            // whitespace/line-wraps to single spaces, so a wrapped phrase still
+            // matches a CSV key like "abu abu". Cap the length so a giant
+            // multi-paragraph selection doesn't try to be a single word.
+            let key = (textView.text as NSString).substring(with: range)
+                .components(separatedBy: .whitespacesAndNewlines)
+                .filter { !$0.isEmpty }.joined(separator: " ")
+            guard !key.isEmpty, key.count <= 40 else { return nil }
+            let define = UIAction(title: "Define") { [weak self, weak textView] _ in
+                self?.define(key, in: textView)
+            }
             return UIMenu(children: [define] + suggestedActions)
+        }
+
+        private func define(_ word: String, in textView: UITextView?) {
+            guard let textView else { return }
+            let body = dictionary?.define(word).map { "\(word) — \($0)" }
+                ?? "“\(word)” isn’t in the dictionary."
+            let popover = DefinitionViewController(text: body)
+            popover.modalPresentationStyle = .popover
+            if let pop = popover.popoverPresentationController {
+                pop.sourceView = textView
+                pop.sourceRect = textView.selectedTextRange
+                    .map { textView.firstRect(for: $0) }
+                    ?? CGRect(x: textView.bounds.midX, y: textView.bounds.midY, width: 1, height: 1)
+                pop.permittedArrowDirections = [.up, .down]
+                pop.delegate = self
+            }
+            Coordinator.presenter(for: textView)?.present(popover, animated: true)
+        }
+
+        // Keep it a popover (arrow, anchored) even on compact widths, rather
+        // than letting iOS promote it to a full-screen sheet.
+        func adaptivePresentationStyle(for controller: UIPresentationController)
+            -> UIModalPresentationStyle { .none }
+
+        /// Nearest presenting view controller, walked up the responder chain
+        /// (the UITextView lives inside SwiftUI's UIHostingController).
+        private static func presenter(for view: UIView) -> UIViewController? {
+            var responder: UIResponder? = view
+            while let r = responder {
+                if let vc = r as? UIViewController { return vc }
+                responder = r.next
+            }
+            return view.window?.rootViewController
         }
     }
 
@@ -325,5 +399,43 @@ private extension UIFont {
     func withTraits(_ traits: UIFontDescriptor.SymbolicTraits) -> UIFont {
         guard let d = fontDescriptor.withSymbolicTraits(traits) else { return self }
         return UIFont(descriptor: d, size: pointSize)
+    }
+}
+
+// MARK: - Definition popover
+
+/// A small popover that shows a word's gloss for long-press "Define". Sizes
+/// itself to the text so the popover hugs the definition.
+private final class DefinitionViewController: UIViewController {
+    private let text: String
+    init(text: String) { self.text = text; super.init(nibName: nil, bundle: nil) }
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .secondarySystemBackground
+        let pad: CGFloat = 14
+        let maxTextWidth: CGFloat = 252
+        let font = UIFont.preferredFont(forTextStyle: .body)
+
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.text = text
+        label.font = font
+        label.preferredMaxLayoutWidth = maxTextWidth
+        label.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(label)
+        NSLayoutConstraint.activate([
+            label.topAnchor.constraint(equalTo: view.topAnchor, constant: pad),
+            label.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -pad),
+            label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: pad),
+            label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -pad),
+        ])
+        let textSize = (text as NSString).boundingRect(
+            with: CGSize(width: maxTextWidth, height: .greatestFiniteMagnitude),
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: [.font: font], context: nil)
+        preferredContentSize = CGSize(width: ceil(textSize.width) + pad * 2,
+                                      height: ceil(textSize.height) + pad * 2)
     }
 }

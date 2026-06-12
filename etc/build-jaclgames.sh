@@ -91,10 +91,14 @@ for game in "$projects"/*.jacl; do
     # Bundle the matching language dictionary for click-to-define. A game that
     # includes <lang>_verbs.library runs `iterate "<lang>_words.csv"`, which the
     # interpreter opens under the game's data/ dir -- so package the CSV at
-    # data/<lang>_words.csv. (french / german / spanish / indonesian.)
-    for lang in french german spanish indonesian; do
-        if grep -qE "#include[[:space:]]+\"?${lang}_verbs\.library" "$game" \
-           && [ -f "$projects/data/${lang}_words.csv" ]; then
+    # data/<lang>_words.csv. The language list is derived from the game's own
+    # #include lines (not hardcoded), so a new language just works once its
+    # <lang>_verbs.library and <lang>_words.csv exist. Plain `verbs.library`
+    # (English, no prefix) has no _verbs prefix to match, so it's skipped.
+    langs=$(grep -oE '#include[[:space:]]+"?[a-z]+_verbs\.library' "$game" \
+            | grep -oE '[a-z]+_verbs\.library' | sed 's/_verbs\.library$//' | sort -u)
+    for lang in $langs; do
+        if [ -f "$projects/data/${lang}_words.csv" ]; then
             mkdir -p "$tmp/data"
             cp "$projects/data/${lang}_words.csv" "$tmp/data/${lang}_words.csv"
             files="$files data/${lang}_words.csv"

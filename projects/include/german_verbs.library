@@ -741,7 +741,7 @@ iterate "german_words.csv" skip_header
    endif
 enditerate
 if wort_gefunden = false
-   write "Das Wort ~" $string "~ steht nicht im Wörterbuch.^"
+   write "The word ~" $string "~ is not in the dictionary.^"
 endif
 set time = false
 }

@@ -241,20 +241,53 @@ enum GameLibrary {
         return ext == "j2" ? dest : nil
     }
 
-    /// Delete a game: its `.j2` and matching `.blorb`. Shared dictionaries in
-    /// data/ are left alone -- other games of the same language may use them.
+    /// Delete a game: its `.j2`, matching `.blorb`, and any bundled dictionary
+    /// no longer used by another installed game (see `pruneDictionaries`).
     /// (To *update* a game, just re-import the new .jaclgame: the importer
     /// overwrites the same-named .j2/.blorb and adds any new data/ files.)
     static func delete(_ game: Game) {
         let fm = FileManager.default
         try? fm.removeItem(at: game.url)
         try? fm.removeItem(at: game.url.deletingPathExtension().appendingPathExtension("blorb"))
+        pruneDictionaries(removing: game.url.deletingPathExtension().lastPathComponent)
+    }
+
+    /// Key for the dictionary manifest: game base name -> the `*_words.csv`
+    /// files that game's package bundled. Lets `delete` garbage-collect a CSV
+    /// once no installed game needs it, while a glossary shared by two games of
+    /// the same language survives until the last one is removed.
+    private static let manifestKey = "dictManifest"
+
+    private static func dictManifest() -> [String: [String]] {
+        UserDefaults.standard.dictionary(forKey: manifestKey) as? [String: [String]] ?? [:]
+    }
+
+    /// Drop `name` from the manifest, then delete any CSV it brought that no
+    /// remaining game references. Skips pruning entirely if any installed game
+    /// predates the manifest (imported by an older build): we can't tell which
+    /// CSV such a game needs, so we keep them all rather than risk pulling a
+    /// dictionary out from under it. Re-importing those games fills the manifest.
+    private static func pruneDictionaries(removing name: String) {
+        var manifest = dictManifest()
+        let removed = manifest.removeValue(forKey: name) ?? []
+        UserDefaults.standard.set(manifest, forKey: manifestKey)
+        guard !removed.isEmpty else { return }
+
+        let remaining = Set(games().map { $0.url.deletingPathExtension().lastPathComponent })
+        guard remaining.isSubset(of: Set(manifest.keys)) else { return }
+
+        let stillNeeded = Set(manifest.values.flatMap { $0 })
+        let dataDir = documents.appendingPathComponent("data", isDirectory: true)
+        for csv in removed where !stillNeeded.contains(csv) {
+            try? FileManager.default.removeItem(at: dataDir.appendingPathComponent(csv))
+        }
     }
 
     /// Unpack a `.jaclgame` (zip of `.j2` [+ `.blorb`]) into Documents/.
     private static func unpack(_ url: URL) throws -> URL? {
         let entries = try MiniZip.entries(of: Data(contentsOf: url))
         var game: URL?
+        var bundledCSVs: [String] = []
         for entry in entries {
             let base = (entry.name as NSString).lastPathComponent
             let ext = (base as NSString).pathExtension.lowercased()
@@ -269,12 +302,20 @@ enum GameLibrary {
                 let dataDir = documents.appendingPathComponent("data", isDirectory: true)
                 try? FileManager.default.createDirectory(at: dataDir, withIntermediateDirectories: true)
                 dest = dataDir.appendingPathComponent(base)
+                bundledCSVs.append(base)
             default:
                 continue   // ignore stray files
             }
             try? FileManager.default.removeItem(at: dest)
             try entry.data.write(to: dest)
             if ext == "j2" { game = dest }
+        }
+        // Record which dictionaries this game brought, so deleting it can later
+        // garbage-collect them (but only once no other game still needs them).
+        if let game {
+            var manifest = dictManifest()
+            manifest[game.deletingPathExtension().lastPathComponent] = bundledCSVs
+            UserDefaults.standard.set(manifest, forKey: manifestKey)
         }
         return game
     }
