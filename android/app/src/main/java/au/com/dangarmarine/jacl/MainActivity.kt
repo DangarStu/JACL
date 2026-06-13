@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -24,6 +25,7 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -84,7 +86,15 @@ fun JaclRoot() {
     fun refresh() { games = GameLibrary.games(ctx) }
 
     val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) { runCatching { GameLibrary.importGame(ctx, uri) }; refresh() }
+        if (uri != null) {
+            val game = runCatching { GameLibrary.importGame(ctx, uri) }.getOrNull()
+            refresh()
+            android.widget.Toast.makeText(
+                ctx,
+                if (game != null) "Game imported" else "That file isn’t a JACL game",
+                android.widget.Toast.LENGTH_SHORT,
+            ).show()
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -124,13 +134,16 @@ fun ShelfScreen(
 ) {
     var pendingDelete by remember { mutableStateOf<Game?>(null) }
     Box(Modifier.fillMaxSize().background(Color.Black)) {
-        // Cover-art watermark: the full image fitted to width, dimmed under a
-        // black scrim -- the same dark, muted look as the iPad shelf.
+        // Cover-art watermark: the WHOLE image fitted within the screen (never
+        // cropped) and dimmed under a black scrim -- matching the iPad's
+        // scaledToFit. Fit centres it, leaving black gaps top/bottom in portrait
+        // or left/right in landscape rather than overflowing the square art.
         Image(
             painter = painterResource(R.drawable.shelf_artwork),
             contentDescription = null,
-            modifier = Modifier.fillMaxWidth().align(Alignment.Center),
-            contentScale = ContentScale.FillWidth,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Fit,
+            alignment = Alignment.Center,
             alpha = 0.55f,
         )
         Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)))
@@ -203,68 +216,105 @@ fun SettingsScreen(prefs: AppPrefs, onClose: () -> Unit) {
                 },
             )
         },
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
     ) { pad ->
-        Column(Modifier.fillMaxSize().padding(pad).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Reading", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
-
-            Row {
-                Text("Text Size", Modifier.weight(1f))
-                Text("${prefs.fontSize.toInt()} pt", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        val uri = LocalUriHandler.current
+        Column(
+            Modifier.fillMaxSize().padding(pad)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+        ) {
+            SettingsSection("Reading") {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Text Size", Modifier.weight(1f))
+                    Text("${prefs.fontSize.toInt()} pt", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Slider(
+                    value = prefs.fontSize,
+                    onValueChange = { prefs.updateFontSize(it) },
+                    valueRange = ReadingDefaults.FONT_RANGE,
+                    steps = (ReadingDefaults.FONT_RANGE.endInclusive - ReadingDefaults.FONT_RANGE.start).toInt() - 1,
+                )
+                Text("The quick brown fox jumps over the lazy dog.",
+                    fontFamily = FontFamily.Serif, fontSize = prefs.fontSize.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            Slider(
-                value = prefs.fontSize,
-                onValueChange = { prefs.updateFontSize(it) },
-                valueRange = ReadingDefaults.FONT_RANGE,
-                steps = (ReadingDefaults.FONT_RANGE.endInclusive - ReadingDefaults.FONT_RANGE.start).toInt() - 1,
-            )
-            Text("The quick brown fox jumps over the lazy dog.",
-                fontFamily = FontFamily.Serif, fontSize = prefs.fontSize.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
 
-            Spacer(Modifier.height(4.dp))
-            Text("Appearance", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
-            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                AppearanceMode.entries.forEachIndexed { i, mode ->
-                    SegmentedButton(
-                        selected = prefs.appearance == mode,
-                        onClick = { prefs.updateAppearance(mode) },
-                        shape = SegmentedButtonDefaults.itemShape(i, AppearanceMode.entries.size),
-                    ) { Text(mode.label) }
+            SettingsSection("Appearance",
+                footer = "Appearance applies to the reading screen; the shelf stays dark.") {
+                SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                    AppearanceMode.entries.forEachIndexed { i, mode ->
+                        SegmentedButton(
+                            selected = prefs.appearance == mode,
+                            onClick = { prefs.updateAppearance(mode) },
+                            shape = SegmentedButtonDefaults.itemShape(i, AppearanceMode.entries.size),
+                        ) { Text(mode.label) }
+                    }
                 }
             }
-            Text("Appearance applies to the reading screen; the shelf stays dark.",
-                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
-            val uri = LocalUriHandler.current
-            Spacer(Modifier.height(8.dp))
-            HorizontalDivider()
+            SettingsSection("Games",
+                footer = "Browse the games at jacl.dangarmarine.com.au, then choose “Open in JACL” to install one.") {
+                SettingsLinkRow("Get more games") { uri.openUri("https://jacl.dangarmarine.com.au/#get") }
+            }
 
-            SettingsLink("Get more games") { uri.openUri("https://jacl.dangarmarine.com.au/#get") }
-            Text("Browse the games at jacl.dangarmarine.com.au, then choose “Open in JACL” to install one.",
-                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            SettingsSection("Privacy",
+                footer = "JACL collects no personal data. Games and saved games stay on your device; "
+                       + "the app makes no network connections and has no accounts or sign-in.") {
+                SettingsLinkRow("Privacy Policy") { uri.openUri("https://jacl.dangarmarine.com.au/privacy.html") }
+            }
 
-            SettingsLink("Privacy Policy") { uri.openUri("https://jacl.dangarmarine.com.au/privacy.html") }
-            Text("JACL collects no personal data. Games and saved games stay on your device; the app makes "
-               + "no network connections and has no accounts or sign-in.",
-                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-
-            Spacer(Modifier.height(8.dp))
-            Text("About", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
-            Text("Version  ${GlkBridge.version}", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text("JACL by Stuart Allen", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            SettingsLink("jacl.dangarmarine.com.au") { uri.openUri("https://jacl.dangarmarine.com.au/") }
+            SettingsSection("About") {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Version", Modifier.weight(1f))
+                    Text(GlkBridge.version, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Text("JACL by Stuart Allen", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                SettingsLinkRow("jacl.dangarmarine.com.au") { uri.openUri("https://jacl.dangarmarine.com.au/") }
+            }
         }
     }
 }
 
-/** A tappable link row in Settings (opens a URL in the browser). */
+/** A grouped settings card with an uppercase header and an optional footer
+ *  note -- mirrors the inset, grouped look of the iPad's SwiftUI Form. */
 @Composable
-private fun SettingsLink(label: String, onClick: () -> Unit) {
+private fun SettingsSection(
+    title: String,
+    footer: String? = null,
+    content: @Composable ColumnScope.() -> Unit,
+) {
     Text(
-        label,
+        title.uppercase(),
+        style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 8.dp),
+        modifier = Modifier.padding(start = 8.dp, top = 12.dp, bottom = 6.dp),
     )
+    Card(
+        Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp), content = content)
+    }
+    if (footer != null) {
+        Text(footer, style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 8.dp, top = 6.dp))
+    }
+}
+
+/** A tappable link row inside a settings card (opens a URL). */
+@Composable
+private fun SettingsLinkRow(label: String, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(label, Modifier.weight(1f), color = MaterialTheme.colorScheme.primary)
+        Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary)
+    }
 }
 
 // MARK: - Game

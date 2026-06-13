@@ -32,24 +32,31 @@ object GameLibrary {
     }
 
     /** Import a picked/opened file. A .jaclgame/.zip is unpacked; a bare
-     *  .j2/.blorb is copied. Returns the playable .j2, if one resulted. */
+     *  .j2/.blorb is copied. Returns the playable .j2, if one resulted.
+     *
+     *  Recognises the type by extension AND by content: a browser download may
+     *  arrive with the wrong/no extension (e.g. "game" or "game.zip") or as an
+     *  opaque content:// uri, so we also sniff the bytes -- ZIP magic ("PK") for
+     *  a .jaclgame, the "#!" / "#processed" / "#encrypted" header for a .j2. */
     fun importGame(ctx: Context, uri: Uri): File? {
         val name = displayName(ctx, uri) ?: "game"
         val ext = name.substringAfterLast('.', "").lowercase()
-        ctx.contentResolver.openInputStream(uri).use { input ->
-            if (input == null) return null
-            return when (ext) {
-                "jaclgame", "zip" -> unpack(ctx, input)
-                "j2" -> copyTo(File(ctx.filesDir, name), input).let { it }
-                "blorb" -> { copyTo(File(ctx.filesDir, name), input); null }
-                else -> null
-            }
+        val base = name.substringBeforeLast('.', name).ifEmpty { "game" }
+        val bytes = ctx.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return null
+
+        val isZip = bytes.size >= 2 && bytes[0] == 'P'.code.toByte() && bytes[1] == 'K'.code.toByte()
+        return when {
+            ext == "blorb" -> { File(ctx.filesDir, "$base.blorb").writeBytes(bytes); null }
+            ext == "jaclgame" || ext == "zip" || isZip -> unpack(ctx, bytes.inputStream())
+            ext == "j2" || looksLikeJ2(bytes) ->
+                File(ctx.filesDir, "$base.j2").also { it.writeBytes(bytes) }
+            else -> null
         }
     }
 
-    private fun copyTo(dest: File, input: java.io.InputStream): File {
-        dest.outputStream().use { input.copyTo(it) }
-        return dest
+    private fun looksLikeJ2(bytes: ByteArray): Boolean {
+        val head = String(bytes.copyOf(minOf(64, bytes.size)), Charsets.US_ASCII)
+        return head.startsWith("#!") || head.contains("#processed") || head.contains("#encrypted")
     }
 
     /** Unpack a .jaclgame (zip of .j2 [+ .blorb + dictionary CSVs]) into filesDir. */
