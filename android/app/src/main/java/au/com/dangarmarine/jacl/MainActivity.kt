@@ -428,10 +428,19 @@ fun TranscriptView(
     LaunchedEffect(paras.size, paras.lastOrNull()?.spans?.sumOf { it.text.length }) {
         scroll.scrollTo(scroll.maxValue)
     }
+    // While waiting for a command, JACL has already written its bare "> " prompt
+    // as the trailing paragraph. Hide it -- the input bar below is the live
+    // prompt, and the command is echoed ("> look") on submit. Only drop a
+    // genuinely short non-image trailing line, so real output is never removed.
+    val visible = if (bridge.pendingInput?.type == "line" && paras.isNotEmpty() &&
+        paras.last().spans.all { it.image == null } &&
+        paras.last().spans.joinToString("") { it.text }.trim().length <= 2) {
+        paras.dropLast(1)
+    } else paras
     var bannerShown = false
     val accent = MaterialTheme.colorScheme.primary
     Column(Modifier.fillMaxSize().verticalScroll(scroll).padding(vertical = 12.dp)) {
-        for (p in paras) {
+        for (p in visible) {
             val img = p.spans.firstOrNull { it.image != null }?.image
             if (img != null) {
                 if (!bannerShown) { BannerImage(bridge, img, headerColor); bannerShown = true }
