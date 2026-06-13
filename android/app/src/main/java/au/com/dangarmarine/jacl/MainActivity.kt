@@ -134,13 +134,16 @@ fun ShelfScreen(
 ) {
     var pendingDelete by remember { mutableStateOf<Game?>(null) }
     Box(Modifier.fillMaxSize().background(Color.Black)) {
-        // Cover-art watermark: the full image fitted to width, dimmed under a
-        // black scrim -- the same dark, muted look as the iPad shelf.
+        // Cover-art watermark: the WHOLE image fitted within the screen (never
+        // cropped) and dimmed under a black scrim -- matching the iPad's
+        // scaledToFit. Fit centres it, leaving black gaps top/bottom in portrait
+        // or left/right in landscape rather than overflowing the square art.
         Image(
             painter = painterResource(R.drawable.shelf_artwork),
             contentDescription = null,
-            modifier = Modifier.fillMaxWidth().align(Alignment.Center),
-            contentScale = ContentScale.FillWidth,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Fit,
+            alignment = Alignment.Center,
             alpha = 0.55f,
         )
         Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)))
