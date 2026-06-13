@@ -49,6 +49,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -542,9 +543,16 @@ fun InputBar(bridge: GlkBridge, fontSize: Float) {
                     textStyle = TextStyle(fontSize = fontSize.sp, color = MaterialTheme.colorScheme.onSurface),
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                     singleLine = true,
+                    // A password-type IME reliably disables autocorrect and
+                    // suggestions on every keyboard (autoCorrect=false alone is
+                    // ignored by Gboard, which otherwise "corrects" non-English
+                    // game words like Indonesian "payung" to English). The text
+                    // stays visible -- Compose only masks via visualTransformation,
+                    // which we leave at its default (None).
                     keyboardOptions = KeyboardOptions(
                         autoCorrect = false,
                         capitalization = KeyboardCapitalization.None,
+                        keyboardType = KeyboardType.Password,
                         imeAction = ImeAction.Send,
                     ),
                     keyboardActions = KeyboardActions(onSend = { submit() }),
