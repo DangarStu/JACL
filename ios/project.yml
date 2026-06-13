@@ -143,3 +143,5 @@ targets:
             UTTypeTagSpecification:
               public.filename-extension:
                 - jaclgame
+              public.mime-type:
+                - application/x-jaclgame
