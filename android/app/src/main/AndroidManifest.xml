@@ -23,11 +23,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Open a .jaclgame / .j2 from Files, a download, or a share.
-                 mimeType="*/*" + pathPattern is the standard recipe for a custom
-                 extension over content:// and file:// schemes. Pinning a specific
-                 MIME (e.g. application/octet-stream) misses whatever the browser
-                 or Files app actually reports for the download. -->
+            <!-- A browser download opens via an opaque content:// uri (no
+                 filename in the path), so match it by the dedicated MIME the
+                 server sends for .jaclgame (see etc/jacl-apache.conf). -->
+            <intent-filter android:label="@string/open_in_jacl">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="application/x-jaclgame" />
+            </intent-filter>
+
+            <!-- Open a .jaclgame / .j2 by extension (Files / file:// / a share
+                 whose uri keeps the name). mimeType="*/*" + pathPattern is the
+                 standard recipe for a custom extension. -->
             <intent-filter android:label="@string/open_in_jacl">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
