@@ -1,0 +1,9 @@
+<resources>
+    <!-- A bare NoActionBar theme; Compose's MaterialTheme drives the real
+         styling. DayNight so the system bars follow light/dark. -->
+    <style name="Theme.JACL" parent="android:Theme.DeviceDefault.DayNight">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+</resources>

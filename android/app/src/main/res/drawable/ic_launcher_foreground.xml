@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- A four-point compass star in gold, centred in the adaptive safe zone. -->
+    <path
+        android:fillColor="#C9A227"
+        android:pathData="M54,30 L60,48 L78,54 L60,60 L54,78 L48,60 L30,54 L48,48 Z" />
+    <path
+        android:fillColor="#9C7A1E"
+        android:pathData="M54,38 L57.5,51 L70,54 L57.5,57 L54,70 L50.5,57 L38,54 L50.5,51 Z" />
+</vector>
