@@ -12,6 +12,7 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @AppStorage(ReadingDefaults.fontSizeKey) private var fontSize = ReadingDefaults.fontSize
+    @AppStorage(AppearanceMode.key) private var appearance = AppearanceMode.system
 
     /// Opens the site's "Get it for iPad" downloads tab directly -- the #get
     /// fragment selects that tab. A plain Safari hand-off; no in-app network.
@@ -52,10 +53,16 @@ struct SettingsView: View {
                             .lineLimit(2)
                     }
                     .padding(.vertical, 4)
+
+                    Picker("Appearance", selection: $appearance) {
+                        ForEach(AppearanceMode.allCases) { Text($0.label).tag($0) }
+                    }
                 } header: {
                     Text("Reading")
                 } footer: {
-                    Text("Sets the size of the game transcript and command text.")
+                    Text("Text size and appearance apply to the game reading "
+                       + "screen. \u{201C}System\u{201D} follows your iPad's "
+                       + "Light/Dark setting; the shelf stays dark.")
                 }
 
                 Section {
