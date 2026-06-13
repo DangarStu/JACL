@@ -19,8 +19,13 @@ int pref_printversion = FALSE;
 int pref_screenwidth = 0;
 int pref_screenheight = 0;
 int pref_messageline = TRUE;
-int pref_reverse_textgrids = FALSE;
-int pref_override_window_borders = FALSE;
+/* JACL defaults: render the status (grid) window as a single reverse-video
+ * bar with no separating rule -- the conventional IF status-line look, and a
+ * match for the iPad app's single status line. Upstream GlkTerm leaves grids
+ * in normal text with an auto-drawn window border; these three lines flip that.
+ * Still overridable from the command line with -revgrid no / -border yes. */
+int pref_reverse_textgrids = TRUE;
+int pref_override_window_borders = TRUE;
 int pref_window_borders = FALSE;
 int pref_precise_timing = FALSE;
 int pref_historylen = 20;
