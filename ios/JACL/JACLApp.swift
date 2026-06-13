@@ -92,10 +92,10 @@ struct GameShelfView: View {
                     }
                     .scrollContentBackground(.hidden)   // let the artwork show through
                     .navigationDestination(for: Game.self) { game in
-                        // Keep the in-game transcript on the light theme; only
-                        // the shelf goes dark for the watermark.
+                        // The reading screen inherits the window scheme, which
+                        // the Appearance setting drives (the stack modifier
+                        // below). System follows the device's Light/Dark.
                         GameView(gamePath: game.url.path)
-                            .preferredColorScheme(.light)
                     }
                 }
             }
@@ -181,8 +181,12 @@ struct GameShelfView: View {
                 games = result
                 loaded = true
             }
+            // Render the shelf content dark for its cover-art watermark (light
+            // text on a dark background), via an environment override so it
+            // holds regardless of the window's actual scheme. The reading
+            // screen's appearance is set from inside GameView itself.
+            .environment(\.colorScheme, .dark)
         }
-        .preferredColorScheme(.dark)   // light text on the dark shelf watermark
     }
 }
 

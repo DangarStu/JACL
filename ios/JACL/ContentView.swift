@@ -32,6 +32,32 @@ final class BlorbImageCache {
     func clear() { store.removeAll() }
 }
 
+/// In-app appearance choice for the reading screen, set in Settings. The shelf
+/// stays dark regardless (its cover-art watermark needs light text); this only
+/// drives the in-game transcript.
+enum AppearanceMode: String, CaseIterable, Identifiable {
+    case system, light, dark
+    var id: String { rawValue }
+    static let key = "appearanceMode"
+
+    var label: String {
+        switch self {
+        case .system: return "System"
+        case .light:  return "Light"
+        case .dark:   return "Dark"
+        }
+    }
+
+    /// The SwiftUI scheme to force, or nil to follow the device's OS setting.
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system: return nil
+        case .light:  return .light
+        case .dark:   return .dark
+        }
+    }
+}
+
 /// Reading preferences shared between the Settings screen and the game view.
 enum ReadingDefaults {
     /// Transcript text size in points. Default is roughly the system `.body`
@@ -95,6 +121,10 @@ struct GameView: View {
     @State private var headerColor: Color?
     /// Transcript text size, set in Settings and persisted app-wide.
     @AppStorage(ReadingDefaults.fontSizeKey) private var transcriptFontSize = ReadingDefaults.fontSize
+    /// In-game appearance (System / Light / Dark), set in Settings. Applied from
+    /// inside the reading screen so it drives the window even though the shelf's
+    /// navigationDestination otherwise detaches it from the stack's scheme.
+    @AppStorage(AppearanceMode.key) private var appearance = AppearanceMode.system
     @FocusState private var inputFocused: Bool
 
     // DEBUG-only scripted input (via `-autocommands "no;look;…"`), used to
@@ -164,6 +194,7 @@ struct GameView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .preferredColorScheme(appearance.colorScheme)
     }
 
     /// Parse `-autocommands "no;look;…"` from the launch args (DEBUG only).
