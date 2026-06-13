@@ -69,6 +69,11 @@ Ave, Cambridge, MA 02139, USA.
 	<li><a href="#installation6">Automated Setup</a>
 	<li><a href="#installation7">Manual Setup</a>
 	<li><a href="#installation8">Troubleshooting</a>
+	<li><a href="#installation_ipad">The iPad Interpreter</a>
+	<ol>
+		<li><a href="#installation_ipad1">Packaging a Game</a>
+		<li><a href="#installation_ipad2">Getting a Game onto the iPad</a>
+	</ol>
 	<li><a href="#installation9">Editor Support</a>
 </ol>
 
@@ -641,6 +646,46 @@ sudo chmod 775 /usr/local/jacl/logs
 </ul>
 
 <p>Common issues include incorrect file permissions on the <b>temp</b> directory, a missing or misconfigured <b>cgijacl.conf</b> file, or the <b>fcgijacl</b> binary not being found at the path specified in the wrapper script.
+
+<h2><a class="section" name="installation_ipad">The iPad Interpreter</a></h2>
+
+<p>JACL also ships as a native iPad app, found in the <b>ios</b> directory of the repository and built on Andrew Plotkin's RemGlk library and Apple's SwiftUI. It runs the same preprocessed <b>.j2</b> games as the desktop interpreters. Imported games appear on a shelf; tapping one plays it with a scrolling transcript and an on-screen command line. The transcript can be selected and copied, and for a game written in a non-English language a long-press on any word offers a <b>Define</b> action that looks the word up in the game's bundled dictionary and shows the meaning in a small popover &mdash; no turn is taken and nothing is typed into the game.
+
+<p>Building and installing the app itself is an Xcode task beyond the scope of this guide; the notes in <b>ios/README.md</b> cover it. For an author the part that matters is getting your own game onto the device, which is two short steps: package the game, then transfer it.
+
+<h3><a class="section" name="installation_ipad1">Packaging a Game</a></h3>
+
+<p>The app runs the preprocessed <b>.j2</b>, not the <b>.jacl</b> source, so a game is distributed as a <b>.jaclgame</b> package: an ordinary zip holding the <b>.j2</b>, any <b>.blorb</b> of images and sounds, and &mdash; for a non-English game &mdash; the matching language dictionary. The <b>ios/mkjaclgame.sh</b> helper does the whole job in a single step:
+
+<pre>
+ios/mkjaclgame.sh projects/mygame.jacl
+</pre>
+
+<p>This preprocesses the source with <b>jpp</b> (compiling <b>jpp</b> first if it has not already been built), then bundles the resulting <b>mygame.j2</b>, a sibling <b>mygame.blorb</b> if one exists, and the dictionary for any <b>&lt;language&gt;_verbs.library</b> the game includes, writing <b>mygame.jaclgame</b> beside the source. The language is detected from the game's own <b>#include</b> lines, so a new language works automatically once its dictionary exists. By default a debug build is produced, which is the easier one to test with; pass <b>-release</b> for an obfuscated, <b>#debug</b>-free build to distribute:
+
+<pre>
+ios/mkjaclgame.sh projects/mygame.jacl -release
+</pre>
+
+<p>A bare <b>.j2</b> also imports and runs, but the package is the tidy single-file way to share a game, and the only way to carry images or a dictionary.
+
+<table class="infowarn"><tr>
+<td><img src="info.png" alt="Information"></td>
+<td>The dictionary feature reads the same <b>&lt;language&gt;_words.csv</b> files the web interpreter uses for its click-to-define lookups (see the <a href="#csv0">CSV Files</a> chapter). <b>mkjaclgame.sh</b> looks for the CSV in a <b>data</b> directory beside your game and then in the repository's <b>projects/data</b> directory.</td>
+</tr></table>
+
+<h3><a class="section" name="installation_ipad2">Getting a Game onto the iPad</a></h3>
+
+<p>The app registers itself as a handler for <b>.j2</b> and <b>.jaclgame</b> files and supports document sharing, so a package can reach it several ways:
+
+<ul>
+<li><b>AirDrop</b> the <b>.jaclgame</b> from a Mac and choose <b>JACL</b> when prompted; or tap the received file and choose <b>Open in JACL</b>.</li>
+<li>Save it into the <b>Files</b> app or iCloud Drive, tap it, and choose <b>Open in JACL</b> &mdash; or, from inside the app, tap the <b>+</b> button and pick it.</li>
+<li>Send it by <b>Mail</b> or <b>Messages</b>, or open a download in <b>Safari</b>, and choose <b>Open in JACL</b>.</li>
+<li>Connect the iPad to a Mac and, in the Finder's <b>Files</b> tab, drag the package into <b>JACL</b>'s document area.</li>
+</ul>
+
+<p>However it arrives, the game appears on the shelf titled by its <b>game_title</b> constant; tap it to play. Re-importing a newer package with the same name overwrites the installed copy, so updating a game is simply a matter of sending the new build. Swiping left on a game, or using the <b>Edit</b> button, removes it.
 
 <h2><a class="section" name="installation9">Editor Support</a></h2>
 
