@@ -42,7 +42,7 @@ constant title_colour      "black"
 <ul>
 <li><b>title_image</b> &mdash; image displayed in the top title bar. Set to <b>"none"</b> to fall back to the value of <b>game_title</b> as plain text. The image must be 85 pixels high; any width works, but the right edge will normally blend into <b>header_colour</b>.</li>
 <li><b>footer_image</b> &mdash; optional image tiled behind the footer. Set to <b>"none"</b> to leave the footer flat.</li>
-<li><b>header_colour</b> &mdash; background of the title bar.</li>
+<li><b>header_colour</b> &mdash; background of the title bar. This constant is also honoured by the iPad interpreter, which paints it behind the game's opening image (see <a href="installation.html#installation_ipad">The iPad Interpreter</a>), so it is worth setting even for a game intended mainly for the iPad app.</li>
 <li><b>linkbar_colour</b> &mdash; background of the link bar (Instructions / Map / About / Restart / Hint).</li>
 <li><b>maintext_colour</b> &mdash; background of the main game output.</li>
 <li><b>title_colour</b> &mdash; text colour used inside the title bar (when no <b>title_image</b> is set).</li>

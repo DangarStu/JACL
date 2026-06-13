@@ -651,6 +651,8 @@ sudo chmod 775 /usr/local/jacl/logs
 
 <p>JACL also ships as a native iPad app, found in the <b>ios</b> directory of the repository and built on Andrew Plotkin's RemGlk library and Apple's SwiftUI. It runs the same preprocessed <b>.j2</b> games as the desktop interpreters. Imported games appear on a shelf; tapping one plays it with a scrolling transcript and an on-screen command line. The transcript can be selected and copied, and for a game written in a non-English language a long-press on any word offers a <b>Define</b> action that looks the word up in the game's bundled dictionary and shows the meaning in a small popover &mdash; no turn is taken and nothing is typed into the game.
 
+<p>One presentation detail carries over from the web. If the game declares a <b>header_colour</b> constant (see <a href="#webinterface0">GUI Web Interface</a>), the iPad paints that colour behind the game's opening image &mdash; running to the right screen edge and exactly the image's height &mdash; so banner art whose edge fades into <b>header_colour</b> blends into it seamlessly, just as it does in the web title bar. There is no separate <b>title_image</b> on the iPad; the banner is simply whatever image the game draws first (typically from its Blorb), so a game meant for both the web and the iPad should use a matching <b>header_colour</b>. The reader can also adjust the transcript text size from the app's Settings screen.
+
 <p>Building and installing the app itself is an Xcode task beyond the scope of this guide; the notes in <b>ios/README.md</b> cover it. For an author the part that matters is getting your own game onto the device, which is two short steps: package the game, then transfer it.
 
 <h3><a class="section" name="installation_ipad1">Packaging a Game</a></h3>
@@ -3265,7 +3267,7 @@ constant title_colour      "black"
 <ul>
 <li><b>title_image</b> &mdash; image displayed in the top title bar. Set to <b>"none"</b> to fall back to the value of <b>game_title</b> as plain text. The image must be 85 pixels high; any width works, but the right edge will normally blend into <b>header_colour</b>.</li>
 <li><b>footer_image</b> &mdash; optional image tiled behind the footer. Set to <b>"none"</b> to leave the footer flat.</li>
-<li><b>header_colour</b> &mdash; background of the title bar.</li>
+<li><b>header_colour</b> &mdash; background of the title bar. This constant is also honoured by the iPad interpreter, which paints it behind the game's opening image (see <a href="#installation_ipad">The iPad Interpreter</a>), so it is worth setting even for a game intended mainly for the iPad app.</li>
 <li><b>linkbar_colour</b> &mdash; background of the link bar (Instructions / Map / About / Restart / Hint).</li>
 <li><b>maintext_colour</b> &mdash; background of the main game output.</li>
 <li><b>title_colour</b> &mdash; text colour used inside the title bar (when no <b>title_image</b> is set).</li>
