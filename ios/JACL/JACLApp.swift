@@ -377,7 +377,9 @@ enum GameLibrary {
     private static func quotedConstant(_ name: String, in bytes: [UInt8]) -> String? {
         guard let line = String(bytes: bytes, encoding: .utf8) else { return nil }
         let parts = line.split(whereSeparator: { $0 == " " || $0 == "\t" })
-        guard parts.count >= 2, parts[0] == "constant", parts[1] == name else { return nil }
+        // game_title / header_colour are `constant`; game_language is a `string`.
+        guard parts.count >= 2, parts[0] == "constant" || parts[0] == "string",
+              parts[1] == name else { return nil }
         guard let a = line.firstIndex(of: "\"") else { return nil }
         let after = line.index(after: a)
         guard let b = line[after...].firstIndex(of: "\"") else { return nil }
