@@ -64,6 +64,12 @@ final class GlkBridge: ObservableObject {
     /// at a time; starting a new game force-stops this one first.
     static weak var active: GlkBridge?
 
+    /// Point size of the monospaced status-grid cell, kept in step with the
+    /// transcript reading size (Settings). The status line is a fixed-width
+    /// grid, so the cell width the interpreter lays out columns to must match
+    /// the font we actually draw -- set this before `start`/`resize`.
+    var statusFontSize: Double = ReadingDefaults.fontSize
+
     // MARK: Lifecycle
 
     /// Launch `gamePath` (an absolute .j2 path in the sandbox) and send the
@@ -268,7 +274,7 @@ final class GlkBridge: ObservableObject {
         // transcript scrolls instead, the right model for a touch UI. The 16pt
         // accounts for the status line's horizontal padding.
         let mono = UIFont.monospacedSystemFont(
-            ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize, weight: .regular)
+            ofSize: CGFloat(statusFontSize), weight: .regular)
         let cw = ("0" as NSString).size(withAttributes: [.font: mono]).width
         return GlkMetrics(width: Double(size.width) - 16,
                           height: 100_000,
