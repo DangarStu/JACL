@@ -3,10 +3,16 @@ package au.com.dangarmarine.jacl
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,163 +20,317 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import kotlinx.coroutines.delay
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.rememberTextMeasurer
+import kotlinx.coroutines.delay
+import java.io.File
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Handle an "Open in JACL" VIEW intent (a .jaclgame / .j2 tapped
-        // elsewhere) before listing the shelf.
+        // "Open in JACL" VIEW intent (a .jaclgame / .j2 tapped elsewhere).
         intent?.data?.let { uri -> runCatching { GameLibrary.importGame(this, uri) } }
+        setContent { JaclRoot() }
+    }
+}
 
-        setContent {
-            MaterialTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background,
-                ) { JaclApp() }
-            }
+/** Material theme wrapper: dark or light, with a themed surface background. */
+@Composable
+fun AppTheme(dark: Boolean, content: @Composable () -> Unit) {
+    MaterialTheme(colorScheme = if (dark) darkColorScheme() else lightColorScheme()) {
+        Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) { content() }
+    }
+}
+
+@Composable
+fun JaclRoot() {
+    val ctx = LocalContext.current
+    val prefs = remember { AppPrefs.of(ctx) }
+    var games by remember { mutableStateOf<List<Game>>(emptyList()) }
+    var current by remember { mutableStateOf<Game?>(null) }
+    var showSettings by remember { mutableStateOf(false) }
+
+    fun refresh() { games = GameLibrary.games(ctx) }
+
+    val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) { runCatching { GameLibrary.importGame(ctx, uri) }; refresh() }
+    }
+
+    LaunchedEffect(Unit) {
+        GameLibrary.installBundledStarters(ctx)
+        refresh()
+    }
+
+    when {
+        showSettings -> AppTheme(prefs.appearance.isDark()) {
+            SettingsScreen(prefs) { showSettings = false }
+        }
+        current != null -> AppTheme(prefs.appearance.isDark()) {
+            GameScreen(current!!, prefs) { current = null }
+        }
+        else -> AppTheme(dark = true) {   // the shelf stays dark for its watermark
+            ShelfScreen(
+                games = games,
+                onOpen = { current = it },
+                onImport = { importer.launch(arrayOf("*/*")) },
+                onSettings = { showSettings = true },
+                onDelete = { GameLibrary.delete(ctx, it); refresh() },
+            )
         }
     }
 }
 
+// MARK: - Shelf
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun JaclApp() {
-    val ctx = androidx.compose.ui.platform.LocalContext.current
-    var games by remember { mutableStateOf<List<Game>>(emptyList()) }
-    var current by remember { mutableStateOf<Game?>(null) }
+fun ShelfScreen(
+    games: List<Game>,
+    onOpen: (Game) -> Unit,
+    onImport: () -> Unit,
+    onSettings: () -> Unit,
+    onDelete: (Game) -> Unit,
+) {
+    var pendingDelete by remember { mutableStateOf<Game?>(null) }
+    Box(Modifier.fillMaxSize().background(Color.Black)) {
+        // Cover-art watermark: the full image fitted to width, dimmed under a
+        // black scrim -- the same dark, muted look as the iPad shelf.
+        Image(
+            painter = painterResource(R.drawable.shelf_artwork),
+            contentDescription = null,
+            modifier = Modifier.fillMaxWidth().align(Alignment.Center),
+            contentScale = ContentScale.FillWidth,
+            alpha = 0.55f,
+        )
+        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f)))
 
-    LaunchedEffect(Unit) {
-        GameLibrary.installBundledStarters(ctx)
-        games = GameLibrary.games(ctx)
-    }
-
-    val game = current
-    if (game == null) {
-        ShelfScreen(games) { current = it }
-    } else {
-        GameScreen(game) { current = null }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ShelfScreen(games: List<Game>, onOpen: (Game) -> Unit) {
-    Scaffold(
-        topBar = { TopAppBar(title = { Text("JACL v${GlkBridge.version}") }) }
-    ) { pad ->
-        if (games.isEmpty()) {
-            Box(Modifier.fillMaxSize().padding(pad), contentAlignment = Alignment.Center) {
-                Text("No games yet — import a .jaclgame to begin.")
-            }
-        } else {
-            LazyColumn(Modifier.fillMaxSize().padding(pad)) {
-                items(games) { g ->
-                    ListItem(
-                        headlineContent = { Text(g.title) },
-                        modifier = Modifier.fillMaxWidth().clickable { onOpen(g) }
-                    )
-                    HorizontalDivider()
+        Scaffold(
+            containerColor = Color.Transparent,
+            topBar = {
+                TopAppBar(
+                    title = { Text("JACL v${GlkBridge.version}") },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        titleContentColor = Color.White,
+                        actionIconContentColor = Color.White,
+                    ),
+                    actions = {
+                        IconButton(onClick = onSettings) { Icon(Icons.Filled.Settings, "Settings") }
+                        IconButton(onClick = onImport) { Icon(Icons.Filled.Add, "Import game") }
+                    },
+                )
+            },
+        ) { pad ->
+            if (games.isEmpty()) {
+                Box(Modifier.fillMaxSize().padding(pad), contentAlignment = Alignment.Center) {
+                    Text("Tap + to import a JACL game.", color = Color.White)
+                }
+            } else {
+                LazyColumn(Modifier.fillMaxSize().padding(pad)) {
+                    items(games, key = { it.file.path }) { g ->
+                        Text(
+                            g.title,
+                            color = Color.White,
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.fillMaxWidth()
+                                .combinedClickable(
+                                    onClick = { onOpen(g) },
+                                    onLongClick = { pendingDelete = g },
+                                )
+                                .padding(horizontal = 16.dp, vertical = 16.dp),
+                        )
+                        HorizontalDivider(color = Color.White.copy(alpha = 0.15f))
+                    }
                 }
             }
         }
     }
+
+    pendingDelete?.let { g ->
+        AlertDialog(
+            onDismissRequest = { pendingDelete = null },
+            title = { Text("Delete game?") },
+            text = { Text("Remove “${g.title}” from this device?") },
+            confirmButton = { TextButton(onClick = { onDelete(g); pendingDelete = null }) { Text("Delete") } },
+            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text("Cancel") } },
+        )
+    }
 }
 
+// MARK: - Settings
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameScreen(game: Game, onBack: () -> Unit) {
+fun SettingsScreen(prefs: AppPrefs, onClose: () -> Unit) {
+    BackHandler(onBack = onClose)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Settings") },
+                navigationIcon = {
+                    IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
+                },
+            )
+        },
+    ) { pad ->
+        Column(Modifier.fillMaxSize().padding(pad).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("Reading", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+
+            Row {
+                Text("Text Size", Modifier.weight(1f))
+                Text("${prefs.fontSize.toInt()} pt", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Slider(
+                value = prefs.fontSize,
+                onValueChange = { prefs.updateFontSize(it) },
+                valueRange = ReadingDefaults.FONT_RANGE,
+                steps = (ReadingDefaults.FONT_RANGE.endInclusive - ReadingDefaults.FONT_RANGE.start).toInt() - 1,
+            )
+            Text("The quick brown fox jumps over the lazy dog.",
+                fontFamily = FontFamily.Serif, fontSize = prefs.fontSize.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+            Spacer(Modifier.height(4.dp))
+            Text("Appearance", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                AppearanceMode.entries.forEachIndexed { i, mode ->
+                    SegmentedButton(
+                        selected = prefs.appearance == mode,
+                        onClick = { prefs.updateAppearance(mode) },
+                        shape = SegmentedButtonDefaults.itemShape(i, AppearanceMode.entries.size),
+                    ) { Text(mode.label) }
+                }
+            }
+            Text("Appearance applies to the reading screen; the shelf stays dark.",
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+            Spacer(Modifier.height(8.dp))
+            Text("About", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+            Text("JACL v${GlkBridge.version} by Stuart Allen",
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+// MARK: - Game
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
+    val ctx = LocalContext.current
     val bridge = remember(game.file.path) { GlkBridge() }
     val density = LocalDensity.current
     val measurer = rememberTextMeasurer()
     var started by remember { mutableStateOf(false) }
     var containerW by remember { mutableStateOf(0) }
-    // The per-game header colour the web/iPad use behind the banner image.
+    val fontSize = prefs.fontSize
+
     val headerColor = remember(game.file.path) {
         GameLibrary.stringConstant(game.file, "header_colour")?.let { parseHexColor(it) }
     }
-
-    DisposableEffect(game.file.path) {
-        onDispose { bridge.stop() }
+    // Bundled glossary (data/<lang>_words.csv) for long-press Define, if any.
+    val dictionary = remember(game.file.path) {
+        GameDictionary.load(File(ctx.filesDir, "data")).takeUnless { it.isEmpty }
+    }
+    var definition by remember { mutableStateOf<Pair<String, String>?>(null) }
+    val onDefine: ((String) -> Unit)? = dictionary?.let { dict ->
+        { word -> definition = word to (dict.define(word) ?: "isn’t in the dictionary.") }
     }
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .onSizeChanged { sz ->
-                if (sz.width > 0 && !started) {
+    BackHandler(onBack = onBack)
+    DisposableEffect(game.file.path) { onDispose { bridge.stop() } }
+
+    fun cell() = measurer.measure(
+        AnnotatedString("0"),
+        style = TextStyle(fontFamily = FontFamily.Monospace, fontSize = fontSize.sp)
+    ).size
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(game.title, maxLines = 1) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
+                },
+            )
+        },
+    ) { pad ->
+        Column(
+            Modifier.fillMaxSize().padding(pad).onSizeChanged { sz ->
+                if (sz.width <= 0) return@onSizeChanged
+                val w = sz.width - with(density) { 16.dp.toPx() }.toInt()
+                val c = cell()
+                if (!started) {
+                    bridge.start(game.file.path, w, sz.height, c.width.toDouble(), c.height.toDouble())
+                    started = true; containerW = sz.width
+                } else if (sz.width != containerW) {
+                    bridge.resize(w, sz.height, c.width.toDouble(), c.height.toDouble())
                     containerW = sz.width
-                    // Measure the monospaced "0" cell at the body size so the
-                    // status grid columns line up (mirrors GlkBridge.metrics).
-                    val m = measurer.measure(
-                        AnnotatedString("0"),
-                        style = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 17.sp)
-                    )
-                    bridge.start(
-                        gamePath = game.file.path,
-                        widthPx = sz.width - with(density) { 16.dp.toPx() }.toInt(),
-                        heightPx = sz.height,
-                        cellWidthPx = m.size.width.toDouble(),
-                        cellHeightPx = m.size.height.toDouble(),
-                    )
-                    started = true
-                } else if (sz.width > 0 && started && sz.width != containerW) {
-                    containerW = sz.width
-                    val m = measurer.measure(
-                        AnnotatedString("0"),
-                        style = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 17.sp)
-                    )
-                    bridge.resize(
-                        sz.width - with(density) { 16.dp.toPx() }.toInt(), sz.height,
-                        m.size.width.toDouble(), m.size.height.toDouble())
                 }
             }
-    ) {
-        // Status (grid) windows on top.
-        for (w in bridge.windows.filter { it.type == "grid" }) {
-            GridView(bridge.grids[w.id] ?: emptyList())
-        }
-        // Transcript (buffer) windows.
-        for (w in bridge.windows.filter { it.type == "buffer" }) {
-            Box(Modifier.weight(1f).fillMaxWidth()) {
-                TranscriptView(bridge, bridge.buffers[w.id] ?: emptyList(), headerColor)
+        ) {
+            for (w in bridge.windows.filter { it.type == "grid" }) {
+                GridView(bridge.grids[w.id] ?: emptyList(), fontSize)
             }
+            for (w in bridge.windows.filter { it.type == "buffer" }) {
+                Box(Modifier.weight(1f).fillMaxWidth()) {
+                    TranscriptView(bridge, bridge.buffers[w.id] ?: emptyList(), headerColor, fontSize, onDefine)
+                }
+            }
+            InputBar(bridge, fontSize)
         }
-        InputBar(bridge)
+    }
+
+    definition?.let { (word, gloss) ->
+        AlertDialog(
+            onDismissRequest = { definition = null },
+            confirmButton = { TextButton(onClick = { definition = null }) { Text("Done") } },
+            title = { Text(word) },
+            text = { Text(gloss) },
+        )
     }
 }
 
 @Composable
-fun GridView(rows: List<List<RenderedSpan>>) {
-    Surface(color = Color(0xFF202020), contentColor = Color.White) {
+fun GridView(rows: List<List<RenderedSpan>>, fontSize: Float) {
+    Surface(color = MaterialTheme.colorScheme.surfaceVariant) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp)) {
             for (row in rows) {
                 Text(
-                    buildSpans(row, Color(0xFF82B1FF)),   // light accent on the dark bar
+                    buildSpans(row, MaterialTheme.colorScheme.primary),
                     fontFamily = FontFamily.Monospace,
-                    fontSize = 17.sp,
+                    fontSize = fontSize.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                 )
             }
@@ -179,13 +339,19 @@ fun GridView(rows: List<List<RenderedSpan>>) {
 }
 
 @Composable
-fun TranscriptView(bridge: GlkBridge, paras: List<RenderedParagraph>, headerColor: Color?) {
+fun TranscriptView(
+    bridge: GlkBridge,
+    paras: List<RenderedParagraph>,
+    headerColor: Color?,
+    fontSize: Float,
+    onDefine: ((String) -> Unit)?,
+) {
     val scroll = rememberScrollState()
     LaunchedEffect(paras.size, paras.lastOrNull()?.spans?.sumOf { it.text.length }) {
         scroll.scrollTo(scroll.maxValue)
     }
-    // Banner (header-colour) treatment applies only to the first image, like iOS.
     var bannerShown = false
+    val accent = MaterialTheme.colorScheme.primary
     Column(Modifier.fillMaxSize().verticalScroll(scroll).padding(vertical = 12.dp)) {
         for (p in paras) {
             val img = p.spans.firstOrNull { it.image != null }?.image
@@ -193,30 +359,62 @@ fun TranscriptView(bridge: GlkBridge, paras: List<RenderedParagraph>, headerColo
                 if (!bannerShown) { BannerImage(bridge, img, headerColor); bannerShown = true }
                 else BlorbImage(bridge, img)
             }
-            val text = buildSpans(p.spans, MaterialTheme.colorScheme.primary)
+            val text = buildSpans(p.spans, accent)
             if (text.isNotEmpty()) {
-                // Body text inset 12dp; the banner above runs full-bleed.
-                Text(text, fontFamily = FontFamily.Serif, fontSize = 17.sp,
-                    modifier = Modifier.padding(horizontal = 12.dp))
+                DefinableText(text, fontSize, onDefine)
             }
             Spacer(Modifier.height(8.dp))
         }
     }
 }
 
-/** The opening banner: the game's header_colour painted behind it, full-bleed
- *  to the right edge with the art flush-left -- matching the web/iPad header. */
+/** A transcript paragraph. Long-press a word for its definition (dictionary
+ *  games); otherwise just selectable text for copy. */
+@Composable
+fun DefinableText(text: AnnotatedString, fontSize: Float, onDefine: ((String) -> Unit)?) {
+    if (onDefine == null) {
+        SelectionContainer {
+            Text(text, fontFamily = FontFamily.Serif, fontSize = fontSize.sp,
+                modifier = Modifier.padding(horizontal = 12.dp))
+        }
+        return
+    }
+    var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
+    Text(
+        text, fontFamily = FontFamily.Serif, fontSize = fontSize.sp,
+        onTextLayout = { layout = it },
+        modifier = Modifier.padding(horizontal = 12.dp).pointerInput(onDefine) {
+            detectTapGestures(onLongPress = { pos ->
+                val l = layout ?: return@detectTapGestures
+                val off = l.getOffsetForPosition(pos)
+                wordAt(text.text, off)?.let(onDefine)
+            })
+        },
+    )
+}
+
+/** The word (letters/digits) around [offset] in [text], or null. */
+fun wordAt(text: String, offset: Int): String? {
+    if (text.isEmpty()) return null
+    val o = offset.coerceIn(0, text.length - 1)
+    var start = o
+    var end = o
+    while (start > 0 && text[start - 1].isLetterOrDigit()) start--
+    while (end < text.length && text[end].isLetterOrDigit()) end++
+    if (start >= end) return null
+    return text.substring(start, end)
+}
+
 @Composable
 fun BannerImage(bridge: GlkBridge, num: Int, headerColor: Color?) {
     val bmp: ImageBitmap = remember(num) {
         bridge.image(num)?.let { BitmapFactory.decodeByteArray(it, 0, it.size)?.asImageBitmap() }
     } ?: return
     Box(
-        Modifier.fillMaxWidth()
-            .then(if (headerColor != null) Modifier.background(headerColor) else Modifier),
+        Modifier.fillMaxWidth().then(if (headerColor != null) Modifier.background(headerColor) else Modifier),
         contentAlignment = Alignment.CenterStart
     ) {
-        Image(bmp, contentDescription = null)   // natural size, left-aligned
+        Image(bmp, contentDescription = null)
     }
     Spacer(Modifier.height(8.dp))
 }
@@ -224,9 +422,7 @@ fun BannerImage(bridge: GlkBridge, num: Int, headerColor: Color?) {
 @Composable
 fun BlorbImage(bridge: GlkBridge, num: Int) {
     val bmp: ImageBitmap? = remember(num) {
-        bridge.image(num)?.let { bytes ->
-            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.asImageBitmap()
-        }
+        bridge.image(num)?.let { BitmapFactory.decodeByteArray(it, 0, it.size)?.asImageBitmap() }
     }
     if (bmp != null) {
         Image(bmp, contentDescription = null, modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp))
@@ -235,14 +431,12 @@ fun BlorbImage(bridge: GlkBridge, num: Int) {
 }
 
 @Composable
-fun InputBar(bridge: GlkBridge) {
+fun InputBar(bridge: GlkBridge, fontSize: Float) {
     val input = bridge.pendingInput
     when (input?.type) {
         "line" -> {
             var text by remember(bridge.buffers) { mutableStateOf("") }
             val focus = remember { FocusRequester() }
-            // Auto-focus (and raise the keyboard) whenever a line prompt appears,
-            // so you can just type -- as the iPad does.
             LaunchedEffect(Unit) { delay(120); runCatching { focus.requestFocus() } }
             Row(
                 Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
@@ -253,8 +447,8 @@ fun InputBar(bridge: GlkBridge) {
                 BasicTextField(
                     value = text,
                     onValueChange = { text = it },
-                    textStyle = TextStyle(fontSize = 17.sp, color = MaterialTheme.colorScheme.onSurface),
-                    cursorBrush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.onSurface),
+                    textStyle = TextStyle(fontSize = fontSize.sp, color = MaterialTheme.colorScheme.onSurface),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
                         autoCorrect = false,
@@ -268,14 +462,12 @@ fun InputBar(bridge: GlkBridge) {
             }
         }
         "char" -> {
-            Button(
-                onClick = { bridge.submitChar(" ") },
-                modifier = Modifier.fillMaxWidth().padding(8.dp)
-            ) { Text("Tap to continue") }
+            Button(onClick = { bridge.submitChar(" ") }, modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                Text("Tap to continue")
+            }
         }
         else -> if (bridge.finished) {
-            Text("The game has ended.", Modifier.padding(8.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("The game has ended.", Modifier.padding(8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -289,9 +481,7 @@ fun parseHexColor(hex: String): Color? {
     return try { Color(("ff$s").toLong(16)) } catch (e: Exception) { null }
 }
 
-/** Build an AnnotatedString from spans, mapping Glk styles to text styling.
- *  `inputColor` tints the player's echoed command (the Glk "input" style),
- *  matching the iOS accent-coloured echo. */
+/** Build an AnnotatedString from spans; `inputColor` tints the echoed command. */
 fun buildSpans(spans: List<RenderedSpan>, inputColor: Color): AnnotatedString = buildAnnotatedString {
     for (s in spans) {
         if (s.text.isEmpty()) continue
@@ -299,7 +489,7 @@ fun buildSpans(spans: List<RenderedSpan>, inputColor: Color): AnnotatedString = 
             "header", "subheader" -> SpanStyle(fontWeight = FontWeight.Bold)
             "emphasized", "note" -> SpanStyle(fontStyle = FontStyle.Italic)
             "alert" -> SpanStyle(color = Color(0xFFD32F2F))
-            "input" -> SpanStyle(color = inputColor)            // the player's typed command
+            "input" -> SpanStyle(color = inputColor)
             "preformatted", "user1", "user2" -> SpanStyle(fontFamily = FontFamily.Monospace)
             else -> SpanStyle()
         }
