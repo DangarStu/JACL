@@ -68,23 +68,40 @@ enum ReadingDefaults {
     static let fontSizeKey = "transcriptFontSize"
 }
 
-/// The bundled language glossary for a game: every `data/*_words.csv` merged
-/// into one lookup, loaded once for native long-press "Define". Keys are
-/// lowercased words/phrases; values are the English gloss. Matches the
-/// interpreter's CSV shape -- field[0] is the word (never quoted), field[1] the
-/// definition, which may be quoted because it can hold commas (e.g.
-/// `acara,"event, program"`).
+/// The bundled glossary for a game: the single `<lang>_words.csv` matching the
+/// game's own declared language (`game_language`), loaded for native long-press
+/// "Define". Keys are lowercased words/phrases; values are the English gloss.
+/// Matches the interpreter's CSV shape -- field[0] is the word (never quoted),
+/// field[1] the definition, which may be quoted because it can hold commas
+/// (e.g. `acara,"event, program"`).
 struct GameDictionary {
     private let entries: [String: String]
     var isEmpty: Bool { entries.isEmpty }
 
-    init(dataDir: String) {
+    /// Map a game's `game_language` (BCP-47, e.g. "id-ID") to the CSV name. Only
+    /// languages that ship a dictionary are listed; English and anything else
+    /// return nil, which disables lookup for that game.
+    private static let csvForLanguage = [
+        "id": "indonesian_words.csv",
+        "fr": "french_words.csv",
+        "de": "german_words.csv",
+        "es": "spanish_words.csv",
+    ]
+
+    /// Load the glossary for `language` (the game's `game_language`) from
+    /// `dataDir`, or nil if that language has no matching CSV there.
+    static func forGame(dataDir: String, language: String?) -> GameDictionary? {
+        guard let sub = language?.split(separator: "-").first.map({ $0.lowercased() }),
+              let name = Self.csvForLanguage[sub] else { return nil }
+        let path = "\(dataDir)/\(name)"
+        guard FileManager.default.fileExists(atPath: path) else { return nil }
+        let dict = GameDictionary(csvPath: path)
+        return dict.isEmpty ? nil : dict
+    }
+
+    private init(csvPath: String) {
         var map: [String: String] = [:]
-        let files = ((try? FileManager.default.contentsOfDirectory(atPath: dataDir)) ?? [])
-            .filter { $0.hasSuffix("_words.csv") }
-        for file in files {
-            guard let text = try? String(contentsOfFile: "\(dataDir)/\(file)", encoding: .utf8)
-            else { continue }
+        if let text = try? String(contentsOfFile: csvPath, encoding: .utf8) {
             var isHeader = true
             for line in text.split(whereSeparator: \.isNewline) {
                 if isHeader { isHeader = false; continue }     // skip header row
@@ -101,7 +118,7 @@ struct GameDictionary {
         entries = map
     }
 
-    /// The gloss for `word` (case-insensitive), or nil if it isn't in any CSV.
+    /// The gloss for `word` (case-insensitive), or nil.
     func define(_ word: String) -> String? { entries[word.lowercased()] }
 }
 
@@ -150,11 +167,14 @@ struct GameView: View {
             .onAppear {
                 guard !started else { return }
                 started = true
-                // A dictionary lives at <gameDir>/data/<lang>_words.csv; load it
-                // once for native long-press "Define" (no command, no turn).
+                // Load the glossary for native long-press "Define" -- only the
+                // CSV matching THIS game's declared language (game_language), so
+                // an English game never offers another game's definitions. nil
+                // when the language ships no dictionary (English etc.).
                 let dataDir = (gamePath as NSString).deletingLastPathComponent + "/data"
-                let dict = GameDictionary(dataDir: dataDir)
-                dictionary = dict.isEmpty ? nil : dict
+                let url = URL(fileURLWithPath: gamePath)
+                dictionary = GameDictionary.forGame(
+                    dataDir: dataDir, language: GameLibrary.stringConstant("game_language", in: url))
                 // The per-game header colour the web interface uses for its
                 // title band; tint the iPad's top chrome to match.
                 headerColor = GameLibrary.stringConstant(
