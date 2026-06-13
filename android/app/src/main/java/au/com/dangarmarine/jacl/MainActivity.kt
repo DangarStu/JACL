@@ -39,6 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontFamily
@@ -234,12 +235,36 @@ fun SettingsScreen(prefs: AppPrefs, onClose: () -> Unit) {
             Text("Appearance applies to the reading screen; the shelf stays dark.",
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
+            val uri = LocalUriHandler.current
+            Spacer(Modifier.height(8.dp))
+            HorizontalDivider()
+
+            SettingsLink("Get more games") { uri.openUri("https://jacl.dangarmarine.com.au/#get") }
+            Text("Browse the games at jacl.dangarmarine.com.au, then choose “Open in JACL” to install one.",
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+            SettingsLink("Privacy Policy") { uri.openUri("https://jacl.dangarmarine.com.au/privacy.html") }
+            Text("JACL collects no personal data. Games and saved games stay on your device; the app makes "
+               + "no network connections and has no accounts or sign-in.",
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
             Spacer(Modifier.height(8.dp))
             Text("About", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
-            Text("JACL v${GlkBridge.version} by Stuart Allen",
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("Version  ${GlkBridge.version}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("JACL by Stuart Allen", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            SettingsLink("jacl.dangarmarine.com.au") { uri.openUri("https://jacl.dangarmarine.com.au/") }
         }
     }
+}
+
+/** A tappable link row in Settings (opens a URL in the browser). */
+@Composable
+private fun SettingsLink(label: String, onClick: () -> Unit) {
+    Text(
+        label,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 8.dp),
+    )
 }
 
 // MARK: - Game
@@ -258,9 +283,12 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
     val headerColor = remember(game.file.path) {
         GameLibrary.stringConstant(game.file, "header_colour")?.let { parseHexColor(it) }
     }
-    // Bundled glossary (data/<lang>_words.csv) for long-press Define, if any.
+    // Glossary for long-press Define -- ONLY the CSV matching the game's own
+    // declared language (game_language); null (lookup disabled) for English or
+    // any language without a bundled dictionary.
     val dictionary = remember(game.file.path) {
-        GameDictionary.load(File(ctx.filesDir, "data")).takeUnless { it.isEmpty }
+        val lang = GameLibrary.stringConstant(game.file, "game_language")
+        GameDictionary.forGame(File(ctx.filesDir, "data"), lang)
     }
     var definition by remember { mutableStateOf<Pair<String, String>?>(null) }
     val onDefine: ((String) -> Unit)? = dictionary?.let { dict ->

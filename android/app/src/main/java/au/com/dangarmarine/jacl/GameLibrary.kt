@@ -123,7 +123,8 @@ object GameLibrary {
     private fun quotedConstant(bytes: ByteArray, name: String): String? {
         val line = String(bytes, Charsets.UTF_8)
         val parts = line.split(' ', '\t').filter { it.isNotEmpty() }
-        if (parts.size < 2 || parts[0] != "constant" || parts[1] != name) return null
+        // game_title / header_colour are `constant`; game_language is a `string`.
+        if (parts.size < 2 || (parts[0] != "constant" && parts[0] != "string") || parts[1] != name) return null
         val a = line.indexOf('"'); if (a < 0) return null
         val b = line.indexOf('"', a + 1); if (b < 0) return null
         return line.substring(a + 1, b)
