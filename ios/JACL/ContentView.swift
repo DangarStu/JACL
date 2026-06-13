@@ -325,7 +325,7 @@ struct TranscriptTextView: UIViewRepresentable {
         guard sig != context.coordinator.lastSig else { return }
         context.coordinator.lastSig = sig
         tv.attributedText = Self.attributed(paragraphs,
-                                            baseFont: UIFont.systemFont(ofSize: fontSize),
+                                            baseFont: Self.transcriptFont(ofSize: fontSize),
                                             headerColor: headerColor)
         DispatchQueue.main.async {
             guard tv.attributedText.length > 0 else { return }
@@ -392,6 +392,14 @@ struct TranscriptTextView: UIViewRepresentable {
             }
             return view.window?.rootViewController
         }
+    }
+
+    /// Body font for the transcript: an old-style serif (Garamond-like, novel
+    /// feel) for comfortable reading, falling back to the system font if it
+    /// isn't available. Bold/italic/monospaced runs derive from this via
+    /// `attributedString(baseFont:)`; preformatted text stays monospaced.
+    static func transcriptFont(ofSize size: CGFloat) -> UIFont {
+        UIFont(name: "Hoefler Text", size: size) ?? UIFont.systemFont(ofSize: size)
     }
 
     private static func attributed(_ paragraphs: [RenderedParagraph],
