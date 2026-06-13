@@ -11,6 +11,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @AppStorage(ReadingDefaults.fontSizeKey) private var fontSize = ReadingDefaults.fontSize
 
     /// Opens the site's "Get it for iPad" downloads tab directly -- the #get
     /// fragment selects that tab. A plain Safari hand-off; no in-app network.
@@ -29,6 +30,34 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Section {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack {
+                            Text("Text Size")
+                            Spacer()
+                            Text("\(Int(fontSize)) pt").foregroundStyle(.secondary)
+                        }
+                        HStack(spacing: 12) {
+                            Image(systemName: "textformat.size.smaller")
+                                .foregroundStyle(.secondary)
+                            Slider(value: $fontSize,
+                                   in: ReadingDefaults.fontRange, step: 1)
+                                .accessibilityLabel("Text size")
+                            Image(systemName: "textformat.size.larger")
+                                .foregroundStyle(.secondary)
+                        }
+                        Text("The quick brown fox jumps over the lazy dog.")
+                            .font(.system(size: fontSize))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                    }
+                    .padding(.vertical, 4)
+                } header: {
+                    Text("Reading")
+                } footer: {
+                    Text("Sets the size of the game transcript and command text.")
+                }
+
                 Section {
                     Link(destination: Self.getMoreURL) {
                         Label("Get more games", systemImage: "arrow.down.circle")

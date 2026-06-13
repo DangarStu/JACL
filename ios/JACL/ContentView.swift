@@ -32,6 +32,16 @@ final class BlorbImageCache {
     func clear() { store.removeAll() }
 }
 
+/// Reading preferences shared between the Settings screen and the game view.
+enum ReadingDefaults {
+    /// Transcript text size in points. Default is roughly the system `.body`
+    /// size at the default Dynamic Type setting.
+    static let fontSize: Double = 17
+    static let fontRange: ClosedRange<Double> = 12...28
+    /// UserDefaults key for the persisted transcript font size.
+    static let fontSizeKey = "transcriptFontSize"
+}
+
 /// The bundled language glossary for a game: every `data/*_words.csv` merged
 /// into one lookup, loaded once for native long-press "Define". Keys are
 /// lowercased words/phrases; values are the English gloss. Matches the
@@ -78,6 +88,13 @@ struct GameView: View {
     /// The bundled language glossary (merged `data/*_words.csv`), if this game
     /// ships one -- enables native long-press "Define". Loaded once on appear.
     @State private var dictionary: GameDictionary?
+    /// The game's `constant header_colour`, used to tint the top chrome (nav bar
+    /// and status line) so it matches the colour the game's banner art fades
+    /// into -- the same per-game header colour the web interface uses. Read once
+    /// on appear; nil for a game that declares none.
+    @State private var headerColor: Color?
+    /// Transcript text size, set in Settings and persisted app-wide.
+    @AppStorage(ReadingDefaults.fontSizeKey) private var transcriptFontSize = ReadingDefaults.fontSize
     @FocusState private var inputFocused: Bool
 
     // DEBUG-only scripted input (via `-autocommands "no;look;…"`), used to
@@ -108,6 +125,14 @@ struct GameView: View {
                 let dataDir = (gamePath as NSString).deletingLastPathComponent + "/data"
                 let dict = GameDictionary(dataDir: dataDir)
                 dictionary = dict.isEmpty ? nil : dict
+                // The per-game header colour the web interface uses for its
+                // title band; tint the iPad's top chrome to match.
+                headerColor = GameLibrary.stringConstant(
+                    "header_colour", in: URL(fileURLWithPath: gamePath)).flatMap(Color.init(hex:))
+                // The status grid is laid out by the interpreter to a column
+                // count derived from the cell metrics we send; measure those at
+                // the chosen reading size so the bar matches the status font.
+                bridge.statusFontSize = transcriptFontSize
                 bridge.start(gamePath: gamePath, size: geo.size)
             }
             .onDisappear {
@@ -118,6 +143,13 @@ struct GameView: View {
                 bridge.stop()
             }
             .onChange(of: geo.size) { _, newSize in bridge.resize(to: newSize) }
+            .onChange(of: transcriptFontSize) { _, newSize in
+                // Reading size changed: re-measure the status cell and tell the
+                // interpreter (via arrange), so it re-lays-out the fixed-width
+                // status line to the new column count instead of overflowing.
+                bridge.statusFontSize = newSize
+                bridge.resize(to: geo.size)
+            }
             .onChange(of: bridge.pendingInput) { _, input in
                 // Put the cursor in the command line whenever the game asks for
                 // one (so you can just type), and replay any scripted command.
@@ -152,7 +184,7 @@ struct GameView: View {
         return VStack(alignment: .leading, spacing: 0) {
             ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
                 rowText(row)
-                    .font(.system(.body, design: .monospaced))
+                    .font(.system(size: transcriptFontSize, design: .monospaced))
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)   // never let the status bar overflow
             }
@@ -183,7 +215,9 @@ struct GameView: View {
         // any time, not just at a prompt). UITextView/TextKit also paginates
         // long transcripts efficiently, sidestepping the old backing-store
         // overflow.
-        return TranscriptTextView(paragraphs: paras, dictionary: dictionary)
+        return TranscriptTextView(paragraphs: paras, dictionary: dictionary,
+                                  headerColor: headerColor.map { UIColor($0) },
+                                  fontSize: transcriptFontSize)
     }
 
     // MARK: Input
@@ -197,6 +231,7 @@ struct GameView: View {
                 Text(">").foregroundColor(.secondary)
                 TextField("", text: $inputText)
                     .textFieldStyle(.plain)
+                    .font(.system(size: transcriptFontSize))
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
                     .focused($inputFocused)
@@ -242,7 +277,7 @@ struct GameView: View {
         case "alert":                    t = t.foregroundColor(.red)
         case "input":                    t = t.foregroundColor(.accentColor)
         case "preformatted", "user1", "user2":
-            t = t.font(.system(.body, design: .monospaced))
+            t = t.font(.system(size: transcriptFontSize, design: .monospaced))
         default:                         break
         }
         if span.hyperlink != nil {
@@ -260,13 +295,22 @@ struct GameView: View {
 struct TranscriptTextView: UIViewRepresentable {
     let paragraphs: [RenderedParagraph]
     let dictionary: GameDictionary?
+    /// The game's header colour, painted behind the opening banner image (the
+    /// same per-game colour the web header band uses). nil leaves images plain.
+    let headerColor: UIColor?
+    /// Base transcript text size in points (from Settings).
+    let fontSize: Double
 
     func makeUIView(context: Context) -> UITextView {
         let tv = UITextView()
         tv.isEditable = false
         tv.isSelectable = true
         tv.backgroundColor = .clear
-        tv.textContainerInset = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
+        // No horizontal inset here: the body text is inset 12pt via paragraph
+        // indents (see `attributed`) so the opening banner can run full-bleed to
+        // the screen edges while the text keeps its margin.
+        tv.textContainerInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
+        tv.textContainer.lineFragmentPadding = 0
         tv.alwaysBounceVertical = true
         tv.delegate = context.coordinator   // adds the "Define" edit-menu item
         return tv
@@ -274,14 +318,15 @@ struct TranscriptTextView: UIViewRepresentable {
 
     func updateUIView(_ tv: UITextView, context: Context) {
         context.coordinator.dictionary = dictionary
-        // Rebuild only when the text actually changed, so an in-progress
-        // selection isn't dropped by an unrelated SwiftUI update.
+        // Rebuild when the text or the chosen font size changes, so an
+        // in-progress selection isn't dropped by an unrelated SwiftUI update.
         let lastLen = paragraphs.last?.spans.reduce(0) { $0 + $1.text.count } ?? 0
-        let sig = "\(paragraphs.count)|\(lastLen)"
+        let sig = "\(paragraphs.count)|\(lastLen)|\(fontSize)"
         guard sig != context.coordinator.lastSig else { return }
         context.coordinator.lastSig = sig
         tv.attributedText = Self.attributed(paragraphs,
-                                            baseFont: UIFont.preferredFont(forTextStyle: .body))
+                                            baseFont: UIFont.systemFont(ofSize: fontSize),
+                                            headerColor: headerColor)
         DispatchQueue.main.async {
             guard tv.attributedText.length > 0 else { return }
             tv.scrollRangeToVisible(NSRange(location: tv.attributedText.length - 1, length: 1))
@@ -350,26 +395,75 @@ struct TranscriptTextView: UIViewRepresentable {
     }
 
     private static func attributed(_ paragraphs: [RenderedParagraph],
-                                   baseFont: UIFont) -> NSAttributedString {
+                                   baseFont: UIFont,
+                                   headerColor: UIColor?) -> NSAttributedString {
         let out = NSMutableAttributedString()
-        let maxImageW = UIScreen.main.bounds.width - 24
+        let screenW = UIScreen.main.bounds.width
+        let inset: CGFloat = 12
+        var bannerLocation: Int?
+        var placedBanner = false
         for (i, para) in paragraphs.enumerated() {
             if i > 0 { out.append(NSAttributedString(string: "\n\n")) }
             for span in para.spans {
                 if let num = span.image, let img = BlorbImageCache.shared.image(num) {
                     let att = NSTextAttachment()
-                    att.image = img
-                    let scale = min(1, maxImageW / max(1, img.size.width))
-                    att.bounds = CGRect(x: 0, y: 0,
-                                        width: img.size.width * scale,
-                                        height: img.size.height * scale)
+                    if !placedBanner, let bg = headerColor {
+                        // The opening banner: full-bleed. Its left edge sits at
+                        // the screen edge (the art's left edge) and the header
+                        // colour fills from the art's right edge to the screen's
+                        // right edge, exactly the image's height -- so the art
+                        // blends into the colour as in the web header band.
+                        let scale = min(1, screenW / max(1, img.size.width))
+                        let h = img.size.height * scale
+                        att.image = bannerComposite(img, width: screenW, height: h, bg: bg)
+                        att.bounds = CGRect(x: 0, y: 0, width: screenW, height: h)
+                        bannerLocation = out.length
+                    } else {
+                        // In-game image: sits within the inset body column.
+                        let maxW = screenW - 2 * inset
+                        let scale = min(1, maxW / max(1, img.size.width))
+                        att.image = img
+                        att.bounds = CGRect(x: 0, y: 0,
+                                            width: img.size.width * scale,
+                                            height: img.size.height * scale)
+                    }
+                    placedBanner = true
                     out.append(NSAttributedString(attachment: att))
                 } else if !span.text.isEmpty {
                     out.append(span.attributedString(baseFont: baseFont))
                 }
             }
         }
+
+        // Indent every paragraph 12pt left/right (the margin the text view no
+        // longer applies), except the full-bleed banner paragraph, which runs
+        // edge to edge.
+        let body = NSMutableParagraphStyle()
+        body.firstLineHeadIndent = inset
+        body.headIndent = inset
+        body.tailIndent = -inset
+        let bannerStyle = NSParagraphStyle()
+        let ns = out.string as NSString
+        ns.enumerateSubstrings(in: NSRange(location: 0, length: ns.length),
+                               options: .byParagraphs) { _, _, enclosing, _ in
+            let isBanner = bannerLocation.map { NSLocationInRange($0, enclosing) } ?? false
+            out.addAttribute(.paragraphStyle, value: isBanner ? bannerStyle : body, range: enclosing)
+        }
         return out
+    }
+
+    /// Draw `img` (scaled to `height`, left-aligned at x=0) onto a band of `bg`
+    /// that is `width` wide and exactly `height` tall, so the header colour
+    /// shows from the art's right edge onward but never to its left.
+    private static func bannerComposite(_ img: UIImage, width: CGFloat,
+                                        height: CGFloat, bg: UIColor) -> UIImage {
+        let size = CGSize(width: width, height: max(1, height))
+        return UIGraphicsImageRenderer(size: size).image { ctx in
+            bg.setFill()
+            ctx.fill(CGRect(origin: .zero, size: size))
+            let imgWidth = img.size.width * (size.height / max(1, img.size.height))
+            img.draw(in: CGRect(x: 0, y: 0, width: imgWidth, height: size.height))
+        }
     }
 }
 
@@ -399,6 +493,20 @@ private extension UIFont {
     func withTraits(_ traits: UIFontDescriptor.SymbolicTraits) -> UIFont {
         guard let d = fontDescriptor.withSymbolicTraits(traits) else { return self }
         return UIFont(descriptor: d, size: pointSize)
+    }
+}
+
+extension Color {
+    /// Parse a CSS-style hex colour as written in a game's `header_colour`
+    /// constant: `#RRGGBB` or the 3-digit shorthand `#RGB` (e.g. "#777").
+    init?(hex: String) {
+        var s = hex.trimmingCharacters(in: .whitespaces)
+        if s.hasPrefix("#") { s.removeFirst() }
+        if s.count == 3 { s = s.map { "\($0)\($0)" }.joined() }   // #RGB -> #RRGGBB
+        guard s.count == 6, let v = UInt64(s, radix: 16) else { return nil }
+        self = Color(red:   Double((v >> 16) & 0xff) / 255,
+                     green: Double((v >> 8) & 0xff) / 255,
+                     blue:  Double(v & 0xff) / 255)
     }
 }
 

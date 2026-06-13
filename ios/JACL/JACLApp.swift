@@ -335,14 +335,15 @@ enum GameLibrary {
         UserDefaults.standard.set(Array(seeded), forKey: key)
     }
 
-    // MARK: Title extraction
+    // MARK: Reading constants from a .j2
 
-    /// Read `constant game_title "..."` from a `.j2`. Release files XOR-
-    /// obfuscate every line after the `#encrypted` marker (JACL's
+    /// Read a quoted `constant <name> "..."` value from a `.j2`. Release files
+    /// XOR-obfuscate every line after the `#encrypted` marker (JACL's
     /// jacl_obfuscate is a byte-wise ^0xFF), so those are de-obfuscated before
-    /// matching. Returns nil if no title line is found. Scans only until the
-    /// title line, which sits near the top of the game source.
-    static func title(of url: URL) -> String? {
+    /// matching. Returns the first match, or nil. Scans only until the constant
+    /// is found; the ones this reads (game_title, header_colour) sit near the
+    /// top of the source.
+    static func stringConstant(_ name: String, in url: URL) -> String? {
         guard let data = try? Data(contentsOf: url, options: .mappedIfSafe) else { return nil }
         let marker = Array("#encrypted".utf8)
         var encrypted = false
@@ -360,16 +361,19 @@ enum GameLibrary {
                 encrypted = true
                 continue
             }
-            if let t = titleInLine(line) { return t }
+            if let v = quotedConstant(name, in: line) { return v }
         }
         return nil
     }
 
-    /// Extract the title from a (decoded) `constant game_title "..."` line.
-    private static func titleInLine(_ bytes: [UInt8]) -> String? {
+    /// The game's display title (`constant game_title "..."`).
+    static func title(of url: URL) -> String? { stringConstant("game_title", in: url) }
+
+    /// Extract the quoted value from a decoded `constant <name> "..."` line.
+    private static func quotedConstant(_ name: String, in bytes: [UInt8]) -> String? {
         guard let line = String(bytes: bytes, encoding: .utf8) else { return nil }
         let parts = line.split(whereSeparator: { $0 == " " || $0 == "\t" })
-        guard parts.count >= 2, parts[0] == "constant", parts[1] == "game_title" else { return nil }
+        guard parts.count >= 2, parts[0] == "constant", parts[1] == name else { return nil }
         guard let a = line.firstIndex(of: "\"") else { return nil }
         let after = line.index(after: a)
         guard let b = line[after...].firstIndex(of: "\"") else { return nil }
