@@ -351,6 +351,8 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
         { word -> definition = word to (dict.define(word) ?: "isn’t in the dictionary.") }
     }
 
+    var showTextSize by remember { mutableStateOf(false) }
+
     BackHandler(onBack = onBack)
     DisposableEffect(game.file.path) { onDispose { bridge.stop() } }
 
@@ -365,6 +367,34 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
                 title = { Text(game.title, maxLines = 1) },
                 navigationIcon = {
                     IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
+                },
+                actions = {
+                    // An "Aa" button that drops the text-size slider, so the
+                    // reading size can be changed without leaving the game.
+                    Box {
+                        IconButton(onClick = { showTextSize = true }) {
+                            Text("Aa", fontWeight = FontWeight.SemiBold)
+                        }
+                        DropdownMenu(
+                            expanded = showTextSize,
+                            onDismissRequest = { showTextSize = false },
+                        ) {
+                            Column(Modifier.width(260.dp).padding(horizontal = 16.dp, vertical = 4.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text("Text Size", Modifier.weight(1f))
+                                    Text("${fontSize.toInt()} pt",
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                                Slider(
+                                    value = fontSize,
+                                    onValueChange = { prefs.updateFontSize(it) },
+                                    valueRange = ReadingDefaults.FONT_RANGE,
+                                    steps = (ReadingDefaults.FONT_RANGE.endInclusive
+                                        - ReadingDefaults.FONT_RANGE.start).toInt() - 1,
+                                )
+                            }
+                        }
+                    }
                 },
             )
         },

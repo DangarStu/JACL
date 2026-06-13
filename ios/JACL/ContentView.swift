@@ -143,6 +143,8 @@ struct GameView: View {
     /// navigationDestination otherwise detaches it from the stack's scheme.
     @AppStorage(AppearanceMode.key) private var appearance = AppearanceMode.system
     @FocusState private var inputFocused: Bool
+    /// Whether the in-game text-size popover (the top-bar "Aa" button) is open.
+    @State private var showTextSize = false
 
     // DEBUG-only scripted input (via `-autocommands "no;look;…"`), used to
     // exercise the bridge's input round-trip headlessly. Empty in release.
@@ -215,6 +217,19 @@ struct GameView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .preferredColorScheme(appearance.colorScheme)
+        .toolbar {
+            // A text-size control beside the back arrow, so the reading size can
+            // be changed without leaving the game for Settings.
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { showTextSize = true } label: {
+                    Image(systemName: "textformat.size")
+                }
+                .accessibilityLabel("Text size")
+                .popover(isPresented: $showTextSize) {
+                    TextSizePopover(fontSize: $transcriptFontSize)
+                }
+            }
+        }
     }
 
     /// Parse `-autocommands "no;look;…"` from the launch args (DEBUG only).
@@ -338,6 +353,34 @@ struct GameView: View {
     }
 }
 
+// MARK: - In-game text size
+
+/// The text-size slider shown from the reading screen's top-bar "Aa" button.
+/// It binds the same persisted `transcriptFontSize` as Settings, so changing it
+/// here updates the live transcript and sticks app-wide.
+private struct TextSizePopover: View {
+    @Binding var fontSize: Double
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Text Size")
+                Spacer()
+                Text("\(Int(fontSize)) pt").foregroundStyle(.secondary)
+            }
+            HStack(spacing: 12) {
+                Image(systemName: "textformat.size.smaller").foregroundStyle(.secondary)
+                Slider(value: $fontSize, in: ReadingDefaults.fontRange, step: 1)
+                    .accessibilityLabel("Text size")
+                Image(systemName: "textformat.size.larger").foregroundStyle(.secondary)
+            }
+        }
+        .padding()
+        .frame(width: 280)
+        .presentationCompactAdaptation(.popover)
+    }
+}
+
 // MARK: - Transcript (UITextView: selection/copy + tap-to-lookup)
 
 /// The scrolling game transcript, in a UITextView so it can be selected and
@@ -363,12 +406,25 @@ struct TranscriptTextView: UIViewRepresentable {
         tv.textContainerInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
         tv.textContainer.lineFragmentPadding = 0
         tv.alwaysBounceVertical = true
-        tv.delegate = context.coordinator   // adds the "Define" edit-menu item
+        tv.delegate = context.coordinator
+        // Dictionary games: a long-press on a word shows its definition straight
+        // away (like the Android app), instead of selecting text and making you
+        // tap a "Define" menu item. The handler no-ops for games without a
+        // glossary, which stay selectable for copy (see updateUIView).
+        let press = UILongPressGestureRecognizer(
+            target: context.coordinator, action: #selector(Coordinator.handleLongPress(_:)))
+        press.delegate = context.coordinator
+        tv.addGestureRecognizer(press)
         return tv
     }
 
     func updateUIView(_ tv: UITextView, context: Context) {
         context.coordinator.dictionary = dictionary
+        // A dictionary game's long-press is owned by our Define gesture, so turn
+        // off the built-in selection there (it would otherwise pop the system
+        // edit menu and fight the definition popover). Other games stay
+        // selectable so the transcript can still be copied.
+        tv.isSelectable = (dictionary == nil)
         // Rebuild when the text or the chosen font size changes, so an
         // in-progress selection isn't dropped by an unrelated SwiftUI update.
         let lastLen = paragraphs.last?.spans.reduce(0) { $0 + $1.text.count } ?? 0
@@ -386,47 +442,75 @@ struct TranscriptTextView: UIViewRepresentable {
 
     func makeCoordinator() -> Coordinator { Coordinator() }
 
-    final class Coordinator: NSObject, UITextViewDelegate, UIPopoverPresentationControllerDelegate {
+    final class Coordinator: NSObject, UITextViewDelegate,
+                             UIPopoverPresentationControllerDelegate, UIGestureRecognizerDelegate {
         var dictionary: GameDictionary?
         var lastSig = ""
 
-        // Long-press selects text and opens the edit menu; when the game ships a
-        // glossary, add a "Define" item next to Copy. Tapping it shows the gloss
-        // in a popover anchored to the selection -- no command, no turn, and it
-        // works any time (even mid-game), unlike the old `lookup` verb path.
-        func textView(_ textView: UITextView, editMenuForTextIn range: NSRange,
-                      suggestedActions: [UIMenuElement]) -> UIMenu? {
-            guard dictionary != nil, range.length > 0 else { return nil }
-            // Fold the selection into a lookup key: trim and collapse internal
-            // whitespace/line-wraps to single spaces, so a wrapped phrase still
-            // matches a CSV key like "abu abu". Cap the length so a giant
-            // multi-paragraph selection doesn't try to be a single word.
-            let key = (textView.text as NSString).substring(with: range)
-                .components(separatedBy: .whitespacesAndNewlines)
-                .filter { !$0.isEmpty }.joined(separator: " ")
-            guard !key.isEmpty, key.count <= 40 else { return nil }
-            let define = UIAction(title: "Define") { [weak self, weak textView] _ in
-                self?.define(key, in: textView)
+        // Long-press a word in a dictionary game and its definition appears
+        // immediately in a popover -- no selection, no edit menu, no extra tap
+        // (matching the Android app). Works any time, even mid-game, with no
+        // command and no turn. No-ops for games without a glossary, which keep
+        // the normal selectable/copy behaviour.
+        @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+            guard gesture.state == .began, dictionary != nil,
+                  let textView = gesture.view as? UITextView else { return }
+            let point = gesture.location(in: textView)
+            guard let position = textView.closestPosition(to: point) else { return }
+            let offset = textView.offset(from: textView.beginningOfDocument, to: position)
+            let text = textView.text as NSString
+            guard let range = Coordinator.wordRange(in: text, at: offset) else { return }
+            let word = text.substring(with: range)
+            // Anchor the popover to the word's on-screen rect; fall back to the
+            // touch point if a text range can't be formed.
+            var anchor = CGRect(x: point.x, y: point.y, width: 1, height: 1)
+            if let start = textView.position(from: textView.beginningOfDocument, offset: range.location),
+               let end = textView.position(from: start, offset: range.length),
+               let wordRange = textView.textRange(from: start, to: end) {
+                anchor = textView.firstRect(for: wordRange)
             }
-            return UIMenu(children: [define] + suggestedActions)
+            UISelectionFeedbackGenerator().selectionChanged()   // acknowledge the press
+            define(word, anchor: anchor, in: textView)
         }
 
-        private func define(_ word: String, in textView: UITextView?) {
-            guard let textView else { return }
+        /// The word (run of letters/digits) surrounding a character offset, as an
+        /// NSRange into `text`, or nil if the offset isn't on a word. Mirrors the
+        /// Android app's `wordAt`.
+        static func wordRange(in text: NSString, at offset: Int) -> NSRange? {
+            guard text.length > 0 else { return nil }
+            let letters = CharacterSet.alphanumerics
+            func isWord(_ i: Int) -> Bool {
+                guard i >= 0, i < text.length,
+                      let scalar = Unicode.Scalar(text.character(at: i)) else { return false }
+                return letters.contains(scalar)
+            }
+            var start = min(offset, text.length - 1)
+            if !isWord(start) && isWord(start - 1) { start -= 1 }   // pressed just past a word
+            guard isWord(start) else { return nil }
+            var end = start
+            while isWord(start - 1) { start -= 1 }
+            while isWord(end + 1) { end += 1 }
+            return NSRange(location: start, length: end - start + 1)
+        }
+
+        private func define(_ word: String, anchor: CGRect, in textView: UITextView) {
             let body = dictionary?.define(word).map { "\(word) — \($0)" }
                 ?? "“\(word)” isn’t in the dictionary."
             let popover = DefinitionViewController(text: body)
             popover.modalPresentationStyle = .popover
             if let pop = popover.popoverPresentationController {
                 pop.sourceView = textView
-                pop.sourceRect = textView.selectedTextRange
-                    .map { textView.firstRect(for: $0) }
-                    ?? CGRect(x: textView.bounds.midX, y: textView.bounds.midY, width: 1, height: 1)
+                pop.sourceRect = anchor
                 pop.permittedArrowDirections = [.up, .down]
                 pop.delegate = self
             }
             Coordinator.presenter(for: textView)?.present(popover, animated: true)
         }
+
+        // Let the long-press coexist with the scroll view's pan, so scrolling the
+        // transcript still works.
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+            shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool { true }
 
         // Keep it a popover (arrow, anchored) even on compact widths, rather
         // than letting iOS promote it to a full-screen sheet.
