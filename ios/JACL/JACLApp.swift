@@ -82,8 +82,16 @@ struct GameShelfView: View {
                     // form let SwiftUI share one destination's state across games.
                     List {
                         ForEach(games) { game in
-                            NavigationLink(game.title, value: game)
-                                .listRowBackground(Color.clear)
+                            NavigationLink(value: game) {
+                                HStack(spacing: 6) {
+                                    Text(game.title)
+                                    // The language, like the online game list.
+                                    Text("(\(game.language))")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .listRowBackground(Color.clear)
                         }
                         .onDelete { offsets in
                             offsets.map { games[$0] }.forEach(GameLibrary.delete)
@@ -192,10 +200,11 @@ struct GameShelfView: View {
 
 // MARK: - Sandbox game storage
 
-/// An imported game: its file plus the display title read from the `.j2`.
+/// An imported game: its file, the display title, and the language it's in.
 struct Game: Identifiable, Hashable {
     let url: URL
     let title: String
+    let language: String
     var id: URL { url }
 }
 
@@ -223,7 +232,21 @@ enum GameLibrary {
                 return da > db
             }
             .map { Game(url: $0,
-                        title: title(of: $0) ?? $0.deletingPathExtension().lastPathComponent) }
+                        title: title(of: $0) ?? $0.deletingPathExtension().lastPathComponent,
+                        language: language(of: $0)) }
+    }
+
+    /// The game's language name, from its `game_language` constant -- the same
+    /// labels the online list shows. Anything unmapped or absent reads as
+    /// English, matching the make-apache landing-page script's default.
+    static func language(of url: URL) -> String {
+        switch stringConstant("game_language", in: url)?.split(separator: "-").first?.lowercased() {
+        case "id": return "Indonesian"
+        case "fr": return "French"
+        case "de": return "German"
+        case "es": return "Spanish"
+        default:   return "English"
+        }
     }
 
     /// Import a picked or opened file into Documents/. A `.jaclgame` (or `.zip`)

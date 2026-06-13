@@ -172,17 +172,22 @@ fun ShelfScreen(
             } else {
                 LazyColumn(Modifier.fillMaxSize().padding(pad)) {
                     items(games, key = { it.file.path }) { g ->
-                        Text(
-                            g.title,
-                            color = Color.White,
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.fillMaxWidth()
+                        Row(
+                            Modifier.fillMaxWidth()
                                 .combinedClickable(
                                     onClick = { onOpen(g) },
                                     onLongClick = { pendingDelete = g },
                                 )
                                 .padding(horizontal = 16.dp, vertical = 16.dp),
-                        )
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(g.title, color = Color.White,
+                                style = MaterialTheme.typography.titleMedium)
+                            Spacer(Modifier.width(8.dp))
+                            // The language, like the online game list.
+                            Text("(${g.language})", color = Color.White.copy(alpha = 0.6f),
+                                style = MaterialTheme.typography.bodyMedium)
+                        }
                         HorizontalDivider(color = Color.White.copy(alpha = 0.15f))
                     }
                 }

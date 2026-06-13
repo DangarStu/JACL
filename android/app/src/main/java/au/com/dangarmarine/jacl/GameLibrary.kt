@@ -5,8 +5,8 @@ import android.net.Uri
 import java.io.File
 import java.util.zip.ZipInputStream
 
-/** An imported game: its .j2 file plus the title read from it. */
-data class Game(val file: File, val title: String)
+/** An imported game: its .j2, the title, and the language it's written in. */
+data class Game(val file: File, val title: String, val language: String)
 
 /**
  * Sandbox game storage -- the Android counterpart of the iOS GameLibrary.
@@ -19,11 +19,24 @@ object GameLibrary {
 
     private fun dataDir(ctx: Context): File = File(ctx.filesDir, "data").apply { mkdirs() }
 
-    /** Imported .j2 games, newest first, each with its resolved title. */
+    /** Imported .j2 games, newest first, each with its title and language. */
     fun games(ctx: Context): List<Game> =
         (ctx.filesDir.listFiles { f -> f.extension.lowercase() == "j2" } ?: emptyArray())
             .sortedByDescending { it.lastModified() }
-            .map { Game(it, title(it) ?: it.nameWithoutExtension) }
+            .map { Game(it, title(it) ?: it.nameWithoutExtension, languageOf(it)) }
+
+    /** The game's language name (English / Indonesian / French / German /
+     *  Spanish), from its game_language constant -- the same labels the online
+     *  list shows. Anything unmapped or absent reads as English, matching the
+     *  make-apache landing-page script's default. */
+    fun languageOf(file: File): String = when (stringConstant(file, "game_language")
+        ?.substringBefore('-')?.lowercase()) {
+        "id" -> "Indonesian"
+        "fr" -> "French"
+        "de" -> "German"
+        "es" -> "Spanish"
+        else -> "English"
+    }
 
     /** Delete a game's .j2 + .blorb. (Shared data/ CSVs are left alone.) */
     fun delete(ctx: Context, game: Game) {
