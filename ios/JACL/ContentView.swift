@@ -147,6 +147,8 @@ struct GameView: View {
     @State private var showTextSize = false
     /// Working text for the "name this save" dialog.
     @State private var saveName = ""
+    /// Whether the "restart this game?" confirmation is showing.
+    @State private var showRestartConfirm = false
 
     // DEBUG-only scripted input (via `-autocommands "no;look;…"`), used to
     // exercise the bridge's input round-trip headlessly. Empty in release.
@@ -231,6 +233,13 @@ struct GameView: View {
                     TextSizePopover(fontSize: $transcriptFontSize)
                 }
             }
+            // Restart: wipe the autosave and begin the game again from the intro.
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { showRestartConfirm = true } label: {
+                    Image(systemName: "arrow.clockwise")
+                }
+                .accessibilityLabel("Restart game")
+            }
         }
         // Saving: the game asked for a name (save verb). Restoring uses the
         // picker below. Both answer the same RemGlk file prompt.
@@ -238,7 +247,10 @@ struct GameView: View {
             TextField("Save name", text: $saveName)
                 .textInputAutocapitalization(.never)
             Button("Save") {
-                bridge.submitFileref(saveName.trimmingCharacters(in: .whitespaces))
+                let n = saveName.trimmingCharacters(in: .whitespaces)
+                // Prefix with the game so the same name works across games; an
+                // empty name cancels.
+                bridge.submitFileref(n.isEmpty ? "" : GlkBridge.saveValue(forGamePath: gamePath, name: n))
                 saveName = ""
             }
             Button("Cancel", role: .cancel) { bridge.cancelFileref(); saveName = "" }
@@ -247,8 +259,20 @@ struct GameView: View {
         }
         .sheet(isPresented: readPromptBinding) {
             RestorePicker(saves: GlkBridge.savedGames(forGamePath: gamePath),
-                          onPick: { bridge.submitFileref($0) },
+                          onPick: { bridge.submitFileref(GlkBridge.saveValue(forGamePath: gamePath, name: $0)) },
                           onCancel: { bridge.cancelFileref() })
+        }
+        .alert("Restart Game?", isPresented: $showRestartConfirm) {
+            Button("Restart", role: .destructive) {
+                // Don't autosave the game we're discarding, drop its autosave
+                // slot, then relaunch the terp so it runs the intro fresh.
+                jacl_autosave_set_suppressed(1)
+                try? FileManager.default.removeItem(atPath: GlkBridge.autosavePath(forGamePath: gamePath))
+                bridge.restart()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Start over from the beginning. Your current progress (the autosave) is lost; named saves are kept.")
         }
     }
 

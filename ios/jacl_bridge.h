@@ -43,6 +43,12 @@ const char *jacl_interpreter_version(void);
  * jacl_bridge_run() may proceed. See jacl_bridge.c. */
 void jacl_bridge_mark_terp_exited(void);
 
+/* Suppress (1) or allow (0) the silent autosave that otherwise fires when the
+ * game's socket closes. The app sets this to 1 right before a Restart closes
+ * the socket, so the discarded game isn't autosaved over; each new game's
+ * glk_main resets it to 0. Defined in jacl.c (JACL_IOS_EMBED). */
+void jacl_autosave_set_suppressed(int suppressed);
+
 #ifdef __cplusplus
 }
 #endif
