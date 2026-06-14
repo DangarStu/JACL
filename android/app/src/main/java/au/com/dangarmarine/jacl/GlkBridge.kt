@@ -51,6 +51,10 @@ class GlkBridge {
     private external fun nativeStart(gamePath: String): Int
     external fun nativeImage(num: Int): ByteArray?
     external fun nativeVersion(): String
+    private external fun nativeSetAutosaveSuppressed(suppressed: Boolean)
+
+    /** Suppress/allow the autosave that fires when the socket closes (Restart). */
+    fun setAutosaveSuppressed(suppressed: Boolean) = nativeSetAutosaveSuppressed(suppressed)
 
     companion object {
         init { System.loadLibrary("jacl") }
@@ -58,18 +62,34 @@ class GlkBridge {
         /** Interpreter version, read once for the shelf. */
         val version: String by lazy { GlkBridge().nativeVersion() }
 
-        /** Reserved base name for the silent per-game autosave slot, kept out
-         *  of the player's named-save list. */
-        const val AUTOSAVE_NAME = "__autosave__"
+        // Every game shares one sandbox dir, so all of a game's saves are
+        // prefixed with its base name ("<base>_"): a save "start" becomes
+        // "dragon_start.glksave", so the same name works across games. The
+        // autosave slot is "<base>__auto.glksave", excluded from the list.
+        // These must match the interpreter's `prefix` (the .j2 basename).
 
-        /** Base names (no ".glksave") of the saved games for [gameFile],
-         *  newest first. RemGlk writes saves next to the .j2; the reserved
-         *  autosave slot is excluded. */
-        fun savedGames(gameFile: java.io.File): List<String> =
-            (gameFile.parentFile?.listFiles { f -> f.extension == "glksave" } ?: emptyArray())
+        /** The game's base name, e.g. "dragon" for "dragon.j2". */
+        fun gameBase(gameFile: java.io.File): String = gameFile.nameWithoutExtension
+
+        /** The game's silent autosave slot file. */
+        fun autosaveFile(gameFile: java.io.File): java.io.File =
+            java.io.File(gameFile.parentFile, gameBase(gameFile) + "__auto.glksave")
+
+        /** The fileref value to send for a player-entered save [name]. */
+        fun saveValue(gameFile: java.io.File, name: String): String =
+            gameBase(gameFile) + "_" + name
+
+        /** Display names (game prefix stripped, autosave excluded) of this
+         *  game's named saves, newest first. */
+        fun savedGames(gameFile: java.io.File): List<String> {
+            val prefix = gameBase(gameFile) + "_"
+            val autoBare = gameBase(gameFile) + "__auto"
+            return (gameFile.parentFile?.listFiles { f -> f.extension == "glksave" } ?: emptyArray())
                 .sortedByDescending { it.lastModified() }
                 .map { it.nameWithoutExtension }
-                .filter { it != AUTOSAVE_NAME }
+                .filter { it.startsWith(prefix) && it != autoBare }
+                .map { it.removePrefix(prefix) }
+        }
     }
 
     // --- Published display model (drives Compose) ---------------------------
@@ -92,7 +112,9 @@ class GlkBridge {
     /** RemGlk wants exactly one event per update; queue while awaiting. */
     private var awaiting = false
     private val outQueue = ArrayDeque<JSONObject>()
-    private val splitter = JsonObjectStream()
+    private var splitter = JsonObjectStream()
+    /** Remembered launch args so the game can be restarted in place. */
+    private var gamePath = ""
 
     private var fontSize = 17.0
     /** Status-grid cell metrics are measured at this size by the UI and set
@@ -107,7 +129,12 @@ class GlkBridge {
     /** Launch [gamePath] and send the initial metrics for the given pixel size
      *  and measured monospaced cell. */
     fun start(gamePath: String, widthPx: Int, heightPx: Int, cellWidthPx: Double, cellHeightPx: Double) {
+        this.gamePath = gamePath
         sizeW = widthPx; sizeH = heightPx; cellW = cellWidthPx; cellH = cellHeightPx
+        // Reset state so this is safe to call again for a Restart (fresh terp).
+        windows = emptyList(); buffers = emptyMap(); grids = emptyMap()
+        pendingInput = null; pendingFilePrompt = null; finished = false
+        generation = 0; awaiting = false; outQueue.clear(); splitter = JsonObjectStream()
         val appFd = nativeStart(gamePath)
         if (appFd < 0) { Log.e(TAG, "nativeStart failed"); finished = true; return }
         val descriptor = ParcelFileDescriptor.adoptFd(appFd)
@@ -122,6 +149,15 @@ class GlkBridge {
         try { pfd?.close() } catch (_: Exception) {}
         pfd = null
         finished = true
+    }
+
+    /** Restart the current game from scratch (Restart control). The caller first
+     *  suppresses the autosave and deletes the slot, so the relaunched terp
+     *  finds no autosave and runs the intro fresh. */
+    fun restart() {
+        if (gamePath.isEmpty()) return
+        stop()
+        start(gamePath, sizeW, sizeH, cellW, cellH)
     }
 
     fun submitLine(value: String) {

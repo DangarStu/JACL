@@ -97,3 +97,12 @@ Java_au_com_dangarmarine_jacl_GlkBridge_nativeVersion(JNIEnv *env, jobject thiz)
 {
     return (*env)->NewStringUTF(env, jacl_interpreter_version());
 }
+
+/* void nativeSetAutosaveSuppressed(boolean) -> suppress/allow the autosave that
+ * fires when the game's socket closes. Kotlin sets it true before a Restart
+ * closes the socket so the discarded game isn't autosaved over. */
+JNIEXPORT void JNICALL
+Java_au_com_dangarmarine_jacl_GlkBridge_nativeSetAutosaveSuppressed(JNIEnv *env, jobject thiz, jboolean suppressed)
+{
+    jacl_autosave_set_suppressed(suppressed ? 1 : 0);
+}

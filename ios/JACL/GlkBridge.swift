@@ -51,6 +51,9 @@ final class GlkBridge: ObservableObject {
 
     private var appFD: Int32 = -1
     private var generation = 0
+    /// Remembered launch args so the game can be restarted in place.
+    private var gamePath = ""
+    private var lastSize = CGSize.zero
     /// RemGlk requires exactly one event per update. `awaiting` is true between
     /// sending an event and receiving the update it triggers; further events
     /// queue (with consecutive arranges coalesced) until then.
@@ -78,6 +81,14 @@ final class GlkBridge: ObservableObject {
     /// Launch `gamePath` (an absolute .j2 path in the sandbox) and send the
     /// initial metrics for a display of `size` points.
     func start(gamePath: String, size: CGSize) {
+        // Remember the launch args + reset all protocol/display state, so this
+        // is safe to call again for a Restart (fresh terp, generation back to 0).
+        self.gamePath = gamePath
+        self.lastSize = size
+        buffers = [:]; grids = [:]; windows = []
+        pendingInput = nil; pendingFilePrompt = nil; finished = false
+        generation = 0; awaiting = false
+        outQueue.removeAll(); splitter = JSONObjectStream()
         // Drop the previous game's cached blorb images -- the cache is keyed by
         // resource number, so this game's image 1 would otherwise show the last
         // game's image 1 (grail rendering the Down Dragon banner).
@@ -162,6 +173,15 @@ final class GlkBridge: ObservableObject {
 
     /// Cancel a pending save/restore prompt (sends an empty filename).
     func cancelFileref() { submitFileref("") }
+
+    /// Restart the current game from scratch (used by the Restart control).
+    /// The caller first suppresses the autosave and deletes the slot, so the
+    /// relaunched terp finds no autosave and runs the intro fresh.
+    func restart() {
+        guard !gamePath.isEmpty else { return }
+        stop()
+        start(gamePath: gamePath, size: lastSize)
+    }
 
     /// Tell the terp the display resized (e.g. rotation, split view, keyboard).
     func resize(to size: CGSize) {
@@ -273,29 +293,50 @@ final class GlkBridge: ObservableObject {
         }
     }
 
-    // MARK: Saved games
+    // MARK: Saved games (per-game namespaced)
 
-    /// Base names (no ".glksave") of the saved games for the game at
-    /// `gamePath`, newest first. RemGlk writes saves next to the .j2 in the
-    /// sandbox; the reserved autosave slot is excluded.
-    static func savedGames(forGamePath gamePath: String) -> [String] {
-        let dir = (gamePath as NSString).deletingLastPathComponent
+    // Every game shares one sandbox dir, so all of a game's saves are prefixed
+    // with its base name ("<base>_"): a save called "start" becomes the file
+    // "dragon_start.glksave", letting the same name be reused across games
+    // without clashing. The autosave slot is "<base>__auto.glksave", excluded
+    // from the player's list. These must match the interpreter's `prefix`
+    // (the .j2 basename) — see jacl.c jacl_autosave_ref.
+
+    /// The game's base name, e.g. "dragon" for ".../dragon.j2".
+    static func gameBase(forGamePath p: String) -> String {
+        ((p as NSString).lastPathComponent as NSString).deletingPathExtension
+    }
+
+    /// The on-disk path of the game's silent autosave slot.
+    static func autosavePath(forGamePath p: String) -> String {
+        (p as NSString).deletingPathExtension + "__auto.glksave"
+    }
+
+    /// The fileref value to send for a player-entered save `name`.
+    static func saveValue(forGamePath p: String, name: String) -> String {
+        gameBase(forGamePath: p) + "_" + name
+    }
+
+    /// Display names (game prefix stripped, autosave excluded) of this game's
+    /// named saves, newest first.
+    static func savedGames(forGamePath p: String) -> [String] {
+        let dir = (p as NSString).deletingLastPathComponent
+        let base = gameBase(forGamePath: p)
+        let prefix = base + "_"
+        let autoBare = base + "__auto"
         let fm = FileManager.default
         let files = (try? fm.contentsOfDirectory(atPath: dir)) ?? []
         return files
             .filter { $0.hasSuffix(".glksave") }
-            .map { String($0.dropLast(".glksave".count)) }
-            .filter { $0 != GlkBridge.autosaveName }
+            .map { String($0.dropLast(".glksave".count)) }     // bare name
+            .filter { $0.hasPrefix(prefix) && $0 != autoBare }
             .sorted { lhs, rhs in
                 let l = (try? fm.attributesOfItem(atPath: "\(dir)/\(lhs).glksave")[.modificationDate]) as? Date
                 let r = (try? fm.attributesOfItem(atPath: "\(dir)/\(rhs).glksave")[.modificationDate]) as? Date
                 return (l ?? .distantPast) > (r ?? .distantPast)
             }
+            .map { String($0.dropFirst(prefix.count)) }        // strip "<base>_"
     }
-
-    /// The reserved base name for the silent per-game autosave slot, kept out
-    /// of the player's named-save list.
-    static let autosaveName = "__autosave__"
 
     private func render(_ span: GlkSpan) -> RenderedSpan {
         RenderedSpan(text: span.text ?? "",

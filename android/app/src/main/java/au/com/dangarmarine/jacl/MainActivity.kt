@@ -27,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -353,6 +354,7 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
 
     var showTextSize by remember { mutableStateOf(false) }
     var saveName by remember { mutableStateOf("") }
+    var showRestartConfirm by remember { mutableStateOf(false) }
 
     BackHandler(onBack = onBack)
     DisposableEffect(game.file.path) { onDispose { bridge.stop() } }
@@ -370,6 +372,10 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
                     IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
                 },
                 actions = {
+                    // Restart: wipe the autosave and begin again from the intro.
+                    IconButton(onClick = { showRestartConfirm = true }) {
+                        Icon(Icons.Filled.Refresh, "Restart game")
+                    }
                     // An "Aa" button that drops the text-size slider, so the
                     // reading size can be changed without leaving the game.
                     Box {
@@ -452,9 +458,12 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
                 )
             },
             confirmButton = {
-                TextButton(onClick = { bridge.submitFileref(saveName.trim()); saveName = "" }) {
-                    Text("Save")
-                }
+                TextButton(onClick = {
+                    // Prefix with the game so the same name works across games.
+                    val n = saveName.trim()
+                    bridge.submitFileref(if (n.isEmpty()) "" else GlkBridge.saveValue(game.file, n))
+                    saveName = ""
+                }) { Text("Save") }
             },
             dismissButton = {
                 TextButton(onClick = { bridge.cancelFileref(); saveName = "" }) { Text("Cancel") }
@@ -472,7 +481,7 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
                     Column {
                         for (name in saves) {
                             TextButton(
-                                onClick = { bridge.submitFileref(name) },
+                                onClick = { bridge.submitFileref(GlkBridge.saveValue(game.file, name)) },
                                 modifier = Modifier.fillMaxWidth(),
                             ) {
                                 Text(name, Modifier.fillMaxWidth())
@@ -484,6 +493,30 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
             confirmButton = {},
             dismissButton = {
                 TextButton(onClick = { bridge.cancelFileref() }) { Text("Cancel") }
+            },
+        )
+    }
+
+    if (showRestartConfirm) {
+        AlertDialog(
+            onDismissRequest = { showRestartConfirm = false },
+            title = { Text("Restart Game?") },
+            text = {
+                Text("Start over from the beginning. Your current progress (the " +
+                     "autosave) is lost; named saves are kept.")
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showRestartConfirm = false
+                    // Don't autosave the discarded game, drop its autosave slot,
+                    // then relaunch the terp so it runs the intro fresh.
+                    bridge.setAutosaveSuppressed(true)
+                    GlkBridge.autosaveFile(game.file).delete()
+                    bridge.restart()
+                }) { Text("Restart") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRestartConfirm = false }) { Text("Cancel") }
             },
         )
     }

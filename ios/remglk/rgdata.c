@@ -570,9 +570,20 @@ static data_raw_t *data_raw_blockread_sub(FILE *file, char *termchar)
     *termchar = '\0';
 
     while (isspace(ch = getc(file))) { };
-    if (ch == EOF)
+    if (ch == EOF) {
+#ifdef JACL_IOS_EMBED
+        /* The app closed the socket: the player left while the game was parked
+         * waiting for the next command. Autosave so reopening resumes here
+         * (no-ops if nothing was played or a Restart suppressed it). Only on
+         * stdin -- reads of save/data files legitimately reach EOF. */
+        if (file == stdin) {
+            extern int jacl_autosave_save(void);
+            jacl_autosave_save();
+        }
+#endif
         gli_fatal_error("data: Unexpected end of input");
-    
+    }
+
     if (ch == ']' || ch == '}') {
         *termchar = ch;
         return NULL;

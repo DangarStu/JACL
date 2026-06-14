@@ -187,12 +187,26 @@ static void jacl_strict_warning(const char *msg)
 	fprintf(stderr, "JACL error: %s\n", msg);
 }
 
+#ifdef JACL_IOS_EMBED
+/* Silent per-game autosave / resume, defined after restore_interaction below;
+ * forward-declared here because glk_main uses them. */
+extern volatile int jacl_autosave_suppressed;
+int jacl_autosave_save(void);
+int jacl_autosave_restore(void);
+#endif
+
 void
 glk_main(void)
 {
 	int             index;
 
 	frefid_t 		blorb_file;
+
+#ifdef JACL_IOS_EMBED
+	/* TRUE when this launch resumed a per-game autosave (see below): +intro is
+	 * skipped and the room is shown with +look_around instead of a fresh turn. */
+	int             jacl_resumed = FALSE;
+#endif
 
 	srand((int) time(NULL));
 
@@ -369,7 +383,18 @@ glk_main(void)
 
 	jacl_set_window(mainwin);
 
+#ifdef JACL_IOS_EMBED
+	/* Fresh launch: allow the next exit to autosave. Then, if this game has a
+	 * per-game autosave slot, resume it instead of replaying the intro -- the
+	 * restored state already holds everything +intro would set up. */
+	jacl_autosave_suppressed = FALSE;
+	jacl_resumed = jacl_autosave_restore();
+	if (!jacl_resumed) {
+		execute("+intro");
+	}
+#else
 	execute("+intro");
+#endif
 
 	if (object[2] == NULL) {
 		log_error (CANT_RUN, PLUS_STDERR);
@@ -379,7 +404,17 @@ glk_main(void)
     /* DUMMY RETRIEVE OF 'HERE' FOR TESTING OF GAME STATE */
     get_here();
 
+#ifdef JACL_IOS_EMBED
+	if (jacl_resumed) {
+		/* Show where the player is, full description, no turn passing
+		 * (+look_around does `set time = false`). */
+		execute("+look_around");
+	} else {
+		eachturn();
+	}
+#else
 	eachturn();
+#endif
 
 	/* TOP OF COMMAND LOOP */
 	do {
@@ -1464,6 +1499,74 @@ restore_interaction(const char *filename)
 		return (TRUE);
 	}
 }
+
+#ifdef JACL_IOS_EMBED
+/* ---- Silent per-game autosave / resume (iOS + Android apps only) -----------
+ *
+ * Mirrors how the web build persists state between commands: leaving a game
+ * (the app closes the socket, so the terp's stdin hits EOF) writes the current
+ * state to a reserved per-game slot "<prefix>__auto.glksave"; reopening the
+ * game restores it in glk_main -- skipping +intro and showing the room via
+ * +look_around -- so the player resumes exactly where they left off with no
+ * turn passing. Named saves the player makes are untouched.
+ *
+ * The slot is per-game (keyed on `prefix`, the .j2 basename) because every
+ * game shares one sandbox directory. An explicit Restart in the app sets the
+ * suppress flag so the next exit doesn't re-autosave, then deletes the slot. */
+
+volatile int jacl_autosave_suppressed = FALSE;
+
+static frefid_t jacl_autosave_ref(void)
+{
+	char name[120];
+	snprintf(name, sizeof(name), "%s__auto", prefix);
+	return glk_fileref_create_by_name(fileusage_SavedGame | fileusage_BinaryMode,
+	                                  name, 0);
+}
+
+/* Save current state to the autosave slot. No-ops unless a game is loaded and
+ * at least one turn has passed (so merely opening and closing a game, or
+ * leaving at the start-up "restore?" prompt, doesn't create a resume point).
+ * Called from the terp thread at the stdin-EOF boundary (rgdata.c), where the
+ * game is parked at a command prompt and its state is consistent. */
+int jacl_autosave_save(void)
+{
+	frefid_t ref;
+
+	if (jacl_autosave_suppressed) return (FALSE);
+	if (objects <= 0) return (FALSE);                         /* no game loaded */
+	if (TOTAL_MOVES == NULL || TOTAL_MOVES->value <= 0) return (FALSE);
+
+	ref = jacl_autosave_ref();
+	if (!ref) return (FALSE);
+	/* save_game() destroys the fileref itself once its stream is open, like
+	 * save_interaction does -- we must NOT destroy it again (double free). */
+	return (save_game(ref));
+}
+
+/* Restore the autosave slot if it exists. Returns TRUE if a game was resumed.
+ * Called from glk_main before +intro. */
+int jacl_autosave_restore(void)
+{
+	frefid_t ref = jacl_autosave_ref();
+
+	if (!ref) return (FALSE);
+	if (!glk_fileref_does_file_exist(ref)) {
+		glk_fileref_destroy(ref);   /* not consumed by restore_game below */
+		return (FALSE);
+	}
+	/* restore_game() destroys the fileref itself once its stream is open. */
+	return (restore_game(ref, FALSE));
+}
+
+/* Set by the app's Restart before it closes the socket, so the imminent exit
+ * doesn't write a fresh autosave over the one being discarded. Reset at the
+ * top of each new game's glk_main. */
+void jacl_autosave_set_suppressed(int suppressed)
+{
+	jacl_autosave_suppressed = suppressed;
+}
+#endif /* JACL_IOS_EMBED */
 
 glui32
 glk_get_bin_line_stream(strid_t file_stream, char *buffer, glui32 max_length)
