@@ -98,13 +98,18 @@ glui32 glk_gestalt_ext(glui32 id, glui32 val, glui32 *arr, glui32 arrlen)
         case gestalt_UnicodeNorm:
             return TRUE;
             
+        /* The embedded iOS/Android apps play sound channels: rgschan.c records
+         * the ops and the app plays them from the blorb. We support play,
+         * volume and music, but not sound-finished notification events. */
         case gestalt_Sound:
         case gestalt_SoundVolume:
-        case gestalt_SoundNotify: 
         case gestalt_SoundMusic:
+            return TRUE;
+
+        case gestalt_SoundNotify:
             return FALSE;
 
-        case gestalt_Hyperlinks: 
+        case gestalt_Hyperlinks:
         case gestalt_HyperlinkInput:
             return gli_supportcaps.hyperlinks;
  

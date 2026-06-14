@@ -33,6 +33,19 @@ int jacl_bridge_run(const char *gamepath, int io_fd);
  * number to actual pixels (see ios/README.md, graphics). */
 const void *jacl_bridge_image(unsigned int num, unsigned int *len);
 
+/* Raw bytes of sound resource `num` from the game's blorb (Ogg Vorbis, AIFF or
+ * MOD), with the length in *len, or NULL if there's no blorb or no such sound.
+ * The pointer is owned by the blorb layer -- copy the bytes to keep them. The
+ * app sniffs the format from the bytes and plays it. */
+const void *jacl_bridge_sound(unsigned int num, unsigned int *len);
+
+/* Decode Ogg Vorbis bytes (a blorb sound) to a self-contained 16-bit PCM WAV
+ * in a malloc'd buffer, with the length in *out_len, or NULL on failure. The
+ * caller owns the returned buffer and must free() it. AVAudioPlayer can't play
+ * Ogg, but it plays the WAV this produces. (Implemented in jacl_audio.c via
+ * stb_vorbis.) */
+void *jacl_ogg_to_wav(const void *ogg, int ogg_len, int *out_len);
+
 /* The JACL interpreter version, "J_VERSION.J_RELEASE.J_BUILD" (e.g. "4.7.0"),
  * from version.h. The app shows it next to this build's link time so you can
  * confirm at a glance which build is actually running. */

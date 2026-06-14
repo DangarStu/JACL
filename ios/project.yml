@@ -40,9 +40,11 @@ targets:
       # seeded into Documents on first launch by installBundledStarters()).
       - path: StarterGames
 
-      # iOS-only C: startup shim + Swift<->RemGlk bridge.
+      # iOS-only C: startup shim + Swift<->RemGlk bridge + Ogg decoding
+      # (jacl_audio.c #includes stb_vorbis.c, so stb_vorbis is not listed).
       - path: ios_startup.c
       - path: jacl_bridge.c
+      - path: jacl_audio.c
 
       # The unmodified JACL interpreter core (same list as src/Makefile's
       # COMMON_SRC, plus jacl.c and the Glk saver). glk_startup.c is NOT

@@ -39,10 +39,18 @@ class AppPrefs(private val sp: SharedPreferences) {
         runCatching { AppearanceMode.valueOf(sp.getString("appearanceMode", "SYSTEM")!!) }
             .getOrDefault(AppearanceMode.SYSTEM)
     ); private set
+    /** Whether game sound effects/music play. Persists across all games. */
+    var soundEnabled by mutableStateOf(sp.getBoolean("soundEnabled", true))
+        private set
 
     fun updateFontSize(v: Float) {
         fontSize = v
         sp.edit().putFloat("transcriptFontSize", v).apply()
+    }
+
+    fun updateSoundEnabled(on: Boolean) {
+        soundEnabled = on
+        sp.edit().putBoolean("soundEnabled", on).apply()
     }
 
     fun updateAppearance(a: AppearanceMode) {

@@ -379,6 +379,15 @@ glk_main(void)
 			sound_channel[index] = glk_schannel_create(0);
 			fade_channel[index] = glk_schannel_create(0);
 		}
+#ifdef JACL_IOS_EMBED
+		/* The console build asks the player whether to enable sound; the apps
+		 * skip that (ios flag) and instead gate playback app-side via a
+		 * persistent Sound setting. So keep the interpreter's sound_enabled ON
+		 * here -- it always emits the channel ops, and the app decides whether
+		 * to actually play them. (The in-game `sound off`/`on` verbs still
+		 * work.) Without this, sound_enabled defaults to 0 and no ops fire. */
+		SOUND_ENABLED->value = TRUE;
+#endif
 	}
 
 	jacl_set_window(mainwin);

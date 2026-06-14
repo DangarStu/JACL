@@ -13,6 +13,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @AppStorage(ReadingDefaults.fontSizeKey) private var fontSize = ReadingDefaults.fontSize
     @AppStorage(AppearanceMode.key) private var appearance = AppearanceMode.system
+    @AppStorage("soundEnabled") private var soundEnabled = true
 
     /// Opens the site's "Get it for iPad" downloads tab directly -- the #get
     /// fragment selects that tab. A plain Safari hand-off; no in-app network.
@@ -63,6 +64,12 @@ struct SettingsView: View {
                     Text("Text size and appearance apply to the game reading "
                        + "screen. \u{201C}System\u{201D} follows your iPad's "
                        + "Light/Dark setting; the shelf stays dark.")
+                }
+
+                Section {
+                    Toggle("Sound", isOn: $soundEnabled)
+                } footer: {
+                    Text("Play game sound effects and music. Applies to every game.")
                 }
 
                 Section {
