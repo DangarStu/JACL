@@ -43,6 +43,9 @@ final class GlkBridge: ObservableObject {
     @Published var grids: [Int: [[RenderedSpan]]] = [:]
     /// The pending input request, if the terp is waiting for one.
     @Published var pendingInput: GlkInput?
+    /// A pending save/restore file prompt, if the game called save/restore and
+    /// is waiting for a filename. Drives the name dialog / restore picker.
+    @Published var pendingFilePrompt: GlkSpecialInput?
     /// Set when the game has quit (terp thread ended / socket closed).
     @Published var finished = false
 
@@ -149,6 +152,17 @@ final class GlkBridge: ObservableObject {
         pendingInput = nil
     }
 
+    /// Answer a pending save/restore file prompt with `name` (a bare filename
+    /// the player chose). An empty `name` cancels the save/restore.
+    func submitFileref(_ name: String) {
+        guard pendingFilePrompt != nil else { return }
+        enqueue(.specialResponse(gen: generation, value: name))
+        pendingFilePrompt = nil
+    }
+
+    /// Cancel a pending save/restore prompt (sends an empty filename).
+    func cancelFileref() { submitFileref("") }
+
     /// Tell the terp the display resized (e.g. rotation, split view, keyboard).
     func resize(to size: CGSize) {
         enqueue(.arrange(gen: generation, metrics: metrics(for: size)))
@@ -251,7 +265,37 @@ final class GlkBridge: ObservableObject {
         }
 
         pendingInput = update.input?.first
+        // A save/restore file prompt arrives as a top-level `specialinput`
+        // instead of a normal line/char request; surface it for the UI to
+        // answer (name dialog when writing, picker when reading).
+        if let si = update.specialinput, si.type == "fileref_prompt" {
+            pendingFilePrompt = si
+        }
     }
+
+    // MARK: Saved games
+
+    /// Base names (no ".glksave") of the saved games for the game at
+    /// `gamePath`, newest first. RemGlk writes saves next to the .j2 in the
+    /// sandbox; the reserved autosave slot is excluded.
+    static func savedGames(forGamePath gamePath: String) -> [String] {
+        let dir = (gamePath as NSString).deletingLastPathComponent
+        let fm = FileManager.default
+        let files = (try? fm.contentsOfDirectory(atPath: dir)) ?? []
+        return files
+            .filter { $0.hasSuffix(".glksave") }
+            .map { String($0.dropLast(".glksave".count)) }
+            .filter { $0 != GlkBridge.autosaveName }
+            .sorted { lhs, rhs in
+                let l = (try? fm.attributesOfItem(atPath: "\(dir)/\(lhs).glksave")[.modificationDate]) as? Date
+                let r = (try? fm.attributesOfItem(atPath: "\(dir)/\(rhs).glksave")[.modificationDate]) as? Date
+                return (l ?? .distantPast) > (r ?? .distantPast)
+            }
+    }
+
+    /// The reserved base name for the silent per-game autosave slot, kept out
+    /// of the player's named-save list.
+    static let autosaveName = "__autosave__"
 
     private func render(_ span: GlkSpan) -> RenderedSpan {
         RenderedSpan(text: span.text ?? "",

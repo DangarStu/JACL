@@ -19,8 +19,18 @@ struct GlkUpdate: Decodable {
     let windows: [GlkWindow]?
     let content: [GlkContent]?
     let input: [GlkInput]?
+    let specialinput: GlkSpecialInput?   // present when the game prompts for a file (save/restore)
     let disable: Bool?
     let message: String?          // present on {"type":"error","message":…}
+}
+
+/// A file-reference prompt: the game called save/restore and RemGlk is waiting
+/// for a filename. `filemode` is "write" (saving) or "read" (restoring);
+/// `filetype` is "save" for the save/restore verbs.
+struct GlkSpecialInput: Decodable, Equatable {
+    let type: String              // "fileref_prompt"
+    let filemode: String?         // "write" | "read" | "readwrite" | "writeappend"
+    let filetype: String?         // "save" | "transcript" | "command" | "data"
 }
 
 /// Geometry + kind of one window. Coordinates are in the same units we send
@@ -107,6 +117,11 @@ enum GlkEvent {
     case char(gen: Int, window: Int, value: String)
     case hyperlink(gen: Int, window: Int, value: Int)
     case redraw(gen: Int)
+    /// Answer a `fileref_prompt` (save/restore). `value` is the bare filename
+    /// the player chose; RemGlk confines it to the game's sandbox dir and
+    /// appends ".glksave". An empty value cancels (no file -> the game reports
+    /// it couldn't save/restore).
+    case specialResponse(gen: Int, value: String)
 
     private var dictionary: [String: Any] {
         switch self {
@@ -123,6 +138,9 @@ enum GlkEvent {
             return ["type": "hyperlink", "gen": gen, "window": window, "value": value]
         case let .redraw(gen):
             return ["type": "redraw", "gen": gen]
+        case let .specialResponse(gen, value):
+            return ["type": "specialresponse", "gen": gen,
+                    "response": "fileref_prompt", "value": value]
         }
     }
 
@@ -143,6 +161,7 @@ enum GlkEvent {
         case let .char(_, w, v):      return .char(gen: gen, window: w, value: v)
         case let .hyperlink(_, w, v): return .hyperlink(gen: gen, window: w, value: v)
         case .redraw:                 return .redraw(gen: gen)
+        case let .specialResponse(_, v): return .specialResponse(gen: gen, value: v)
         }
     }
 
