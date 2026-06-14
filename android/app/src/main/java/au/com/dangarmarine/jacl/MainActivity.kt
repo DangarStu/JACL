@@ -352,6 +352,7 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
     }
 
     var showTextSize by remember { mutableStateOf(false) }
+    var saveName by remember { mutableStateOf("") }
 
     BackHandler(onBack = onBack)
     DisposableEffect(game.file.path) { onDispose { bridge.stop() } }
@@ -431,6 +432,59 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
             confirmButton = { TextButton(onClick = { definition = null }) { Text("Done") } },
             title = { Text(word) },
             text = { Text(gloss) },
+        )
+    }
+
+    // Save/restore file prompts. The game's save verb asks for a name (write);
+    // the restore verb shows the existing saves to pick from (read). Both
+    // answer the same RemGlk file prompt.
+    val prompt = bridge.pendingFilePrompt
+    if (prompt?.filemode == "write") {
+        AlertDialog(
+            onDismissRequest = { bridge.cancelFileref(); saveName = "" },
+            title = { Text("Save Game") },
+            text = {
+                OutlinedTextField(
+                    value = saveName,
+                    onValueChange = { saveName = it },
+                    singleLine = true,
+                    label = { Text("Save name") },
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { bridge.submitFileref(saveName.trim()); saveName = "" }) {
+                    Text("Save")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { bridge.cancelFileref(); saveName = "" }) { Text("Cancel") }
+            },
+        )
+    } else if (prompt?.filemode == "read") {
+        val saves = remember(prompt) { GlkBridge.savedGames(game.file) }
+        AlertDialog(
+            onDismissRequest = { bridge.cancelFileref() },
+            title = { Text("Restore Game") },
+            text = {
+                if (saves.isEmpty()) {
+                    Text("No saved games. Type “save” during play to create one.")
+                } else {
+                    Column {
+                        for (name in saves) {
+                            TextButton(
+                                onClick = { bridge.submitFileref(name) },
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Text(name, Modifier.fillMaxWidth())
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { bridge.cancelFileref() }) { Text("Cancel") }
+            },
         )
     }
 }

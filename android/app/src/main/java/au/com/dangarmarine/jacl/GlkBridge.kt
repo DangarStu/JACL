@@ -29,6 +29,11 @@ class RenderedParagraph(val spans: MutableList<RenderedSpan>)
 /** The pending input request the terp is waiting on. */
 data class GlkInput(val id: Int, val type: String)
 
+/** A pending save/restore file prompt: the game called save/restore and the
+ *  terp is waiting for a filename. [filemode] is "write" (saving) or "read"
+ *  (restoring). Mirrors the iOS GlkSpecialInput. */
+data class GlkSpecialInput(val filemode: String, val filetype: String)
+
 /** A window in the current layout (we only need id + kind). */
 data class GlkWindow(val id: Int, val type: String)
 
@@ -52,6 +57,19 @@ class GlkBridge {
         private const val TAG = "JACL"
         /** Interpreter version, read once for the shelf. */
         val version: String by lazy { GlkBridge().nativeVersion() }
+
+        /** Reserved base name for the silent per-game autosave slot, kept out
+         *  of the player's named-save list. */
+        const val AUTOSAVE_NAME = "__autosave__"
+
+        /** Base names (no ".glksave") of the saved games for [gameFile],
+         *  newest first. RemGlk writes saves next to the .j2; the reserved
+         *  autosave slot is excluded. */
+        fun savedGames(gameFile: java.io.File): List<String> =
+            (gameFile.parentFile?.listFiles { f -> f.extension == "glksave" } ?: emptyArray())
+                .sortedByDescending { it.lastModified() }
+                .map { it.nameWithoutExtension }
+                .filter { it != AUTOSAVE_NAME }
     }
 
     // --- Published display model (drives Compose) ---------------------------
@@ -59,6 +77,9 @@ class GlkBridge {
     var buffers by mutableStateOf<Map<Int, List<RenderedParagraph>>>(emptyMap()); private set
     var grids by mutableStateOf<Map<Int, List<List<RenderedSpan>>>>(emptyMap()); private set
     var pendingInput by mutableStateOf<GlkInput?>(null); private set
+    /** A pending save/restore file prompt, if the game is waiting for a
+     *  filename. Drives the name dialog / restore picker. */
+    var pendingFilePrompt by mutableStateOf<GlkSpecialInput?>(null); private set
     var finished by mutableStateOf(false); private set
 
     // --- Plumbing -----------------------------------------------------------
@@ -118,6 +139,18 @@ class GlkBridge {
             .put("window", req.id).put("value", value))
         pendingInput = null
     }
+
+    /** Answer a pending save/restore file prompt with [name] (a bare filename).
+     *  An empty [name] cancels the save/restore. */
+    fun submitFileref(name: String) {
+        if (pendingFilePrompt == null) return
+        enqueue(JSONObject().put("type", "specialresponse").put("gen", generation)
+            .put("response", "fileref_prompt").put("value", name))
+        pendingFilePrompt = null
+    }
+
+    /** Cancel a pending save/restore prompt (sends an empty filename). */
+    fun cancelFileref() = submitFileref("")
 
     fun resize(widthPx: Int, heightPx: Int, cellWidthPx: Double, cellHeightPx: Double) {
         sizeW = widthPx; sizeH = heightPx; cellW = cellWidthPx; cellH = cellHeightPx
@@ -243,6 +276,15 @@ class GlkBridge {
                 val inp = inputs.getJSONObject(0)
                 GlkInput(inp.getInt("id"), inp.optString("type"))
             } else null
+
+            // A save/restore prompt arrives as a top-level `specialinput`
+            // instead of a normal input request; surface it for the UI.
+            val special = update.optJSONObject("specialinput")
+            if (special != null && special.optString("type") == "fileref_prompt") {
+                pendingFilePrompt = GlkSpecialInput(
+                    filemode = special.optString("filemode", "read"),
+                    filetype = special.optString("filetype", "save"))
+            }
         } finally {
             awaiting = false
             pump()

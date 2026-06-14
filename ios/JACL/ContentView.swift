@@ -145,6 +145,8 @@ struct GameView: View {
     @FocusState private var inputFocused: Bool
     /// Whether the in-game text-size popover (the top-bar "Aa" button) is open.
     @State private var showTextSize = false
+    /// Working text for the "name this save" dialog.
+    @State private var saveName = ""
 
     // DEBUG-only scripted input (via `-autocommands "no;look;…"`), used to
     // exercise the bridge's input round-trip headlessly. Empty in release.
@@ -230,6 +232,45 @@ struct GameView: View {
                 }
             }
         }
+        // Saving: the game asked for a name (save verb). Restoring uses the
+        // picker below. Both answer the same RemGlk file prompt.
+        .alert("Save Game", isPresented: writePromptBinding) {
+            TextField("Save name", text: $saveName)
+                .textInputAutocapitalization(.never)
+            Button("Save") {
+                bridge.submitFileref(saveName.trimmingCharacters(in: .whitespaces))
+                saveName = ""
+            }
+            Button("Cancel", role: .cancel) { bridge.cancelFileref(); saveName = "" }
+        } message: {
+            Text("Name this saved game.")
+        }
+        .sheet(isPresented: readPromptBinding) {
+            RestorePicker(saves: GlkBridge.savedGames(forGamePath: gamePath),
+                          onPick: { bridge.submitFileref($0) },
+                          onCancel: { bridge.cancelFileref() })
+        }
+    }
+
+    /// True while the game is waiting for a save name (write-mode file prompt).
+    private var writePromptBinding: Binding<Bool> {
+        Binding(get: { bridge.pendingFilePrompt?.filemode == "write" },
+                set: { show in
+                    if !show, bridge.pendingFilePrompt?.filemode == "write" {
+                        bridge.cancelFileref()
+                    }
+                })
+    }
+
+    /// True while the game is waiting for a save to restore (read-mode prompt).
+    /// Swiping the picker away cancels the restore.
+    private var readPromptBinding: Binding<Bool> {
+        Binding(get: { bridge.pendingFilePrompt?.filemode == "read" },
+                set: { show in
+                    if !show, bridge.pendingFilePrompt?.filemode == "read" {
+                        bridge.cancelFileref()
+                    }
+                })
     }
 
     /// Parse `-autocommands "no;look;…"` from the launch args (DEBUG only).
@@ -378,6 +419,43 @@ private struct TextSizePopover: View {
         .padding()
         .frame(width: 280)
         .presentationCompactAdaptation(.popover)
+    }
+}
+
+// MARK: - Restore picker
+
+/// A list of the game's saved games, shown when the player types "restore".
+/// Picking one answers the file prompt with its name; the bundled binding
+/// cancels the restore if the sheet is dismissed without a choice.
+private struct RestorePicker: View {
+    let saves: [String]
+    let onPick: (String) -> Void
+    let onCancel: () -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if saves.isEmpty {
+                    ContentUnavailableView("No Saved Games", systemImage: "tray",
+                        description: Text("Type “save” during play to create one."))
+                } else {
+                    List(saves, id: \.self) { name in
+                        Button { onPick(name); dismiss() } label: {
+                            Label(name, systemImage: "doc")
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Restore Game")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { onCancel(); dismiss() }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
     }
 }
 
