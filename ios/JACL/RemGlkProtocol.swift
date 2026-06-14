@@ -25,11 +25,13 @@ struct GlkUpdate: Decodable {
     /// The game's Glk timer request, present only when it CHANGES: a number
     /// (re)starts the interval, null cancels. nil here = no change this update.
     let timer: TimerUpdate?
+    /// Sound-channel ops (play/stop/volume) for this update, if any.
+    let schannel: [SchannelOp]?
 
     enum TimerUpdate: Equatable { case set(ms: Int); case cancel }
 
     enum CodingKeys: String, CodingKey {
-        case type, gen, windows, content, input, specialinput, disable, message, timer
+        case type, gen, windows, content, input, specialinput, disable, message, timer, schannel
     }
 
     init(from decoder: Decoder) throws {
@@ -53,7 +55,20 @@ struct GlkUpdate: Decodable {
         } else {
             timer = nil
         }
+        schannel = try c.decodeIfPresent([SchannelOp].self, forKey: .schannel)
     }
+}
+
+/// One sound-channel op: `op` is "play" | "stop" | "volume"; `chan` is the
+/// channel id; the rest are present per op (Glk volume is 0..0x10000,
+/// `repeats` -1 means loop).
+struct SchannelOp: Decodable {
+    let op: String
+    let chan: Int
+    let snd: Int?
+    let repeats: Int?
+    let vol: Int?
+    let dur: Int?
 }
 
 /// A file-reference prompt: the game called save/restore and RemGlk is waiting

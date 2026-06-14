@@ -142,6 +142,8 @@ struct GameView: View {
     /// inside the reading screen so it drives the window even though the shelf's
     /// navigationDestination otherwise detaches it from the stack's scheme.
     @AppStorage(AppearanceMode.key) private var appearance = AppearanceMode.system
+    /// Whether game sound plays. Persistent across all games (see Settings).
+    @AppStorage("soundEnabled") private var soundEnabled = true
     @FocusState private var inputFocused: Bool
     /// Whether the in-game text-size popover (the top-bar "Aa" button) is open.
     @State private var showTextSize = false
@@ -189,6 +191,7 @@ struct GameView: View {
                 // count derived from the cell metrics we send; measure those at
                 // the chosen reading size so the bar matches the status font.
                 bridge.statusFontSize = transcriptFontSize
+                bridge.setSoundEnabled(soundEnabled)
                 bridge.start(gamePath: gamePath, size: geo.size)
             }
             .onDisappear {
@@ -206,6 +209,7 @@ struct GameView: View {
                 bridge.statusFontSize = newSize
                 bridge.resize(to: geo.size)
             }
+            .onChange(of: soundEnabled) { _, on in bridge.setSoundEnabled(on) }
             .onChange(of: bridge.pendingInput) { _, input in
                 // Put the cursor in the command line whenever the game asks for
                 // one (so you can just type), and replay any scripted command.

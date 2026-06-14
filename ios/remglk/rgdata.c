@@ -1514,6 +1514,9 @@ void data_update_free(data_update_t *dat)
     free(dat);
 }
 
+/* Defined in rgschan.c: flush the pending sound-channel ops into the update. */
+extern void gli_schannel_print_ops(void);
+
 void data_update_print(data_update_t *dat)
 {
     int ix;
@@ -1588,6 +1591,10 @@ void data_update_print(data_update_t *dat)
         }
         printf(" ]");
     }
+
+    /* Pending sound-channel ops (play/stop/volume), for the app to play from
+     * the blorb. RemGlk proper plays no audio; the embedded apps do. */
+    gli_schannel_print_ops();
 
     printf("}\n");
 }

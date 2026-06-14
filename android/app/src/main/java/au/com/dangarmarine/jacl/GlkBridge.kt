@@ -50,11 +50,18 @@ class GlkBridge {
     // --- Native entry points (android_jni.c) --------------------------------
     private external fun nativeStart(gamePath: String): Int
     external fun nativeImage(num: Int): ByteArray?
+    private external fun nativeSound(num: Int): ByteArray?
     external fun nativeVersion(): String
     private external fun nativeSetAutosaveSuppressed(suppressed: Boolean)
 
+    /** Sound-channel playback, fed sound bytes straight from the blorb. */
+    private val audio = JaclAudio { num -> nativeSound(num) }
+
     /** Suppress/allow the autosave that fires when the socket closes (Restart). */
     fun setAutosaveSuppressed(suppressed: Boolean) = nativeSetAutosaveSuppressed(suppressed)
+
+    /** Apply the persistent Sound setting: when off, channel ops are ignored. */
+    fun setSoundEnabled(on: Boolean) { audio.muted = !on }
 
     companion object {
         init { System.loadLibrary("jacl") }
@@ -151,6 +158,7 @@ class GlkBridge {
     /** Stop the terp: closing our socket end gives it EOF -> glk_exit. */
     fun stop() {
         main.removeCallbacks(timerRunnable)
+        audio.releaseAll()
         try { pfd?.close() } catch (_: Exception) {}
         pfd = null
         finished = true
@@ -351,6 +359,20 @@ class GlkBridge {
             if (update.has("timer")) {
                 timerIntervalMs = if (update.isNull("timer")) 0 else update.getInt("timer")
                 rescheduleTimer()
+            }
+
+            // Sound-channel ops (play/stop/volume), played from the blorb.
+            update.optJSONArray("schannel")?.let { arr ->
+                for (i in 0 until arr.length()) {
+                    val o = arr.getJSONObject(i)
+                    val chan = o.optInt("chan")
+                    when (o.optString("op")) {
+                        "play" -> audio.play(chan, o.optInt("snd"),
+                            o.optInt("repeats", 1), o.optInt("vol", 65536))
+                        "stop" -> audio.stop(chan)
+                        "volume" -> audio.setVolume(chan, o.optInt("vol", 65536))
+                    }
+                }
             }
         } finally {
             awaiting = false

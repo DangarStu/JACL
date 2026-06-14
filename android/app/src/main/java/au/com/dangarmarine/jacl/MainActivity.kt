@@ -260,6 +260,17 @@ fun SettingsScreen(prefs: AppPrefs, onClose: () -> Unit) {
                 }
             }
 
+            SettingsSection("Sound",
+                footer = "Play game sound effects and music. Applies to every game.") {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Sound", Modifier.weight(1f))
+                    Switch(
+                        checked = prefs.soundEnabled,
+                        onCheckedChange = { prefs.updateSoundEnabled(it) },
+                    )
+                }
+            }
+
             SettingsSection("Games",
                 footer = "Browse the games at jacl.dangarmarine.com.au, then choose “Open in JACL” to install one.") {
                 SettingsLinkRow("Get more games") { uri.openUri("https://jacl.dangarmarine.com.au/#get") }
@@ -358,6 +369,8 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
 
     BackHandler(onBack = onBack)
     DisposableEffect(game.file.path) { onDispose { bridge.stop() } }
+    // Apply the persistent Sound setting (and react to it changing live).
+    LaunchedEffect(prefs.soundEnabled) { bridge.setSoundEnabled(prefs.soundEnabled) }
 
     fun cell() = measurer.measure(
         AnnotatedString("0"),

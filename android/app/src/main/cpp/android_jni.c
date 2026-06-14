@@ -91,6 +91,20 @@ Java_au_com_dangarmarine_jacl_GlkBridge_nativeImage(JNIEnv *env, jobject thiz, j
     return arr;
 }
 
+/* byte[] nativeSound(int num) -> the blorb sound bytes (Ogg/AIFF/MOD), or null. */
+JNIEXPORT jbyteArray JNICALL
+Java_au_com_dangarmarine_jacl_GlkBridge_nativeSound(JNIEnv *env, jobject thiz, jint num)
+{
+    unsigned int len = 0;
+    const void *data = jacl_bridge_sound((unsigned int) num, &len);
+    if (data == NULL || len == 0) return NULL;
+
+    jbyteArray arr = (*env)->NewByteArray(env, (jsize) len);
+    if (arr == NULL) return NULL;
+    (*env)->SetByteArrayRegion(env, arr, 0, (jsize) len, (const jbyte *) data);
+    return arr;
+}
+
 /* String nativeVersion() -> "J_VERSION.J_RELEASE.J_BUILD". */
 JNIEXPORT jstring JNICALL
 Java_au_com_dangarmarine_jacl_GlkBridge_nativeVersion(JNIEnv *env, jobject thiz)

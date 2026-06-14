@@ -150,3 +150,27 @@ const void *jacl_bridge_image(unsigned int num, unsigned int *len)
 	*len = (unsigned int) res.length;
 	return res.data.ptr;
 }
+
+const void *jacl_bridge_sound(unsigned int num, unsigned int *len)
+{
+	giblorb_result_t res;
+	giblorb_map_t *map;
+
+	*len = 0;
+
+	/* Sounds live in the game's blorb as Snd resources (Ogg/AIFF/MOD). Return
+	 * the raw bytes; the app sniffs the format and plays it. NULL if the game
+	 * has no blorb or no such sound. */
+	map = giblorb_get_resource_map();
+	if (map == NULL) {
+		return NULL;
+	}
+
+	if (giblorb_load_resource(map, giblorb_method_Memory, &res,
+	                          giblorb_ID_Snd, num) != giblorb_err_None) {
+		return NULL;
+	}
+
+	*len = (unsigned int) res.length;
+	return res.data.ptr;
+}

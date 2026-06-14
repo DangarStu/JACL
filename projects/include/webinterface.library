@@ -124,9 +124,12 @@ if interpreter = CGI
    write "^"
 else
    if ios = true
-      # No sound on iOS (the native Glk backend has no sound support), so
-      # don't ask the question -- leave sound effects off.
-      set sound_enabled = false
+      # The native iOS/Android apps DO play sound now: RemGlk records the Glk
+      # channel ops and the app plays them from the blorb, gated by a
+      # persistent in-app Sound setting. So enable it at the JACL level (the
+      # interpreter always emits the ops; the app decides whether to play) and
+      # skip the console question.
+      set sound_enabled = true
    else
       # GLK console: getyesorno is synchronous, no state guards needed.
       # TTS is browser-only so only the sound question is asked.

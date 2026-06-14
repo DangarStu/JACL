@@ -58,6 +58,18 @@ final class GlkBridge: ObservableObject {
     /// posts a {"type":"timer"} event each interval until the game cancels it.
     private var timerIntervalMs = 0
     private var glkTimer: Timer?
+    /// Sound-channel playback, fed sound bytes straight from the blorb.
+    private lazy var audio = JaclAudio { [weak self] num in self?.soundData(num) }
+
+    /// The raw blorb bytes for sound resource `num` (Ogg Vorbis), or nil.
+    private func soundData(_ num: Int) -> Data? {
+        var len: UInt32 = 0
+        guard let ptr = jacl_bridge_sound(UInt32(num), &len), len > 0 else { return nil }
+        return Data(bytes: ptr, count: Int(len))
+    }
+
+    /// Apply the persistent Sound setting: when off, channel ops are ignored.
+    func setSoundEnabled(_ on: Bool) { audio.muted = !on }
     /// RemGlk requires exactly one event per update. `awaiting` is true between
     /// sending an event and receiving the update it triggers; further events
     /// queue (with consecutive arranges coalesced) until then.
@@ -93,6 +105,7 @@ final class GlkBridge: ObservableObject {
         pendingInput = nil; pendingFilePrompt = nil; finished = false
         generation = 0; awaiting = false
         glkTimer?.invalidate(); glkTimer = nil; timerIntervalMs = 0
+        audio.stopAll()
         outQueue.removeAll(); splitter = JSONObjectStream()
         // Drop the previous game's cached blorb images -- the cache is keyed by
         // resource number, so this game's image 1 would otherwise show the last
@@ -139,6 +152,7 @@ final class GlkBridge: ObservableObject {
     /// which is only safe because the previous terp has been stopped first.
     func stop() {
         glkTimer?.invalidate(); glkTimer = nil; timerIntervalMs = 0
+        audio.stopAll()
         let fd = appFD
         guard fd >= 0 else { return }
         appFD = -1
@@ -306,6 +320,16 @@ final class GlkBridge: ObservableObject {
             case .cancel:      timerIntervalMs = 0
             }
             rescheduleTimer()
+        }
+        // Sound-channel ops (play/stop/volume), played from the blorb.
+        for sop in update.schannel ?? [] {
+            switch sop.op {
+            case "play":   audio.play(chan: sop.chan, snd: sop.snd ?? 0,
+                                      repeats: sop.repeats ?? 1, vol: sop.vol ?? 65536)
+            case "stop":   audio.stop(chan: sop.chan)
+            case "volume": audio.setVolume(chan: sop.chan, vol: sop.vol ?? 65536)
+            default:       break
+            }
         }
     }
 
