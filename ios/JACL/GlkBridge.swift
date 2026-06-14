@@ -54,6 +54,10 @@ final class GlkBridge: ObservableObject {
     /// Remembered launch args so the game can be restarted in place.
     private var gamePath = ""
     private var lastSize = CGSize.zero
+    /// Current Glk timer interval in ms (0 = off) and the repeating timer that
+    /// posts a {"type":"timer"} event each interval until the game cancels it.
+    private var timerIntervalMs = 0
+    private var glkTimer: Timer?
     /// RemGlk requires exactly one event per update. `awaiting` is true between
     /// sending an event and receiving the update it triggers; further events
     /// queue (with consecutive arranges coalesced) until then.
@@ -88,6 +92,7 @@ final class GlkBridge: ObservableObject {
         buffers = [:]; grids = [:]; windows = []
         pendingInput = nil; pendingFilePrompt = nil; finished = false
         generation = 0; awaiting = false
+        glkTimer?.invalidate(); glkTimer = nil; timerIntervalMs = 0
         outQueue.removeAll(); splitter = JSONObjectStream()
         // Drop the previous game's cached blorb images -- the cache is keyed by
         // resource number, so this game's image 1 would otherwise show the last
@@ -133,6 +138,7 @@ final class GlkBridge: ObservableObject {
     /// RemGlk's gli_initialize_windows() reset that state for a clean start --
     /// which is only safe because the previous terp has been stopped first.
     func stop() {
+        glkTimer?.invalidate(); glkTimer = nil; timerIntervalMs = 0
         let fd = appFD
         guard fd >= 0 else { return }
         appFD = -1
@@ -142,6 +148,7 @@ final class GlkBridge: ObservableObject {
     }
 
     deinit {
+        glkTimer?.invalidate()
         let fd = appFD
         if fd >= 0 {
             shutdown(fd, SHUT_RDWR)
@@ -290,6 +297,31 @@ final class GlkBridge: ObservableObject {
         // answer (name dialog when writing, picker when reading).
         if let si = update.specialinput, si.type == "fileref_prompt" {
             pendingFilePrompt = si
+        }
+        // The game changed its Glk timer: (re)start at the given interval, or
+        // cancel. Absent (update.timer == nil) means no change.
+        if let t = update.timer {
+            switch t {
+            case .set(let ms): timerIntervalMs = ms
+            case .cancel:      timerIntervalMs = 0
+            }
+            rescheduleTimer()
+        }
+    }
+
+    // MARK: Glk timer
+
+    private func rescheduleTimer() {
+        glkTimer?.invalidate()
+        glkTimer = nil
+        guard timerIntervalMs > 0 else { return }
+        glkTimer = Timer.scheduledTimer(withTimeInterval: Double(timerIntervalMs) / 1000.0,
+                                        repeats: true) { [weak self] _ in
+            guard let self else { return }
+            // Coalesce: at most one pending tick, so a slow turn can't pile them up.
+            if !self.outQueue.contains(where: { $0.isTimer }) {
+                self.enqueue(.timer(gen: self.generation))
+            }
         }
     }
 

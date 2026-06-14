@@ -22,6 +22,38 @@ struct GlkUpdate: Decodable {
     let specialinput: GlkSpecialInput?   // present when the game prompts for a file (save/restore)
     let disable: Bool?
     let message: String?          // present on {"type":"error","message":…}
+    /// The game's Glk timer request, present only when it CHANGES: a number
+    /// (re)starts the interval, null cancels. nil here = no change this update.
+    let timer: TimerUpdate?
+
+    enum TimerUpdate: Equatable { case set(ms: Int); case cancel }
+
+    enum CodingKeys: String, CodingKey {
+        case type, gen, windows, content, input, specialinput, disable, message, timer
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        type = try c.decode(String.self, forKey: .type)
+        gen = try c.decodeIfPresent(Int.self, forKey: .gen)
+        windows = try c.decodeIfPresent([GlkWindow].self, forKey: .windows)
+        content = try c.decodeIfPresent([GlkContent].self, forKey: .content)
+        input = try c.decodeIfPresent([GlkInput].self, forKey: .input)
+        specialinput = try c.decodeIfPresent(GlkSpecialInput.self, forKey: .specialinput)
+        disable = try c.decodeIfPresent(Bool.self, forKey: .disable)
+        message = try c.decodeIfPresent(String.self, forKey: .message)
+        // Distinguish "timer": N (set) from "timer": null (cancel) from absent
+        // (no change) -- a plain Int? can't, so check key presence explicitly.
+        if c.contains(.timer) {
+            if let ms = try c.decodeIfPresent(Int.self, forKey: .timer) {
+                timer = .set(ms: ms)
+            } else {
+                timer = .cancel
+            }
+        } else {
+            timer = nil
+        }
+    }
 }
 
 /// A file-reference prompt: the game called save/restore and RemGlk is waiting
@@ -117,6 +149,8 @@ enum GlkEvent {
     case char(gen: Int, window: Int, value: String)
     case hyperlink(gen: Int, window: Int, value: Int)
     case redraw(gen: Int)
+    /// Deliver a Glk timer tick (the game requested timer events).
+    case timer(gen: Int)
     /// Answer a `fileref_prompt` (save/restore). `value` is the bare filename
     /// the player chose; RemGlk confines it to the game's sandbox dir and
     /// appends ".glksave". An empty value cancels (no file -> the game reports
@@ -138,6 +172,8 @@ enum GlkEvent {
             return ["type": "hyperlink", "gen": gen, "window": window, "value": value]
         case let .redraw(gen):
             return ["type": "redraw", "gen": gen]
+        case let .timer(gen):
+            return ["type": "timer", "gen": gen]
         case let .specialResponse(gen, value):
             return ["type": "specialresponse", "gen": gen,
                     "response": "fileref_prompt", "value": value]
@@ -161,8 +197,14 @@ enum GlkEvent {
         case let .char(_, w, v):      return .char(gen: gen, window: w, value: v)
         case let .hyperlink(_, w, v): return .hyperlink(gen: gen, window: w, value: v)
         case .redraw:                 return .redraw(gen: gen)
+        case .timer:                  return .timer(gen: gen)
         case let .specialResponse(_, v): return .specialResponse(gen: gen, value: v)
         }
+    }
+
+    var isTimer: Bool {
+        if case .timer = self { return true }
+        return false
     }
 
     /// JSON bytes for this event, newline-terminated. RemGlk reads one

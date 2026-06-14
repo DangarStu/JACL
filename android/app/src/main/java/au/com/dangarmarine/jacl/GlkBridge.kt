@@ -115,6 +115,10 @@ class GlkBridge {
     private var splitter = JsonObjectStream()
     /** Remembered launch args so the game can be restarted in place. */
     private var gamePath = ""
+    /** Current Glk timer interval in ms (0 = off). The game sets it via the
+     *  "timer" field of an update; we then post a {"type":"timer"} event every
+     *  interval until it's cancelled (a null "timer"). */
+    private var timerIntervalMs = 0
 
     private var fontSize = 17.0
     /** Status-grid cell metrics are measured at this size by the UI and set
@@ -146,9 +150,28 @@ class GlkBridge {
 
     /** Stop the terp: closing our socket end gives it EOF -> glk_exit. */
     fun stop() {
+        main.removeCallbacks(timerRunnable)
         try { pfd?.close() } catch (_: Exception) {}
         pfd = null
         finished = true
+    }
+
+    // --- Glk timer ----------------------------------------------------------
+    private val timerRunnable = object : Runnable {
+        override fun run() {
+            if (timerIntervalMs <= 0) return
+            // Coalesce: one pending tick at a time, so a slow turn can't make
+            // ticks pile up.
+            if (outQueue.none { it.optString("type") == "timer" }) {
+                enqueue(JSONObject().put("type", "timer").put("gen", generation))
+            }
+            main.postDelayed(this, timerIntervalMs.toLong())
+        }
+    }
+
+    private fun rescheduleTimer() {
+        main.removeCallbacks(timerRunnable)
+        if (timerIntervalMs > 0) main.postDelayed(timerRunnable, timerIntervalMs.toLong())
     }
 
     /** Restart the current game from scratch (Restart control). The caller first
@@ -320,6 +343,14 @@ class GlkBridge {
                 pendingFilePrompt = GlkSpecialInput(
                     filemode = special.optString("filemode", "read"),
                     filetype = special.optString("filetype", "save"))
+            }
+
+            // The "timer" field appears only when the game changes its timer:
+            // a number sets/restarts the interval, null cancels it. Absent =
+            // no change.
+            if (update.has("timer")) {
+                timerIntervalMs = if (update.isNull("timer")) 0 else update.getInt("timer")
+                rescheduleTimer()
             }
         } finally {
             awaiting = false
