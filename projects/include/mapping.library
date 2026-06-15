@@ -551,12 +551,14 @@ write "</jacl-map>^"
 {+map
 if interpreter <> CGI
    if ios = true
-      # Native apps: emit the map as data for the app's map sheet to draw.
+      # Native apps: emit the map as data for the app's map sheet to draw,
+      # then a visible line so the transcript reads sensibly afterwards.
       set map_show_all = 0
       execute "+map_bounds"
       set linebreaks = false
       execute "+map_native"
       set linebreaks = true
+      write "Map opened.^"
    else
       write "The map command is currently only available in the web interpreter.^"
    endif
@@ -633,12 +635,15 @@ set time = false
 {+map_all
 if interpreter <> CGI
    if ios = true
+      # `map all` reveals every location (a cheat). The header Map button only
+      # ever sends plain `map` (visited rooms), so this is opt-in by typing it.
       set map_show_all = 1
       execute "+map_bounds"
       set linebreaks = false
       execute "+map_native"
       set linebreaks = true
       set map_show_all = 0
+      write "Full map opened.^"
    else
       write "The map command is currently only available in the web interpreter.^"
    endif

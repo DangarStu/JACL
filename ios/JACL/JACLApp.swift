@@ -347,19 +347,21 @@ enum GameLibrary {
         return game
     }
 
-    /// Copy the games bundled with the app into Documents on first launch.
-    /// Tracks which starters have been seeded (by filename) so deleting one
-    /// doesn't bring it back, while a new starter shipped in an app update
-    /// still seeds once.
+    /// Copy the games bundled with the app into Documents. A game is (re)seeded
+    /// when first seen OR when the bundled package changed (its size differs) --
+    /// so an app update pushes updated games to existing installs without a
+    /// delete+reinstall. Re-seeding overwrites the .j2/.blorb but leaves the
+    /// player's .glksave saves alone (unpack only rewrites the package's files).
     static func installBundledStarters() {
-        let key = "seededStarters"
-        var seeded = Set(UserDefaults.standard.stringArray(forKey: key) ?? [])
+        let defaults = UserDefaults.standard
         let bundled = Bundle.main.urls(forResourcesWithExtension: "jaclgame", subdirectory: nil) ?? []
-        for url in bundled where !seeded.contains(url.lastPathComponent) {
+        for url in bundled {
+            let key = "seedSize_" + url.lastPathComponent
+            let size = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? -1
+            if size > 0, defaults.integer(forKey: key) == size { continue }   // unchanged
             _ = try? importGame(from: url)
-            seeded.insert(url.lastPathComponent)
+            defaults.set(size, forKey: key)
         }
-        UserDefaults.standard.set(Array(seeded), forKey: key)
     }
 
     // MARK: Reading constants from a .j2

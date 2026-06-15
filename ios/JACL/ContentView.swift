@@ -212,6 +212,9 @@ struct GameView: View {
                 bridge.resize(to: geo.size)
             }
             .onChange(of: soundEnabled) { _, on in bridge.setSoundEnabled(on) }
+            // A fresh map arrived (player typed `map` or tapped the button) --
+            // open the sheet to show it.
+            .onChange(of: bridge.mapVersion) { _, _ in showMap = true }
             .onChange(of: bridge.pendingInput) { _, input in
                 // Put the cursor in the command line whenever the game asks for
                 // one (so you can just type), and replay any scripted command.
