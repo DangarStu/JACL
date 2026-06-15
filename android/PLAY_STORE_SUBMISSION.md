@@ -59,7 +59,7 @@ Reuse the iOS description verbatim from `ios/APP_STORE_SUBMISSION.md` §2
 |---|---|---|
 | App icon | 512×512 PNG | ✅ `PlayStore/graphics/icon-512.png` |
 | Feature graphic | 1024×500 PNG | ✅ `PlayStore/graphics/feature-graphic.png` (source `.svg` alongside) |
-| Phone screenshots | ≥2, 16:9-ish | ✏️ capture on a phone emulator (Medium_Phone_API_35 is installed) |
+| Phone screenshots | 1080×2160 (2:1 — Play caps phone at 2:1) | ✅ `PlayStore/screenshots-phone/` (bookshelf, map, settings) |
 | Tablet screenshots | 2560×1600 | ✅ `PlayStore/screenshots/` (bookshelf, map, settings) |
 
 ### URLs
