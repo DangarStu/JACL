@@ -23,7 +23,7 @@ enum class AppearanceMode(val label: String) {
 }
 
 object ReadingDefaults {
-    const val FONT_SIZE = 17f
+    const val FONT_SIZE = 21f
     val FONT_RANGE = 12f..28f
 }
 

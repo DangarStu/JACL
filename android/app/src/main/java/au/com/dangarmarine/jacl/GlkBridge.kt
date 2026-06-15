@@ -109,6 +109,9 @@ class GlkBridge {
     var pendingFilePrompt by mutableStateOf<GlkSpecialInput?>(null); private set
     /** The latest explored map (from the `map` command), or null if none yet. */
     var gameMap by mutableStateOf<GameMap?>(null); private set
+    /** Bumped each time a fresh map is parsed, so the UI can auto-open the
+     *  sheet (whether the player typed `map` or tapped the Map button). */
+    var mapVersion by mutableStateOf(0); private set
     var finished by mutableStateOf(false); private set
 
     // --- Plumbing -----------------------------------------------------------
@@ -394,7 +397,7 @@ class GlkBridge {
         if (start < 0) return paras
         val end = ((start + 1) until paras.size).firstOrNull { text(paras[it]) == "</jacl-map>" }
             ?: return paras
-        parseGameMap((start + 1 until end).map { text(paras[it]) })?.let { gameMap = it }
+        parseGameMap((start + 1 until end).map { text(paras[it]) })?.let { gameMap = it; mapVersion++ }
         return paras.filterIndexed { i, _ -> i < start || i > end }
     }
 

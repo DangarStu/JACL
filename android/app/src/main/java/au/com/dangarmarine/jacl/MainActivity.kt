@@ -373,6 +373,8 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
     DisposableEffect(game.file.path) { onDispose { bridge.stop() } }
     // Apply the persistent Sound setting (and react to it changing live).
     LaunchedEffect(prefs.soundEnabled) { bridge.setSoundEnabled(prefs.soundEnabled) }
+    // A fresh map arrived (typed `map` or the Map button) -- open the sheet.
+    LaunchedEffect(bridge.mapVersion) { if (bridge.mapVersion > 0) showMap = true }
 
     fun cell() = measurer.measure(
         AnnotatedString("0"),

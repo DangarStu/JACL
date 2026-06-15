@@ -48,6 +48,9 @@ final class GlkBridge: ObservableObject {
     @Published var pendingFilePrompt: GlkSpecialInput?
     /// The latest explored map (from the `map` command), or nil if none yet.
     @Published var gameMap: GameMap?
+    /// Bumped each time a fresh map is parsed, so the UI can auto-open the sheet
+    /// (whether the player typed `map` or tapped the Map button).
+    @Published var mapVersion = 0
     /// Set when the game has quit (terp thread ended / socket closed).
     @Published var finished = false
 
@@ -406,7 +409,7 @@ final class GlkBridge: ObservableObject {
         guard let start = paras.firstIndex(where: { text($0) == "<jacl-map>" }),
               let end = paras[(start + 1)...].firstIndex(where: { text($0) == "</jacl-map>" })
         else { return paras }
-        if let m = parseGameMap(paras[(start + 1)..<end].map(text)) { gameMap = m }
+        if let m = parseGameMap(paras[(start + 1)..<end].map(text)) { gameMap = m; mapVersion += 1 }
         var out = paras
         out.removeSubrange(start...end)
         return out

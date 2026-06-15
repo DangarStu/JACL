@@ -99,14 +99,20 @@ object GameLibrary {
     /** Seed games bundled in assets/ on first launch (tracked by name). */
     fun installBundledStarters(ctx: Context) {
         val prefs = ctx.getSharedPreferences("jacl", Context.MODE_PRIVATE)
-        val seeded = prefs.getStringSet("seededStarters", emptySet())!!.toMutableSet()
         val bundled = ctx.assets.list("")?.filter { it.endsWith(".jaclgame") } ?: emptyList()
+        val edit = prefs.edit()
         for (asset in bundled) {
-            if (asset in seeded) continue
+            // Re-unpack when first seen OR when the bundled game changed (its
+            // size differs), so an app update pushes updated games to existing
+            // installs. Re-unpacking overwrites the .j2/.blorb but leaves the
+            // player's .glksave saves alone. (available() is the uncompressed
+            // asset size -- a cheap fingerprint.)
+            val size = try { ctx.assets.open(asset).use { it.available() } } catch (e: Exception) { -1 }
+            if (size >= 0 && prefs.getInt("seedSize_$asset", -1) == size) continue
             ctx.assets.open(asset).use { unpack(ctx, it) }
-            seeded.add(asset)
+            edit.putInt("seedSize_$asset", size)
         }
-        prefs.edit().putStringSet("seededStarters", seeded).apply()
+        edit.apply()
     }
 
     // --- Reading constants from a .j2 ---------------------------------------
