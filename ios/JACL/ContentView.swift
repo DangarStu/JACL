@@ -60,9 +60,9 @@ enum AppearanceMode: String, CaseIterable, Identifiable {
 
 /// Reading preferences shared between the Settings screen and the game view.
 enum ReadingDefaults {
-    /// Transcript text size in points. Default is roughly the system `.body`
-    /// size at the default Dynamic Type setting.
-    static let fontSize: Double = 17
+    /// Transcript text size in points -- a comfortable reading size on a
+    /// tablet (the slider goes 12...28 in Settings).
+    static let fontSize: Double = 21
     static let fontRange: ClosedRange<Double> = 12...28
     /// UserDefaults key for the persisted transcript font size.
     static let fontSizeKey = "transcriptFontSize"
