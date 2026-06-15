@@ -27,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -366,6 +367,7 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
     var showTextSize by remember { mutableStateOf(false) }
     var saveName by remember { mutableStateOf("") }
     var showRestartConfirm by remember { mutableStateOf(false) }
+    var showMap by remember { mutableStateOf(false) }
 
     BackHandler(onBack = onBack)
     DisposableEffect(game.file.path) { onDispose { bridge.stop() } }
@@ -385,6 +387,10 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
                     IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
                 },
                 actions = {
+                    // Map: ask the game to emit its map, then open the map sheet.
+                    IconButton(onClick = { bridge.submitLine("map"); showMap = true }) {
+                        Icon(Icons.Filled.Place, "Map")
+                    }
                     // Restart: wipe the autosave and begin again from the intro.
                     IconButton(onClick = { showRestartConfirm = true }) {
                         Icon(Icons.Filled.Refresh, "Restart game")
@@ -508,6 +514,10 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
                 TextButton(onClick = { bridge.cancelFileref() }) { Text("Cancel") }
             },
         )
+    }
+
+    if (showMap) {
+        MapSheet(map = bridge.gameMap, onDismiss = { showMap = false })
     }
 
     if (showRestartConfirm) {

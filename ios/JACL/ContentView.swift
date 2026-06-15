@@ -151,6 +151,8 @@ struct GameView: View {
     @State private var saveName = ""
     /// Whether the "restart this game?" confirmation is showing.
     @State private var showRestartConfirm = false
+    /// Whether the map sheet is showing.
+    @State private var showMap = false
 
     // DEBUG-only scripted input (via `-autocommands "no;look;…"`), used to
     // exercise the bridge's input round-trip headlessly. Empty in release.
@@ -237,6 +239,13 @@ struct GameView: View {
                     TextSizePopover(fontSize: $transcriptFontSize)
                 }
             }
+            // Map: ask the game to emit its map, then open the map sheet.
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { bridge.submitLine("map"); showMap = true } label: {
+                    Image(systemName: "map")
+                }
+                .accessibilityLabel("Map")
+            }
             // Restart: wipe the autosave and begin the game again from the intro.
             ToolbarItem(placement: .topBarTrailing) {
                 Button { showRestartConfirm = true } label: {
@@ -244,6 +253,9 @@ struct GameView: View {
                 }
                 .accessibilityLabel("Restart game")
             }
+        }
+        .sheet(isPresented: $showMap) {
+            MapSheet(map: bridge.gameMap)
         }
         // Saving: the game asked for a name (save verb). Restoring uses the
         // picker below. Both answer the same RemGlk file prompt.

@@ -107,6 +107,8 @@ class GlkBridge {
     /** A pending save/restore file prompt, if the game is waiting for a
      *  filename. Drives the name dialog / restore picker. */
     var pendingFilePrompt by mutableStateOf<GlkSpecialInput?>(null); private set
+    /** The latest explored map (from the `map` command), or null if none yet. */
+    var gameMap by mutableStateOf<GameMap?>(null); private set
     var finished by mutableStateOf(false); private set
 
     // --- Plumbing -----------------------------------------------------------
@@ -334,6 +336,9 @@ class GlkBridge {
                         newBuffers[id] = paras
                     }
                 }
+                // Pull any <jacl-map> data block out of the transcript (the
+                // `map` command emits it) and keep it for the map sheet.
+                for ((id, paras) in newBuffers) newBuffers[id] = stripMapBlock(paras)
                 buffers = newBuffers
                 grids = newGrids
             }
@@ -378,6 +383,19 @@ class GlkBridge {
             awaiting = false
             pump()
         }
+    }
+
+    /** Find a <jacl-map>...</jacl-map> run in the paragraphs, parse it into
+     *  [gameMap], and return the paragraphs with that run removed (so the raw
+     *  data never shows in the transcript). */
+    private fun stripMapBlock(paras: List<RenderedParagraph>): List<RenderedParagraph> {
+        fun text(p: RenderedParagraph) = p.spans.joinToString("") { it.text }.trim()
+        val start = paras.indexOfFirst { text(it) == "<jacl-map>" }
+        if (start < 0) return paras
+        val end = ((start + 1) until paras.size).firstOrNull { text(paras[it]) == "</jacl-map>" }
+            ?: return paras
+        parseGameMap((start + 1 until end).map { text(paras[it]) })?.let { gameMap = it }
+        return paras.filterIndexed { i, _ -> i < start || i > end }
     }
 
     private fun renderSpans(content: JSONArray?): List<RenderedSpan> {

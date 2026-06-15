@@ -46,6 +46,8 @@ final class GlkBridge: ObservableObject {
     /// A pending save/restore file prompt, if the game called save/restore and
     /// is waiting for a filename. Drives the name dialog / restore picker.
     @Published var pendingFilePrompt: GlkSpecialInput?
+    /// The latest explored map (from the `map` command), or nil if none yet.
+    @Published var gameMap: GameMap?
     /// Set when the game has quit (terp thread ended / socket closed).
     @Published var finished = false
 
@@ -301,7 +303,7 @@ final class GlkBridge: ObservableObject {
                         paras.append(RenderedParagraph(spans: spans))
                     }
                 }
-                buffers[c.id] = paras
+                buffers[c.id] = stripMapBlock(paras)
             }
         }
 
@@ -392,6 +394,22 @@ final class GlkBridge: ObservableObject {
                 return (l ?? .distantPast) > (r ?? .distantPast)
             }
             .map { String($0.dropFirst(prefix.count)) }        // strip "<base>_"
+    }
+
+    /// Find a <jacl-map>…</jacl-map> run in the paragraphs, parse it into
+    /// `gameMap`, and return the paragraphs with that run removed (so the raw
+    /// data never shows in the transcript).
+    private func stripMapBlock(_ paras: [RenderedParagraph]) -> [RenderedParagraph] {
+        func text(_ p: RenderedParagraph) -> String {
+            p.spans.map(\.text).joined().trimmingCharacters(in: .whitespaces)
+        }
+        guard let start = paras.firstIndex(where: { text($0) == "<jacl-map>" }),
+              let end = paras[(start + 1)...].firstIndex(where: { text($0) == "</jacl-map>" })
+        else { return paras }
+        if let m = parseGameMap(paras[(start + 1)..<end].map(text)) { gameMap = m }
+        var out = paras
+        out.removeSubrange(start...end)
+        return out
     }
 
     private func render(_ span: GlkSpan) -> RenderedSpan {
