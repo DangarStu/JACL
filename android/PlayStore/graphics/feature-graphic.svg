@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1024" height="500" viewBox="0 0 1024 500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0"   stop-color="#16273c"/>
+      <stop offset="0.55" stop-color="#1d3047"/>
+      <stop offset="1"   stop-color="#0e1b2b"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#f3d385"/>
+      <stop offset="0.5" stop-color="#e3b24f"/>
+      <stop offset="1"   stop-color="#c08f2f"/>
+    </linearGradient>
+    <clipPath id="round"><rect x="64" y="58" width="384" height="384" rx="86" ry="86"/></clipPath>
+  </defs>
+
+  <!-- background -->
+  <rect width="1024" height="500" fill="url(#bg)"/>
+  <!-- subtle gold hairline frame -->
+  <rect x="10" y="10" width="1004" height="480" rx="14" fill="none"
+        stroke="#caa24e" stroke-opacity="0.30" stroke-width="2"/>
+
+  <!-- app icon as a rounded card, with a faint gold rim -->
+  <image clip-path="url(#round)" x="64" y="58" width="384" height="384"
+         xlink:href="file:///Users/stuart/git/jacl/android/PlayStore/graphics/icon-512.png"/>
+  <rect x="64" y="58" width="384" height="384" rx="86" fill="none"
+        stroke="#e3b24f" stroke-opacity="0.55" stroke-width="3"/>
+
+  <!-- text block -->
+  <g font-family="Georgia, 'Times New Roman', serif">
+    <text x="506" y="176" font-size="74" font-weight="bold" fill="url(#gold)">Classic Text</text>
+    <text x="506" y="256" font-size="74" font-weight="bold" fill="url(#gold)">Adventures</text>
+
+    <line x1="508" y1="296" x2="946" y2="296" stroke="#caa24e" stroke-opacity="0.45" stroke-width="2"/>
+
+    <text x="508" y="350" font-size="33" fill="#efe6d2" font-style="italic">Type what you want to do —</text>
+    <text x="508" y="392" font-size="33" fill="#efe6d2" font-style="italic">and the story responds.</text>
+
+    <text x="508" y="446" font-size="25" letter-spacing="3" fill="#bcd0e2">iPad  ·  Android  ·  Web</text>
+  </g>
+</svg>
