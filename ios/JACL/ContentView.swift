@@ -215,10 +215,14 @@ struct GameView: View {
             // A fresh map arrived (player typed `map` or tapped the button) --
             // open the sheet to show it.
             .onChange(of: bridge.mapVersion) { _, _ in showMap = true }
+            // Re-focus the command line after a sheet closes, so you can keep
+            // typing without tapping the field again.
+            .onChange(of: showMap) { _, shown in if !shown { focusInput() } }
+            .onChange(of: showTextSize) { _, shown in if !shown { focusInput() } }
             .onChange(of: bridge.pendingInput) { _, input in
                 // Put the cursor in the command line whenever the game asks for
                 // one (so you can just type), and replay any scripted command.
-                inputFocused = (input?.type == "line")
+                if input?.type == "line" { focusInput() } else { inputFocused = false }
                 guard let input, input.type == "line", autoIndex < autoCommands.count else { return }
                 let cmd = autoCommands[autoIndex]
                 autoIndex += 1
@@ -409,6 +413,16 @@ struct GameView: View {
         let line = inputText
         inputText = ""
         bridge.submitLine(line)
+    }
+
+    /// Focus the command line when the game is waiting for a line of input, so
+    /// you can just type. A short delay lets the field appear (on first open)
+    /// or a dismissing sheet settle before the focus is requested.
+    private func focusInput() {
+        guard bridge.pendingInput?.type == "line" else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            if bridge.pendingInput?.type == "line" { inputFocused = true }
+        }
     }
 
     // MARK: Styled-text helpers

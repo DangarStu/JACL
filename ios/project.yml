@@ -23,6 +23,11 @@ settings:
   base:
     SWIFT_VERSION: "5.0"
     GCC_C_LANGUAGE_STANDARD: gnu2x   # the core builds with -std=gnu23 on desktop
+  configs:
+    debug:
+      # Define DEBUG so `#if DEBUG` code (e.g. the -autocommands test hook) is
+      # compiled in debug builds. xcodegen doesn't add this by default.
+      SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
 
 targets:
   JACL:

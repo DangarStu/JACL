@@ -43,22 +43,32 @@ private struct MapCanvas: View {
 
     var body: some View {
         GeometryReader { geo in
-            let fit = min(geo.size.width / CGFloat(max(map.w, 1)),
-                          geo.size.height / CGFloat(max(map.h, 1))) * 0.95
+            // Everything is drawn in SCREEN coordinates (map coord * scale +
+            // offset), so there's no giant scaled frame -- a large `map all`
+            // map (which SwiftUI's scaleEffect-on-a-huge-frame failed to render)
+            // now lays out fine. `scale` fits the whole map to the viewport,
+            // times the pinch zoom; `ox/oy` centre it plus the drag pan.
+            let baseFit = min(geo.size.width / CGFloat(max(map.w, 1)),
+                              geo.size.height / CGFloat(max(map.h, 1))) * 0.95
+            let scale = baseFit * zoom
+            let ox = (geo.size.width - CGFloat(map.w) * scale) / 2 + pan.width
+            let oy = (geo.size.height - CGFloat(map.h) * scale) / 2 + pan.height
+            let sp = { (x: Int, y: Int) -> CGPoint in
+                CGPoint(x: ox + CGFloat(x) * scale, y: oy + CGFloat(y) * scale)
+            }
             ZStack(alignment: .topLeading) {
                 Canvas { ctx, _ in
                     for e in map.edges {
                         var path = Path()
-                        path.move(to: CGPoint(x: e.x1, y: e.y1))
-                        path.addLine(to: CGPoint(x: e.x2, y: e.y2))
+                        path.move(to: sp(e.x1, e.y1))
+                        path.addLine(to: sp(e.x2, e.y2))
                         ctx.stroke(path, with: .color(.secondary), lineWidth: 1.5)
-                        if e.updown {
-                            drawArrow(ctx, CGPoint(x: e.x1, y: e.y1), CGPoint(x: e.x2, y: e.y2))
-                        }
+                        if e.updown { drawArrow(ctx, sp(e.x1, e.y1), sp(e.x2, e.y2)) }
                     }
                     for n in map.nodes {
-                        let rect = CGRect(x: n.x, y: n.y, width: 80, height: 80)
-                        let rr = Path(roundedRect: rect, cornerRadius: 12)
+                        let tl = sp(n.x, n.y)
+                        let rect = CGRect(x: tl.x, y: tl.y, width: 80 * scale, height: 80 * scale)
+                        let rr = Path(roundedRect: rect, cornerRadius: 12 * scale)
                         // Opaque base hides the exit lines that run to the box
                         // centre; the current room gets an accent tint on top.
                         ctx.fill(rr, with: .color(Color(.secondarySystemBackground)))
@@ -66,28 +76,26 @@ private struct MapCanvas: View {
                         ctx.stroke(rr, with: .color(.secondary), lineWidth: 1)
                     }
                 }
-                .frame(width: CGFloat(map.w), height: CGFloat(map.h))
 
-                // Room names: centred, wrapped, shrunk to fit the 80x80 box.
+                // Room names: centred (H+V), wrapped, shrunk to fit the box.
                 ForEach(Array(map.nodes.enumerated()), id: \.offset) { _, n in
                     Text(n.label)
-                        .font(.system(size: 12))
+                        .font(.system(size: max(6, 11 * scale)))
                         .multilineTextAlignment(.center)
                         .minimumScaleFactor(0.4)
                         .lineLimit(4)
-                        .frame(width: 74, height: 74)
-                        .position(x: CGFloat(n.x) + 40, y: CGFloat(n.y) + 40)
+                        .frame(width: 74 * scale, height: 74 * scale)
+                        .position(x: ox + (CGFloat(n.x) + 40) * scale,
+                                  y: oy + (CGFloat(n.y) + 40) * scale)
                 }
             }
-            .frame(width: CGFloat(map.w), height: CGFloat(map.h))
-            .scaleEffect(fit * zoom)
-            .offset(pan)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(width: geo.size.width, height: geo.size.height)
+            .contentShape(Rectangle())
             .gesture(
                 SimultaneousGesture(
                     MagnificationGesture()
                         .onChanged { zoom = $0 }
-                        .onEnded { _ in if zoom < 0.3 { withAnimation { zoom = 1 } } },
+                        .onEnded { _ in if zoom < 0.25 { withAnimation { zoom = 1; pan = .zero; lastPan = .zero } } },
                     DragGesture()
                         .onChanged { pan = CGSize(width: lastPan.width + $0.translation.width,
                                                   height: lastPan.height + $0.translation.height) }
