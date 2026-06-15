@@ -4,17 +4,19 @@
 import SwiftUI
 
 struct MapSheet: View {
-    let map: GameMap?
+    // Observe the bridge so the sheet updates when the `map` command's data
+    // arrives (it's published a moment after the Map button sends "map").
+    @ObservedObject var bridge: GlkBridge
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
             Group {
-                if let map {
+                if let map = bridge.gameMap {
                     MapCanvas(map: map)
                 } else {
                     ContentUnavailableView("No Map Yet", systemImage: "map",
-                        description: Text("Type “map” during play to chart where you've been."))
+                        description: Text("Move around, then tap Map to chart where you've been."))
                 }
             }
             .navigationTitle("Map")

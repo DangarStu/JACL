@@ -255,7 +255,7 @@ struct GameView: View {
             }
         }
         .sheet(isPresented: $showMap) {
-            MapSheet(map: bridge.gameMap)
+            MapSheet(bridge: bridge)
         }
         // Saving: the game asked for a name (save verb). Restoring uses the
         // picker below. Both answer the same RemGlk file prompt.
