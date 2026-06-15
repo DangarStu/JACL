@@ -19,15 +19,15 @@ val keystoreProperties = Properties().apply {
 
 android {
     namespace = "au.com.dangarmarine.jacl"
-    compileSdk = 34
+    compileSdk = 35
     ndkVersion = "28.2.13676358"
 
     defaultConfig {
         applicationId = "au.com.dangarmarine.jacl"
         minSdk = 29            // timespec_get (RemGlk timers) needs API 29+
-        targetSdk = 34
+        targetSdk = 35         // Play requires new apps to target API 35 (Android 15)
         versionCode = 1
-        versionName = "0.1"
+        versionName = "1.0"
 
         externalNativeBuild {
             cmake {
