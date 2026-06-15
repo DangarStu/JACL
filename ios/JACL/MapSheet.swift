@@ -29,7 +29,10 @@ struct MapSheet: View {
     }
 }
 
-/// Draws the map fit-to-view, with pinch-zoom and drag-pan on top.
+/// Draws the rooms/exits on a Canvas (in the map's own pixel space) and lays
+/// the room names over them as real Text views, so they centre, wrap and
+/// shrink to fit the box. The whole thing is scaled fit-to-view, with
+/// pinch-zoom and drag-pan on top.
 private struct MapCanvas: View {
     let map: GameMap
     @State private var zoom: CGFloat = 1
@@ -40,35 +43,43 @@ private struct MapCanvas: View {
         GeometryReader { geo in
             let fit = min(geo.size.width / CGFloat(max(map.w, 1)),
                           geo.size.height / CGFloat(max(map.h, 1))) * 0.95
-            Canvas { ctx, size in
-                let ox = (size.width - CGFloat(map.w) * fit) / 2
-                let oy = (size.height - CGFloat(map.h) * fit) / 2
-                func p(_ x: Int, _ y: Int) -> CGPoint {
-                    CGPoint(x: ox + CGFloat(x) * fit, y: oy + CGFloat(y) * fit)
+            ZStack(alignment: .topLeading) {
+                Canvas { ctx, _ in
+                    for e in map.edges {
+                        var path = Path()
+                        path.move(to: CGPoint(x: e.x1, y: e.y1))
+                        path.addLine(to: CGPoint(x: e.x2, y: e.y2))
+                        ctx.stroke(path, with: .color(.secondary), lineWidth: 1.5)
+                        if e.updown {
+                            drawArrow(ctx, CGPoint(x: e.x1, y: e.y1), CGPoint(x: e.x2, y: e.y2))
+                        }
+                    }
+                    for n in map.nodes {
+                        let rect = CGRect(x: n.x, y: n.y, width: 80, height: 80)
+                        let rr = Path(roundedRect: rect, cornerRadius: 12)
+                        ctx.fill(rr, with: .color(n.here
+                            ? Color.accentColor.opacity(0.3)
+                            : Color(.secondarySystemBackground)))
+                        ctx.stroke(rr, with: .color(.secondary), lineWidth: 1)
+                    }
                 }
+                .frame(width: CGFloat(map.w), height: CGFloat(map.h))
 
-                for e in map.edges {
-                    var path = Path()
-                    path.move(to: p(e.x1, e.y1))
-                    path.addLine(to: p(e.x2, e.y2))
-                    ctx.stroke(path, with: .color(.secondary), lineWidth: 1.5)
-                    if e.updown { drawArrow(ctx, p(e.x1, e.y1), p(e.x2, e.y2)) }
-                }
-
-                for n in map.nodes {
-                    let rect = CGRect(x: ox + CGFloat(n.x) * fit, y: oy + CGFloat(n.y) * fit,
-                                      width: 80 * fit, height: 80 * fit)
-                    let rr = Path(roundedRect: rect, cornerRadius: 12 * fit)
-                    ctx.fill(rr, with: .color(n.here
-                        ? Color.accentColor.opacity(0.3)
-                        : Color(.secondarySystemBackground)))
-                    ctx.stroke(rr, with: .color(.secondary), lineWidth: 1)
-                    let text = Text(n.label).font(.system(size: max(7, 11 * fit)))
-                    ctx.draw(ctx.resolve(text), in: rect.insetBy(dx: 2, dy: 2))
+                // Room names: centred, wrapped, shrunk to fit the 80x80 box.
+                ForEach(Array(map.nodes.enumerated()), id: \.offset) { _, n in
+                    Text(n.label)
+                        .font(.system(size: 12))
+                        .multilineTextAlignment(.center)
+                        .minimumScaleFactor(0.4)
+                        .lineLimit(4)
+                        .frame(width: 74, height: 74)
+                        .position(x: CGFloat(n.x) + 40, y: CGFloat(n.y) + 40)
                 }
             }
-            .scaleEffect(zoom)
+            .frame(width: CGFloat(map.w), height: CGFloat(map.h))
+            .scaleEffect(fit * zoom)
             .offset(pan)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .gesture(
                 SimultaneousGesture(
                     MagnificationGesture()

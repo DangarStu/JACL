@@ -28,7 +28,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
@@ -98,6 +100,7 @@ private fun MapCanvas(map: GameMap, modifier: Modifier) {
                 }
             }
         ) {
+            // Rooms + exits in map space.
             withTransform({
                 translate(offset.x, offset.y)
                 scale(scale, scale, pivot = Offset.Zero)
@@ -109,18 +112,32 @@ private fun MapCanvas(map: GameMap, modifier: Modifier) {
                     if (e.updown) drawArrowhead(a, b, edge)
                 }
                 for (n in map.nodes) {
-                    val tl = Offset(n.x.toFloat(), n.y.toFloat())
                     val sz = Size(80f, 80f)
-                    drawRoundRect(if (n.here) here else other, tl, sz, CornerRadius(12f))
-                    drawRoundRect(border, tl, sz, CornerRadius(12f), style = Stroke(width = 2f))
-                    val layout = measurer.measure(
-                        n.label,
-                        style = TextStyle(fontSize = 11.sp, color = onNode, textAlign = TextAlign.Center),
-                        constraints = Constraints(maxWidth = 76),
-                    )
+                    drawRoundRect(if (n.here) here else other,
+                        Offset(n.x.toFloat(), n.y.toFloat()), sz, CornerRadius(12f))
+                    drawRoundRect(border, Offset(n.x.toFloat(), n.y.toFloat()), sz,
+                        CornerRadius(12f), style = Stroke(width = 2f))
+                }
+            }
+            // Room names in screen space, centred (H+V), wrapped, sized to the
+            // box and clipped so long names never spill out.
+            for (n in map.nodes) {
+                val sx = offset.x + n.x * scale
+                val sy = offset.y + n.y * scale
+                val box = 80f * scale
+                val fontPx = (box * 0.17f).coerceIn(7f, 26f)
+                val layout = measurer.measure(
+                    n.label,
+                    style = TextStyle(fontSize = fontPx.toSp(), color = onNode,
+                        textAlign = TextAlign.Center),
+                    constraints = Constraints(maxWidth = (box - 8f).toInt().coerceAtLeast(1)),
+                    maxLines = 5,
+                    overflow = TextOverflow.Clip,
+                )
+                clipRect(sx, sy, sx + box, sy + box) {
                     drawText(layout, topLeft = Offset(
-                        tl.x + (80 - layout.size.width) / 2f,
-                        tl.y + (80 - layout.size.height) / 2f))
+                        sx + (box - layout.size.width) / 2f,
+                        sy + (box - layout.size.height) / 2f))
                 }
             }
         }
