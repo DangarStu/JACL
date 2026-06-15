@@ -29,6 +29,18 @@ settings:
       # compiled in debug builds. xcodegen doesn't add this by default.
       SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
 
+schemes:
+  JACL:
+    # A shared scheme so `xcodebuild -scheme JACL ... archive` works (archiving
+    # requires a scheme; xcodegen doesn't create one by default).
+    build:
+      targets:
+        JACL: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+
 targets:
   JACL:
     type: application
