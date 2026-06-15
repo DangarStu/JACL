@@ -57,9 +57,10 @@ private struct MapCanvas: View {
                     for n in map.nodes {
                         let rect = CGRect(x: n.x, y: n.y, width: 80, height: 80)
                         let rr = Path(roundedRect: rect, cornerRadius: 12)
-                        ctx.fill(rr, with: .color(n.here
-                            ? Color.accentColor.opacity(0.3)
-                            : Color(.secondarySystemBackground)))
+                        // Opaque base hides the exit lines that run to the box
+                        // centre; the current room gets an accent tint on top.
+                        ctx.fill(rr, with: .color(Color(.secondarySystemBackground)))
+                        if n.here { ctx.fill(rr, with: .color(Color.accentColor.opacity(0.35))) }
                         ctx.stroke(rr, with: .color(.secondary), lineWidth: 1)
                     }
                 }
