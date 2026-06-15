@@ -449,12 +449,117 @@ endselect
 }
 
 # -------------------------------------------------------------------
-# +map -- inline rendering in #maintext.
+# +map_native -- emit the map as a plain-text data block for the native
+# iOS/Android apps to draw (they have no Raphael/SVG). The app strips the
+# <jacl-map>...</jacl-map> block from the transcript and renders it on a
+# canvas. Pixel coords match the web (120 px/cell, 80 px nodes), so node
+# top-lefts and edge centre-points are emitted directly. Each record is one
+# line: "M w h" (canvas), "N x y here label" (node top-left + current flag +
+# name), "E x1 y1 x2 y2 updown" (edge centre-to-centre + up/down flag).
+# Caller runs +map_bounds first and brackets this with linebreaks = false.
+# -------------------------------------------------------------------
+
+{+map_native
+write "<jacl-map>^"
+write "M " map_canvas_w " " map_canvas_h "^"
+
+# EXIT LINES from each drawable location.
+select LOCATION map_here
+   set map_should_draw = 0
+   if map_show_all = 1
+      if map_here hasnt DONT_MAP
+         set map_should_draw = 1
+      endif
+   endif
+   if map_here has VISITED
+      if map_here hasnt DONT_MAP
+         set map_should_draw = 1
+      endif
+   endif
+   if map_should_draw = 1
+   set map_loop = 0
+   repeat
+      ifall map_here(map_loop) != nowhere : map_here(map_loop) != NO_GO
+         set map_target = map_here(map_loop)
+         set map_x = map_here(x)
+         set map_x + map_offset_x
+         set map_x * 120
+         set map_x + 60
+         set map_y = map_here(y)
+         set map_y + map_offset_y
+         set map_y * 120
+         set map_y + 60
+         set map_dest_x = map_target(x)
+         set map_dest_x + map_offset_x
+         set map_dest_x * 120
+         set map_dest_x + 60
+         set map_dest_y = map_target(y)
+         set map_dest_y + map_offset_y
+         set map_dest_y * 120
+         set map_dest_y + 60
+         # up/down flag (slots 8 = up, 9 = down) so the app draws an arrow.
+         set map_stub_x = 0
+         ifall map_loop != 8 : map_loop != 9
+         else
+            set map_stub_x = 1
+         endif
+         write "E " map_x " " map_y " " map_dest_x " " map_dest_y " " map_stub_x "^"
+      endif
+      set map_loop + 1
+   until map_loop = 12
+   endif
+endselect
+
+# LABELLED NODES.
+select LOCATION map_here
+   set map_should_draw = 0
+   if map_show_all = 1
+      if map_here hasnt DONT_MAP
+         set map_should_draw = 1
+      endif
+   endif
+   if map_here has VISITED
+      if map_here hasnt DONT_MAP
+         set map_should_draw = 1
+      endif
+   endif
+   if map_should_draw = 1
+   set map_x = map_here(x)
+   set map_x + map_offset_x
+   set map_x * 120
+   set map_x + 20
+   set map_y = map_here(y)
+   set map_y + map_offset_y
+   set map_y * 120
+   set map_y + 20
+   set map_target = 0
+   if map_here = here
+      set map_target = 1
+   endif
+   write "N " map_x " " map_y " " map_target " " map_here{The} "^"
+   endif
+endselect
+
+write "</jacl-map>^"
+}
+
+# -------------------------------------------------------------------
+# +map -- inline rendering in #maintext (web), or a <jacl-map> data block
+# for the native apps.
 # -------------------------------------------------------------------
 
 {+map
 if interpreter <> CGI
-   write "The map command is currently only available in the web interpreter.^"
+   if ios = true
+      # Native apps: emit the map as data for the app's map sheet to draw.
+      set map_show_all = 0
+      execute "+map_bounds"
+      set linebreaks = false
+      execute "+map_native"
+      set linebreaks = true
+   else
+      write "The map command is currently only available in the web interpreter.^"
+   endif
    set time = false
    return
 endif
@@ -527,7 +632,16 @@ set time = false
 
 {+map_all
 if interpreter <> CGI
-   write "The map command is currently only available in the web interpreter.^"
+   if ios = true
+      set map_show_all = 1
+      execute "+map_bounds"
+      set linebreaks = false
+      execute "+map_native"
+      set linebreaks = true
+      set map_show_all = 0
+   else
+      write "The map command is currently only available in the web interpreter.^"
+   endif
    set time = false
    return
 endif
