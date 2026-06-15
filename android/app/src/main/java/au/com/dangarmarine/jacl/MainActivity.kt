@@ -717,7 +717,7 @@ fun buildSpans(spans: List<RenderedSpan>, inputColor: Color): AnnotatedString = 
         if (s.text.isEmpty()) continue
         val style = when (s.style) {
             "header", "subheader" -> SpanStyle(fontWeight = FontWeight.Bold)
-            "emphasized", "note" -> SpanStyle(fontStyle = FontStyle.Italic)
+            "emphasized", "note", "blockquote" -> SpanStyle(fontStyle = FontStyle.Italic)
             "alert" -> SpanStyle(color = Color(0xFFD32F2F))
             "input" -> SpanStyle(color = inputColor)
             "preformatted", "user1", "user2" -> SpanStyle(fontFamily = FontFamily.Monospace)

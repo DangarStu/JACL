@@ -408,7 +408,7 @@ struct GameView: View {
         var t = Text(span.text)
         switch span.style {
         case "header", "subheader":      t = t.bold()
-        case "emphasized", "note":       t = t.italic()
+        case "emphasized", "note", "blockquote": t = t.italic()
         case "alert":                    t = t.foregroundColor(.red)
         case "input":                    t = t.foregroundColor(.accentColor)
         case "preformatted", "user1", "user2":
@@ -724,7 +724,7 @@ private extension RenderedSpan {
         var underline = false
         switch style {
         case "header", "subheader": font = baseFont.withTraits(.traitBold)
-        case "emphasized", "note":  font = baseFont.withTraits(.traitItalic)
+        case "emphasized", "note", "blockquote": font = baseFont.withTraits(.traitItalic)
         case "alert":               color = .systemRed
         case "input":               color = .tintColor
         case "preformatted", "user1", "user2":
