@@ -7,6 +7,16 @@ Status legend:  ✅ ready   ⏳ blocked on enrollment   ✏️ you must supply/c
 
 ---
 
+## SUBMITTED — version 1.0 (build 1)
+
+- **Submitted:** 15 June 2026, "Waiting for Review"
+- **Submission ID:** `6be04e7d-d29c-4817-b6db-0cd53c61cf66`
+- **Signed with:** Individual team `5TU3TU28JN` (see [[project_apple_signing]])
+- Release: automatic on approval (no phased/manual release set).
+- If rejected: check the Resolution Center, fix, and resubmit.
+
+---
+
 ## 0. Publisher account
 
 - **Decision: enroll an _Individual / Sole Proprietor_ membership** under your
