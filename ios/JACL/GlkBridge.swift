@@ -91,11 +91,12 @@ final class GlkBridge: ObservableObject {
     /// at a time; starting a new game force-stops this one first.
     static weak var active: GlkBridge?
 
-    /// Point size of the monospaced status-grid cell, kept in step with the
-    /// transcript reading size (Settings). The status line is a fixed-width
-    /// grid, so the cell width the interpreter lays out columns to must match
-    /// the font we actually draw -- set this before `start`/`resize`.
-    var statusFontSize: Double = ReadingDefaults.fontSize
+    /// The monospaced status-grid cell the UI actually draws, set before
+    /// `start`/`resize`. The view derives these from the chosen column count so
+    /// the interpreter's grid (floor(width / charwidth)) is exactly that many
+    /// columns and the status line can't overflow.
+    var cellWidth: Double = 10
+    var cellHeight: Double = 20
 
     // MARK: Lifecycle
 
@@ -429,19 +430,16 @@ final class GlkBridge: ObservableObject {
     /// (status line) columns line up exactly.
     private func metrics(for size: CGSize) -> GlkMetrics {
         // The status line is a fixed-width grid: the game lays it out to
-        // width/charwidth columns and we render it monospaced, so charwidth
-        // must match the glyph we actually draw or the bar overflows the
-        // screen. Measure the real monospaced .body glyph. Height is reported
-        // very tall so the game never pauses with a "[MORE]" prompt -- the
-        // transcript scrolls instead, the right model for a touch UI. The 16pt
-        // accounts for the status line's horizontal padding.
-        let mono = UIFont.monospacedSystemFont(
-            ofSize: CGFloat(statusFontSize), weight: .regular)
-        let cw = ("0" as NSString).size(withAttributes: [.font: mono]).width
+        // width/charwidth columns. The view sets cellWidth/cellHeight (derived
+        // from the chosen column count, the same cell it draws), so the grid is
+        // exactly `columns` wide. Height is reported very tall so the game never
+        // pauses with a "[MORE]" prompt -- the transcript scrolls instead, the
+        // right model for a touch UI. The 16pt accounts for the status line's
+        // horizontal padding.
         return GlkMetrics(width: Double(size.width) - 16,
                           height: 100_000,
-                          charwidth: Double(cw),
-                          charheight: Double(mono.lineHeight))
+                          charwidth: cellWidth,
+                          charheight: cellHeight)
     }
 }
 

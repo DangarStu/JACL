@@ -11,7 +11,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
-    @AppStorage(ReadingDefaults.fontSizeKey) private var fontSize = ReadingDefaults.fontSize
+    @AppStorage(ReadingDefaults.columnsKey) private var columns = ReadingDefaults.columns
     @AppStorage(AppearanceMode.key) private var appearance = AppearanceMode.system
     @AppStorage("soundEnabled") private var soundEnabled = true
 
@@ -43,21 +43,21 @@ struct SettingsView: View {
                 Section {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack {
-                            Text("Text Size")
+                            Text("Columns")
                             Spacer()
-                            Text("\(Int(fontSize)) pt").foregroundStyle(.secondary)
+                            Text("\(Int(columns))").foregroundStyle(.secondary)
                         }
                         HStack(spacing: 12) {
-                            Image(systemName: "textformat.size.smaller")
-                                .foregroundStyle(.secondary)
-                            Slider(value: $fontSize,
-                                   in: ReadingDefaults.fontRange, step: 1)
-                                .accessibilityLabel("Text size")
                             Image(systemName: "textformat.size.larger")
                                 .foregroundStyle(.secondary)
+                            Slider(value: $columns,
+                                   in: ReadingDefaults.columnRange, step: 1)
+                                .accessibilityLabel("Columns")
+                            Image(systemName: "textformat.size.smaller")
+                                .foregroundStyle(.secondary)
                         }
-                        Text("The quick brown fox jumps over the lazy dog.")
-                            .font(.system(size: fontSize))
+                        Text("Sets the line width. Fewer columns means larger text; the font scales to fill the screen.")
+                            .font(.footnote)
                             .foregroundStyle(.secondary)
                             .lineLimit(2)
                     }

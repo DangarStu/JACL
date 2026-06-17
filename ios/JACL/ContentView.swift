@@ -60,12 +60,14 @@ enum AppearanceMode: String, CaseIterable, Identifiable {
 
 /// Reading preferences shared between the Settings screen and the game view.
 enum ReadingDefaults {
-    /// Transcript text size in points -- a comfortable reading size on a
-    /// tablet (the slider goes 12...28 in Settings).
-    static let fontSize: Double = 21
-    static let fontRange: ClosedRange<Double> = 12...28
-    /// UserDefaults key for the persisted transcript font size.
-    static let fontSizeKey = "transcriptFontSize"
+    /// Reading width in characters. The font size is derived so this many
+    /// columns fill the window width -- so choosing a column count is really
+    /// choosing the text size (fewer columns = bigger text), and it rescales
+    /// with the window. The Settings slider goes 40...80, centred on 60.
+    static let columns: Double = 60
+    static let columnRange: ClosedRange<Double> = 40...80
+    /// UserDefaults key for the persisted column count.
+    static let columnsKey = "readingColumns"
 }
 
 /// The bundled glossary for a game: the single `<lang>_words.csv` matching the
@@ -136,8 +138,11 @@ struct GameView: View {
     /// into -- the same per-game header colour the web interface uses. Read once
     /// on appear; nil for a game that declares none.
     @State private var headerColor: Color?
-    /// Transcript text size, set in Settings and persisted app-wide.
-    @AppStorage(ReadingDefaults.fontSizeKey) private var transcriptFontSize = ReadingDefaults.fontSize
+    /// Reading width in columns, set in Settings and persisted app-wide.
+    @AppStorage(ReadingDefaults.columnsKey) private var columns = ReadingDefaults.columns
+    /// Font size derived from `columns` + the window width, so the chosen number
+    /// of columns fills the screen and rescales with it (see applyColumns).
+    @State private var derivedFontSize: Double = 18
     /// In-game appearance (System / Light / Dark), set in Settings. Applied from
     /// inside the reading screen so it drives the window even though the shelf's
     /// navigationDestination otherwise detaches it from the stack's scheme.
@@ -192,7 +197,7 @@ struct GameView: View {
                 // The status grid is laid out by the interpreter to a column
                 // count derived from the cell metrics we send; measure those at
                 // the chosen reading size so the bar matches the status font.
-                bridge.statusFontSize = transcriptFontSize
+                applyColumns(width: geo.size.width)
                 bridge.setSoundEnabled(soundEnabled)
                 bridge.start(gamePath: gamePath, size: geo.size)
             }
@@ -203,12 +208,14 @@ struct GameView: View {
                 // interpreters running in one process and the app hangs/crashes.
                 bridge.stop()
             }
-            .onChange(of: geo.size) { _, newSize in bridge.resize(to: newSize) }
-            .onChange(of: transcriptFontSize) { _, newSize in
-                // Reading size changed: re-measure the status cell and tell the
-                // interpreter (via arrange), so it re-lays-out the fixed-width
-                // status line to the new column count instead of overflowing.
-                bridge.statusFontSize = newSize
+            .onChange(of: geo.size) { _, newSize in
+                applyColumns(width: newSize.width)   // re-derive the font for the new width
+                bridge.resize(to: newSize)
+            }
+            .onChange(of: columns) { _, _ in
+                // Column count changed (the slider): re-derive the font and the
+                // status cell, then re-arrange so the grid follows the new width.
+                applyColumns(width: geo.size.width)
                 bridge.resize(to: geo.size)
             }
             .onChange(of: soundEnabled) { _, on in bridge.setSoundEnabled(on) }
@@ -243,7 +250,7 @@ struct GameView: View {
                 }
                 .accessibilityLabel("Text size")
                 .popover(isPresented: $showTextSize) {
-                    TextSizePopover(fontSize: $transcriptFontSize)
+                    TextSizePopover(columns: $columns)
                 }
             }
             // Map: ask the game to emit its map, then open the map sheet.
@@ -331,6 +338,30 @@ struct GameView: View {
         #endif
     }
 
+    /// Derive the reading font from the chosen column count: size it so `columns`
+    /// columns fill the window width, and set the cell metrics the interpreter
+    /// lays the status grid out to, so the grid is exactly `columns` wide. The
+    /// drawn glyph runs a hair wider than the measured advance, so the font
+    /// targets ~0.5pt under the cell to keep the status text inside the grid.
+    private func applyColumns(width: CGFloat) {
+        let avail = Double(width) - 16
+        guard avail > 0 else { return }
+        let cols = max(1, columns)
+        let cellW = avail / cols
+        let target = max(1, cellW - 0.5)
+        func advance(_ pt: Double) -> Double {
+            let f = UIFont.monospacedSystemFont(ofSize: CGFloat(pt), weight: .regular)
+            return Double(("0" as NSString).size(withAttributes: [.font: f]).width)
+        }
+        let refSize = 20.0
+        var font = min(44, max(7, refSize * target / advance(refSize)))
+        font = min(44, max(7, font * target / advance(font)))   // refine (advance ~linear)
+        derivedFontSize = font
+        bridge.cellWidth = cellW                                // grid = floor(avail/cellW) = columns
+        bridge.cellHeight = Double(
+            UIFont.monospacedSystemFont(ofSize: CGFloat(font), weight: .regular).lineHeight)
+    }
+
     // MARK: Grid window (status line / game board) — fixed monospaced rows
 
     private func gridView(id: Int) -> some View {
@@ -338,7 +369,7 @@ struct GameView: View {
         return VStack(alignment: .leading, spacing: 0) {
             ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
                 rowText(row)
-                    .font(.system(size: transcriptFontSize, design: .monospaced))
+                    .font(.system(size: derivedFontSize, design: .monospaced))
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)   // never let the status bar overflow
             }
@@ -371,7 +402,7 @@ struct GameView: View {
         // overflow.
         return TranscriptTextView(paragraphs: paras, dictionary: dictionary,
                                   headerColor: headerColor.map { UIColor($0) },
-                                  fontSize: transcriptFontSize)
+                                  fontSize: derivedFontSize)
     }
 
     // MARK: Input
@@ -385,7 +416,7 @@ struct GameView: View {
                 Text(">").foregroundColor(.secondary)
                 TextField("", text: $inputText)
                     .textFieldStyle(.plain)
-                    .font(.system(size: transcriptFontSize))
+                    .font(.system(size: derivedFontSize))
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
                     .focused($inputFocused)
@@ -441,7 +472,7 @@ struct GameView: View {
         case "alert":                    t = t.foregroundColor(.red)
         case "input":                    t = t.foregroundColor(.accentColor)
         case "preformatted", "user1", "user2":
-            t = t.font(.system(size: transcriptFontSize, design: .monospaced))
+            t = t.font(.system(size: derivedFontSize, design: .monospaced))
         default:                         break
         }
         if span.hyperlink != nil {
@@ -453,24 +484,24 @@ struct GameView: View {
 
 // MARK: - In-game text size
 
-/// The text-size slider shown from the reading screen's top-bar "Aa" button.
-/// It binds the same persisted `transcriptFontSize` as Settings, so changing it
-/// here updates the live transcript and sticks app-wide.
+/// The column-width slider shown from the reading screen's top-bar "Aa" button.
+/// It binds the same persisted `columns` as Settings, so changing it here
+/// rescales the live transcript and sticks app-wide (fewer columns = bigger text).
 private struct TextSizePopover: View {
-    @Binding var fontSize: Double
+    @Binding var columns: Double
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Text Size")
+                Text("Columns")
                 Spacer()
-                Text("\(Int(fontSize)) pt").foregroundStyle(.secondary)
+                Text("\(Int(columns))").foregroundStyle(.secondary)
             }
             HStack(spacing: 12) {
-                Image(systemName: "textformat.size.smaller").foregroundStyle(.secondary)
-                Slider(value: $fontSize, in: ReadingDefaults.fontRange, step: 1)
-                    .accessibilityLabel("Text size")
                 Image(systemName: "textformat.size.larger").foregroundStyle(.secondary)
+                Slider(value: $columns, in: ReadingDefaults.columnRange, step: 1)
+                    .accessibilityLabel("Columns")
+                Image(systemName: "textformat.size.smaller").foregroundStyle(.secondary)
             }
         }
         .padding()
