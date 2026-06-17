@@ -236,17 +236,17 @@ fun SettingsScreen(prefs: AppPrefs, onClose: () -> Unit) {
         ) {
             SettingsSection("Reading") {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Text Size", Modifier.weight(1f))
-                    Text("${prefs.fontSize.toInt()} pt", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("Columns", Modifier.weight(1f))
+                    Text("${prefs.columns.toInt()}", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 Slider(
-                    value = prefs.fontSize,
-                    onValueChange = { prefs.updateFontSize(it) },
-                    valueRange = ReadingDefaults.FONT_RANGE,
-                    steps = (ReadingDefaults.FONT_RANGE.endInclusive - ReadingDefaults.FONT_RANGE.start).toInt() - 1,
+                    value = prefs.columns,
+                    onValueChange = { prefs.updateColumns(it) },
+                    valueRange = ReadingDefaults.COLUMN_RANGE,
+                    steps = (ReadingDefaults.COLUMN_RANGE.endInclusive - ReadingDefaults.COLUMN_RANGE.start).toInt() - 1,
                 )
-                Text("The quick brown fox jumps over the lazy dog.",
-                    fontFamily = FontFamily.Serif, fontSize = prefs.fontSize.sp,
+                Text("Sets the line width. Fewer columns means larger text; the font scales to fill the screen.",
+                    fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
 
@@ -349,7 +349,21 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
     val measurer = rememberTextMeasurer()
     var started by remember { mutableStateOf(false) }
     var containerW by remember { mutableStateOf(0) }
-    val fontSize = prefs.fontSize
+    var containerH by remember { mutableStateOf(0) }
+    // The slider chooses a column count; the font size is derived so that many
+    // columns fill the window (see the LaunchedEffect below). Fewer columns =
+    // bigger text, and it rescales when the window does.
+    val columns = prefs.columns.toInt().coerceAtLeast(1)
+    var derivedFontSize by remember { mutableStateOf(18f) }
+    // Per-character advance measured at a reference size, to turn a target pixel
+    // cell width back into a font size (monospace advance is linear in size).
+    val refSp = 20f
+    val advanceRefPx = remember {
+        measurer.measure(
+            AnnotatedString("0".repeat(40)),
+            style = TextStyle(fontFamily = FontFamily.Monospace, fontSize = refSp.sp)
+        ).size.width.toDouble() / 40
+    }
 
     val headerColor = remember(game.file.path) {
         GameLibrary.stringConstant(game.file, "header_colour")?.let { parseHexColor(it) }
@@ -378,10 +392,43 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
     // A fresh map arrived (typed `map` or the Map button) -- open the sheet.
     LaunchedEffect(bridge.mapVersion) { if (bridge.mapVersion > 0) showMap = true }
 
-    fun cell() = measurer.measure(
-        AnnotatedString("0"),
-        style = TextStyle(fontFamily = FontFamily.Monospace, fontSize = fontSize.sp)
-    ).size
+    // Derive the font from the chosen column count: size it so `columns` columns
+    // fill the available width. The text then always spans the window, rescales
+    // when the window changes, and the status bar is exactly that many columns
+    // (so it can't overflow). Re-runs on a width change (rotation) or a column
+    // change -- not on the keyboard, since the terp's metric height is fixed and
+    // height doesn't affect the column layout.
+    LaunchedEffect(containerW, columns) {
+        if (containerW <= 0) return@LaunchedEffect
+        val avail = containerW - with(density) { 16.dp.toPx() }.toInt()
+        if (avail <= 0) return@LaunchedEffect
+        fun advanceAt(sp: Float) = measurer.measure(
+            AnnotatedString("0".repeat(40)),
+            style = TextStyle(fontFamily = FontFamily.Monospace, fontSize = sp.sp)
+        ).size.width.toDouble() / 40
+        // The cell budget per column. The terp's grid is floor(width / cellW),
+        // i.e. exactly `columns`. But each glyph DRAWS ~1px wider than the
+        // measurer reports, so size the font for a measured advance ~1.5px under
+        // the cell; the drawn text then fills the cell without the status bar's
+        // right-aligned text clipping. Estimate the font (advance is ~linear in
+        // size) then refine by measuring at that size (it isn't perfectly linear).
+        val cellW = avail.toDouble() / columns
+        val charW = (cellW - 1.5).coerceAtLeast(1.0)
+        var font = (refSp * charW / advanceRefPx).toFloat().coerceIn(7f, 44f)
+        font = (font * charW / advanceAt(font)).toFloat().coerceIn(7f, 44f)
+        derivedFontSize = font
+        val drawnAdvance = cellW
+        val charHeight = measurer.measure(
+            AnnotatedString("0"),
+            style = TextStyle(fontFamily = FontFamily.Monospace, fontSize = font.sp)
+        ).size.height.toDouble()
+        if (!started) {
+            bridge.start(game.file.path, avail, containerH, drawnAdvance, charHeight)
+            started = true
+        } else {
+            bridge.resize(avail, containerH, drawnAdvance, charHeight)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -411,16 +458,16 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
                         ) {
                             Column(Modifier.width(260.dp).padding(horizontal = 16.dp, vertical = 4.dp)) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text("Text Size", Modifier.weight(1f))
-                                    Text("${fontSize.toInt()} pt",
+                                    Text("Columns", Modifier.weight(1f))
+                                    Text("${prefs.columns.toInt()}",
                                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
                                 Slider(
-                                    value = fontSize,
-                                    onValueChange = { prefs.updateFontSize(it) },
-                                    valueRange = ReadingDefaults.FONT_RANGE,
-                                    steps = (ReadingDefaults.FONT_RANGE.endInclusive
-                                        - ReadingDefaults.FONT_RANGE.start).toInt() - 1,
+                                    value = prefs.columns,
+                                    onValueChange = { prefs.updateColumns(it) },
+                                    valueRange = ReadingDefaults.COLUMN_RANGE,
+                                    steps = (ReadingDefaults.COLUMN_RANGE.endInclusive
+                                        - ReadingDefaults.COLUMN_RANGE.start).toInt() - 1,
                                 )
                             }
                         }
@@ -437,39 +484,20 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
     ) { pad ->
         Column(
             Modifier.fillMaxSize().padding(pad).onSizeChanged { sz ->
-                if (sz.width <= 0) return@onSizeChanged
-                val w = sz.width - with(density) { 16.dp.toPx() }.toInt()
-                val c = cell()
-                // Cell WIDTH is the monospace pitch, measured from a run / count
-                // (a single glyph's box is narrower than its advance) plus a
-                // small safety margin. The measured pitch runs a touch under what
-                // is actually drawn (each glyph snaps to a whole pixel), so
-                // without the margin RemGlk -- which sets the grid columns to
-                // floor(width / charwidth) -- fits a couple too many columns and
-                // the right-aligned status text (Moves) clips off the edge.
-                // Erring ~2px wide costs at most one column of right padding.
-                val advance = measurer.measure(
-                    AnnotatedString("0".repeat(40)),
-                    style = TextStyle(fontFamily = FontFamily.Monospace, fontSize = fontSize.sp)
-                ).size.width.toDouble() / 40 + 2.0
-                if (!started) {
-                    bridge.start(game.file.path, w, sz.height, advance, c.height.toDouble())
-                    started = true; containerW = sz.width
-                } else if (sz.width != containerW) {
-                    bridge.resize(w, sz.height, advance, c.height.toDouble())
-                    containerW = sz.width
-                }
+                // Just record the size; the LaunchedEffect above turns the width
+                // + column count into the font and the terp's cell metrics.
+                if (sz.width > 0) { containerW = sz.width; containerH = sz.height }
             }
         ) {
             for (w in bridge.windows.filter { it.type == "grid" }) {
-                GridView(bridge.grids[w.id] ?: emptyList(), fontSize)
+                GridView(bridge.grids[w.id] ?: emptyList(), derivedFontSize)
             }
             for (w in bridge.windows.filter { it.type == "buffer" }) {
                 Box(Modifier.weight(1f).fillMaxWidth()) {
-                    TranscriptView(bridge, bridge.buffers[w.id] ?: emptyList(), headerColor, fontSize, onDefine)
+                    TranscriptView(bridge, bridge.buffers[w.id] ?: emptyList(), headerColor, derivedFontSize, onDefine)
                 }
             }
-            InputBar(bridge, fontSize)
+            InputBar(bridge, derivedFontSize)
         }
     }
 

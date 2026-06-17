@@ -23,8 +23,12 @@ enum class AppearanceMode(val label: String) {
 }
 
 object ReadingDefaults {
-    const val FONT_SIZE = 21f
-    val FONT_RANGE = 12f..28f
+    // The reading width, in characters. The font size is derived so that this
+    // many columns fill the window -- so choosing a column count is really
+    // choosing the text size (fewer columns = bigger text), and the text always
+    // spans the width and rescales with the window.
+    const val COLUMNS = 70f
+    val COLUMN_RANGE = 40f..100f
 }
 
 /**
@@ -33,7 +37,7 @@ object ReadingDefaults {
  * the iOS @AppStorage settings.
  */
 class AppPrefs(private val sp: SharedPreferences) {
-    var fontSize by mutableFloatStateOf(sp.getFloat("transcriptFontSize", ReadingDefaults.FONT_SIZE))
+    var columns by mutableFloatStateOf(sp.getFloat("readingColumns", ReadingDefaults.COLUMNS))
         private set
     var appearance by mutableStateOf(
         runCatching { AppearanceMode.valueOf(sp.getString("appearanceMode", "SYSTEM")!!) }
@@ -43,9 +47,9 @@ class AppPrefs(private val sp: SharedPreferences) {
     var soundEnabled by mutableStateOf(sp.getBoolean("soundEnabled", true))
         private set
 
-    fun updateFontSize(v: Float) {
-        fontSize = v
-        sp.edit().putFloat("transcriptFontSize", v).apply()
+    fun updateColumns(v: Float) {
+        columns = v
+        sp.edit().putFloat("readingColumns", v).apply()
     }
 
     fun updateSoundEnabled(on: Boolean) {
