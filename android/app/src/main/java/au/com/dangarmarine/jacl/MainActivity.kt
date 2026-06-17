@@ -684,7 +684,9 @@ fun TranscriptView(
                 if (text.isNotEmpty()) {
                     DefinableText(text, fontSize, onDefine)
                 }
-                Spacer(Modifier.height(8.dp))
+                // Scale the inter-paragraph gap with the font, so a small font in
+                // a shrunk window doesn't leave a fixed 8dp gap dwarfing the text.
+                Spacer(Modifier.height((fontSize * 0.4f).dp))
             }
         }
     }
