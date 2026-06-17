@@ -40,7 +40,9 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
@@ -438,11 +440,23 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
                 if (sz.width <= 0) return@onSizeChanged
                 val w = sz.width - with(density) { 16.dp.toPx() }.toInt()
                 val c = cell()
+                // Cell WIDTH is the monospace pitch, measured from a run / count
+                // (a single glyph's box is narrower than its advance) plus a
+                // small safety margin. The measured pitch runs a touch under what
+                // is actually drawn (each glyph snaps to a whole pixel), so
+                // without the margin RemGlk -- which sets the grid columns to
+                // floor(width / charwidth) -- fits a couple too many columns and
+                // the right-aligned status text (Moves) clips off the edge.
+                // Erring ~2px wide costs at most one column of right padding.
+                val advance = measurer.measure(
+                    AnnotatedString("0".repeat(40)),
+                    style = TextStyle(fontFamily = FontFamily.Monospace, fontSize = fontSize.sp)
+                ).size.width.toDouble() / 40 + 2.0
                 if (!started) {
-                    bridge.start(game.file.path, w, sz.height, c.width.toDouble(), c.height.toDouble())
+                    bridge.start(game.file.path, w, sz.height, advance, c.height.toDouble())
                     started = true; containerW = sz.width
                 } else if (sz.width != containerW) {
-                    bridge.resize(w, sz.height, c.width.toDouble(), c.height.toDouble())
+                    bridge.resize(w, sz.height, advance, c.height.toDouble())
                     containerW = sz.width
                 }
             }
@@ -579,9 +593,8 @@ fun TranscriptView(
     onDefine: ((String) -> Unit)?,
 ) {
     val scroll = rememberScrollState()
-    LaunchedEffect(paras.size, paras.lastOrNull()?.spans?.sumOf { it.text.length }) {
-        scroll.scrollTo(scroll.maxValue)
-    }
+    val imeBottom = WindowInsets.ime.getBottom(LocalDensity.current)
+
     // While waiting for a command, JACL has already written its bare "> " prompt
     // as the trailing paragraph. Hide it -- the input bar below is the live
     // prompt, and the command is echoed ("> look") on submit. Only drop a
@@ -591,20 +604,56 @@ fun TranscriptView(
         paras.last().spans.joinToString("") { it.text }.trim().length <= 2) {
         paras.dropLast(1)
     } else paras
+
+    // Pin the just-typed command ("> look", echoed by JACL) to the top of the
+    // transcript after each turn, so a long response is read from its start and
+    // scrolled down for the rest. scrollTo() clamps to the bottom, so a short
+    // response still sits snug above the keyboard with nothing cut off. Before
+    // the first command (the intro) and for any non-command output, keep the
+    // latest line in view instead.
+    val cmdEcho = visible.indexOfLast { p ->
+        p.spans.all { it.image == null } &&
+            p.spans.joinToString("") { it.text }
+                .let { it.trimStart().startsWith(">") && it.trim().length > 2 }
+    }
+    var viewportTop by remember { mutableStateOf(0f) }
+    var cmdOffset by remember { mutableStateOf<Int?>(null) }
+    // Re-pin on a new turn (cmdOffset/visible change) and when the keyboard
+    // opens or closes (the IME inset resizes the viewport).
+    LaunchedEffect(cmdEcho, visible.size, imeBottom, cmdOffset) {
+        if (cmdEcho >= 0 && cmdOffset != null) scroll.scrollTo(cmdOffset!!)
+        else scroll.scrollTo(scroll.maxValue)
+    }
+
     var bannerShown = false
     val accent = MaterialTheme.colorScheme.primary
-    Column(Modifier.fillMaxSize().verticalScroll(scroll).padding(vertical = 12.dp)) {
-        for (p in visible) {
-            val img = p.spans.firstOrNull { it.image != null }?.image
-            if (img != null) {
-                if (!bannerShown) { BannerImage(bridge, img, headerColor); bannerShown = true }
-                else BlorbImage(bridge, img)
+    Column(
+        Modifier.fillMaxSize()
+            .onGloballyPositioned { viewportTop = it.positionInWindow().y }
+            .verticalScroll(scroll)
+            .padding(vertical = 12.dp)
+    ) {
+        visible.forEachIndexed { i, p ->
+            // Measure the command echo's offset within the scrolling content:
+            // its window position minus the viewport top, plus the current
+            // scroll. This is invariant under scrolling, so it doesn't loop.
+            val posMod = if (i == cmdEcho) {
+                Modifier.onGloballyPositioned { c ->
+                    cmdOffset = (c.positionInWindow().y - viewportTop + scroll.value).toInt()
+                }
+            } else Modifier
+            Column(posMod.fillMaxWidth()) {
+                val img = p.spans.firstOrNull { it.image != null }?.image
+                if (img != null) {
+                    if (!bannerShown) { BannerImage(bridge, img, headerColor); bannerShown = true }
+                    else BlorbImage(bridge, img)
+                }
+                val text = buildSpans(p.spans, accent)
+                if (text.isNotEmpty()) {
+                    DefinableText(text, fontSize, onDefine)
+                }
+                Spacer(Modifier.height(8.dp))
             }
-            val text = buildSpans(p.spans, accent)
-            if (text.isNotEmpty()) {
-                DefinableText(text, fontSize, onDefine)
-            }
-            Spacer(Modifier.height(8.dp))
         }
     }
 }
