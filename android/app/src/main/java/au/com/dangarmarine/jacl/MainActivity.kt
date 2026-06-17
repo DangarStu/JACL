@@ -426,6 +426,12 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
                 },
             )
         },
+        // Pad content for the system bars AND the keyboard, so the input line
+        // rises above the IME instead of hiding under it (the manifest's
+        // adjustResize is ignored once the app draws edge-to-edge on API 35+).
+        // union() takes the larger inset per edge -- no double-padding, and it's
+        // zero when a hardware keyboard means no on-screen keyboard shows.
+        contentWindowInsets = WindowInsets.systemBars.union(WindowInsets.ime),
     ) { pad ->
         Column(
             Modifier.fillMaxSize().padding(pad).onSizeChanged { sz ->
