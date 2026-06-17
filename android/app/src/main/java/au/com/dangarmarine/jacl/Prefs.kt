@@ -27,8 +27,8 @@ object ReadingDefaults {
     // many columns fill the window -- so choosing a column count is really
     // choosing the text size (fewer columns = bigger text), and the text always
     // spans the width and rescales with the window.
-    const val COLUMNS = 60f
-    val COLUMN_RANGE = 40f..80f
+    const val COLUMNS = 50f
+    val COLUMN_RANGE = 30f..70f
 }
 
 /**

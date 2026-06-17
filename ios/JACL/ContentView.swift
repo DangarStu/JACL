@@ -64,8 +64,8 @@ enum ReadingDefaults {
     /// columns fill the window width -- so choosing a column count is really
     /// choosing the text size (fewer columns = bigger text), and it rescales
     /// with the window. The Settings slider goes 40...80, centred on 60.
-    static let columns: Double = 60
-    static let columnRange: ClosedRange<Double> = 40...80
+    static let columns: Double = 50
+    static let columnRange: ClosedRange<Double> = 30...70
     /// UserDefaults key for the persisted column count.
     static let columnsKey = "readingColumns"
 }
@@ -346,7 +346,8 @@ struct GameView: View {
     private func applyColumns(width: CGFloat) {
         let avail = Double(width) - 16
         guard avail > 0 else { return }
-        let cols = max(1, columns)
+        let cols = min(max(columns, ReadingDefaults.columnRange.lowerBound),
+                       ReadingDefaults.columnRange.upperBound)
         let cellW = avail / cols
         let target = max(1, cellW - 0.5)
         func advance(_ pt: Double) -> Double {
