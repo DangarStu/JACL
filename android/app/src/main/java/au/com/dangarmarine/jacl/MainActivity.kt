@@ -356,7 +356,8 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
     // The slider chooses a column count; the font size is derived so that many
     // columns fill the window (see the LaunchedEffect below). Fewer columns =
     // bigger text, and it rescales when the window does.
-    val columns = prefs.columns.toInt().coerceAtLeast(1)
+    val columns = prefs.columns.toInt().coerceIn(
+        ReadingDefaults.COLUMN_RANGE.start.toInt(), ReadingDefaults.COLUMN_RANGE.endInclusive.toInt())
     var derivedFontSize by remember { mutableStateOf(18f) }
     // Per-character advance measured at a reference size, to turn a target pixel
     // cell width back into a font size (monospace advance is linear in size).
