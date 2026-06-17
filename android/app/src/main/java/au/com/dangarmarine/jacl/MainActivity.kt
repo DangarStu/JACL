@@ -290,6 +290,9 @@ fun SettingsScreen(prefs: AppPrefs, onClose: () -> Unit) {
                     Text("Version", Modifier.weight(1f))
                     Text(GlkBridge.version, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
+                Text("Build ${BuildConfig.VERSION_NAME} · ${BuildConfig.BUILD_TIME} · ${BuildConfig.GIT_HASH}",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text("JACL by Stuart Allen", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 SettingsLinkRow("jacl.dangarmarine.com.au") { uri.openUri("https://jacl.dangarmarine.com.au/") }
             }

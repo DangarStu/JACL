@@ -1,4 +1,6 @@
 import java.io.FileInputStream
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Properties
 
 plugins {
@@ -17,6 +19,14 @@ val keystoreProperties = Properties().apply {
     if (keystorePropertiesFile.exists()) FileInputStream(keystorePropertiesFile).use { load(it) }
 }
 
+// Short git commit, surfaced in the app's About screen (with a build time) so
+// you can confirm which build is actually installed.
+fun gitHash(): String = try {
+    ProcessBuilder("git", "rev-parse", "--short", "HEAD")
+        .redirectErrorStream(true).start()
+        .inputStream.bufferedReader().use { it.readText().trim() }
+} catch (e: Exception) { "?" }
+
 android {
     namespace = "au.com.dangarmarine.jacl"
     compileSdk = 35
@@ -28,6 +38,9 @@ android {
         targetSdk = 35         // Play requires new apps to target API 35 (Android 15)
         versionCode = 1
         versionName = "1.0"
+        buildConfigField("String", "BUILD_TIME",
+            "\"${SimpleDateFormat("yyyy-MM-dd HH:mm").format(Date())}\"")
+        buildConfigField("String", "GIT_HASH", "\"${gitHash()}\"")
 
         externalNativeBuild {
             cmake {
@@ -74,7 +87,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
-    buildFeatures { compose = true }
+    buildFeatures { compose = true; buildConfig = true }
 }
 
 dependencies {

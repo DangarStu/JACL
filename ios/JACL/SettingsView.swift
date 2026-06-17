@@ -26,7 +26,15 @@ struct SettingsView: View {
         let info = Bundle.main.infoDictionary
         let short = info?["CFBundleShortVersionString"] as? String ?? "?"
         let build = info?["CFBundleVersion"] as? String ?? "?"
-        return "\(short) (\(build))"
+        var s = "\(short) (\(build))"
+        // Append the binary's build time so it's clear which build is installed.
+        if let exec = Bundle.main.executableURL,
+           let date = (try? FileManager.default.attributesOfItem(atPath: exec.path))?[.modificationDate] as? Date {
+            let f = DateFormatter()
+            f.dateFormat = "yyyy-MM-dd HH:mm"
+            s += " · \(f.string(from: date))"
+        }
+        return s
     }
 
     var body: some View {
