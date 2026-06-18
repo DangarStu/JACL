@@ -83,7 +83,7 @@ cat <<'HEAD'
     <section class="intro">
       <p><strong>Interactive fiction</strong> is a genre of text-based computer games where you read a description of a scene and type simple commands (for example <em>go north</em>, <em>take lamp</em>, or <em>examine desk</em>) to move through a story and solve its puzzles.</p>
       <p>It is a direct descendant of the text adventures of the 1970s and 80s &mdash; titles like <em>Zork</em>, <em>Adventure</em>, and <em>The Hitchhiker&rsquo;s Guide to the Galaxy</em> &mdash; and has a thriving modern community of authors and players.</p>
-      <p>Want to write your own? The <a href="/guide/">JACL Guide</a> walks you through the language.</p>
+      <p>Want to write your own? The <a href="/guide/">JACL Guide</a> walks you through the language &mdash; and you can buy it in print as <a href="https://www.lulu.com/shop/stuart-allen/jacl-authors-guide/paperback/product-e7nkeqd.html"><em>The JACL Author&rsquo;s Guide</em></a> paperback from Lulu.</p>
       <p>The interpreter source code &mdash; for running JACL locally or contributing &mdash; is on <a href="https://github.com/DangarStu/JACL">GitHub</a>.</p>
     </section>
     <input class="tabsel" type="radio" name="tab" id="tab-play" checked>
