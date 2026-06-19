@@ -97,7 +97,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: au.com.dangarmarine.JACL
-        TARGETED_DEVICE_FAMILY: "2"          # iPad only
+        TARGETED_DEVICE_FAMILY: "1,2"        # iPhone + iPad
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon   # JACL/Assets.xcassets
         SWIFT_OBJC_BRIDGING_HEADER: JACL/JACL-Bridging-Header.h
         GCC_PREPROCESSOR_DEFINITIONS:
@@ -136,6 +136,11 @@ targets:
         UIFileSharingEnabled: true
         LSSupportsOpeningDocumentsInPlace: true
         UIApplicationSupportsIndirectInputEvents: true
+        # iPhone: portrait + both landscapes (no upside-down, per convention).
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
         UISupportedInterfaceOrientations~ipad:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationPortraitUpsideDown

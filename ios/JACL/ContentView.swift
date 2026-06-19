@@ -64,10 +64,19 @@ enum ReadingDefaults {
     /// columns fill the window width -- so choosing a column count is really
     /// choosing the text size (fewer columns = bigger text), and it rescales
     /// with the window. The Settings slider goes 40...80, centred on 60.
-    static let columns: Double = 50
-    static let columnRange: ClosedRange<Double> = 30...70
+    /// A phone is far narrower than a tablet, so the same column count gives tiny
+    /// text; phones get fewer columns (bigger text) and a lower range.
+    static var isPhone: Bool { UIDevice.current.userInterfaceIdiom == .phone }
+    static var columns: Double { isPhone ? 30 : 50 }
+    static var columnRange: ClosedRange<Double> { isPhone ? 20...45 : 30...70 }
     /// UserDefaults key for the persisted column count.
     static let columnsKey = "readingColumns"
+    /// Cap the reading column's width (points). The chosen columns fill *this*,
+    /// not the whole window, so the font stays a consistent reading size and the
+    /// surplus width of a wide landscape iPad becomes centred margins instead of
+    /// one long, ballooned line. Auto-scales: a narrow phone shows no margin, a
+    /// wide iPad shows generous ones. Matches the Android build.
+    static let maxContentWidth: Double = 800
 }
 
 /// The bundled glossary for a game: the single `<lang>_words.csv` matching the
@@ -179,6 +188,11 @@ struct GameView: View {
 
                 inputBar
             }
+            // Centre the (possibly capped) reading column: a wide landscape iPad
+            // splits the surplus width into equal side margins; a phone or narrow
+            // window stays full width. Auto-scales with the window.
+            .frame(maxWidth: min(geo.size.width, CGFloat(ReadingDefaults.maxContentWidth) + 16))
+            .frame(maxWidth: .infinity)
             .onAppear {
                 guard !started else { return }
                 started = true
@@ -346,9 +360,14 @@ struct GameView: View {
     private func applyColumns(width: CGFloat) {
         let avail = Double(width) - 16
         guard avail > 0 else { return }
+        // Cap the column at a comfortable reading width; `columns` columns fill
+        // *this*, not the whole window, so the surplus of a wide landscape iPad
+        // becomes centred margins (see the body's frame) rather than a font
+        // ballooned to fill the screen. A narrow phone stays under the cap.
+        let content = min(avail, ReadingDefaults.maxContentWidth)
         let cols = min(max(columns, ReadingDefaults.columnRange.lowerBound),
                        ReadingDefaults.columnRange.upperBound)
-        let cellW = avail / cols
+        let cellW = content / cols
         let target = max(1, cellW - 0.5)
         func advance(_ pt: Double) -> Double {
             let f = UIFont.monospacedSystemFont(ofSize: CGFloat(pt), weight: .regular)
@@ -358,7 +377,8 @@ struct GameView: View {
         var font = min(44, max(7, refSize * target / advance(refSize)))
         font = min(44, max(7, font * target / advance(font)))   // refine (advance ~linear)
         derivedFontSize = font
-        bridge.cellWidth = cellW                                // grid = floor(avail/cellW) = columns
+        bridge.cellWidth = cellW                                // grid = floor(content/cellW) = columns
+        bridge.contentWidth = content                           // the terp's window width (<= avail)
         bridge.cellHeight = Double(
             UIFont.monospacedSystemFont(ofSize: CGFloat(font), weight: .regular).lineHeight)
     }

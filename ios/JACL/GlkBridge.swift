@@ -97,6 +97,10 @@ final class GlkBridge: ObservableObject {
     /// columns and the status line can't overflow.
     var cellWidth: Double = 10
     var cellHeight: Double = 20
+    /// The reading column's width in points (<= the window). The view caps it
+    /// (ReadingDefaults.maxContentWidth) so a wide window gains margins; the terp
+    /// lays out to this, not the full window. 0 until the view's first measure.
+    var contentWidth: Double = 0
 
     // MARK: Lifecycle
 
@@ -436,7 +440,11 @@ final class GlkBridge: ObservableObject {
         // pauses with a "[MORE]" prompt -- the transcript scrolls instead, the
         // right model for a touch UI. The 16pt accounts for the status line's
         // horizontal padding.
-        return GlkMetrics(width: Double(size.width) - 16,
+        // Use the view's capped content width when it has measured one, so the
+        // grid is `columns` wide and a wide window's surplus stays margin; fall
+        // back to the full window (minus padding) before the first measure.
+        let w = contentWidth > 0 ? contentWidth : Double(size.width) - 16
+        return GlkMetrics(width: w,
                           height: 100_000,
                           charwidth: cellWidth,
                           charheight: cellHeight)
