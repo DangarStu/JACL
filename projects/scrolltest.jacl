@@ -1,0 +1,107 @@
+#!../bin/jacl
+#------------------------------------------------------------------------------
+#                                                                   SCROLL TEST
+#
+# A deliberately tiny game for checking how the transcript scrolls on every
+# platform. No saving, no restore prompt, no puzzles -- it drops you straight
+# into one room with two things to examine:
+#
+#   X COIN     a short, two-line reply        (should show in full, at the bottom)
+#   X MANUAL   a reply longer than any screen (command pins to the top; scroll on)
+#   LOOK       the room description           (medium length)
+
+constant game_title       "Scroll Test"
+constant game_author      "Stuart Allen"
+constant game_version     1
+constant ifid             "JACL-SCROLLTEST-1"
+constant game_publish     false
+
+{+intro
+clear
+write "^^"
+style bold
+write game_title
+style normal
+write "^^"
+print:
+   A bare room for checking how the transcript scrolls. Type LOOK to
+   re-read the room, X COIN for a short reply, and X MANUAL for a reply
+   that is longer than the screen on any device. There is nothing to
+   solve and nothing to save -- just scrolling.^^
+.
+execute "+look_around"
+}
+
+location chamber : test chamber room
+ short         the "Test Chamber"
+
+{look
+print:
+   A plain, white-walled room, empty except for a small COIN on the
+   floor and a thick MANUAL resting on a plinth in the centre. Examine
+   either one, or LOOK again, to see how each reply scrolls.^
+.
+}
+
+object coin : small copper coin
+ short         a "copper coin"
+ parent        chamber
+
+{examine
+print:
+   A small copper coin, worn smooth with age. One face shows a tower;
+   the other is blank.^
+.
+}
+
+object manual : thick heavy manual book tome
+ short         a "thick manual"
+ parent        chamber
+
+{examine
+print:
+   The manual is enormous, and falls open to a rambling chapter on the
+   theory of scrolling. You begin to read.^^
+   Paragraph one. When a response is taller than the visible area, the
+   command you typed should rest at the very top of the screen, with the
+   reply running on below it, and you scroll down to read the remainder.
+   This stands in for the old [MORE] prompt of the console: a screenful
+   at a time, paced by you.^^
+   Paragraph two. When a response is shorter than the screen, the end of
+   it should sit at the bottom of the text area, the command you typed
+   visible just above it, and the tail of the previous turn filling the
+   space above that, because the new reply alone does not fill the view.^^
+   Paragraph three. None of this should change when the on-screen keyboard
+   is up: the visible area simply becomes the space between the status bar
+   and the keyboard, and the same rules apply within it. A short reply must
+   not hide behind the keyboard, and a long one must still pin its command
+   to the top of whatever room is left.^^
+   Paragraph four. Rotating the device must not break any of it. In
+   landscape the column is narrower and centred, with margins either side,
+   but the command-at-top and reply-at-bottom behaviour is unchanged.^^
+   Paragraph five. The page continues at length, purely to guarantee that
+   this reply overflows even a large tablet held in portrait. Read on, and
+   on, past where the screen can show, confirming that the text above has
+   scrolled up out of view and that the command line is anchored at the top.^^
+   Paragraph six. Still more words, padding the chapter so that no plausible
+   display could contain it in a single screen. If you can see this last
+   line only by scrolling down, then the long-response case is working
+   exactly as intended, and the test is a success.^
+.
+}
+
+object plinth : plinth pedestal centre center
+ has           SURFACE NO_TAB
+ short         the "plinth"
+
+object floor : floor ground
+ has           SURFACE NO_TAB
+ short         the "floor"
+
+object tester : myself self me yourself
+ has           ANIMATE
+ short         name "yourself"
+ parent        chamber
+ player
+
+#include "verbs.library"
