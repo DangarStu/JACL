@@ -43,3 +43,6 @@ guide/guide.html
 
 # local iOS build outputs (device/sim)
 ios/build_*/
+
+# Play closed-test access codes (tester credentials -- local only)
+android/closed-test-codes.csv
