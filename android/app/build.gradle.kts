@@ -36,8 +36,8 @@ android {
         applicationId = "au.com.dangarmarine.jacl"
         minSdk = 29            // timespec_get (RemGlk timers) needs API 29+
         targetSdk = 35         // Play requires new apps to target API 35 (Android 15)
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.1"
         buildConfigField("String", "BUILD_TIME",
             "\"${SimpleDateFormat("yyyy-MM-dd HH:mm").format(Date())}\"")
         buildConfigField("String", "GIT_HASH", "\"${gitHash()}\"")

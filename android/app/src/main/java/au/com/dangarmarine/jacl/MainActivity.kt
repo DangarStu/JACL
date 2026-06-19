@@ -359,6 +359,10 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
     val columns = prefs.columns.toInt().coerceIn(
         ReadingDefaults.COLUMN_RANGE.start.toInt(), ReadingDefaults.COLUMN_RANGE.endInclusive.toInt())
     var derivedFontSize by remember { mutableStateOf(18f) }
+    // The reading column's width in px (<= the window). In a wide window it's
+    // capped (ReadingDefaults.MAX_CONTENT_WIDTH_DP) and the rest becomes centred
+    // margins. 0 until the first measure.
+    var contentWidthPx by remember { mutableStateOf(0) }
     // Per-character advance measured at a reference size, to turn a target pixel
     // cell width back into a font size (monospace advance is linear in size).
     val refSp = 20f
@@ -406,6 +410,12 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
         if (containerW <= 0) return@LaunchedEffect
         val avail = containerW - with(density) { 16.dp.toPx() }.toInt()
         if (avail <= 0) return@LaunchedEffect
+        // Cap the column at a comfortable reading width; `columns` columns fill
+        // *this*, not the whole window, so the surplus of a wide landscape window
+        // becomes centred margins (see the layout) rather than a font ballooned
+        // to fill the screen. Portrait is usually under the cap, so unaffected.
+        val maxContentPx = with(density) { ReadingDefaults.MAX_CONTENT_WIDTH_DP.dp.toPx() }.toInt()
+        val content = minOf(avail, maxContentPx)
         fun advanceAt(sp: Float) = measurer.measure(
             AnnotatedString("0".repeat(40)),
             style = TextStyle(fontFamily = FontFamily.Monospace, fontSize = sp.sp)
@@ -416,21 +426,22 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
         // the cell; the drawn text then fills the cell without the status bar's
         // right-aligned text clipping. Estimate the font (advance is ~linear in
         // size) then refine by measuring at that size (it isn't perfectly linear).
-        val cellW = avail.toDouble() / columns
+        val cellW = content.toDouble() / columns
         val charW = (cellW - 1.5).coerceAtLeast(1.0)
         var font = (refSp * charW / advanceRefPx).toFloat().coerceIn(7f, 44f)
         font = (font * charW / advanceAt(font)).toFloat().coerceIn(7f, 44f)
         derivedFontSize = font
+        contentWidthPx = content
         val drawnAdvance = cellW
         val charHeight = measurer.measure(
             AnnotatedString("0"),
             style = TextStyle(fontFamily = FontFamily.Monospace, fontSize = font.sp)
         ).size.height.toDouble()
         if (!started) {
-            bridge.start(game.file.path, avail, containerH, drawnAdvance, charHeight)
+            bridge.start(game.file.path, content, containerH, drawnAdvance, charHeight)
             started = true
         } else {
-            bridge.resize(avail, containerH, drawnAdvance, charHeight)
+            bridge.resize(content, containerH, drawnAdvance, charHeight)
         }
     }
 
@@ -493,15 +504,23 @@ fun GameScreen(game: Game, prefs: AppPrefs, onBack: () -> Unit) {
                 if (sz.width > 0) { containerW = sz.width; containerH = sz.height }
             }
         ) {
-            for (w in bridge.windows.filter { it.type == "grid" }) {
-                GridView(bridge.grids[w.id] ?: emptyList(), derivedFontSize)
-            }
-            for (w in bridge.windows.filter { it.type == "buffer" }) {
-                Box(Modifier.weight(1f).fillMaxWidth()) {
-                    TranscriptView(bridge, bridge.buffers[w.id] ?: emptyList(), headerColor, derivedFontSize, onDefine)
+            // Centre the (possibly capped) reading column: in a wide landscape
+            // window the surplus width splits into equal side margins; portrait
+            // is usually under the cap, so margin is ~0. Auto-scales with the
+            // window, so a rotation just grows or shrinks the margins.
+            val marginDp = if (contentWidthPx in 1 until containerW)
+                with(density) { ((containerW - contentWidthPx) / 2).toDp() } else 0.dp
+            Column(Modifier.fillMaxSize().padding(horizontal = marginDp)) {
+                for (w in bridge.windows.filter { it.type == "grid" }) {
+                    GridView(bridge.grids[w.id] ?: emptyList(), derivedFontSize)
                 }
+                for (w in bridge.windows.filter { it.type == "buffer" }) {
+                    Box(Modifier.weight(1f).fillMaxWidth()) {
+                        TranscriptView(bridge, bridge.buffers[w.id] ?: emptyList(), headerColor, derivedFontSize, onDefine)
+                    }
+                }
+                InputBar(bridge, derivedFontSize)
             }
-            InputBar(bridge, derivedFontSize)
         }
     }
 

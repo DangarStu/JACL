@@ -29,6 +29,13 @@ object ReadingDefaults {
     // spans the width and rescales with the window.
     const val COLUMNS = 50f
     val COLUMN_RANGE = 30f..70f
+
+    // Cap the reading column's width (dp). The chosen columns fill *this* width,
+    // not the whole window, so the font stays a consistent reading size across
+    // orientations and the surplus width of a wide landscape tablet becomes
+    // centred margins instead of one long, ballooned line. Auto-scales: portrait
+    // shows little or no margin, landscape shows generous margins.
+    const val MAX_CONTENT_WIDTH_DP = 800f
 }
 
 /**
