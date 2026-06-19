@@ -161,6 +161,18 @@ struct GameView: View {
     @FocusState private var inputFocused: Bool
     /// Whether the in-game text-size popover (the top-bar "Aa" button) is open.
     @State private var showTextSize = false
+    /// Bumped on each command submit, so the transcript anchors its scroll on the
+    /// start of the new turn (see TranscriptTextView).
+    @State private var turnCount = 0
+    /// Screen-y of the on-screen keyboard's top (.infinity = no keyboard). We take
+    /// over keyboard avoidance (see body) so the transcript shrinks to the real
+    /// visible region instead of sliding under the nav bar -- which makes its
+    /// bounds.height the true viewport the scroll logic needs.
+    @State private var keyboardTop: CGFloat = .infinity
+    /// The transcript view's frame in global (screen) coords, measured by SwiftUI
+    /// (reliable, unlike UIKit frame conversion). Combined with keyboardTop it
+    /// gives the true visible height for the scroll maths.
+    @State private var bufferFrame: CGRect = .zero
     /// Working text for the "name this save" dialog.
     @State private var saveName = ""
     /// Whether the "restart this game?" confirmation is showing.
@@ -175,6 +187,10 @@ struct GameView: View {
 
     var body: some View {
         GeometryReader { geo in
+            // True visible height of the transcript: from its top down to the
+            // keyboard top (or its own bottom when no keyboard). Measured in
+            // SwiftUI, so it's right regardless of how the keyboard shifts things.
+            let visibleHeight = currentVisibleHeight()
             VStack(spacing: 0) {
                 ForEach(bridge.windows.filter { $0.type == "grid" }) { w in
                     gridView(id: w.id)
@@ -183,7 +199,12 @@ struct GameView: View {
                 }
 
                 ForEach(bridge.windows.filter { $0.type == "buffer" }) { w in
-                    bufferView(id: w.id)
+                    bufferView(id: w.id, visibleHeight: visibleHeight)
+                        .background(GeometryReader { g in
+                            Color.clear
+                                .onAppear { bufferFrame = g.frame(in: .global) }
+                                .onChange(of: g.frame(in: .global)) { _, f in bufferFrame = f }
+                        })
                 }
 
                 inputBar
@@ -252,6 +273,14 @@ struct GameView: View {
                     submit()
                 }
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillChangeFrameNotification)) { note in
+            if let f = (note.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+                keyboardTop = f.minY
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            keyboardTop = .infinity
         }
         .navigationBarTitleDisplayMode(.inline)
         .preferredColorScheme(appearance.colorScheme)
@@ -401,7 +430,15 @@ struct GameView: View {
 
     // MARK: Buffer window (scrolling transcript), auto-scrolled to bottom
 
-    private func bufferView(id: Int) -> some View {
+    /// The transcript's true visible height: top of the measured buffer frame down
+    /// to the keyboard top (or its own bottom when there's no keyboard).
+    private func currentVisibleHeight() -> CGFloat {
+        guard keyboardTop.isFinite, bufferFrame.height > 0 else { return bufferFrame.height }
+        let bottomLimit = min(bufferFrame.maxY, keyboardTop)
+        return max(1, bottomLimit - bufferFrame.minY)
+    }
+
+    private func bufferView(id: Int, visibleHeight: CGFloat) -> some View {
         var paras = bridge.buffers[id] ?? []
         // While the game waits for a command, JACL has already written its bare
         // prompt ("> ") as the trailing paragraph. Hide it: the input bar below
@@ -423,7 +460,8 @@ struct GameView: View {
         // overflow.
         return TranscriptTextView(paragraphs: paras, dictionary: dictionary,
                                   headerColor: headerColor.map { UIColor($0) },
-                                  fontSize: derivedFontSize)
+                                  fontSize: derivedFontSize, turnCount: turnCount,
+                                  visibleHeight: visibleHeight)
     }
 
     // MARK: Input
@@ -464,6 +502,7 @@ struct GameView: View {
     private func submit() {
         let line = inputText
         inputText = ""
+        turnCount += 1          // anchor the transcript scroll on this new turn
         bridge.submitLine(line)
     }
 
@@ -581,6 +620,12 @@ struct TranscriptTextView: UIViewRepresentable {
     let headerColor: UIColor?
     /// Base transcript text size in points (from Settings).
     let fontSize: Double
+    /// Bumped each time the player submits a command, so the view anchors the
+    /// scroll on the turn's start regardless of the echo's text format.
+    let turnCount: Int
+    /// The transcript's true visible height (SwiftUI-measured, keyboard-aware),
+    /// used directly for the scroll maths.
+    var visibleHeight: CGFloat = 0
 
     func makeUIView(context: Context) -> UITextView {
         let tv = UITextView()
@@ -612,19 +657,62 @@ struct TranscriptTextView: UIViewRepresentable {
         // edit menu and fight the definition popover). Other games stay
         // selectable so the transcript can still be copied.
         tv.isSelectable = (dictionary == nil)
+        // Console-version scroll logic: when a command is submitted (turnCount
+        // bumps), anchor on the CURRENT content height -- where this turn's output
+        // will append -- before any of it arrives. Echo and response come in
+        // separate updates, so the fixed anchor lets the whole turn scroll from
+        // the command line: taller than a screen -> command at top; shorter ->
+        // show it all at the bottom. Keyed off the submit, not the echo text, so
+        // it's robust to the echo's exact format.
+        if turnCount != context.coordinator.lastTurn {
+            context.coordinator.lastTurn = turnCount
+            tv.layoutManager.ensureLayout(for: tv.textContainer)
+            context.coordinator.commandAnchor = tv.contentSize.height
+            context.coordinator.userHasScrolled = false                 // new turn: auto-position again
+        }
         // Rebuild when the text or the chosen font size changes, so an
         // in-progress selection isn't dropped by an unrelated SwiftUI update.
         let lastLen = paragraphs.last?.spans.reduce(0) { $0 + $1.text.count } ?? 0
         let sig = "\(paragraphs.count)|\(lastLen)|\(fontSize)"
-        guard sig != context.coordinator.lastSig else { return }
+        let contentChanged = sig != context.coordinator.lastSig
+        // Re-position on a content change OR a viewport change -- the keyboard
+        // shrinking visibleHeight after the scroll already ran is why a short
+        // response landed behind the keyboard.
+        let viewportChanged = abs(visibleHeight - context.coordinator.lastVisibleHeight) > 0.5
+        guard contentChanged || viewportChanged else { return }
         context.coordinator.lastSig = sig
-        tv.attributedText = Self.attributed(paragraphs,
-                                            baseFont: Self.transcriptFont(ofSize: fontSize),
-                                            headerColor: headerColor)
-        DispatchQueue.main.async {
-            guard tv.attributedText.length > 0 else { return }
-            tv.scrollRangeToVisible(NSRange(location: tv.attributedText.length - 1, length: 1))
+        context.coordinator.lastVisibleHeight = visibleHeight
+        if contentChanged {
+            tv.attributedText = Self.attributed(paragraphs,
+                                                baseFont: Self.transcriptFont(ofSize: fontSize),
+                                                headerColor: headerColor)
         }
+        let anchor = context.coordinator.commandAnchor
+        DispatchQueue.main.async {
+            guard tv.attributedText.length > 0,
+                  !context.coordinator.userHasScrolled else { return }   // don't fight a manual scroll
+            Self.scrollToAnchor(tv, anchor: anchor, visibleH: visibleHeight)
+        }
+    }
+
+    /// Position the latest output the way the console version does: if it's taller
+    /// than the visible area, put its command line (`anchor`) at the top and let
+    /// the rest scroll; if it fits, show it all (scrolled to the bottom). `anchor`
+    /// is the content height captured just before this turn's text was appended.
+    private static func scrollToAnchor(_ tv: UITextView, anchor: CGFloat, visibleH: CGFloat) {
+        tv.layoutManager.ensureLayout(for: tv.textContainer)
+        let contentH = tv.layoutManager.usedRect(for: tv.textContainer).maxY
+            + tv.textContainerInset.top + tv.textContainerInset.bottom
+        // SwiftUI measured the true visible height (keyboard-aware). Fall back to
+        // the full bounds before the first measure. Inset the bottom by the hidden
+        // part so a long response can still scroll fully clear of the keyboard.
+        let v = visibleH > 1 ? visibleH : tv.bounds.height
+        let occluded = max(0, tv.bounds.height - v)
+        tv.contentInset.bottom = occluded
+        tv.verticalScrollIndicatorInsets.bottom = occluded
+        let bottom = max(0, contentH - v)
+        let y = (contentH - anchor) > v ? min(anchor, bottom) : bottom
+        tv.setContentOffset(CGPoint(x: 0, y: y), animated: false)
     }
 
     func makeCoordinator() -> Coordinator { Coordinator() }
@@ -633,6 +721,17 @@ struct TranscriptTextView: UIViewRepresentable {
                              UIPopoverPresentationControllerDelegate, UIGestureRecognizerDelegate {
         var dictionary: GameDictionary?
         var lastSig = ""
+        /// Content-y of the current command, so its whole output (echo + response,
+        /// which arrive in separate updates) scrolls from one fixed anchor.
+        var commandAnchor: CGFloat = 0
+        var lastTurn = -1
+        var lastVisibleHeight: CGFloat = -1
+        /// Set once the player drags the transcript, so incidental re-renders (the
+        /// prompt settling, the keyboard opening, a resize) don't yank the scroll
+        /// back. Reset when a new command starts a fresh turn.
+        var userHasScrolled = false
+
+        func scrollViewWillBeginDragging(_ scrollView: UIScrollView) { userHasScrolled = true }
 
         // Long-press a word in a dictionary game and its definition appears
         // immediately in a popover -- no selection, no edit menu, no extra tap
