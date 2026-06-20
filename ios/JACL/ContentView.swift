@@ -192,28 +192,34 @@ struct GameView: View {
             // SwiftUI, so it's right regardless of how the keyboard shifts things.
             let visibleHeight = currentVisibleHeight()
             VStack(spacing: 0) {
+                // Status grid(s): full window width. A status bar is chrome -- it
+                // spans the window edge to edge (on a wide Mac/iPad it must not be
+                // boxed into the centred reading column). fixedSize keeps it hugging
+                // its rows so it never balloons taller than the status text.
                 ForEach(bridge.windows.filter { $0.type == "grid" }) { w in
                     gridView(id: w.id)
+                        .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(Color(.secondarySystemBackground))
                 }
 
-                ForEach(bridge.windows.filter { $0.type == "buffer" }) { w in
-                    bufferView(id: w.id, visibleHeight: visibleHeight)
-                        .background(GeometryReader { g in
-                            Color.clear
-                                .onAppear { bufferFrame = g.frame(in: .global) }
-                                .onChange(of: g.frame(in: .global)) { _, f in bufferFrame = f }
-                        })
+                // Reading column (transcript + input): capped and centred so a wide
+                // landscape iPad / Mac window gets equal side margins instead of a
+                // stretched line; a phone or narrow window stays full width.
+                VStack(spacing: 0) {
+                    ForEach(bridge.windows.filter { $0.type == "buffer" }) { w in
+                        bufferView(id: w.id, visibleHeight: visibleHeight)
+                            .background(GeometryReader { g in
+                                Color.clear
+                                    .onAppear { bufferFrame = g.frame(in: .global) }
+                                    .onChange(of: g.frame(in: .global)) { _, f in bufferFrame = f }
+                            })
+                    }
+                    inputBar
                 }
-
-                inputBar
+                .frame(maxWidth: min(geo.size.width, CGFloat(ReadingDefaults.maxContentWidth) + 16))
+                .frame(maxWidth: .infinity)
             }
-            // Centre the (possibly capped) reading column: a wide landscape iPad
-            // splits the surplus width into equal side margins; a phone or narrow
-            // window stays full width. Auto-scales with the window.
-            .frame(maxWidth: min(geo.size.width, CGFloat(ReadingDefaults.maxContentWidth) + 16))
-            .frame(maxWidth: .infinity)
             .onAppear {
                 guard !started else { return }
                 started = true
@@ -288,7 +294,16 @@ struct GameView: View {
             // A text-size control beside the back arrow, so the reading size can
             // be changed without leaving the game for Settings.
             ToolbarItem(placement: .topBarTrailing) {
-                Button { showTextSize = true } label: {
+                Button {
+                    // Resign the command field before presenting. On Mac Catalyst,
+                    // presenting this popover while the input holds the keyboard
+                    // crashes UIKit in the keyboard scene delegate (it pins the
+                    // input views during the presentation transition). Harmless on
+                    // iOS/iPadOS, where the field just gives up focus for the popover.
+                    UIApplication.shared.sendAction(
+                        #selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                    showTextSize = true
+                } label: {
                     Image(systemName: "textformat.size")
                 }
                 .accessibilityLabel("Text size")
