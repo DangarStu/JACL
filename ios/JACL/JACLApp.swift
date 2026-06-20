@@ -38,6 +38,10 @@ struct JACLApp: App {
         WindowGroup("Map", id: AppModel.mapWindowID) {
             MapWindow().environmentObject(appModel)
         }
+        // In-game Settings as a window too (a sheet would crash over the field).
+        WindowGroup("Settings", id: AppModel.settingsWindowID) {
+            SettingsView()
+        }
         #endif
     }
 
@@ -68,7 +72,6 @@ struct JACLApp: App {
 struct GameCommands: Commands {
     @ObservedObject var appModel: AppModel
     @AppStorage(ReadingDefaults.columnsKey) private var columns = ReadingDefaults.columns
-    @Environment(\.openWindow) private var openWindow
 
     var body: some Commands {
         CommandMenu("Game") {
@@ -83,14 +86,9 @@ struct GameCommands: Commands {
 
             Divider()
 
-            Button("Show Map") {
-                appModel.requestMap()
-                #if targetEnvironment(macCatalyst)
-                openWindow(id: AppModel.mapWindowID)
-                #endif
-            }
-            .keyboardShortcut("m", modifiers: [.command, .shift])
-            .disabled(!appModel.hasActiveGame)
+            Button("Show Map") { appModel.requestMap() }
+                .keyboardShortcut("m", modifiers: [.command, .shift])
+                .disabled(!appModel.hasActiveGame)
 
             Divider()
 
@@ -118,6 +116,8 @@ struct MapWindow: View {
             }
         }
         .navigationTitle("Map")
+        .onAppear { appModel.mapWindowOpen = true }
+        .onDisappear { appModel.mapWindowOpen = false }
     }
 }
 

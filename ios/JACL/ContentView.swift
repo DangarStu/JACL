@@ -138,6 +138,7 @@ struct GameView: View {
 
     @StateObject private var bridge = GlkBridge()
     @EnvironmentObject private var appModel: AppModel
+    @Environment(\.openWindow) private var openWindow
     @State private var inputText = ""
     @State private var started = false
     /// The bundled language glossary (merged `data/*_words.csv`), if this game
@@ -220,6 +221,14 @@ struct GameView: View {
                 }
                 .frame(maxWidth: min(geo.size.width, CGFloat(ReadingDefaults.maxContentWidth) + 16))
                 .frame(maxWidth: .infinity)
+
+                // Mac: a control bar across the bottom (full width, like the status
+                // bar up top), so the reading-size / map / settings / restart
+                // controls live in the window instead of only the menu bar -- and
+                // the input prompt isn't left sitting on bare space.
+                #if targetEnvironment(macCatalyst)
+                macControlBar
+                #endif
             }
             .onAppear {
                 // Publish this game so the menu bar / map window reach its bridge.
@@ -264,10 +273,14 @@ struct GameView: View {
                 bridge.resize(to: geo.size)
             }
             .onChange(of: soundEnabled) { _, on in bridge.setSoundEnabled(on) }
-            // A fresh map arrived (player typed `map` or tapped the button) --
-            // open the sheet to show it. On Mac the map is its own window
-            // observing gameMap, so there's no sheet to raise.
-            #if !targetEnvironment(macCatalyst)
+            // A fresh map arrived (the player typed `map`, or the map button/menu
+            // asked for it). iOS raises the sheet; Mac opens the map window once,
+            // then leaves it to redraw from gameMap.
+            #if targetEnvironment(macCatalyst)
+            .onChange(of: bridge.mapVersion) { _, _ in
+                if !appModel.mapWindowOpen { openWindow(id: AppModel.mapWindowID) }
+            }
+            #else
             .onChange(of: bridge.mapVersion) { _, _ in showMap = true }
             #endif
             // Re-focus the command line after a sheet closes, so you can keep
@@ -364,13 +377,7 @@ struct GameView: View {
                           onCancel: { bridge.cancelFileref() })
         }
         .alert("Restart Game?", isPresented: $showRestartConfirm) {
-            Button("Restart", role: .destructive) {
-                // Don't autosave the game we're discarding, drop its autosave
-                // slot, then relaunch the terp so it runs the intro fresh.
-                jacl_autosave_set_suppressed(1)
-                try? FileManager.default.removeItem(atPath: GlkBridge.autosavePath(forGamePath: gamePath))
-                bridge.restart()
-            }
+            Button("Restart", role: .destructive) { restartGame() }
             Button("Cancel", role: .cancel) { }
         } message: {
             Text("Start over from the beginning. Your current progress (the autosave) is lost; named saves are kept.")
@@ -532,6 +539,54 @@ struct GameView: View {
         inputText = ""
         turnCount += 1          // anchor the transcript scroll on this new turn
         bridge.submitLine(line)
+    }
+
+    #if targetEnvironment(macCatalyst)
+    /// Bottom control bar (Mac): reading size, map, settings, restart. Every action
+    /// is direct or opens a separate window -- never a modal over the focused
+    /// command field (which crashes UIKit's keyboard scene delegate on Catalyst).
+    @ViewBuilder private var macControlBar: some View {
+        HStack(spacing: 2) {
+            Button { adjustColumns(by: 4) } label: { Image(systemName: "textformat.size.smaller") }
+                .help("Smaller text")
+            Button { adjustColumns(by: -4) } label: { Image(systemName: "textformat.size.larger") }
+                .help("Larger text")
+
+            Divider().frame(height: 18).padding(.horizontal, 10)
+
+            Button { bridge.submitLine("map") } label: { Image(systemName: "map") }
+                .help("Show map")
+
+            Spacer()
+
+            Button { openWindow(id: AppModel.settingsWindowID) } label: { Image(systemName: "gearshape") }
+                .help("Settings")
+            Button { restartGame() } label: { Image(systemName: "arrow.clockwise") }
+                .help("Restart game")
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.primary)
+        .font(.system(size: 18))
+        .imageScale(.large)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 9)
+        .frame(maxWidth: .infinity)
+        .background(Color(.secondarySystemBackground))
+        .overlay(alignment: .top) { Divider() }
+    }
+    #endif
+
+    /// Clamp the reading width by `delta` columns (more columns = smaller text).
+    private func adjustColumns(by delta: Double) {
+        columns = min(ReadingDefaults.columnRange.upperBound,
+                      max(ReadingDefaults.columnRange.lowerBound, columns + delta))
+    }
+
+    /// Restart the game: suppress + drop its autosave, relaunch the terp at the intro.
+    private func restartGame() {
+        jacl_autosave_set_suppressed(1)
+        try? FileManager.default.removeItem(atPath: GlkBridge.autosavePath(forGamePath: gamePath))
+        bridge.restart()
     }
 
     /// Focus the command line when the game is waiting for a line of input, so

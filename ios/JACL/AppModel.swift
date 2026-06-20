@@ -11,13 +11,18 @@
 import SwiftUI
 
 @MainActor final class AppModel: ObservableObject {
-    /// Scene id for the standalone Mac map window.
+    /// Scene ids for the standalone Mac windows.
     static let mapWindowID = "jacl-map"
+    static let settingsWindowID = "jacl-settings"
 
     /// The game currently on screen, or nil at the shelf. Set by GameView on
     /// appear and cleared on disappear.
     @Published var activeBridge: GlkBridge?
     @Published var activeGamePath: String?
+
+    /// Whether the standalone map window is currently open, so a fresh map only
+    /// *opens* it once -- after that the open window just redraws from gameMap.
+    @Published var mapWindowOpen = false
 
     var hasActiveGame: Bool { activeBridge != nil }
 
