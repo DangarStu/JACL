@@ -23,25 +23,124 @@ struct JACLApp: App {
         // (a ~10s black screen on a fresh install). The shelf does it in .task.
     }
 
+    @StateObject private var appModel = AppModel()
+
     var body: some Scene {
         WindowGroup {
-            #if DEBUG
-            // Debug-only hook: `simctl launch … -autoplay` opens the first
-            // imported game straight into the game view, so the RemGlk bridge
-            // can be exercised headlessly. Normal launches (and all release
-            // builds) show the shelf.
-            if ProcessInfo.processInfo.arguments.contains("-autoplay"),
-               let game = GameLibrary.games().first {
-                GameView(gamePath: game.url.path)
-            } else {
-                GameShelfView()
-            }
-            #else
+            rootView.environmentObject(appModel)
+        }
+        .commands { GameCommands(appModel: appModel) }
+
+        #if targetEnvironment(macCatalyst)
+        // A persistent, live map window on Mac: keep it open beside the game and
+        // it redraws as the map updates -- no modal sheet to open and dismiss.
+        // (Catalyst uses the iOS SDK, so it's a WindowGroup, not a macOS `Window`.)
+        WindowGroup("Map", id: AppModel.mapWindowID) {
+            MapWindow().environmentObject(appModel)
+        }
+        #endif
+    }
+
+    @ViewBuilder private var rootView: some View {
+        #if DEBUG
+        // Debug-only hook: `simctl launch … -autoplay` opens the first imported
+        // game straight into the game view, so the RemGlk bridge can be exercised
+        // headlessly. Normal launches (and all release builds) show the shelf.
+        if ProcessInfo.processInfo.arguments.contains("-autoplay"),
+           let game = GameLibrary.games().first {
+            GameView(gamePath: game.url.path)
+        } else {
             GameShelfView()
-            #endif
+        }
+        #else
+        GameShelfView()
+        #endif
+    }
+}
+
+// MARK: - Mac menu-bar commands
+
+/// Drives the game in the front window from the Mac menu bar. On Catalyst these
+/// replace the in-game toolbar popovers/sheets, which crash UIKit when presented
+/// over the focused command field; opening a menu resigns that field, so the
+/// commands (and any follow-on dialog) are safe. Harmless on iPhone/iPad, where
+/// the toolbar controls remain the primary path.
+struct GameCommands: Commands {
+    @ObservedObject var appModel: AppModel
+    @AppStorage(ReadingDefaults.columnsKey) private var columns = ReadingDefaults.columns
+    @Environment(\.openWindow) private var openWindow
+
+    var body: some Commands {
+        CommandMenu("Game") {
+            Button("Bigger Text") {
+                columns = max(ReadingDefaults.columnRange.lowerBound, columns - 4)
+            }
+            .keyboardShortcut("+", modifiers: .command)
+            Button("Smaller Text") {
+                columns = min(ReadingDefaults.columnRange.upperBound, columns + 4)
+            }
+            .keyboardShortcut("-", modifiers: .command)
+
+            Divider()
+
+            Button("Show Map") {
+                appModel.requestMap()
+                #if targetEnvironment(macCatalyst)
+                openWindow(id: AppModel.mapWindowID)
+                #endif
+            }
+            .keyboardShortcut("m", modifiers: [.command, .shift])
+            .disabled(!appModel.hasActiveGame)
+
+            Divider()
+
+            Button("Restart Game") { appModel.restartActiveGame() }
+                .disabled(!appModel.hasActiveGame)
         }
     }
 }
+
+#if targetEnvironment(macCatalyst)
+// MARK: - Standalone map window (Mac)
+
+/// The map window's content: observes the active game's bridge so it redraws
+/// whenever the map data changes, and a toolbar Refresh re-asks for the map.
+struct MapWindow: View {
+    @EnvironmentObject var appModel: AppModel
+
+    var body: some View {
+        Group {
+            if let bridge = appModel.activeBridge {
+                MapWindowContent(bridge: bridge)
+            } else {
+                ContentUnavailableView("No Game Open", systemImage: "map",
+                    description: Text("Open a game, then choose Game ▸ Show Map."))
+            }
+        }
+        .navigationTitle("Map")
+    }
+}
+
+private struct MapWindowContent: View {
+    @ObservedObject var bridge: GlkBridge
+
+    var body: some View {
+        Group {
+            if let map = bridge.gameMap {
+                MapCanvas(map: map)
+            } else {
+                ContentUnavailableView("No Map Yet", systemImage: "map",
+                    description: Text("Move around, then Refresh."))
+            }
+        }
+        .toolbar {
+            Button { bridge.submitLine("map") } label: {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            }
+        }
+    }
+}
+#endif
 
 // MARK: - Shelf
 

@@ -36,7 +36,7 @@ struct MapSheet: View {
 /// the room names over them as real Text views, so they centre, wrap and
 /// shrink to fit the box. The whole thing is scaled fit-to-view, with
 /// pinch-zoom and drag-pan on top.
-private struct MapCanvas: View {
+struct MapCanvas: View {
     let map: GameMap
     @State private var zoom: CGFloat = 1
     @State private var pan: CGSize = .zero

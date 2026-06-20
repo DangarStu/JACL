@@ -137,6 +137,7 @@ struct GameView: View {
     let gamePath: String
 
     @StateObject private var bridge = GlkBridge()
+    @EnvironmentObject private var appModel: AppModel
     @State private var inputText = ""
     @State private var started = false
     /// The bundled language glossary (merged `data/*_words.csv`), if this game
@@ -221,6 +222,8 @@ struct GameView: View {
                 .frame(maxWidth: .infinity)
             }
             .onAppear {
+                // Publish this game so the menu bar / map window reach its bridge.
+                appModel.setActive(bridge, path: gamePath)
                 guard !started else { return }
                 started = true
                 // Load the glossary for native long-press "Define" -- only the
@@ -248,6 +251,7 @@ struct GameView: View {
                 // another game starts. Without this, swapping games leaves two
                 // interpreters running in one process and the app hangs/crashes.
                 bridge.stop()
+                appModel.clearIfActive(bridge)
             }
             .onChange(of: geo.size) { _, newSize in
                 applyColumns(width: newSize.width)   // re-derive the font for the new width
@@ -261,8 +265,11 @@ struct GameView: View {
             }
             .onChange(of: soundEnabled) { _, on in bridge.setSoundEnabled(on) }
             // A fresh map arrived (player typed `map` or tapped the button) --
-            // open the sheet to show it.
+            // open the sheet to show it. On Mac the map is its own window
+            // observing gameMap, so there's no sheet to raise.
+            #if !targetEnvironment(macCatalyst)
             .onChange(of: bridge.mapVersion) { _, _ in showMap = true }
+            #endif
             // Re-focus the command line after a sheet closes, so you can keep
             // typing without tapping the field again.
             .onChange(of: showMap) { _, shown in if !shown { focusInput() } }
@@ -290,6 +297,11 @@ struct GameView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .preferredColorScheme(appearance.colorScheme)
+        // Mac drives text-size / map / restart from the menu bar (GameCommands)
+        // and shows the map in its own window: presenting a popover/sheet/alert
+        // over the focused command field crashes UIKit's keyboard scene delegate
+        // on Catalyst. iPhone/iPad keep these in the toolbar.
+        #if !targetEnvironment(macCatalyst)
         .toolbar {
             // A text-size control beside the back arrow, so the reading size can
             // be changed without leaving the game for Settings.
@@ -329,6 +341,7 @@ struct GameView: View {
         .sheet(isPresented: $showMap) {
             MapSheet(bridge: bridge)
         }
+        #endif
         // Saving: the game asked for a name (save verb). Restoring uses the
         // picker below. Both answer the same RemGlk file prompt.
         .alert("Save Game", isPresented: writePromptBinding) {
