@@ -685,7 +685,8 @@ struct TranscriptTextView: UIViewRepresentable {
         if contentChanged {
             tv.attributedText = Self.attributed(paragraphs,
                                                 baseFont: Self.transcriptFont(ofSize: fontSize),
-                                                headerColor: headerColor)
+                                                headerColor: headerColor,
+                                                width: tv.bounds.width > 0 ? tv.bounds.width : UIScreen.main.bounds.width)
         }
         let anchor = context.coordinator.commandAnchor
         DispatchQueue.main.async {
@@ -825,9 +826,13 @@ struct TranscriptTextView: UIViewRepresentable {
 
     private static func attributed(_ paragraphs: [RenderedParagraph],
                                    baseFont: UIFont,
-                                   headerColor: UIColor?) -> NSAttributedString {
+                                   headerColor: UIColor?,
+                                   width: CGFloat) -> NSAttributedString {
         let out = NSMutableAttributedString()
-        let screenW = UIScreen.main.bounds.width
+        // Full-bleed banner / in-game images span the text view's actual width --
+        // the app *window* on Mac (not UIScreen, which is the whole monitor), and
+        // the capped reading column in landscape (not the full screen).
+        let screenW = width
         let inset: CGFloat = 12
         var bannerLocation: Int?
         var placedBanner = false
