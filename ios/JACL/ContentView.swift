@@ -71,12 +71,33 @@ enum ReadingDefaults {
     static var columnRange: ClosedRange<Double> { isPhone ? 20...45 : 30...70 }
     /// UserDefaults key for the persisted column count.
     static let columnsKey = "readingColumns"
-    /// Cap the reading column's width (points). The chosen columns fill *this*,
-    /// not the whole window, so the font stays a consistent reading size and the
-    /// surplus width of a wide landscape iPad becomes centred margins instead of
-    /// one long, ballooned line. Auto-scales: a narrow phone shows no margin, a
-    /// wide iPad shows generous ones. Matches the Android build.
-    static let maxContentWidth: Double = 800
+    /// UserDefaults key for the side-margin width (narrow/normal/wide).
+    static let marginsKey = "readingMargins"
+    /// A base side padding kept even at the narrowest margin (points).
+    static let horizontalPadding: Double = 16
+    /// Monospace cell width as a fraction of the point size (≈ "0" advance), used
+    /// only as a first guess; the exact advance is measured in applyColumns.
+    static let charWidthRatio: Double = 0.6
+    /// Cap the reading column's width (points) as a last resort on a very wide
+    /// window, so even "narrow" margins don't give one ballooned line.
+    static let maxContentWidth: Double = 900
+}
+
+/// Side-margin width, mirroring Wryter so JACL's reading settings match and the
+/// two feel like a suite. `fraction` is the share of the window kept as margin on
+/// each side; the column centres in what's left and the scroll bar rides the
+/// window edge out in the margin.
+enum MarginWidth: String, CaseIterable, Identifiable {
+    case narrow, normal, wide
+    var id: String { rawValue }
+    var label: String { rawValue.capitalized }
+    var fraction: Double {
+        switch self {
+        case .narrow: return 0.04
+        case .normal: return 0.10
+        case .wide:   return 0.16
+        }
+    }
 }
 
 /// The bundled glossary for a game: the single `<lang>_words.csv` matching the
@@ -151,9 +172,15 @@ struct GameView: View {
     @State private var headerColor: Color?
     /// Reading width in columns, set in Settings and persisted app-wide.
     @AppStorage(ReadingDefaults.columnsKey) private var columns = ReadingDefaults.columns
+    /// Side-margin width (narrow/normal/wide), set in Settings (matches Wryter).
+    @AppStorage(ReadingDefaults.marginsKey) private var margins: MarginWidth = .normal
     /// Font size derived from `columns` + the window width, so the chosen number
     /// of columns fills the screen and rescales with it (see applyColumns).
     @State private var derivedFontSize: Double = 18
+    /// Side inset that centres the reading column; the transcript text view spans
+    /// the full width with this inset, so the scroll bar rides the window's right
+    /// edge. Derived in applyColumns from the column width and the margin setting.
+    @State private var sideInset: CGFloat = 0
     /// In-game appearance (System / Light / Dark), set in Settings. Applied from
     /// inside the reading screen so it drives the window even though the shelf's
     /// navigationDestination otherwise detaches it from the stack's scheme.
@@ -193,6 +220,9 @@ struct GameView: View {
             // keyboard top (or its own bottom when no keyboard). Measured in
             // SwiftUI, so it's right regardless of how the keyboard shifts things.
             let visibleHeight = currentVisibleHeight()
+            // `sideInset` is derived in applyColumns from the column width and the
+            // margin setting; the transcript spans the full width with the text
+            // inset by it, so the scroll bar rides the window's right edge.
             VStack(spacing: 0) {
                 // Status grid(s): full window width. A status bar is chrome -- it
                 // spans the window edge to edge (on a wide Mac/iPad it must not be
@@ -201,26 +231,26 @@ struct GameView: View {
                 ForEach(bridge.windows.filter { $0.type == "grid" }) { w in
                     gridView(id: w.id)
                         .fixedSize(horizontal: false, vertical: true)
+                        .padding(.leading, sideInset)   // align status text with the centred column
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(Color(.secondarySystemBackground))
                 }
 
-                // Reading column (transcript + input): capped and centred so a wide
-                // landscape iPad / Mac window gets equal side margins instead of a
-                // stretched line; a phone or narrow window stays full width.
-                VStack(spacing: 0) {
-                    ForEach(bridge.windows.filter { $0.type == "buffer" }) { w in
-                        bufferView(id: w.id, visibleHeight: visibleHeight)
-                            .background(GeometryReader { g in
-                                Color.clear
-                                    .onAppear { bufferFrame = g.frame(in: .global) }
-                                    .onChange(of: g.frame(in: .global)) { _, f in bufferFrame = f }
-                            })
-                    }
-                    inputBar
+                // Transcript: full-width text view (forced), text inset to the
+                // centred column, so the scroll bar sits out in the right margin.
+                ForEach(bridge.windows.filter { $0.type == "buffer" }) { w in
+                    bufferView(id: w.id, visibleHeight: visibleHeight, horizontalInset: sideInset)
+                        .frame(maxWidth: .infinity)
+                        .background(GeometryReader { g in
+                            Color.clear
+                                .onAppear { bufferFrame = g.frame(in: .global) }
+                                .onChange(of: g.frame(in: .global)) { _, f in bufferFrame = f }
+                        })
                 }
-                .frame(maxWidth: min(geo.size.width, CGFloat(ReadingDefaults.maxContentWidth) + 16))
-                .frame(maxWidth: .infinity)
+
+                // Input: inset to align under the centred text column.
+                inputBar
+                    .padding(.horizontal, sideInset)
 
                 // Mac: a control bar across the bottom (full width, like the status
                 // bar up top), so the reading-size / map / settings / restart
@@ -269,6 +299,11 @@ struct GameView: View {
             .onChange(of: columns) { _, _ in
                 // Column count changed (the slider): re-derive the font and the
                 // status cell, then re-arrange so the grid follows the new width.
+                applyColumns(width: geo.size.width)
+                bridge.resize(to: geo.size)
+            }
+            .onChange(of: margins) { _, _ in
+                // Margin width changed: re-derive the column and re-arrange.
                 applyColumns(width: geo.size.width)
                 bridge.resize(to: geo.size)
             }
@@ -422,17 +457,17 @@ struct GameView: View {
     /// drawn glyph runs a hair wider than the measured advance, so the font
     /// targets ~0.5pt under the cell to keep the status text inside the grid.
     private func applyColumns(width: CGFloat) {
-        let avail = Double(width) - 16
-        guard avail > 0 else { return }
-        // Cap the column at a comfortable reading width; `columns` columns fill
-        // *this*, not the whole window, so the surplus of a wide landscape iPad
-        // becomes centred margins (see the body's frame) rather than a font
-        // ballooned to fill the screen. A narrow phone stays under the cap.
-        let content = min(avail, ReadingDefaults.maxContentWidth)
+        let w = Double(width)
+        guard w > 0 else { return }
         let cols = min(max(columns, ReadingDefaults.columnRange.lowerBound),
                        ReadingDefaults.columnRange.upperBound)
-        let cellW = content / cols
-        let target = max(1, cellW - 0.5)
+        // Margins (Wryter-style) reserve a share of the window on each side; the
+        // font then scales so `cols` columns fill what's left (capped to a
+        // readable size), and the column centres in the remainder -- the surplus
+        // becomes the margin, with the scroll bar riding the window edge in it.
+        let side0 = w * margins.fraction + ReadingDefaults.horizontalPadding
+        let usable = max(w - 2 * side0, 1)
+        let target = max(1, usable / cols - 0.5)
         func advance(_ pt: Double) -> Double {
             let f = UIFont.monospacedSystemFont(ofSize: CGFloat(pt), weight: .regular)
             return Double(("0" as NSString).size(withAttributes: [.font: f]).width)
@@ -440,11 +475,16 @@ struct GameView: View {
         let refSize = 20.0
         var font = min(44, max(7, refSize * target / advance(refSize)))
         font = min(44, max(7, font * target / advance(font)))   // refine (advance ~linear)
+        let cellW = advance(font)
+        let content = min(usable, Double(cols) * cellW)         // column width (font-capped)
         derivedFontSize = font
         bridge.cellWidth = cellW                                // grid = floor(content/cellW) = columns
-        bridge.contentWidth = content                           // the terp's window width (<= avail)
+        bridge.contentWidth = content                           // the terp's window width
         bridge.cellHeight = Double(
             UIFont.monospacedSystemFont(ofSize: CGFloat(font), weight: .regular).lineHeight)
+        // Centre the column; the transcript text view spans the full width with
+        // this inset so the scroll bar sits out in the right margin.
+        sideInset = CGFloat(max((w - content) / 2, ReadingDefaults.horizontalPadding))
     }
 
     // MARK: Grid window (status line / game board) — fixed monospaced rows
@@ -473,7 +513,7 @@ struct GameView: View {
         return max(1, bottomLimit - bufferFrame.minY)
     }
 
-    private func bufferView(id: Int, visibleHeight: CGFloat) -> some View {
+    private func bufferView(id: Int, visibleHeight: CGFloat, horizontalInset: CGFloat) -> some View {
         var paras = bridge.buffers[id] ?? []
         // While the game waits for a command, JACL has already written its bare
         // prompt ("> ") as the trailing paragraph. Hide it: the input bar below
@@ -496,7 +536,7 @@ struct GameView: View {
         return TranscriptTextView(paragraphs: paras, dictionary: dictionary,
                                   headerColor: headerColor.map { UIColor($0) },
                                   fontSize: derivedFontSize, turnCount: turnCount,
-                                  visibleHeight: visibleHeight)
+                                  visibleHeight: visibleHeight, horizontalInset: horizontalInset)
     }
 
     // MARK: Input
@@ -709,6 +749,10 @@ struct TranscriptTextView: UIViewRepresentable {
     /// The transcript's true visible height (SwiftUI-measured, keyboard-aware),
     /// used directly for the scroll maths.
     var visibleHeight: CGFloat = 0
+    /// Side inset that centres the reading column inside a full-width text view,
+    /// so the scroll bar rides the window's right edge out in the margin (like a
+    /// desktop editor) instead of hugging the text. 0 on a narrow/phone window.
+    var horizontalInset: CGFloat = 0
 
     func makeUIView(context: Context) -> UITextView {
         let tv = UITextView()
@@ -740,6 +784,13 @@ struct TranscriptTextView: UIViewRepresentable {
         // edit menu and fight the definition popover). Other games stay
         // selectable so the transcript can still be copied.
         tv.isSelectable = (dictionary == nil)
+        // Centre the reading column inside the full-width text view, so the
+        // scroll bar sits at the window's right edge out in the margin (not
+        // hugging the text). 0 on a narrow window, where the column fills it.
+        if abs(tv.textContainerInset.left - horizontalInset) > 0.5 {
+            tv.textContainerInset.left = horizontalInset
+            tv.textContainerInset.right = horizontalInset
+        }
         // Console-version scroll logic: when a command is submitted (turnCount
         // bumps), anchor on the CURRENT content height -- where this turn's output
         // will append -- before any of it arrives. Echo and response come in
@@ -766,10 +817,11 @@ struct TranscriptTextView: UIViewRepresentable {
         context.coordinator.lastSig = sig
         context.coordinator.lastVisibleHeight = visibleHeight
         if contentChanged {
+            let viewW = tv.bounds.width > 0 ? tv.bounds.width : UIScreen.main.bounds.width
             tv.attributedText = Self.attributed(paragraphs,
                                                 baseFont: Self.transcriptFont(ofSize: fontSize),
                                                 headerColor: headerColor,
-                                                width: tv.bounds.width > 0 ? tv.bounds.width : UIScreen.main.bounds.width)
+                                                width: max(1, viewW - 2 * horizontalInset))
         }
         let anchor = context.coordinator.commandAnchor
         DispatchQueue.main.async {

@@ -12,6 +12,7 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @AppStorage(ReadingDefaults.columnsKey) private var columns = ReadingDefaults.columns
+    @AppStorage(ReadingDefaults.marginsKey) private var margins: MarginWidth = .normal
     @AppStorage(AppearanceMode.key) private var appearance = AppearanceMode.system
     @AppStorage("soundEnabled") private var soundEnabled = true
 
@@ -56,12 +57,17 @@ struct SettingsView: View {
                             Image(systemName: "textformat.size.smaller")
                                 .foregroundStyle(.secondary)
                         }
-                        Text("Sets the line width. Fewer columns means larger text; the font scales to fill the screen.")
+                        Text("Characters per line. Fewer columns means larger text; the font scales with the window.")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                             .lineLimit(2)
                     }
                     .padding(.vertical, 4)
+
+                    Picker("Margins", selection: $margins) {
+                        ForEach(MarginWidth.allCases) { Text($0.label).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
 
                     Picker("Appearance", selection: $appearance) {
                         ForEach(AppearanceMode.allCases) { Text($0.label).tag($0) }
@@ -69,9 +75,10 @@ struct SettingsView: View {
                 } header: {
                     Text("Reading")
                 } footer: {
-                    Text("Text size and appearance apply to the game reading "
-                       + "screen. \u{201C}System\u{201D} follows your iPad's "
-                       + "Light/Dark setting; the shelf stays dark.")
+                    Text("Line width and how much side margin to keep; the font "
+                       + "scales with the window to satisfy both. Appearance "
+                       + "\u{201C}System\u{201D} follows your device's Light/Dark "
+                       + "setting; the shelf stays dark.")
                 }
 
                 Section {
