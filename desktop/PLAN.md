@@ -1,77 +1,73 @@
 # JACL Desktop (Electron) — Plan
 
 Goal: a cross-platform **Mac / Linux / Windows** desktop app for JACL with a
-**separate, resizable map window** that works like the native Mac (Catalyst)
-app — a real second OS window, not a Glk pane. Built as background work while the
-App Store / Google Play 1.2 releases ship.
+**separate, resizable map window** like the native Mac (Catalyst) app — and,
+because it's a real browser, **full web-feature parity** (HTML forms, JavaScript,
+hyperlinks, graphics, the rich map) that the native apps *can't* do. Games like
+**Blackjacl** that use HTML forms would run here. Background work while the App
+Store / Google Play 1.2 releases ship.
 
 ## Decisions (made)
 
-- **Shell: Electron** (over Tauri). Lectrote is a proven template on the exact
-  stack, and Node makes driving the C interpreter trivial. Trade-off accepted:
-  larger binary (~100 MB) for guaranteed-consistent Chromium rendering everywhere.
-- **Engine stack: RemGlk + GlkOte** — the JSON-Glk + JS-UI pair JACL already
-  speaks (the iOS/Android apps embed RemGlk; the web map is GlkOte). We reuse it
-  rather than inventing a desktop UI.
-- **Map = a second `BrowserWindow`**, reusing the *existing web map renderer*.
+- **Shell: Electron** (over Tauri). Proven (Lectrote), and Node makes hosting the
+  engine trivial. Larger binary accepted for consistent Chromium rendering.
+- **Engine: `cgijacl`** — the existing **web** interpreter (raw HTML output),
+  **not** RemGlk/GlkOte. This is the key call: only `cgijacl` renders the HTML the
+  web-flavoured games (forms, JS, map JS) emit. RemGlk → a custom renderer with no
+  HTML; `cgijacl` → a real web page. We want the web page. Already built in `bin/`.
+- **Map = a second `BrowserWindow`**, reusing the existing web map renderer.
 
-## Why this is tractable (not a core rewrite)
+## Why this beats the native apps
 
-The library already emits the map data for native clients. `mapping.library`'s
-`+map` has three branches:
-- `interpreter == CGI` → inline web (Raphael) rendering
-- `interpreter != CGI && ios == true` → emit the `<jacl-map>` data block (`+map_native`)
-- else → "only available in the web interpreter"
-
-So the desktop just needs to (a) make the engine report as a native client so the
-`<jacl-map>` block is emitted, and (b) render that block in a window — **a frontend
-+ renderer job, not a library/core rewrite.**
+`mapping.library`'s `+map` has three branches: `interpreter == CGI` (inline web
+HTML/Raphael), `ios == true` (a custom `<jacl-map>` data block the native apps
+draw), else "web only". The native apps take the **data** path and render it with
+custom code — they never run arbitrary HTML. By hosting **`cgijacl`** the desktop
+takes the **web** path and gets the full HTML experience: forms, JS, hyperlinks,
+graphics, the Raphael map — a superset of the native apps.
 
 ## Architecture
 
 ```
-Electron main (Node)                 Renderer (Chromium)
-  └─ spawn: jacl --remglk  ── stdio(JSON) ──>  GlkOte  → game window
-       (RemGlk build of JACL)                    │
-                                                 └─ on <jacl-map> → main: openWindow("map")
-                                                                         │
-                                          Map BrowserWindow ── web map renderer (reused)
+Electron main (Node)                         Renderer (Chromium)
+  ├─ local HTTP server  ── http://127.0.0.1 ──>  BrowserWindow (game)
+  │    ├─ runs cgijacl as a CGI per request          │  full web JACL: text, forms, JS
+  │    └─ serves the web frontend assets             └─ map → main: openWindow("map")
+  └─ manages one local game session                        │
+                                              Map BrowserWindow ── web map (reused)
 ```
 
-- The engine is a **standalone RemGlk JACL CLI** speaking GlkOte/RemGlk JSON on
-  stdin/stdout (same protocol the apps use, just a normal `main()` instead of the
-  iOS embedded variant).
-- The renderer intercepts the `<jacl-map>` block (as the iOS/Android bridges do)
-  and asks main to open/refresh the map window.
+The whole web app runs locally; Electron is just the browser + window manager.
+The map opens in its own `BrowserWindow` for a real, resizable second window.
 
-## Roadmap (phased — each step independently testable)
+## Roadmap (phased — each step testable)
 
-1. **RemGlk JACL CLI.** Add a Makefile target linking `src/` core + vendored
-   `remglk` + a normal `main()` → a binary that plays a `.j2` and speaks RemGlk
-   JSON on stdio. Smoke-test with a scripted session. *(Critical path — do first.)*
-2. **Electron skeleton.** `main.js` spawns the CLI; one `BrowserWindow` runs
-   GlkOte wired to the process. Confirm a game is playable.
-3. **Map window.** Detect `<jacl-map>` in the stream; open a second
-   `BrowserWindow` that draws it with the **existing web map code**. Resizable,
-   re-renders on each `map`.
-4. **(Later) live refresh** — auto-request the map each turn (shared with the
-   Catalyst app's pending live-map work).
-5. **Packaging.** electron-builder for Mac / Linux / Windows; bundle the CLI per
-   platform.
+1. **Local `cgijacl` host.** A Node HTTP server (in Electron main) that runs
+   `bin/cgijacl` as a CGI (env, stdin/stdout, query/POST) and serves the web
+   frontend, so a game is playable at `127.0.0.1` in a normal browser. *(Critical
+   path + riskiest: CGI env, `cgijacl.conf`, temp dirs, one-session state.)*
+2. **Electron shell.** Point a `BrowserWindow` at the local server; confirm a game
+   (incl. an HTML-form game like Blackjacl) plays.
+3. **Map window.** Route the map into a second `BrowserWindow` (reuse the web map
+   renderer), resizable, re-rendered each `map`.
+4. **(Later) live refresh** — auto-request the map each turn.
+5. **Packaging.** electron-builder for Mac / Linux / Windows; bundle `cgijacl` +
+   frontend + the game-state/config setup per platform.
 
 ## To verify / open questions
 
-- Does a RemGlk standalone build exist already, or is it new? (Apps embed RemGlk
-  with `JACL_IOS_EMBED`; the CLI wants the plain `main()`.)
-- Reuse the web map renderer from `cgijacl`'s output, or port the `<jacl-map>`
-  parser the apps already have (`GameMap.swift`/`.kt`) to JS.
-- How the engine signals "native client" so `+map_native` fires (an `ios`-style
-  flag, or a new desktop flag in `mapping.library`).
+- `cgijacl`'s required environment: `cgijacl.conf`, a writable **temp dir** (the
+  known "missing temp dir" failure), and how it scopes one local session.
+- Where the web **frontend assets** live (the play page + map JS) and how to bundle
+  them — `etc/`, the `*.library` HTML/JS emitters, CSS.
+- Reuse the inline web map, or pull it into the dedicated map window (it currently
+  renders into `#maintext`).
+- Superseded: the RemGlk-CLI path (Glk-only, no HTML) — not pursued.
 
 ## Status
 
-- [ ] 1. RemGlk JACL CLI
-- [ ] 2. Electron skeleton + GlkOte
+- [ ] 1. Local cgijacl host (HTTP+CGI, game playable at 127.0.0.1)
+- [ ] 2. Electron shell
 - [ ] 3. Separate map window
 - [ ] 4. Live refresh
 - [ ] 5. Packaging
