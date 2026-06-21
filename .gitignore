@@ -46,3 +46,6 @@ ios/build_*/
 
 # Play closed-test access codes (tester credentials -- local only)
 android/closed-test-codes.csv
+
+# Desktop (Electron) local scratch: generated cgijacl.conf, temp, logs
+desktop/run/

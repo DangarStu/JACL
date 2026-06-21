@@ -64,10 +64,23 @@ The map opens in its own `BrowserWindow` for a real, resizable second window.
   renders into `#maintext`).
 - Superseded: the RemGlk-CLI path (Glk-only, no HTML) — not pursued.
 
+## Validated (2026-06-22)
+
+`cgijacl` has a **built-in web server** (`webjacl.c`) — no Node CGI host needed.
+Invocation: **`cgijacl -p <port> <game.j2>`** (the `-p` flag = server mode; the
+game file is the last arg; reads `./cgijacl.conf` for include/temp/logs). Confirmed:
+it serves the **full web-JACL HTML play page** at `127.0.0.1:<port>`. So the
+"local host" is just spawning that process; Electron loads the URL.
+
+- One server instance serves **one game**. Game selection → spawn a `cgijacl`
+  per opened game (or reuse the web landing page + per-game servers).
+- Config: a generated `cgijacl.conf` (writable temp dir, `projects/include/`,
+  logs); auth left off. `desktop/run/` is the local scratch dir (gitignored).
+
 ## Status
 
-- [ ] 1. Local cgijacl host (HTTP+CGI, game playable at 127.0.0.1)
-- [ ] 2. Electron shell
+- [x] 1. Local cgijacl server — `cgijacl -p <port> <game.j2>` serves full web HTML ✓
+- [ ] 2. Electron shell (spawn cgijacl + BrowserWindow + game picker)
 - [ ] 3. Separate map window
 - [ ] 4. Live refresh
 - [ ] 5. Packaging
