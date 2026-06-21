@@ -1,7 +1,7 @@
 Platform,Channel,Version,Build,Status,Date,Notes
 iOS,App Store,1.0,1,Live,,iPad-only — original release
 iOS,App Store,1.1,2,Waiting for Review,2026-06-20,Universal (iPhone + iPad); column layout; landscape margins; transcript scroll fix
-iOS,Development,1.1,2,In progress,2026-06-21,mac-native branch — Wryter-style margins; Mac Catalyst; keyboard/landscape fixes. BUMP build before next submit
+iOS,Development,1.2,3,In progress,2026-06-21,mac-native branch — Wryter-style margins; Mac Catalyst; keyboard/landscape fixes
 Android,Google Play,1.0,1,Closed test,,Original closed-test build
 Android,Google Play,1.0.1,2,In review,,Landscape reading-margins fix
-Android,Development,1.0.1,2,In progress,2026-06-21,mac-native branch — not yet version-bumped
+Android,Development,1.2,3,In progress,2026-06-21,mac-native branch — keyboard + restart fixes

@@ -22,6 +22,28 @@ _Last updated: 2026-06-21_
 > The newest thing the public can get is **iOS 1.1 / Android 1.0.1**. Everything
 > in §3 below is **newer than that and not submitted anywhere yet.**
 
+### Desktop & web (the original interpreter, core **v4.7.0**)
+
+| Channel | Platforms | Distribution | Feature level |
+|---|---|---|---|
+| Desktop (Gargoyle/Glk) | Mac, Linux, Windows | Website downloads / prebuilt in `bin/` | Classic two-window Glk (text + status, inline images). **No** map window, reading margins, or in-app settings. |
+| Web interpreter | Browser — jacl.dangarmarine.com.au | `cgijacl`/`fcgijacl`, deployed to the site | Full modern UI: graphical map, hyperlinks, graphics. |
+| Nintendo DS | DS | `jacl.nds` (legacy) | Historical. |
+
+> Parity, high → low: **web ≈ apps** (map, rich UI) > **desktop** (classic Glk
+> text). Desktop builds are mature *as text interpreters* but don't share the
+> apps' map/reading polish — by design (Gargoyle is a standard Glk UI).
+
+---
+
+## Versioning (two independent numbers, deliberately)
+
+- **App marketing version** (App Store / Google Play): **iOS and Android kept in
+  sync.** They drifted (iOS 1.1, Android 1.0.1); reconciled forward to **1.2** for
+  the next release — see §3.
+- **Interpreter core** (`src/version.h`, shown in-app as "JACL v4.7.0"): **4.7.0**,
+  shared by every platform (apps, web, desktop). Independent of the app version.
+
 ---
 
 ## 2. Local installs (your devices — keep this honest)
@@ -41,8 +63,10 @@ Sideloaded builds are dev builds off the current branch, *ahead of the stores*.
 
 ## 3. Unreleased — changed since the store versions (NOT yet submitted)
 
-All on branch **`mac-native`**. **Bump the version/build before submitting**, or
-the stores reject it as a duplicate (iOS is still at build 2, Android at vc 2).
+All on branch **`mac-native`**, now bumped to **1.2** in the working tree (iOS
+build 3, Android vc 3) — iOS and Android **reconciled to the same marketing
+version**. Ready for the next submission once merged (let 1.1 / 1.0.1 clear review
+first).
 
 ### iOS / iPadOS (next App Store update)
 - Banner & in-game images sized to the **text-view width** (window-relative), not the whole screen.
