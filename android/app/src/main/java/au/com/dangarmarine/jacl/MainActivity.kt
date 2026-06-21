@@ -776,11 +776,23 @@ fun BlorbImage(bridge: GlkBridge, num: Int) {
 @Composable
 fun InputBar(bridge: GlkBridge, fontSize: Float) {
     val input = bridge.pendingInput
-    when (input?.type) {
-        "line" -> {
+    // Show the line field at a "line" prompt AND through the brief gap between
+    // turns (pendingInput momentarily null), so the field -- and the on-screen
+    // keyboard attached to it -- stays put instead of being torn down and rebuilt
+    // each command (which dropped and re-raised the keyboard). A char prompt, a
+    // save/restore file prompt, or the end of the game hides it.
+    val showsLine = !bridge.finished && bridge.pendingFilePrompt == null &&
+                    (input?.type == "line" || input == null)
+    when {
+        showsLine -> {
             var text by remember(bridge.buffers) { mutableStateOf("") }
             val focus = remember { FocusRequester() }
-            LaunchedEffect(Unit) { delay(120); runCatching { focus.requestFocus() } }
+            // Focus only when the game actually asks for a line (not during the
+            // intro's null gap); the field stays composed between turns so the
+            // keyboard holds without re-raising.
+            LaunchedEffect(input?.type) {
+                if (input?.type == "line") { delay(120); runCatching { focus.requestFocus() } }
+            }
             Row(
                 Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -811,12 +823,12 @@ fun InputBar(bridge: GlkBridge, fontSize: Float) {
                 TextButton(onClick = { submit() }) { Text("Enter") }
             }
         }
-        "char" -> {
+        input?.type == "char" -> {
             Button(onClick = { bridge.submitChar(" ") }, modifier = Modifier.fillMaxWidth().padding(8.dp)) {
                 Text("Tap to continue")
             }
         }
-        else -> if (bridge.finished) {
+        bridge.finished -> {
             Text("The game has ended.", Modifier.padding(8.dp), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }

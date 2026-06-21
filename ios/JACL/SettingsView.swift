@@ -12,7 +12,7 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @AppStorage(ReadingDefaults.columnsKey) private var columns = ReadingDefaults.columns
-    @AppStorage(ReadingDefaults.marginsKey) private var margins: MarginWidth = .normal
+    @AppStorage(ReadingDefaults.marginsKey) private var margins: MarginWidth = ReadingDefaults.defaultMargins
     @AppStorage(AppearanceMode.key) private var appearance = AppearanceMode.system
     @AppStorage("soundEnabled") private var soundEnabled = true
 

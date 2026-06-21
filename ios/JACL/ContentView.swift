@@ -73,6 +73,9 @@ enum ReadingDefaults {
     static let columnsKey = "readingColumns"
     /// UserDefaults key for the side-margin width (narrow/normal/wide).
     static let marginsKey = "readingMargins"
+    /// Default margin: narrow on a phone (every point of width matters for the
+    /// font size), normal on the roomier iPad / Mac. Matches Wryter's options.
+    static var defaultMargins: MarginWidth { isPhone ? .narrow : .normal }
     /// A base side padding kept even at the narrowest margin (points).
     static let horizontalPadding: Double = 16
     /// Monospace cell width as a fraction of the point size (≈ "0" advance), used
@@ -173,7 +176,7 @@ struct GameView: View {
     /// Reading width in columns, set in Settings and persisted app-wide.
     @AppStorage(ReadingDefaults.columnsKey) private var columns = ReadingDefaults.columns
     /// Side-margin width (narrow/normal/wide), set in Settings (matches Wryter).
-    @AppStorage(ReadingDefaults.marginsKey) private var margins: MarginWidth = .normal
+    @AppStorage(ReadingDefaults.marginsKey) private var margins: MarginWidth = ReadingDefaults.defaultMargins
     /// Font size derived from `columns` + the window width, so the chosen number
     /// of columns fills the screen and rescales with it (see applyColumns).
     @State private var derivedFontSize: Double = 18
@@ -325,7 +328,11 @@ struct GameView: View {
             .onChange(of: bridge.pendingInput) { _, input in
                 // Put the cursor in the command line whenever the game asks for
                 // one (so you can just type), and replay any scripted command.
-                if input?.type == "line" { focusInput() } else { inputFocused = false }
+                // Between turns pendingInput briefly goes nil; keep the field
+                // focused through that gap so the keyboard doesn't drop and
+                // re-raise after every command. Only a char prompt resigns it.
+                if input?.type == "line" { focusInput() }
+                else if input?.type == "char" { inputFocused = false }
                 guard let input, input.type == "line", autoIndex < autoCommands.count else { return }
                 let cmd = autoCommands[autoIndex]
                 autoIndex += 1
@@ -541,8 +548,21 @@ struct GameView: View {
 
     // MARK: Input
 
+    /// Whether to show the line-input field. True at a "line" prompt AND through
+    /// the brief gap between turns (pendingInput momentarily nil), so the field --
+    /// and the keyboard attached to it -- stays put instead of being torn down and
+    /// rebuilt every command (which dropped and re-raised the keyboard). A "char"
+    /// prompt, a file prompt, or the end of the game hides it.
+    private var showsLineInput: Bool {
+        if bridge.finished || bridge.pendingFilePrompt != nil { return false }
+        switch bridge.pendingInput?.type {
+        case "line", nil: return true
+        default:          return false   // "char" (press-a-key) etc.
+        }
+    }
+
     @ViewBuilder private var inputBar: some View {
-        if bridge.pendingInput?.type == "line" {
+        if showsLineInput {
             // Console-style prompt: you type beside a ">", and the command is
             // echoed into the transcript on submit (the bare ">" there is hidden
             // by bufferView until then).

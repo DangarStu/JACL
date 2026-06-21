@@ -130,6 +130,10 @@ targets:
         CFBundleDisplayName: JACL
         CFBundleShortVersionString: "1.1"
         CFBundleVersion: "2"
+        # Allow secondary windows (the Mac map / settings windows). Without this
+        # openWindow() silently no-ops -- the app is treated as single-window.
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: true
         # No non-exempt encryption: the .j2 XOR-obfuscation isn't cryptographic
         # data protection. Declaring this skips the export-compliance question
         # on every App Store Connect upload.
