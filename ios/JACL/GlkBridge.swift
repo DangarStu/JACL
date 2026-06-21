@@ -221,8 +221,11 @@ final class GlkBridge: ObservableObject {
 
     // MARK: Reader
 
+    private var readerToken = 0
     private func startReader() {
         let fd = appFD
+        readerToken += 1                  // identifies THIS reader; a Restart bumps it
+        let myToken = readerToken
         readerQueue.async { [weak self] in
             var buf = [UInt8](repeating: 0, count: 16 * 1024)
             while true {
@@ -235,7 +238,10 @@ final class GlkBridge: ObservableObject {
                     DispatchQueue.main.async { self?.apply(update) }
                 }
             }
-            DispatchQueue.main.async { self?.finished = true }
+            // Only the current reader may end the game. A reader whose fd we closed
+            // for a Restart has a stale token, so its EOF won't clobber the fresh
+            // terp's finished=false (which left "The game has ended." stuck).
+            DispatchQueue.main.async { if self?.readerToken == myToken { self?.finished = true } }
         }
     }
 
