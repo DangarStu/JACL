@@ -80,7 +80,9 @@ it serves the **full web-JACL HTML play page** at `127.0.0.1:<port>`. So the
 ## Status
 
 - [x] 1. Local cgijacl server — `cgijacl -p <port> <game.j2>` serves full web HTML ✓
-- [ ] 2. Electron shell (spawn cgijacl + BrowserWindow + game picker)
+- [x] 2. Electron shell — `desktop/main.js` spawns cgijacl + loads it; a game renders
+      with **HTML forms working** (proven with Bumper's "New sticker" form) ✓
+- [ ] 2b. Game picker (currently a hardcoded game in main.js)
 - [ ] 3. Separate map window
 - [ ] 4. Live refresh
 - [ ] 5. Packaging
