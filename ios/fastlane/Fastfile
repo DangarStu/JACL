@@ -24,6 +24,10 @@ platform :ios do
       configuration: "Release",
       export_method: "app-store",
       output_directory: "build-ipa",
+      # Hand the API key to the BUILD too, so -allowProvisioningUpdates can
+      # authenticate and create/refresh the App Store profile (otherwise
+      # xcodebuild reports "No Accounts" / no profile and the archive fails).
+      api_key: api_key,
       xcargs: "-allowProvisioningUpdates CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=5TU3TU28JN",
     )
 
