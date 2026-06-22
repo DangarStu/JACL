@@ -12,6 +12,8 @@
     "dist:linux": "npm run build-engine && npm run prepare-bundle && electron-builder --linux"
   },
   "license": "MIT",
+  "author": "Stuart Allen <dangarstu@gmail.com>",
+  "homepage": "https://jacl.dangarmarine.com.au",
   "devDependencies": {
     "electron": "^33.0.0",
     "electron-builder": "^25.0.0"
