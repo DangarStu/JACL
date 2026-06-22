@@ -1,0 +1,139 @@
+# JACL Desktop (Electron) — Plan
+
+Goal: a cross-platform **Mac / Linux / Windows** desktop app for JACL with a
+**separate, resizable map window** like the native Mac (Catalyst) app — and,
+because it's a real browser, **full web-feature parity** (HTML forms, JavaScript,
+hyperlinks, graphics, the rich map) that the native apps *can't* do. Games like
+**Blackjacl** that use HTML forms would run here. Background work while the App
+Store / Google Play 1.2 releases ship.
+
+## Decisions (made)
+
+- **Shell: Electron** (over Tauri). Proven (Lectrote), and Node makes hosting the
+  engine trivial. Larger binary accepted for consistent Chromium rendering.
+- **Engine: `cgijacl`** — the existing **web** interpreter (raw HTML output),
+  **not** RemGlk/GlkOte. This is the key call: only `cgijacl` renders the HTML the
+  web-flavoured games (forms, JS, map JS) emit. RemGlk → a custom renderer with no
+  HTML; `cgijacl` → a real web page. We want the web page. Already built in `bin/`.
+- **Map = a second `BrowserWindow`**, reusing the existing web map renderer.
+
+## Why this beats the native apps
+
+`mapping.library`'s `+map` has three branches: `interpreter == CGI` (inline web
+HTML/Raphael), `ios == true` (a custom `<jacl-map>` data block the native apps
+draw), else "web only". The native apps take the **data** path and render it with
+custom code — they never run arbitrary HTML. By hosting **`cgijacl`** the desktop
+takes the **web** path and gets the full HTML experience: forms, JS, hyperlinks,
+graphics, the Raphael map — a superset of the native apps.
+
+## Architecture
+
+```
+Electron main (Node)                         Renderer (Chromium)
+  ├─ local HTTP server  ── http://127.0.0.1 ──>  BrowserWindow (game)
+  │    ├─ runs cgijacl as a CGI per request          │  full web JACL: text, forms, JS
+  │    └─ serves the web frontend assets             └─ map → main: openWindow("map")
+  └─ manages one local game session                        │
+                                              Map BrowserWindow ── web map (reused)
+```
+
+The whole web app runs locally; Electron is just the browser + window manager.
+The map opens in its own `BrowserWindow` for a real, resizable second window.
+
+## Roadmap (phased — each step testable)
+
+1. **Local `cgijacl` host.** A Node HTTP server (in Electron main) that runs
+   `bin/cgijacl` as a CGI (env, stdin/stdout, query/POST) and serves the web
+   frontend, so a game is playable at `127.0.0.1` in a normal browser. *(Critical
+   path + riskiest: CGI env, `cgijacl.conf`, temp dirs, one-session state.)*
+2. **Electron shell.** Point a `BrowserWindow` at the local server; confirm a game
+   (incl. an HTML-form game like Blackjacl) plays.
+3. **Map window.** Route the map into a second `BrowserWindow` (reuse the web map
+   renderer), resizable, re-rendered each `map`.
+4. **(Later) live refresh** — auto-request the map each turn.
+5. **Packaging.** electron-builder for Mac / Linux / Windows; bundle `cgijacl` +
+   frontend + the game-state/config setup per platform.
+
+## To verify / open questions
+
+- `cgijacl`'s required environment: `cgijacl.conf`, a writable **temp dir** (the
+  known "missing temp dir" failure), and how it scopes one local session.
+- Where the web **frontend assets** live (the play page + map JS) and how to bundle
+  them — `etc/`, the `*.library` HTML/JS emitters, CSS.
+- Reuse the inline web map, or pull it into the dedicated map window (it currently
+  renders into `#maintext`).
+- Superseded: the RemGlk-CLI path (Glk-only, no HTML) — not pursued.
+
+## Validated (2026-06-22)
+
+`cgijacl` has a **built-in web server** (`webjacl.c`) — no Node CGI host needed.
+Invocation: **`cgijacl -p <port> <game.j2>`** (the `-p` flag = server mode; the
+game file is the last arg; reads `./cgijacl.conf` for include/temp/logs). Confirmed:
+it serves the **full web-JACL HTML play page** at `127.0.0.1:<port>`. So the
+"local host" is just spawning that process; Electron loads the URL.
+
+- One server instance serves **one game**. Game selection → spawn a `cgijacl`
+  per opened game (or reuse the web landing page + per-game servers).
+- Config: a generated `cgijacl.conf` (writable temp dir, `projects/include/`,
+  logs); auth left off. `desktop/run/` is the local scratch dir (gitignored).
+
+## Status
+
+- [x] 1. Local cgijacl server — `cgijacl -p <port> <game.j2>` serves full web HTML ✓
+- [x] 2. Electron shell — `desktop/main.js` spawns cgijacl + loads it; a game renders
+      with **HTML forms working** (proven with Bumper's "New sticker" form) ✓
+- [x] 2b. Game picker — iPad-style "bookshelf" (dark, full-window shelf-artwork
+      backdrop, title + language + chevron rows). Lists only **published** games
+      (`game_publish true`, like the website); a pick (re)starts cgijacl on a fresh
+      port. ✓
+- [x] 3. Map window — `setWindowOpenHandler` opens the web's `map window`/`map open`
+      `window.open('','jacl_map',...)` as a real resizable BrowserWindow. VERIFIED:
+      the map (rooms + exit lines) draws in its own window (capturePage of the popup).
+- [x] 4. Live refresh — the web popup redraws each turn (jaclDrawMapInPopup); free.
+- [~] 5. Packaging — **electron-builder; macOS + Linux done, Windows TODO.**
+      `npm run dist:mac` / `dist:linux` (build cgijacl → compile+stage published
+      games → package). `.github/workflows/desktop.yml` builds mac+linux per-OS and
+      publishes a GitHub Release on a `desktop-v*` tag. VERIFIED: a local **unsigned
+      Mac .app + .zip** build runs — bookshelf shows the 16 games, bundled cgijacl
+      serves a game. Remaining: code-signing/notarisation, and a Windows cgijacl build.
+- [x] 6. Polish — **'‹ Library' button** (+ Game › Library ⌘L) to return to the
+      bookshelf; **Reading menu** (Bigger/Smaller Text ⌘±, narrow/normal/wide Margins)
+      sizing the transcript font from columns × window width like the iPad, rescaling
+      on resize (status bar follows via status_cols); **app icon** from the iOS 1024px
+      icon (`desktop/build/icon.png`, electron-builder generates .icns/.ico). ✓
+
+### Packaging notes (step 5)
+
+- **What's bundled** (`package.json` build): the per-OS `cgijacl` binary
+  (`extraResources` → `resources/bin/`) + a `jacl-data` tree (only **published**
+  games' `.j2` + a `games.json` manifest of title/language + `include/www/images/
+  sounds`) → `resources/jacl-data/`. `main.js` `resolvePaths()` switches dev↔packaged.
+- **Writable copy.** Packaged resources are read-only, but cgijacl writes a per-game
+  `.media` and temp files — so on launch `main.js` seeds `jacl-data` into
+  `userData/` (re-seeded per app version) and runs there.
+- **Web-only games belong here.** `build-jaclgames.sh` *skips* `game_web_only` games
+  (blackjacl) for the iPad (no HTML interface); the desktop **is** the web interface,
+  so the picker includes them — the desktop is their proper home.
+- **CI compiles games.** A clean checkout has no `*.j2` (gitignored), so
+  `prepare-bundle.sh` builds `jpp` (directly with gcc — `src/Makefile` is
+  configure-generated and absent) and runs `jpp <src> -release` per published game.
+- **Signing: UNSIGNED for now** (`mac.identity: null`). To sign+notarise later: an
+  Apple **Developer ID Application** cert (team `5TU3TU28JN`, the account the store
+  pipelines already use) via electron-builder's `CSC_LINK`/`CSC_KEY_PASSWORD` +
+  `notarize` (App Store Connect API key) — all from CI secrets, none committed.
+  Windows signing (an Authenticode cert) is a similar later step.
+- **Windows is not built.** cgijacl's `webjacl.c` server is POSIX C; it needs a
+  Windows port or a mingw build before the `win`/nsis target can run. The
+  electron-builder `win` config + a 3rd matrix entry are ready for when it does.
+
+### Two fixes needed to make static content work (2026-06-22)
+
+- **cgijacl must be current.** The repo's root-owned `bin/cgijacl` was stale and
+  its built-in server's media matching was broken (every `/include/*`, `/images/*`
+  → 404 → empty map, missing header). `desktop/build-cgijacl.sh` builds a fresh
+  one into `desktop/bin/` (gitignored); `main.js` prefers it. Re-run if the C core
+  changes. (Reinstalling the repo binary with sudo would also fix it.)
+- **A `.media` manifest is required.** webjacl serves *all* static files
+  (raphael.min.js, images) only if `<gamecore>.media` exists next to the game,
+  listing `<urlpath> <mime> <relpath>`. `main.js` generates it on launch from
+  `projects/www/*.js` + `projects/images/*`.

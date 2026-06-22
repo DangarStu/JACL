@@ -54,3 +54,10 @@ android/closed-test-codes.csv
 **/Gemfile.lock
 ios/build-ipa/
 *.ipa
+
+# Desktop (Electron) local scratch: generated cgijacl.conf, temp, logs
+desktop/run/
+desktop/node_modules/
+desktop/bin/
+desktop/dist/
+desktop/staging/

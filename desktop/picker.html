@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>JACL</title>
+  <style>
+    html, body { margin: 0; height: 100%; }
+    body {
+      background: #000;
+      color: #f2efe9;
+      font-family: Georgia, Palatino, "Times New Roman", serif;
+      -webkit-user-select: none; user-select: none;
+      display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+      /* keep text legible over the now full-window backdrop */
+      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.9);
+    }
+    /* The JACL / Interactive Fiction + compass artwork as a faint backdrop,
+       like the iPad shelf. */
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: url('shelf-artwork.png') no-repeat center center;
+      background-size: cover;          /* fill the window, keep aspect ratio (crops) */
+      opacity: 0.9;
+    }
+    header, main, footer { position: relative; z-index: 1; }
+
+    header { padding: 22px 28px 12px; }
+    h1 { margin: 0; font-size: 30px; font-weight: 600; letter-spacing: .3px; }
+    h1 .ver { color: #8f887c; font-weight: 400; font-size: 23px; }
+
+    main { flex: 1; overflow-y: auto; }
+    ul { list-style: none; margin: 0; padding: 0; }
+    li.game {
+      display: flex; align-items: baseline; gap: 9px; cursor: pointer;
+      padding: 13px 28px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    li.game:hover { background: rgba(255, 255, 255, 0.06); }
+    li.game .title { font-size: 19px; color: #f2efe9; }
+    li.game .lang  { font-size: 14px; color: #b9985c; }      /* gold, like the logo */
+    li.game .chev  { margin-left: auto; color: #5f594f; font-size: 19px; }
+    .msg { padding: 24px 28px; color: #8f887c; }
+
+    footer { text-align: center; color: #5f594f; font-size: 12px; padding: 12px; }
+  </style>
+</head>
+<body>
+  <header><h1>JACL <span class="ver">v4.7.0</span></h1></header>
+  <main><ul id="games"><li class="msg">Loading…</li></ul></main>
+  <footer>v4.7.0 &middot; Interactive Fiction</footer>
+  <script>
+    (async () => {
+      const ul = document.getElementById('games')
+      let games = []
+      try { games = await window.jacl.listGames() } catch (e) {}
+      if (!games.length) { ul.innerHTML = '<li class="msg">No games found.</li>'; return }
+      ul.innerHTML = ''
+      for (const g of games) {
+        const li = document.createElement('li')
+        li.className = 'game'
+        const title = document.createElement('span'); title.className = 'title'; title.textContent = g.title
+        const lang = document.createElement('span'); lang.className = 'lang'
+        if (g.language) lang.textContent = '(' + g.language + ')'
+        const chev = document.createElement('span'); chev.className = 'chev'; chev.textContent = '›'
+        li.append(title, lang, chev)
+        li.addEventListener('click', () => { title.textContent = 'Loading ' + g.title + '…'; window.jacl.play(g.path) })
+        ul.appendChild(li)
+      }
+    })()
+  </script>
+</body>
+</html>
