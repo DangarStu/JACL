@@ -82,7 +82,10 @@ it serves the **full web-JACL HTML play page** at `127.0.0.1:<port>`. So the
 - [x] 1. Local cgijacl server — `cgijacl -p <port> <game.j2>` serves full web HTML ✓
 - [x] 2. Electron shell — `desktop/main.js` spawns cgijacl + loads it; a game renders
       with **HTML forms working** (proven with Bumper's "New sticker" form) ✓
-- [ ] 2b. Game picker (currently a hardcoded game in main.js)
+- [x] 2b. Game picker — iPad-style "bookshelf" (dark, full-window shelf-artwork
+      backdrop, title + language + chevron rows). Lists only **published** games
+      (`game_publish true`, like the website); a pick (re)starts cgijacl on a fresh
+      port. ✓
 - [x] 3. Map window — `setWindowOpenHandler` opens the web's `map window`/`map open`
       `window.open('','jacl_map',...)` as a real resizable BrowserWindow. VERIFIED:
       the map (rooms + exit lines) draws in its own window (capturePage of the popup).
