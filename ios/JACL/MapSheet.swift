@@ -2,6 +2,7 @@
 //  A swipe-to-dismiss sheet showing the explored map, drawn on a Canvas.
 
 import SwiftUI
+import UIKit
 
 struct MapSheet: View {
     // Observe the bridge so the sheet updates when the `map` command's data
@@ -35,7 +36,7 @@ struct MapSheet: View {
 /// the room names over them as real Text views, so they centre, wrap and
 /// shrink to fit the box. The whole thing is scaled fit-to-view, with
 /// pinch-zoom and drag-pan on top.
-private struct MapCanvas: View {
+struct MapCanvas: View {
     let map: GameMap
     @State private var zoom: CGFloat = 1
     @State private var pan: CGSize = .zero
@@ -91,18 +92,43 @@ private struct MapCanvas: View {
             }
             .frame(width: geo.size.width, height: geo.size.height)
             .contentShape(Rectangle())
-            .gesture(
-                SimultaneousGesture(
-                    MagnificationGesture()
-                        .onChanged { zoom = $0 }
-                        .onEnded { _ in if zoom < 0.25 { withAnimation { zoom = 1; pan = .zero; lastPan = .zero } } },
-                    DragGesture()
-                        .onChanged { pan = CGSize(width: lastPan.width + $0.translation.width,
-                                                  height: lastPan.height + $0.translation.height) }
-                        .onEnded { _ in lastPan = pan }
+            // One input surface for every device: mouse wheel / trackpad two-finger
+            // scroll and pinch both zoom; finger or pointer drag pans; double-tap or
+            // double-click resets. SwiftUI gestures can't see Catalyst's scroll-wheel
+            // events, so this drops to UIKit recognizers (see MapInput).
+            .overlay(
+                MapInput(
+                    onZoom: { factor in zoom = min(6, max(0.3, zoom * factor)) },
+                    onPan: { t in pan = CGSize(width: lastPan.width + t.width,
+                                               height: lastPan.height + t.height) },
+                    onPanEnded: { lastPan = pan },
+                    onReset: { withAnimation { zoom = 1; pan = .zero; lastPan = .zero } }
                 )
             )
+            // Always-available zoom controls -- the reliable path on a Mac with a
+            // mouse (where scroll-wheel routing through the sheet is unreliable) and
+            // a clear affordance on touch too. Drawn on top of the input surface.
+            .overlay(alignment: .bottomTrailing) {
+                VStack(spacing: 0) {
+                    zoomButton("plus")  { zoom = min(6, zoom * 1.3) }
+                    Divider().frame(width: 26)
+                    zoomButton("minus") { zoom = max(0.3, zoom / 1.3) }
+                }
+                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10))
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(.quaternary, lineWidth: 1))
+                .padding(14)
+            }
         }
+    }
+
+    private func zoomButton(_ icon: String, action: @escaping () -> Void) -> some View {
+        Button { withAnimation(.easeOut(duration: 0.15)) { action() } } label: {
+            Image(systemName: icon)
+                .font(.system(size: 17, weight: .semibold))
+                .frame(width: 40, height: 40)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     private func drawArrow(_ ctx: GraphicsContext, _ a: CGPoint, _ b: CGPoint) {
@@ -116,5 +142,91 @@ private struct MapCanvas: View {
         path.move(to: mid); path.addLine(to: CGPoint(x: base.x + px, y: base.y + py))
         path.move(to: mid); path.addLine(to: CGPoint(x: base.x - px, y: base.y - py))
         ctx.stroke(path, with: .color(.secondary), lineWidth: 1.5)
+    }
+}
+
+/// A transparent input surface over the map covering every input device:
+///   - mouse wheel / trackpad two-finger scroll  -> zoom  (the Mac gap we're filling)
+///   - pinch                                      -> zoom
+///   - finger or pointer drag                     -> pan
+///   - double tap / double click                  -> reset
+/// SwiftUI gestures can't observe Catalyst's scroll-wheel events, so this uses
+/// UIKit recognizers. A scroll-only pan (maximumNumberOfTouches = 0) is kept
+/// separate from the drag pan (minimumNumberOfTouches = 1) so the two never fight.
+private struct MapInput: UIViewRepresentable {
+    var onZoom: (CGFloat) -> Void     // multiplicative factor (1 == no change)
+    var onPan: (CGSize) -> Void       // translation within the current drag
+    var onPanEnded: () -> Void
+    var onReset: () -> Void
+
+    func makeUIView(context: Context) -> UIView {
+        let v = UIView()
+        v.backgroundColor = .clear
+        let c = context.coordinator
+
+        let scroll = UIPanGestureRecognizer(target: c, action: #selector(Coordinator.onScroll(_:)))
+        scroll.allowedScrollTypesMask = .all      // mouse wheel + trackpad scroll
+        scroll.maximumNumberOfTouches = 0         // indirect scroll only, never a finger
+        scroll.delegate = c
+        v.addGestureRecognizer(scroll)
+
+        let drag = UIPanGestureRecognizer(target: c, action: #selector(Coordinator.onDrag(_:)))
+        drag.minimumNumberOfTouches = 1
+        drag.delegate = c
+        v.addGestureRecognizer(drag)
+
+        let pinch = UIPinchGestureRecognizer(target: c, action: #selector(Coordinator.onPinch(_:)))
+        pinch.delegate = c
+        v.addGestureRecognizer(pinch)
+
+        let reset = UITapGestureRecognizer(target: c, action: #selector(Coordinator.onReset))
+        reset.numberOfTapsRequired = 2
+        v.addGestureRecognizer(reset)
+        return v
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) { context.coordinator.parent = self }
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
+
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        var parent: MapInput
+        private var lastScrollY: CGFloat = 0
+        private var lastPinch: CGFloat = 1
+        init(_ p: MapInput) { parent = p }
+
+        @objc func onScroll(_ g: UIPanGestureRecognizer) {
+            let y = g.translation(in: g.view).y
+            switch g.state {
+            case .began:   lastScrollY = y
+            case .changed:
+                let dy = y - lastScrollY
+                lastScrollY = y
+                parent.onZoom(1 - dy / 250)        // scroll up -> zoom in
+            default:       lastScrollY = 0
+            }
+        }
+
+        @objc func onDrag(_ g: UIPanGestureRecognizer) {
+            let t = g.translation(in: g.view)
+            parent.onPan(CGSize(width: t.x, height: t.y))
+            if g.state == .ended || g.state == .cancelled {
+                parent.onPanEnded()
+                g.setTranslation(.zero, in: g.view)
+            }
+        }
+
+        @objc func onPinch(_ g: UIPinchGestureRecognizer) {
+            switch g.state {
+            case .began:   lastPinch = 1
+            case .changed: parent.onZoom(g.scale / lastPinch); lastPinch = g.scale
+            default:       lastPinch = 1
+            }
+        }
+
+        @objc func onReset() { parent.onReset() }
+
+        // Let pinch + drag (and the scroll pan) coexist without one cancelling another.
+        func gestureRecognizer(_ g: UIGestureRecognizer,
+                               shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool { true }
     }
 }

@@ -269,7 +269,9 @@ class GlkBridge {
     }
 
     // --- Reader -------------------------------------------------------------
+    private var readerToken = 0
     private fun startReader(input: FileInputStream) {
+        val myToken = ++readerToken   // identifies THIS reader; a Restart bumps it
         thread(name = "jacl.remglk.reader", isDaemon = true) {
             val buf = ByteArray(16 * 1024)
             try {
@@ -282,7 +284,10 @@ class GlkBridge {
                     }
                 }
             } catch (_: Exception) { }
-            main.post { finished = true }
+            // Only the current reader may end the game. A reader whose fd we closed
+            // for a Restart carries a stale token, so its EOF won't clobber the
+            // fresh terp's finished=false (which left "The game has ended." stuck).
+            main.post { if (myToken == readerToken) finished = true }
         }
     }
 
