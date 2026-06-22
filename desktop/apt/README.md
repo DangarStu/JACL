@@ -7,10 +7,10 @@ Linux users can install and auto-update with `apt`.
 
 ```bash
 # 1. trust the repo's signing key
-curl -fsSL https://dangarstu.github.io/JACL/jacl.gpg | sudo gpg --dearmor -o /usr/share/keyrings/jacl.gpg
+curl -fsSL https://apt.dangarmarine.com.au/jacl.gpg | sudo gpg --dearmor -o /usr/share/keyrings/jacl.gpg
 
 # 2. add the repo
-echo "deb [signed-by=/usr/share/keyrings/jacl.gpg] https://dangarstu.github.io/JACL stable main" \
+echo "deb [signed-by=/usr/share/keyrings/jacl.gpg] https://apt.dangarmarine.com.au stable main" \
   | sudo tee /etc/apt/sources.list.d/jacl.list
 
 # 3. install
