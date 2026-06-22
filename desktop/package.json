@@ -30,7 +30,11 @@
     "mac": {
       "target": ["dmg", "zip"],
       "category": "public.app-category.games",
-      "identity": null
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "notarize": { "teamId": "5TU3TU28JN" }
     },
     "linux": {
       "target": ["AppImage", "deb"],

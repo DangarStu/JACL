@@ -117,11 +117,23 @@ it serves the **full web-JACL HTML play page** at `127.0.0.1:<port>`. So the
 - **CI compiles games.** A clean checkout has no `*.j2` (gitignored), so
   `prepare-bundle.sh` builds `jpp` (directly with gcc — `src/Makefile` is
   configure-generated and absent) and runs `jpp <src> -release` per published game.
-- **Signing: UNSIGNED for now** (`mac.identity: null`). To sign+notarise later: an
-  Apple **Developer ID Application** cert (team `5TU3TU28JN`, the account the store
-  pipelines already use) via electron-builder's `CSC_LINK`/`CSC_KEY_PASSWORD` +
-  `notarize` (App Store Connect API key) — all from CI secrets, none committed.
-  Windows signing (an Authenticode cert) is a similar later step.
+- **macOS signing: CONFIGURED, pending the cert.** `package.json` mac config now
+  has `hardenedRuntime`, `entitlements`/`entitlementsInherit`
+  (`build/entitlements.mac.plist`) and `notarize: { teamId: 5TU3TU28JN }`;
+  `identity: null` removed. `desktop.yml`'s mac job gates signing/notarisation on a
+  `HAS_MAC_CERT` flag (= `secrets.MAC_CSC_LINK != ''`) so builds stay green until
+  the cert exists. Notarisation reuses the existing ASC API key (`ASC_*` secrets).
+  Verified locally with no cert: signing is skipped cleanly and **notarisation is
+  not attempted** (the `.app`/`.zip` build; only the local `.dmg` step needs a real
+  runner). `cgijacl` in `Resources/bin/` is deep-signed by electron-builder
+  (ad-hoc without a cert; Developer-ID + hardened-runtime with one).
+  **The user must add two secrets:** `MAC_CSC_LINK` (base64 of the Developer ID
+  Application `.p12`) and `MAC_CSC_KEY_PASSWORD` (its password). Then re-tag.
+  Windows signing (Authenticode) is a similar later step.
+- **Known gap (NOT signing):** the bundled `cgijacl` links Homebrew dylibs
+  (`jansson`, `openssl@3`) by absolute path, so it won't launch on a Mac without
+  Homebrew. Needs static linking or `@loader_path` bundling before the desktop
+  app actually runs on a clean machine — independent of signing.
 - **Windows is not built.** cgijacl's `webjacl.c` server is POSIX C; it needs a
   Windows port or a mingw build before the `win`/nsis target can run. The
   electron-builder `win` config + a 3rd matrix entry are ready for when it does.
