@@ -49,3 +49,5 @@ android/closed-test-codes.csv
 
 # Desktop (Electron) local scratch: generated cgijacl.conf, temp, logs
 desktop/run/
+desktop/node_modules/
+desktop/bin/

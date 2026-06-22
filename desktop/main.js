@@ -9,11 +9,14 @@ const { app, BrowserWindow } = require('electron')
 const { spawn } = require('child_process')
 const path = require('path')
 const fs = require('fs')
-const net = require('net')
 
 const REPO = path.resolve(__dirname, '..')             // the jacl repo root
 const RUN = path.join(__dirname, 'run')                // local scratch (gitignored)
-const CGIJACL = path.join(REPO, 'bin', 'cgijacl')
+// Prefer the app's own freshly-built cgijacl (desktop/build-cgijacl.sh) -- the
+// repo's bin/cgijacl is root-owned and was stale (broken media serving). Fall
+// back to bin/cgijacl if the local build isn't present.
+const LOCAL_CGIJACL = path.join(__dirname, 'bin', 'cgijacl')
+const CGIJACL = fs.existsSync(LOCAL_CGIJACL) ? LOCAL_CGIJACL : path.join(REPO, 'bin', 'cgijacl')
 // Hardcoded game for the scaffold; a picker comes next.
 const GAME = path.join(REPO, 'projects', 'temp', 'grail.j2')
 const PORT = 8099
@@ -33,6 +36,37 @@ function writeConfig () {
     ''
   ].join('\n')
   fs.writeFileSync(path.join(RUN, 'cgijacl.conf'), conf)
+}
+
+// webjacl serves ALL static files (raphael.min.js, images, the header banner)
+// from a "<gamecore>.media" manifest next to the game file -- without it, every
+// /include/* and /images/* request 404s (empty map + missing header). Generate
+// one listing projects/www/*.js and projects/images/* with paths relative to
+// the game's directory.
+const MIME = {
+  '.js': 'application/javascript', '.png': 'image/png', '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.ico': 'image/x-icon',
+  '.svg': 'image/svg+xml', '.ogg': 'audio/ogg', '.mp3': 'audio/mpeg'
+}
+function writeMediaManifest () {
+  const gameDir = path.dirname(GAME)
+  const base = path.basename(GAME).replace(/\.[^.]+$/, '')
+  const lines = []
+  const add = (urlPrefix, dir) => {
+    let files = []
+    try { files = fs.readdirSync(dir) } catch (e) { return }
+    for (const name of files) {
+      const ext = path.extname(name).toLowerCase()
+      const mime = MIME[ext]
+      if (!mime) continue
+      const rel = path.relative(gameDir, path.join(dir, name))
+      lines.push(`${urlPrefix}${name} ${mime} ${rel}`)
+    }
+  }
+  add('/include/', path.join(REPO, 'projects', 'www'))
+  add('/images/', path.join(REPO, 'projects', 'images'))
+  add('/sounds/', path.join(REPO, 'projects', 'sounds'))
+  fs.writeFileSync(path.join(gameDir, base + '.media'), lines.join('\n') + '\n')
 }
 
 // `-p` = server mode; the game file is the last arg; cwd=RUN so it finds
@@ -67,8 +101,15 @@ function createWindow () {
   tryLoad()
 }
 
+// The map opens via window.open('','jacl_map'), into which the game
+// document.write()s its HTML (incl. <script src='/include/raphael.min.js'>).
+// Electron resolves that root-relative src against the opener's origin, so once
+// raphael is actually served (it 404'd before the cgijacl fix) the map draws on
+// its own -- no extra handling needed here.
+
 app.whenReady().then(() => {
   writeConfig()
+  writeMediaManifest()
   startServer()
   setTimeout(createWindow, 600)   // let cgijacl bind first
 })

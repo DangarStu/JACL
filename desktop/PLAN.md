@@ -83,9 +83,20 @@ it serves the **full web-JACL HTML play page** at `127.0.0.1:<port>`. So the
 - [x] 2. Electron shell — `desktop/main.js` spawns cgijacl + loads it; a game renders
       with **HTML forms working** (proven with Bumper's "New sticker" form) ✓
 - [ ] 2b. Game picker (currently a hardcoded game in main.js)
-- [~] 3. Map window — the web already has `map window`/`map open` which pops a
-      **resizable, auto-updating** map via `window.open('','jacl_map',...)`
-      (webinterface.library:487). main.js's `setWindowOpenHandler` lets Electron
-      open it as a real BrowserWindow. PENDING: verify in-app.
-- [~] 4. Live refresh — included free: the web's map popup auto-updates each turn.
+- [x] 3. Map window — `setWindowOpenHandler` opens the web's `map window`/`map open`
+      `window.open('','jacl_map',...)` as a real resizable BrowserWindow. VERIFIED:
+      the map (rooms + exit lines) draws in its own window (capturePage of the popup).
+- [x] 4. Live refresh — the web popup redraws each turn (jaclDrawMapInPopup); free.
 - [ ] 5. Packaging
+
+### Two fixes needed to make static content work (2026-06-22)
+
+- **cgijacl must be current.** The repo's root-owned `bin/cgijacl` was stale and
+  its built-in server's media matching was broken (every `/include/*`, `/images/*`
+  → 404 → empty map, missing header). `desktop/build-cgijacl.sh` builds a fresh
+  one into `desktop/bin/` (gitignored); `main.js` prefers it. Re-run if the C core
+  changes. (Reinstalling the repo binary with sudo would also fix it.)
+- **A `.media` manifest is required.** webjacl serves *all* static files
+  (raphael.min.js, images) only if `<gamecore>.media` exists next to the game,
+  listing `<urlpath> <mime> <relpath>`. `main.js` generates it on launch from
+  `projects/www/*.js` + `projects/images/*`.
