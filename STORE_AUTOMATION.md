@@ -32,6 +32,11 @@ Two tag namespaces (separate from any other repo's tags):
 | `ios-v*` (e.g. `ios-v1.3`) | iOS → TestFlight |
 | `android-v*` (e.g. `android-v1.3`) | Android → Play internal |
 
+- **Bump the marketing version first.** The tag only *triggers* a build — the
+  uploaded version comes from `ios/project.yml` (`CFBundleShortVersionString`) and
+  `android/app/build.gradle.kts` (`versionName`), so bump those to match before
+  tagging, or an `ios-v1.3` tag will still upload **1.2**. (The build *number* is
+  set automatically to `1000 + run`, so you never touch that.)
 - **On a tag**: `git tag ios-v1.3 && git push origin ios-v1.3` (or `android-v1.3`).
 - **Manually**: Actions tab → pick the workflow → **Run workflow**.
 - `gh` must be active as `DangarStu` (`gh auth switch --user DangarStu`).
