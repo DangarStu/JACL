@@ -1,0 +1,104 @@
+name: APT repo
+
+# Publish/refresh the signed APT repository on gh-pages so Debian/Ubuntu users can
+# `apt install jacl-desktop`. Independent of the desktop build + macOS notarization:
+# it pulls the already-published Linux .deb from a desktop-v* GitHub Release (the
+# download retries, so a push-triggered run waits only for the fast Linux job's
+# .deb, never the slow mac). Signing key: APT_GPG_PRIVATE_KEY secret (public key
+# committed at desktop/apt/jacl.gpg). One-time: enable Pages on the gh-pages branch.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: desktop release tag to publish the .deb from
+        default: desktop-v0.2
+        required: true
+  push:
+    tags: ['desktop-v*']
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Publish APT repo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4            # for desktop/apt/jacl.gpg
+
+      - name: Download the release .deb (wait for it if the build just started)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          mkdir -p incoming
+          for i in $(seq 1 30); do
+            if gh release download "$TAG" -p '*.deb' -D incoming -R "$GITHUB_REPOSITORY" 2>/dev/null \
+               && ls incoming/*.deb >/dev/null 2>&1; then
+              echo "got the .deb from $TAG"; ls -la incoming; exit 0
+            fi
+            echo "waiting for $TAG .deb to be published... ($i/30)"; sleep 20
+          done
+          echo "no .deb on $TAG after waiting"; exit 1
+
+      - name: Install apt tooling + import signing key
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev apt-utils gnupg
+          echo "$APT_GPG_PRIVATE_KEY" | gpg --batch --import
+        env:
+          APT_GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
+
+      - name: Build + publish the signed APT repo
+        env:
+          KEY_FPR: 50EBC4C2EBD182EF36AA21AD37874D532601DA28
+          TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TAG: ${{ github.event.inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          REMOTE="https://x-access-token:${TOKEN}@github.com/${REPO}.git"
+          # Reuse the existing gh-pages pool (keep old versions), or start fresh.
+          if git clone --depth 1 --branch gh-pages "$REMOTE" ghp 2>/dev/null; then
+            echo "reusing existing gh-pages"
+          else
+            git clone --depth 1 "$REMOTE" ghp
+            ( cd ghp && git checkout --orphan gh-pages && git rm -rf . >/dev/null 2>&1 || true )
+          fi
+          mkdir -p ghp/pool/main ghp/dists/stable/main/binary-amd64
+          cp incoming/*.deb ghp/pool/main/
+          cp desktop/apt/jacl.gpg ghp/jacl.gpg
+          echo "apt.dangarmarine.com.au" > ghp/CNAME   # Pages custom domain (persist across pushes)
+          touch ghp/.nojekyll                 # serve dists/ + pool/ verbatim (no Jekyll)
+          cat > ghp/index.html <<'HTML'
+          <!doctype html><meta charset=utf-8><title>JACL desktop — APT repo</title>
+          <body style="font-family:system-ui;max-width:48rem;margin:3rem auto;padding:0 1rem">
+          <h1>JACL desktop — Debian/Ubuntu (apt)</h1>
+          <pre style="background:#111;color:#eee;padding:1rem;border-radius:8px;overflow:auto">
+          curl -fsSL https://apt.dangarmarine.com.au/jacl.gpg | sudo gpg --dearmor -o /usr/share/keyrings/jacl.gpg
+          echo "deb [signed-by=/usr/share/keyrings/jacl.gpg] https://apt.dangarmarine.com.au stable main" | sudo tee /etc/apt/sources.list.d/jacl.list
+          sudo apt update &amp;&amp; sudo apt install jacl-desktop</pre>
+          <p>Other Linux: the <code>.AppImage</code> on the
+          <a href="https://github.com/DangarStu/JACL/releases">Releases page</a> runs anywhere, no install.</p>
+          </body>
+          HTML
+          cd ghp
+          dpkg-scanpackages --multiversion pool/main > dists/stable/main/binary-amd64/Packages
+          gzip -9 -kf dists/stable/main/binary-amd64/Packages
+          ( cd dists/stable
+            apt-ftparchive \
+              -o APT::FTPArchive::Release::Origin=JACL \
+              -o APT::FTPArchive::Release::Label=JACL \
+              -o APT::FTPArchive::Release::Suite=stable \
+              -o APT::FTPArchive::Release::Codename=stable \
+              -o APT::FTPArchive::Release::Components=main \
+              -o APT::FTPArchive::Release::Architectures=amd64 \
+              release . > Release
+            gpg --batch --yes --local-user "$KEY_FPR" -abs -o Release.gpg Release
+            gpg --batch --yes --local-user "$KEY_FPR" --clearsign -o InRelease Release
+          )
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "apt: publish ${TAG}" || { echo "no changes"; exit 0; }
+          git push "$REMOTE" gh-pages
