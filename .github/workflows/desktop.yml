@@ -1,0 +1,81 @@
+name: Desktop builds
+
+# Cross-platform installers for the JACL Electron desktop app. cgijacl (the engine)
+# is C, compiled per-OS on its own runner; jpp compiles the published games; then
+# electron-builder packages the app. workflow_dispatch yields the installers as
+# Artifacts; a `desktop-v*` tag also publishes them to a GitHub Release.
+# (Tags are namespaced: ios-v*/android-v* are the store pipelines; desktop-v* is this.)
+#
+# Windows is NOT built yet: cgijacl's built-in web server (webjacl.c) is POSIX C and
+# needs a Windows port or a mingw build first. See desktop/PLAN.md.
+on:
+  workflow_dispatch:
+  push:
+    tags: ['desktop-v*']
+
+permissions:
+  contents: write   # a tag build creates/attaches the GitHub Release
+
+jobs:
+  package:
+    name: ${{ matrix.target }} on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            target: mac
+          - os: ubuntu-latest
+            target: linux
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # cgijacl links jansson / openssl / libcurl (see build-cgijacl.sh).
+      - name: Install engine build deps (macOS)
+        if: runner.os == 'macOS'
+        run: brew install jansson openssl@3 curl
+      - name: Install engine build deps (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config fakeroot \
+            libjansson-dev libssl-dev libcurl4-openssl-dev
+
+      - name: Install npm deps
+        run: npm ci
+
+      # dist:<target> = build cgijacl -> compile+stage published games -> electron-builder.
+      - name: Build engine + games and package
+        run: npm run dist:${{ matrix.target }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jacl-desktop-${{ matrix.target }}
+          path: |
+            desktop/dist/*.dmg
+            desktop/dist/*.zip
+            desktop/dist/*.AppImage
+            desktop/dist/*.deb
+          if-no-files-found: warn
+
+      # On a desktop-v* tag, attach this OS's installers to the GitHub Release.
+      - name: Publish to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            desktop/dist/*.dmg
+            desktop/dist/*.zip
+            desktop/dist/*.AppImage
+            desktop/dist/*.deb
+          fail_on_unmatched_files: false
+          generate_release_notes: true

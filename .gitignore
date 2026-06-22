@@ -51,3 +51,5 @@ android/closed-test-codes.csv
 desktop/run/
 desktop/node_modules/
 desktop/bin/
+desktop/dist/
+desktop/staging/

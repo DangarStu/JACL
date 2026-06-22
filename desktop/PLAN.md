@@ -90,7 +90,36 @@ it serves the **full web-JACL HTML play page** at `127.0.0.1:<port>`. So the
       `window.open('','jacl_map',...)` as a real resizable BrowserWindow. VERIFIED:
       the map (rooms + exit lines) draws in its own window (capturePage of the popup).
 - [x] 4. Live refresh — the web popup redraws each turn (jaclDrawMapInPopup); free.
-- [ ] 5. Packaging
+- [~] 5. Packaging — **electron-builder; macOS + Linux done, Windows TODO.**
+      `npm run dist:mac` / `dist:linux` (build cgijacl → compile+stage published
+      games → package). `.github/workflows/desktop.yml` builds mac+linux per-OS and
+      publishes a GitHub Release on a `desktop-v*` tag. VERIFIED: a local **unsigned
+      Mac .app + .zip** build runs — bookshelf shows the 16 games, bundled cgijacl
+      serves a game. Remaining: code-signing/notarisation, and a Windows cgijacl build.
+
+### Packaging notes (step 5)
+
+- **What's bundled** (`package.json` build): the per-OS `cgijacl` binary
+  (`extraResources` → `resources/bin/`) + a `jacl-data` tree (only **published**
+  games' `.j2` + a `games.json` manifest of title/language + `include/www/images/
+  sounds`) → `resources/jacl-data/`. `main.js` `resolvePaths()` switches dev↔packaged.
+- **Writable copy.** Packaged resources are read-only, but cgijacl writes a per-game
+  `.media` and temp files — so on launch `main.js` seeds `jacl-data` into
+  `userData/` (re-seeded per app version) and runs there.
+- **Web-only games belong here.** `build-jaclgames.sh` *skips* `game_web_only` games
+  (blackjacl) for the iPad (no HTML interface); the desktop **is** the web interface,
+  so the picker includes them — the desktop is their proper home.
+- **CI compiles games.** A clean checkout has no `*.j2` (gitignored), so
+  `prepare-bundle.sh` builds `jpp` (directly with gcc — `src/Makefile` is
+  configure-generated and absent) and runs `jpp <src> -release` per published game.
+- **Signing: UNSIGNED for now** (`mac.identity: null`). To sign+notarise later: an
+  Apple **Developer ID Application** cert (team `5TU3TU28JN`, the account the store
+  pipelines already use) via electron-builder's `CSC_LINK`/`CSC_KEY_PASSWORD` +
+  `notarize` (App Store Connect API key) — all from CI secrets, none committed.
+  Windows signing (an Authenticode cert) is a similar later step.
+- **Windows is not built.** cgijacl's `webjacl.c` server is POSIX C; it needs a
+  Windows port or a mingw build before the `win`/nsis target can run. The
+  electron-builder `win` config + a 3rd matrix entry are ready for when it does.
 
 ### Two fixes needed to make static content work (2026-06-22)
 

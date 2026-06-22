@@ -6,31 +6,69 @@
 // a fresh port (avoids rebinding a port still in TIME_WAIT). The map opens in its
 // own resizable BrowserWindow — the web's "map window" popup, honoured by
 // setWindowOpenHandler.
+//
+// Paths differ dev vs packaged (see resolvePaths): dev runs against the repo in
+// place; a packaged app bundles cgijacl + a `jacl-data` tree (published games +
+// include/www/images/sounds + games.json) as resources, and seeds a writable copy
+// into userData so cgijacl can write per-game .media manifests and temp files.
 
 const { app, BrowserWindow, Menu, ipcMain } = require('electron')
 const { spawn } = require('child_process')
 const path = require('path')
 const fs = require('fs')
 
-const REPO = path.resolve(__dirname, '..')             // the jacl repo root
-const RUN = path.join(__dirname, 'run')                // local scratch (gitignored)
-// Prefer the app's own freshly-built cgijacl (desktop/build-cgijacl.sh) -- the
-// repo's bin/cgijacl is root-owned and was stale (broken media serving). Fall
-// back to bin/cgijacl if the local build isn't present.
-const LOCAL_CGIJACL = path.join(__dirname, 'bin', 'cgijacl')
-const CGIJACL = fs.existsSync(LOCAL_CGIJACL) ? LOCAL_CGIJACL : path.join(REPO, 'bin', 'cgijacl')
-// Where playable games (.j2) live. Dev: the jpp output dir; packaging bundles a
-// games dir and repoints this.
-const GAMES_DIR = path.join(REPO, 'projects', 'temp')
-// Game sources, read to honour `constant game_publish true` (like the website).
-const SOURCES_DIR = path.join(REPO, 'projects')
+// Resolved by resolvePaths() once the app is ready.
+let CGIJACL, GAMES_DIR, SOURCES_DIR, INCLUDE_DIR, WWW_DIR, IMAGES_DIR, SOUNDS_DIR, RUN, GAMES_JSON
 
 let win = null
 let server = null            // the current cgijacl child process
 let activePort = 8098        // pre-incremented on each game launch
 let gameRetries = 0          // retry budget for loading the game URL while cgijacl binds
 
-// --- games ---------------------------------------------------------------
+// --- paths ----------------------------------------------------------------
+// Copy the bundled (read-only) jacl-data into a writable userData dir on first
+// launch / after an upgrade, so cgijacl can write .media manifests next to games.
+function seedData (src, dst) {
+  const marker = path.join(dst, '.seeded-' + app.getVersion())
+  if (fs.existsSync(marker)) return
+  fs.rmSync(dst, { recursive: true, force: true })
+  fs.cpSync(src, dst, { recursive: true })
+  fs.writeFileSync(marker, '')
+}
+
+function resolvePaths () {
+  if (!app.isPackaged) {
+    const REPO = path.resolve(__dirname, '..')
+    // Prefer the app's own freshly-built cgijacl (desktop/build-cgijacl.sh) -- the
+    // repo's bin/cgijacl is root-owned and was stale (broken media serving).
+    const local = path.join(__dirname, 'bin', 'cgijacl')
+    CGIJACL = fs.existsSync(local) ? local : path.join(REPO, 'bin', 'cgijacl')
+    GAMES_DIR = path.join(REPO, 'projects', 'temp')
+    SOURCES_DIR = path.join(REPO, 'projects')        // dev reads game_publish from here
+    INCLUDE_DIR = path.join(REPO, 'projects', 'include')
+    WWW_DIR = path.join(REPO, 'projects', 'www')
+    IMAGES_DIR = path.join(REPO, 'projects', 'images')
+    SOUNDS_DIR = path.join(REPO, 'projects', 'sounds')
+    RUN = path.join(__dirname, 'run')
+    GAMES_JSON = null                                // dev scans sources instead
+  } else {
+    const res = path.join(process.resourcesPath, 'jacl-data')
+    const base = path.join(app.getPath('userData'), 'jacl-data')
+    seedData(res, base)
+    const exe = process.platform === 'win32' ? 'cgijacl.exe' : 'cgijacl'
+    CGIJACL = path.join(process.resourcesPath, 'bin', exe)
+    GAMES_DIR = path.join(base, 'games')
+    SOURCES_DIR = null
+    INCLUDE_DIR = path.join(base, 'include')
+    WWW_DIR = path.join(base, 'www')
+    IMAGES_DIR = path.join(base, 'images')
+    SOUNDS_DIR = path.join(base, 'sounds')
+    RUN = path.join(app.getPath('userData'), 'run')
+    GAMES_JSON = path.join(GAMES_DIR, 'games.json')  // prebuilt manifest of published games
+  }
+}
+
+// --- games ----------------------------------------------------------------
 function prettify (stem) {
   return stem.replace(/[_-]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 }
@@ -46,15 +84,21 @@ function detectLanguage (stem) {
 }
 // A game is "published" iff its source declares `constant game_publish true` near
 // the top -- the same rule the website (etc/gen-landing.sh, build-jaclgames.sh)
-// uses. If the source isn't present (a packaged build bundling only published
-// .j2), treat it as published.
+// uses. Only consulted in dev; packaged builds bundle a games.json of already-
+// published games (prepare-bundle.sh).
 function isPublished (stem) {
-  let text
-  try { text = fs.readFileSync(path.join(SOURCES_DIR, stem + '.jacl'), 'utf8') }
-  catch (e) { return true }
-  return /^constant\s+game_publish\s+true\b/m.test(text)
+  try {
+    return /^constant\s+game_publish\s+true\b/m.test(
+      fs.readFileSync(path.join(SOURCES_DIR, stem + '.jacl'), 'utf8'))
+  } catch (e) { return true }
 }
 function listGames () {
+  if (GAMES_JSON && fs.existsSync(GAMES_JSON)) {
+    try {
+      return JSON.parse(fs.readFileSync(GAMES_JSON, 'utf8'))
+        .map(g => ({ ...g, path: path.join(GAMES_DIR, g.file) }))
+    } catch (e) { /* fall through to a directory scan */ }
+  }
   let files = []
   try { files = fs.readdirSync(GAMES_DIR) } catch (e) { return [] }
   return files.filter(f => f.endsWith('.j2')).map(f => f.replace(/\.j2$/, ''))
@@ -69,7 +113,7 @@ function writeConfig () {
   const conf = [
     `access_log\t"${path.join(RUN, 'logs', 'access.log')}"`,
     `error_log\t"${path.join(RUN, 'logs', 'error.log')}"`,
-    `include\t\t"${path.join(REPO, 'projects', 'include')}/"`,
+    `include\t\t"${INCLUDE_DIR}/"`,
     `temp\t\t"${path.join(RUN, 'temp')}/"`,
     'cookie_expiry\t20000',
     ''
@@ -80,8 +124,7 @@ function writeConfig () {
 // webjacl serves ALL static files (raphael.min.js, images, the header banner)
 // from a "<gamecore>.media" manifest next to the game file -- without it, every
 // /include/* and /images/* request 404s (empty map + missing header). Generate
-// one listing projects/www/*.js and projects/images/* with paths relative to the
-// game's directory.
+// one listing www/*.js and images/* with paths relative to the game's directory.
 const MIME = {
   '.js': 'application/javascript', '.png': 'image/png', '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.ico': 'image/x-icon',
@@ -100,9 +143,9 @@ function writeMediaManifest (gamePath) {
       lines.push(`${urlPrefix}${name} ${mime} ${path.relative(gameDir, path.join(dir, name))}`)
     }
   }
-  add('/include/', path.join(REPO, 'projects', 'www'))
-  add('/images/', path.join(REPO, 'projects', 'images'))
-  add('/sounds/', path.join(REPO, 'projects', 'sounds'))
+  add('/include/', WWW_DIR)
+  add('/images/', IMAGES_DIR)
+  add('/sounds/', SOUNDS_DIR)
   fs.writeFileSync(path.join(gameDir, base + '.media'), lines.join('\n') + '\n')
 }
 
@@ -181,6 +224,7 @@ ipcMain.handle('play-game', (e, gamePath) => {
 })
 
 app.whenReady().then(() => {
+  resolvePaths()
   writeConfig()
   buildMenu()
   createWindow()

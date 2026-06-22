@@ -4,10 +4,38 @@
   "description": "JACL desktop (Electron): the full web JACL hosted locally via cgijacl, with the map in its own window.",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build-engine": "./build-cgijacl.sh",
+    "prepare-bundle": "./prepare-bundle.sh",
+    "dist": "npm run build-engine && npm run prepare-bundle && electron-builder",
+    "dist:mac": "npm run build-engine && npm run prepare-bundle && electron-builder --mac",
+    "dist:linux": "npm run build-engine && npm run prepare-bundle && electron-builder --linux"
   },
   "license": "MIT",
   "devDependencies": {
-    "electron": "^33.0.0"
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "au.com.dangarmarine.jacl",
+    "productName": "JACL",
+    "directories": { "output": "dist" },
+    "files": ["main.js", "preload.js", "picker.html", "shelf-artwork.png"],
+    "extraResources": [
+      { "from": "bin", "to": "bin" },
+      { "from": "staging/jacl-data", "to": "jacl-data" }
+    ],
+    "mac": {
+      "target": ["dmg", "zip"],
+      "category": "public.app-category.games",
+      "identity": null
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Game"
+    },
+    "win": {
+      "target": ["nsis"]
+    }
   }
 }
