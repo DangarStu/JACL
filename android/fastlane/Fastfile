@@ -1,0 +1,32 @@
+# JACL Android — Google Play automation (run by .github/workflows/android-release.yml).
+# The workflow recreates keystore.properties + the upload keystore from secrets
+# before this runs, so :app:bundleRelease produces a signed .aab. The Play service
+# account JSON (PLAY_SERVICE_ACCOUNT_JSON) authorises the upload. (Identical to
+# Wryter's android/fastlane/Fastfile.)
+#
+# Note: the Play Developer API can only publish AFTER the app has had at least one
+# manual .aab upload in the Play Console (Google's rule for new apps).
+
+default_platform(:android)
+
+platform :android do
+  desc "Build a signed Release AAB and upload it to the Play internal track"
+  lane :internal do
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      # Unique, increasing versionCode per CI run (stores reject duplicates).
+      properties: { "android.injected.version.code" => ENV.fetch("BUILD_NUMBER").to_i },
+    )
+    upload_to_play_store(
+      track: "internal",
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+      json_key_data: ENV.fetch("PLAY_SERVICE_ACCOUNT_JSON"),
+      # Code-only upload; manage listing/screenshots in the console for now.
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+    )
+  end
+end

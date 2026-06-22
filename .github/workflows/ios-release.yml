@@ -1,0 +1,57 @@
+name: iOS — TestFlight
+
+# Runs on an `ios-v*` tag (e.g. `git tag ios-v1.3 && git push origin ios-v1.3`) or
+# manually from the Actions tab. Needs the secrets in STORE_AUTOMATION.md; without
+# them the run fails fast. (Won't run until you push such a tag.)
+on:
+  workflow_dispatch:
+  push:
+    tags: ['ios-v*']
+
+permissions:
+  contents: read
+
+jobs:
+  testflight:
+    runs-on: macos-14
+    defaults:
+      run:
+        working-directory: ios
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Generate the Xcode project (it's gitignored)
+        run: ./generate.sh
+
+      # 1000 + run number: a unique, always-increasing build number that also
+      # clears any build numbers already used in earlier (manual) store uploads.
+      - name: Compute build number
+        run: echo "BUILD_NUMBER=$((1000 + ${{ github.run_number }}))" >> "$GITHUB_ENV"
+
+      - name: Set build number
+        run: /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" JACL/Info.plist
+
+      # Imports the distribution cert (.p12) into a temporary keychain so xcodebuild
+      # can sign for the App Store. The provisioning profile is created/refreshed by
+      # -allowProvisioningUpdates + the API key (in the fastlane lane).
+      - name: Import signing certificate
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.IOS_DIST_CERT_P12_BASE64 }}
+          p12-password: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Build & upload to TestFlight
+        run: bundle exec fastlane beta
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}

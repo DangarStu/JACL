@@ -46,3 +46,11 @@ ios/build_*/
 
 # Play closed-test access codes (tester credentials -- local only)
 android/closed-test-codes.csv
+
+# fastlane / store automation
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/test_output/
+**/Gemfile.lock
+ios/build-ipa/
+*.ipa
