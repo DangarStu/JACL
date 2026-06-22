@@ -1,0 +1,23 @@
+Architectures: amd64
+Codename: stable
+Components: main
+Date: Mon, 22 Jun 2026 09:34:59 +0000
+Label: JACL
+Origin: JACL
+Suite: stable
+MD5Sum:
+ a1cac4a49522e22f6786b6f8401db87d              132 Release
+ 017ccd651b05c04841a5c563a61ff3d0              748 main/binary-amd64/Packages
+ 82815c9243d623ce612dea7bf4152e84              521 main/binary-amd64/Packages.gz
+SHA1:
+ e1823bd5d927c9e2cdc2a795af59c4d6bb6b460b              132 Release
+ e77c65f899dcec143ae80347ba27e0b1b5834631              748 main/binary-amd64/Packages
+ 189c36e623be8cb4d42715d3f46701e161b6aaba              521 main/binary-amd64/Packages.gz
+SHA256:
+ ab9c44fab338dfe9e55864322dea906c66845de9a281f764a687293d2735389a              132 Release
+ 6c6ff566e80a4b146bc609312b3b7b5d70ba0a139b6feee1e6927153d7c04d01              748 main/binary-amd64/Packages
+ 2292fc33b877c5cc98e6086ffac68b302923ec9bd632b98d25fec4b6a70cb897              521 main/binary-amd64/Packages.gz
+SHA512:
+ 86c6fb90a95650f0a28bfe5c2d3f13bd42fd53c741eda85d9528b70520a2cac1167b73c657eed359ba4a82d7814c1ce7bb750167c98ddcf88ace973de1064943              132 Release
+ b709aa5d81e6094c46bee8a589b5046eabc74829d776e12001e6bba722eba89debe653fcc2acd599f4ce3ea2f3cd3fab1e49a4e9c0345fc1be3ce1d7749bb06b              748 main/binary-amd64/Packages
+ d5ffe64d1d0c8a5f52ec43eeb4f198a3cf2e5254305cf8b78dde7f843ef03457458dc89af4bc5306d9f033e4ba17a9e8282814589811fe6373157d8bc090f017              521 main/binary-amd64/Packages.gz
