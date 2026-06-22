@@ -78,5 +78,9 @@ Grant the JACL Play service account permission to upload:
 
 ## Notes
 - First real runs of iOS signing often need a small tweak (export method/profile).
-- The two distribution certs in the account: `664U3KB5TA` (Wryter) and `232DHH2434`
-  (JACL). Both are valid team Apple Distribution certs.
+- **Apple Distribution cert (App Store / TestFlight):** `WTQJCH4ZW4`, **shared by
+  Wryter + JACL** (Apple's 2-cert limit forced consolidation). The old `232DHH2434`
+  (JACL) and `664U3KB5TA` (Wryter) were **revoked**. Don't mint a new distribution
+  cert without coordinating — it changes both apps' `IOS_DIST_CERT_*` secrets.
+  (This is the App Store cert; the desktop `.dmg` needs a separate **Developer ID
+  Application** cert — see `desktop/PLAN.md`.)
