@@ -22,17 +22,19 @@ _Last updated: 2026-06-21_
 > The newest thing the public can get is **iOS 1.1 / Android 1.0.1**. Everything
 > in §3 below is **newer than that and not submitted anywhere yet.**
 
-### Desktop & web (the original interpreter, core **v4.7.0**)
+### Desktop & web
 
 | Channel | Platforms | Distribution | Feature level |
 |---|---|---|---|
-| Desktop (Gargoyle/Glk) | Mac, Linux, Windows | Website downloads / prebuilt in `bin/` | Classic two-window Glk (text + status, inline images). **No** map window, reading margins, or in-app settings. |
-| Web interpreter | Browser — jacl.dangarmarine.com.au | `cgijacl`/`fcgijacl`, deployed to the site | Full modern UI: graphical map, hyperlinks, graphics. |
+| **Desktop app (Electron) — DEFAULT** | Mac, Linux *(Windows pending the `cgijacl` POSIX port)* | **GitHub Releases** (`desktop-v*` tags → `desktop.yml`); first cut **`desktop-v0.1`** (unsigned) | **Full web parity:** HTML forms, the **live map window**, the iPad-style bookshelf, Library button, reading controls. Hosts `cgijacl` locally. **This is now the primary desktop build.** |
+| Desktop (Gargoyle/Glk) — *legacy* | Mac, Linux, Windows | prebuilt in `bin/` | Classic two-window Glk (text + status, inline images). **No** map window / reading polish. Superseded by the Electron app. |
+| Web interpreter | Browser — jacl.dangarmarine.com.au | `cgijacl`/`fcgijacl`, deployed to the site | Full modern UI — the same engine the Electron app hosts. |
 | Nintendo DS | DS | `jacl.nds` (legacy) | Historical. |
 
-> Parity, high → low: **web ≈ apps** (map, rich UI) > **desktop** (classic Glk
-> text). Desktop builds are mature *as text interpreters* but don't share the
-> apps' map/reading polish — by design (Gargoyle is a standard Glk UI).
+> Parity, high → low: **Electron desktop ≈ web ≈ apps** (map, rich UI) > the
+> legacy **Gargoyle** text build. The web-enabled Electron app is the default
+> desktop going forward; the Gargoyle binaries stay available but are no longer
+> the recommended download.
 
 ---
 
