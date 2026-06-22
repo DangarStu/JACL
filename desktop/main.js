@@ -24,6 +24,7 @@ let win = null
 let server = null            // the current cgijacl child process
 let activePort = 8098        // pre-incremented on each game launch
 let gameRetries = 0          // retry budget for loading the game URL while cgijacl binds
+let reading = { columns: 64, margin: 'normal' }   // iPad-style reading prefs (persisted)
 
 // --- paths ----------------------------------------------------------------
 // Copy the bundled (read-only) jacl-data into a writable userData dir on first
@@ -193,20 +194,98 @@ function createWindow () {
   win.webContents.on('did-fail-load', () => {
     if (gameRetries-- > 0) setTimeout(() => win.loadURL(`http://127.0.0.1:${activePort}/`), 250)
   })
+  // On a game page (not the picker), add the "‹ Library" button + apply reading prefs.
+  win.webContents.on('did-finish-load', () => {
+    if (win.webContents.getURL().startsWith('http://127.0.0.1')) { injectLibraryButton(); applyReading() }
+  })
   showPicker()
+}
+
+// --- reading prefs (columns + margins -> font size, iPad-style) -----------
+const MARGINS = { narrow: 0.04, normal: 0.10, wide: 0.16 }   // matches iOS MarginWidth
+const COLS_MIN = 40, COLS_MAX = 110, COLS_STEP = 6
+function readingFile () { return path.join(app.getPath('userData'), 'reading.json') }
+function loadReading () { try { Object.assign(reading, JSON.parse(fs.readFileSync(readingFile(), 'utf8'))) } catch (e) {} }
+function saveReading () { try { fs.writeFileSync(readingFile(), JSON.stringify(reading)) } catch (e) {} }
+
+// A small fixed "‹ Library" button injected into the game page, so returning to
+// the bookshelf doesn't depend on finding the menu.
+function injectLibraryButton () {
+  win.webContents.executeJavaScript(`(function(){
+    if(document.getElementById('jaclLibraryBtn'))return;
+    var b=document.createElement('button');b.id='jaclLibraryBtn';b.textContent='‹ Library';
+    b.style.cssText='position:fixed;top:7px;left:7px;z-index:2147483647;font:13px Georgia,serif;color:#e8e2d6;background:rgba(20,18,15,.72);border:1px solid rgba(255,255,255,.18);border-radius:7px;padding:4px 10px;cursor:pointer';
+    b.onmouseenter=function(){b.style.background='rgba(45,40,33,.9)'};
+    b.onmouseleave=function(){b.style.background='rgba(20,18,15,.72)'};
+    b.onclick=function(){window.jacl&&window.jacl.library&&window.jacl.library()};
+    document.body.appendChild(b);
+  })();`).catch(() => {})
+}
+
+// Size the transcript so `columns` characters fill the usable width (window minus
+// margins) -- the same idea as the iPad's applyColumns, but measuring the actual
+// proportional char width. The status bar follows for free: the page re-measures
+// jaclMeasureStatusCols against the now-padded #statuswin and sends &status_cols=
+// next turn. Re-applies on window resize so it rescales live.
+function applyReading () {
+  if (!win || win.webContents.getURL().startsWith('file://')) return
+  const m = MARGINS[reading.margin] ?? 0.10
+  win.webContents.executeJavaScript(`(function(){
+    window.jaclReading={c:${reading.columns},m:${m}};
+    function apply(){
+      var r=window.jaclReading;if(!r)return;
+      var mt=document.getElementById('maintext');if(!mt)return;
+      var w=document.documentElement.clientWidth||window.innerWidth;
+      var side=Math.round(w*r.m),usable=Math.max(w-2*side,120);
+      var p=document.createElement('span');
+      p.style.cssText='position:absolute;visibility:hidden;white-space:pre;font-size:200px;font-family:'+getComputedStyle(mt).fontFamily;
+      p.textContent='abcdefghijklmnopqrstuvwxyz abcdefghijklmnopqrstuvwxyz';
+      document.body.appendChild(p);
+      var cw=p.getBoundingClientRect().width/p.textContent.length/200;
+      document.body.removeChild(p);
+      var fs=Math.max(9,Math.min(usable/(r.c*cw),48));
+      var st=document.getElementById('jaclReadingStyle');
+      if(!st){st=document.createElement('style');st.id='jaclReadingStyle';document.head.appendChild(st);}
+      var pad='padding-left:'+side+'px !important;padding-right:'+side+'px !important;box-sizing:border-box !important';
+      st.textContent='#maintext{font-size:'+fs.toFixed(2)+'px !important;'+pad+'}#statuswin{'+pad+'}.directions{'+pad+'}';
+    }
+    if(!window.__jaclReadingHook){window.__jaclReadingHook=true;window.addEventListener('resize',apply);}
+    apply();
+  })();`).catch(() => {})
 }
 
 // --- menu ----------------------------------------------------------------
 function buildMenu () {
   const isMac = process.platform === 'darwin'
+  const setMargin = (mm) => { reading.margin = mm; saveReading(); applyReading(); buildMenu() }
+  const bumpCols = (d) => {
+    reading.columns = Math.max(COLS_MIN, Math.min(COLS_MAX, reading.columns + d))
+    saveReading(); applyReading()
+  }
   Menu.setApplicationMenu(Menu.buildFromTemplate([
     ...(isMac ? [{ role: 'appMenu' }] : []),
     {
       label: 'Game',
       submenu: [
-        { label: 'Choose Game…', accelerator: 'CmdOrCtrl+O', click: showPicker },
+        { label: 'Library', accelerator: 'CmdOrCtrl+L', click: showPicker },
         { type: 'separator' },
         isMac ? { role: 'close' } : { role: 'quit' }
+      ]
+    },
+    {
+      label: 'Reading',
+      submenu: [
+        // Fewer columns = bigger text (matches the iPad's text-size control).
+        { label: 'Bigger Text', accelerator: 'CmdOrCtrl+Plus', click: () => bumpCols(-COLS_STEP) },
+        { label: 'Smaller Text', accelerator: 'CmdOrCtrl+-', click: () => bumpCols(COLS_STEP) },
+        { type: 'separator' },
+        {
+          label: 'Margins',
+          submenu: ['narrow', 'normal', 'wide'].map(mm => ({
+            label: mm[0].toUpperCase() + mm.slice(1), type: 'radio',
+            checked: reading.margin === mm, click: () => setMargin(mm)
+          }))
+        }
       ]
     },
     { role: 'editMenu' },
@@ -222,9 +301,11 @@ ipcMain.handle('play-game', (e, gamePath) => {
   startServer(gamePath)
   loadGame()
 })
+ipcMain.handle('show-picker', () => showPicker())
 
 app.whenReady().then(() => {
   resolvePaths()
+  loadReading()
   writeConfig()
   buildMenu()
   createWindow()
