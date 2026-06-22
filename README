@@ -49,6 +49,23 @@ For the full language reference see the Author's Guide:
 
     guide/index.html
 
+Desktop app
+-----------
+
+Pre-built desktop apps -- an Electron shell around cgijacl with the full
+web interface (clickable map, images, sound) -- are on the Releases page:
+
+    https://github.com/DangarStu/JACL/releases
+
+Debian / Ubuntu (apt):
+
+    curl -fsSL https://apt.dangarmarine.com.au/jacl.gpg | sudo gpg --dearmor -o /usr/share/keyrings/jacl.gpg
+    echo "deb [signed-by=/usr/share/keyrings/jacl.gpg] https://apt.dangarmarine.com.au stable main" | sudo tee /etc/apt/sources.list.d/jacl.list
+    sudo apt update && sudo apt install jacl-desktop
+
+  macOS        download the .dmg from the Releases page
+  Other Linux  download the .AppImage from the Releases page (runs anywhere)
+
 Deploying to Apache
 -------------------
 

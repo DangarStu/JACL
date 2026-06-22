@@ -647,6 +647,20 @@ sudo chmod 775 /usr/local/jacl/logs
 
 <p>Common issues include incorrect file permissions on the <b>temp</b> directory, a missing or misconfigured <b>cgijacl.conf</b> file, or the <b>fcgijacl</b> binary not being found at the path specified in the wrapper script.
 
+<h2><a class="section" name="installation_desktop">The Desktop App</a></h2>
+
+<p>For players who would rather not build from source, JACL is also packaged as a pre-built desktop app for macOS and Linux. It is an Electron shell wrapped around the <b>cgijacl</b> web interpreter, so it presents the full web interface &mdash; the clickable map window, images and sound &mdash; in a native window, with a bookshelf of the bundled games. The installers are published on the <a href="https://github.com/DangarStu/JACL/releases">GitHub Releases page</a>.
+
+<p>On Debian and Ubuntu the app is served from a signed APT repository, so it installs and updates through <b>apt</b> like any other package:
+
+<pre>
+curl -fsSL https://apt.dangarmarine.com.au/jacl.gpg | sudo gpg --dearmor -o /usr/share/keyrings/jacl.gpg
+echo "deb [signed-by=/usr/share/keyrings/jacl.gpg] https://apt.dangarmarine.com.au stable main" | sudo tee /etc/apt/sources.list.d/jacl.list
+sudo apt update &amp;&amp; sudo apt install jacl-desktop
+</pre>
+
+<p>On macOS, download the <b>.dmg</b> from the Releases page and drag the app into Applications. On other Linux distributions, download the <b>.AppImage</b>, which runs anywhere with no installation. A Windows build is not yet available.
+
 <h2><a class="section" name="installation_ipad">The iPad Interpreter</a></h2>
 
 <p>JACL also ships as a native iPad app, found in the <b>ios</b> directory of the repository and built on Andrew Plotkin's RemGlk library and Apple's SwiftUI. It runs the same preprocessed <b>.j2</b> games as the desktop interpreters. Imported games appear on a shelf; tapping one plays it with a scrolling transcript and an on-screen command line. The transcript can be selected and copied, and for a game written in a non-English language a long-press on any word offers a <b>Define</b> action that looks the word up in the game's bundled dictionary and shows the meaning in a small popover &mdash; no turn is taken and nothing is typed into the game.
