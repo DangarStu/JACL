@@ -96,6 +96,11 @@ it serves the **full web-JACL HTML play page** at `127.0.0.1:<port>`. So the
       publishes a GitHub Release on a `desktop-v*` tag. VERIFIED: a local **unsigned
       Mac .app + .zip** build runs — bookshelf shows the 16 games, bundled cgijacl
       serves a game. Remaining: code-signing/notarisation, and a Windows cgijacl build.
+- [x] 6. Polish — **'‹ Library' button** (+ Game › Library ⌘L) to return to the
+      bookshelf; **Reading menu** (Bigger/Smaller Text ⌘±, narrow/normal/wide Margins)
+      sizing the transcript font from columns × window width like the iPad, rescaling
+      on resize (status bar follows via status_cols); **app icon** from the iOS 1024px
+      icon (`desktop/build/icon.png`, electron-builder generates .icns/.ico). ✓
 
 ### Packaging notes (step 5)
 
