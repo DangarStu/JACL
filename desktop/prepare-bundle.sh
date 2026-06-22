@@ -14,7 +14,7 @@ mkdir -p "$STAGE/games"
 # preprocessor and compile published games on demand below. jpp writes the
 # release .j2 to projects/temp/<name>.j2. Build jpp directly (its src/Makefile is
 # configure-generated and absent on a clean checkout); flags mirror the jpp target.
-[ -x src/jpp ] || ( cd src && gcc -std=gnu23 -O2 -DNATIVE_LANGUAGE=1 -DGLK jppmain.c jpp.c -Iglkterm -o jpp )
+[ -x src/jpp ] || ( cd src && gcc -std=gnu2x -O2 -DNATIVE_LANGUAGE=1 -DGLK jppmain.c jpp.c -Iglkterm -o jpp )
 mkdir -p projects/temp
 
 cp -R projects/include "$STAGE/include"

@@ -25,7 +25,7 @@ else
   DEP_LIBS=$(pkg-config --libs jansson libcurl openssl)
 fi
 
-gcc -std=gnu23 -Wall -O2 -Wno-unused-result -Wno-unused-but-set-variable \
+gcc -std=gnu2x -Wall -O2 -Wno-unused-result -Wno-unused-but-set-variable \
   -DNATIVE_LANGUAGE=1 -DWEBJACL $DEP_CFLAGS \
   cgijacl.c auth.c findroute.c interpreter.c loader.c logging.c parser.c \
   display.c utils.c jpp.c resolvers.c errors.c encapsulate.c libcsv.c saver.c webjacl.c \
