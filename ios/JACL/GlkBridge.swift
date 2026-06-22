@@ -398,16 +398,22 @@ final class GlkBridge: ObservableObject {
         let autoBare = base + "__auto"
         let fm = FileManager.default
         let files = (try? fm.contentsOfDirectory(atPath: dir)) ?? []
-        return files
+
+        // Broken into typed steps so the Swift type-checker doesn't time out on the
+        // chain under Xcode 16 ("unable to type-check this expression in reasonable
+        // time").
+        let bareNames: [String] = files
             .filter { $0.hasSuffix(".glksave") }
             .map { String($0.dropLast(".glksave".count)) }     // bare name
             .filter { $0.hasPrefix(prefix) && $0 != autoBare }
-            .sorted { lhs, rhs in
-                let l = (try? fm.attributesOfItem(atPath: "\(dir)/\(lhs).glksave")[.modificationDate]) as? Date
-                let r = (try? fm.attributesOfItem(atPath: "\(dir)/\(rhs).glksave")[.modificationDate]) as? Date
-                return (l ?? .distantPast) > (r ?? .distantPast)
-            }
-            .map { String($0.dropFirst(prefix.count)) }        // strip "<base>_"
+
+        func modDate(_ bare: String) -> Date {
+            let attrs = try? fm.attributesOfItem(atPath: "\(dir)/\(bare).glksave")
+            return (attrs?[.modificationDate] as? Date) ?? .distantPast
+        }
+
+        let newestFirst = bareNames.sorted { modDate($0) > modDate($1) }
+        return newestFirst.map { String($0.dropFirst(prefix.count)) }   // strip "<base>_"
     }
 
     /// Find a <jacl-map>…</jacl-map> run in the paragraphs, parse it into
