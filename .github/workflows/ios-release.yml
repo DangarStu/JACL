@@ -20,11 +20,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # The runner's default Xcode (15.4) can't read xcodegen's project format 77.
-      # Select the newest installed Xcode (16.x) explicitly.
-      - name: Select Xcode 16
+      # Use the newest installed Xcode: the default (15.4) can't read xcodegen's
+      # project format 77, AND App Store Connect now requires the iOS 26 SDK
+      # (Xcode 26). Pick the highest non-beta Xcode available on the runner.
+      - name: Use the newest Xcode
         run: |
-          sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | sort -V | tail -1)"
+          echo "Available Xcodes:"; ls -d /Applications/Xcode*.app
+          LATEST=$(ls -d /Applications/Xcode_[0-9]*.app 2>/dev/null | grep -vi beta | sort -V | tail -1)
+          echo "Selecting $LATEST"
+          sudo xcode-select -s "$LATEST"
           xcodebuild -version
 
       - name: Install xcodegen
