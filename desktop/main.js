@@ -14,8 +14,8 @@ const net = require('net')
 const REPO = path.resolve(__dirname, '..')             // the jacl repo root
 const RUN = path.join(__dirname, 'run')                // local scratch (gitignored)
 const CGIJACL = path.join(REPO, 'bin', 'cgijacl')
-// Hardcoded game for the step-2 scaffold; a picker comes next.
-const GAME = path.join(REPO, 'projects', 'temp', 'bumper.j2')
+// Hardcoded game for the scaffold; a picker comes next.
+const GAME = path.join(REPO, 'projects', 'temp', 'grail.j2')
 const PORT = 8099
 
 let server = null   // the cgijacl child process
@@ -47,6 +47,17 @@ function startServer () {
 
 function createWindow () {
   const win = new BrowserWindow({ width: 1024, height: 800, title: 'JACL' })
+  // The web JACL's "map window" / "map open" command pops the map via
+  // window.open('', 'jacl_map', '...resizable=yes') and auto-updates it. Let
+  // Electron honour that as a real, resizable BrowserWindow -- that IS our
+  // separate, live map window, for free.
+  win.webContents.setWindowOpenHandler(({ frameName }) => ({
+    action: 'allow',
+    overrideBrowserWindowOptions: {
+      width: 720, height: 720, resizable: true,
+      title: frameName === 'jacl_map' ? 'Map' : 'JACL'
+    }
+  }))
   const url = `http://127.0.0.1:${PORT}/`
   let tries = 40
   const tryLoad = () => win.loadURL(url)

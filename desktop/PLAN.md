@@ -83,6 +83,9 @@ it serves the **full web-JACL HTML play page** at `127.0.0.1:<port>`. So the
 - [x] 2. Electron shell — `desktop/main.js` spawns cgijacl + loads it; a game renders
       with **HTML forms working** (proven with Bumper's "New sticker" form) ✓
 - [ ] 2b. Game picker (currently a hardcoded game in main.js)
-- [ ] 3. Separate map window
-- [ ] 4. Live refresh
+- [~] 3. Map window — the web already has `map window`/`map open` which pops a
+      **resizable, auto-updating** map via `window.open('','jacl_map',...)`
+      (webinterface.library:487). main.js's `setWindowOpenHandler` lets Electron
+      open it as a real BrowserWindow. PENDING: verify in-app.
+- [~] 4. Live refresh — included free: the web's map popup auto-updates each turn.
 - [ ] 5. Packaging
