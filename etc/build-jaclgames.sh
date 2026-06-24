@@ -83,6 +83,29 @@ for game in "$projects"/*.jacl; do
     tmp=$(mktemp -d)
     cp "$j2" "$tmp/$name.j2"
     files="$name.j2"
+
+    # Plain-text metadata the apps read to title the shelf. The release .j2 is
+    # XOR-obfuscated, so they can't grep its `constant game_title` -- they read
+    # this game.json instead. Title from the .jacl SOURCE (same rule as
+    # gen-landing.sh), language from the game's <lang>_verbs.library #include;
+    # stored UN-obfuscated, as it's metadata, not game code.
+    title_line=$(grep -E '^constant[[:space:]]+game_title[[:space:]]' "$game" 2>/dev/null | head -1)
+    title=$(printf '%s\n' "$title_line" | sed -E 's/.*"([^"]+)".*/\1/')
+    if [ -z "$title" ] || [ "$title" = "$title_line" ]; then
+        title=$(printf '%s\n' "$name" | sed 's/[_-]\{1,\}/ /g' \
+                | awk '{for(i=1;i<=NF;i++)$i=toupper(substr($i,1,1)) substr($i,2)}1')
+    fi
+    language="English"
+    if   grep -q '^#include "indonesian_verbs.library"' "$game"; then language="Indonesian"
+    elif grep -q '^#include "spanish_verbs.library"' "$game"; then language="Spanish"
+    elif grep -qE '^#include "french_verbs.library"|^#include "french_webinterface.library"' "$game"; then language="French"
+    elif grep -q '^#include "german_verbs.library"' "$game"; then language="German"
+    fi
+    json_escape() { printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'; }
+    printf '{"title":"%s","language":"%s"}\n' \
+        "$(json_escape "$title")" "$(json_escape "$language")" > "$tmp/game.json"
+    files="$files game.json"
+
     if [ -f "$projects/$name.blorb" ]; then
         cp "$projects/$name.blorb" "$tmp/$name.blorb"
         files="$files $name.blorb"

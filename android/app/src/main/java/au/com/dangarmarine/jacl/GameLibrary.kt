@@ -2,6 +2,7 @@ package au.com.dangarmarine.jacl
 
 import android.content.Context
 import android.net.Uri
+import org.json.JSONObject
 import java.io.File
 import java.util.zip.ZipInputStream
 
@@ -23,7 +24,25 @@ object GameLibrary {
     fun games(ctx: Context): List<Game> =
         (ctx.filesDir.listFiles { f -> f.extension.lowercase() == "j2" } ?: emptyArray())
             .sortedByDescending { it.lastModified() }
-            .map { Game(it, title(it) ?: it.nameWithoutExtension, languageOf(it)) }
+            .map { f ->
+                val meta = metadata(f)
+                Game(f,
+                     meta?.optString("title")?.ifEmpty { null } ?: title(f) ?: f.nameWithoutExtension,
+                     meta?.optString("language")?.ifEmpty { null } ?: languageOf(f))
+            }
+
+    // --- Package metadata (game.json) ---------------------------------------
+    // The release .j2 XOR-obfuscates its `constant game_title`, so it can't be
+    // grepped. The .jaclgame instead ships an un-obfuscated game.json (written
+    // from the .jacl source by mkjaclgame.sh); on import we persist it as a
+    // sidecar beside the .j2 so the shelf shows the real title.
+
+    /** Sidecar path for a stored game's metadata: grail.j2 -> grail.meta.json. */
+    private fun metaFile(j2: File): File = File(j2.parentFile, j2.nameWithoutExtension + ".meta.json")
+
+    private fun metadata(j2: File): JSONObject? = try {
+        metaFile(j2).takeIf { it.isFile }?.let { JSONObject(it.readText()) }
+    } catch (e: Exception) { null }
 
     /** The game's language name (English / Indonesian / French / German /
      *  Spanish), from its game_language constant -- the same labels the online
@@ -42,6 +61,7 @@ object GameLibrary {
     fun delete(ctx: Context, game: Game) {
         game.file.delete()
         File(ctx.filesDir, game.file.nameWithoutExtension + ".blorb").delete()
+        metaFile(game.file).delete()
     }
 
     /** Import a picked/opened file. A .jaclgame/.zip is unpacked; a bare
@@ -75,23 +95,34 @@ object GameLibrary {
     /** Unpack a .jaclgame (zip of .j2 [+ .blorb + dictionary CSVs]) into filesDir. */
     private fun unpack(ctx: Context, input: java.io.InputStream): File? {
         var game: File? = null
+        var metaJson: ByteArray? = null   // game.json, written as a sidecar below
         ZipInputStream(input).use { zip ->
             var entry = zip.nextEntry
             while (entry != null) {
                 val base = File(entry.name).name
                 val ext = base.substringAfterLast('.', "").lowercase()
-                val dest: File? = when (ext) {
-                    "j2", "blorb" -> File(ctx.filesDir, base)
-                    "csv" -> File(dataDir(ctx), base)   // interpreter opens data/<lang>_words.csv
-                    else -> null
-                }
-                if (dest != null) {
-                    dest.outputStream().use { zip.copyTo(it) }
-                    if (ext == "j2") game = dest
+                if (base == "game.json") {
+                    metaJson = zip.readBytes()
+                } else {
+                    val dest: File? = when (ext) {
+                        "j2", "blorb" -> File(ctx.filesDir, base)
+                        "csv" -> File(dataDir(ctx), base)   // interpreter opens data/<lang>_words.csv
+                        else -> null
+                    }
+                    if (dest != null) {
+                        dest.outputStream().use { zip.copyTo(it) }
+                        if (ext == "j2") game = dest
+                    }
                 }
                 zip.closeEntry()
                 entry = zip.nextEntry
             }
+        }
+        // Persist the plain-text title/language beside the .j2 (or clear a stale
+        // sidecar from an earlier import that lacked one).
+        game?.let { g ->
+            val sidecar = metaFile(g)
+            metaJson?.let { sidecar.writeBytes(it) } ?: sidecar.delete()
         }
         return game
     }

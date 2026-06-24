@@ -330,10 +330,38 @@ enum GameLibrary {
                 let db = (try? b.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
                 return da > db
             }
-            .map { Game(url: $0,
-                        title: title(of: $0) ?? $0.deletingPathExtension().lastPathComponent,
-                        language: language(of: $0)) }
+            .map { url in
+                let meta = metadata(for: url)
+                return Game(url: url,
+                            title: meta?.title ?? title(of: url)
+                                ?? url.deletingPathExtension().lastPathComponent,
+                            language: meta?.language ?? language(of: url))
+            }
     }
+
+    // MARK: Package metadata (game.json)
+
+    /// Plain-text metadata a `.jaclgame` carries (title + language). The release
+    /// `.j2` is XOR-obfuscated, so its `constant game_title` can't be grepped --
+    /// the package ships an un-obfuscated `game.json`, written by mkjaclgame.sh
+    /// from the `.jacl` source. We persist it as a sidecar beside the stored
+    /// `.j2` so the shelf can show the real title without parsing the `.j2`.
+    struct Meta: Codable { let title: String; let language: String? }
+
+    /// Sidecar URL for a stored game's metadata: `grail.j2` -> `grail.meta.json`.
+    private static func metaURL(for j2: URL) -> URL {
+        j2.deletingPathExtension().appendingPathExtension("meta.json")
+    }
+
+    private static func metadata(for j2: URL) -> Meta? {
+        guard let data = try? Data(contentsOf: metaURL(for: j2)) else { return nil }
+        return try? JSONDecoder().decode(Meta.self, from: data)
+    }
+
+    /// The game's display title, from a `.j2` (legacy / bare imports). Release
+    /// files obfuscate, so this only succeeds on a debug `.j2`; the shelf prefers
+    /// the package's `game.json` (see `metadata(for:)`) and then the filename.
+    static func title(of url: URL) -> String? { stringConstant("game_title", in: url) }
 
     /// The game's language name, from its `game_language` constant -- the same
     /// labels the online list shows. Anything unmapped or absent reads as
@@ -375,6 +403,7 @@ enum GameLibrary {
         let fm = FileManager.default
         try? fm.removeItem(at: game.url)
         try? fm.removeItem(at: game.url.deletingPathExtension().appendingPathExtension("blorb"))
+        try? fm.removeItem(at: metaURL(for: game.url))
         pruneDictionaries(removing: game.url.deletingPathExtension().lastPathComponent)
     }
 
@@ -414,9 +443,13 @@ enum GameLibrary {
         let entries = try MiniZip.entries(of: Data(contentsOf: url))
         var game: URL?
         var bundledCSVs: [String] = []
+        var metaJSON: Data?
         for entry in entries {
             let base = (entry.name as NSString).lastPathComponent
             let ext = (base as NSString).pathExtension.lowercased()
+            // Plain-text shelf metadata (title/language). Held aside and written
+            // as a sidecar beside the .j2 below, once we know the game's name.
+            if base == "game.json" { metaJSON = entry.data; continue }
             let dest: URL
             switch ext {
             case "j2", "blorb":
@@ -442,6 +475,14 @@ enum GameLibrary {
             var manifest = dictManifest()
             manifest[game.deletingPathExtension().lastPathComponent] = bundledCSVs
             UserDefaults.standard.set(manifest, forKey: manifestKey)
+            // Persist the package's plain-text title/language as a sidecar beside
+            // the .j2, so the shelf titles it without parsing the obfuscated .j2.
+            let metaDest = metaURL(for: game)
+            if let metaJSON {
+                try? metaJSON.write(to: metaDest)
+            } else {
+                try? FileManager.default.removeItem(at: metaDest)   // stale from an old import
+            }
         }
         return game
     }
@@ -493,9 +534,6 @@ enum GameLibrary {
         }
         return nil
     }
-
-    /// The game's display title (`constant game_title "..."`).
-    static func title(of url: URL) -> String? { stringConstant("game_title", in: url) }
 
     /// Extract the quoted value from a decoded `constant <name> "..."` line.
     private static func quotedConstant(_ name: String, in bytes: [UInt8]) -> String? {
