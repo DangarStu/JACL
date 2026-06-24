@@ -41,7 +41,11 @@ echo "[" > "$manifest"; first=1; n=0
 for src in projects/*.jacl; do
   s=$(basename "$src" .jacl)
   grep -qE '^constant[[:space:]]+game_publish[[:space:]]+true' "$src" || continue
-  [ -f "projects/temp/$s.j2" ] || src/jpp "$src" -release >/dev/null 2>&1 || true
+  # Always recompile: the web CSS/JS (webinterface.css/.library) are #include'd
+  # INTO the .j2 at compile time, so a stale projects/temp/<game>.j2 would ship
+  # the old assets even after those source files change. Force a fresh build.
+  rm -f "projects/temp/$s.j2"
+  src/jpp "$src" -release >/dev/null 2>&1 || true
   [ -f "projects/temp/$s.j2" ] || { echo "  skip $s (no .j2 produced)"; continue; }
   cp "projects/temp/$s.j2" "$STAGE/games/$s.j2"
   [ $first -eq 1 ] || echo "," >> "$manifest"; first=0; n=$((n+1))
