@@ -6,6 +6,11 @@ name: Android — Play internal
 # Console first. (Won't run until you push such a tag.)
 on:
   workflow_dispatch:
+    inputs:
+      play_track:
+        description: 'Play track to upload to (e.g. internal, alpha for closed testing)'
+        required: false
+        default: 'internal'
   push:
     tags: ['android-v*']
 
@@ -55,8 +60,9 @@ jobs:
           bundler-cache: true
           working-directory: android
 
-      - name: Build & upload to the Play internal track
+      - name: Build & upload to the Play track
         run: bundle exec fastlane internal
         env:
           PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
+          PLAY_TRACK: ${{ github.event.inputs.play_track || 'internal' }}

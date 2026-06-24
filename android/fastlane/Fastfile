@@ -19,7 +19,9 @@ platform :android do
       properties: { "android.injected.version.code" => ENV.fetch("BUILD_NUMBER").to_i },
     )
     upload_to_play_store(
-      track: "internal",
+      # Track is configurable via PLAY_TRACK (set by the workflow_dispatch input).
+      # Defaults to "internal"; pass e.g. "alpha" for closed testing.
+      track: ENV.fetch("PLAY_TRACK", "internal"),
       aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
       json_key_data: ENV.fetch("PLAY_SERVICE_ACCOUNT_JSON"),
       # Code-only upload; manage listing/screenshots in the console for now.
