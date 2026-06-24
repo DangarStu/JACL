@@ -61,10 +61,21 @@ platform :ios do
       is_key_content_base64: true,
     )
 
+    version = ENV.fetch("APP_VERSION", "1.2")
+    # CI uploads use build numbers like 1000+run_number (see ios-release.yml), NOT
+    # the project's CFBundleVersion, so discover the real latest build for this
+    # version instead of hardcoding it.
+    build_num = latest_testflight_build_number(
+      api_key: api_key,
+      app_identifier: "au.com.dangarmarine.JACL",
+      version: version,
+    ).to_s
+    UI.message("Submitting #{version} build #{build_num} for App Store review")
+
     deliver(
       api_key: api_key,
-      app_version: ENV.fetch("APP_VERSION", "1.2"),
-      build_number: ENV.fetch("BUILD_NUMBER", "3"),
+      app_version: version,
+      build_number: build_num,
       metadata_path: File.join(__dir__, "metadata"),
       submit_for_review: true,
       automatic_release: true,
