@@ -1043,8 +1043,12 @@ status_line()
 		glk_window_move_cursor(statuswin, 1, 0);
 		write_text(status_location);
 
-		/* score/moves: right-justified, on its own row when two-line */
-		{
+		/* score/moves: right-justified on the single-line layout; on the
+		 * two-line layout, left-justified at column 1 to share the
+		 * location's left margin on row 1 */
+		if (two_line) {
+			cursor = 1;
+		} else {
 			size_t sm_len = strlen(status_scoremoves);
 			if (sm_len + 1 < status_width) {
 				cursor = status_width - (glui32) sm_len - 1;
