@@ -358,15 +358,23 @@ print:
       var padX = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);^
       if (padX > 0 && padX < w) { w = w - padX; }^
       probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre';^
-      /* Force monospace family even if the fallback target has a^
-       * proportional font, so the measurement matches the bar's^
-       * actual monospace stack. */^
-      probe.style.fontFamily = 'ui-monospace, SF Mono, Menlo, Consolas, Courier New, monospace';^
-      probe.style.fontSize = (bar ? cs.fontSize : '12px');^
       probe.textContent = '0123456789012345678901234567890123456789';^
-      document.body.appendChild(probe);^
+      /* Measure INSIDE #statuswin so the probe inherits the bar's exact^
+       * font, weight and metrics; charW then equals what actually paints.^
+       * Measuring on document.body with a re-stated stack can resolve^
+       * ui-monospace to a slightly narrower metric, over-counting columns^
+       * so +print_right lands past the right edge and clips. Force a^
+       * monospace stack only for the #main fallback (proportional body). */^
+      if (bar) {^
+         probe.style.font = 'inherit';^
+         bar.appendChild(probe);^
+      } else {^
+         probe.style.fontFamily = 'ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace';^
+         probe.style.fontSize = '12px';^
+         document.body.appendChild(probe);^
+      }^
       var charW = probe.offsetWidth / 40;^
-      document.body.removeChild(probe);^
+      probe.parentNode.removeChild(probe);^
       if (charW <= 0) return 80;^
       /* One extra char of slack so the last column never lands hard^
        * against the padding edge after sub-pixel rounding. */^
