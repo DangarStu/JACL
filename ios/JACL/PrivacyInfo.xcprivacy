@@ -1,28 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!--
-  PrivacyInfo.xcprivacy --- Apple required "privacy manifest" for the JACL app.
-
-  JACL is a fully offline interactive-fiction interpreter: it has no analytics,
-  no SDKs, no network requests (the only outbound links open Safari), and it
-  collects nothing about the user. So tracking is false and the tracking-domain
-  and collected-data lists are empty.
-
-  It does touch two "required-reason" APIs, both for benign local use:
-    * UserDefaults (NSUserDefaults) -- stores the reading-column count, margin
-      width, and the bundled-game seed sizes. Reason CA92.1: access info from
-      the same app, only on this device.
-    * File-timestamp / file-size attributes (.modificationDate,
-      .contentModificationDateKey, .fileSizeKey) -- to show the build's link
-      time and to sort imported .j2 games and .glksave saves newest-first.
-      Every access is on files inside the app's own bundle or Documents
-      container, so reason DDA9.1 (timestamps of files inside the app
-      container) applies; we never read timestamps of files outside the app.
-
-  No disk-space (E174.1) or system-boot-time (35F9.1) reasons are declared: the
-  app's only clock_gettime call uses CLOCK_REALTIME (wall clock, not the
-  boot-time category), and nothing queries free disk space.
--->
 <plist version="1.0">
 <dict>
 	<key>NSPrivacyTracking</key>
@@ -46,7 +23,7 @@
 			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
 			<key>NSPrivacyAccessedAPITypeReasons</key>
 			<array>
-				<string>DDA9.1</string>
+				<string>C617.1</string>
 			</array>
 		</dict>
 	</array>
