@@ -14,6 +14,9 @@ on:
       build_number:
         description: "Build number to attach"
         default: "3"
+      submit:
+        description: "Submit for review (false = only update What's New / metadata)"
+        default: "true"
 
 permissions:
   contents: read
@@ -66,11 +69,14 @@ jobs:
 
       - name: Set "What's New" for every locale
         run: |
-          NOTES="The on-screen keyboard now stays up between commands instead of flickering away and back after each one. Default text margins on phones are tighter for easier reading, plus minor stability fixes."
           shopt -s nullglob
           for d in fastlane/metadata/*/; do
             [ -f "${d}description.txt" ] || continue   # only real locale dirs
-            printf '%s' "$NOTES" > "${d}release_notes.txt"
+            printf '%s\n%s\n%s\n%s\n' \
+              '• Keyboard now stays up between commands — no more flicker.' \
+              '• New reading-margin options (narrow / normal / wide).' \
+              '• Fixed a stray "game has ended" message after Restart.' \
+              '• Title images now fit the text width.' > "${d}release_notes.txt"
             echo "  set release notes for $d"
           done
 
@@ -82,3 +88,4 @@ jobs:
           ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
           APP_VERSION: ${{ inputs.app_version }}
           BUILD_NUMBER: ${{ inputs.build_number }}
+          SUBMIT_FOR_REVIEW: ${{ inputs.submit }}

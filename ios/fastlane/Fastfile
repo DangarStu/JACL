@@ -77,7 +77,7 @@ platform :ios do
       app_version: version,
       build_number: build_num,
       metadata_path: File.join(__dir__, "metadata"),
-      submit_for_review: true,
+      submit_for_review: ENV.fetch("SUBMIT_FOR_REVIEW", "true") == "true",
       automatic_release: true,
       force: true,                 # no interactive HTML preview in CI
       skip_binary_upload: true,    # binary already on TestFlight
