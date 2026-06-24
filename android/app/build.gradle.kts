@@ -36,7 +36,10 @@ android {
         applicationId = "au.com.dangarmarine.jacl"
         minSdk = 29            // timespec_get (RemGlk timers) needs API 29+
         targetSdk = 35         // Play requires new apps to target API 35 (Android 15)
-        versionCode = 3
+        // CI sets BUILD_NUMBER = 1000 + run number for a unique, increasing code;
+        // android.injected.version.code isn't honoured by bundleRelease, so read it
+        // here. Falls back to 3 for local builds.
+        versionCode = System.getenv("BUILD_NUMBER")?.toIntOrNull() ?: 3
         versionName = "1.2"
         buildConfigField("String", "BUILD_TIME",
             "\"${SimpleDateFormat("yyyy-MM-dd HH:mm").format(Date())}\"")
