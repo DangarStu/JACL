@@ -1,0 +1,253 @@
+name: iOS — diagnose why version is not ready to submit (READ-ONLY)
+
+# Pure read-only diagnostic. Given an app + an editable appStoreVersion that
+# keeps failing submit-for-review with HTTP 409 "Version is not ready to be
+# submitted yet", this walks every required pre-submission item the ASC API
+# exposes and reports which one is blocking. It performs ONLY GET requests:
+# no PATCH, POST, DELETE, or submit.
+on:
+  workflow_dispatch:
+    inputs:
+      app_id:
+        description: "App Store Connect app id"
+        default: "6780354110"
+      version_id:
+        description: "appStoreVersion id (the editable 1.2 version)"
+        default: "31885caa-8057-48a1-8d55-ac1c9879ef51"
+      build_number:
+        description: "Build number that should be attached"
+        default: "1012"
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Diagnose submission blockers via ASC API (read-only)
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          APP_ID: ${{ inputs.app_id }}
+          VERSION_ID: ${{ inputs.version_id }}
+          BUILD_NUMBER: ${{ inputs.build_number }}
+          BUNDLE_ID: au.com.dangarmarine.JACL
+        run: |
+          python3 -m pip install --quiet pyjwt cryptography requests
+          python3 - <<'PY'
+          import os, sys, time, json, base64
+          import jwt
+          import requests
+
+          KEY_ID    = os.environ["ASC_KEY_ID"]
+          ISSUER_ID = os.environ["ASC_ISSUER_ID"]
+          PRIVATE_KEY = base64.b64decode(os.environ["ASC_KEY_P8_BASE64"]).decode()
+          APP_ID = os.environ["APP_ID"]
+          VERSION_ID = os.environ["VERSION_ID"]
+          BUILD_NUMBER = os.environ["BUILD_NUMBER"]
+          BUNDLE_ID = os.environ["BUNDLE_ID"]
+
+          BASE = "https://api.appstoreconnect.apple.com"
+
+          now = int(time.time())
+          token = jwt.encode(
+              {
+                  "iss": ISSUER_ID,
+                  "iat": now,
+                  "exp": now + 20 * 60,
+                  "aud": "appstoreconnect-v1",
+              },
+              PRIVATE_KEY,
+              algorithm="ES256",
+              headers={"kid": KEY_ID, "typ": "JWT"},
+          )
+          HEADERS = {"Authorization": f"Bearer {token}"}
+
+          def get(path, params=None, label=None):
+              url = path if path.startswith("http") else f"{BASE}{path}"
+              r = requests.get(url, headers=HEADERS, params=params)
+              if label:
+                  print(f"\n=== {label} -> HTTP {r.status_code} ===")
+                  try:
+                      print(json.dumps(r.json(), indent=2))
+                  except Exception:
+                      print(r.text)
+              return r
+
+          blockers = []
+
+          # ---------------------------------------------------------------
+          # 1. The appStoreVersion itself: full attributes + appStoreState.
+          # ---------------------------------------------------------------
+          r = get(f"/v1/appStoreVersions/{VERSION_ID}",
+                  {"include": "build,ageRatingDeclaration,appStoreVersionPhasedRelease"},
+                  "1. appStoreVersion")
+          vjson = r.json()
+          vattr = vjson.get("data", {}).get("attributes", {})
+          vrel  = vjson.get("data", {}).get("relationships", {})
+          state = vattr.get("appStoreState")
+          print(f"\n  appStoreState        = {state}")
+          print(f"  versionString        = {vattr.get('versionString')}")
+          print(f"  releaseType          = {vattr.get('releaseType')}")
+          print(f"  downloadable         = {vattr.get('downloadable')}")
+
+          # ---------------------------------------------------------------
+          # 2. The attached build: processingState + EXPORT COMPLIANCE.
+          # ---------------------------------------------------------------
+          build_ref = (vrel.get("build", {}) or {}).get("data")
+          build_id = build_ref.get("id") if build_ref else None
+          print(f"\n  attached build id    = {build_id}")
+          if not build_id:
+              blockers.append("NO BUILD attached to the appStoreVersion.")
+          else:
+              rb = get(f"/v1/builds/{build_id}",
+                       {"include": "appEncryptionDeclaration,buildBetaDetail,preReleaseVersion"},
+                       "2. attached build")
+              bjson = rb.json()
+              battr = bjson.get("data", {}).get("attributes", {})
+              brel  = bjson.get("data", {}).get("relationships", {})
+              proc  = battr.get("processingState")
+              expired = battr.get("expired")
+              uses_non_exempt = battr.get("usesNonExemptEncryption")
+              print(f"\n  build version        = {battr.get('version')}")
+              print(f"  processingState      = {proc}")
+              print(f"  expired              = {expired}")
+              print(f"  usesNonExemptEncryption (on build) = {uses_non_exempt}")
+
+              if proc != "VALID":
+                  blockers.append(f"Build processingState = {proc} (must be VALID).")
+              if expired:
+                  blockers.append("Build is EXPIRED.")
+
+              # Export compliance: the build needs an encryption answer. This is
+              # either the build's own usesNonExemptEncryption attribute, OR an
+              # attached appEncryptionDeclaration. If both are absent -> blocked.
+              enc_ref = (brel.get("appEncryptionDeclaration", {}) or {}).get("data")
+              print(f"\n  appEncryptionDeclaration ref = {enc_ref}")
+              if uses_non_exempt is None and not enc_ref:
+                  blockers.append(
+                      "EXPORT COMPLIANCE MISSING: build has neither "
+                      "usesNonExemptEncryption nor an appEncryptionDeclaration. "
+                      "This blocks the version from being submittable.")
+              if enc_ref:
+                  re = get(f"/v1/appEncryptionDeclarations/{enc_ref['id']}",
+                           None, "2b. appEncryptionDeclaration")
+                  eattr = re.json().get("data", {}).get("attributes", {})
+                  print(f"\n  declaration state    = {eattr.get('appEncryptionDeclarationState')}")
+                  print(f"  usesNonExemptEncryption (decl) = {eattr.get('usesNonExemptEncryption')}")
+
+              # buildBetaDetail (informational).
+              bbd_ref = (brel.get("buildBetaDetail", {}) or {}).get("data")
+              if bbd_ref:
+                  get(f"/v1/buildBetaDetails/{bbd_ref['id']}", None,
+                      "2c. buildBetaDetail")
+
+          # ---------------------------------------------------------------
+          # 3. ageRatingDeclaration on the version.
+          # ---------------------------------------------------------------
+          ra = get(f"/v1/appStoreVersions/{VERSION_ID}/ageRatingDeclaration",
+                   None, "3. ageRatingDeclaration")
+          if ra.status_code == 200:
+              adata = ra.json().get("data")
+              if not adata:
+                  blockers.append("ageRatingDeclaration is EMPTY/null on the version.")
+          else:
+              print(f"\n  (ageRatingDeclaration GET returned HTTP {ra.status_code})")
+
+          # ---------------------------------------------------------------
+          # 4. All review submissions for the app + items + states.
+          # ---------------------------------------------------------------
+          rs = get("/v1/reviewSubmissions",
+                   {"filter[app]": APP_ID, "limit": 50},
+                   "4. ALL reviewSubmissions for app")
+          subs = rs.json().get("data", [])
+          open_holding = []
+          for s in subs:
+              sid = s["id"]
+              sattr = s.get("attributes", {})
+              sstate = sattr.get("state")
+              submitted = sattr.get("submitted")
+              print(f"\n  reviewSubmission {sid}: state={sstate} submitted={submitted}")
+              ri = get(f"/v1/reviewSubmissions/{sid}/items",
+                       {"include": "appStoreVersion", "limit": 50},
+                       f"4b. items of reviewSubmission {sid}")
+              ij = ri.json()
+              holds_our_version = False
+              for it in ij.get("data", []):
+                  iattr = it.get("attributes", {})
+                  irel = it.get("relationships", {})
+                  av = (irel.get("appStoreVersion", {}) or {}).get("data") or {}
+                  print(f"      item {it['id']}: state={iattr.get('state')} "
+                        f"removed={iattr.get('removed')} "
+                        f"appStoreVersion={av.get('id')}")
+                  if av.get("id") == VERSION_ID:
+                      holds_our_version = True
+              for inc in ij.get("included", []):
+                  if inc.get("type") == "appStoreVersions" and inc.get("id") == VERSION_ID:
+                      holds_our_version = True
+              # A non-completed submission that contains our version (other than
+              # one we'd submit) blocks the version: it can't belong to two.
+              if holds_our_version and sstate not in ("COMPLETE", "COMPLETED"):
+                  open_holding.append((sid, sstate))
+                  print(f"      *** This submission ({sstate}) HOLDS version {VERSION_ID} ***")
+
+          if len(open_holding) > 1:
+              blockers.append(
+                  f"Version is held by MULTIPLE open reviewSubmissions: {open_holding}. "
+                  "A version can only belong to one. Remove the stale one(s).")
+          for sid, sstate in open_holding:
+              if sstate in ("UNRESOLVED_ISSUES",):
+                  blockers.append(
+                      f"reviewSubmission {sid} is in state {sstate} and still holds "
+                      f"the version. This stale submission blocks a new submit; "
+                      f"it must be resolved/removed first.")
+
+          # ---------------------------------------------------------------
+          # 5. idfaDeclaration / content rights / phased release / other.
+          # ---------------------------------------------------------------
+          ri = get(f"/v1/appStoreVersions/{VERSION_ID}/idfaDeclaration",
+                   None, "5a. idfaDeclaration (version)")
+          # App-level content rights + review detail.
+          get(f"/v1/apps/{APP_ID}",
+              {"include": "appInfos"}, "5b. app (with appInfos)")
+          rci = get(f"/v1/apps/{APP_ID}/appInfos", None, "5c. appInfos")
+          for ai in rci.json().get("data", []):
+              aiattr = ai.get("attributes", {})
+              print(f"\n  appInfo {ai['id']}: "
+                    f"appStoreState={aiattr.get('appStoreState')} "
+                    f"state={aiattr.get('state')}")
+              for k in ("appStoreAgeRating", "brazilAgeRating",
+                        "kidsAgeBand"):
+                  if k in aiattr:
+                      print(f"      {k} = {aiattr.get(k)}")
+
+          # appStoreReviewDetail (contact info etc.).
+          get(f"/v1/appStoreVersions/{VERSION_ID}/appStoreReviewDetail",
+              None, "5d. appStoreReviewDetail")
+
+          # appStoreVersionLocalizations (must have at least one populated).
+          get(f"/v1/appStoreVersions/{VERSION_ID}/appStoreVersionLocalizations",
+              {"limit": 5}, "5e. appStoreVersionLocalizations")
+
+          # Content rights declaration at app level.
+          get(f"/v1/apps/{APP_ID}",
+              {"fields[apps]": "contentRightsDeclaration"},
+              "5f. app contentRightsDeclaration")
+
+          # ---------------------------------------------------------------
+          # SUMMARY
+          # ---------------------------------------------------------------
+          print("\n\n================ BLOCKER SUMMARY ================")
+          print(f"appStoreVersion {VERSION_ID}")
+          print(f"  appStoreState = {state}")
+          if blockers:
+              print("\nLIKELY BLOCKERS:")
+              for b in blockers:
+                  print(f"  - {b}")
+          else:
+              print("\nNo definitive blocker auto-detected; review the dumps above "
+                    "for any incomplete required item.")
+          print("=================================================")
+          PY
