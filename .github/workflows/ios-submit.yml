@@ -1,0 +1,245 @@
+name: iOS — submit App Store version for review (raw ASC API)
+
+# Submits an App Store version for App Review via the App Store Connect
+# reviewSubmissions API. The ASC UI's "submit" button can be hard to find once
+# a draft review submission exists; this drives the same flow over the API:
+# find (or create) an in-progress reviewSubmission, attach the editable
+# appStoreVersion as a reviewSubmissionItem, then PATCH submitted:true.
+#
+# It does NOT change metadata or the attached build — only the review
+# submission. Use this as the default way to push a release to App Review.
+on:
+  workflow_dispatch:
+    inputs:
+      app_version:
+        description: "Marketing version to submit for review"
+        default: "1.2"
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Submit App Store version for review via ASC API
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          APP_VERSION: ${{ inputs.app_version }}
+          BUNDLE_ID: au.com.dangarmarine.JACL
+        run: |
+          python3 -m pip install --quiet pyjwt cryptography requests
+          python3 - <<'PY'
+          import os, sys, time, json, base64
+          import jwt
+          import requests
+
+          KEY_ID    = os.environ["ASC_KEY_ID"]
+          ISSUER_ID = os.environ["ASC_ISSUER_ID"]
+          PRIVATE_KEY = base64.b64decode(os.environ["ASC_KEY_P8_BASE64"]).decode()
+          BUNDLE_ID = os.environ["BUNDLE_ID"]
+          APP_VERSION = os.environ["APP_VERSION"]
+          PLATFORM = "IOS"
+
+          BASE = "https://api.appstoreconnect.apple.com"
+
+          # 1. ES256 JWT, 20-min expiry, aud appstoreconnect-v1.
+          now = int(time.time())
+          token = jwt.encode(
+              {
+                  "iss": ISSUER_ID,
+                  "iat": now,
+                  "exp": now + 20 * 60,
+                  "aud": "appstoreconnect-v1",
+              },
+              PRIVATE_KEY,
+              algorithm="ES256",
+              headers={"kid": KEY_ID, "typ": "JWT"},
+          )
+          HEADERS = {
+              "Authorization": f"Bearer {token}",
+              "Content-Type": "application/json",
+          }
+
+          def show(label, r):
+              print(f"\n=== {label} -> HTTP {r.status_code} ===")
+              body = r.text
+              try:
+                  body = json.dumps(r.json(), indent=2)
+              except Exception:
+                  pass
+              print(body)
+              return r
+
+          # 2. App id by bundle id.
+          r = show("GET app",
+              requests.get(f"{BASE}/v1/apps",
+                  headers=HEADERS,
+                  params={"filter[bundleId]": BUNDLE_ID}))
+          apps = r.json().get("data", [])
+          if not apps:
+              sys.exit(f"No app found for bundle id {BUNDLE_ID}")
+          app_id = apps[0]["id"]
+          print(f"app_id = {app_id}")
+
+          # 3. Editable appStoreVersion for APP_VERSION.
+          r = show("GET appStoreVersions",
+              requests.get(f"{BASE}/v1/apps/{app_id}/appStoreVersions",
+                  headers=HEADERS,
+                  params={"filter[versionString]": APP_VERSION}))
+          versions = r.json().get("data", [])
+
+          # States from which a version can still be submitted for review.
+          SUBMITTABLE = {
+              "READY_FOR_REVIEW",
+              "PREPARE_FOR_SUBMISSION",
+              "DEVELOPER_REJECTED",
+              "REJECTED",
+              "METADATA_REJECTED",
+              "INVALID_BINARY",
+          }
+          version = None
+          print("\nVersions found:")
+          for v in versions:
+              state = v["attributes"].get("appStoreState")
+              print(f"  id={v['id']} state={state}")
+              if version is None and state in SUBMITTABLE:
+                  version = v
+          if version is None and versions:
+              print("\nWARNING: no version in a known-submittable state; "
+                    "using the first version found.")
+              version = versions[0]
+          if version is None:
+              sys.exit(f"No App Store version found for {APP_VERSION}")
+          version_id = version["id"]
+          version_state = version["attributes"].get("appStoreState")
+          print(f"\nSelected version id = {version_id}  state = {version_state}")
+
+          # 4. Find an existing in-progress reviewSubmission for this app, or
+          #    create one. A submission must be in a not-yet-submitted state to
+          #    accept items; READY_FOR_REVIEW is the editable/draft state.
+          OPEN_STATES = {"READY_FOR_REVIEW"}
+          r = show("GET reviewSubmissions",
+              requests.get(f"{BASE}/v1/reviewSubmissions",
+                  headers=HEADERS,
+                  params={
+                      "filter[app]": app_id,
+                      "filter[platform]": PLATFORM,
+                      "filter[state]": "READY_FOR_REVIEW",
+                  }))
+          submissions = r.json().get("data", [])
+          submission = submissions[0] if submissions else None
+
+          if submission is None:
+              r = show("POST reviewSubmissions (create)",
+                  requests.post(f"{BASE}/v1/reviewSubmissions",
+                      headers=HEADERS,
+                      data=json.dumps({
+                          "data": {
+                              "type": "reviewSubmissions",
+                              "attributes": {"platform": PLATFORM},
+                              "relationships": {
+                                  "app": {
+                                      "data": {"type": "apps", "id": app_id}
+                                  }
+                              },
+                          }
+                      })))
+              if r.status_code not in (200, 201):
+                  sys.exit("Failed to create reviewSubmission.")
+              submission = r.json()["data"]
+
+          sub_id = submission["id"]
+          sub_state = submission["attributes"].get("state")
+          print(f"\nReview submission id = {sub_id}  state = {sub_state}")
+
+          # 5. Ensure the appStoreVersion is an item of this submission.
+          r = show("GET reviewSubmissionItems",
+              requests.get(
+                  f"{BASE}/v1/reviewSubmissions/{sub_id}/items",
+                  headers=HEADERS,
+                  params={"include": "appStoreVersion", "limit": 50}))
+          items = r.json().get("data", [])
+          included = r.json().get("included", [])
+          # The version is already an item if either its relationship link or
+          # the included appStoreVersion resources name our version id. ASC
+          # sometimes omits the relationship block on the item, so check both.
+          present = False
+          for it in items:
+              av = (it.get("relationships", {})
+                      .get("appStoreVersion", {})
+                      .get("data") or {})
+              if av.get("id") == version_id:
+                  present = True
+                  break
+          if not present:
+              for inc in included:
+                  if (inc.get("type") == "appStoreVersions"
+                          and inc.get("id") == version_id):
+                      present = True
+                      break
+
+          if not present:
+              r = show("POST reviewSubmissionItems (attach version)",
+                  requests.post(f"{BASE}/v1/reviewSubmissionItems",
+                      headers=HEADERS,
+                      data=json.dumps({
+                          "data": {
+                              "type": "reviewSubmissionItems",
+                              "relationships": {
+                                  "reviewSubmission": {
+                                      "data": {
+                                          "type": "reviewSubmissions",
+                                          "id": sub_id,
+                                      }
+                                  },
+                                  "appStoreVersion": {
+                                      "data": {
+                                          "type": "appStoreVersions",
+                                          "id": version_id,
+                                      }
+                                  },
+                              },
+                          }
+                      })))
+              if r.status_code not in (200, 201):
+                  sys.exit("Failed to attach appStoreVersion to the "
+                           "review submission.")
+          else:
+              print(f"\nappStoreVersion {version_id} already an item of "
+                    f"submission {sub_id}.")
+
+          # 6. Submit: PATCH submitted:true.
+          r = show("PATCH reviewSubmissions/{id} (submitted=true)",
+              requests.patch(f"{BASE}/v1/reviewSubmissions/{sub_id}",
+                  headers=HEADERS,
+                  data=json.dumps({
+                      "data": {
+                          "type": "reviewSubmissions",
+                          "id": sub_id,
+                          "attributes": {"submitted": True},
+                      }
+                  })))
+
+          final_state = None
+          if r.status_code in (200, 201):
+              final_state = (r.json().get("data", {})
+                              .get("attributes", {}).get("state"))
+
+          print("\n================ SUMMARY ================")
+          print(f"version {APP_VERSION} appStoreState : {version_state}")
+          print(f"review submission id        : {sub_id}")
+          print(f"submit HTTP status          : {r.status_code}")
+          print(f"review submission state     : {final_state}")
+          if r.status_code in (200, 201):
+              print("RESULT                      : SUBMITTED")
+          else:
+              print("RESULT                      : FAILED")
+              print("API said:")
+              print(r.text)
+          print("========================================")
+
+          sys.exit(0 if r.status_code in (200, 201) else 1)
+          PY
