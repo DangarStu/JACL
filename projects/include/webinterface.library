@@ -350,6 +350,13 @@ print:
       var probe = document.createElement('span');^
       var fontTarget = bar || main || document.body;^
       var cs = window.getComputedStyle(fontTarget);^
+      /* getBoundingClientRect() is the border-box width, so the bar's^
+       * left/right padding (12px each in the CSS) is still inside `w`.^
+       * Subtract the real horizontal padding so the grid maps to the^
+       * content box; otherwise the right-aligned segment (Score:...)^
+       * is positioned ~2 chars past the visible edge and clipped. */^
+      var padX = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);^
+      if (padX > 0 && padX < w) { w = w - padX; }^
       probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre';^
       /* Force monospace family even if the fallback target has a^
        * proportional font, so the measurement matches the bar's^
@@ -361,8 +368,9 @@ print:
       var charW = probe.offsetWidth / 40;^
       document.body.removeChild(probe);^
       if (charW <= 0) return 80;^
-      /* Subtract a couple of chars for left/right padding on the bar. */^
-      var cols = Math.floor(w / charW) - 2;^
+      /* One extra char of slack so the last column never lands hard^
+       * against the padding edge after sub-pixel rounding. */^
+      var cols = Math.floor(w / charW) - 1;^
       return Math.max(40, Math.min(400, cols));^
    }^
 
@@ -803,6 +811,59 @@ print:
        * wider, the right-aligned segment sits short of the edge until^
        * the next updatestatus call (typically the first command). */^
       window.jaclStatusCols = jaclMeasureStatusCols();^
+      /* Monotonic token incremented on every measurement-driven fetch.^
+       * If a turn command or another refresh lands a fresher status^
+       * bar while this fetch is still in flight, the late response^
+       * must NOT overwrite it. Compare token at apply time. */^
+      var jaclResizeToken = 0;^
+      /* Re-measure the bar width and ask the engine for a fresh status^
+       * bar at the corrected column count. The initial +intro render^
+       * used the engine default (120) and the page is laid out before^
+       * Merriweather loads, so the first measurement -- and the bar the^
+       * engine already drew -- can be too wide: +print_right then lands^
+       * past the viewport edge and the right-aligned segment (Score:...)^
+       * is clipped. Used by fonts.ready, the resize handler, and a^
+       * load-time fallback so the bar settles to the real width without^
+       * waiting for the player to type a command. */^
+      function jaclRefreshStatus() {^
+         window.jaclStatusCols = jaclMeasureStatusCols();^
+         /* Don't fire while a player command is being processed -- the^
+          * command response carries a fresh bar at the current^
+          * status_cols anyway, and racing it would clobber. */^
+         if (window.jaclSubmitInflight) return;^
+         var statusBar = document.getElementById('statuswin');^
+         if (!statusBar || statusBar.innerHTML.length === 0) return;^
+         var myToken = ++jaclResizeToken;^
+         var url = window.location.pathname + '?ajax=true&rpc=resize&status_cols=' + window.jaclStatusCols;^
+         var p = fetch(url, { credentials: 'same-origin' });^
+         p = p.then(function(r) { return r.text(); });^
+         p = p.then(function(data) {^
+            /* If a newer refresh / command has run since we sent^
+             * this fetch, our token is stale -- discard. */^
+            if (myToken !== jaclResizeToken) return;^
+            if (window.jaclSubmitInflight) return;^
+            var holder = document.createElement('div');^
+            holder.innerHTML = data;^
+            var statusUpdate = holder.querySelector('jacl-status');^
+            if (!statusUpdate) return;^
+            var lines = parseInt(statusUpdate.getAttribute('data-lines') || '1', 10);^
+            if (isNaN(lines) || lines < 1) lines = 1;^
+            if (lines > 10) lines = 10;^
+            document.body.style.setProperty('--status-lines', lines);^
+            statusBar.innerHTML = statusUpdate.innerHTML;^
+         });^
+         p.catch(function() {});^
+      }^
+      window.jaclRefreshStatus = jaclRefreshStatus;^
+      /* Fonts settle after DOMContentLoaded: once Merriweather has^
+       * loaded the page reflows and the status bar's real width is^
+       * known. Re-measure and pull a correctly sized bar then. The^
+       * extra setTimeout fallback covers browsers where fonts.ready^
+       * resolves before the bar element is fully laid out. */^
+      if (document.fonts && document.fonts.ready) {^
+         document.fonts.ready.then(function() { jaclRefreshStatus(); });^
+      }^
+      setTimeout(function() { jaclRefreshStatus(); }, 300);^
       /* Recompute on resize and ask the engine for a fresh status bar^
        * at the new column count. Without the rpc=resize fetch, the^
        * grid stays at the width sent on the last command/timer tick^
@@ -810,42 +871,12 @@ print:
        * until the player types something. Debounced so dragging a^
        * window edge does not spam the server. */^
       var jaclResizeTimer = null;^
-      /* Monotonic token incremented on every resize-driven fetch.^
-       * If a turn command or another resize lands a fresher status^
-       * bar while this fetch is still in flight, the late response^
-       * must NOT overwrite it. Compare token at apply time. */^
-      var jaclResizeToken = 0;^
       window.addEventListener('resize', function() {^
          window.jaclStatusCols = jaclMeasureStatusCols();^
          if (jaclResizeTimer) clearTimeout(jaclResizeTimer);^
          jaclResizeTimer = setTimeout(function() {^
             jaclResizeTimer = null;^
-            /* Don't fire while a player command is being processed --^
-             * the command response carries a fresh bar at the current^
-             * status_cols anyway, and racing it would clobber. */^
-            if (window.jaclSubmitInflight) return;^
-            var statusBar = document.getElementById('statuswin');^
-            if (!statusBar || statusBar.innerHTML.length === 0) return;^
-            var myToken = ++jaclResizeToken;^
-            var url = window.location.pathname + '?ajax=true&rpc=resize&status_cols=' + window.jaclStatusCols;^
-            var p = fetch(url, { credentials: 'same-origin' });^
-            p = p.then(function(r) { return r.text(); });^
-            p = p.then(function(data) {^
-               /* If a newer resize / command has run since we sent^
-                * this fetch, our token is stale -- discard. */^
-               if (myToken !== jaclResizeToken) return;^
-               if (window.jaclSubmitInflight) return;^
-               var holder = document.createElement('div');^
-               holder.innerHTML = data;^
-               var statusUpdate = holder.querySelector('jacl-status');^
-               if (!statusUpdate) return;^
-               var lines = parseInt(statusUpdate.getAttribute('data-lines') || '1', 10);^
-               if (isNaN(lines) || lines < 1) lines = 1;^
-               if (lines > 10) lines = 10;^
-               document.body.style.setProperty('--status-lines', lines);^
-               statusBar.innerHTML = statusUpdate.innerHTML;^
-            });^
-            p.catch(function() {});^
+            jaclRefreshStatus();^
          }, 200);^
       });^
       /* Hyperlinks emitted by the `hyperlink` opcode are plain^

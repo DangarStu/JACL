@@ -13,7 +13,9 @@ print:
 		left: 0;
 		right: 0; 
 		border: 0;
-		background-color: black; }^
+.
+write "        background-color: " header_colour "; }^"
+print:
      #header {
 		position: absolute;
 		top:0;
