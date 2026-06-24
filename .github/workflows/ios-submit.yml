@@ -130,9 +130,51 @@ jobs:
                       "filter[state]": "READY_FOR_REVIEW",
                   }))
           submissions = r.json().get("data", [])
-          submission = submissions[0] if submissions else None
 
-          if submission is None:
+          def items_of(sid):
+              """Return (item_resources, included_resources) for a submission."""
+              rr = show(f"GET items of reviewSubmission {sid}",
+                  requests.get(
+                      f"{BASE}/v1/reviewSubmissions/{sid}/items",
+                      headers=HEADERS,
+                      params={"include": "appStoreVersion", "limit": 50}))
+              j = rr.json()
+              return j.get("data", []), j.get("included", [])
+
+          def has_version(sid):
+              """True if appStoreVersion version_id is an item of submission sid.
+
+              ASC sometimes omits the relationship block on the item itself, so
+              we also accept a match against the included appStoreVersions.
+              """
+              its, inc = items_of(sid)
+              for it in its:
+                  av = (it.get("relationships", {})
+                          .get("appStoreVersion", {})
+                          .get("data") or {})
+                  if av.get("id") == version_id:
+                      return True
+              for x in inc:
+                  if x.get("type") == "appStoreVersions" \
+                          and x.get("id") == version_id:
+                      return True
+              return False
+
+          # Prefer the open submission that already contains our version: the
+          # draft the ASC UI shows. (Apple won't let a version belong to two
+          # submissions at once, so this is the one we must submit.)
+          sub_id = None
+          present = False
+          for s in submissions:
+              if has_version(s["id"]):
+                  sub_id = s["id"]
+                  present = True
+                  break
+
+          # Otherwise fall back to any open submission, or create a fresh one.
+          if sub_id is None and submissions:
+              sub_id = submissions[0]["id"]
+          if sub_id is None:
               r = show("POST reviewSubmissions (create)",
                   requests.post(f"{BASE}/v1/reviewSubmissions",
                       headers=HEADERS,
@@ -149,38 +191,12 @@ jobs:
                       })))
               if r.status_code not in (200, 201):
                   sys.exit("Failed to create reviewSubmission.")
-              submission = r.json()["data"]
+              sub_id = r.json()["data"]["id"]
 
-          sub_id = submission["id"]
-          sub_state = submission["attributes"].get("state")
-          print(f"\nReview submission id = {sub_id}  state = {sub_state}")
+          print(f"\nUsing review submission id = {sub_id} "
+                f"(version already present: {present})")
 
           # 5. Ensure the appStoreVersion is an item of this submission.
-          r = show("GET reviewSubmissionItems",
-              requests.get(
-                  f"{BASE}/v1/reviewSubmissions/{sub_id}/items",
-                  headers=HEADERS,
-                  params={"include": "appStoreVersion", "limit": 50}))
-          items = r.json().get("data", [])
-          included = r.json().get("included", [])
-          # The version is already an item if either its relationship link or
-          # the included appStoreVersion resources name our version id. ASC
-          # sometimes omits the relationship block on the item, so check both.
-          present = False
-          for it in items:
-              av = (it.get("relationships", {})
-                      .get("appStoreVersion", {})
-                      .get("data") or {})
-              if av.get("id") == version_id:
-                  present = True
-                  break
-          if not present:
-              for inc in included:
-                  if (inc.get("type") == "appStoreVersions"
-                          and inc.get("id") == version_id):
-                      present = True
-                      break
-
           if not present:
               r = show("POST reviewSubmissionItems (attach version)",
                   requests.post(f"{BASE}/v1/reviewSubmissionItems",
@@ -205,11 +221,38 @@ jobs:
                           }
                       })))
               if r.status_code not in (200, 201):
-                  sys.exit("Failed to attach appStoreVersion to the "
-                           "review submission.")
-          else:
-              print(f"\nappStoreVersion {version_id} already an item of "
-                    f"submission {sub_id}.")
+                  # If the version is already part of another submission, that
+                  # other submission is the one to submit — switch to it.
+                  other = None
+                  try:
+                      for err in r.json().get("errors", []):
+                          if err.get("code") == \
+                                  "STATE_ERROR.ITEM_PART_OF_ANOTHER_SUBMISSION":
+                              detail = err.get("detail", "")
+                              m = detail.rsplit("reviewSubmission with id ", 1)
+                              if len(m) == 2:
+                                  other = m[1].strip().strip(".")
+                          for ae in (err.get("meta", {})
+                                       .get("associatedErrors", {}).values()):
+                              for inner in ae:
+                                  if inner.get("code") == \
+                                          "STATE_ERROR." \
+                                          "ITEM_PART_OF_ANOTHER_SUBMISSION":
+                                      d = inner.get("detail", "")
+                                      mm = d.rsplit(
+                                          "reviewSubmission with id ", 1)
+                                      if len(mm) == 2:
+                                          other = mm[1].strip().strip(".")
+                  except Exception:
+                      pass
+                  if other:
+                      print(f"\nVersion already belongs to reviewSubmission "
+                            f"{other}; switching to submit that one.")
+                      sub_id = other
+                      present = True
+                  else:
+                      sys.exit("Failed to attach appStoreVersion to the "
+                               "review submission.")
 
           # 6. Submit: PATCH submitted:true.
           r = show("PATCH reviewSubmissions/{id} (submitted=true)",
