@@ -959,51 +959,71 @@ jacl_sleep(unsigned int mseconds)
 void
 status_line()
 {
-	int cursor, index;
+	glui32 cursor;
+	int index;
 	winid_t pair_window;
 
 	if (!statuswin) {
-        return;
-	} else {
-		// THERE IS AN EXISTING STATUS WINDOW, MAKE SURE A NEW SIZE HASN'T BEEN
-        // REQUESTED
-   		glk_window_get_size(statuswin, &status_width, &status_height);
-		if (status_height != integer_resolve("status_window")->value) {
-			// HEIGHT HAS CHANGED, UPDATE THE WINDOW
-			pair_window = glk_window_get_parent(statuswin);
-			glk_window_set_arrangement(pair_window, winmethod_Above | winmethod_Fixed, integer_resolve("status_window")->value, statuswin);
-   			glk_window_get_size(statuswin, &status_width, &status_height);
-		}
+		return;
+	}
+
+	glk_window_get_size(statuswin, &status_width, &status_height);
+
+	/* total_moves starts at -1 before the first eachturn(); clamp to >= 0 for
+	 * the render (and the width measurement below) and restore afterwards. */
+	int saved_total_moves = (TOTAL_MOVES != NULL) ? TOTAL_MOVES->value : 0;
+	if (TOTAL_MOVES != NULL && TOTAL_MOVES->value < 0) {
+		TOTAL_MOVES->value = 0;
+	}
+
+	/* Build the default bar's content up front so we can decide whether it
+	 * fits one line and draw it safely. sentence_output() reuses a shared
+	 * buffer, so copy it before anything else touches it. */
+	char status_location[1024];
+	char status_scoremoves[64];
+	strncpy(status_location, sentence_output(HERE, TRUE), sizeof(status_location) - 1);
+	status_location[sizeof(status_location) - 1] = 0;
+	sprintf(status_scoremoves, "Score: %d  Moves: %d",
+		(SCORE != NULL ? SCORE->value : 0),
+		(TOTAL_MOVES != NULL ? TOTAL_MOVES->value : 0));
+
+	/* Two-line fallback: when location + score/moves (with a one-column gap)
+	 * won't fit the window width, drop score/moves onto its own row. Only the
+	 * built-in default bar wraps; a game with its own +update_status_window
+	 * owns its layout and its `status_window` height. */
+	int has_custom = (function_resolve("+update_status_window") != NULL);
+	int two_line = (!has_custom)
+		&& (strlen(status_location) + 1 + strlen(status_scoremoves) >= status_width);
+
+	/* Apply the requested height, bumped to 2 when the default bar must wrap
+	 * (so an explicit `status_window 2` still wins and the bump isn't reset to
+	 * 1 on the next turn). */
+	int want_height = integer_resolve("status_window")->value;
+	if (two_line && want_height == 1) {
+		want_height = 2;
+	}
+	if ((int) status_height != want_height) {
+		pair_window = glk_window_get_parent(statuswin);
+		glk_window_set_arrangement(pair_window, winmethod_Above | winmethod_Fixed, want_height, statuswin);
+		glk_window_get_size(statuswin, &status_width, &status_height);
 	}
 
 	if (status_height == 0) {
-		// THE STATUS WINDOW CAN'T BE CLOSED, ONLY SET TO HAVE A HEIGHT OF ZERO
+		/* the status window can only be height zero, never closed */
+		if (TOTAL_MOVES != NULL) {
+			TOTAL_MOVES->value = saved_total_moves;
+		}
 		return;
 	}
 
 	jacl_set_window(statuswin);
 	glk_window_clear(statuswin);
 
-	/* total_moves starts at -1 (loader: "time passes before the first
-	 * prompt") and eachturn() bumps it to 0. A status line drawn during
-	 * +intro -- before that first eachturn() -- would otherwise show
-	 * "Moves: -1". Clamp to >= 0 for the render and restore afterwards, so
-	 * the GLK status matches the web frontend (web_render_status_bar does
-	 * the same) while game code that tests total_moves = -1 (e.g. Eria)
-	 * keeps seeing the real value. */
-	int saved_total_moves = (TOTAL_MOVES != NULL) ? TOTAL_MOVES->value : 0;
-	if (TOTAL_MOVES != NULL && TOTAL_MOVES->value < 0) {
-		TOTAL_MOVES->value = 0;
-	}
-
 	if (execute("+update_status_window") == FALSE) {
 		glk_set_style(style_User1);
 
-		/* DISPLAY THE INVERSE STATUS LINE AT THE TOP OF THE SCREEN.
-		 * Clamp the fill width to temp_buffer's capacity: status_width
-		 * is a glui32 from Glk and on a very wide window (Gargoyle
-		 * resized full-screen on a hi-DPI display) it can exceed
-		 * 1024, overrunning temp_buffer. */
+		/* Fill each row with spaces so the inverse background spans the whole
+		 * bar. Clamp the fill width to temp_buffer's capacity. */
 		glui32 fill_width = status_width;
 		if (fill_width >= sizeof(temp_buffer)) {
 			fill_width = sizeof(temp_buffer) - 1;
@@ -1012,30 +1032,28 @@ status_line()
 			temp_buffer[index] = ' ';
 		}
 		temp_buffer[index] = 0;
+		glk_window_move_cursor(statuswin, 0, 0);
 		write_text(temp_buffer);
+		if (two_line) {
+			glk_window_move_cursor(statuswin, 0, 1);
+			write_text(temp_buffer);
+		}
 
-    	/* PRINT THE LOCATION'S TITLE ON THE LEFT. */
+		/* location on the left of row 0 */
 		glk_window_move_cursor(statuswin, 1, 0);
-		write_text(sentence_output(HERE, TRUE));
+		write_text(status_location);
 
-		/* BUILD THE SCORE/ MOVES STRING */
-		temp_buffer[0] = 0;
-		sprintf (temp_buffer, "Score: %d  Moves: %d", SCORE->value, TOTAL_MOVES->value);
-
-		/* Compute right-justified cursor; if the score/moves string
-		 * is wider than the window, fall back to column 0 rather
-		 * than letting (status_width - strlen) underflow into a
-		 * huge glui32. */
+		/* score/moves: right-justified, on its own row when two-line */
 		{
-			size_t tb_len = strlen(temp_buffer);
-			if (tb_len + 1 < status_width) {
-				cursor = status_width - tb_len - 1;
+			size_t sm_len = strlen(status_scoremoves);
+			if (sm_len + 1 < status_width) {
+				cursor = status_width - (glui32) sm_len - 1;
 			} else {
 				cursor = 0;
 			}
 		}
-		glk_window_move_cursor(statuswin, cursor, 0);
-		write_text(temp_buffer);
+		glk_window_move_cursor(statuswin, cursor, two_line ? 1 : 0);
+		write_text(status_scoremoves);
 	}
 
 	if (TOTAL_MOVES != NULL) {
