@@ -347,6 +347,12 @@ print:
          w = document.documentElement.clientWidth || 0;^
       }^
       if (w <= 0) return 80;^
+      /* #statuswin spans left:0;right:0 so its box can include the vertical^
+       * scrollbar gutter that the painted text area does not -- cap at the^
+       * scrollbar-excluded viewport width so the grid can't out-run it. */^
+      if (document.documentElement && document.documentElement.clientWidth > 0) {^
+         w = Math.min(w, document.documentElement.clientWidth);^
+      }^
       var probe = document.createElement('span');^
       var fontTarget = bar || main || document.body;^
       var cs = window.getComputedStyle(fontTarget);^
@@ -376,9 +382,10 @@ print:
       var charW = probe.offsetWidth / 40;^
       probe.parentNode.removeChild(probe);^
       if (charW <= 0) return 80;^
-      /* One extra char of slack so the last column never lands hard^
-       * against the padding edge after sub-pixel rounding. */^
-      var cols = Math.floor(w / charW) - 1;^
+      /* Two chars of slack so the last column never lands hard against the^
+       * padding edge after sub-pixel rounding or a residual gutter. */^
+      var cols = Math.floor(w / charW) - 2;^
+      if (window.console) window.console.log('JACL_STATUS w=' + Math.round(w) + ' clientW=' + document.documentElement.clientWidth + ' charW=' + charW.toFixed(2) + ' cols=' + cols);^
       return Math.max(40, Math.min(400, cols));^
    }^
 
