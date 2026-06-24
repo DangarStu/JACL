@@ -49,8 +49,12 @@ for src in projects/*.jacl; do
   [ -f "projects/temp/$s.j2" ] || { echo "  skip $s (no .j2 produced)"; continue; }
   cp "projects/temp/$s.j2" "$STAGE/games/$s.j2"
   [ $first -eq 1 ] || echo "," >> "$manifest"; first=0; n=$((n+1))
+  # Display title = the game's own `constant game_title "..."` (same as the web
+  # landing page); fall back to the prettified filename if it isn't declared.
+  title=$(grep -E '^constant[[:space:]]+game_title[[:space:]]' "$src" 2>/dev/null | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+  case "$title" in ""|*game_title*) title=$(prettify "$s") ;; esac
   printf '  {"file":"%s.j2","title":"%s","language":"%s"}' \
-    "$s" "$(prettify "$s")" "$(language "$s")" >> "$manifest"
+    "$s" "$title" "$(language "$s")" >> "$manifest"
 done
 printf '\n]\n' >> "$manifest"
 echo "staged $n published games + assets into $STAGE"
