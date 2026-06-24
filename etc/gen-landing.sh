@@ -57,6 +57,15 @@ cat <<'HEAD'
     ul.games li:hover { transform: translateY(-2px); box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
     ul.games a { display: block; padding: 0.9em 1.1em; text-decoration: none; color: var(--accent); font-weight: bold; font-size: 1.05em; }
     ul.games .lang { color: var(--muted); font-weight: normal; font-size: 0.88em; margin-left: 0.3em; }
+    ul.apps { list-style: none; padding: 0; margin: 0.4em 0 1.2em; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 0.8em; }
+    ul.apps li { background: var(--card); border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); transition: transform 0.1s, box-shadow 0.1s; }
+    ul.apps li:hover { transform: translateY(-2px); box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+    ul.apps a, ul.apps li.soon span { display: block; padding: 0.85em 1.05em; text-decoration: none; }
+    ul.apps a { color: var(--accent); }
+    ul.apps strong { display: block; font-size: 1.05em; }
+    ul.apps em { display: block; color: var(--muted); font-size: 0.86em; font-style: normal; }
+    ul.apps li.soon { opacity: 0.55; }
+    pre.apt { background: var(--accent-dark); color: var(--bg); font-family: ui-monospace, Menlo, Consolas, monospace; padding: 1em; border-radius: 6px; overflow-x: auto; font-size: 0.78em; line-height: 1.5; }
     nav.tabs { display: flex; gap: 0.4em; border-bottom: 2px solid var(--accent); margin-bottom: 1.4em; }
     nav.tabs label { padding: 0.55em 1.2em; cursor: pointer; color: var(--muted); font-weight: bold; border-radius: 6px 6px 0 0; }
     input.tabsel { position: absolute; left: -9999px; }
@@ -85,6 +94,20 @@ cat <<'HEAD'
       <p>It is a direct descendant of the text adventures of the 1970s and 80s &mdash; titles like <em>Zork</em>, <em>Adventure</em>, and <em>The Hitchhiker&rsquo;s Guide to the Galaxy</em> &mdash; and has a thriving modern community of authors and players.</p>
       <p>Want to write your own? The <a href="/guide/">JACL Guide</a> walks you through the language &mdash; and you can buy it in print as <a href="https://www.lulu.com/shop/stuart-allen/jacl-authors-guide/paperback/product-e7nkeqd.html"><em>The JACL Author&rsquo;s Guide</em></a> paperback from Lulu.</p>
       <p>The interpreter source code &mdash; for running JACL locally or contributing &mdash; is on <a href="https://github.com/DangarStu/JACL">GitHub</a>.</p>
+    </section>
+    <section class="intro">
+      <h2>Get the app</h2>
+      <p>Play online below, or install a native app &mdash; offline play with graphics, sound, and a live map window.</p>
+      <ul class="apps">
+        <li><a href="https://apps.apple.com/app/id6780354110"><strong>iPhone &amp; iPad</strong><em>App Store</em></a></li>
+        <li><a href="https://github.com/DangarStu/JACL/releases"><strong>macOS</strong><em>Download .dmg</em></a></li>
+        <li><a href="https://github.com/DangarStu/JACL/releases"><strong>Linux</strong><em>.deb / AppImage</em></a></li>
+        <li class="soon"><span><strong>Android</strong><em>Coming to Google Play</em></span></li>
+      </ul>
+      <p class="tabintro">Debian &amp; Ubuntu &mdash; install and auto-update with apt:</p>
+      <pre class="apt">curl -fsSL https://apt.dangarmarine.com.au/jacl.gpg | sudo gpg --dearmor -o /usr/share/keyrings/jacl.gpg
+echo "deb [signed-by=/usr/share/keyrings/jacl.gpg] https://apt.dangarmarine.com.au stable main" | sudo tee /etc/apt/sources.list.d/jacl.list
+sudo apt update &amp;&amp; sudo apt install jacl-desktop</pre>
     </section>
     <input class="tabsel" type="radio" name="tab" id="tab-play" checked>
     <input class="tabsel" type="radio" name="tab" id="tab-get">
