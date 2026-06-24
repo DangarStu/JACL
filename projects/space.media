@@ -1,3 +1,5 @@
 /include/raphael.min.js application/javascript www/raphael.min.js
 /images/favicon.ico image/x-icon images/favicon.ico
 /images/missioncontrol-title.png image/png images/missioncontrol-title.png
+/include/fonts/merriweather-latin.woff2 font/woff2 www/fonts/merriweather-latin.woff2
+/include/fonts/merriweather-latin-ext.woff2 font/woff2 www/fonts/merriweather-latin-ext.woff2

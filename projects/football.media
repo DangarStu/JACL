@@ -2,3 +2,5 @@
 /images/favicon.ico image/x-icon images/favicon.ico
 /images/Pitch.png image/png images/Pitch.png
 /images/Player.png image/png images/Player.png
+/include/fonts/merriweather-latin.woff2 font/woff2 www/fonts/merriweather-latin.woff2
+/include/fonts/merriweather-latin-ext.woff2 font/woff2 www/fonts/merriweather-latin-ext.woff2

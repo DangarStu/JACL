@@ -1,3 +1,5 @@
 /include/jquery-3.6.0.min.js application/javascript www/jquery-3.6.0.min.js
 /include/raphael.min.js application/javascript www/raphael.min.js
 /images/favicon.ico image/x-icon images/favicon.ico
+/include/fonts/merriweather-latin.woff2 font/woff2 www/fonts/merriweather-latin.woff2
+/include/fonts/merriweather-latin-ext.woff2 font/woff2 www/fonts/merriweather-latin-ext.woff2

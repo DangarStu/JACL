@@ -1,1 +1,3 @@
 /include/jquery-1.7.min.js application/javascript include/jquery-1.7.min.js
+/include/fonts/merriweather-latin.woff2 font/woff2 www/fonts/merriweather-latin.woff2
+/include/fonts/merriweather-latin-ext.woff2 font/woff2 www/fonts/merriweather-latin-ext.woff2

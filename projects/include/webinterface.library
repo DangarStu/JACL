@@ -146,7 +146,7 @@ print:
 .
 write "<html lang=~" game_language "~><head>"
 print:
-<link href="https://fonts.googleapis.com/css?family=Merriweather" rel="stylesheet" type="text/css">
+<!-- Merriweather is self-hosted: @font-face in webinterface.css -> /include/fonts/ (works offline / in the desktop app) -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 .

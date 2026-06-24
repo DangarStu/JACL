@@ -13,15 +13,23 @@ set -euo pipefail
 cd "$(dirname "$0")/../src"
 mkdir -p ../desktop/bin
 
+# Universal (arm64 + x86_64) on macOS so the app ships ONE fat cgijacl that runs on
+# both Apple Silicon and Intel Macs; native single-arch elsewhere (Linux CI).
+ARCHFLAGS=""
+[ "$(uname)" = "Darwin" ] && ARCHFLAGS="-arch arm64 -arch x86_64"
+
 # cgijacl links -lcgihtml; cgihtml-1.69 has a self-contained Makefile (no configure).
-make -C cgihtml-1.69 libcgihtml.a
+# Rebuild it with the SAME arch flags -- a single-arch .a breaks the universal link
+# and the @electron/universal merge.
+make -C cgihtml-1.69 clean >/dev/null 2>&1 || true
+make -C cgihtml-1.69 libcgihtml.a CC="cc $ARCHFLAGS"
 
 # Build with auth_stub.c instead of auth.c. The desktop never uses Google Sign-In,
 # and auth.c is the ONLY thing that needs jansson/openssl/curl -- which hard-link
 # Homebrew dylibs (/opt/homebrew/opt/jansson, openssl@3) and stop the bundled binary
 # from launching on a Mac without Homebrew. With the stub the desktop cgijacl links
 # only the static -lcgihtml + libc/libm, so it runs on any clean machine.
-gcc -std=gnu2x -Wall -O2 -Wno-unused-result -Wno-unused-but-set-variable \
+gcc $ARCHFLAGS -std=gnu2x -Wall -O2 -Wno-unused-result -Wno-unused-but-set-variable \
   -DNATIVE_LANGUAGE=1 -DWEBJACL \
   cgijacl.c auth_stub.c findroute.c interpreter.c loader.c logging.c parser.c \
   display.c utils.c jpp.c resolvers.c errors.c encapsulate.c libcsv.c saver.c webjacl.c \

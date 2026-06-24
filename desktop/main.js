@@ -129,7 +129,8 @@ function writeConfig () {
 const MIME = {
   '.js': 'application/javascript', '.png': 'image/png', '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.ico': 'image/x-icon',
-  '.svg': 'image/svg+xml', '.ogg': 'audio/ogg', '.mp3': 'audio/mpeg'
+  '.svg': 'image/svg+xml', '.ogg': 'audio/ogg', '.mp3': 'audio/mpeg',
+  '.woff2': 'font/woff2', '.woff': 'font/woff'
 }
 function writeMediaManifest (gamePath) {
   const gameDir = path.dirname(gamePath)
@@ -145,6 +146,7 @@ function writeMediaManifest (gamePath) {
     }
   }
   add('/include/', WWW_DIR)
+  add('/include/fonts/', path.join(WWW_DIR, 'fonts'))   // self-hosted Merriweather woff2
   add('/images/', IMAGES_DIR)
   add('/sounds/', SOUNDS_DIR)
   fs.writeFileSync(path.join(gameDir, base + '.media'), lines.join('\n') + '\n')

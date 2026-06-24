@@ -34,3 +34,5 @@
 /images/compass/southwest_blue.png image/png images/compass/southwest_blue.png
 /images/compass/south_blue.png image/png images/compass/south_blue.png
 /images/compass/southeast_blue.png image/png images/compass/southeast_blue.png
+/include/fonts/merriweather-latin.woff2 font/woff2 www/fonts/merriweather-latin.woff2
+/include/fonts/merriweather-latin-ext.woff2 font/woff2 www/fonts/merriweather-latin-ext.woff2

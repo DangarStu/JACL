@@ -28,8 +28,12 @@
       { "from": "staging/jacl-data", "to": "jacl-data" }
     ],
     "mac": {
-      "target": ["dmg", "zip"],
+      "target": [
+        { "target": "dmg", "arch": ["universal"] },
+        { "target": "zip", "arch": ["universal"] }
+      ],
       "category": "public.app-category.games",
+      "x64ArchFiles": "**/cgijacl",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",

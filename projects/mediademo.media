@@ -9,3 +9,5 @@
 /sounds/GeneratorRunning.ogg audio/ogg sounds/GeneratorRunning.ogg
 /sounds/Thunder.ogg audio/ogg sounds/Thunder.ogg
 /sounds/Flies.ogg audio/ogg sounds/Flies.ogg
+/include/fonts/merriweather-latin.woff2 font/woff2 www/fonts/merriweather-latin.woff2
+/include/fonts/merriweather-latin-ext.woff2 font/woff2 www/fonts/merriweather-latin-ext.woff2
