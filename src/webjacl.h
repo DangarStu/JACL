@@ -65,6 +65,38 @@
 #ifdef NOZOMBIES
 #include <sys/wait.h>
 #endif
+
+#ifdef _WIN32
+/* Native Windows (mingw-w64) build: sockets are NOT file descriptors, so the
+ * POSIX socket headers below do not apply. Pull in Winsock and the small-IO
+ * helpers instead. All Windows-specific behaviour in webjacl.c is guarded by
+ * #ifdef _WIN32 so the POSIX (macOS/Linux) build is byte-for-byte unchanged. */
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <io.h>
+#include <process.h>
+#include <ctype.h>
+#include <errno.h>
+
+/* Winsock uses SOCKET (an unsigned handle), not int, and closesocket() rather
+ * than close(). Map them so the shared code can keep using the POSIX names. */
+typedef SOCKET wj_socket_t;
+#define WJ_INVALID_SOCK INVALID_SOCKET
+#ifndef close
+#define close closesocket
+#endif
+
+/* Windows has no setenv(); _putenv_s has the same (name, value) effect. */
+#ifndef setenv
+#define setenv(n, v, o) _putenv_s((n), (v))
+#endif
+
+/* socklen_t is not always defined by the mingw headers. */
+#ifndef socklen_t
+typedef int socklen_t;
+#endif
+
+#else /* POSIX */
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <netinet/in.h>
@@ -73,6 +105,10 @@
 #include <ctype.h>
 #include <errno.h>
 #include <unistd.h>
+
+typedef int wj_socket_t;
+#define WJ_INVALID_SOCK (-1)
+#endif /* _WIN32 */
 
 #define DEFAULT_PROTOCOL 0
 
@@ -123,5 +159,7 @@ void wj_cleanup( int signo );
 int  wj_listen( void );
 int  wj_setupdb( void );
 void wj_cleanup_without_exit( void );
+void wj_connect_io( wj_socket_t clientFd );
+void wj_disconnect_io( wj_socket_t clientFd );
 
 #endif

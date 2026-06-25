@@ -23,12 +23,39 @@
 #include <sys/stat.h>
 #include <string.h>
 
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <io.h>
+#include <fcntl.h>
+#include <process.h>
+#else
 #if OPTIONAL_NET==1
 #include <netdb.h>
+#endif
 #endif
 
 #include "webjacl.h"
 #include "language.h"
+
+#ifdef _WIN32
+/* On Windows a connected socket is a SOCKET handle, NOT a file descriptor, so
+ * the POSIX trick of dup2()'ing it onto stdin/stdout does not work. Instead we
+ * buffer the HTTP request and response through temp files: recv() the request
+ * into a temp file that becomes stdin (so fgets(stdin) parses it unchanged),
+ * collect the response in a temp file that becomes stdout (so the printf/fwrite
+ * response code is unchanged), then send() that file's bytes to the socket when
+ * the connection is torn down. These globals hold that per-connection state. */
+static char wj_req_tmpname[MAX_PATH];
+static char wj_resp_tmpname[MAX_PATH];
+#endif
+
+/* Saved original stdin/stdout file descriptors. On both platforms the per-
+ * connection I/O helpers stash the real stdin/stdout here while stdin/stdout
+ * are pointed at the client (POSIX: the socket itself; Windows: temp files)
+ * and restore them when the connection is torn down. */
+static int  wj_savefdIN  = -1;
+static int  wj_savefdOUT = -1;
 
 /* Some variables... */
 /* Port number for webjacl server (is set on command line) */
@@ -48,8 +75,10 @@ time_t          wj_startuptime;
  */
 int             wj_servertype = WJ_SERVERTYPE;
 
-/* Some file descriptor and socket things */
-int             serverFd, clientFd;
+/* Some file descriptor and socket things. wj_socket_t is int on POSIX (so this
+ * is unchanged there) and SOCKET on Windows, where a connected socket is a
+ * handle rather than a file descriptor. */
+wj_socket_t     serverFd, clientFd;
 struct sockaddr_in serverAddress;
 struct sockaddr *serverSockAddrPtr;
 struct sockaddr_in clientAddress;
@@ -363,6 +392,173 @@ wj_cleanup_without_exit(void)
 
 
 /*
+ * wj_connect_io( clientFd ) --- Point stdin/stdout at the just-accepted client
+ * connection so the existing request-parsing (fgets(stdin)) and response-writing
+ * (printf/fwrite to stdout) code works unchanged.
+ *
+ * POSIX: a connected socket IS a file descriptor, so we dup2() it onto stdout
+ * and stdin (saving the originals first). This is exactly the code that lived
+ * inline in wj_listen() before the refactor.
+ *
+ * Windows: a SOCKET is not a file descriptor, so dup2() can't be used. We recv()
+ * the HTTP request header block from the socket into a temp file and make that
+ * temp file stdin; and we create a second temp file and make it stdout. The
+ * response is flushed to the socket later, in wj_disconnect_io().
+ */
+void
+wj_connect_io(wj_socket_t clientFd)
+{
+#ifdef _WIN32
+	FILE           *reqfp, *respfp;
+	char            recvbuf[4096];
+	int             n, header_end = 0;
+	int             reqfd, respfd;
+
+	/*
+	 * Read the HTTP request headers from the socket into a temp file. We
+	 * stop once we have seen the blank line ("\r\n\r\n") that terminates
+	 * the header block. webjacl only ever inspects the request line and a
+	 * couple of headers (Cookie), and does not consume a POST body, so the
+	 * headers are all we need to buffer.
+	 */
+	wj_req_tmpname[0] = '\0';
+	wj_resp_tmpname[0] = '\0';
+
+	if (tmpnam(wj_req_tmpname) == NULL ||
+	    (reqfp = fopen(wj_req_tmpname, "w+b")) == NULL) {
+		fprintf(stderr, "WebJACL: cannot create request temp file\n");
+		return;
+	}
+
+	while (!header_end &&
+	       (n = recv(clientFd, recvbuf, (int) sizeof(recvbuf), 0)) > 0) {
+		fwrite(recvbuf, 1, (size_t) n, reqfp);
+		/*
+		 * Cheap end-of-headers detection: a blank line. We re-scan the
+		 * whole received chunk each time which is fine for the tiny
+		 * request sizes webjacl deals with.
+		 */
+		if (n >= 4) {
+			int i;
+			for (i = 0; i <= n - 4; i++) {
+				if (recvbuf[i] == '\r' && recvbuf[i + 1] == '\n' &&
+				    recvbuf[i + 2] == '\r' && recvbuf[i + 3] == '\n') {
+					header_end = 1;
+					break;
+				}
+			}
+		}
+	}
+	fflush(reqfp);
+	fclose(reqfp);
+
+	/* Create the response temp file. */
+	if (tmpnam(wj_resp_tmpname) == NULL ||
+	    (respfp = fopen(wj_resp_tmpname, "w+b")) == NULL) {
+		fprintf(stderr, "WebJACL: cannot create response temp file\n");
+		remove(wj_req_tmpname);
+		wj_req_tmpname[0] = '\0';
+		return;
+	}
+
+	/* Save the real stdin/stdout, then redirect them at the temp files. */
+	wj_savefdOUT = _dup(MYSTDOUT);
+	wj_savefdIN = _dup(MYSTDIN);
+
+	respfd = _fileno(respfp);
+	_dup2(respfd, MYSTDOUT);
+	fclose(respfp);
+
+	if ((reqfp = fopen(wj_req_tmpname, "rb")) != NULL) {
+		reqfd = _fileno(reqfp);
+		_dup2(reqfd, MYSTDIN);
+		fclose(reqfp);
+	}
+#else
+	/*
+	 * Redirect file descriptors for stdin/stdout. We do this at file
+	 * descriptor level, so that all stdio is automatically redirected too.
+	 */
+	dup2(MYSTDOUT, wj_savefdOUT);
+	dup2(clientFd, MYSTDOUT);
+
+	dup2(MYSTDIN, wj_savefdIN);
+	dup2(clientFd, MYSTDIN);
+#endif
+}
+
+
+/*
+ * wj_disconnect_io( clientFd ) --- Tear a client connection down, restoring the
+ * real stdin/stdout and closing the socket. Replaces the
+ *   fflush(stdout); dup2(savefdOUT,MYSTDOUT); dup2(savefdIN,MYSTDIN);
+ *   shutdown(clientFd,2);
+ * idiom that previously appeared inline in every wj_listen() exit path.
+ *
+ * Windows: the response was buffered into a temp file (stdout). We rewind it,
+ * send() its bytes to the socket, restore stdin/stdout, close the socket and
+ * delete both temp files.
+ */
+void
+wj_disconnect_io(wj_socket_t clientFd)
+{
+#ifdef _WIN32
+	FILE           *respfp;
+	char            sendbuf[4096];
+	size_t          n;
+
+	fflush(stdout);
+
+	/* Restore the real stdout/stdin (this also closes our temp-file fds). */
+	if (wj_savefdOUT != -1) {
+		_dup2(wj_savefdOUT, MYSTDOUT);
+		_close(wj_savefdOUT);
+		wj_savefdOUT = -1;
+	}
+	if (wj_savefdIN != -1) {
+		_dup2(wj_savefdIN, MYSTDIN);
+		_close(wj_savefdIN);
+		wj_savefdIN = -1;
+	}
+
+	/* Flush the buffered response file out to the socket. */
+	if (wj_resp_tmpname[0] != '\0' &&
+	    (respfp = fopen(wj_resp_tmpname, "rb")) != NULL) {
+		while ((n = fread(sendbuf, 1, sizeof(sendbuf), respfp)) > 0) {
+			char *p = sendbuf;
+			size_t left = n;
+			while (left > 0) {
+				int sent = send(clientFd, p, (int) left, 0);
+				if (sent <= 0)
+					break;
+				p += sent;
+				left -= (size_t) sent;
+			}
+		}
+		fclose(respfp);
+	}
+
+	shutdown(clientFd, 2);
+	closesocket(clientFd);
+
+	if (wj_req_tmpname[0] != '\0') {
+		remove(wj_req_tmpname);
+		wj_req_tmpname[0] = '\0';
+	}
+	if (wj_resp_tmpname[0] != '\0') {
+		remove(wj_resp_tmpname);
+		wj_resp_tmpname[0] = '\0';
+	}
+#else
+	fflush(stdout);
+	dup2(wj_savefdOUT, MYSTDOUT);
+	dup2(wj_savefdIN, MYSTDIN);
+	shutdown(clientFd, 2);
+#endif
+}
+
+
+/*
  * int wj_listen( void ) This function is called when the application waits
  * for a connection. It blocks until a connection is established on the
  * listening socket, then returns. After a move has been done within the
@@ -397,7 +593,6 @@ wj_listen(void)
 
 	char            request[WJ_MAX_REQ_SIZE], request_line[WJ_MAX_REQ_SIZE], webjacl_cookies[WJ_MAX_REQ_SIZE];
 	int             port, sockopt;
-	static int      savefdIN, savefdOUT;
 
 	int             request_len = 0;
 
@@ -412,7 +607,18 @@ listen_again:
 	wj_totalconnections++;
 
 	if (!server_initialized) {
+#ifdef _WIN32
+		/* Winsock must be initialised before any socket call. SIGPIPE
+		 * does not exist on Windows (a broken send() just returns an
+		 * error), so it is not ignored here. */
+		WSADATA wsaData;
+		if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+			fprintf(stderr, "WebJACL: WSAStartup failed\n");
+			exit(1);
+		}
+#else
 		signal(SIGPIPE, SIG_IGN);
+#endif
 		signal(SIGTERM, wj_cleanup);
 		signal(SIGINT, wj_cleanup);
 
@@ -423,7 +629,7 @@ listen_again:
 		/* Now set up the server socket */
 		serverFd = socket(AF_INET, SOCK_STREAM, DEFAULT_PROTOCOL);
 		serverLen = sizeof(serverAddress);
-		bzero((char *) &serverAddress, serverLen);
+		memset((char *) &serverAddress, 0, serverLen);
 		serverAddress.sin_family = AF_INET;
 		serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
 		serverAddress.sin_port = htons(port);
@@ -452,23 +658,20 @@ listen_again:
 		server_initialized = 1;
 
 	}
-	 /* End of server initialization */ 
+	 /* End of server initialization */
 	else {
 		/*
 		 * If a connection already exists, close it, so that the
 		 * browser displays our output
 		 */
-		fflush(stdout);
-		dup2(savefdOUT, MYSTDOUT);
-		dup2(savefdIN, MYSTDIN);
-		shutdown(clientFd, 2);
+		wj_disconnect_io(clientFd);
 		clientFd = -1;
 	}
 
 	/* Wait for a connection */
 
 	//fprintf(stderr, "Waiting for a connection.\n");
-	if ((clientFd = accept(serverFd, clientSockAddrPtr, &clientLen)) != -1) {
+	if ((clientFd = accept(serverFd, clientSockAddrPtr, &clientLen)) != WJ_INVALID_SOCK) {
 		//fprintf(stderr, "Got a connection from %d - %s.\n", clientSockAddrPtr->sa_family, clientSockAddrPtr->sa_data);
 		/*
 		 * Handle one connection: 1. Connect our stdin/stdout to the
@@ -480,12 +683,8 @@ listen_again:
 		 * processing
 		 */
 
-		/* Redirect file descriptors for stdin/stdout */
-		dup2(MYSTDOUT, savefdOUT);
-		dup2(clientFd, MYSTDOUT);
-
-		dup2(MYSTDIN, savefdIN);
-		dup2(clientFd, MYSTDIN);
+		/* Redirect stdin/stdout to the client connection */
+		wj_connect_io(clientFd);
 
 
 		/*
@@ -532,10 +731,16 @@ listen_again:
 
 		if (request[0] == 0) {
 			fprintf(stderr, "Invalid request, ignoring.\n");
+#ifdef _WIN32
+			/* Restore stdin/stdout, flush the (empty) response and
+			 * delete the temp files before looping back. */
+			wj_disconnect_io(clientFd);
+#else
 			shutdown(clientFd, 2);
+#endif
 			clientFd = -1;
 			goto listen_again;
-		}	
+		}
 
 		/*
 		 * From here on we only use the string variable "request",
@@ -659,10 +864,7 @@ listen_again:
 								printf
 									("<HTML><HEAD></HEAD><BODY><H1>404 Not Found</H1>Your browser said to WebJACL:<PRE>%s</PRE></BODY></HTML>\r\n",
 								   request);
-								fflush(stdout);
-								dup2(savefdOUT, MYSTDOUT);
-								dup2(savefdIN, MYSTDIN);
-								shutdown(clientFd, 2);
+								wj_disconnect_io(clientFd);
 								clientFd = -1;
 								goto listen_again;
 							} else {
@@ -681,10 +883,7 @@ listen_again:
 										 WJ_SERVERNAME);
 									printf
 										("<HTML><HEAD></HEAD><BODY><H1>413 Payload Too Large</H1></BODY></HTML>\r\n");
-									fflush(stdout);
-									dup2(savefdOUT, MYSTDOUT);
-									dup2(savefdIN, MYSTDIN);
-									shutdown(clientFd, 2);
+									wj_disconnect_io(clientFd);
 									clientFd = -1;
 									goto listen_again;
 								}
@@ -702,10 +901,7 @@ listen_again:
 									printf
 										("<HTML><HEAD></HEAD><BODY><H1>403 Forbidden</H1>Your browser said to WebJACL:<PRE>%s</PRE></BODY></HTML>\r\n",
 										 request);
-									fflush(stdout);
-									dup2(savefdOUT, MYSTDOUT);
-									dup2(savefdIN, MYSTDIN);
-									shutdown(clientFd, 2);
+									wj_disconnect_io(clientFd);
 									clientFd = -1;
 									goto listen_again;
 								}
@@ -740,10 +936,7 @@ listen_again:
 						printf
 							("<HTML><HEAD></HEAD><BODY><H1>404 Not Found</H1>Your browser said to WebJACL:<PRE>%s</PRE></BODY></HTML>\r\n",
 							 request);
-						fflush(stdout);
-						dup2(savefdOUT, MYSTDOUT);
-						dup2(savefdIN, MYSTDIN);
-						shutdown(clientFd, 2);
+						wj_disconnect_io(clientFd);
 						clientFd = -1;
 						goto listen_again;
 					}
@@ -775,10 +968,7 @@ listen_again:
 			printf
 				("<HTML><HEAD></HEAD><BODY><H1>Method POST not implemented yet!</H1>Your browser said to WebJACL:<PRE>%s</PRE></BODY></HTML>\r\n",
 				 request);
-			fflush(stdout);
-			dup2(savefdOUT, MYSTDOUT);
-			dup2(savefdIN, MYSTDIN);
-			shutdown(clientFd, 2);
+			wj_disconnect_io(clientFd);
 			clientFd = -1;
 			goto listen_again;
 		}
