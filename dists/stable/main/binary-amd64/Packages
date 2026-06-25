@@ -26,10 +26,10 @@ Installed-Size: 290922
 Depends: libgtk-3-0, libnotify4, libnss3, libxss1, libxtst6, xdg-utils, libatspi2.0-0, libuuid1, libsecret-1-0
 Recommends: libappindicator3-1
 Filename: pool/main/jacl-desktop_0.2.2_amd64.deb
-Size: 90959894
-MD5sum: 9590d56f0402a527e00f82305b48fee1
-SHA1: 08d123ca58b418ee9cb76b54b75ac078e99b2f15
-SHA256: 444a3c8d4399ec060294c998861ecc7e76f2f7f56de1315be61d9982f656ddae
+Size: 90960428
+MD5sum: 817e6a3a03a14ae9238045b28d81df01
+SHA1: 9b1c7758c52497d8b340ade1414eb97c955b4588
+SHA256: b9af4e01645cb165cf9c6840c16c34a3f2eb9a2c7f9354e8ea72904caa879871
 Section: default
 Priority: optional
 Homepage: https://jacl.dangarmarine.com.au
