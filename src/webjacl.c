@@ -663,7 +663,7 @@ listen_again:
 		if (wj_servertype == WJ_DEVSERVER) {
 			sockopt = 1;
 			if (setsockopt
-			    (serverFd, SOL_SOCKET, SO_REUSEADDR, &sockopt,
+			    (serverFd, SOL_SOCKET, SO_REUSEADDR, (const char *) &sockopt,
 			     sizeof(sockopt)) == -1) {
 				perror("WebJACL:wj_listen()");
 				exit(1);

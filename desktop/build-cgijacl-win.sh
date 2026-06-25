@@ -21,14 +21,23 @@ if ! command -v "$CROSS" >/dev/null 2>&1; then
   exit 1
 fi
 
-# cgijacl links -lcgihtml; cgihtml-1.69 has a self-contained Makefile (no
-# configure). Build it with the cross compiler (and the matching cross ranlib,
-# so the host ranlib doesn't choke on the PE/COFF archive). We do NOT pass
-# -DWINDOWS: cgihtml's legacy WINDOWS branch references an undefined BINARY
-# macro and is only reached by the multipart-upload path, which webjacl never
-# uses (it answers POST with 501). The default branch cross-compiles cleanly.
-make -C cgihtml-1.69 clean >/dev/null 2>&1 || true
-make -C cgihtml-1.69 libcgihtml.a CC="$CROSS" RANLIB="$CROSS_RANLIB"
+# cgijacl links -lcgihtml. Build cgihtml-1.69 directly with the cross toolchain
+# rather than via its Makefile: that Makefile hardcodes `ar cr` (not $(AR)), so
+# the host (macOS) ar archives the PE/COFF objects with a symbol index the mingw
+# linker can't read -> "undefined reference to cgi_val" at link time. Using the
+# cross ar + ranlib produces a valid PE archive. We do NOT pass -DWINDOWS:
+# cgihtml's legacy WINDOWS branch references an undefined BINARY macro and is
+# only reached by the multipart-upload path, which webjacl never uses (it
+# answers POST with 501). The default (-DUNIX) branch cross-compiles cleanly.
+CROSS_AR="${CROSS_PREFIX}-ar"
+( cd cgihtml-1.69
+  rm -f ./*.o libcgihtml.a
+  for obj in string-lib cgi-llist cgi-lib html-lib; do
+    "$CROSS" -O -Wall -DUNIX -c -o "$obj.o" "$obj.c"
+  done
+  "$CROSS_AR" cr libcgihtml.a string-lib.o cgi-llist.o cgi-lib.o html-lib.o
+  "$CROSS_RANLIB" libcgihtml.a
+)
 
 # Same source list + auth_stub.c as build-cgijacl.sh. Link -lws2_32 for Winsock
 # (socket/recv/send/WSAStartup) used by webjacl.c on Windows.

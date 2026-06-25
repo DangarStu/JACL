@@ -8,6 +8,12 @@
 #include "prototypes.h"
 #include "language.h"
 
+#ifdef _WIN32
+/* Windows has localtime_s (args swapped, returns errno_t) rather than the
+ * POSIX reentrant localtime_r; shim it so the call site below is unchanged. */
+#define localtime_r(t, tm) (localtime_s((tm), (t)) == 0 ? (tm) : NULL)
+#endif
+
 #ifdef __NDS__
 void
 log_error(const char *message, int console)
