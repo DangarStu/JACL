@@ -248,8 +248,15 @@ function applyReading () {
       var fs=Math.max(9,Math.min(usable/(r.c*cw),48));
       var st=document.getElementById('jaclReadingStyle');
       if(!st){st=document.createElement('style');st.id='jaclReadingStyle';document.head.appendChild(st);}
-      var pad='padding-left:'+side+'px !important;padding-right:'+side+'px !important;box-sizing:border-box !important';
-      st.textContent='#maintext{font-size:'+fs.toFixed(2)+'px !important;'+pad+'}#statuswin{'+pad+'}.directions{'+pad+'}';
+      // #statuswin is position:absolute with left:0;right:0, so width is auto and
+      // its left/right padding is absorbed within the fixed full width (no
+      // overflow) -- so it must NOT get box-sizing:border-box, which would pull the
+      // 2px vertical padding inside its height, shrink the bar ~4px and open a gap
+      // above #main (whose top is calc'd for the content-box height). Only the flow
+      // blocks (#maintext, .directions) need border-box.
+      var pad='padding-left:'+side+'px !important;padding-right:'+side+'px !important';
+      var bb=';box-sizing:border-box !important';
+      st.textContent='#maintext{font-size:'+fs.toFixed(2)+'px !important;'+pad+bb+'}#statuswin{'+pad+'}.directions{'+pad+bb+'}';
     }
     if(!window.__jaclReadingHook){window.__jaclReadingHook=true;window.addEventListener('resize',apply);}
     apply();
