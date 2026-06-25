@@ -4,39 +4,39 @@ Hash: SHA512
 Architectures: amd64
 Codename: stable
 Components: main
-Date: Thu, 25 Jun 2026 01:55:43 +0000
+Date: Thu, 25 Jun 2026 01:59:28 +0000
 Label: JACL
 Origin: JACL
 Suite: stable
 MD5Sum:
- dbb4f6cd2d2b4c6defdc0f78d45f62fa              132 Release
+ 0121f9dd001f45bb7dea84f135a7d06f              132 Release
  0d88c6abe4b2ec4cbe42ae825486378e             1496 main/binary-amd64/Packages
- 58df73e46bbf4b27168b8cdf681f2b88              643 main/binary-amd64/Packages.gz
+ 0e105a395164f86ebed3bea481d4e979              643 main/binary-amd64/Packages.gz
 SHA1:
- 2b3ac6f8313e1bec5948e2fcae2a5c63d94150cb              132 Release
+ bf053f7c7ce5e4cc5fe86d0abd5300621090cc7e              132 Release
  53145ffaf142408b1ae98621b4f8073c0bf758b6             1496 main/binary-amd64/Packages
- b6f4a787c40fa78ba42a9cae4880c92486adcf14              643 main/binary-amd64/Packages.gz
+ fdf5b77672d77997a4ae0312d885020197166af8              643 main/binary-amd64/Packages.gz
 SHA256:
- 5b84aea244da827e93f6b7055530dec394f75e272d0dbde3dd3eb86be668356f              132 Release
+ 49f759596b6595c898525a78c82fdd8dab6acbc325fbb2368729799ed2c42c6c              132 Release
  c3400ae7cf8c53af02880a3efcf0398b6e13f77ee43add45c6daf71f656f260f             1496 main/binary-amd64/Packages
- c036ddd73efb69c1228a3d0583a57b18f42436de24f09ea3897bc4650b3a3dd0              643 main/binary-amd64/Packages.gz
+ 312cf2cf0dcb99875201acd7a8e9c45c9f88350caac515718aabbacc9150702c              643 main/binary-amd64/Packages.gz
 SHA512:
- 707afefa9ea7f352f97075f3c44af149f5626b299e8890701192cf5fa00436a5ad5d91c4c715c169f9ab674bb1b4af65641e6ad1d82b9721097c42feb158a970              132 Release
+ 7a77af8b0287aa4756fe474eeaedb560c73dd662ec00205747bbbdc15ec922dfdb5b26f8cc21d115627ef39ebeab10ac2b1459cf6d069ebd7473be57c08f2eab              132 Release
  b46e0de47b8b10c276847f62d375257e20379d9f6284b8f1772553e97608de4f367e64a24d3b6a21dde45f3d19f6ca6f6c4be861ce65e6c746937776bf053fd0             1496 main/binary-amd64/Packages
- 0974a9aa5d8f4eaf2ebcef8de5f825f636f7dc68e7b408c398723e03001f712fde7be2e1242139d288acea9b4968294275ebcfa7d63ee518a92acfe145b5a24c              643 main/binary-amd64/Packages.gz
+ 2e6476b978c4b1bafaf4f194e115160ad2ebfee1d3ea8df6c0278b44878f1f3a99286e8f224add0df12a6b9fc701f3b0178936c6e82c7d60f2446915f73a826a              643 main/binary-amd64/Packages.gz
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEUOvEwuvRgu82qiGtN4dNUyYB2igFAmo8ip8ACgkQN4dNUyYB
-2ii+OA/+KvKTw9PsZRjWkLkALdrSn0jmcfyPuTzE646QXQTE6Zd44wsWKymWV1vd
-RiY1/2MK/JQYpqyHqWpMayZLUQgCPG/dJ3g4d5xZRN1fPcAmLn15lcjplcaYUpOP
-OcCjV3sMbg/8trTBTfabh4IsdMYvZ59hGdobleqLF5ARWqHSD/Eu2QoMytgzbitt
-wpXjDqV0G3Hc+j2LIcfCIlAXAqsM4UR3aQS7Q/r2iC559igaXVkUKMxafQKD7MM0
-Jes/ozTQZ/ItsinxqFCdH/4HXshATOUwxZjtR6GCyMdtcHZ+/QjHQysyk5/0qpoT
-wIdv+jESYmkm8z8RxqAy8UxqVx+nFkD8eBNihEdL7/5oL1MHonv6FdPqQxgaT9D7
-snqJe8LeYfTjNrqm79V/wXMqJDDRhqfe3B5a9pjKxWIhnQMO22b8YeRaa6povyfv
-5vKvjiRW870T40sFWSoDksHpflTC7aYvC02HJQxBve7GLLvX0QuobZEJmMA0cwRC
-ZRtZrbLHekKMM1fifCHzUssm/hHQRQG1gCCiOyXZ/Oi0lWrbintPqzRBp/rO0ahe
-g3p0mUZIbZXtZqcUaBZUDcjcXy5cZ1O0xHxIUpA/Dek3USap6c1lNcmSc7l3fveB
-zM/ttIK432JIWwmxLxTzV2xHpblGmu+rcCw986jxymnfIvB/bVg=
-=wZOo
+iQIzBAEBCgAdFiEEUOvEwuvRgu82qiGtN4dNUyYB2igFAmo8i4AACgkQN4dNUyYB
+2ig9uhAAn4ujXvPSkYXbBWbGYiAzVXqg3M1sOGYoW0lUeM1uHtp7bR9b1AKi8NDr
+9qgDPNUvBjAWVHg5h1NEPnm7zGOpAPVvUXuayNM2apZagjkwmwdUUhdAO26nCjJl
+cyE5f5jSEPGfBHrBjS5yH+SyVG7R5a/mrBFIqb9tShnsZGWlC4PdTGWeN7UGn44z
+/WprnraMi1bcBzDm1NFEGSdgJgp7eSKlglbhOHcLrk0LAa8n1xhrwB7WEKJjNfqz
+g/pk3nYQ19RsT6asZRZ+fWgpaIFwpfph3OSGofOVn68hkeZ62p8IxnH/aYDVaedD
+0akuDWRUeOVkQZR3p4VaslUXDic6AhF9IP7/bEZiRnCbBqT7Qh2gx5CYqxV7ZJgB
+zvTnIT9n+p6Y7FogU0iDuRdzAGs3uCQAntuEIxsLFa/IYfhjomgZk7D+iLNQc2Zj
+uLxFtltUmIrBdqom2RxcUkmUee02A7y6ThSz2yAes1okIrcsu+ygfkzTFU0avdHv
+tHMNCQz+IZaPF89hZk/59y8rzrRb6e8t3Se22NS6S4APA4D2J/p+luutiAWeVMgB
+lfckJth9DZ2V4juRnom8kBJzKZ+KWRIzWNEvfF5nioI94hoirCC/QhnjNksevbFB
+NfhUUAorZ7nb+D9vV7Ag5HOLCOvm1n+NsbI28/zKRTzCGMeeBHs=
+=mVoU
 -----END PGP SIGNATURE-----
