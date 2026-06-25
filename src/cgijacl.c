@@ -1603,7 +1603,13 @@ version_info()
  * <jacl-status> machinery in the JS picks it up. */
 
 #define WEB_STATUS_MAX_ROWS 32
-#define WEB_STATUS_MAX_COLS 200
+/* Must be >= the &status_cols= upper bound clamped in the request handler
+ * (currently 500). web_render_status_bar right-aligns score/moves at column
+ * status_window_width - strlen - 1; if that column exceeds the grid width,
+ * web_status_putchar bounds-checks x and silently drops the chars, so on a
+ * wide viewport "Score: N  Moves: N" lands past the old 200-col cap and
+ * vanishes off the right edge entirely. */
+#define WEB_STATUS_MAX_COLS 512
 
 static int  web_status_mode = 0;
 static int  web_status_x = 0;
