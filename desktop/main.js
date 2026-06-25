@@ -73,6 +73,17 @@ function resolvePaths () {
 function prettify (stem) {
   return stem.replace(/[_-]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 }
+// Dev (no games.json) shows the game's own `constant game_title "..."` -- the
+// same value the packaged games.json, the website and the apps use -- so the
+// bookshelf matches everywhere; prettified filename as the fallback.
+function gameTitle (stem) {
+  try {
+    const m = fs.readFileSync(path.join(SOURCES_DIR, stem + '.jacl'), 'utf8')
+      .match(/^constant\s+game_title\s+"([^"]+)"/m)
+    if (m) return m[1]
+  } catch (e) { /* fall back to the prettified stem */ }
+  return prettify(stem)
+}
 // Best-effort language tag from the filename (the .j2 is obfuscated, so reading
 // its game_language constant isn't cheap). Defaults to English.
 const LANG = [
@@ -104,7 +115,7 @@ function listGames () {
   try { files = fs.readdirSync(GAMES_DIR) } catch (e) { return [] }
   return files.filter(f => f.endsWith('.j2')).map(f => f.replace(/\.j2$/, ''))
     .filter(isPublished).sort()
-    .map(stem => ({ title: prettify(stem), language: detectLanguage(stem), path: path.join(GAMES_DIR, stem + '.j2') }))
+    .map(stem => ({ title: gameTitle(stem), language: detectLanguage(stem), path: path.join(GAMES_DIR, stem + '.j2') }))
 }
 
 // --- cgijacl config + media ----------------------------------------------
