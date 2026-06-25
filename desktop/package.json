@@ -33,7 +33,7 @@
         { "target": "zip", "arch": ["universal"] }
       ],
       "category": "public.app-category.games",
-      "identity": "Developer ID Application: Stuart Allen (5TU3TU28JN)",
+      "identity": "Stuart Allen (5TU3TU28JN)",
       "x64ArchFiles": "**/cgijacl",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
