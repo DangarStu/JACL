@@ -20,7 +20,7 @@ sudo apt update && sudo apt install jacl-desktop
 `apt upgrade` then picks up new releases automatically.
 
 > amd64 only (Debian/Ubuntu family). On any other Linux, the **`.AppImage`** on the
-> [Releases page](https://github.com/DangarStu/JACL/releases) runs with no install.
+> [Releases page](https://github.com/DangarStu/JACL/releases/latest) runs with no install.
 
 ## How it works / maintenance
 

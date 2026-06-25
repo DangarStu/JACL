@@ -55,7 +55,7 @@ Desktop app
 Pre-built desktop apps -- an Electron shell around cgijacl with the full
 web interface (clickable map, images, sound) -- are on the Releases page:
 
-    https://github.com/DangarStu/JACL/releases
+    https://github.com/DangarStu/JACL/releases/latest
 
 Debian / Ubuntu (apt):
 

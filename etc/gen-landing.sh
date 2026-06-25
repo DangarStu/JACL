@@ -100,8 +100,8 @@ cat <<'HEAD'
       <p>Play online below, or install a native app &mdash; offline play with graphics, sound, and a live map window.</p>
       <ul class="apps">
         <li><a href="https://apps.apple.com/app/id6780354110"><strong>iPhone &amp; iPad</strong><em>App Store</em></a></li>
-        <li><a href="https://github.com/DangarStu/JACL/releases"><strong>macOS</strong><em>Download .dmg</em></a></li>
-        <li><a href="https://github.com/DangarStu/JACL/releases"><strong>Linux</strong><em>.deb / AppImage</em></a></li>
+        <li><a href="https://github.com/DangarStu/JACL/releases/latest"><strong>macOS</strong><em>Download .dmg</em></a></li>
+        <li><a href="https://github.com/DangarStu/JACL/releases/latest"><strong>Linux</strong><em>.deb / AppImage</em></a></li>
         <li class="soon"><span><strong>Android</strong><em>Coming to Google Play</em></span></li>
       </ul>
       <p class="tabintro">Debian &amp; Ubuntu &mdash; install and auto-update with apt:</p>
