@@ -125,6 +125,7 @@ jobs:
             desktop/dist/*.zip
             desktop/dist/*.AppImage
             desktop/dist/*.deb
+            desktop/dist/*.exe
           if-no-files-found: warn
 
       # On a desktop-v* tag, attach this OS's installers to the GitHub Release.
@@ -137,5 +138,6 @@ jobs:
             desktop/dist/*.zip
             desktop/dist/*.AppImage
             desktop/dist/*.deb
+            desktop/dist/*.exe
           fail_on_unmatched_files: false
           generate_release_notes: true
