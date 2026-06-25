@@ -119,11 +119,20 @@ create_paths(char *full_path)
 	/* Keep the full game-file name. */
 	strcpy(game_file, full_path);
 
-	last_slash = strrchr(full_path, DIR_SEPARATOR);
+	/* Accept either separator: bash tooling (e.g. desktop/prepare-bundle.sh)
+	 * passes forward-slash paths even on Windows, where DIR_SEPARATOR is '\\'.
+	 * Take the rightmost '/' or '\\' so the game directory splits off correctly
+	 * and includes resolve; Windows accepts the resulting mixed-separator path. */
+	last_slash = strrchr(full_path, '/');
+	{
+		char           *back_slash = strrchr(full_path, '\\');
+		if (back_slash != NULL && (last_slash == NULL || back_slash > last_slash))
+			last_slash = back_slash;
+	}
 
 	/* Strip the file extension (back to the last '.' before any slash). */
 	for (i = (int) strlen(full_path) - 1; i >= 0; i--) {
-		if (full_path[i] == DIR_SEPARATOR) {
+		if (full_path[i] == '/' || full_path[i] == '\\') {
 			break;
 		} else if (full_path[i] == '.') {
 			full_path[i] = 0;
