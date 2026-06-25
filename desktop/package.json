@@ -22,6 +22,7 @@
     "appId": "au.com.dangarmarine.jacl",
     "productName": "JACL",
     "directories": { "output": "dist" },
+    "dmg": { "sign": true },
     "files": ["main.js", "preload.js", "picker.html", "shelf-artwork.png"],
     "extraResources": [
       { "from": "bin", "to": "bin" },
