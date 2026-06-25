@@ -6,8 +6,8 @@ name: Desktop builds
 # Artifacts; a `desktop-v*` tag also publishes them to a GitHub Release.
 # (Tags are namespaced: ios-v*/android-v* are the store pipelines; desktop-v* is this.)
 #
-# Windows is NOT built yet: cgijacl's built-in web server (webjacl.c) is POSIX C and
-# needs a Windows port or a mingw build first. See desktop/PLAN.md.
+# Windows: cgijacl is built with mingw (webjacl.c has a native Winsock path behind
+# #ifdef _WIN32); the windows-latest runner's gcc targets mingw. See desktop/PLAN.md.
 on:
   workflow_dispatch:
   push:
@@ -27,6 +27,8 @@ jobs:
             target: mac
           - os: ubuntu-latest
             target: linux
+          - os: windows-latest
+            target: win
     runs-on: ${{ matrix.os }}
     # 'true' only when the Developer ID cert secret exists; gates the mac
     # signing/notarization steps so builds stay green until MAC_CSC_LINK is added.
@@ -56,6 +58,12 @@ jobs:
 
       - name: Install npm deps
         run: npm ci
+
+      # npm on Windows runs package scripts through cmd by default; our build
+      # scripts are bash. Point npm's script-shell at bash (Git Bash, on PATH).
+      - name: Use bash for npm scripts (Windows)
+        if: runner.os == 'Windows'
+        run: npm config set script-shell bash
 
       # macOS notarization key — reuses the App Store Connect API key already in
       # secrets (shared with the iOS pipeline). Only when the signing cert exists,

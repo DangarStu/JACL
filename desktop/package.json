@@ -6,10 +6,12 @@
   "scripts": {
     "start": "electron .",
     "build-engine": "./build-cgijacl.sh",
+    "build-engine-win": "./build-cgijacl-win.sh",
     "prepare-bundle": "./prepare-bundle.sh",
     "dist": "npm run build-engine && npm run prepare-bundle && electron-builder",
     "dist:mac": "npm run build-engine && npm run prepare-bundle && electron-builder --mac",
-    "dist:linux": "npm run build-engine && npm run prepare-bundle && electron-builder --linux"
+    "dist:linux": "npm run build-engine && npm run prepare-bundle && electron-builder --linux",
+    "dist:win": "npm run build-engine-win && npm run prepare-bundle && electron-builder --win"
   },
   "license": "MIT",
   "author": "Stuart Allen <dangarstu@gmail.com>",

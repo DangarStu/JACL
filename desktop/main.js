@@ -42,8 +42,9 @@ function resolvePaths () {
     const REPO = path.resolve(__dirname, '..')
     // Prefer the app's own freshly-built cgijacl (desktop/build-cgijacl.sh) -- the
     // repo's bin/cgijacl is root-owned and was stale (broken media serving).
-    const local = path.join(__dirname, 'bin', 'cgijacl')
-    CGIJACL = fs.existsSync(local) ? local : path.join(REPO, 'bin', 'cgijacl')
+    const exe = process.platform === 'win32' ? 'cgijacl.exe' : 'cgijacl'
+    const local = path.join(__dirname, 'bin', exe)
+    CGIJACL = fs.existsSync(local) ? local : path.join(REPO, 'bin', exe)
     GAMES_DIR = path.join(REPO, 'projects', 'temp')
     SOURCES_DIR = path.join(REPO, 'projects')        // dev reads game_publish from here
     INCLUDE_DIR = path.join(REPO, 'projects', 'include')
