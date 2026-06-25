@@ -2,8 +2,8 @@
 <body style="font-family:system-ui;max-width:48rem;margin:3rem auto;padding:0 1rem">
 <h1>JACL desktop — Debian/Ubuntu (apt)</h1>
 <pre style="background:#111;color:#eee;padding:1rem;border-radius:8px;overflow:auto">
-curl -fsSL https://dangarstu.github.io/JACL/jacl.gpg | sudo gpg --dearmor -o /usr/share/keyrings/jacl.gpg
-echo "deb [signed-by=/usr/share/keyrings/jacl.gpg] https://dangarstu.github.io/JACL stable main" | sudo tee /etc/apt/sources.list.d/jacl.list
+curl -fsSL https://apt.dangarmarine.com.au/jacl.gpg | sudo gpg --dearmor -o /usr/share/keyrings/jacl.gpg
+echo "deb [signed-by=/usr/share/keyrings/jacl.gpg] https://apt.dangarmarine.com.au stable main" | sudo tee /etc/apt/sources.list.d/jacl.list
 sudo apt update &amp;&amp; sudo apt install jacl-desktop</pre>
 <p>Other Linux: the <code>.AppImage</code> on the
 <a href="https://github.com/DangarStu/JACL/releases">Releases page</a> runs anywhere, no install.</p>
