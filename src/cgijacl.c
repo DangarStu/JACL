@@ -31,6 +31,14 @@
 #include "errno.h"
 #include <dirent.h>
 
+#ifdef _WIN32
+/* Windows mkdir (_mkdir in <direct.h>) takes no mode argument. Map the POSIX
+ * 2-arg form used below onto it so the temp-directory creation compiles
+ * unchanged. POSIX builds are untouched. */
+#include <direct.h>
+#define mkdir(path, mode) _mkdir(path)
+#endif
+
 extern int            style_index;
 
 /* Walk include_directory and return the newest mtime among its files.

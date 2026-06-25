@@ -26,6 +26,7 @@
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <windows.h>
 #include <io.h>
 #include <fcntl.h>
 #include <process.h>
@@ -48,14 +49,35 @@
  * the connection is torn down. These globals hold that per-connection state. */
 static char wj_req_tmpname[MAX_PATH];
 static char wj_resp_tmpname[MAX_PATH];
+
+/* Build a unique path in the system temp directory. tmpnam() on Windows tends
+ * to hand back a name at the root of the current drive, which is usually not
+ * writable; GetTempFileName() is the robust idiom and also creates the file. */
+static int
+wj_make_tempfile(char *out)
+{
+	char tmpdir[MAX_PATH];
+	if (GetTempPathA(sizeof(tmpdir), tmpdir) == 0)
+		return -1;
+	if (GetTempFileNameA(tmpdir, "wj", 0, out) == 0)
+		return -1;
+	return 0;
+}
 #endif
 
 /* Saved original stdin/stdout file descriptors. On both platforms the per-
  * connection I/O helpers stash the real stdin/stdout here while stdin/stdout
  * are pointed at the client (POSIX: the socket itself; Windows: temp files)
- * and restore them when the connection is torn down. */
-static int  wj_savefdIN  = -1;
-static int  wj_savefdOUT = -1;
+ * and restore them when the connection is torn down.
+ *
+ * Initialised to 0 because on POSIX the original code used zero-initialised
+ * static locals here, and the first wj_connect_io() does dup2(stdout, savefd)
+ * with that value -- keeping the POSIX behaviour byte-for-byte identical. On
+ * Windows wj_connect_io() always overwrites these with _dup() results (and
+ * wj_disconnect_io() resets them to -1), so the initial value is irrelevant
+ * there. */
+static int  wj_savefdIN  = 0;
+static int  wj_savefdOUT = 0;
 
 /* Some variables... */
 /* Port number for webjacl server (is set on command line) */
@@ -423,8 +445,10 @@ wj_connect_io(wj_socket_t clientFd)
 	 */
 	wj_req_tmpname[0] = '\0';
 	wj_resp_tmpname[0] = '\0';
+	wj_savefdIN = -1;
+	wj_savefdOUT = -1;
 
-	if (tmpnam(wj_req_tmpname) == NULL ||
+	if (wj_make_tempfile(wj_req_tmpname) != 0 ||
 	    (reqfp = fopen(wj_req_tmpname, "w+b")) == NULL) {
 		fprintf(stderr, "WebJACL: cannot create request temp file\n");
 		return;
@@ -453,7 +477,7 @@ wj_connect_io(wj_socket_t clientFd)
 	fclose(reqfp);
 
 	/* Create the response temp file. */
-	if (tmpnam(wj_resp_tmpname) == NULL ||
+	if (wj_make_tempfile(wj_resp_tmpname) != 0 ||
 	    (respfp = fopen(wj_resp_tmpname, "w+b")) == NULL) {
 		fprintf(stderr, "WebJACL: cannot create response temp file\n");
 		remove(wj_req_tmpname);
