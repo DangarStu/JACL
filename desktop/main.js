@@ -270,7 +270,11 @@ function applyReading () {
       var bb=';box-sizing:border-box !important';
       st.textContent='#maintext{font-size:'+fs.toFixed(2)+'px !important;'+pad+bb+'}#statuswin{'+pad+'}.directions{'+pad+bb+'}';
     }
-    if(!window.__jaclReadingHook){window.__jaclReadingHook=true;window.addEventListener('resize',apply);}
+    if(!window.__jaclReadingHook){window.__jaclReadingHook=true;window.addEventListener('resize',apply);
+      // Merriweather is a self-hosted webfont; if it hasn't loaded when we first
+      // measure, the fallback serif (narrower) yields too large a font. Re-measure
+      // once fonts settle -- matters on Windows, where first paint beats the load.
+      if(document.fonts&&document.fonts.ready){document.fonts.ready.then(apply);}}
     apply();
   })();`).catch(() => {})
 }

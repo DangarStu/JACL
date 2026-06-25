@@ -16,6 +16,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifdef _WIN32
+/* Enable rand_s() (the Windows CSPRNG); this must be defined before <stdlib.h>,
+ * which the headers below pull in. Used by secure_random_user_id(), since
+ * Windows has no /dev/urandom. */
+#define _CRT_RAND_S
+#endif
+
 #include "jacl.h"
 #include "cgijacl.h"
 #include "cgi-lib.h"
@@ -110,12 +117,31 @@ secure_random_user_id(char *buf, size_t buflen)
 {
     /* "anon_" (5) + 32 hex + NUL = 38 */
     if (buflen < 38) return -1;
-    FILE *fp = fopen("/dev/urandom", "rb");
-    if (fp == NULL) return -1;
     unsigned char raw[16];
-    size_t got = fread(raw, 1, sizeof(raw), fp);
-    fclose(fp);
-    if (got != sizeof(raw)) return -1;
+#ifdef _WIN32
+    /* Windows has no /dev/urandom; rand_s() draws from the OS CSPRNG
+     * (RtlGenRandom) and needs no extra library. Fill 16 bytes from four
+     * 32-bit draws. */
+    {
+        size_t j;
+        for (j = 0; j < sizeof(raw); j += 4) {
+            unsigned int r;
+            if (rand_s(&r) != 0) return -1;
+            raw[j]     = (unsigned char) r;
+            raw[j + 1] = (unsigned char) (r >> 8);
+            raw[j + 2] = (unsigned char) (r >> 16);
+            raw[j + 3] = (unsigned char) (r >> 24);
+        }
+    }
+#else
+    {
+        FILE *fp = fopen("/dev/urandom", "rb");
+        if (fp == NULL) return -1;
+        size_t got = fread(raw, 1, sizeof(raw), fp);
+        fclose(fp);
+        if (got != sizeof(raw)) return -1;
+    }
+#endif
     static const char hex[] = "0123456789abcdef";
     memcpy(buf, "anon_", 5);
     size_t i;
@@ -501,9 +527,14 @@ main(int argc, char *argv[])
         /* IF THIS IS DEVELOPMENT SERVER, TRY TO RELOAD DATA FILE IF IT
          * HAS CHANGED SINCE OUT LAST RESTART */
 
-        /* GET THE URL THIS GAME IS BEING CALLED AS 
+        /* GET THE URL THIS GAME IS BEING CALLED AS
          * FROM THE ENVIRONMENT VARIABLE SCRIPT_NAME*/
-        strcpy (game_url, SCRIPT_NAME);
+        /* SCRIPT_NAME is getenv("SCRIPT_NAME"). On Windows the empty value set by
+         * setenv("SCRIPT_NAME","") goes through _putenv_s, which DELETES the var
+         * (Windows can't hold an empty env var), so getenv returns NULL and
+         * strcpy(dst, NULL) faults -- crashing the request and blanking the page.
+         * Guard against NULL (treat a missing SCRIPT_NAME as the empty string). */
+        strcpy (game_url, SCRIPT_NAME ? SCRIPT_NAME : "");
 
         /* DETERMINE FILE MODIFICATION TIME.  Take the newest mtime across
          * the game file and every shared include, so a git pull that only
