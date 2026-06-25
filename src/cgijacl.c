@@ -301,23 +301,18 @@ main(int argc, char *argv[])
 
     strcpy(temp_buffer, argv[1]);
 
-#ifdef _WIN32
-    /* THIS CODE CONVERTS ALL FORWARD SLASHES TO BACK SLASHES AND IS
-     * REQUIRED WHEN COMPILING FOR MS WINDOWS USING VISUAL C++ */
-
-    for (index = 0; index < strlen(temp_buffer); index++) {
-        if (temp_buffer[index] == '/')
-            temp_buffer[index] = '\\';
-    }
-#else
-    /* THIS CODE CONVERTS ALL BACK SLASHES TO FORWARD SLASHES AND IS
-     * REQUIRED WHEN COMPILING FOR MS WINDOWS USING CYGWIN */
-
+    /* Normalise every separator to '/' so the basename/suffix extraction below
+     * (which scans for '/') works regardless of which separator the caller
+     * passed. Windows accepts forward-slash paths, so this is safe there too.
+     * The old _WIN32 branch converted the other way (to '\\') and then
+     * strrchr(temp_buffer, '/') found nothing, so prefix became the whole
+     * absolute path -- making the per-game state path (temp_directory + prefix)
+     * invalid ("C:\...\temp/C:\...\desa") and every game on Windows failed with
+     * "Unable to save game state to file" and rendered a blank screen. */
     for (index = 0; index < strlen(temp_buffer); index++) {
         if (temp_buffer[index] == '\\')
             temp_buffer[index] = '/';
     }
-#endif
 
     /* SAVE A COPY OF THE SUPPLIED GAMEFILE NAME WITH ALL SLASHES CHANGED */
     strcpy(game_file, temp_buffer);
