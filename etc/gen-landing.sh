@@ -4,12 +4,15 @@
 #   gen-landing.sh [PROJECTS_DIR] [GAMES_DIR]
 #
 # PROJECTS_DIR: where the .jacl sources live (for titles / languages).
-# GAMES_DIR:    where built .jaclgame packages live; the "Get it for iPad"
-#               tab lists only games that have one.
+# GAMES_DIR:    where built .jaclgame packages live; the "iPad Games" tab
+#               lists only games that have one.
 #
-# Two CSS-only tabs: "Play Online" (fcgijacl links) and "Get it for iPad"
-# (.jaclgame downloads). Tab switching is pure CSS; a small script at the end
-# adds one enhancement -- opening the page as .../#get selects the iPad tab.
+# Four CSS-only tabs below the intro: Games (play online, default), iPad Games
+# (.jaclgame downloads), Software (native app downloads), User Guide. Tab
+# switching is pure CSS; a small script adds deep-linking. IMPORTANT: the JACL
+# iPad app's "Get more games" opens the site at .../#get (see
+# ios/JACL/SettingsView.swift), which MUST land on the iPad-games tab where the
+# /games/<name>.jaclgame download links live -- both are preserved here.
 
 projects="${1:-../projects}"
 games="${2:-$projects/jaclgames}"
@@ -66,14 +69,19 @@ cat <<'HEAD'
     ul.apps em { display: block; color: var(--muted); font-size: 0.86em; font-style: normal; }
     ul.apps li.soon { opacity: 0.55; }
     pre.apt { background: var(--accent-dark); color: var(--bg); font-family: ui-monospace, Menlo, Consolas, monospace; padding: 1em; border-radius: 6px; overflow-x: auto; font-size: 0.78em; line-height: 1.5; }
-    nav.tabs { display: flex; gap: 0.4em; border-bottom: 2px solid var(--accent); margin-bottom: 1.4em; }
-    nav.tabs label { padding: 0.55em 1.2em; cursor: pointer; color: var(--muted); font-weight: bold; border-radius: 6px 6px 0 0; }
+    nav.tabs { display: flex; flex-wrap: wrap; gap: 0.3em; border-bottom: 2px solid var(--accent); margin-bottom: 1.4em; }
+    nav.tabs label { padding: 0.55em 1.1em; cursor: pointer; color: var(--muted); font-weight: bold; border-radius: 6px 6px 0 0; white-space: nowrap; }
+    nav.tabs label:hover { color: var(--accent-dark); }
     input.tabsel { position: absolute; left: -9999px; }
     .tabpane { display: none; }
-    #tab-play:checked ~ .tabpane.play { display: block; }
-    #tab-get:checked ~ .tabpane.get { display: block; }
-    #tab-play:checked ~ nav.tabs label[for=tab-play],
-    #tab-get:checked ~ nav.tabs label[for=tab-get] { color: var(--accent-dark); background: var(--card); box-shadow: 0 -1px 3px rgba(0,0,0,0.06); }
+    #tab-games:checked ~ .tabpane.games,
+    #tab-ipad:checked ~ .tabpane.ipad,
+    #tab-software:checked ~ .tabpane.software,
+    #tab-guide:checked ~ .tabpane.guide { display: block; }
+    #tab-games:checked ~ nav.tabs label[for=tab-games],
+    #tab-ipad:checked ~ nav.tabs label[for=tab-ipad],
+    #tab-software:checked ~ nav.tabs label[for=tab-software],
+    #tab-guide:checked ~ nav.tabs label[for=tab-guide] { color: var(--accent-dark); background: var(--card); box-shadow: 0 -1px 3px rgba(0,0,0,0.06); }
     p.tabintro { color: var(--muted); margin: 0 0 1.2em; }
     footer { margin: 3em 1em 2em; color: var(--muted); font-size: 0.85em; text-align: center; }
     footer a { color: var(--accent); }
@@ -92,36 +100,27 @@ cat <<'HEAD'
     <section class="intro">
       <p><strong>Interactive fiction</strong> is a genre of text-based computer games where you read a description of a scene and type simple commands (for example <em>go north</em>, <em>take lamp</em>, or <em>examine desk</em>) to move through a story and solve its puzzles.</p>
       <p>It is a direct descendant of the text adventures of the 1970s and 80s &mdash; titles like <em>Zork</em>, <em>Adventure</em>, and <em>The Hitchhiker&rsquo;s Guide to the Galaxy</em> &mdash; and has a thriving modern community of authors and players.</p>
-      <p>Want to write your own? The <a href="/guide/">JACL Guide</a> walks you through the language &mdash; and you can buy it in print as <a href="https://www.lulu.com/shop/stuart-allen/jacl-authors-guide/paperback/product-e7nkeqd.html"><em>The JACL Author&rsquo;s Guide</em></a> paperback from Lulu.</p>
       <p>The interpreter source code &mdash; for running JACL locally or contributing &mdash; is on <a href="https://github.com/DangarStu/JACL">GitHub</a>.</p>
     </section>
-    <section class="intro">
-      <h2>Get the app</h2>
-      <p>Play online below, or install a native app &mdash; offline play with graphics, sound, and a live map window.</p>
-      <ul class="apps">
-        <li><a href="https://apps.apple.com/app/id6780354110"><strong>iPhone &amp; iPad</strong><em>App Store</em></a></li>
-        <li><a href="https://github.com/DangarStu/JACL/releases/latest/download/JACL.dmg"><strong>macOS</strong><em>Download .dmg</em></a></li>
-        <li><a href="https://github.com/DangarStu/JACL/releases/latest/download/JACL-Setup.exe"><strong>Windows</strong><em>Download installer</em></a></li>
-        <li><a href="https://github.com/DangarStu/JACL/releases/latest/download/JACL.AppImage"><strong>Linux</strong><em>Download .AppImage</em></a></li>
-        <li class="soon"><span><strong>Android</strong><em>Coming to Google Play</em></span></li>
-      </ul>
-      <p class="tabintro">Debian &amp; Ubuntu &mdash; install and auto-update with apt:</p>
-      <pre class="apt">curl -fsSL https://apt.dangarmarine.com.au/jacl.gpg | sudo gpg --dearmor -o /usr/share/keyrings/jacl.gpg
-echo "deb [signed-by=/usr/share/keyrings/jacl.gpg] https://apt.dangarmarine.com.au stable main" | sudo tee /etc/apt/sources.list.d/jacl.list
-sudo apt update &amp;&amp; sudo apt install jacl-desktop</pre>
-    </section>
-    <input class="tabsel" type="radio" name="tab" id="tab-play" checked>
-    <input class="tabsel" type="radio" name="tab" id="tab-get">
+
+    <input class="tabsel" type="radio" name="tab" id="tab-games" checked>
+    <input class="tabsel" type="radio" name="tab" id="tab-ipad">
+    <input class="tabsel" type="radio" name="tab" id="tab-software">
+    <input class="tabsel" type="radio" name="tab" id="tab-guide">
     <nav class="tabs">
-      <label for="tab-play">Play Online</label>
-      <label for="tab-get">Get it for iPad</label>
+      <label for="tab-games">Games</label>
+      <label for="tab-ipad">iPad Games</label>
+      <label for="tab-software">Software</label>
+      <label for="tab-guide">User Guide</label>
     </nav>
-    <div class="tabpane play">
+
+    <div class="tabpane games">
       <h2>Play a game</h2>
+      <p class="tabintro">Click a game to play it right here in your browser &mdash; nothing to install.</p>
       <ul class="games">
 HEAD
 
-# --- Play Online list ---
+# --- Games tab: play online (fcgijacl) ---
 for game in "$projects"/*.jacl; do
     [ -e "$game" ] || continue
     grep -qE '^constant[[:space:]]+game_publish[[:space:]]+true' "$game" || continue
@@ -132,13 +131,16 @@ done
 cat <<'MID'
       </ul>
     </div>
-    <div class="tabpane get">
-      <h2>Get it for iPad</h2>
-      <p class="tabintro">Download a game on your iPad and choose <strong>Open in JACL</strong> to play it in the app &mdash; offline, with graphics. Each download is a single <code>.jaclgame</code> file.</p>
+
+    <div class="tabpane ipad">
+      <h2>iPad games</h2>
+      <p class="tabintro">Download a game on your iPad and choose <strong>Open in JACL</strong> to play it in the app &mdash; offline, with graphics. Each download is a single <code>.jaclgame</code> file. (Don&rsquo;t have the app yet? Get it under <strong>Software</strong>.)</p>
       <ul class="games">
 MID
 
-# --- Get it for iPad list (only games with a built package) ---
+# --- iPad Games tab: .jaclgame downloads (only games with a built package).
+# The JACL iPad app deep-links here via .../#get; do NOT change the /games/
+# <name>.jaclgame URLs or the #get -> tab-ipad mapping in the script below. ---
 for game in "$projects"/*.jacl; do
     [ -e "$game" ] || continue
     grep -qE '^constant[[:space:]]+game_publish[[:space:]]+true' "$game" || continue
@@ -150,16 +152,42 @@ done
 cat <<'TAIL'
       </ul>
     </div>
+
+    <div class="tabpane software">
+      <h2>Get the app</h2>
+      <p class="tabintro">Native apps &mdash; offline play with graphics, sound, and a live map window.</p>
+      <ul class="apps">
+        <li><a href="https://apps.apple.com/app/id6780354110"><strong>iPhone &amp; iPad</strong><em>App Store</em></a></li>
+        <li><a href="https://github.com/DangarStu/JACL/releases/latest/download/JACL.dmg"><strong>macOS</strong><em>Download .dmg</em></a></li>
+        <li><a href="https://github.com/DangarStu/JACL/releases/latest/download/JACL-Setup.exe"><strong>Windows</strong><em>Download installer</em></a></li>
+        <li><a href="https://github.com/DangarStu/JACL/releases/latest/download/JACL.AppImage"><strong>Linux</strong><em>Download .AppImage</em></a></li>
+        <li class="soon"><span><strong>Android</strong><em>Coming to Google Play</em></span></li>
+      </ul>
+      <p class="tabintro">Debian &amp; Ubuntu &mdash; install and auto-update with apt:</p>
+      <pre class="apt">curl -fsSL https://apt.dangarmarine.com.au/jacl.gpg | sudo gpg --dearmor -o /usr/share/keyrings/jacl.gpg
+echo "deb [signed-by=/usr/share/keyrings/jacl.gpg] https://apt.dangarmarine.com.au stable main" | sudo tee /etc/apt/sources.list.d/jacl.list
+sudo apt update &amp;&amp; sudo apt install jacl-desktop</pre>
+    </div>
+
+    <div class="tabpane guide">
+      <h2>The JACL Author&rsquo;s Guide</h2>
+      <p class="tabintro">Want to write your own interactive fiction? The Guide walks you through the JACL language from first principles to a finished game.</p>
+      <ul class="apps">
+        <li><a href="/guide/"><strong>Read online</strong><em>The full Guide, free</em></a></li>
+        <li><a href="https://www.lulu.com/shop/stuart-allen/jacl-authors-guide/paperback/product-e7nkeqd.html"><strong>Paperback</strong><em>Buy on Lulu</em></a></li>
+      </ul>
+    </div>
   </main>
   <footer>Served by JACL. Online games run via the fcgijacl interpreter. <a href="/guide/">Read the Guide</a> to write your own. &middot; <a href="/privacy.html">Privacy</a></footer>
   <script>
-    /* Deep-link: opening the page as .../#get (e.g. the JACL iPad app's
-       "Get more games" link) selects the "Get it for iPad" tab directly.
-       Pure enhancement -- without JS the page just shows the default tab. */
-    if (location.hash === '#get') {
-      var g = document.getElementById('tab-get');
-      if (g) g.checked = true;
-    }
+    /* Deep-link the tabs by URL hash. The JACL iPad app's "Get more games"
+       opens the site as .../#get and MUST land on the iPad-games downloads tab
+       (ios/JACL/SettingsView.swift) -- keep that mapping. Pure enhancement:
+       without JS the page just shows the default Games tab. */
+    var jaclTab = { '#get': 'tab-ipad', '#ipad': 'tab-ipad', '#software': 'tab-software',
+                    '#guide': 'tab-guide', '#play': 'tab-games', '#games': 'tab-games' };
+    var jaclTabId = jaclTab[location.hash];
+    if (jaclTabId) { var el = document.getElementById(jaclTabId); if (el) el.checked = true; }
   </script>
 </body></html>
 TAIL
