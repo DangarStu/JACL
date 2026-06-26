@@ -83,6 +83,7 @@ cat <<'HEAD'
     #tab-software:checked ~ nav.tabs label[for=tab-software],
     #tab-guide:checked ~ nav.tabs label[for=tab-guide] { color: var(--accent-dark); background: var(--card); box-shadow: 0 -1px 3px rgba(0,0,0,0.06); }
     p.tabintro { color: var(--muted); margin: 0 0 1.2em; }
+    iframe.guideframe { width: 100%; height: 75vh; border: 1px solid rgba(0,0,0,0.12); border-radius: 6px; background: var(--card); }
     footer { margin: 3em 1em 2em; color: var(--muted); font-size: 0.85em; text-align: center; }
     footer a { color: var(--accent); }
   </style>
@@ -171,11 +172,8 @@ sudo apt update &amp;&amp; sudo apt install jacl-desktop</pre>
 
     <div class="tabpane guide">
       <h2>The JACL Author&rsquo;s Guide</h2>
-      <p class="tabintro">Want to write your own interactive fiction? The Guide walks you through the JACL language from first principles to a finished game.</p>
-      <ul class="apps">
-        <li><a href="/guide/"><strong>Read online</strong><em>The full Guide, free</em></a></li>
-        <li><a href="https://www.lulu.com/shop/stuart-allen/jacl-authors-guide/paperback/product-e7nkeqd.html"><strong>Paperback</strong><em>Buy on Lulu</em></a></li>
-      </ul>
+      <p class="tabintro">Read the full Guide right here, or <a href="/guide/" target="_blank">open it in its own tab</a> &middot; also in print as the <a href="https://www.lulu.com/shop/stuart-allen/jacl-authors-guide/paperback/product-e7nkeqd.html">Lulu paperback</a>.</p>
+      <iframe class="guideframe" src="/guide/" title="The JACL Author&rsquo;s Guide" loading="lazy"></iframe>
     </div>
   </main>
   <footer>Served by JACL. Online games run via the fcgijacl interpreter. <a href="/guide/">Read the Guide</a> to write your own. &middot; <a href="/privacy.html">Privacy</a></footer>
