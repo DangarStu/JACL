@@ -987,13 +987,19 @@ status_line()
 		(SCORE != NULL ? SCORE->value : 0),
 		(TOTAL_MOVES != NULL ? TOTAL_MOVES->value : 0));
 
-	/* Two-line fallback: when location + score/moves (with a one-column gap)
-	 * won't fit the window width, drop score/moves onto its own row. Only the
-	 * built-in default bar wraps; a game with its own +update_status_window
-	 * owns its layout and its `status_window` height. */
+	/* Drop score/moves onto its own row for either reason:
+	 *   - narrow window (e.g. a phone): below 40 columns we commit to two lines
+	 *     so the bar doesn't flip between one and two rows as the location title
+	 *     changes length from room to room;
+	 *   - won't fit: location + score can't share one line with a blank column
+	 *     between them. The "+2" reserves that gap (leading margin + one space)
+	 *     so a just-fitting title never butts straight against "Score:".
+	 * Only the built-in default bar wraps; a game with its own
+	 * +update_status_window owns its layout and its `status_window` height. */
 	int has_custom = (function_resolve("+update_status_window") != NULL);
 	int two_line = (!has_custom)
-		&& (strlen(status_location) + 1 + strlen(status_scoremoves) >= status_width);
+		&& (status_width < 40
+		    || strlen(status_location) + 2 + strlen(status_scoremoves) >= status_width);
 
 	/* Apply the requested height, bumped to 2 when the default bar must wrap
 	 * (so an explicit `status_window 2` still wins and the bump isn't reset to
