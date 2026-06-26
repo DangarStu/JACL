@@ -1,6 +1,6 @@
 {
   "name": "jacl-desktop",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "JACL desktop (Electron): the full web JACL hosted locally via cgijacl, with the map in its own window.",
   "main": "main.js",
   "scripts": {

@@ -278,7 +278,17 @@ function applyReading () {
       // blocks (#maintext, .directions) need border-box.
       var pad='padding-left:'+side+'px !important;padding-right:'+side+'px !important';
       var bb=';box-sizing:border-box !important';
-      st.textContent='#maintext{font-size:'+fs.toFixed(2)+'px !important;'+pad+bb+'}#statuswin{'+pad+'}.directions{'+pad+bb+'}';
+      // webinterface.css pins the transcript's text to absolute pt sizes (p/b/h2
+      // 12pt, a 10pt, h1 24pt), so they don't inherit #maintext's scaled size --
+      // a bold <b> game title then renders SMALLER than the body around it. Re-
+      // scale them by the same ratio (fs is the 12pt-base body size; a=10/12,
+      // h1=24/12) so bold + headings track the reading size, matching how the web
+      // (which never rescales) shows them all in proportion.
+      st.textContent='#maintext{font-size:'+fs.toFixed(2)+'px !important;'+pad+bb+'}'
+        +'#maintext p,#maintext b,#maintext h2{font-size:'+fs.toFixed(2)+'px !important}'
+        +'#maintext a{font-size:'+(fs*10/12).toFixed(2)+'px !important}'
+        +'#maintext h1{font-size:'+(fs*2).toFixed(2)+'px !important}'
+        +'#statuswin{'+pad+'}.directions{'+pad+bb+'}';
     }
     if(!window.__jaclReadingHook){window.__jaclReadingHook=true;window.addEventListener('resize',apply);
       // Merriweather is a self-hosted webfont; if it hasn't loaded when we first
