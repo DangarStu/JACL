@@ -4201,48 +4201,72 @@ web_render_status_bar(void)
         tm->value = 0;
     }
 
+    /* Decide the line count BEFORE emitting <jacl-status data-lines>: the
+     * default bar drops score/moves onto a second row on a narrow viewport
+     * (< 40 cols, so it doesn't flip 1<->2 lines as the room title length
+     * changes) or when location + score won't share one line with a blank
+     * column between them -- the same rule as the GLK status_line(). A game
+     * with its own +update_status_window[_web] owns its layout and line count
+     * (sw->value), so this only applies to the built-in default. */
+    int has_custom = (function_resolve("+update_status_window_web") != NULL
+                      || function_resolve("+update_status_window") != NULL);
+    char def_loc[256] = "";
+    char def_sm[64];
+    int def_two_line = 0;
+    int lines = sw->value;
+    sprintf(def_sm, "Score: %d  Moves: %d", SCORE->value, TOTAL_MOVES->value);
+    if (!has_custom) {
+        int here_idx = HERE;
+        if (here_idx > 0 && here_idx <= objects
+            && object[here_idx] != NULL) {
+            const char *here_text = sentence_output(here_idx, TRUE);
+            if (here_text != NULL) {
+                strncpy(def_loc, here_text, sizeof(def_loc) - 1);
+                def_loc[sizeof(def_loc) - 1] = 0;
+            }
+        }
+        def_two_line = (cols < 40
+                        || strlen(def_loc) + 2 + strlen(def_sm) >= (size_t) cols);
+        if (def_two_line && lines < 2) lines = 2;
+    }
+
     sprintf(temp_buffer,
             "<jacl-status data-lines=~%d~ style=~display:none~>",
-            sw->value);
+            lines);
     write_text(temp_buffer);
-    web_status_begin(sw->value, cols);
+    web_status_begin(lines, cols);
     /* Counter incremented each time the bar is emitted this request.
      * cgijacl.c's end-of-ajax safety net checks it and emits one
      * more if no updatestatus fired during the command -- catches
      * TIME=false verbs like look / inventory that skip eachturn. */
     web_status_emit_count++;
 
-    /* Try a web-specific override first, then the GLK function name
-     * (so games that already have +update_status_window can share it
-     * between targets thanks to the grid emulation), then fall back
-     * to a sensible default. */
-    if (execute("+update_status_window_web") == FALSE
-        && execute("+update_status_window") == FALSE) {
-        /* Default: location title left-justified, 'Score: N
-         * Moves: N' right-justified. Skipped when HERE doesn't
-         * resolve to a real object (e.g. utility games like life.jacl
-         * whose player has no parent). */
-        char defstr[64];
-        int len, pad, j;
-        int here_idx = HERE;
-        if (here_idx > 0 && here_idx <= objects
-            && object[here_idx] != NULL) {
-            const char *here_text = sentence_output(here_idx, TRUE);
-            if (here_text != NULL) {
-                web_status_cursor(1, 0);
-                for (j = 0; here_text[j] && j + 2 < cols; j++) {
-                    web_status_putchar((unsigned char) here_text[j]);
-                }
-            }
+    /* Try a web-specific override first, then the GLK function name (so games
+     * that already have +update_status_window can share it between targets
+     * thanks to the grid emulation), then fall back to the default drawn above
+     * the data-lines decision. */
+    if (has_custom) {
+        if (execute("+update_status_window_web") == FALSE)
+            execute("+update_status_window");
+    } else {
+        /* Default: location left on row 0. Score/moves either right-justified
+         * on row 0 (single line) or left-justified on row 1 (two lines),
+         * sharing the location's left margin -- matching status_line(). The
+         * two-line decision above guarantees the one-line case keeps a gap. */
+        int j, pad;
+        web_status_cursor(1, 0);
+        for (j = 0; def_loc[j] && j + 2 < cols; j++) {
+            web_status_putchar((unsigned char) def_loc[j]);
         }
-        sprintf(defstr, "Score: %d  Moves: %d",
-                SCORE->value, TOTAL_MOVES->value);
-        len = (int) strlen(defstr);
-        pad = cols - len - 1;
-        if (pad < 0) pad = 0;
-        web_status_cursor(pad, 0);
-        for (j = 0; defstr[j]; j++) {
-            web_status_putchar((unsigned char) defstr[j]);
+        if (def_two_line) {
+            web_status_cursor(1, 1);
+        } else {
+            pad = cols - (int) strlen(def_sm) - 1;
+            if (pad < 0) pad = 0;
+            web_status_cursor(pad, 0);
+        }
+        for (j = 0; def_sm[j]; j++) {
+            web_status_putchar((unsigned char) def_sm[j]);
         }
     }
     web_status_end();
