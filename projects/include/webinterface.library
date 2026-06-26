@@ -1031,7 +1031,12 @@ hyperlink LINK_MAP "map window" "header"
 write " | "
 hyperlink LINK_ABOUT "about" "header"
 write " | "
-hyperlink LINK_RESTART "restart" "header"
+# RESTART is matched as a meta-command (against RESTART_WORD in jacl.c/cgijacl.c),
+# not a grammar verb, so the click must submit the game's own word -- "ulang" in
+# Indonesian -- not the English literal, or a non-English parser rejects it
+# ("Anda tidak bisa menggunakan kata 'restart'..."). The other header links are
+# real grammar verbs that every language library also accepts in English.
+hyperlink LINK_RESTART RESTART_WORD "header"
 write " | "
 hyperlink LINK_HINT "hint" "header"
 ifstring google_client_id != ""
