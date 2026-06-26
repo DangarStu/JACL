@@ -32,8 +32,11 @@ jobs:
           TAG: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
           mkdir -p incoming
+          # Only the amd64 build (JACL.deb). The arm64 release asset is
+          # JACL-arm64.deb; this APT repo is amd64-only (dpkg-scanpackages ->
+          # binary-amd64 below), so pulling both would mis-file the arm64 deb.
           for i in $(seq 1 30); do
-            if gh release download "$TAG" -p '*.deb' -D incoming -R "$GITHUB_REPOSITORY" 2>/dev/null \
+            if gh release download "$TAG" -p 'JACL.deb' -D incoming -R "$GITHUB_REPOSITORY" 2>/dev/null \
                && ls incoming/*.deb >/dev/null 2>&1; then
               echo "got the .deb from $TAG"; ls -la incoming; exit 0
             fi

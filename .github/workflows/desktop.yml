@@ -27,6 +27,8 @@ jobs:
             target: mac
           - os: ubuntu-latest
             target: linux
+          - os: ubuntu-24.04-arm
+            target: linux-arm64
           - os: windows-latest
             target: win
     runs-on: ${{ matrix.os }}
@@ -97,6 +99,19 @@ jobs:
         run: npm run dist:${{ matrix.target }}
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: ${{ env.HAS_MAC_CERT }}
+
+      # The arm64 Linux job builds JACL.AppImage / JACL.deb with the same names as
+      # the x64 job (just an arm64 payload), so suffix them with -arm64 to keep
+      # both archs on the release and leave the x64 direct-download links intact.
+      - name: Suffix arm64 Linux artifacts
+        if: matrix.target == 'linux-arm64'
+        run: |
+          shopt -s nullglob
+          for f in dist/JACL.AppImage dist/JACL.deb; do
+            [ -e "$f" ] || continue
+            mv "$f" "${f%.*}-arm64.${f##*.}"
+          done
+          ls -la dist/*.AppImage dist/*.deb 2>/dev/null || true
 
       # electron-builder notarizes + staples the .app but leaves the .dmg
       # container un-notarized, so a freshly downloaded .dmg can prompt Gatekeeper
