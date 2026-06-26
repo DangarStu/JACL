@@ -11,7 +11,7 @@
     "dist": "npm run build-engine && npm run prepare-bundle && electron-builder",
     "dist:mac": "npm run build-engine && npm run prepare-bundle && electron-builder --mac",
     "dist:linux": "npm run build-engine && npm run prepare-bundle && electron-builder --linux",
-    "dist:linux-arm64": "npm run build-engine && npm run prepare-bundle && electron-builder --linux --arm64",
+    "dist:linux-arm64": "npm run build-engine && npm run prepare-bundle && electron-builder --linux AppImage --arm64",
     "dist:win": "npm run build-engine-win && npm run prepare-bundle && electron-builder --win"
   },
   "license": "MIT",
