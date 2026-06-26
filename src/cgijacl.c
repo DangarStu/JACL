@@ -1283,11 +1283,13 @@ default_header()
     puts("if(xhReq == null) { return true; }");
     puts("var user_id = document.JACLGameForm.user_id.value;");
     puts("var command = document.JACLGameForm.command.value;");
+    puts("var cols = jaclMeasureStatusCols();");
     printf("xhReq.open(\"GET\", \"%s", game_url);
-    puts("?user_id=\"+user_id+\"&command=\"+command+\"&ajax=true\", false);");
+    puts("?user_id=\"+user_id+\"&command=\"+command+\"&ajax=true&status_cols=\"+cols, false);");
     puts("xhReq.send(null);");
     puts("var serverResponse = xhReq.responseText;");
     puts("var maintext = document.getElementById(\"maintext\");");
+    puts("serverResponse = jaclShowStatus(serverResponse);");
     puts("maintext.innerHTML += \"<br><b>&gt;\" + command + \"</b><br>\" + serverResponse;");
     puts("var main = document.getElementById(\"main\");");
     puts("main.scrollTop = main.scrollHeight;");
@@ -1301,15 +1303,74 @@ default_header()
     puts("try { return new XMLHttpRequest(); } catch(e) {}");
     puts("try { return new ActiveXObject(\"Msxml2.XMLHTTP\"); } catch (e) {}");
     puts("return null; }");
+    /* The engine emits the status bar each turn as a hidden
+     * <jacl-status data-lines=N> (monospace grid rows; the score is
+     * right-justified to status_cols). Surface it into #statuswin exactly as
+     * webinterface.library does, so a game that doesn't include the web
+     * interface still gets the default location/score bar -- matching the GLK
+     * console. jaclMeasureStatusCols feeds the real viewport width back so the
+     * right-justified segment isn't clipped. */
+    puts("function jaclMeasureStatusCols() {");
+    puts("var bar = document.getElementById(\"statuswin\");");
+    puts("var mn = document.getElementById(\"main\");");
+    puts("var w = bar ? bar.getBoundingClientRect().width : (mn ? mn.getBoundingClientRect().width : 0);");
+    puts("if (w <= 0) w = document.documentElement.clientWidth || 0;");
+    puts("if (w <= 0) return 80;");
+    puts("var ref = bar || mn || document.body;");
+    puts("var cs = window.getComputedStyle(ref);");
+    puts("var padX = (parseFloat(cs.paddingLeft)||0) + (parseFloat(cs.paddingRight)||0);");
+    puts("if (padX > 0 && padX < w) w = w - padX;");
+    puts("var probe = document.createElement(\"span\");");
+    puts("probe.style.cssText = \"position:absolute;visibility:hidden;white-space:pre\";");
+    puts("probe.style.fontFamily = \"ui-monospace, Menlo, Consolas, monospace\";");
+    puts("probe.style.fontSize = bar ? cs.fontSize : \"12px\";");
+    puts("probe.textContent = \"0123456789012345678901234567890123456789\";");
+    puts("document.body.appendChild(probe);");
+    puts("var charW = probe.offsetWidth / 40;");
+    puts("document.body.removeChild(probe);");
+    puts("if (charW <= 0) return 80;");
+    puts("return Math.max(40, Math.min(400, Math.floor(w / charW) - 1)); }");
+    puts("function jaclPopulateStatus(s) {");
+    puts("var bar = document.getElementById(\"statuswin\"); if (!bar) return;");
+    puts("var n = parseInt(s.getAttribute(\"data-lines\") || \"1\", 10);");
+    puts("if (isNaN(n) || n < 1) n = 1; if (n > 10) n = 10;");
+    puts("document.body.style.setProperty(\"--status-lines\", n);");
+    puts("bar.innerHTML = s.innerHTML; bar.style.display = \"block\"; }");
+    puts("function jaclShowStatus(html) {");
+    puts("var holder = document.createElement(\"div\"); holder.innerHTML = html;");
+    puts("var s = holder.querySelector(\"jacl-status\");");
+    puts("if (s) { jaclPopulateStatus(s); s.parentNode.removeChild(s); }");
+    puts("return holder.innerHTML; }");
+    /* Re-fetch the bar at the measured width via an ASYNC request. A
+     * synchronous XHR fired from the load event is unreliable in Chromium, so
+     * the first render otherwise kept the engine's 120-col default and the
+     * right-justified score ran off the edge. Also re-measure on resize, the
+     * same way webinterface.library's jaclRefreshStatus does. */
+    puts("function jaclRefreshStatus() {");
+    puts("var bar = document.getElementById(\"statuswin\");");
+    puts("if (!bar || bar.innerHTML.length === 0) return;");
+    puts("var xhr = createXMLHttpRequest(); if (xhr == null) return;");
+    puts("xhr.onreadystatechange = function(){ if (xhr.readyState===4 && xhr.status===200) jaclShowStatus(xhr.responseText); };");
+    printf("xhr.open(\"GET\", \"%s", game_url);
+    puts("?ajax=true&rpc=resize&status_cols=\"+jaclMeasureStatusCols(), true);");
+    puts("xhr.send(null); }");
+    puts("function jaclInitStatus() {");
+    puts("var mt = document.getElementById(\"maintext\");");
+    puts("var s = mt ? mt.querySelector(\"jacl-status\") : null;");
+    puts("if (s) { jaclPopulateStatus(s); s.parentNode.removeChild(s); }");
+    puts("jaclRefreshStatus(); setTimeout(jaclRefreshStatus, 50); }");
+    puts("if (window.addEventListener) window.addEventListener(\"resize\", jaclRefreshStatus);");
     puts("-->");
     puts("</script>");
     puts("<style> <!--");
     puts("#footer { position:absolute; bottom:0; left:0; right:0;  height: 70px; background-color: #bbbbbb; text-align: center; }");
-    puts("#main { position:absolute; left:0px; top:0px; right:0px; overflow:auto; bottom: 70px;}");
+    puts("#statuswin { position:absolute; top:0; left:0; right:0; height: calc(var(--status-lines, 1) * 1.5em); background-color:#2c3e50; color:#fff; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11pt; line-height: 1.5em; white-space: pre; padding: 0 12px; box-sizing: border-box; overflow: hidden; display: none; }");
+    puts("#main { position:absolute; left:0px; top: calc(var(--status-lines, 0) * 1.5em); right:0px; overflow:auto; bottom: 70px;}");
     puts("div.maintext { font-family: Verdana, Arial, Sanserif; padding-top: 20px; padding-bottom: 20px; padding-left: 50px; padding-right: 50px; font-size: 12pt; overflow: auto; }");
     puts("#JACLCommandPrompt { width: 95%; margin: 25px 10px 10px 10px;}");
     puts("--> </style>");
-    puts("</head><body onLoad=\"putFocus(0, 0);\">");
+    puts("</head><body onLoad=\"putFocus(0, 0); jaclInitStatus();\">");
+    puts("<div id=\"statuswin\"></div>");
     puts("<div id=\"main\">");
     puts("<div id=\"maintext\" class=\"maintext\">");
 }
