@@ -1,6 +1,6 @@
 {
   "name": "jacl-desktop",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "JACL desktop (Electron): the full web JACL hosted locally via cgijacl, with the map in its own window.",
   "main": "main.js",
   "scripts": {
@@ -35,6 +35,7 @@
         { "target": "dmg", "arch": ["universal"] },
         { "target": "zip", "arch": ["universal"] }
       ],
+      "artifactName": "${productName}.${ext}",
       "category": "public.app-category.games",
       "identity": "Stuart Allen (5TU3TU28JN)",
       "x64ArchFiles": "**/cgijacl",
@@ -46,10 +47,12 @@
     },
     "linux": {
       "target": ["AppImage", "deb"],
+      "artifactName": "${productName}.${ext}",
       "category": "Game"
     },
     "win": {
-      "target": ["nsis"]
+      "target": ["nsis"],
+      "artifactName": "${productName}-Setup.${ext}"
     }
   }
 }
