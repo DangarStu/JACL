@@ -250,7 +250,17 @@ function applyReading () {
       var r=window.jaclReading;if(!r)return;
       var mt=document.getElementById('maintext');if(!mt)return;
       var w=document.documentElement.clientWidth||window.innerWidth;
-      var side=Math.round(w*r.m),usable=Math.max(w-2*side,120);
+      // Cap the reading column. "Fill r.c columns" scales the font with window
+      // width, so a wide desktop window (1024px+, esp. Retina) balloons the font
+      // to ~23px. Keep >= r.m margin each side, but never let the column exceed
+      // maxCol; the surplus becomes centring margin, so text stays a comfortable
+      // book width however wide the window gets. (The web serves the same page but
+      // injects no reading view, so it never grows like this -- this keeps the
+      // desktop in line. Narrow windows are unaffected: usable < maxCol there.)
+      var maxCol=680;
+      var minSide=Math.round(w*r.m);
+      var usable=Math.max(Math.min(w-2*minSide,maxCol),120);
+      var side=Math.round((w-usable)/2);
       var p=document.createElement('span');
       p.style.cssText='position:absolute;visibility:hidden;white-space:pre;font-size:200px;font-family:'+getComputedStyle(mt).fontFamily;
       p.textContent='abcdefghijklmnopqrstuvwxyz abcdefghijklmnopqrstuvwxyz';
