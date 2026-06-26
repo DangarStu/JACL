@@ -1,23 +1,23 @@
 Architectures: amd64
 Codename: stable
 Components: main
-Date: Thu, 25 Jun 2026 04:26:25 +0000
+Date: Fri, 26 Jun 2026 00:49:40 +0000
 Label: JACL
 Origin: JACL
 Suite: stable
 MD5Sum:
- a5966e7c4617bfba0c5669ad1c0e29ce              132 Release
- b7a933e83ae4d47532d24301f39f2372             1496 main/binary-amd64/Packages
- 49d636af52f364cbaa8ba3a083f15178              644 main/binary-amd64/Packages.gz
+ 4ed89cc3e2fa6690d7d5a8a5e62f6410              132 Release
+ c3d96793a0dacd643654b41297d1e2de             2224 main/binary-amd64/Packages
+ 298a100783115227d92e4b90271ffb21              760 main/binary-amd64/Packages.gz
 SHA1:
- 61aa5dfe598176a4885a03d4b10f232cc35e0c37              132 Release
- 35b4eaf9b3c3a01fca2bab57a17ff807ec39bda4             1496 main/binary-amd64/Packages
- 74e9ee1d59d721aa2a6f7dffdc4f04665f8ac7d8              644 main/binary-amd64/Packages.gz
+ c6dfcd5bdf1bba4d43aa111654d7b5abc7af6d84              132 Release
+ b56f02708796b0290c984b2838907e19daa8d5a5             2224 main/binary-amd64/Packages
+ 56fd951427fdd1bf0fff91eefc33db762f8f0b03              760 main/binary-amd64/Packages.gz
 SHA256:
- 2a1c01b8cbe97b8968f396a3513df3a47bbe3e4b0318225d56b4460862d74568              132 Release
- 1b57083c6a1e9e7f37b087fd53f687f3eb612f02cb3abe01c351867d82583ef4             1496 main/binary-amd64/Packages
- 8c1f15dcb8184ab2375e164d3f7f388d2e90d38708499430117cd65d4c6775cc              644 main/binary-amd64/Packages.gz
+ 78057a1ae2f890d9fcb7adc5cac2f7c16761657198f601f48c5b08439bc2b888              132 Release
+ 990d6f780a66f3a71098b660b37adba13cc5b3a53dfbde97b8131d90d684abe2             2224 main/binary-amd64/Packages
+ 6a520dc744cb3fe0346dc8df8fa1d534618f1f1b7283092a3cc8a01adaa30aa3              760 main/binary-amd64/Packages.gz
 SHA512:
- 120453da77fc349c3bb068a00c767f6b71b8bcd853cfba26aca6ba5e67e2ee2077ed540d7dd2038f850d8748fb76ea7937d53601f6b6018db73a37c6b51019bf              132 Release
- 5e09776197b586aa6e7447874dab83fad9f5802b500fda18940ac8b548c2fc7554a5453466e03de3891903993b19d59878e98e3a3eef78f8ee493b994510c85f             1496 main/binary-amd64/Packages
- acdb920db30ac8a4973b0ca0ba3c43a6d7e38bcc4a47b15b23812b9f6e8cafdbba3c185a74458f779a60a09dff68c04e09452db0090cc0ec5b4db909ba7d6990              644 main/binary-amd64/Packages.gz
+ 3f3690f9811937994665efa1d1a73640011f9ac617092c633ce09bd54f614dbf3973007891e64b465e92385bcd98ac972f374c2b93c73e505f43ec092aa7550a              132 Release
+ cb41ed8d22f7ba0441594d3018b9171e04e3918ad8c8b37047f461ff0d80575eece7567854f5df321aec4d3d84523886615d358147e02840776fedb3c9125539             2224 main/binary-amd64/Packages
+ a93beeebe5e466944ea3e45b7ea0eaac8d5c8b19e7e85f073ddb43bb9ca2e28de1122298e17f53eb4e7071b2c8bf805f7c998928eb20752a4bbdff6c2f99453c              760 main/binary-amd64/Packages.gz
