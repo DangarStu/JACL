@@ -14,18 +14,16 @@
       /* keep text legible over the now full-window backdrop */
       text-shadow: 0 1px 5px rgba(0, 0, 0, 0.9);
     }
-    /* The JACL / Interactive Fiction + compass artwork as a backdrop, washed out
-       to match the iPad/Android shelf: the art at 0.55 opacity under a 40% black
-       scrim, so the game titles stay readable over it (rather than a pale wash). */
+    /* The JACL / Interactive Fiction artwork as a dimmed backdrop. The dimming is
+       baked straight into shelf-artwork.png (the PNG is pre-multiplied to ~30%) --
+       NOT done with CSS opacity or a gradient/scrim overlay. The desktop's Electron,
+       software-rendered on Linux/Wayland, did NOT composite either of those (the logo
+       stayed full brightness); drawing an already-dark image needs no compositing, so
+       it renders correctly everywhere. */
     body::before {
       content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background: url('shelf-artwork.png') no-repeat center center;
       background-size: cover;          /* fill the window, keep aspect ratio (crops) */
-      opacity: 0.55;                   /* matches iPad Image("ShelfArtwork").opacity(0.55) */
-    }
-    body::after {                      /* the black scrim on top (iPad Color.black.opacity(0.4)) */
-      content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
-      background: rgba(0, 0, 0, 0.4);
     }
     header, main, footer { position: relative; z-index: 1; }
 
