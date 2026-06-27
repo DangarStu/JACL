@@ -234,9 +234,11 @@ function createWindow () {
   win.webContents.on('did-fail-load', () => {
     if (gameRetries-- > 0) setTimeout(() => win.loadURL(`http://127.0.0.1:${activePort}/`), 250)
   })
-  // On a game page (not the picker), add the "‹ Library" button + apply reading prefs.
+  // On a game page (not the picker), mark it loaded + apply reading prefs. Returning
+  // to the bookshelf is the Game > Library menu item (Ctrl/Cmd+L) -- no in-page button,
+  // so nothing floats over the game's header banner.
   win.webContents.on('did-finish-load', () => {
-    if (win.webContents.getURL().startsWith('http://127.0.0.1')) { gameLoaded = true; injectLibraryButton(); applyReading() }
+    if (win.webContents.getURL().startsWith('http://127.0.0.1')) { gameLoaded = true; applyReading() }
   })
   showPicker()
 }
@@ -247,20 +249,6 @@ const COLS_MIN = 40, COLS_MAX = 110, COLS_STEP = 6
 function readingFile () { return path.join(app.getPath('userData'), 'reading.json') }
 function loadReading () { try { Object.assign(reading, JSON.parse(fs.readFileSync(readingFile(), 'utf8'))) } catch (e) {} }
 function saveReading () { try { fs.writeFileSync(readingFile(), JSON.stringify(reading)) } catch (e) {} }
-
-// A small fixed "‹ Library" button injected into the game page, so returning to
-// the bookshelf doesn't depend on finding the menu.
-function injectLibraryButton () {
-  win.webContents.executeJavaScript(`(function(){
-    if(document.getElementById('jaclLibraryBtn'))return;
-    var b=document.createElement('button');b.id='jaclLibraryBtn';b.textContent='‹ Library';
-    b.style.cssText='position:fixed;top:7px;left:7px;z-index:2147483647;font:13px Georgia,serif;color:#e8e2d6;background:rgba(20,18,15,.72);border:1px solid rgba(255,255,255,.18);border-radius:7px;padding:4px 10px;cursor:pointer';
-    b.onmouseenter=function(){b.style.background='rgba(45,40,33,.9)'};
-    b.onmouseleave=function(){b.style.background='rgba(20,18,15,.72)'};
-    b.onclick=function(){window.jacl&&window.jacl.library&&window.jacl.library()};
-    document.body.appendChild(b);
-  })();`).catch(() => {})
-}
 
 // Size the transcript so `columns` characters fill the usable width (window minus
 // margins) -- the same idea as the iPad's applyColumns, but measuring the actual
