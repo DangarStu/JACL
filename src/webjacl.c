@@ -928,7 +928,12 @@ listen_again:
 										"WebJACL:listen(): Panic! Can't malloc!\n");
 									exit(0);
 								}
-								if ((media_fp = fopen(fullpath, "r")) == NULL) {
+								/* "rb", not "r": media files are binary (PNG/JPG/woff2).
+								 * Windows text mode mangles them (\r\n<->\n translation,
+								 * ^Z-as-EOF), so the served PNG fails to decode in the
+								 * browser -- a broken-image icon for the title banner.
+								 * No-op on macOS/Linux where text mode == binary. */
+								if ((media_fp = fopen(fullpath, "rb")) == NULL) {
 									/* Don 't panic if we can't read the file. This is a defined 403 condition */
 									printf
 										("HTTP/1.0 403 Forbidden\r\nServer: %s\r\nConnection: close\r\nContent-Type: text/html\r\n\r\n",
