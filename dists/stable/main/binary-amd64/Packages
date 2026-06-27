@@ -39,17 +39,17 @@ License: MIT
 Vendor: Stuart Allen <dangarstu@gmail.com>
 
 Package: jacl-desktop
-Version: 0.2.8
+Version: 0.2.9
 Architecture: amd64
 Maintainer: Stuart Allen <dangarstu@gmail.com>
-Installed-Size: 290933
+Installed-Size: 290934
 Depends: libgtk-3-0, libnotify4, libnss3, libxss1, libxtst6, xdg-utils, libatspi2.0-0, libuuid1, libsecret-1-0
 Recommends: libappindicator3-1
 Filename: pool/main/JACL.deb
-Size: 90945246
-MD5sum: 15e618f19c238d3b1c2ad661fcc57e71
-SHA1: 77e7347b56dc3198d330dd48f26f71fb10ef122d
-SHA256: a63f1d71d469e4600022fca9332bc63941e31b4475bba782129604f3dcdab850
+Size: 90956878
+MD5sum: fee541b894bd747a97373b313254f705
+SHA1: d8a4bd8b9adcce980b414bac331cef5344ce0be4
+SHA256: 720d17225348e449d069f5157958a17e168b929373a8aa373ed6d051bf374b79
 Section: default
 Priority: optional
 Homepage: https://jacl.dangarmarine.com.au
