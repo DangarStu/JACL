@@ -19,6 +19,26 @@ License: MIT
 Vendor: Stuart Allen <dangarstu@gmail.com>
 
 Package: jacl-desktop
+Version: 0.2.10
+Architecture: amd64
+Maintainer: Stuart Allen <dangarstu@gmail.com>
+Installed-Size: 290934
+Depends: libgtk-3-0, libnotify4, libnss3, libxss1, libxtst6, xdg-utils, libatspi2.0-0, libuuid1, libsecret-1-0
+Recommends: libappindicator3-1
+Filename: pool/main/JACL.deb
+Size: 90961094
+MD5sum: 1b262e68f82a8b6b79595796d7837d34
+SHA1: 1b3fc622a2ffe50d37f44cdf7dd0126d8354b137
+SHA256: 9e1c3f710acce6fb6dc4b37b35ae02ff6831584ba8be05761467702a83605832
+Section: default
+Priority: optional
+Homepage: https://jacl.dangarmarine.com.au
+Description:
+  JACL desktop (Electron): the full web JACL hosted locally via cgijacl, with the map in its own window.
+License: MIT
+Vendor: Stuart Allen <dangarstu@gmail.com>
+
+Package: jacl-desktop
 Version: 0.2.2
 Architecture: amd64
 Maintainer: Stuart Allen <dangarstu@gmail.com>
@@ -30,26 +50,6 @@ Size: 90960428
 MD5sum: 817e6a3a03a14ae9238045b28d81df01
 SHA1: 9b1c7758c52497d8b340ade1414eb97c955b4588
 SHA256: b9af4e01645cb165cf9c6840c16c34a3f2eb9a2c7f9354e8ea72904caa879871
-Section: default
-Priority: optional
-Homepage: https://jacl.dangarmarine.com.au
-Description:
-  JACL desktop (Electron): the full web JACL hosted locally via cgijacl, with the map in its own window.
-License: MIT
-Vendor: Stuart Allen <dangarstu@gmail.com>
-
-Package: jacl-desktop
-Version: 0.2.9
-Architecture: amd64
-Maintainer: Stuart Allen <dangarstu@gmail.com>
-Installed-Size: 290934
-Depends: libgtk-3-0, libnotify4, libnss3, libxss1, libxtst6, xdg-utils, libatspi2.0-0, libuuid1, libsecret-1-0
-Recommends: libappindicator3-1
-Filename: pool/main/JACL.deb
-Size: 90956878
-MD5sum: fee541b894bd747a97373b313254f705
-SHA1: d8a4bd8b9adcce980b414bac331cef5344ce0be4
-SHA256: 720d17225348e449d069f5157958a17e168b929373a8aa373ed6d051bf374b79
 Section: default
 Priority: optional
 Homepage: https://jacl.dangarmarine.com.au
