@@ -22,6 +22,9 @@ let CGIJACL, GAMES_DIR, SOURCES_DIR, INCLUDE_DIR, WWW_DIR, IMAGES_DIR, SOUNDS_DI
 
 let win = null
 let server = null            // the current cgijacl child process
+let currentGame = null       // game path of the active server (for early-exit respawn)
+let serverRespawns = 0       // respawn budget while the game page hasn't loaded yet
+let gameLoaded = false       // has a game page finished loading on the current server?
 let activePort = 8098        // pre-incremented on each game launch
 let gameRetries = 0          // retry budget for loading the game URL while cgijacl binds
 let reading = { columns: 64, margin: 'normal' }   // iPad-style reading prefs (persisted)
@@ -169,12 +172,34 @@ function writeMediaManifest (gamePath) {
 // ./cgijacl.conf. Each call kills the previous server and uses a fresh port.
 function startServer (gamePath) {
   if (server) { server.removeAllListeners(); try { server.kill() } catch (e) {} server = null }
+  // The run dirs are made once at startup, but re-assert them before every spawn:
+  // cgijacl runs with cwd=RUN and reads ./cgijacl.conf for its logs/temp; a missing
+  // one makes it bail on the game file ("Unable to open game file", exit 41).
+  try {
+    fs.mkdirSync(path.join(RUN, 'logs'), { recursive: true })
+    fs.mkdirSync(path.join(RUN, 'temp'), { recursive: true })
+  } catch (e) {}
+  currentGame = gamePath
+  gameLoaded = false
   const port = ++activePort
   server = spawn(CGIJACL, ['-p', String(port), gamePath], { cwd: RUN })
   const log = d => process.stdout.write('[cgijacl] ' + d)
   server.stdout.on('data', log)
   server.stderr.on('data', log)
-  server.on('exit', code => console.log('[cgijacl] exited', code))
+  // If the engine exits before the game page has loaded -- a cold-start race can
+  // make the very first spawn bail -- re-spawn it (a fresh spawn reliably works) so
+  // the user never lands on a blank page they must escape by re-picking the game.
+  // Guarded by a budget, by gameLoaded, and by the window still being alive (so a
+  // kill on quit or a deliberate return to the picker doesn't trigger a respawn).
+  server.on('exit', code => {
+    console.log('[cgijacl] exited', code)
+    if (!gameLoaded && currentGame && serverRespawns < 5 && win && !win.isDestroyed()) {
+      serverRespawns++
+      console.log('[cgijacl] respawning after early exit (' + serverRespawns + ')')
+      startServer(currentGame)
+      loadGame()
+    }
+  })
   return port
 }
 
@@ -185,7 +210,8 @@ function loadGame () {
 }
 
 function showPicker () {
-  gameRetries = 0   // stop any in-flight game-load retry loop
+  gameRetries = 0      // stop any in-flight game-load retry loop
+  currentGame = null   // and stop the engine-respawn loop -- we've left the game
   win.loadFile(path.join(__dirname, 'picker.html'))
 }
 
@@ -210,7 +236,7 @@ function createWindow () {
   })
   // On a game page (not the picker), add the "‹ Library" button + apply reading prefs.
   win.webContents.on('did-finish-load', () => {
-    if (win.webContents.getURL().startsWith('http://127.0.0.1')) { injectLibraryButton(); applyReading() }
+    if (win.webContents.getURL().startsWith('http://127.0.0.1')) { gameLoaded = true; injectLibraryButton(); applyReading() }
   })
   showPicker()
 }
@@ -342,6 +368,7 @@ function buildMenu () {
 // --- ipc -----------------------------------------------------------------
 ipcMain.handle('list-games', () => listGames())
 ipcMain.handle('play-game', (e, gamePath) => {
+  serverRespawns = 0   // fresh respawn budget for this game
   writeMediaManifest(gamePath)
   startServer(gamePath)
   loadGame()
