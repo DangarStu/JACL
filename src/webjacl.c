@@ -220,8 +220,17 @@ wj_setup(int *pargc, char **pargv)
 				 * Now remove these 2 parameters from
 				 * argc/argv
 				 */
+				/* Shift the argv POINTERS down, never strcpy the
+				 * contents: pargv[j-2] and pargv[j] are slices of
+				 * the same contiguous argv block and overlap, so
+				 * strcpy() between them is undefined behaviour. An
+				 * optimised (vectorised) strcpy reads ahead and
+				 * corrupted the game path on some memory layouts
+				 * (e.g. run as a normal user rather than root),
+				 * after which stat() failed with "Unable to open
+				 * game file" and the desktop showed a blank page. */
 				for (j = i + 2; j < *pargc; j++)
-					strcpy(pargv[j - 2], pargv[j]);
+					pargv[j - 2] = pargv[j];
 				*pargc -= 2;
 
 				/* Store port in global variable */
@@ -240,8 +249,10 @@ wj_setup(int *pargc, char **pargv)
 					 * Now remove this parameter from
 					 * argc/argv
 					 */
+					/* Pointer shift, never strcpy -- the slices
+					 * overlap (see the note above). */
 					for (j = i + 1; j < *pargc; j++)
-						strcpy(pargv[j - 1], pargv[j]);
+						pargv[j - 1] = pargv[j];
 					(*pargc)--;
 
 					/* Store port in global variable */
