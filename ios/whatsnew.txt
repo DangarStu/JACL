@@ -1,0 +1,1 @@
+Status bar polish: the score no longer crowds the room name, and the layout stays steady as you move between rooms.

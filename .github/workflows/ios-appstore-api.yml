@@ -1,0 +1,48 @@
+name: iOS — App Store submit (raw ASC API, hands-off)
+
+# Fully hands-off App Store submission via the App Store Connect API -- no
+# deliver/fastlane and no manual App Store Connect steps. For the target
+# marketing version it:
+#   1. finds (or creates) the editable App Store version,
+#   2. sets "What's New" on every localization from ios/whatsnew.txt,
+#   3. attaches the TestFlight build (input, or the latest for the version), and
+#   4. submits for review (reviewSubmissions API).
+#
+# Supersedes the deliver-based ios-appstore.yml (its download_metadata produced
+# no localizations, so the required whatsNew came up empty) and folds in the jobs
+# previously split across ios-set-build.yml + ios-submit.yml. The release note is
+# version-controlled in ios/whatsnew.txt -- edit that per release; nothing to type
+# in ASC. Logic lives in .github/scripts/ios_appstore_submit.py.
+on:
+  workflow_dispatch:
+    inputs:
+      app_version:
+        description: "Marketing version to submit"
+        default: "1.3"
+      build_number:
+        description: "TestFlight build to attach (blank = latest for this version)"
+        default: ""
+      submit:
+        description: "Submit for review (false = set build + What's New only)"
+        default: "true"
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Submit via ASC API
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          APP_VERSION: ${{ inputs.app_version }}
+          BUILD_NUMBER: ${{ inputs.build_number }}
+          SUBMIT: ${{ inputs.submit }}
+          BUNDLE_ID: au.com.dangarmarine.JACL
+        run: |
+          python3 -m pip install --quiet pyjwt cryptography requests
+          python3 .github/scripts/ios_appstore_submit.py
