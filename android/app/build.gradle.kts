@@ -40,7 +40,7 @@ android {
         // android.injected.version.code isn't honoured by bundleRelease, so read it
         // here. Falls back to 3 for local builds.
         versionCode = System.getenv("BUILD_NUMBER")?.toIntOrNull() ?: 3
-        versionName = "1.2"
+        versionName = "1.3"
         buildConfigField("String", "BUILD_TIME",
             "\"${SimpleDateFormat("yyyy-MM-dd HH:mm").format(Date())}\"")
         buildConfigField("String", "GIT_HASH", "\"${gitHash()}\"")

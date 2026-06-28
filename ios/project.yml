@@ -128,7 +128,7 @@ targets:
       path: JACL/Info.plist
       properties:
         CFBundleDisplayName: JACL
-        CFBundleShortVersionString: "1.2"
+        CFBundleShortVersionString: "1.3"
         CFBundleVersion: "3"
         # Allow secondary windows (the Mac map / settings windows). Without this
         # openWindow() silently no-ops -- the app is treated as single-window.

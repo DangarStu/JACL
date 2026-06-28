@@ -72,11 +72,8 @@ jobs:
           shopt -s nullglob
           for d in fastlane/metadata/*/; do
             [ -f "${d}description.txt" ] || continue   # only real locale dirs
-            printf '%s\n%s\n%s\n%s\n' \
-              '• Keyboard now stays up between commands — no more flicker.' \
-              '• New reading-margin options (narrow / normal / wide).' \
-              '• Fixed a stray "game has ended" message after Restart.' \
-              '• Title images now fit the text width.' > "${d}release_notes.txt"
+            printf '%s\n' \
+              '• Status bar polish: the score no longer crowds the room name, and the layout stays steady as you move between rooms.' > "${d}release_notes.txt"
             echo "  set release notes for $d"
           done
 
