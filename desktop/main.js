@@ -245,6 +245,11 @@ function createWindow () {
 
 // --- reading prefs (columns + margins -> font size, iPad-style) -----------
 const MARGINS = { narrow: 0.04, normal: 0.10, wide: 0.16 }   // matches iOS MarginWidth
+// Max book-column width (px) per margin. The column is capped so the font doesn't
+// balloon on wide windows; making that cap depend on the margin is what keeps the
+// Narrow/Normal/Wide choice visible on a wide window, where the window-relative
+// margin alone gets clamped away by a fixed cap (so margins appeared to do nothing).
+const MAXCOL = { narrow: 780, normal: 680, wide: 580 }
 const COLS_MIN = 40, COLS_MAX = 110, COLS_STEP = 6
 function readingFile () { return path.join(app.getPath('userData'), 'reading.json') }
 function loadReading () { try { Object.assign(reading, JSON.parse(fs.readFileSync(readingFile(), 'utf8'))) } catch (e) {} }
@@ -258,8 +263,9 @@ function saveReading () { try { fs.writeFileSync(readingFile(), JSON.stringify(r
 function applyReading () {
   if (!win || win.webContents.getURL().startsWith('file://')) return
   const m = MARGINS[reading.margin] ?? 0.10
+  const maxCol = MAXCOL[reading.margin] ?? 680
   win.webContents.executeJavaScript(`(function(){
-    window.jaclReading={c:${reading.columns},m:${m}};
+    window.jaclReading={c:${reading.columns},m:${m},x:${maxCol}};
     function apply(){
       var r=window.jaclReading;if(!r)return;
       var mt=document.getElementById('maintext');if(!mt)return;
@@ -271,7 +277,7 @@ function applyReading () {
       // book width however wide the window gets. (The web serves the same page but
       // injects no reading view, so it never grows like this -- this keeps the
       // desktop in line. Narrow windows are unaffected: usable < maxCol there.)
-      var maxCol=680;
+      var maxCol=r.x;
       var minSide=Math.round(w*r.m);
       var usable=Math.max(Math.min(w-2*minSide,maxCol),120);
       var side=Math.round((w-usable)/2);
