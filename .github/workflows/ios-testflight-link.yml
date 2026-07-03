@@ -1,0 +1,33 @@
+name: iOS — enable TestFlight public link
+
+# Enables (and prints) a shareable TestFlight public link for an external beta
+# group, via the App Store Connect API -- so iPad testers can join from one URL
+# instead of per-email invites. Idempotent: reuses an existing external group or
+# creates "Public Testers". Optionally attaches a build for external testers to
+# install (needs Beta App Review + Test Information; the link is returned either
+# way). Logic in .github/scripts/ios_testflight_public_link.py.
+on:
+  workflow_dispatch:
+    inputs:
+      build_number:
+        description: "Build to offer external testers (blank = just enable the link)"
+        default: "1013"
+
+permissions:
+  contents: read
+
+jobs:
+  link:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enable TestFlight public link via ASC API
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          BUILD_NUMBER: ${{ inputs.build_number }}
+          BUNDLE_ID: au.com.dangarmarine.JACL
+        run: |
+          python3 -m pip install --quiet pyjwt cryptography requests
+          python3 .github/scripts/ios_testflight_public_link.py
