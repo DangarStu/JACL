@@ -102,6 +102,41 @@ your iPad beta users, friends/family with Android devices, and the JACL website
 audience. Testers only need to accept the opt-in link and install once — they
 don't have to play daily, just stay opted in for the 14 days.
 
+### 6a. Recruiting via a public Google Group  (the way Wryter does it)
+For open, self-serve recruitment, use a **dedicated Google Group as the dynamic
+tester list** — *not* the `jacl-discuss` archive (a different-purpose group; leave
+it as its historical record). Mirrors Wryter's `wryter-testers` setup.
+
+1. **Google Groups** (`groups.google.com`, signed in as the tester account):
+   create **`jacl-testers@googlegroups.com`**. Set *Who can join* → **Anyone can
+   join** (max volume — "the more testers the better early on"); *Who can post* →
+   members, with **new-member first-post moderation** on (open join invites spam).
+   Add yourself as an actual **member** (not a pending invite). The group doubles
+   as the tester **feedback/discussion forum**.
+2. **Play Console → JACL → Testing → Closed testing → (track) → Testers**: attach
+   `jacl-testers@googlegroups.com` → **Save changes**. (Uploading a build to a
+   track does *not* attach testers — this step is separate.)
+3. Publish **two** links on the JACL site as a "Become a tester" page:
+   - group join link (become a tester), then
+   - opt-in URL `https://play.google.com/apps/testing/au.com.dangarmarine.jacl`
+     (installs the app — only works once you're on the attached list).
+
+**Gotchas (all hit during the Wryter setup):**
+- A Google Group's **email address is permanent** — you can't rename it, only
+  recreate. The *display name* is editable.
+- A **brand-new group takes minutes-to-hours to propagate** before Play's tester
+  check sees it; until then the opt-in URL returns **"App not available"** even
+  for a confirmed member. To unblock one person instantly, add their email as a
+  **direct email list** on the track (no propagation delay); keep the group as
+  the long-term roster.
+- `.../store/apps/details?id=au.com.dangarmarine.jacl` (the public store listing)
+  **404s until a production/open-testing release** — don't put it on the site
+  during closed testing; use the group-join + opt-in links instead.
+- The Google Group **cannot** be reused for **iOS/TestFlight** — Apple has no
+  Google integration. iOS uses a TestFlight external group + public link (see the
+  `ios-testflight-link` workflow). The group *can* be the shared feedback forum
+  for both platforms.
+
 ---
 
 ## 7. Production
