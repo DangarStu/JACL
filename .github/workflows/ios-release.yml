@@ -60,6 +60,25 @@ jobs:
           bundler-cache: true
           working-directory: ios
 
+      # Reclaim Apple's certificate quota before signing. Automatic signing (below)
+      # mints a fresh "Apple Development" cert on every runner; they pile up until
+      # Apple rejects the build with "maximum number of certificates". Prune stale
+      # dev certs (keep the newest 1) so there's always headroom for this build's.
+      # Distribution certs are never touched. Same script as ios-cert-cleanup.yml.
+      # (Apple account is shared with Wryter, so this prunes the same cert pool.)
+      - name: Prune stale dev certificates (reclaim quota)
+        working-directory: ${{ github.workspace }}
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          KEEP: "1"
+          APPLY: "true"
+        run: |
+          # macos runners' Homebrew python is PEP-668 "externally managed" -> need --break-system-packages.
+          python3 -m pip install --quiet --break-system-packages pyjwt cryptography requests
+          python3 .github/scripts/asc_revoke_dev_certs.py
+
       - name: Build & upload to TestFlight
         run: bundle exec fastlane beta
         env:

@@ -1,0 +1,38 @@
+name: iOS — revoke stale dev certificates
+
+# Reclaims the Apple account's certificate quota by revoking old "Apple Development"
+# certificates via the App Store Connect API. The TestFlight lane signs with automatic
+# signing, so every fresh CI runner mints a new dev cert; they pile up until Apple
+# rejects new builds with "maximum number of certificates". Run this (APPLY=true) to
+# clear them out. Distribution certs are never touched. Logic in
+# .github/scripts/asc_revoke_dev_certs.py. (Note: the Apple account is shared with
+# Wryter, so this prunes the same cert pool — either app's builds refill it.)
+on:
+  workflow_dispatch:
+    inputs:
+      keep:
+        description: "How many of the newest dev certs to keep"
+        default: "1"
+      apply:
+        description: "Actually revoke? (false = dry run listing only)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Revoke stale development certificates
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          KEEP: ${{ inputs.keep }}
+          APPLY: ${{ inputs.apply }}
+        run: |
+          python3 -m pip install --quiet pyjwt cryptography requests
+          python3 .github/scripts/asc_revoke_dev_certs.py
