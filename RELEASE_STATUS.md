@@ -80,7 +80,7 @@ change.
 | Platform | Shipped | Release point | Newer app code on `master`? |
 |---|---|---|---|
 | iOS / iPadOS | **1.3** (build 1013) — App Store live | tag `ios-v1.3` | none |
-| Android | **1.3** (vc 1008) — closed test | built @ `9b932e1` | none |
+| Android | **1.3** (vc 1008) — closed test | tag `android-v1.3` (@ `9b932e1`) | none |
 | Desktop (Electron) | **0.2.15** — GitHub Releases | tag `desktop-v0.2.15` | none |
 | Interpreter core | **4.7.0** (`INTERPRETER_VERSION 470`) | — | unchanged |
 
@@ -88,10 +88,11 @@ The `mac-native` branch (the old home of this changelog) is **merged into `maste
 the 1.2/1.3 App Store work and the new Mac Catalyst platform once listed here have all
 shipped. When you next change app code, rebuild this section from the diff above.
 
-> **Tag gap:** there is no `android-v1.3` tag — Android 1.3 shipped via a manual
-> `android-release.yml` dispatch (built @ `9b932e1`), not a tag push. Tag it
-> retroactively with `git tag android-v1.3 9b932e1 && git push origin android-v1.3`
-> to keep the `ios-v* / android-v* / desktop-v*` scheme complete.
+> **Note:** Android 1.3 shipped via a manual `android-release.yml` dispatch (built
+> @ `9b932e1`), not a tag push, so the `android-v1.3` tag was added **retroactively
+> on 2026-07-05** → `9b932e1`, keeping the `ios-v* / android-v* / desktop-v*` scheme
+> complete. `ios-v1.3` sits one commit earlier at `defab1c` (the version bump); the
+> only diff to `9b932e1` is the android-tracks diagnostic — no app code.
 
 ---
 
