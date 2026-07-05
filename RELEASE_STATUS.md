@@ -19,13 +19,13 @@ _Last updated: 2026-07-05_
 
 > The newest **public** release is **iOS 1.3** (App Store, live). **Android 1.3** is
 > in **closed testing** — the store gate is 20 testers × 14 continuous days before
-> production. §3 below is stale (1.2 and 1.3 have since shipped).
+> production. Everything is shipped and in sync (see §3); nothing is unreleased.
 
 ### Desktop & web
 
 | Channel | Platforms | Distribution | Feature level |
 |---|---|---|---|
-| **Desktop app (Electron) — DEFAULT** | Mac, Linux *(Windows pending the `cgijacl` POSIX port)* | **GitHub Releases** (`desktop-v*` tags → `desktop.yml`); first cut **`desktop-v0.1`** (unsigned) | **Full web parity:** HTML forms, the **live map window**, the iPad-style bookshelf, Library button, reading controls. Hosts `cgijacl` locally. **This is now the primary desktop build.** |
+| **Desktop app (Electron) — DEFAULT** | Mac, Windows, Linux (incl. arm64) | **GitHub Releases** (`desktop-v*` tags → `desktop.yml`, all four targets build); current **`desktop-v0.2.15`** (mac signed + notarized) | **Full web parity:** HTML forms, the **live map window**, the iPad-style bookshelf, Library button, reading controls. Hosts `cgijacl` locally. **This is now the primary desktop build.** |
 | Desktop (Gargoyle/Glk) — *legacy* | Mac, Linux, Windows | prebuilt in `bin/` | Classic two-window Glk (text + status, inline images). **No** map window / reading polish. Superseded by the Electron app. |
 | Web interpreter | Browser — jacl.dangarmarine.com.au | `cgijacl`/`fcgijacl`, deployed to the site | Full modern UI — the same engine the Electron app hosts. |
 | Nintendo DS | DS | `jacl.nds` (legacy) | Historical. |
@@ -40,8 +40,8 @@ _Last updated: 2026-07-05_
 ## Versioning (two independent numbers, deliberately)
 
 - **App marketing version** (App Store / Google Play): **iOS and Android kept in
-  sync.** They drifted (iOS 1.1, Android 1.0.1); reconciled forward to **1.2** for
-  the next release — see §3.
+  sync — both currently 1.3.** They drifted early (iOS 1.1 vs Android 1.0.1), then
+  reconciled at 1.2 and have stayed in lockstep since.
 - **Interpreter core** (`src/version.h`, shown in-app as "JACL v4.7.0"): **4.7.0**,
   shared by every platform (apps, web, desktop). Independent of the app version.
 
@@ -50,45 +50,48 @@ _Last updated: 2026-07-05_
 ## 2. Local installs (your devices — keep this honest)
 
 Method = **Store** (downloaded) or **Sideload** (Xcode/devicectl/adb dev build).
-Sideloaded builds are dev builds off the current branch, *ahead of the stores*.
+**As of 2026-07-05 the stores have caught up** — iOS 1.3 is live, Android 1.3 is in
+closed testing, desktop is 0.2.15 — so the June dev sideloads are now *behind* the
+store builds, not ahead; prefer reinstalling from the store/current release. Rows
+marked ✓ were probed on 2026-07-05; *(unverified)* rows couldn't be read (device
+offline, or the app inventory didn't enumerate) — confirm on the device.
 
 | Device | OS | Build on it | Method | As of | Notes |
 |---|---|---|---|---|---|
-| iPhone "WOPR" (15 Pro) | iOS | dev `mac-native` @ edd452c | Sideload (devicectl) | 2026-06-21 | keyboard fix, margins |
-| iPad "Vicki's iPad" (Air 4) | iPadOS | ~1.1-era sideload *(verify)* | Sideload | ~2026-06-20 | confirm current build |
-| Mac (this machine, M5 Pro) | macOS (Catalyst) | dev `mac-native` | Run locally (`build_mac`) | 2026-06-21 | menu/map-window work |
-| Android tablet (Samsung, R5GYB4191FF) | Android | dev `mac-native` @ edd452c | Sideload (adb) | 2026-06-21 | keyboard fix |
-| Android emulator (Medium_Phone_API_35) | Android | debug build | Sideload (adb) | 2026-06-21 | |
+| Mac (this machine, M5 Pro) | macOS | **Desktop 0.2.15** (`/Applications/JACL.app`) ✓ | Store/release | 2026-07-05 | Electron app, current. Catalyst native Mac app also builds locally (`build_mac`). |
+| iPad "Vicki's iPad" (Air 4) | iPadOS | *(unverified)* — App Store **1.3** available | — | 2026-07-05 | Paired at probe but app inventory didn't enumerate; recommend installing App Store 1.3. |
+| iPhone "WOPR" (15 Pro) | iOS | *(unverified)* — last known dev @ `edd452c` | Sideload | 2026-06-21 | Offline at probe; App Store 1.3 now available. |
+| Android tablet (Samsung, R5GYB4191FF) | Android | *(unverified)* — last known dev @ `edd452c` | Sideload (adb) | 2026-06-21 | Not connected at probe. See ‡ — a physical Android got Play 1.3 today. |
+| Android emulator (Medium_Phone_API_35) | Android | **1.0.1 (vc 2)** — stale ✓ | Sideload (adb) | 2026-07-05 | Old closed-test build; update to Play 1.3 or a current dev build. |
+
+‡ You installed **Play 1.3 (vc 1008, build stamp `9b932e1`)** on a physical Android
+on 2026-07-05 via the closed-test opt-in — confirm which device (likely the Samsung
+tablet) and set its row to **Store / 1.3**.
 
 ---
 
-## 3. Unreleased — changed since the store versions (NOT yet submitted)
+## 3. Unreleased — changed since the store versions
 
-> ⚠️ **Stale (2026-07-05):** the 1.2 and 1.3 releases described below have since
-> shipped — iOS **1.3** is live on the App Store and Android **1.3** is in closed
-> testing. This section needs reconciling against `git log` for whatever is
-> genuinely unreleased now.
+**Nothing — every platform is shipped and in sync (as of 2026-07-05).** Verified by
+diffing each platform's release point against `master`: the only commits since are
+CI, docs, metadata and store screenshots — no app-binary or `src/` interpreter-core
+change.
 
-All on branch **`mac-native`**, now bumped to **1.2** in the working tree (iOS
-build 3, Android vc 3) — iOS and Android **reconciled to the same marketing
-version**. Ready for the next submission once merged (let 1.1 / 1.0.1 clear review
-first).
+| Platform | Shipped | Release point | Newer app code on `master`? |
+|---|---|---|---|
+| iOS / iPadOS | **1.3** (build 1013) — App Store live | tag `ios-v1.3` | none |
+| Android | **1.3** (vc 1008) — closed test | built @ `9b932e1` | none |
+| Desktop (Electron) | **0.2.15** — GitHub Releases | tag `desktop-v0.2.15` | none |
+| Interpreter core | **4.7.0** (`INTERPRETER_VERSION 470`) | — | unchanged |
 
-### iOS / iPadOS (next App Store update)
-- Banner & in-game images sized to the **text-view width** (window-relative), not the whole screen.
-- **Wryter-style margins** (Narrow / Normal / Wide) + the **scroll bar out in the margin**; phones default to Narrow.
-- Status bar spans the full window; reading column centred.
-- **Map zoom** controls (pinch / scroll-wheel / +− buttons).
-- **Keyboard holds steady** between turns (no drop-and-reraise flicker).
-- **Restart** no longer leaves "The game has ended." stuck (stale-reader race fixed).
+The `mac-native` branch (the old home of this changelog) is **merged into `master`**;
+the 1.2/1.3 App Store work and the new Mac Catalyst platform once listed here have all
+shipped. When you next change app code, rebuild this section from the diff above.
 
-### Mac (brand-new platform — Catalyst; never shipped)
-- Native Mac build: menu-bar **Game** commands (text size / map / restart), a **bottom control bar**, a **live, separate map window**, and a **settings window**.
-- Crash-safe on macOS (the modal-over-keyboard crashes are gone).
-
-### Android (next Google Play update)
-- **Keyboard holds steady** between turns (no flicker).
-- **Restart** no longer leaves "The game has ended." stuck.
+> **Tag gap:** there is no `android-v1.3` tag — Android 1.3 shipped via a manual
+> `android-release.yml` dispatch (built @ `9b932e1`), not a tag push. Tag it
+> retroactively with `git tag android-v1.3 9b932e1 && git push origin android-v1.3`
+> to keep the `ios-v* / android-v* / desktop-v*` scheme complete.
 
 ---
 
