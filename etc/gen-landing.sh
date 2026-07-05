@@ -162,8 +162,9 @@ cat <<'TAIL'
         <li><a href="https://github.com/DangarStu/JACL/releases/latest/download/JACL.dmg"><strong>macOS</strong><em>Download .dmg</em></a></li>
         <li><a href="https://github.com/DangarStu/JACL/releases/latest/download/JACL-Setup.exe"><strong>Windows</strong><em>Download installer</em></a></li>
         <li><a href="https://github.com/DangarStu/JACL/releases/latest/download/JACL.AppImage"><strong>Linux</strong><em>Download .AppImage</em></a></li>
-        <li class="soon"><span><strong>Android</strong><em>Coming to Google Play</em></span></li>
+        <li><a href="https://play.google.com/apps/testing/au.com.dangarmarine.jacl"><strong>Android</strong><em>Beta on Google Play</em></a></li>
       </ul>
+      <p class="tabintro"><strong>Android beta &mdash; two quick steps.</strong> First <a href="https://groups.google.com/g/jacl-testers">join the jacl-testers group</a> (Google Play grants beta access through this group), then <a href="https://play.google.com/apps/testing/au.com.dangarmarine.jacl">opt in and install from Google Play</a>.</p>
       <p class="tabintro">Debian &amp; Ubuntu &mdash; install and auto-update with apt:</p>
       <pre class="apt">curl -fsSL https://apt.dangarmarine.com.au/jacl.gpg | sudo gpg --dearmor -o /usr/share/keyrings/jacl.gpg
 echo "deb [signed-by=/usr/share/keyrings/jacl.gpg] https://apt.dangarmarine.com.au stable main" | sudo tee /etc/apt/sources.list.d/jacl.list
