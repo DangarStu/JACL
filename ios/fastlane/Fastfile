@@ -45,48 +45,4 @@ platform :ios do
       skip_waiting_for_build_processing: true,
     )
   end
-
-  # Submit an ALREADY-UPLOADED build (on TestFlight) for App Store review — no
-  # rebuild, no binary upload. The workflow (.github/workflows/ios-appstore.yml)
-  # FIRST runs `deliver download_metadata --use_live_version` so fastlane/metadata
-  # holds the live listing verbatim, then overwrites only release_notes.txt, so the
-  # new version inherits the current description/keywords/screenshots untouched.
-  # APP_VERSION / BUILD_NUMBER select which prepared version + build to attach.
-  desc "Submit the already-uploaded build for App Store review (no rebuild)"
-  lane :release do
-    api_key = app_store_connect_api_key(
-      key_id: ENV.fetch("ASC_KEY_ID"),
-      issuer_id: ENV.fetch("ASC_ISSUER_ID"),
-      key_content: ENV.fetch("ASC_KEY_P8_BASE64"),
-      is_key_content_base64: true,
-    )
-
-    version = ENV.fetch("APP_VERSION", "1.2")
-    # CI uploads use build numbers like 1000+run_number (see ios-release.yml), NOT
-    # the project's CFBundleVersion, so discover the real latest build for this
-    # version instead of hardcoding it.
-    build_num = latest_testflight_build_number(
-      api_key: api_key,
-      app_identifier: "au.com.dangarmarine.JACL",
-      version: version,
-    ).to_s
-    UI.message("Submitting #{version} build #{build_num} for App Store review")
-
-    deliver(
-      api_key: api_key,
-      app_version: version,
-      build_number: build_num,
-      metadata_path: File.join(__dir__, "metadata"),
-      submit_for_review: ENV.fetch("SUBMIT_FOR_REVIEW", "true") == "true",
-      automatic_release: true,
-      force: true,                 # no interactive HTML preview in CI
-      skip_binary_upload: true,    # binary already on TestFlight
-      skip_screenshots: true,      # leave live screenshots untouched
-      precheck_include_in_app_purchases: false,
-      submission_information: {
-        export_compliance_uses_encryption: false,
-        add_id_info_uses_idfa: false,
-      },
-    )
-  end
 end
