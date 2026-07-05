@@ -1,7 +1,8 @@
 Platform,Channel,Version,Build,Status,Date,Notes
-iOS,App Store,1.0,1,Live,,iPad-only — original release
-iOS,App Store,1.1,2,Waiting for Review,2026-06-20,Universal (iPhone + iPad); column layout; landscape margins; transcript scroll fix
-iOS,Development,1.2,3,In progress,2026-06-21,mac-native branch — Wryter-style margins; Mac Catalyst; keyboard/landscape fixes
-Android,Google Play,1.0,1,Closed test,,Original closed-test build
-Android,Google Play,1.0.1,2,In review,,Landscape reading-margins fix
-Android,Development,1.2,3,In progress,2026-06-21,mac-native branch — keyboard + restart fixes
+iOS,App Store,1.0,1,Superseded,,iPad-only — original release
+iOS,App Store,1.1,2,Superseded,2026-06-20,Universal (iPhone + iPad); column layout; landscape margins; transcript scroll fix
+iOS,App Store,1.2,1011,Superseded,,Wryter-style margins; Mac Catalyst; keyboard/landscape fixes
+iOS,App Store,1.3,1013,Live,2026-07-05,Current public release — Glk status-bar spacing fix; confirmed READY_FOR_SALE via ASC API
+Android,Google Play,1.0,1,Superseded,,Original closed-test build
+Android,Google Play,1.0.1,2,Superseded,,Landscape reading-margins fix
+Android,Google Play,1.3,1008,Closed test,2026-07-05,"""1.0 Testing"" track — rollout complete; recruiting 20 testers x 14 days before production"

@@ -6,7 +6,7 @@ whenever you submit a build or sideload a device.
 
 Structured version log: [`android/release-tracker.csv`](android/release-tracker.csv).
 
-_Last updated: 2026-06-21_
+_Last updated: 2026-07-05_
 
 ---
 
@@ -14,13 +14,12 @@ _Last updated: 2026-06-21_
 
 | Store | Version | Build | Status | Notes |
 |---|---|---|---|---|
-| **App Store** | 1.0 | 1 | Live | iPad-only — original release |
-| **App Store** | **1.1** | **2** | **Waiting for Review** (submitted 2026-06-20) | First universal (iPhone + iPad) |
-| **Google Play** | 1.0 | 1 | Closed test | First closed-test build |
-| **Google Play** | **1.0.1** | **2** | **In review** | Landscape reading-margins fix |
+| **App Store** | **1.3** | **1013** | **Live** (as of 2026-07-05) | Current public release — universal iPhone + iPad. Confirmed `READY_FOR_SALE` via ASC API. 1.0–1.2 released and superseded. |
+| **Google Play** | **1.3** | **1008** | **Closed test** — rollout complete | On the `"1.0 Testing"` track; self-service via the `jacl-testers` Google Group. Recruiting 20 testers × 14 days before production. |
 
-> The newest thing the public can get is **iOS 1.1 / Android 1.0.1**. Everything
-> in §3 below is **newer than that and not submitted anywhere yet.**
+> The newest **public** release is **iOS 1.3** (App Store, live). **Android 1.3** is
+> in **closed testing** — the store gate is 20 testers × 14 continuous days before
+> production. §3 below is stale (1.2 and 1.3 have since shipped).
 
 ### Desktop & web
 
@@ -64,6 +63,11 @@ Sideloaded builds are dev builds off the current branch, *ahead of the stores*.
 ---
 
 ## 3. Unreleased — changed since the store versions (NOT yet submitted)
+
+> ⚠️ **Stale (2026-07-05):** the 1.2 and 1.3 releases described below have since
+> shipped — iOS **1.3** is live on the App Store and Android **1.3** is in closed
+> testing. This section needs reconciling against `git log` for whatever is
+> genuinely unreleased now.
 
 All on branch **`mac-native`**, now bumped to **1.2** in the working tree (iOS
 build 3, Android vc 3) — iOS and Android **reconciled to the same marketing
