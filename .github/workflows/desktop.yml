@@ -132,7 +132,13 @@ jobs:
             echo "::endgroup::"
           done
 
+      # Only keep a workflow artifact for manual (workflow_dispatch) builds. On a
+      # desktop-v* tag the GitHub Release below already holds these binaries durably
+      # (Release assets don't count against Actions storage), so uploading them as an
+      # artifact too just fills the 2 GB Actions quota. Expire the dispatch artifact
+      # quickly so it can't accumulate either.
       - uses: actions/upload-artifact@v4
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         with:
           name: jacl-desktop-${{ matrix.target }}
           path: |
@@ -142,6 +148,7 @@ jobs:
             desktop/dist/*.deb
             desktop/dist/*.exe
           if-no-files-found: warn
+          retention-days: 5
 
       # On a desktop-v* tag, attach this OS's installers to the GitHub Release.
       - name: Publish to GitHub Release
