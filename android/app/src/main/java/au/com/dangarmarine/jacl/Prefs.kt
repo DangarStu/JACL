@@ -35,6 +35,11 @@ object ReadingDefaults {
     // orientations and the surplus width of a wide landscape tablet becomes
     // centred margins instead of one long, ballooned line. Auto-scales: portrait
     // shows little or no margin, landscape shows generous margins.
+    //
+    // NB: Android deliberately has NO narrow/normal/wide margin picker (unlike
+    // desktop's MARGINS in desktop/main.js and iOS's MarginWidth in
+    // ContentView.swift) -- this single cap does the job. If you ever add one,
+    // mirror those fractions (0.04 / 0.10 / 0.16) so all three platforms match.
     const val MAX_CONTENT_WIDTH_DP = 800f
 }
 

@@ -94,6 +94,9 @@ enum MarginWidth: String, CaseIterable, Identifiable {
     case narrow, normal, wide
     var id: String { rawValue }
     var label: String { rawValue.capitalized }
+    /// KEEP THE FRACTIONS IN SYNC with desktop `MARGINS` in desktop/main.js — the
+    /// desktop app deliberately shares these so its reading settings match. (Android
+    /// has no margin picker; it uses a single MAX_CONTENT_WIDTH_DP cap in Prefs.kt.)
     var fraction: Double {
         switch self {
         case .narrow: return 0.04

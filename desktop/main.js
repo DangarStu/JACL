@@ -244,7 +244,11 @@ function createWindow () {
 }
 
 // --- reading prefs (columns + margins -> font size, iPad-style) -----------
-const MARGINS = { narrow: 0.04, normal: 0.10, wide: 0.16 }   // matches iOS MarginWidth
+// Side margin as a fraction of window width. KEEP THE FRACTIONS IN SYNC with iOS
+// MarginWidth.fraction (ios/JACL/ContentView.swift) — the two apps deliberately
+// share these so their reading settings feel identical. (Android has no margin
+// picker; it uses a single MAX_CONTENT_WIDTH_DP cap in Prefs.kt instead.)
+const MARGINS = { narrow: 0.04, normal: 0.10, wide: 0.16 }
 // Max book-column width (px) per margin. The column is capped so the font doesn't
 // balloon on wide windows; making that cap depend on the margin is what keeps the
 // Narrow/Normal/Wide choice visible on a wide window, where the window-relative
