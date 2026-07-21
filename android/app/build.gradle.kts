@@ -29,13 +29,13 @@ fun gitHash(): String = try {
 
 android {
     namespace = "au.com.dangarmarine.jacl"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = "28.2.13676358"
 
     defaultConfig {
         applicationId = "au.com.dangarmarine.jacl"
         minSdk = 29            // timespec_get (RemGlk timers) needs API 29+
-        targetSdk = 35         // Play requires new apps to target API 35 (Android 15)
+        targetSdk = 36         // Play requires apps to target API 36 (Android 16) by 31 Aug 2026
         // CI sets BUILD_NUMBER = 1000 + run number for a unique, increasing code;
         // android.injected.version.code isn't honoured by bundleRelease, so read it
         // here. Falls back to 3 for local builds.
