@@ -15,15 +15,16 @@ _Last updated: 2026-08-30_
 | Store | Version | Build | Status | Notes |
 |---|---|---|---|---|
 | **App Store** | **1.3** | **1013** | **Live** (as of 2026-07-05) | Current public release — universal iPhone + iPad. Confirmed `READY_FOR_SALE` via ASC API. 1.0–1.2 released and superseded. |
-| **Google Play** | **1.3** | **1011** | **Closed test** — rollout complete | On the `"1.0 Testing"` (alpha) track; self-service via the `jacl-testers` Google Group. Recruiting 20 testers × 14 days before production. Build **1011** **published 2026-08-30** — **retargeted to API 36 (Android 16)** for Play's **31 Aug 2026** deadline (`compileSdk`/`targetSdk` 35→36; AGP 8.9.1 + Gradle 8.11.1; native untouched). A smoke build **1010** also went to the exempt *internal* track. **Caution:** 1011 was *uploaded* 21 Jul but sat **unpublished in the Managed-publishing queue for 5 weeks** (2 queued changes: "1.3 — Start full rollout" + "Track status — Resume track"), so the track kept serving **1008** (target SDK 35) — exactly the bundle Play flagged. Managed publishing is **on** for JACL: a CI upload is *not* a release until you press Publish. |
+| **Google Play** | **1.3** | **1011** | **Closed test** — rollout complete | On the `"1.0 Testing"` (alpha) track; self-service via the `jacl-testers` Google Group. Recruiting 20 testers × 14 days before production. Build **1011** **submitted to the `"1.0 Testing"` track 2026-08-30** (in review) — **retargeted to API 36 (Android 16)** for Play's **31 Aug 2026** deadline (`compileSdk`/`targetSdk` 35→36; AGP 8.9.1 + Gradle 8.11.1; native untouched). A smoke build **1010** also went to the exempt *internal* track. **Two traps here, both hit on 2026-08-30.** (1) 1011 was *uploaded* 21 Jul but sat **unpublished in the managed-publishing queue for 5 weeks** — managed publishing is **on** for JACL, so a CI upload is *not* a release until you press Publish. (2) **JACL has TWO closed tracks** — `"1.0 Testing"` (the real tester channel, `jacl-testers` group) and a separate **`Alpha`** track. Fastlane's `play_track=alpha` targets **Alpha**, *not* the tester channel, so publishing the queue activated Alpha while `"1.0 Testing"` went on serving **1008** (target SDK 35) — the only bundle Play ever flagged. Fixed by adding bundle 1011 to `"1.0 Testing"` in the Console and submitting for review. |
 
 > The newest **public** release is **iOS 1.3** (App Store, live). **Android 1.3** is
 > in **closed testing** — the store gate is 20 testers × 14 continuous days before
 > production. Everything is shipped and in sync (see §3); nothing is unreleased.
 > The Android closed (alpha) build now targets **API 36 (Android 16)**, satisfying
 > Play's **31 Aug 2026** target-API deadline; adding it to the same track does not
-> reset the 20-tester/14-day gate. **Published 2026-08-30** (one day before the
-> deadline) after it was found still queued behind Managed publishing.
+> reset the 20-tester/14-day gate. **Submitted to `"1.0 Testing"` 2026-08-30**, one
+> day before the deadline, after it was found that the July upload had gone to the
+> *other* closed track (`Alpha`) and had never been published at all.
 
 ### Desktop & web
 

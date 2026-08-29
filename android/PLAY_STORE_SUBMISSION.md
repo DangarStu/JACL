@@ -198,10 +198,25 @@ repo, CI, or `RELEASE_STATUS.md`; all three said "shipped".
 **Trap 1 — with managed publishing ON, a green CI upload is not a release.**
 JACL's API-36 bundle 1011 uploaded fine on 21 Jul, then sat **five weeks** in the
 managed-publishing queue as two unpublished changes ("1.3 — Start full rollout" +
-"Track status — Resume track"). The closed track went on serving **1008, target SDK 35**
-— precisely the bundle Play was complaining about. Fix: **Publishing overview →
-Publish changes**. JACL has managed publishing **on**; Wryter has it **off** and
-self-publishes. Check which before assuming an upload landed.
+"Track status — Resume track"). Fix: **Publishing overview → Publish changes**. JACL
+has managed publishing **on**; Wryter has it **off** and self-publishes. Check which
+before assuming an upload landed.
+
+**Trap 1b — JACL has TWO closed tracks, and the CI lane targets the wrong one.**
+Publishing that queue still didn't fix it. `"1.0 Testing"` is the **real tester
+channel** (the `jacl-testers` Google Group); there is a *separate* built-in **`Alpha`**
+track. Fastlane's `play_track=alpha` uploads to **Alpha**, so 1011 landed there while
+`"1.0 Testing"` went on serving **1008, target SDK 35** — the only bundle Play ever
+flagged. Publishing the queue merely activated Alpha, which no tester uses.
+
+> **Check `Test and release → Testing → Closed testing` for the track list before
+> dispatching.** Two closed tracks look identical in the release-tracker CSV and in
+> `RELEASE_STATUS.md` — both say "closed (alpha)" — but only one is the tester channel,
+> and only that one's bundle counts for policy.
+
+Fix, when the compliant bundle already exists: the track → **Create new release** →
+**Add from library** → pick the bundle → Save → **Publishing overview → submit/publish**.
+No rebuild needed.
 
 **Trap 2 — a stale *internal*-track build flags an otherwise-compliant app.**
 Wryter's closed Alpha was already on API 36 (1017) yet the warning stayed live. The
@@ -222,15 +237,18 @@ listed bundle is what must be superseded, and neither app needed a production re
    code **and its track**.
 2. Land the 3-file code fix; verify `assembleDebug` + `bundleRelease` and badging.
 3. Ship a compliant build to **every track holding a flagged bundle** — closed *and*
-   internal if both appear:
-   - JACL: `gh workflow run android-release.yml -f play_track=alpha` (input is
-     `play_track`, a Play track id: `internal`, `alpha`, …).
+   internal if both appear, and to the *named* track the bundle list reports, not
+   whichever one the CI lane happens to target:
+   - JACL: `gh workflow run android-release.yml -f play_track=alpha` reaches the
+     **`Alpha`** track — **not** `"1.0 Testing"`. For that one, add the bundle to the
+     track in the Console (Trap 1b), or pass its own track id.
    - Wryter: `gh workflow run android-release.yml -f track=internal` (input is
      `track`, a **fastlane lane name**: `internal` or `closed`). Same flag name,
      different meaning — read the workflow before dispatching.
 4. If managed publishing is on: **Publishing overview → Publish changes**.
-5. Confirm the track's release summary shows the **new version code** — not just that
-   CI was green — and that Policy status is clear.
+5. Confirm **the flagged track's** release summary shows the **new version code** —
+   not just that CI was green, and not a *different* track's summary — and that the
+   Policy status bundle list is empty. This is the only step that proves the fix.
 
 Adding a build to an existing closed track does **not** reset the 12-tester/14-day
 production gate, so it is safe to push mid-gate.
