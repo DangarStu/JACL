@@ -6,7 +6,7 @@ whenever you submit a build or sideload a device.
 
 Structured version log: [`android/release-tracker.csv`](android/release-tracker.csv).
 
-_Last updated: 2026-07-22_
+_Last updated: 2026-08-30_
 
 ---
 
@@ -15,14 +15,15 @@ _Last updated: 2026-07-22_
 | Store | Version | Build | Status | Notes |
 |---|---|---|---|---|
 | **App Store** | **1.3** | **1013** | **Live** (as of 2026-07-05) | Current public release — universal iPhone + iPad. Confirmed `READY_FOR_SALE` via ASC API. 1.0–1.2 released and superseded. |
-| **Google Play** | **1.3** | **1011** | **Closed test** — rollout complete | On the `"1.0 Testing"` (alpha) track; self-service via the `jacl-testers` Google Group. Recruiting 20 testers × 14 days before production. Build **1011** uploaded 2026-07-22 — **retargeted to API 36 (Android 16)** for Play's **31 Aug 2026** deadline (`compileSdk`/`targetSdk` 35→36; AGP 8.9.1 + Gradle 8.11.1; native untouched). A smoke build **1010** also went to the exempt *internal* track. |
+| **Google Play** | **1.3** | **1011** | **Closed test** — rollout complete | On the `"1.0 Testing"` (alpha) track; self-service via the `jacl-testers` Google Group. Recruiting 20 testers × 14 days before production. Build **1011** **published 2026-08-30** — **retargeted to API 36 (Android 16)** for Play's **31 Aug 2026** deadline (`compileSdk`/`targetSdk` 35→36; AGP 8.9.1 + Gradle 8.11.1; native untouched). A smoke build **1010** also went to the exempt *internal* track. **Caution:** 1011 was *uploaded* 21 Jul but sat **unpublished in the Managed-publishing queue for 5 weeks** (2 queued changes: "1.3 — Start full rollout" + "Track status — Resume track"), so the track kept serving **1008** (target SDK 35) — exactly the bundle Play flagged. Managed publishing is **on** for JACL: a CI upload is *not* a release until you press Publish. |
 
 > The newest **public** release is **iOS 1.3** (App Store, live). **Android 1.3** is
 > in **closed testing** — the store gate is 20 testers × 14 continuous days before
 > production. Everything is shipped and in sync (see §3); nothing is unreleased.
 > The Android closed (alpha) build now targets **API 36 (Android 16)**, satisfying
 > Play's **31 Aug 2026** target-API deadline; adding it to the same track does not
-> reset the 20-tester/14-day gate.
+> reset the 20-tester/14-day gate. **Published 2026-08-30** (one day before the
+> deadline) after it was found still queued behind Managed publishing.
 
 ### Desktop & web
 
