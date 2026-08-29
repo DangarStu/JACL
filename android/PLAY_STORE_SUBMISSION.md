@@ -1,7 +1,8 @@
 # JACL — Google Play Submission
 
 Companion to `ios/APP_STORE_SUBMISSION.md`. The app is built for Android
-(`au.com.dangarmarine.jacl`, versionName 1.0 / versionCode 1, target API 35).
+(`au.com.dangarmarine.jacl`; see `RELEASE_STATUS.md` for the current version/build and
+target API — the target API floor moves every year, see §9).
 Most listing copy and the privacy URL are reused from the iOS submission.
 
 Status legend:  ✅ ready   ✏️ you must supply/confirm   ⏳ gated on account/test
@@ -155,3 +156,81 @@ it as its historical record). Mirrors Wryter's `wryter-testers` setup.
 - [ ] Content rating questionnaire (§5)
 - [ ] Closed test: 20 testers × 14 days (§6)
 - [ ] Promote to Production + submit (§7)
+- [ ] **Annually before 31 Aug:** target-API bump landed, uploaded, **published**, and
+      verified on every affected track (§9)
+
+---
+
+## 9. The annual target-API deadline (and the two traps that fake "done")
+
+Google Play requires every app to target **within ~1 year of the latest Android**,
+enforced by a hard **31 August** deadline each year: 2025 = API 35, **2026 = API 36**
+(Android 16), 2027 = API 37. Miss it and you simply **cannot ship updates** — the app
+already installed keeps working, but every upload is rejected.
+
+### The code fix (≈30 min, both apps)
+Raising `compileSdk`/`targetSdk` drags the toolchain with it — the old AGP literally
+cannot compile against the new SDK. For **API 36** the floor was AGP **≥ 8.9.1** and
+Gradle wrapper **≥ 8.11.1**. Three files per repo:
+
+| File | Change |
+|---|---|
+| `android/app/build.gradle.kts` | `compileSdk` + `targetSdk` |
+| `android/build.gradle.kts` | `com.android.application` plugin version (AGP) |
+| `android/gradle/wrapper/gradle-wrapper.properties` | `distributionUrl` (Gradle) |
+
+JACL has **native code** (NDK + CMake, ABIs arm64-v8a + x86_64). The compile/target
+bump leaves the native side alone, but build both ABIs before believing it.
+
+Verify locally — don't trust the diff:
+```sh
+./gradlew :app:assembleDebug :app:bundleRelease
+$ANDROID_HOME/build-tools/<ver>/aapt2 dump badging <apk> | grep targetSdkVersion
+```
+
+### Then the part that actually counts
+**Compiling against the new SDK satisfies nothing.** A build *targeting* the new level
+must be **uploaded to Play and actually published on a track that serves users**. On
+2026-08-30 — one day before the cutoff — both apps were believed done since 22 July.
+Both were still non-compliant, for two different reasons. Neither was visible from the
+repo, CI, or `RELEASE_STATUS.md`; all three said "shipped".
+
+**Trap 1 — with managed publishing ON, a green CI upload is not a release.**
+JACL's API-36 bundle 1011 uploaded fine on 21 Jul, then sat **five weeks** in the
+managed-publishing queue as two unpublished changes ("1.3 — Start full rollout" +
+"Track status — Resume track"). The closed track went on serving **1008, target SDK 35**
+— precisely the bundle Play was complaining about. Fix: **Publishing overview →
+Publish changes**. JACL has managed publishing **on**; Wryter has it **off** and
+self-publishes. Check which before assuming an upload landed.
+
+**Trap 2 — a stale *internal*-track build flags an otherwise-compliant app.**
+Wryter's closed Alpha was already on API 36 (1017) yet the warning stayed live. The
+culprit was bundle **1007 (v0.2, target SDK 35)** still active on the **internal** track
+from two months earlier. Internal testing is exempt from *having to comply*, but a live
+release there is still **reviewed and flagged**. The check looks at **every track with
+an active release**, so sweep them all — internal included.
+
+### Diagnose from Play, never from the repo
+**Policy status → the target-API issue → "View app bundles"** names the offending
+**version code and its track**. That single screen identifies the real culprit in about
+a minute; it is the first thing to open, not the last. The issue page's generic advice
+("publish a new version to production") is boilerplate — for a test-track-only app the
+listed bundle is what must be superseded, and neither app needed a production release.
+
+### Runbook
+1. Open **Policy status → View app bundles** for each app. Note every flagged version
+   code **and its track**.
+2. Land the 3-file code fix; verify `assembleDebug` + `bundleRelease` and badging.
+3. Ship a compliant build to **every track holding a flagged bundle** — closed *and*
+   internal if both appear:
+   - JACL: `gh workflow run android-release.yml -f play_track=alpha` (input is
+     `play_track`, a Play track id: `internal`, `alpha`, …).
+   - Wryter: `gh workflow run android-release.yml -f track=internal` (input is
+     `track`, a **fastlane lane name**: `internal` or `closed`). Same flag name,
+     different meaning — read the workflow before dispatching.
+4. If managed publishing is on: **Publishing overview → Publish changes**.
+5. Confirm the track's release summary shows the **new version code** — not just that
+   CI was green — and that Policy status is clear.
+
+Adding a build to an existing closed track does **not** reset the 12-tester/14-day
+production gate, so it is safe to push mid-gate.
