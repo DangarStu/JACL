@@ -47,8 +47,8 @@ char            game_file[256] = "\0";
 char            game_path[256] = "\0";
 char            prefix[81] = "\0";
 char            processed_file[256] = "\0";
-char            include_directory[81] = "\0";
-char            temp_directory[81] = "\0";
+char            include_directory[512] = "\0";
+char            temp_directory[512] = "\0";
 
 /* jpp.c owns `release`; -release flips it on. */
 extern short int release;

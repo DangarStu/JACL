@@ -193,11 +193,11 @@ void            web_render_status_bar(void);
  * lives further down with the other web_status_* state. */
 extern int      web_status_emit_count;
 
-char            include_directory[81] = "\0";
-char            temp_directory[81] = "\0";
-char            data_directory[81] = "\0";
-char            error_log[81] = "\0";
-char            access_log[81] = "\0";
+char            include_directory[512] = "\0";
+char            temp_directory[512] = "\0";
+char            data_directory[512] = "\0";
+char            error_log[512] = "\0";
+char            access_log[512] = "\0";
 
 
 char            function_name[81];

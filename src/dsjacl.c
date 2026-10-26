@@ -56,8 +56,8 @@ extern int			encrypted;
 extern int			notify;
 extern int			debug;
 
-char            include_directory[84] = "\0";
-char            temp_directory[84] = "\0";
+char            include_directory[512] = "\0";
+char            temp_directory[512] = "\0";
 char            command_prompt[84] = "\0";
 char            file_prompt[5] = ": \0";
 char            margin_string[84] = "\0";
