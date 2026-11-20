@@ -3403,6 +3403,31 @@ write "<meta name=~theme-color~ content=~#2e5e2e~>"
 write "<meta name=~apple-mobile-web-app-title~ content=~OFFSIDE~>"
 write "<meta name=~mobile-web-app-capable~ content=~yes~>"
 write "<meta name=~apple-mobile-web-app-capable~ content=~yes~>"
+
+# A ONE-OFF TIP ON PHONES: ON AN iPHONE OR iPAD, HOW TO ADD OFFSIDE FROM THE
+# SHARE MENU; ON ANDROID, ONLY IF CHROME OFFERS TO INSTALL IT, AN Add BUTTON.
+# NEVER WHEN IT'S ALREADY RUNNING FROM THE HOME SCREEN, AND ONLY EVER SHOWN
+# ONCE PER BROWSER (REMEMBERED IN localStorage WHEN IT APPEARS, SO IGNORING
+# IT COUNTS). IT WAITS A FEW SECONDS SO IT DOESN'T GREET THE PAGE.
+write "<script>(function() { "
+write "var KEY = 'offside-home-tip'; "
+write "function seen() { try { return localStorage.getItem(KEY) == '1'; } catch (e) { return true; } } "
+write "function mark() { try { localStorage.setItem(KEY, '1'); } catch (e) {} } "
+write "if (seen() || window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches) return; "
+write "var ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform == 'MacIntel' && navigator.maxTouchPoints > 1); "
+write "var share = '<svg class=~share~ viewBox=~0 0 16 20~ width=~13~ height=~16~><path d=~M8 1v12M4 5l4-4 4 4M5 8H2v11h12V8h-3~ fill=~none~ stroke=~currentColor~ stroke-width=~1.6~/></svg>'; "
+write "function show(html, onAdd) { if (seen()) return; mark(); "
+write "var d = document.createElement('div'); d.className = 'hometip'; d.setAttribute('role', 'note'); "
+write "d.innerHTML = '<img src=~/images/offside-icon-192.png~ alt=~~><div>' + html + '</div><button type=~button~ class=~close~ aria-label=~Close~>&times;</button>'; "
+write "if (onAdd) { var b = document.createElement('button'); b.type = 'button'; b.className = 'add'; b.textContent = 'Add'; "
+write "b.onclick = function() { d.remove(); onAdd(); }; d.querySelector('div').appendChild(b); } "
+write "d.querySelector('.close').onclick = function() { d.remove(); }; "
+write "document.body.appendChild(d); } "
+write "if (ios) { window.addEventListener('load', function() { setTimeout(function() { "
+write "show('<b>Tip:</b> add OFFSIDE to your home screen. Tap Share ' + share + ' then <b>Add to Home Screen</b>.'); }, 4000); }); } "
+write "window.addEventListener('beforeinstallprompt', function(e) { e.preventDefault(); setTimeout(function() { "
+write "show('<b>Tip:</b> add OFFSIDE to your home screen to check results in one tap.', function() { e.prompt(); }); }, 4000); }); "
+write "})();</script>"
 # STOP A FORM BEING SENT TWICE (SEE USED_TOKENS): ONCE ONE HAS BEEN SUBMITTED,
 # FURTHER SUBMITS OF IT DO NOTHING UNTIL THE NEXT PAGE ARRIVES, AND EACH
 # SUBMIT CARRIES A ONE-USE TOKEN SO THE SERVER CAN REFUSE A REPEAT. A PAGE
@@ -3468,6 +3493,12 @@ print:
    span.authslot { transition: opacity 0.3s ease-in; }^
    span.authslot.settling { opacity: 0; }^
    form.sending input[type=submit] { opacity: 0.5; }^
+   div.hometip { position: fixed; left: 12px; right: 12px; bottom: 12px; max-width: 420px; margin: 0 auto; z-index: 50; display: flex; align-items: center; gap: 10px; padding: 10px 34px 10px 10px; background: white; color: #222222; border: 1px solid #b8c8b8; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.25); font-family: Verdana, Arial, sans-serif; font-size: 9.5pt; line-height: 1.35; animation: tipin 0.3s ease-out; }^
+   div.hometip img { width: 40px; height: 40px; border-radius: 9px; flex: none; }^
+   div.hometip svg.share { vertical-align: -3px; color: #1a73e8; }^
+   div.hometip button.close { position: absolute; top: 4px; right: 6px; border: none; background: none; font-size: 18pt; line-height: 1; color: #777777; padding: 2px 6px; cursor: pointer; }^
+   div.hometip button.add { margin-left: 8px; padding: 3px 12px; border: none; border-radius: 6px; background: #2e5e2e; color: white; font-size: 10pt; cursor: pointer; }^
+   @keyframes tipin { from { transform: translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }^
    span.scorers { display: block; font-size: 8.5pt; color: #555555; font-weight: normal; white-space: normal; }^
    p.scoringteam { margin: 10px 0 4px 0; font-weight: bold; }^
    form.scorersform select { width: auto; max-width: 100%; margin: 0 6px 6px 0; }^
