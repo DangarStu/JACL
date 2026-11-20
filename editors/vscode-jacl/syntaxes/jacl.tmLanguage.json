@@ -169,7 +169,7 @@
     "commands": {
       "patterns": [
         {
-          "match": "^\\s*(write|look|move|set|ensure|execute|call|proxy|setstring|addstring|padstring|split|length|points|append|append_fc|append_nt|append_lc|insert|cursor|style|sound|image|volume|timer|button|control|hyperlink|hyperlinkNE|hidden|option|prompt|clear|flush|more|getenv|savegame|restoregame|restartgame|endgame|undomove|terminate|inspect|output|mesg|error|travel|position|bearing|distance|dir_to|npc_to|override|print)\\b",
+          "match": "^\\s*(write|look|move|set|ensure|execute|call|proxy|setstring|addstring|padstring|split|substring|length|points|append|append_fc|append_nt|append_lc|insert|cursor|style|sound|image|volume|timer|button|control|hyperlink|hyperlinkNE|hidden|option|prompt|clear|flush|more|getenv|savegame|restoregame|restartgame|endgame|undomove|terminate|inspect|output|mesg|error|travel|position|bearing|distance|dir_to|npc_to|override|print)\\b",
           "name": "keyword.other.command.jacl"
         }
       ]
