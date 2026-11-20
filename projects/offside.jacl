@@ -16,7 +16,9 @@
 #                              away id, home goals, away goals, kick-off
 #                              (hhmm) -- the goals are "-" until the result
 #                              is entered; kick-off 2400 means "to be
-#                              confirmed", as does a row without the column
+#                              confirmed", as does a row without the column;
+#                              then status: "-", "F" (forfeit, stored as
+#                              3-0) or "W" (washed out, no score)
 #   offside-organisers.csv     id, competition id, Google account id, name
 #   offside-invites.csv        id, code, competition id, expiry (unixtime),
 #                              name
@@ -271,6 +273,20 @@ integer_array g_away     MAX_GAMES
 integer_array g_hg       MAX_GAMES
 integer_array g_ag       MAX_GAMES
 integer_array g_time     MAX_GAMES
+# A FIXTURE'S STATUS, THE 9TH COLUMN (MISSING ON OLDER ROWS): "-" AS NORMAL,
+# "F" A FORFEIT, STORED AS A 3-0 WIN TO THE OTHER TEAM SO THE TABLE COUNTS
+# IT LIKE ANY RESULT, OR "W" WASHED OUT OR CALLED OFF, WITH NO SCORE SO IT
+# ISN'T COUNTED. LOADED AS GAME_NORMAL/FORFEIT/WASHOUT.
+constant GAME_NORMAL     0
+constant GAME_FORFEIT    1
+constant GAME_WASHOUT    2
+constant FORFEIT_GOALS   3
+integer_array g_st       MAX_GAMES
+integer game_status
+string row_status
+string new_status
+integer forfeit_goals
+integer any_washout
 integer game_time
 integer tl_h
 integer tl_m
@@ -975,8 +991,12 @@ update fixtures
    if field_count > 7
       setstring row_time field[7]
    endif
+   setstring row_status "-"
+   if field_count > 8
+      setstring row_status field[8]
+   endif
    if field[1] != arg[0]
-      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6] row_time
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6] row_time row_status
    endif
 endupdate
 }
@@ -1570,7 +1590,7 @@ execute "+scorer_form<edit_id"
 # ALREADY RECORDED. THE PAGE JOINS EACH SIDE'S MENUS INTO home_scorers AND
 # away_scorers WHEN IT'S SENT.
 {+scorer_form
-if game_hg < 0
+if game_hg < 0 : game_status = GAME_FORFEIT
    return
 endif
 set sc_total = game_hg
@@ -1666,8 +1686,8 @@ if allowed = false
    execute "+deny"
    return
 endif
-if game_hg < 0
-   write "<p class=~notice~>That fixture hasn't been played yet.</p>"
+if game_hg < 0 : game_status = GAME_FORFEIT
+   write "<p class=~notice~>That game has no goals to record scorers for.</p>"
    return
 endif
 set sc_fixture = edit_id
@@ -1827,6 +1847,9 @@ while INDEX < team_count
    set INDEX + 1
 endwhile
 set sc_total - sc_known
+# A FORFEIT'S GOALS WERE NEVER SCORED
+execute "+count_forfeit_goals"
+set sc_total - forfeit_goals
 if sc_total > 0
    write "<p class=~key~>Plus " sc_total " goal"
    if sc_total != 1
@@ -1968,12 +1991,20 @@ if game_count = 0
    write "<p>No fixtures have been added yet.</p>"
 else
    execute "+game_table_head"
+   set any_washout = false
    set INDEX = 0
    while INDEX < game_count
       execute "+game_row<INDEX"
       set INDEX + 1
    endwhile
    write "</table>"
+   if any_washout = true
+      write "<p class=~key~>P - P: washed out or called off, and not counted in the table. "
+      if can_edit = true
+         write "To replay one, give it a new date with <b>Change time</b>."
+      endif
+      write "</p>"
+   endif
 endif
 
 if can_edit = false
@@ -2036,7 +2067,12 @@ execute "+date_label<game_key"
 set game_time = g_time[game_pos]
 execute "+time_label<game_time"
 if g_hg[game_pos] = -1
-   write "<tr>"
+   if g_st[game_pos] = GAME_WASHOUT
+      write "<tr class=~washout~>"
+      set any_washout = true
+   else
+      write "<tr>"
+   endif
 else
    write "<tr class=~played~>"
 endif
@@ -2048,9 +2084,17 @@ write escaped
 set sc_fixture = g_id[game_pos]
 set sc_goal = g_hg[game_pos]
 execute "+scorer_line<sc_fixture<game_team<sc_goal"
+ifall g_st[game_pos] = GAME_FORFEIT : g_hg[game_pos] = 0
+   write "<span class=~scorers~>forfeited</span>"
+endif
 write "</td><td class=~score~>"
 if g_hg[game_pos] = -1
-   write "v"
+   # P - P IS FOOTBALL'S SHORTHAND FOR A POSTPONED GAME
+   if g_st[game_pos] = GAME_WASHOUT
+      write "P - P"
+   else
+      write "v"
+   endif
 else
    write g_hg[game_pos] " - " g_ag[game_pos]
 endif
@@ -2062,6 +2106,9 @@ write escaped
 set sc_fixture = g_id[game_pos]
 set sc_goal = g_ag[game_pos]
 execute "+scorer_line<sc_fixture<game_team<sc_goal"
+ifall g_st[game_pos] = GAME_FORFEIT : g_ag[game_pos] = 0
+   write "<span class=~scorers~>forfeited</span>"
+endif
 write "</td>"
 if can_edit = true
    write "<td>"
@@ -2075,7 +2122,7 @@ if can_edit = true
       hyperlinkNE "Edit score" action
       set sc_goal = g_hg[game_pos]
       set sc_goal + g_ag[game_pos]
-      if sc_goal > 0
+      ifall sc_goal > 0 : g_st[game_pos] != GAME_FORFEIT
          write " &middot; "
          setstring action "scorers " g_id[game_pos]
          hyperlinkNE "Scorers" action
@@ -2126,6 +2173,7 @@ iterate fixtures
                   set g_away[game_pos] = g_away[game_prev]
                   set g_hg[game_pos] = g_hg[game_prev]
                   set g_ag[game_pos] = g_ag[game_prev]
+                  set g_st[game_pos] = g_st[game_prev]
                   set game_pos - 1
                else
                   set moving = false
@@ -2142,6 +2190,15 @@ iterate fixtures
          ifstring field[5] != "-"
             set g_hg[game_pos] = field[5]
             set g_ag[game_pos] = field[6]
+         endif
+         set g_st[game_pos] = GAME_NORMAL
+         if field_count > 8
+            ifstring field[8] = "F"
+               set g_st[game_pos] = GAME_FORFEIT
+            endif
+            ifstring field[8] = "W"
+               set g_st[game_pos] = GAME_WASHOUT
+            endif
          endif
          set game_count + 1
       endif
@@ -2354,7 +2411,7 @@ write "</select>"
 set dr_unplayed = 0
 set INDEX = 0
 while INDEX < game_count
-   if g_hg[INDEX] = -1
+   ifall g_hg[INDEX] = -1 : g_st[INDEX] != GAME_WASHOUT
       set dr_unplayed + 1
    endif
    set INDEX + 1
@@ -2665,30 +2722,43 @@ endif
 {+count_unplayed
 set dr_unplayed = 0
 iterate fixtures
-   if field[1] = current_comp
+   ifall field[1] = current_comp : field_count < 9
       ifstring field[5] = "-"
          set dr_unplayed + 1
+      endif
+   endif
+   ifall field[1] = current_comp : field_count > 8
+      ifstring field[5] = "-"
+         ifstring field[8] = "-"
+            set dr_unplayed + 1
+         endif
       endif
    endif
 enditerate
 }
 
 # DROPS COMPETITION arg[0]'S FIXTURES THAT HAVEN'T BEEN PLAYED (THEY HAVE
-# NO SCORERS TO TIDY UP)
+# NO SCORERS TO TIDY UP). WASHOUTS STAY ON THE RECORD.
 {+purge_unplayed
 update fixtures
    setstring row_time "2400"
    if field_count > 7
       setstring row_time field[7]
    endif
+   setstring row_status "-"
+   if field_count > 8
+      setstring row_status field[8]
+   endif
    set found = true
    if field[1] = arg[0]
       ifstring field[5] = "-"
-         set found = false
+         ifstring row_status = "-"
+            set found = false
+         endif
       endif
    endif
    if found = true
-      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6] row_time
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6] row_time row_status
    endif
 endupdate
 }
@@ -3005,6 +3075,15 @@ iterate fixtures
       if field_count > 7
          set game_time = field[7]
       endif
+      set game_status = GAME_NORMAL
+      if field_count > 8
+         ifstring field[8] = "F"
+            set game_status = GAME_FORFEIT
+         endif
+         ifstring field[8] = "W"
+            set game_status = GAME_WASHOUT
+         endif
+      endif
    endif
 enditerate
 execute "+date_label<game_key"
@@ -3083,7 +3162,24 @@ write "<span class=~buttons~><input type=~submit~ value=~Save result~> "
 hyperlinkNE "Cancel" "blankjacl"
 write "</span></form>"
 execute "+find_fixture<edit_id"
-if game_hg != -1
+write "<p class=~notplayed~>Not played? "
+execute "+team_label<game_home"
+escapestring escaped team_label
+setstring action "forfeit home " edit_id
+hyperlinkNE escaped action
+write " forfeited &middot; "
+execute "+team_label<game_away"
+escapestring escaped team_label
+setstring action "forfeit away " edit_id
+hyperlinkNE escaped action
+write " forfeited"
+if game_status != GAME_WASHOUT
+   write " &middot; "
+   setstring action "washout " edit_id
+   hyperlinkNE "Washed out or called off" action
+endif
+write "<br><span class=~key~>A forfeit counts as a " FORFEIT_GOALS "-0 win to the other team.</span></p>"
+if game_hg != -1 : game_status = GAME_WASHOUT
    write "<form>"
    write "<input type=~hidden~ name=~command~ value=~clear score " edit_id "~/>"
    hidden
@@ -3183,10 +3279,18 @@ update fixtures
    if field_count > 7
       setstring row_time field[7]
    endif
+   setstring row_status "-"
+   if field_count > 8
+      setstring row_status field[8]
+   endif
    if field[0] = arg[0]
-      insert field[0] field[1] arg[1] field[3] field[4] field[5] field[6] arg[2]
+      # A WASHED-OUT GAME GIVEN A NEW DATE IS BACK ON
+      ifstring row_status = "W"
+         setstring row_status "-"
+      endif
+      insert field[0] field[1] arg[1] field[3] field[4] field[5] field[6] arg[2] row_status
    else
-      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6] row_time
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6] row_time row_status
    endif
 endupdate
 }
@@ -3206,6 +3310,7 @@ if allowed = false
 endif
 set sc_old_h = game_hg
 set sc_old_a = game_ag
+setstring new_status "-"
 execute "+set_score<edit_id<home_goals<away_goals"
 execute "+find_fixture<edit_id"
 # A SIDE'S SCORERS NO LONGER ADD UP IF ITS GOALS CHANGED
@@ -3222,6 +3327,94 @@ write ".</p>"
 execute "+scorer_form<edit_id"
 }
 
+grammar forfeit home $integer     >forfeit_home
+grammar forfeit away $integer     >forfeit_away
+grammar washout $integer          >washout
+
+{+forfeit_home
+set edit_id = $integer
+execute "+fixture_editable"
+if allowed = false
+   return
+endif
+set home_goals = 0
+set away_goals = FORFEIT_GOALS
+execute "+record_forfeit"
+}
+
+{+forfeit_away
+set edit_id = $integer
+execute "+fixture_editable"
+if allowed = false
+   return
+endif
+set home_goals = FORFEIT_GOALS
+set away_goals = 0
+execute "+record_forfeit"
+}
+
+# RECORDS FIXTURE edit_id AS A FORFEIT WITH SCORE home_goals - away_goals
+{+record_forfeit
+setstring new_status "F"
+execute "+set_score<edit_id<home_goals<away_goals"
+set game_team = 0
+execute "+purge_fixture_goals<edit_id<game_team"
+execute "+find_fixture<edit_id"
+execute "+load_teams<target_comp"
+if game_hg = 0
+   execute "+team_label<game_home"
+else
+   execute "+team_label<game_away"
+endif
+escapestring escaped team_label
+write "<p class=~notice~>" escaped " forfeited: "
+execute "+write_match"
+write ".</p>"
+}
+
+{+washout
+set edit_id = $integer
+execute "+fixture_editable"
+if allowed = false
+   return
+endif
+set game_hg = -1
+setstring new_status "W"
+execute "+set_score<edit_id<game_hg<game_hg"
+set game_team = 0
+execute "+purge_fixture_goals<edit_id<game_team"
+execute "+load_teams<target_comp"
+write "<p class=~notice~>"
+execute "+write_match"
+write " is marked as washed out, and won't count in the table. "
+write "To replay it, give it a new date with <b>Change time</b>.</p>"
+}
+
+# FINDS FIXTURE edit_id AND CHECKS IT CAN BE CHANGED, SETTING allowed
+{+fixture_editable
+set allowed = false
+execute "+find_fixture<edit_id"
+if target_comp = 0
+   return
+endif
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+endif
+}
+
+# GOALS IN THE CURRENT COMPETITION'S FORFEITS, IN forfeit_goals
+{+count_forfeit_goals
+set forfeit_goals = 0
+iterate fixtures
+   ifall field[1] = current_comp : field_count > 8
+      ifstring field[8] = "F"
+         set forfeit_goals + FORFEIT_GOALS
+      endif
+   endif
+enditerate
+}
+
 grammar clear score $integer     >clear_score
 
 {+clear_score
@@ -3236,6 +3429,7 @@ if allowed = false
    return
 endif
 set game_hg = -1
+setstring new_status "-"
 execute "+set_score<edit_id<game_hg<game_hg"
 set game_team = 0
 execute "+purge_fixture_goals<edit_id<game_team"
@@ -3243,7 +3437,7 @@ write "<p class=~notice~>Result cleared; it's back in the fixtures.</p>"
 }
 
 # REWRITES FIXTURE arg[0] WITH SCORE arg[1] - arg[2], OR AS NOT PLAYED IF
-# arg[1] IS -1
+# arg[1] IS -1, AND STATUS new_status ("-", "F" OR "W")
 {+set_score
 update fixtures
    # field[] ISN'T CLEARED BETWEEN ROWS, SO CHECK A KICK-OFF IS REALLY THERE
@@ -3251,14 +3445,18 @@ update fixtures
    if field_count > 7
       setstring row_time field[7]
    endif
+   setstring row_status "-"
+   if field_count > 8
+      setstring row_status field[8]
+   endif
    if field[0] = arg[0]
       if arg[1] = -1
-         insert field[0] field[1] field[2] field[3] field[4] score_none score_none row_time
+         insert field[0] field[1] field[2] field[3] field[4] score_none score_none row_time new_status
       else
-         insert field[0] field[1] field[2] field[3] field[4] arg[1] arg[2] row_time
+         insert field[0] field[1] field[2] field[3] field[4] arg[1] arg[2] row_time new_status
       endif
    else
-      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6] row_time
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6] row_time row_status
    endif
 endupdate
 }
@@ -3296,8 +3494,12 @@ update fixtures
    if field_count > 7
       setstring row_time field[7]
    endif
+   setstring row_status "-"
+   if field_count > 8
+      setstring row_status field[8]
+   endif
    if field[0] != arg[0]
-      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6] row_time
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6] row_time row_status
    endif
 endupdate
 }
@@ -3404,7 +3606,8 @@ while INDEX < team_count
 endwhile
 write "</table>"
 write "<p class=~key~>Ordered by points, then goal difference, then goals scored. "
-write "Three points for a win, one for a draw.</p>"
+write "Three points for a win, one for a draw. A forfeit counts as a "
+write FORFEIT_GOALS "-0 win to the other team.</p>"
 execute "+top_scorers"
 }
 
@@ -4061,6 +4264,8 @@ print:
    table.games td:nth-child(6) { white-space: nowrap; }^
    table.games td { overflow: hidden; text-overflow: ellipsis; }^
    table.games tr.played td { background-color: #eef4ee; }^
+   table.games tr.washout td { color: #888888; }^
+   p.notplayed { margin-top: 12px; font-size: 10pt; line-height: 1.6; }^
    select.datepart { width: auto; margin-right: 4px; }^
    div.scoreform { background-color: #e6f2e6; border: 1px solid #2e5e2e; padding: 6px 14px 12px 14px; margin-bottom: 14px; font-family: Verdana, Arial, sans-serif; }^
    div.scoreform form { display: inline-block; margin-right: 12px; }^
