@@ -10,6 +10,8 @@ their own repos (`outboard/deploy/`, `wryter/etc/`).
 | `sites-enabled/000-default.conf` (port 80, redirects JACL to HTTPS) | `etc/dangarmarine/000-default.conf` |
 | `sites-enabled/jacl-ssl.conf` (port 443) | `etc/dangarmarine/jacl-ssl.conf` |
 | `/var/www/html/robots.txt` (keeps crawlers off `?command=` URLs) | not in git |
+| `sites-enabled/bastrd.conf` (port 80 for bastrd.dangarmarine.com.au) | `etc/dangarmarine/bastrd.conf` |
+| `sites-enabled/bastrd-ssl.conf` (BASTRD at the root of its own subdomain) | `etc/dangarmarine/bastrd-ssl.conf` |
 
 The two files here are copies of the live ones, with a comment added at the
 top, so they're a record rather than something to install unchanged. Copy
@@ -23,3 +25,15 @@ port 80: any host no other vhost names lands on the JACL pages. Before
 another site becomes the default, JACL needs its own port-80 vhost with
 `ServerName jacl.dangarmarine.com.au`, and the server-wide aliases in
 `jacl.conf` should move inside JACL's vhosts.
+
+## BASTRD's subdomain
+
+`bastrd.conf` and `bastrd-ssl.conf` are the source for the live files, not
+just a record. `setup-bastrd-site.sh` installs them, getting the
+certificate in between (the HTTPS site can't load until it exists). It
+needs the DNS A record for `bastrd` pointing at the VM first. To run it
+without a checkout on the VM, copy all three files over and run it there:
+
+    scp etc/dangarmarine/bastrd*.conf etc/dangarmarine/setup-bastrd-site.sh stuart@jacl.dangarmarine.com.au:
+    ssh -t stuart@jacl.dangarmarine.com.au 'sudo sh ~/setup-bastrd-site.sh'
+
