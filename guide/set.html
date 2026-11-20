@@ -180,6 +180,18 @@ padstring status_text " " status_width
 split VALID_count string_arg[0] "/" VALID_string
 </pre>
 
+<h2><a class="section" name="set7">The SUBSTRING Command</a></h2>
+
+<p>The <b>substring</b> command copies part of a string into another string. It takes four parameters: the string to copy into, the text to copy from, the position of the first character to copy and the number of characters to copy. Positions count from 0; a negative position counts back from the end, so <b>-1</b> is the last character. A range that runs past either end of the text is simply cut short. It counts characters rather than bytes, so an accented letter is never cut in half.
+
+<p>The following code turns a name such as &quot;Shona&quot; into &quot;S&hellip;a&quot;:
+
+<pre>
+substring first_letter player_name 0 1
+substring last_letter player_name -1 1
+setstring short_name first_letter "&hellip;" last_letter
+</pre>
+
 <!-- END OF BODY -->
 <p><a href="index.html">Back to Contents</a>
 </body></html>

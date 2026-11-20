@@ -9,7 +9,8 @@
 #   offside-competitions.csv   id, name, season, owner
 #   offside-teams.csv          id, competition id, name
 #   offside-players.csv        id, team id, name, position, shirt number,
-#                              gender ("Female", "Male" or "-")
+#                              gender ("Female", "Male" or "-"), "Hidden"
+#                              if the name is withheld from the public, or "-"
 #   offside-goals.csv          id, competition id, fixture id, team id,
 #                              player id (one row per goal with a known scorer)
 #   offside-fixtures.csv       id, competition id, date (yyyymmdd), home id,
@@ -132,6 +133,16 @@ parameter gender         gender_data
 string gender_data
 constant gender_values       "Not stated" "Female" "Male"
 string row_gender
+# A PLAYER CAN HAVE THEIR NAME HIDDEN: ONLY THE COMPETITION'S ORGANISERS (AND
+# SITE ADMINS) SEE IT; EVERYONE ELSE GETS ITS FIRST AND LAST LETTERS
+# ("Shona" -> "S…a"), WORKED OUT HERE SO THE FULL NAME NEVER REACHES THEM
+integer hide_name_p      0
+parameter hide_name      hide_name_p      0 1
+string row_hidden
+string player_hidden
+string wh_first
+string wh_last
+integer wh_len
 string row_position
 integer gender_f
 integer gender_m
@@ -257,7 +268,6 @@ integer dr_left
 integer dr_days
 integer dr_total
 integer dr_unplayed
-integer days_in_month
 
 string day_abbr          "Sat" "Sun" "Mon" "Tue" "Wed" "Thu" "Fri"
 string month_abbr        "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"
@@ -724,6 +734,7 @@ setstring player_name_data    ""
 setstring player_name_error   ""
 setstring position_data       ""
 setstring gender_data         ""
+set hide_name_p = 0
 setstring home_scorers_data   ""
 setstring away_scorers_data   ""
 setstring shirt_data          ""
@@ -1043,8 +1054,12 @@ update players
    if field_count > 5
       setstring row_gender field[5]
    endif
+   setstring row_hidden "-"
+   if field_count > 6
+      setstring row_hidden field[6]
+   endif
    if found = false
-      insert field[0] field[1] field[2] field[3] field[4] row_gender
+      insert field[0] field[1] field[2] field[3] field[4] row_gender row_hidden
    endif
 endupdate
 }
@@ -1254,8 +1269,12 @@ update players
    if field_count > 5
       setstring row_gender field[5]
    endif
+   setstring row_hidden "-"
+   if field_count > 6
+      setstring row_hidden field[6]
+   endif
    if field[1] != arg[0]
-      insert field[0] field[1] field[2] field[3] field[4] row_gender
+      insert field[0] field[1] field[2] field[3] field[4] row_gender row_hidden
    endif
 endupdate
 }
@@ -1280,6 +1299,26 @@ iterate players
       escapestring escaped field[2]
       escapestring escaped2 field[4]
       escapestring escaped3 field[3]
+      setstring row_hidden "-"
+      if field_count > 6
+         setstring row_hidden field[6]
+      endif
+      ifstring row_hidden = "Hidden"
+         if can_edit = true
+            setstring escaped escaped " <span class=~withheld~>(hidden from the public)</span>"
+         else
+            # FIRST AND LAST LETTERS ONLY (substring IS AN OPCODE, SO IT'S
+            # FINE INSIDE iterate)
+            substring wh_first field[2] 0 1
+            substring wh_last field[2] -1 1
+            length wh_len field[2]
+            if wh_len < 2
+               setstring wh_last ""
+            endif
+            setstring wh_first wh_first "…" wh_last
+            escapestring escaped wh_first
+         endif
+      endif
       write "<tr><td>" escaped2 "</td><td class=~home~>" escaped "</td><td>" escaped3 "</td><td>"
       ifstring row_gender = "Female"
          write "F"
@@ -1329,6 +1368,8 @@ execute "+select<Position<position"
 setstring row_gender "-"
 execute "+gender_row"
 execute "+text<Shirt number<shirt<4"
+setstring player_hidden "-"
+execute "+hidden_row"
 execute "+submit_row<Add player"
 write "<input type=~hidden~ name=~command~ value=~add player~/>"
 hidden
@@ -1372,6 +1413,26 @@ endwhile
 write "</select></div></div>"
 }
 
+# A "Hide name from the public" CHECKBOX, TICKED IF player_hidden SAYS SO
+{+hidden_row
+write "<div class=~row~><div class=~label~></div><div class=~input~><label>"
+write "<input type=~checkbox~ name=~hide_name~ value=~1~"
+ifstring player_hidden = "Hidden"
+   write " checked"
+endif
+write "> Hide name from the public</label>"
+write "<div class=~hint~>Everyone else sees just the first and last letters, like S…a. "
+write "Organisers still see the full name.</div></div></div>"
+}
+
+# THE SUBMITTED CHECKBOX AS WHAT'S STORED, IN player_hidden
+{+hidden_value
+setstring player_hidden "-"
+if hide_name_p = 1
+   setstring player_hidden "Hidden"
+endif
+}
+
 # TURNS THE SUBMITTED gender_data INTO WHAT'S STORED, IN row_gender
 {+gender_value
 setstring row_gender "-"
@@ -1400,6 +1461,10 @@ iterate players
       if field_count > 5
          setstring row_gender field[5]
       endif
+      setstring player_hidden "-"
+      if field_count > 6
+         setstring player_hidden field[6]
+      endif
    endif
 enditerate
 set target_comp = 0
@@ -1427,6 +1492,7 @@ write "<div class=~row~><div class=~label~>Player name:</div><div class=~input~>
 write "<input type=~text~ name=~player_name~ value=~" escaped "~ class=~jaclform~ size=~40~ maxlength=~254~/></div></div>"
 execute "+position_row"
 execute "+gender_row"
+execute "+hidden_row"
 ifstring shirt_data = "-"
    setstring shirt_data ""
 endif
@@ -1474,6 +1540,7 @@ ifstring shirt_data = ""
    setstring shirt_data "-"
 endif
 execute "+gender_value"
+execute "+hidden_value"
 execute "+rewrite_player<edit_id"
 escapestring escaped player_name_data
 write "<p class=~notice~>" escaped " updated.</p>"
@@ -1485,10 +1552,14 @@ update players
    if field_count > 5
       setstring row_time field[5]
    endif
+   setstring row_hidden "-"
+   if field_count > 6
+      setstring row_hidden field[6]
+   endif
    if field[0] = arg[0]
-      insert field[0] field[1] player_name_data row_position shirt_data row_gender
+      insert field[0] field[1] player_name_data row_position shirt_data row_gender player_hidden
    else
-      insert field[0] field[1] field[2] field[3] field[4] row_time
+      insert field[0] field[1] field[2] field[3] field[4] row_time row_hidden
    endif
 endupdate
 }
@@ -1523,11 +1594,27 @@ set new_id + 1
 # PLAYER arg[0]'S NAME, IN player_label
 {+player_name
 setstring player_label "?"
+set found = false
 iterate players
    if field[0] = arg[0]
       setstring player_label field[2]
+      if field_count > 6
+         ifstring field[6] = "Hidden"
+            set found = true
+         endif
+      endif
    endif
 enditerate
+# A HIDDEN NAME SHOWS AS ITS FIRST AND LAST LETTERS TO ANYONE BUT ORGANISERS
+ifall found = true : can_edit = false
+   substring wh_first player_label 0 1
+   substring wh_last player_label -1 1
+   length wh_len player_label
+   if wh_len < 2
+      setstring wh_last ""
+   endif
+   setstring player_label wh_first "…" wh_last
+endif
 }
 
 # UNDER A TEAM'S NAME IN A RESULT, ITS KNOWN SCORERS: "Sam 2, Jo, 1 unknown".
@@ -1946,7 +2033,8 @@ if errors != 0
 endif
 execute "+gender_value"
 execute "+next_player_id"
-append players new_id current_team player_name_data position_data shirt_data row_gender
+execute "+hidden_value"
+append players new_id current_team player_name_data position_data shirt_data row_gender player_hidden
 escapestring escaped player_name_data
 write "<p class=~notice~>" escaped " added to the squad.</p>"
 }
@@ -1991,8 +2079,12 @@ update players
    if field_count > 5
       setstring row_gender field[5]
    endif
+   setstring row_hidden "-"
+   if field_count > 6
+      setstring row_hidden field[6]
+   endif
    if field[0] != arg[0]
-      insert field[0] field[1] field[2] field[3] field[4] row_gender
+      insert field[0] field[1] field[2] field[3] field[4] row_gender row_hidden
    endif
 endupdate
 }
@@ -4532,6 +4624,7 @@ print:
    ul.history { margin: 6px 0; padding-left: 18px; font-size: 9pt; line-height: 1.5; color: #333333; }^
    ul.history span.when { color: #777777; white-space: nowrap; }^
    p.historyhead { margin: 12px 0 0 0; font-size: 10pt; font-weight: bold; }^
+   span.withheld { color: #777777; font-style: italic; font-size: 9pt; }^
    p.sitefoot { margin: 28px 0 6px 0; font-size: 8.5pt; text-align: center; }^
    p.sitefoot a { color: #777777; }^
    p.notplayed { margin-top: 12px; font-size: 10pt; line-height: 1.6; }^
