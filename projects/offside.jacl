@@ -141,7 +141,7 @@ parameter away_team      away_team     0 65535
 parameter home_goals     home_goals    0 99
 parameter away_goals     away_goals    0 99
 
-constant position_values     "Goalkeeper" "Defender" "Midfielder" "Forward"
+constant position_values     "Goalkeeper" "Defender" "Midfielder" "Forward" "Missionary"
 
 # A PLAYER'S GENDER IS STORED AS "Female", "Male" OR "-" (NOT STATED). A MIXED
 # COMP CAN THEN SEE HOW MANY WOMEN EACH SQUAD HAS.
