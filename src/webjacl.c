@@ -741,6 +741,9 @@ listen_again:
 
 		fflush(stdin);
 
+		/* A REQUEST WITH NO Cookie HEADER MUST NOT REUSE THE LAST ONE'S */
+		webjacl_cookies[0] = 0;
+
 		while (request_len > 2) {
 
 			// LOOP THROUGH ALL THE REQUEST

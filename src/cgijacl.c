@@ -594,6 +594,14 @@ main(int argc, char *argv[])
         pending_clear_session_cookie = FALSE;
 
         read_cgi_input(&entries);
+        /* EMPTY LAST REQUEST'S COOKIES FIRST. parse_cookies() RETURNS
+         * WITHOUT TOUCHING THE LIST WHEN THERE'S NO Cookie HEADER, SO IN A
+         * LONG-RUNNING PROCESS (fcgijacl, cgijacl -p) A COOKIELESS VISITOR
+         * -- A FIRST VISIT, A CRAWLER, A LINK PREVIEWER -- INHERITED THE
+         * PREVIOUS VISITOR'S user_id AND jacl_session AND WAS TREATED AS
+         * THEM, SIGNED-IN GOOGLE ACCOUNTS INCLUDED. */
+        list_clear(&jacl_cookies);
+        list_create(&jacl_cookies);
         parse_cookies(&jacl_cookies);
         cookie_read_successfully = FALSE;
 
