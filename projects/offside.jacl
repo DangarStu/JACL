@@ -2630,6 +2630,7 @@ print:
       h2 { font-size: 14pt; margin-top: 4px; }^
       div.links { position: relative; top: auto; bottom: auto; right: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: auto; padding: 6px 10px; font-size: 10pt; text-align: left; white-space: normal; }^
       span.authslot { margin-left: auto; flex: none; }^
+      div.mode { align-items: stretch; }^
       div.tab, div.selectedtab { flex: 1 1 0; min-width: 0; padding: 0; height: auto; line-height: 1.25; display: flex; align-items: center; justify-content: center; font-size: 10pt; }^
       div.selectedtab { padding: 10px 3px; }^
       a.tablink { display: block; width: 100%; padding: 10px 3px; font-size: 10pt; }^
