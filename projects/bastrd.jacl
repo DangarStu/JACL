@@ -460,6 +460,16 @@ execute "+write_comp_label"
 write "</span><script>var c = document.getElementById('compname'); "
 write "if (c) c.innerHTML = document.getElementById('compnow').innerHTML;</script>"
 
+# THE FORMS ARE GETs, SO AFTER ONE IS SUBMITTED ITS FIELDS AND command= STAY IN
+# THE ADDRESS BAR AND A RELOAD WOULD RUN IT AGAIN (ADDING A SECOND INVITE,
+# TEAM OR FIXTURE). CUT THE ADDRESS BACK TO THE TAB, KEEPING ONLY WHAT
+# IDENTIFIES THE VISITOR AND AN UNACCEPTED ?invite= (CLEARED BELOW ONCE USED)
+write "<script>(function() { var q = new URLSearchParams(location.search), k = new URLSearchParams(); "
+write "['user_id', 'device', 'invite'].forEach(function(n) { if (q.has(n)) k.set(n, q.get(n)); }); "
+write "k.set('mode', '" WEBAPP_mode "'); "
+write "var u = location.pathname + '?' + k.toString(); "
+write "if (u != location.pathname + location.search) history.replaceState(null, '', u); })();</script>"
+
 ifstring invite_message != ""
    write invite_message
    setstring invite_message ""
