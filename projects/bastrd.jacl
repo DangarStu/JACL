@@ -1113,43 +1113,18 @@ write "<h2>Fixtures &amp; results in " escaped "</h2>"
 execute "+load_teams<current_comp"
 execute "+load_games<current_comp"
 
-# FIXTURES STILL TO BE PLAYED, SOONEST FIRST
-write "<h3>Fixtures</h3>"
-set COUNT = 0
-set INDEX = 0
-while INDEX < game_count
-   if g_hg[INDEX] = -1
-      if COUNT = 0
-         execute "+game_table_head"
-      endif
-      execute "+game_row<INDEX"
-      set COUNT + 1
-   endif
-   set INDEX + 1
-endwhile
-if COUNT = 0
-   write "<p>No fixtures are waiting to be played.</p>"
+# ONE LIST IN DATE AND KICK-OFF ORDER, AS FOOTBALL SITES SHOW IT: GAMES
+# ALREADY PLAYED SHOW THEIR SCORE IN PLACE OF "v", SO THE RESULTS COME FIRST
+# AND THE NEXT FIXTURE FOLLOWS THE LAST RESULT
+if game_count = 0
+   write "<p>No fixtures have been added yet.</p>"
 else
-   write "</table>"
-endif
-
-# RESULTS, MOST RECENT FIRST
-write "<h3>Results</h3>"
-set COUNT = 0
-set INDEX = game_count
-while INDEX > 0
-   set INDEX - 1
-   if g_hg[INDEX] != -1
-      if COUNT = 0
-         execute "+game_table_head"
-      endif
+   execute "+game_table_head"
+   set INDEX = 0
+   while INDEX < game_count
       execute "+game_row<INDEX"
-      set COUNT + 1
-   endif
-endwhile
-if COUNT = 0
-   write "<p>No results have been entered yet.</p>"
-else
+      set INDEX + 1
+   endwhile
    write "</table>"
 endif
 
@@ -1211,7 +1186,12 @@ set game_key = g_key[game_pos]
 execute "+date_label<game_key"
 set game_time = g_time[game_pos]
 execute "+time_label<game_time"
-write "<tr><td class=~date~>" date_label "</td><td class=~date~>" time_label "</td><td class=~home~>"
+if g_hg[game_pos] = -1
+   write "<tr>"
+else
+   write "<tr class=~played~>"
+endif
+write "<td class=~date~>" date_label "</td><td class=~date~>" time_label "</td><td class=~home~>"
 set game_team = g_home[game_pos]
 execute "+team_label<game_team"
 escapestring escaped team_label
@@ -2602,6 +2582,7 @@ print:
    table.games th:nth-child(4) { width: 4em; }^
    table.games th:nth-child(6) { width: 17em; }^
    table.games td { overflow: hidden; text-overflow: ellipsis; }^
+   table.games tr.played td { background-color: #eef4ee; }^
    select.datepart { width: auto; margin-right: 4px; }^
    div.scoreform { background-color: #e6f2e6; border: 1px solid #2e5e2e; padding: 6px 14px 12px 14px; margin-bottom: 14px; font-family: Verdana, Arial, sans-serif; }^
    div.scoreform form { display: inline-block; margin-right: 12px; }^
