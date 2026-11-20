@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Nightly backup of OFFSIDE's live data to ~/Backups/OFFSIDE on this Mac
+     (etc/dangarmarine/backup-offside.sh). If the Mac is asleep at 2:30am it
+     runs when it next wakes. Install or update with:
+       cp etc/dangarmarine/au.com.dangarmarine.offside-backup.plist ~/Library/LaunchAgents/
+       launchctl bootout gui/$(id -u)/au.com.dangarmarine.offside-backup 2>/dev/null
+       launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/au.com.dangarmarine.offside-backup.plist
+     Remove with
+       launchctl bootout gui/$(id -u)/au.com.dangarmarine.offside-backup -->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>au.com.dangarmarine.offside-backup</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/sh</string>
+    <string>etc/dangarmarine/backup-offside.sh</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/stuart/git/jacl</string>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>2</integer>
+    <key>Minute</key>
+    <integer>30</integer>
+  </dict>
+  <key>StandardOutPath</key>
+  <string>/Users/stuart/Library/Logs/offside-backup.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/stuart/Library/Logs/offside-backup.log</string>
+</dict>
+</plist>

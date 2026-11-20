@@ -40,3 +40,15 @@ and run it there:
 The app was called BASTRD and served from bastrd.dangarmarine.com.au until
 it was renamed. That name's DNS record, sites and certificate have been
 removed.
+
+## Backups
+
+OFFSIDE's data is only the `offside-*.csv` files in
+`/usr/local/jacl/projects/data`. `backup-offside.sh` pulls them down to
+`~/Backups/OFFSIDE/<date>/` on Stuart's Mac, keeping 30 days, run nightly at
+2:30am (or on next wake) by the launchd job in
+`au.com.dangarmarine.offside-backup.plist`, which says how to install it. The
+log is `~/Library/Logs/offside-backup.log`. To restore a file, copy it back
+into the data folder (the stuart account can write there without sudo):
+
+    scp ~/Backups/OFFSIDE/<date>/offside-fixtures.csv stuart@jacl.dangarmarine.com.au:/usr/local/jacl/projects/data/
