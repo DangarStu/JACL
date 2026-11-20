@@ -19,6 +19,9 @@
 #                              confirmed", as does a row without the column;
 #                              then status: "-", "F" (forfeit, stored as
 #                              3-0) or "W" (washed out, no score)
+#   offside-history.csv        id, competition id, fixture id (0 for none),
+#                              time (unixtime), Google account id, their
+#                              name, what they did ("entered the result ...")
 #   offside-organisers.csv     id, competition id, Google account id, name
 #   offside-invites.csv        id, code, competition id, expiry (unixtime),
 #                              name
@@ -286,6 +289,28 @@ integer game_status
 string row_status
 string new_status
 integer forfeit_goals
+
+# CHANGE HISTORY: WHO ENTERED OR CHANGED A RESULT AND WHEN. THE NAME IS
+# LOOKED UP WHEN THE CHANGE IS MADE AND STORED WITH IT. THE MOST RECENT
+# LOG_SHOWN ROWS ARE LOADED INTO A RING OF lg_* ARRAYS, NEWEST SHOWN FIRST.
+constant LOG_SHOWN       25
+integer_array lg_time    LOG_SHOWN
+string_array lg_name     LOG_SHOWN
+string_array lg_what     LOG_SHOWN
+integer lg_count
+integer lg_at
+integer lg_end
+integer lg_i
+integer lg_key
+integer lg_hm
+integer syd_t
+integer syd_dst
+integer syd_sun
+integer log_time
+string match_text
+string log_what
+string editor_name
+string when_label
 integer any_washout
 integer game_time
 integer tl_h
@@ -952,6 +977,7 @@ execute "+purge_players"
 execute "+purge_teams<new_id"
 execute "+purge_fixtures<new_id"
 execute "+purge_comp_goals<new_id"
+execute "+purge_comp_history<new_id"
 execute "+purge_competition<new_id"
 if current_comp = new_id
    set current_comp = 0
@@ -1703,6 +1729,9 @@ write "<p class=~notice~>Scorers saved for "
 execute "+load_teams<target_comp"
 execute "+write_match"
 write ".</p>"
+execute "+match_text"
+setstring log_what "updated the scorers for " match_text
+execute "+log_change<edit_id"
 }
 
 # RECORDS THE KNOWN SCORERS FROM sc_text (A COMMA-SEPARATED LIST OF PLAYER
@@ -2004,6 +2033,16 @@ else
          write "To replay one, give it a new date with <b>Change time</b>."
       endif
       write "</p>"
+   endif
+   if can_edit = true
+      set dr_t = 0
+      execute "+load_log<current_comp<dr_t"
+      if lg_count > 0
+         write "<details class=~history~><summary>Recent changes</summary>"
+         write "<p class=~key~>Who entered or changed what, newest first. Only organisers see this.</p>"
+         execute "+write_log"
+         write "</details>"
+      endif
    endif
 endif
 
@@ -2316,13 +2355,42 @@ endwhile
 write "</select>"
 }
 
+# unixtime arg[0] AS SYDNEY LOCAL TIME, STILL IN SECONDS FOR +process_epoch:
+# time.library'S FIXED +10 HOURS, PLUS ONE FOR DAYLIGHT SAVING FROM THE FIRST
+# SUNDAY IN OCTOBER TO THE FIRST SUNDAY IN APRIL (SWITCHING AT MIDNIGHT
+# RATHER THAN 2-3am, WHICH IS CLOSE ENOUGH HERE)
+{+sydney_time
+set syd_t = arg[0]
+set syd_t = +adjusted_time<syd_t
+execute "+process_epoch<syd_t"
+set syd_dst = false
+# TIME_month COUNTS FROM 0: NOVEMBER TO MARCH ARE ALL DAYLIGHT SAVING
+if TIME_month > 9 : TIME_month < 3
+   set syd_dst = true
+endif
+# THE DATE OF THE SUNDAY ON OR BEFORE TODAY (TIME_day 0 IS SUNDAY), BELOW 1
+# IF THERE HASN'T BEEN ONE YET THIS MONTH
+set syd_sun = TIME_date
+set syd_sun - TIME_day
+ifall TIME_month = 9 : syd_sun >= 1
+   set syd_dst = true
+endif
+ifall TIME_month = 3 : syd_sun < 1
+   set syd_dst = true
+endif
+if syd_dst = true
+   set syd_t + 3600
+endif
+return syd_t
+}
+
 # THE FORM STARTS AT TODAY UNTIL A DATE HAS BEEN CHOSEN
 {+default_date
 ifall chosen_day != 0 : chosen_month != 0 : chosen_year != 0 : chosen_time != 0
    return
 endif
 set gmt = unixtime
-set now = +adjusted_time<gmt
+set now = +sydney_time<gmt
 execute "+process_epoch<now"
 set chosen_day = TIME_date
 set chosen_month = TIME_month
@@ -2685,6 +2753,13 @@ execute "+next_fixture_id"
 set dr_create = true
 execute "+build_draw"
 write "<p class=~notice~>Draw created: " dr_total " fixtures over " dr_rounds " rounds.</p>"
+set target_comp = current_comp
+setstring log_what "generated a draw of " dr_total " fixtures"
+if gen_replace_p = 1
+   setstring log_what log_what ", replacing the ones not yet played"
+endif
+set dr_t = 0
+execute "+log_change<dr_t"
 }
 
 # dr_n (TEAMS, PLUS A DUMMY IF ODD), dr_pairs, dr_rounds (ALL TIMES
@@ -3006,6 +3081,13 @@ setstring date_label date_label ", " time_label
 write "<p class=~notice~>Fixture added: "
 execute "+write_teams<home_team<away_team"
 write ", " date_label ".</p>"
+set target_comp = current_comp
+set dr_t = new_id
+execute "+team_label<home_team"
+setstring log_what "added " team_label " v "
+execute "+team_label<away_team"
+setstring log_what log_what team_label " (" date_label ")"
+execute "+log_change<dr_t"
 # THE DATE STAYS FOR THE NEXT FIXTURE OF THE ROUND; THE TEAMS DON'T
 set home_team = 0
 set away_team = 0
@@ -3162,6 +3244,11 @@ write "<span class=~buttons~><input type=~submit~ value=~Save result~> "
 hyperlinkNE "Cancel" "blankjacl"
 write "</span></form>"
 execute "+find_fixture<edit_id"
+execute "+load_log<target_comp<edit_id"
+if lg_count > 0
+   write "<p class=~historyhead~>History</p>"
+   execute "+write_log"
+endif
 write "<p class=~notplayed~>Not played? "
 execute "+team_label<game_home"
 escapestring escaped team_label
@@ -3270,6 +3357,9 @@ execute "+load_teams<target_comp"
 write "<p class=~notice~>Moved: "
 execute "+write_match"
 write ", now " date_label ".</p>"
+execute "+match_text"
+setstring log_what "moved " match_text " to " date_label
+execute "+log_change<edit_id"
 }
 
 # REWRITES FIXTURE arg[0] WITH DATE arg[1] (yyyymmdd) AND KICK-OFF arg[2]
@@ -3324,7 +3414,158 @@ execute "+load_teams<target_comp"
 write "<p class=~notice~>Result saved: "
 execute "+write_match"
 write ".</p>"
+execute "+match_text"
+if sc_old_h = -1
+   setstring log_what "entered the result " match_text
+else
+   setstring log_what "changed the result to " match_text
+endif
+execute "+log_change<edit_id"
 execute "+scorer_form<edit_id"
+}
+
+# -----------------------------------------------------------------------------
+# CHANGE HISTORY
+# -----------------------------------------------------------------------------
+
+# "Home v Away", OR "Home 2 - 1 Away" ONCE PLAYED, IN match_text, FOR THE
+# FIXTURE +find_fixture LAST FOUND (NEEDS ITS TEAMS LOADED)
+{+match_text
+execute "+team_label<game_home"
+setstring match_text team_label
+if game_hg = -1
+   setstring match_text match_text " v "
+else
+   setstring match_text match_text " " game_hg " - " game_ag " "
+endif
+execute "+team_label<game_away"
+setstring match_text match_text team_label
+}
+
+# RECORDS log_what AGAINST FIXTURE arg[0] (0 FOR NONE) OF target_comp, BY
+# WHOEVER IS SIGNED IN. USES new_id, SO CALL IT AFTER ANYTHING ELSE THAT DOES.
+{+log_change
+execute "+editor_name<target_comp"
+execute "+next_log_id"
+set log_time = unixtime
+append history new_id target_comp arg[0] log_time google_sub editor_name log_what
+}
+
+{+next_log_id
+set new_id = 0
+iterate history
+   if field[0] > new_id
+      set new_id = field[0]
+   endif
+enditerate
+set new_id + 1
+}
+
+# THE SIGNED-IN PERSON'S NAME AS AN ORGANISER OF COMPETITION arg[0], OR AS
+# A SITE ADMIN, IN editor_name
+{+editor_name
+setstring editor_name ""
+iterate organisers
+   if field[1] = arg[0]
+      ifstring field[2] = google_sub
+         setstring editor_name field[3]
+      endif
+   endif
+enditerate
+ifstring editor_name != ""
+   return
+endif
+iterate admins
+   ifstring field[0] = google_sub
+      setstring editor_name field[1]
+   endif
+enditerate
+ifstring editor_name != ""
+   return
+endif
+setstring editor_name "An organiser"
+ifstring current_comp_owner = google_sub
+   setstring editor_name "The competition's creator"
+endif
+}
+
+# LOADS THE LAST LOG_SHOWN CHANGES TO COMPETITION arg[0], ONLY THOSE TO
+# FIXTURE arg[1] UNLESS IT'S 0
+{+load_log
+set lg_count = 0
+iterate history
+   if field[1] = arg[0]
+      set found = true
+      if arg[1] != 0
+         if field[2] != arg[1]
+            set found = false
+         endif
+      endif
+      if found = true
+         set lg_at = lg_count
+         set lg_at % LOG_SHOWN
+         set lg_time[lg_at] = field[3]
+         setstring lg_name[lg_at] field[5]
+         setstring lg_what[lg_at] field[6]
+         set lg_count + 1
+      endif
+   endif
+enditerate
+}
+
+# THE LOADED CHANGES, NEWEST FIRST
+{+write_log
+write "<ul class=~history~>"
+set lg_end = lg_count
+set lg_end - LOG_SHOWN
+if lg_end < 0
+   set lg_end = 0
+endif
+set lg_i = lg_count
+while lg_i > lg_end
+   set lg_i - 1
+   set lg_at = lg_i
+   set lg_at % LOG_SHOWN
+   set log_time = lg_time[lg_at]
+   execute "+when_label<log_time"
+   escapestring escaped lg_name[lg_at]
+   escapestring escaped2 lg_what[lg_at]
+   write "<li><span class=~when~>" when_label "</span> " escaped " " escaped2 "</li>"
+endwhile
+write "</ul>"
+}
+
+# unixtime arg[0] IN LOCAL TIME AS E.G. "Sat 21 Nov 2026, 7:40pm", IN
+# when_label
+{+when_label
+set lg_hm = arg[0]
+set lg_key = +sydney_time<lg_hm
+execute "+process_epoch<lg_key"
+set lg_key = TIME_year
+set lg_key * 100
+set lg_hm = TIME_month
+set lg_hm + 1
+set lg_key + lg_hm
+set lg_key * 100
+set lg_key + TIME_date
+execute "+date_label<lg_key"
+set lg_hm = TIME_hour
+set lg_hm * 100
+set lg_hm + TIME_minute
+# time_label READS 0 AS "NOT SET"; A MINUTE PAST MIDNIGHT IS CLOSE ENOUGH
+if lg_hm = 0
+   set lg_hm = 1
+endif
+execute "+time_label<lg_hm"
+setstring when_label date_label ", " time_label
+}
+
+{+purge_comp_history
+update history
+   if field[1] != arg[0]
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
+   endif
+endupdate
 }
 
 grammar forfeit home $integer     >forfeit_home
@@ -3367,9 +3608,14 @@ else
    execute "+team_label<game_away"
 endif
 escapestring escaped team_label
+# +write_match AND +match_text REUSE team_label, SO NAME THE TEAM FIRST
+setstring log_what "recorded a forfeit by " team_label ": "
 write "<p class=~notice~>" escaped " forfeited: "
 execute "+write_match"
 write ".</p>"
+execute "+match_text"
+setstring log_what log_what match_text
+execute "+log_change<edit_id"
 }
 
 {+washout
@@ -3388,6 +3634,10 @@ write "<p class=~notice~>"
 execute "+write_match"
 write " is marked as washed out, and won't count in the table. "
 write "To replay it, give it a new date with <b>Change time</b>.</p>"
+execute "+find_fixture<edit_id"
+execute "+match_text"
+setstring log_what "marked " match_text " as washed out"
+execute "+log_change<edit_id"
 }
 
 # FINDS FIXTURE edit_id AND CHECKS IT CAN BE CHANGED, SETTING allowed
@@ -3428,11 +3678,18 @@ if allowed = false
    execute "+deny"
    return
 endif
+execute "+load_teams<target_comp"
+execute "+match_text"
+setstring log_what "cleared the result " match_text
+if game_status = GAME_WASHOUT
+   setstring log_what "put " match_text " back on after a washout"
+endif
 set game_hg = -1
 setstring new_status "-"
 execute "+set_score<edit_id<game_hg<game_hg"
 set game_team = 0
 execute "+purge_fixture_goals<edit_id<game_team"
+execute "+log_change<edit_id"
 write "<p class=~notice~>Result cleared; it's back in the fixtures.</p>"
 }
 
@@ -3478,9 +3735,13 @@ if allowed = false
    execute "+deny"
    return
 endif
+execute "+load_teams<target_comp"
+execute "+match_text"
+setstring log_what "deleted " match_text " (" date_label ")"
 execute "+remove_fixture<edit_id"
 set game_team = 0
 execute "+purge_fixture_goals<edit_id<game_team"
+execute "+log_change<edit_id"
 if game_hg = -1
    write "<p class=~notice~>Fixture deleted.</p>"
 else
@@ -4265,6 +4526,11 @@ print:
    table.games td { overflow: hidden; text-overflow: ellipsis; }^
    table.games tr.played td { background-color: #eef4ee; }^
    table.games tr.washout td { color: #888888; }^
+   details.history { margin: 10px 0 4px 0; }^
+   details.history summary { cursor: pointer; font-size: 10pt; color: #2e5e2e; }^
+   ul.history { margin: 6px 0; padding-left: 18px; font-size: 9pt; line-height: 1.5; color: #333333; }^
+   ul.history span.when { color: #777777; white-space: nowrap; }^
+   p.historyhead { margin: 12px 0 0 0; font-size: 10pt; font-weight: bold; }^
    p.notplayed { margin-top: 12px; font-size: 10pt; line-height: 1.6; }^
    select.datepart { width: auto; margin-right: 4px; }^
    div.scoreform { background-color: #e6f2e6; border: 1px solid #2e5e2e; padding: 6px 14px 12px 14px; margin-bottom: 14px; font-family: Verdana, Arial, sans-serif; }^
