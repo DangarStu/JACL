@@ -60,7 +60,9 @@ print:
       float: left; 
       height: 23px;
 .
-write "width: " tab_width "px;"
+# TABS SIZE TO THEIR LABEL. THEY USED TO TAKE THEIR WIDTH FROM A tab_width
+# CONSTANT THAT NO PROGRAM DEFINED, SO EVERY TAB COLLAPSED TO ITS TEXT
+write "min-width: 110px; padding: 0px 14px; line-height: 23px;"
 print:
       font-family: Verdana, Arial, Sanserif; 
       font-size: 12pt;
@@ -86,7 +88,9 @@ print:
       float: left; 
       height: 23px;
 .
-write "width: " tab_width "px;"
+# TABS SIZE TO THEIR LABEL. THEY USED TO TAKE THEIR WIDTH FROM A tab_width
+# CONSTANT THAT NO PROGRAM DEFINED, SO EVERY TAB COLLAPSED TO ITS TEXT
+write "min-width: 110px; padding: 0px 14px; line-height: 23px;"
 print:
       font-family: Verdana, Arial, Sanserif; 
       font-color: black;
