@@ -279,7 +279,7 @@ write "</span>"
 {+write_comp_label
 ifstring current_comp_name != ""
    escapestring escaped current_comp_name
-   write "Competition: <b>" escaped "</b>"
+   write "<b>" escaped "</b>"
 else
    write "No competition selected"
 endif
@@ -2604,7 +2604,8 @@ print:
    div.addway details { margin-top: 14px; }^
    div.addway summary { cursor: pointer; font-size: 10pt; color: #2e5e2e; }^
    span.expires { font-size: 9pt; color: #555555; white-space: nowrap; }^
-   span.authslot { display: inline-block; vertical-align: middle; margin-left: 14px; }^
+   span.authslot { display: inline-block; vertical-align: middle; margin-left: 14px; text-shadow: none; }^
+   span.authslot a.signout { text-shadow: 0 0 4px black; }^
    a.signout { color: white; font-size: 10pt; }^
    div.confirm { background-color: #fbe9e7; border: 1px solid #c62828; padding: 6px 14px 12px 14px; margin-bottom: 14px; font-family: Verdana, Arial, sans-serif; }^
    input.danger { background-color: #c62828; color: white; border: none; padding: 4px 14px; }^
@@ -2628,7 +2629,8 @@ print:
    @media (max-width: 700px) {^
       div#main { padding: 12px 10px; }^
       h2 { font-size: 14pt; margin-top: 4px; }^
-      div.links { position: relative; top: auto; bottom: auto; right: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: auto; padding: 6px 10px; font-size: 10pt; text-align: left; white-space: normal; }^
+      div.links { position: relative; top: auto; bottom: auto; right: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 40px; box-sizing: border-box; padding: 0 10px; font-size: 10pt; text-align: left; white-space: nowrap; }^
+      span#compname { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }^
       span.authslot { margin-left: auto; flex: none; }^
       div.mode { align-items: stretch; }^
       div.tab, div.selectedtab { flex: 1 1 0; min-width: 0; padding: 0; height: auto; line-height: 1.25; display: flex; align-items: center; justify-content: center; font-size: 10pt; }^
