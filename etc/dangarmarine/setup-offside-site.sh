@@ -1,8 +1,7 @@
 #!/bin/sh
 # Puts the OFFSIDE app at https://offside.dangarmarine.com.au/ on the Dangar
-# Marine VM, and turns the old BASTRD address into a redirect to it. Run as
-# root from the folder holding offside.conf, offside-ssl.conf and
-# bastrd-ssl.conf (this one in the repo, or wherever they were copied):
+# Marine VM. Run as root from the folder holding offside.conf and
+# offside-ssl.conf (this one in the repo, or wherever they were copied):
 #
 #   sudo sh setup-offside-site.sh
 #
@@ -42,17 +41,6 @@ cp "$HERE/offside-ssl.conf" "$SITES/"
 a2ensite -q offside-ssl
 apache2ctl configtest
 systemctl reload apache2
-
-echo "=== Old name"
-# THE APP WAS BASTRD AT bastrd.dangarmarine.com.au. ITS PORT 80 SITE AND
-# CERTIFICATE STAY; ITS HTTPS SITE BECOMES A REDIRECT TO THE NEW NAME
-if [ -d /etc/letsencrypt/live/bastrd.dangarmarine.com.au ]; then
-    cp "$HERE/bastrd-ssl.conf" "$SITES/"
-    a2ensite -q bastrd-ssl
-    apache2ctl configtest
-    systemctl reload apache2
-    curl -s -o /dev/null -w "old name %{http_code} -> %{redirect_url}\n" "https://bastrd.dangarmarine.com.au/?mode=3"
-fi
 
 echo "=== Checking"
 curl -s -o /dev/null -w "http  %{http_code} -> %{redirect_url}\n" "http://$HOST/"
