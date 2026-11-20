@@ -526,9 +526,11 @@ int parse_cookies(llist *entries)
   int numcookies = 0;
   short NM = 1;
 
+  /* START A FRESH LIST EVEN WHEN THERE ARE NO COOKIES, SO A CALLER THAT
+   * REUSES THE LIST ACROSS REQUESTS NEVER SEES THE LAST REQUEST'S */
+  list_create(entries);
   if (cookies == NULL)
     return 0;
-  list_create(entries);
   window = entries->head;
   len = strlen(cookies);
   entry.name = (char *)malloc(sizeof(char) * len + 1);
