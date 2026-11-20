@@ -799,8 +799,11 @@ execute(const char *funcname)
                     sprintf(error_buffer, "Failed to open input CSV file ~%s~: %s\n", in_name, strerror(errno));
                     log_error(error_buffer, LOG_ONLY);
                     if (outfile != NULL) {
+                        /* NOTHING WAS WRITTEN; DON'T LEAVE THE EMPTY
+                         * TEMPORARY FILE BEHIND IN THE DATA DIRECTORY */
                         fclose(outfile);
                         outfile = NULL;
+                        remove(out_name);
                     }
                     return(exit_function (TRUE));
                   } else {
