@@ -163,6 +163,8 @@ integer sc_known
 integer sc_total
 integer sc_first
 integer sc_at
+integer sc_rank
+integer sc_prev
 integer sc_fixture
 integer sc_old_h
 integer sc_old_a
@@ -1724,21 +1726,33 @@ endwhile
 if sc_known = 0
    return
 endif
-write "<h3>Top scorers</h3>"
+write "<h3>Golden Boot</h3>"
 write "<table class=~league standings~><tr><th>#</th><th class=~home~>Player</th><th class=~home~>Team</th><th>Goals</th></tr>"
+# JOINT SCORERS SHARE A PLACE AND THE NEXT ONE SKIPS AHEAD (1, 1, 3); THE
+# MEDAL GOES TO EVERYONE IN FIRST
 set sc_first = 0
+set sc_rank = 0
+set sc_prev = -1
 set sc_scan = 0
 while sc_scan >= 0
    execute "+best_scorer"
    if sc_scan >= 0
       set sc_first + 1
+      if pl_goals[sc_scan] != sc_prev
+         set sc_rank = sc_first
+         set sc_prev = pl_goals[sc_scan]
+      endif
       set sc_player = pl_id[sc_scan]
       execute "+player_name<sc_player"
       escapestring escaped player_label
       set sc_team = pl_team[sc_scan]
       execute "+team_label<sc_team"
       escapestring escaped2 team_label
-      write "<tr><td>" sc_first "</td><td class=~home~>" escaped "</td><td class=~home~>" escaped2 "</td>"
+      write "<tr><td>" sc_rank "</td><td class=~home~>"
+      if sc_rank = 1
+         write "&#x1F947; "
+      endif
+      write escaped "</td><td class=~home~>" escaped2 "</td>"
       write "<td class=~points~>" pl_goals[sc_scan] "</td></tr>"
       set pl_goals[sc_scan] = 0
    endif
