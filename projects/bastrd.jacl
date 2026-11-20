@@ -426,7 +426,7 @@ endif
 if can_edit = false
    write "<p class=~key~>View only. "
    if google_signed_in = false
-      write "Sign in with Google (top right) to create and run your own competitions."
+      write "Sign in with Google (the button at the bottom right of the banner) to create and run your own competitions."
    else
       write "Only this competition's organisers can change it. To become one, "
       write "give its creator your account ID from the <b>Competitions</b> tab."
@@ -622,7 +622,7 @@ if COUNT = 0
 endif
 
 if google_signed_in = false
-   write "<p class=~key~>Sign in with Google (top right) to create and run "
+   write "<p class=~key~>Sign in with Google (the button at the bottom right of the banner) to create and run "
    write "your own competitions.</p>"
    return
 endif
@@ -653,7 +653,7 @@ grammar add competition     >add_competition
 
 {+add_competition
 if google_signed_in = false
-   write "<p class=~notice~>Sign in with Google to create a competition.</p>"
+   write "<p class=~notice~>Sign in with Google (the button at the bottom right of the banner) to create a competition.</p>"
    return
 endif
 ifstring comp_name_data = ""
@@ -2465,7 +2465,7 @@ enditerate
 set WEBAPP_mode = COMPETITIONS
 if google_signed_in = false
    # KEEP invite_data: SIGNING IN RELOADS THIS ADDRESS AND COMES BACK HERE
-   setstring invite_message "<p class=~notice~>You've been invited to help run <b>" invite_comp_name "</b>. Sign in with Google (bottom right of the banner) to accept.</p>"
+   setstring invite_message "<p class=~notice~>You've been invited to help run <b>" invite_comp_name "</b>. Sign in with Google (the button at the bottom right of the banner) to accept.</p>"
    setstring invite_name_data ""
    return
 endif
