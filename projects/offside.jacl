@@ -8,7 +8,10 @@
 #
 #   offside-competitions.csv   id, name, season, owner
 #   offside-teams.csv          id, competition id, name
-#   offside-players.csv        id, team id, name, position, shirt number
+#   offside-players.csv        id, team id, name, position, shirt number,
+#                              gender ("Female", "Male" or "-")
+#   offside-goals.csv          id, competition id, fixture id, team id,
+#                              player id (one row per goal with a known scorer)
 #   offside-fixtures.csv       id, competition id, date (yyyymmdd), home id,
 #                              away id, home goals, away goals, kick-off
 #                              (hhmm) -- the goals are "-" until the result
@@ -118,6 +121,54 @@ parameter away_goals     away_goals    0 99
 
 constant position_values     "Goalkeeper" "Defender" "Midfielder" "Forward"
 
+# A PLAYER'S GENDER IS STORED AS "Female", "Male" OR "-" (NOT STATED). A MIXED
+# COMP CAN THEN SEE HOW MANY WOMEN EACH SQUAD HAS.
+parameter gender         gender_data
+string gender_data
+constant gender_values       "Not stated" "Female" "Male"
+string row_gender
+string row_position
+integer gender_f
+integer gender_m
+integer gender_n
+
+# GOAL SCORERS: offside-goals.csv HOLDS ONE ROW PER GOAL WHOSE SCORER IS
+# KNOWN (id, competition, fixture, team, player). A RESULT'S OTHER GOALS ARE
+# SIMPLY UNKNOWN, SO NOTHING HAS TO BE ENTERED. THE SCORERS FORM SENDS EACH
+# SIDE'S PICKS AS A COMMA-SEPARATED LIST OF PLAYER IDS (0 = UNKNOWN), PUT
+# TOGETHER BY THE PAGE WHEN IT'S SUBMITTED.
+parameter home_scorers   home_scorers_data
+parameter away_scorers   away_scorers_data
+string home_scorers_data
+string away_scorers_data
+constant MAX_GOALS       2000
+integer_array gl_fixture MAX_GOALS
+integer_array gl_team    MAX_GOALS
+integer_array gl_player  MAX_GOALS
+integer goal_count       0
+constant MAX_PLAYERS     600
+integer_array pl_id      MAX_PLAYERS
+integer_array pl_team    MAX_PLAYERS
+integer_array pl_goals   MAX_PLAYERS
+integer player_count     0
+string_array sc_parts    24
+integer sc_count
+integer sc_index
+integer sc_limit
+integer sc_team
+integer sc_player
+integer sc_goal
+integer sc_scan
+integer sc_known
+integer sc_total
+integer sc_first
+integer sc_at
+integer sc_fixture
+integer sc_old_h
+integer sc_old_a
+string sc_text
+string player_label
+
 # A FIXTURE'S DATE IS CHOSEN FROM THREE DROP-DOWNS RATHER THAN TYPED, SO
 # cgijacl RANGE-CHECKS EACH PART AS AN INTEGER AND THE PROGRAM NEVER HAS TO
 # PARSE FREE TEXT (split LEAVES OLD ELEMENTS BEHIND AND A NON-NUMBER ABORTS
@@ -215,6 +266,7 @@ integer sort_b
 string action
 string escaped
 string escaped2
+string escaped3
 
 # PERMISSIONS, RECALCULATED ON EVERY REQUEST BY +refresh_permissions.
 # google_signed_in AND google_sub ARE SET BY THE INTERPRETER, AND ONLY FROM A
@@ -572,6 +624,9 @@ setstring team_name_error     ""
 setstring player_name_data    ""
 setstring player_name_error   ""
 setstring position_data       ""
+setstring gender_data         ""
+setstring home_scorers_data   ""
+setstring away_scorers_data   ""
 setstring shirt_data          ""
 setstring shirt_error         ""
 setstring fixture_error       ""
@@ -816,6 +871,7 @@ execute "+load_teams<new_id"
 execute "+purge_players"
 execute "+purge_teams<new_id"
 execute "+purge_fixtures<new_id"
+execute "+purge_comp_goals<new_id"
 execute "+purge_competition<new_id"
 if current_comp = new_id
    set current_comp = 0
@@ -824,7 +880,7 @@ if current_comp = new_id
    setstring current_team_name ""
 endif
 write "<p class=~notice~>Competition deleted along with its teams, "
-write "players, fixtures and results.</p>"
+write "players, fixtures, results and scorers.</p>"
 execute "+refresh_permissions"
 }
 
@@ -872,8 +928,12 @@ update players
       endif
       set INDEX + 1
    endwhile
+   setstring row_gender "-"
+   if field_count > 5
+      setstring row_gender field[5]
+   endif
    if found = false
-      insert field[0] field[1] field[2] field[3] field[4]
+      insert field[0] field[1] field[2] field[3] field[4] row_gender
    endif
 endupdate
 }
@@ -1079,8 +1139,12 @@ endupdate
 
 {+purge_squad
 update players
+   setstring row_gender "-"
+   if field_count > 5
+      setstring row_gender field[5]
+   endif
    if field[1] != arg[0]
-      insert field[0] field[1] field[2] field[3] field[4]
+      insert field[0] field[1] field[2] field[3] field[4] row_gender
    endif
 endupdate
 }
@@ -1089,14 +1153,39 @@ endupdate
 escapestring escaped current_team_name
 write "<h2>Squad: " escaped "</h2>"
 set COUNT = 0
-write "<table class=~league~>"
-write "<tr><th>No.</th><th>Player</th><th>Position</th><th>Action</th></tr>"
+set gender_f = 0
+set gender_m = 0
+set gender_n = 0
 iterate players
    if field[1] = current_team
+      if COUNT = 0
+         write "<table class=~league~>"
+         write "<tr><th>No.</th><th class=~home~>Player</th><th>Position</th><th>Gender</th><th>Action</th></tr>"
+      endif
+      setstring row_gender "-"
+      if field_count > 5
+         setstring row_gender field[5]
+      endif
       escapestring escaped field[2]
       escapestring escaped2 field[4]
-      write "<tr><td>" escaped2 "</td><td>" escaped "</td><td>" field[3] "</td><td>"
+      escapestring escaped3 field[3]
+      write "<tr><td>" escaped2 "</td><td class=~home~>" escaped "</td><td>" escaped3 "</td><td>"
+      ifstring row_gender = "Female"
+         write "F"
+         set gender_f + 1
+      else
+         ifstring row_gender = "Male"
+            write "M"
+            set gender_m + 1
+         else
+            set gender_n + 1
+         endif
+      endif
+      write "</td><td>"
       if can_edit = true
+         setstring action "edit player " field[0]
+         hyperlinkNE "Edit" action
+         write " &middot; "
          setstring action "confirm delete player " field[0]
          hyperlinkNE "Delete" action
       endif
@@ -1104,9 +1193,19 @@ iterate players
       set COUNT + 1
    endif
 enditerate
-write "</table>"
 if COUNT = 0
    write "<p>No players have been added to this team yet.</p>"
+else
+   write "</table>"
+   write "<p class=~key~>" COUNT " player"
+   if COUNT != 1
+      write "s"
+   endif
+   write ": " gender_f " female, " gender_m " male"
+   if gender_n != 0
+      write ", " gender_n " not stated"
+   endif
+   write ".</p>"
 endif
 
 if can_edit = false
@@ -1116,11 +1215,579 @@ write "<h3>Add a player</h3>"
 write "<form>"
 execute "+text<Player name<player_name<40"
 execute "+select<Position<position"
+setstring row_gender "-"
+execute "+gender_row"
 execute "+text<Shirt number<shirt<4"
 execute "+submit_row<Add player"
 write "<input type=~hidden~ name=~command~ value=~add player~/>"
 hidden
 write "</form>"
+}
+
+# A Gender: ROW FOR A PLAYER FORM, SELECTING row_gender ("Female", "Male" OR
+# "-"). THE VALUE SENT IS WHAT'S STORED.
+{+gender_row
+write "<div class=~row~><div class=~label~>Gender:</div><div class=~input~>"
+write "<select name=~gender~ class=~jaclform~>"
+write "<option value=~-~>Not stated</option>"
+write "<option value=~Female~"
+ifstring row_gender = "Female"
+   write " selected"
+endif
+write ">Female</option><option value=~Male~"
+ifstring row_gender = "Male"
+   write " selected"
+endif
+write ">Male</option></select></div></div>"
+}
+
+# A Position: ROW SELECTING row_position
+{+position_row
+write "<div class=~row~><div class=~label~>Position:</div><div class=~input~>"
+write "<select name=~position~ class=~jaclform~>"
+set sc_scan = 0
+setstring FORMS_string "@position_values"
+set sc_limit = FORMS_string
+while sc_scan < sc_limit
+   setstring FORMS_string "position_values[" sc_scan "]"
+   escapestring escaped %FORMS_string
+   write "<option value=~" escaped "~"
+   ifstring %FORMS_string = row_position
+      write " selected"
+   endif
+   write ">" escaped "</option>"
+   set sc_scan + 1
+endwhile
+write "</select></div></div>"
+}
+
+# TURNS THE SUBMITTED gender_data INTO WHAT'S STORED, IN row_gender
+{+gender_value
+setstring row_gender "-"
+ifstring gender_data = "Female"
+   setstring row_gender "Female"
+endif
+ifstring gender_data = "Male"
+   setstring row_gender "Male"
+endif
+}
+
+grammar edit player $integer     >edit_player
+
+# FINDS PLAYER arg[0], LEAVING THEIR TEAM IN new_id AND THEIR COMPETITION IN
+# target_comp, AND THEIR DETAILS IN player_name_data, row_position,
+# shirt_data AND row_gender
+{+find_player
+set new_id = 0
+iterate players
+   if field[0] = arg[0]
+      set new_id = field[1]
+      setstring player_name_data field[2]
+      setstring row_position field[3]
+      setstring shirt_data field[4]
+      setstring row_gender "-"
+      if field_count > 5
+         setstring row_gender field[5]
+      endif
+   endif
+enditerate
+set target_comp = 0
+iterate teams
+   if field[0] = new_id
+      set target_comp = field[1]
+   endif
+enditerate
+}
+
+{+edit_player
+set edit_id = $integer
+execute "+find_player<edit_id"
+if target_comp = 0
+   return
+endif
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+escapestring escaped player_name_data
+write "<div class=~scoreform~><p><b>Edit " escaped "</b></p><form>"
+write "<div class=~row~><div class=~label~>Player name:</div><div class=~input~>"
+write "<input type=~text~ name=~player_name~ value=~" escaped "~ class=~jaclform~ size=~40~ maxlength=~254~/></div></div>"
+execute "+position_row"
+execute "+gender_row"
+ifstring shirt_data = "-"
+   setstring shirt_data ""
+endif
+escapestring escaped shirt_data
+write "<div class=~row~><div class=~label~>Shirt number:</div><div class=~input~>"
+write "<input type=~text~ name=~shirt~ value=~" escaped "~ class=~jaclform~ size=~4~ maxlength=~254~/></div></div>"
+execute "+submit_row<Save player"
+write "<input type=~hidden~ name=~command~ value=~save player " edit_id "~/>"
+hidden
+write "</form> "
+hyperlinkNE "Cancel" "blankjacl"
+write "</div>"
+# THE ADD-A-PLAYER FORM FURTHER DOWN WOULD OTHERWISE PICK THESE UP
+setstring player_name_data ""
+setstring shirt_data ""
+}
+
+grammar save player $integer     >save_player
+
+{+save_player
+set edit_id = $integer
+setstring escaped2 player_name_data
+setstring escaped3 position_data
+setstring sc_text shirt_data
+execute "+find_player<edit_id"
+if target_comp = 0
+   return
+endif
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+ifstring escaped2 = ""
+   write "<p class=~notice~>A player needs a name, so nothing was changed.</p>"
+   return
+endif
+setstring player_name_data escaped2
+setstring row_position escaped3
+ifstring row_position = ""
+   setstring row_position "-"
+endif
+setstring shirt_data sc_text
+ifstring shirt_data = ""
+   setstring shirt_data "-"
+endif
+execute "+gender_value"
+execute "+rewrite_player<edit_id"
+escapestring escaped player_name_data
+write "<p class=~notice~>" escaped " updated.</p>"
+}
+
+{+rewrite_player
+update players
+   setstring row_time "-"
+   if field_count > 5
+      setstring row_time field[5]
+   endif
+   if field[0] = arg[0]
+      insert field[0] field[1] player_name_data row_position shirt_data row_gender
+   else
+      insert field[0] field[1] field[2] field[3] field[4] row_time
+   endif
+endupdate
+}
+
+# -----------------------------------------------------------------------------
+# GOAL SCORERS
+# -----------------------------------------------------------------------------
+
+# LOADS competition arg[0]'S KNOWN SCORERS INTO THE gl_* ARRAYS
+{+load_comp_goals
+set goal_count = 0
+iterate goals
+   ifall field[1] = arg[0] : goal_count < MAX_GOALS
+      set gl_fixture[goal_count] = field[2]
+      set gl_team[goal_count] = field[3]
+      set gl_player[goal_count] = field[4]
+      set goal_count + 1
+   endif
+enditerate
+}
+
+{+next_goal_id
+set new_id = 0
+iterate goals
+   if field[0] > new_id
+      set new_id = field[0]
+   endif
+enditerate
+set new_id + 1
+}
+
+# PLAYER arg[0]'S NAME, IN player_label
+{+player_name
+setstring player_label "?"
+iterate players
+   if field[0] = arg[0]
+      setstring player_label field[2]
+   endif
+enditerate
+}
+
+# UNDER A TEAM'S NAME IN A RESULT, ITS KNOWN SCORERS: "Sam 2, Jo, 1 unknown".
+# arg[0] = FIXTURE, arg[1] = TEAM, arg[2] = ITS GOALS. NOTHING IF NONE OF ITS
+# GOALS HAS A KNOWN SCORER. NEEDS +load_comp_goals.
+{+scorer_line
+if arg[2] < 1
+   return
+endif
+set sc_fixture = arg[0]
+set sc_team = arg[1]
+set sc_total = arg[2]
+set sc_known = 0
+set sc_index = 0
+while sc_index < goal_count
+   ifall gl_fixture[sc_index] = sc_fixture : gl_team[sc_index] = sc_team
+      set sc_known + 1
+   endif
+   set sc_index + 1
+endwhile
+if sc_known = 0
+   return
+endif
+write "<span class=~scorers~>"
+set sc_first = true
+set sc_index = 0
+while sc_index < goal_count
+   ifall gl_fixture[sc_index] = sc_fixture : gl_team[sc_index] = sc_team
+      execute "+scorer_once<sc_index"
+   endif
+   set sc_index + 1
+endwhile
+if sc_known < sc_total
+   set sc_total - sc_known
+   write ", " sc_total " unknown"
+endif
+write "</span>"
+}
+
+# WRITES gl ROW arg[0]'S SCORER AND THEIR GOAL COUNT IN THIS GAME, UNLESS AN
+# EARLIER ROW ALREADY DID
+{+scorer_once
+set sc_at = arg[0]
+set sc_player = gl_player[sc_at]
+set sc_goal = 0
+set sc_scan = 0
+while sc_scan < goal_count
+   ifall gl_fixture[sc_scan] = sc_fixture : gl_team[sc_scan] = sc_team : gl_player[sc_scan] = sc_player
+      if sc_scan < sc_at
+         return
+      endif
+      set sc_goal + 1
+   endif
+   set sc_scan + 1
+endwhile
+execute "+player_name<sc_player"
+escapestring escaped player_label
+if sc_first = false
+   write ", "
+endif
+set sc_first = false
+write escaped
+if sc_goal > 1
+   write " " sc_goal
+endif
+}
+
+grammar scorers $integer     >scorers
+
+{+scorers
+set edit_id = $integer
+execute "+find_fixture<edit_id"
+if target_comp = 0
+   return
+endif
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+execute "+load_teams<target_comp"
+execute "+scorer_form<edit_id"
+}
+
+# THE "WHO SCORED?" FORM FOR FIXTURE arg[0], AFTER +find_fixture: ONE MENU
+# PER GOAL, EACH LISTING THAT TEAM'S PLAYERS AND "Unknown", PRESET TO WHAT'S
+# ALREADY RECORDED. THE PAGE JOINS EACH SIDE'S MENUS INTO home_scorers AND
+# away_scorers WHEN IT'S SENT.
+{+scorer_form
+if game_hg < 0
+   return
+endif
+set sc_total = game_hg
+set sc_total + game_ag
+if sc_total = 0
+   return
+endif
+execute "+load_comp_goals<target_comp"
+set sc_fixture = arg[0]
+write "<div class=~scoreform~><p><b>Who scored?</b> &middot; "
+execute "+write_match"
+write "</p><p class=~key~>Optional. Leave a goal as Unknown if no one's sure.</p>"
+write "<form class=~scorersform~ onsubmit=~"
+write "this.home_scorers.value = Array.from(this.querySelectorAll('select.sch')).map(s => s.value).join(','); "
+write "this.away_scorers.value = Array.from(this.querySelectorAll('select.sca')).map(s => s.value).join(',');~>"
+if game_hg > 0
+   execute "+team_label<game_home"
+   escapestring escaped team_label
+   write "<p class=~scoringteam~>" escaped "</p>"
+   setstring sc_text "sch"
+   execute "+scorer_selects<game_home<game_hg"
+endif
+if game_ag > 0
+   execute "+team_label<game_away"
+   escapestring escaped team_label
+   write "<p class=~scoringteam~>" escaped "</p>"
+   setstring sc_text "sca"
+   execute "+scorer_selects<game_away<game_ag"
+endif
+write "<input type=~hidden~ name=~home_scorers~ value=~~>"
+write "<input type=~hidden~ name=~away_scorers~ value=~~>"
+write "<input type=~hidden~ name=~command~ value=~save scorers " arg[0] "~/>"
+hidden
+write "<p><input type=~submit~ value=~Save scorers~> "
+hyperlinkNE "Skip" "blankjacl"
+write "</p></form></div>"
+}
+
+# arg[1] MENUS FOR TEAM arg[0]'S GOALS, CLASS sc_text, PRESET IN ORDER TO
+# THE SCORERS ALREADY RECORDED FOR sc_fixture (pl_goals IS SCRATCH HERE)
+{+scorer_selects
+set sc_team = arg[0]
+set sc_limit = arg[1]
+set sc_known = 0
+set sc_index = 0
+while sc_index < goal_count
+   ifall gl_fixture[sc_index] = sc_fixture : gl_team[sc_index] = sc_team
+      if sc_known < MAX_PLAYERS
+         set pl_goals[sc_known] = gl_player[sc_index]
+         set sc_known + 1
+      endif
+   endif
+   set sc_index + 1
+endwhile
+set sc_index = 0
+while sc_index < sc_limit
+   set sc_player = 0
+   if sc_index < sc_known
+      set sc_player = pl_goals[sc_index]
+   endif
+   write "<select class=~" sc_text " goals~>"
+   execute "+player_options<sc_team<sc_player"
+   write "</select> "
+   set sc_index + 1
+endwhile
+}
+
+# <option>s FOR TEAM arg[0]'S PLAYERS AFTER "Unknown", SELECTING PLAYER arg[1]
+{+player_options
+write "<option value=~0~>Unknown</option>"
+iterate players
+   if field[1] = arg[0]
+      escapestring escaped field[2]
+      write "<option value=~" field[0] "~"
+      if field[0] = arg[1]
+         write " selected"
+      endif
+      write ">" escaped "</option>"
+   endif
+enditerate
+}
+
+grammar save scorers $integer     >save_scorers
+
+{+save_scorers
+set edit_id = $integer
+execute "+find_fixture<edit_id"
+if target_comp = 0
+   return
+endif
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+if game_hg < 0
+   write "<p class=~notice~>That fixture hasn't been played yet.</p>"
+   return
+endif
+set sc_fixture = edit_id
+set game_team = 0
+execute "+purge_fixture_goals<edit_id<game_team"
+execute "+next_goal_id"
+set sc_total = 0
+setstring sc_text home_scorers_data
+execute "+save_side<game_home<game_hg"
+setstring sc_text away_scorers_data
+execute "+save_side<game_away<game_ag"
+write "<p class=~notice~>Scorers saved for "
+execute "+load_teams<target_comp"
+execute "+write_match"
+write ".</p>"
+}
+
+# RECORDS THE KNOWN SCORERS FROM sc_text (A COMMA-SEPARATED LIST OF PLAYER
+# IDS) FOR TEAM arg[0], AT MOST arg[1] OF THEM. ANYTHING THAT ISN'T ONE OF
+# THAT TEAM'S PLAYERS COUNTS AS UNKNOWN. ROW IDS CARRY ON FROM new_id.
+{+save_side
+ifstring sc_text = ""
+   return
+endif
+set sc_team = arg[0]
+split sc_count sc_text "," sc_parts
+set sc_limit = sc_count
+if sc_limit > arg[1]
+   set sc_limit = arg[1]
+endif
+set sc_index = 0
+while sc_index < sc_limit
+   execute "+match_player<sc_team"
+   if sc_player != 0
+      append goals new_id target_comp sc_fixture sc_team sc_player
+      set new_id + 1
+   endif
+   set sc_index + 1
+endwhile
+}
+
+# sc_parts[sc_index] AS ONE OF TEAM arg[0]'S PLAYER IDS, IN sc_player (0 IF
+# IT ISN'T ONE). COMPARED AS TEXT SO A STRAY VALUE CAN'T ABORT ANYTHING.
+{+match_player
+set sc_player = 0
+iterate players
+   if field[1] = arg[0]
+      ifstring field[0] = sc_parts[sc_index]
+         set sc_player = field[0]
+      endif
+   endif
+enditerate
+}
+
+# EACH update LIVES IN ITS OWN FUNCTION: update ABORTS ITS CALLER WHEN THE
+# FILE DOESN'T EXIST YET (NO GOALS RECORDED SO FAR)
+
+# DROPS FIXTURE arg[0]'S SCORERS FOR TEAM arg[1], OR FOR BOTH TEAMS IF 0
+{+purge_fixture_goals
+update goals
+   set found = false
+   if field[2] = arg[0]
+      if arg[1] = 0
+         set found = true
+      endif
+      if field[3] = arg[1]
+         set found = true
+      endif
+   endif
+   if found = false
+      insert field[0] field[1] field[2] field[3] field[4]
+   endif
+endupdate
+}
+
+{+purge_comp_goals
+update goals
+   if field[1] != arg[0]
+      insert field[0] field[1] field[2] field[3] field[4]
+   endif
+endupdate
+}
+
+{+purge_player_goals
+update goals
+   if field[4] != arg[0]
+      insert field[0] field[1] field[2] field[3] field[4]
+   endif
+endupdate
+}
+
+# THE LEAGUE TABLE TAB'S TOP SCORERS, AFTER +display_table (WHICH LOADED THE
+# TEAMS AND THEIR GOALS FOR)
+{+top_scorers
+execute "+load_comp_goals<current_comp"
+if goal_count = 0
+   return
+endif
+set player_count = 0
+iterate players
+   set INDEX = 0
+   while INDEX < team_count
+      ifall field[1] = t_id[INDEX] : player_count < MAX_PLAYERS
+         set pl_id[player_count] = field[0]
+         set pl_team[player_count] = field[1]
+         set pl_goals[player_count] = 0
+         set player_count + 1
+      endif
+      set INDEX + 1
+   endwhile
+enditerate
+set sc_known = 0
+set sc_index = 0
+while sc_index < goal_count
+   execute "+credit_goal<sc_index"
+   set sc_index + 1
+endwhile
+if sc_known = 0
+   return
+endif
+write "<h3>Top scorers</h3>"
+write "<table class=~league standings~><tr><th>#</th><th class=~home~>Player</th><th class=~home~>Team</th><th>Goals</th></tr>"
+set sc_first = 0
+set sc_scan = 0
+while sc_scan >= 0
+   execute "+best_scorer"
+   if sc_scan >= 0
+      set sc_first + 1
+      set sc_player = pl_id[sc_scan]
+      execute "+player_name<sc_player"
+      escapestring escaped player_label
+      set sc_team = pl_team[sc_scan]
+      execute "+team_label<sc_team"
+      escapestring escaped2 team_label
+      write "<tr><td>" sc_first "</td><td class=~home~>" escaped "</td><td class=~home~>" escaped2 "</td>"
+      write "<td class=~points~>" pl_goals[sc_scan] "</td></tr>"
+      set pl_goals[sc_scan] = 0
+   endif
+endwhile
+write "</table>"
+set sc_total = 0
+set INDEX = 0
+while INDEX < team_count
+   set sc_total + t_gf[INDEX]
+   set INDEX + 1
+endwhile
+set sc_total - sc_known
+if sc_total > 0
+   write "<p class=~key~>Plus " sc_total " goal"
+   if sc_total != 1
+      write "s"
+   endif
+   write " with no scorer recorded.</p>"
+endif
+}
+
+# ADDS gl ROW arg[0]'S GOAL TO ITS SCORER'S TALLY
+{+credit_goal
+set sc_at = arg[0]
+set sc_player = gl_player[sc_at]
+set INDEX = 0
+while INDEX < player_count
+   if pl_id[INDEX] = sc_player
+      set pl_goals[INDEX] + 1
+      set sc_known + 1
+      return
+   endif
+   set INDEX + 1
+endwhile
+}
+
+# THE INDEX OF THE PLAYER WITH THE MOST GOALS STILL TO LIST, IN sc_scan (-1
+# WHEN NONE IS LEFT)
+{+best_scorer
+set sc_scan = -1
+set sc_goal = 0
+set INDEX = 0
+while INDEX < player_count
+   if pl_goals[INDEX] > sc_goal
+      set sc_goal = pl_goals[INDEX]
+      set sc_scan = INDEX
+   endif
+   set INDEX + 1
+endwhile
 }
 
 grammar add player     >add_player
@@ -1148,8 +1815,9 @@ endif
 if errors != 0
    return
 endif
+execute "+gender_value"
 execute "+next_player_id"
-append players new_id current_team player_name_data position_data shirt_data
+append players new_id current_team player_name_data position_data shirt_data row_gender
 escapestring escaped player_name_data
 write "<p class=~notice~>" escaped " added to the squad.</p>"
 }
@@ -1181,12 +1849,23 @@ if allowed = false
    return
 endif
 
+set edit_id = $integer
+execute "+remove_player<edit_id"
+# THEIR GOALS STAY IN THE RESULTS BUT BECOME UNKNOWN
+execute "+purge_player_goals<edit_id"
+write "<p class=~notice~>Player deleted.</p>"
+}
+
+{+remove_player
 update players
-   if field[0] != $integer
-      insert field[0] field[1] field[2] field[3] field[4]
+   setstring row_gender "-"
+   if field_count > 5
+      setstring row_gender field[5]
+   endif
+   if field[0] != arg[0]
+      insert field[0] field[1] field[2] field[3] field[4] row_gender
    endif
 endupdate
-write "<p class=~notice~>Player deleted.</p>"
 }
 
 # -----------------------------------------------------------------------------
@@ -1204,6 +1883,7 @@ write "<h2>Fixtures &amp; results in " escaped "</h2>"
 
 execute "+load_teams<current_comp"
 execute "+load_games<current_comp"
+execute "+load_comp_goals<current_comp"
 
 # ONE LIST IN DATE AND KICK-OFF ORDER, AS FOOTBALL SITES SHOW IT: GAMES
 # ALREADY PLAYED SHOW THEIR SCORE IN PLACE OF "v", SO THE RESULTS COME FIRST
@@ -1287,7 +1967,11 @@ write "<td class=~date~>" date_label "</td><td class=~date~>" time_label "</td><
 set game_team = g_home[game_pos]
 execute "+team_label<game_team"
 escapestring escaped team_label
-write escaped "</td><td class=~score~>"
+write escaped
+set sc_fixture = g_id[game_pos]
+set sc_goal = g_hg[game_pos]
+execute "+scorer_line<sc_fixture<game_team<sc_goal"
+write "</td><td class=~score~>"
 if g_hg[game_pos] = -1
    write "v"
 else
@@ -1297,7 +1981,11 @@ write "</td><td class=~home~>"
 set game_team = g_away[game_pos]
 execute "+team_label<game_team"
 escapestring escaped team_label
-write escaped "</td>"
+write escaped
+set sc_fixture = g_id[game_pos]
+set sc_goal = g_ag[game_pos]
+execute "+scorer_line<sc_fixture<game_team<sc_goal"
+write "</td>"
 if can_edit = true
    write "<td>"
    setstring action "score fixture " g_id[game_pos]
@@ -1308,6 +1996,13 @@ if can_edit = true
       hyperlinkNE "Change time" action
    else
       hyperlinkNE "Edit score" action
+      set sc_goal = g_hg[game_pos]
+      set sc_goal + g_ag[game_pos]
+      if sc_goal > 0
+         write " &middot; "
+         setstring action "scorers " g_id[game_pos]
+         hyperlinkNE "Scorers" action
+      endif
    endif
    write " &middot; "
    setstring action "confirm delete fixture " g_id[game_pos]
@@ -1925,12 +2620,22 @@ if allowed = false
    execute "+deny"
    return
 endif
+set sc_old_h = game_hg
+set sc_old_a = game_ag
 execute "+set_score<edit_id<home_goals<away_goals"
 execute "+find_fixture<edit_id"
+# A SIDE'S SCORERS NO LONGER ADD UP IF ITS GOALS CHANGED
+if sc_old_h != game_hg
+   execute "+purge_fixture_goals<edit_id<game_home"
+endif
+if sc_old_a != game_ag
+   execute "+purge_fixture_goals<edit_id<game_away"
+endif
 execute "+load_teams<target_comp"
 write "<p class=~notice~>Result saved: "
 execute "+write_match"
 write ".</p>"
+execute "+scorer_form<edit_id"
 }
 
 grammar clear score $integer     >clear_score
@@ -1948,6 +2653,8 @@ if allowed = false
 endif
 set game_hg = -1
 execute "+set_score<edit_id<game_hg<game_hg"
+set game_team = 0
+execute "+purge_fixture_goals<edit_id<game_team"
 write "<p class=~notice~>Result cleared; it's back in the fixtures.</p>"
 }
 
@@ -1990,6 +2697,8 @@ if allowed = false
    return
 endif
 execute "+remove_fixture<edit_id"
+set game_team = 0
+execute "+purge_fixture_goals<edit_id<game_team"
 if game_hg = -1
    write "<p class=~notice~>Fixture deleted.</p>"
 else
@@ -2112,6 +2821,7 @@ endwhile
 write "</table>"
 write "<p class=~key~>Ordered by points, then goal difference, then goals scored. "
 write "Three points for a win, one for a draw.</p>"
+execute "+top_scorers"
 }
 
 # ONE BUBBLE-SORT PASS OVER t_order, SETTING swapped IF ANYTHING MOVED
@@ -2733,6 +3443,9 @@ print:
    span.authslot { transition: opacity 0.3s ease-in; }^
    span.authslot.settling { opacity: 0; }^
    form.sending input[type=submit] { opacity: 0.5; }^
+   span.scorers { display: block; font-size: 8.5pt; color: #555555; font-weight: normal; white-space: normal; }^
+   p.scoringteam { margin: 10px 0 4px 0; font-weight: bold; }^
+   form.scorersform select { width: auto; max-width: 100%; margin: 0 6px 6px 0; }^
    a.signout { color: white; font-size: 10pt; }^
    div.confirm { background-color: #fbe9e7; border: 1px solid #c62828; padding: 6px 14px 12px 14px; margin-bottom: 14px; font-family: Verdana, Arial, sans-serif; }^
    input.danger { background-color: #c62828; color: white; border: none; padding: 4px 14px; }^
