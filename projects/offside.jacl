@@ -710,6 +710,7 @@ endif
 if WEBAPP_mode = TABLE
    execute "+display_table"
 endif
+write "<p class=~sitefoot~><a href=~/privacy.html#offside~ target=~_blank~>Privacy</a></p>"
 
 # CLEAR THE PARAMETERS SO THEY DON'T LEAK INTO THE NEXT REQUEST VIA THE
 # SAVED SESSION STATE
@@ -4531,6 +4532,8 @@ print:
    ul.history { margin: 6px 0; padding-left: 18px; font-size: 9pt; line-height: 1.5; color: #333333; }^
    ul.history span.when { color: #777777; white-space: nowrap; }^
    p.historyhead { margin: 12px 0 0 0; font-size: 10pt; font-weight: bold; }^
+   p.sitefoot { margin: 28px 0 6px 0; font-size: 8.5pt; text-align: center; }^
+   p.sitefoot a { color: #777777; }^
    p.notplayed { margin-top: 12px; font-size: 10pt; line-height: 1.6; }^
    select.datepart { width: auto; margin-right: 4px; }^
    div.scoreform { background-color: #e6f2e6; border: 1px solid #2e5e2e; padding: 6px 14px 12px 14px; margin-bottom: 14px; font-family: Verdana, Arial, sans-serif; }^
