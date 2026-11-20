@@ -13,8 +13,9 @@ write "  .then(function(data) {^"
 ifexecute "+local_success"
 	# RESULT HANDLED BY LOCAL APPLICATION
 else
+	# DEFAULT ACTION. (THIS COMMENT USED TO SIT INSIDE THE print: BLOCK,
+	# WHERE IT WAS EMITTED INTO THE JAVASCRIPT AS A SYNTAX ERROR.)
 print:
-	# DEFAULT ACTION
 			if (details.replace === true) {^
 				document.querySelector(details.element).innerHTML = data;^
 			} else {^

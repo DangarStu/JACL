@@ -37,11 +37,10 @@ write "<title>" game_title "</title>"
 execute "+styles"
 call "+user_styles"
 
-ifstring favicon_image = "none"
-	write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
-else
-	write "<link rel=~icon~ href=~" favicon_image "~ type=~image/x-icon~>"
-endif
+# NO PROGRAM EVER DEFINED favicon_image, SO THE OLD ifstring COMPARED THE
+# LITERAL WORD AND EMITTED href="favicon_image". A PROGRAM WANTING ITS OWN
+# ICON CAN ADD A LATER <link rel="icon"> IN +local_header; THE LAST ONE WINS.
+write "<link rel=~icon~ href=~/images/favicon.ico~ type=~image/x-icon~>"
 print:
    <script>^
 	if (window.matchMedia("(max-width: 767px)").matches) {
@@ -62,6 +61,48 @@ write "}"
 #include "ajax.library"
 
 write "</script>^"
+
+# OPTIONAL GOOGLE SIGN-IN, THE SAME CONTRACT AS webinterface.library. THE
+# INTERPRETER ONLY FILLS IN google_client_id WHEN THE SERVER HAS BOTH A
+# CLIENT ID AND A SESSION SECRET CONFIGURED, AND ONLY SETS google_signed_in /
+# google_sub FROM A VERIFIED SESSION COOKIE. PROGRAMS DECIDE WHAT A SIGNED-IN
+# ACCOUNT MAY DO.
+ifstring google_client_id != ""
+   write "<script>window.JACL_GOOGLE_CLIENT_ID = '" google_client_id "'; window.JACL_GOOGLE_SIGNED_IN = " google_signed_in ";</script>^"
+   write "<script src=~https://accounts.google.com/gsi/client~ async defer></script>^"
+   write "<script>^"
+   write "function jaclGoogleCallback(response) {^"
+   write "   var token = response && response.credential;^"
+   write "   if (!token) return;^"
+   write "   var url = window.location.pathname + '?auth=google&credential=' + encodeURIComponent(token);^"
+   write "   var p = fetch(url, { credentials: 'same-origin' });^"
+   write "   p = p.then(function(r) { return r.json(); });^"
+   write "   p = p.then(function(j) { if (j && j.ok) window.location.reload(); });^"
+   write "   p.catch(function() {});^"
+   write "}^"
+   write "function jaclLogout() {^"
+   write "   var p = fetch(window.location.pathname + '?auth=logout', { credentials: 'same-origin' });^"
+   write "   p = p.then(function() { window.location.reload(); });^"
+   write "   p.catch(function() {});^"
+   write "}^"
+   write "function jaclRenderGoogleAuth() {^"
+   write "   var slot = document.getElementById('jaclAuthSlot');^"
+   write "   if (!slot) return;^"
+   write "   if (window.JACL_GOOGLE_SIGNED_IN) {^"
+   write "      slot.innerHTML = 'Signed in &middot; <a class=~signout~ href=~javascript:jaclLogout()~>sign out</a>';^"
+   write "      return;^"
+   write "   }^"
+   write "   if (!window.google || !google.accounts || !google.accounts.id) {^"
+   write "      setTimeout(jaclRenderGoogleAuth, 200);^"
+   write "      return;^"
+   write "   }^"
+   write "   google.accounts.id.initialize({ client_id: window.JACL_GOOGLE_CLIENT_ID, callback: jaclGoogleCallback, auto_select: false });^"
+   write "   google.accounts.id.renderButton(slot, { theme: 'outline', size: 'small', type: 'standard' });^"
+   write "}^"
+   write "window.addEventListener('load', jaclRenderGoogleAuth);^"
+   write "</script>^"
+endif
+
 call "+local_header"
 print:  
    </head><body>^
@@ -83,6 +124,9 @@ write "<div class=~linkbar~>"
 write "</div>^"
 write "<div class=~links~>"
 call "+links_div"
+ifstring google_client_id != ""
+   write " <span id=~jaclAuthSlot~ class=~authslot~></span>"
+endif
 write "</div>"
 write "</div>^"
 if @tab_names > 1
