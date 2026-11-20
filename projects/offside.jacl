@@ -2577,6 +2577,33 @@ endupdate
 # EVERY CLASS SELECTOR IS QUALIFIED WITH ITS ELEMENT NAME.
 # -----------------------------------------------------------------------------
 
+# GOOGLE'S SIGN-IN BUTTON ARRIVES IN TWO STEPS: ITS SCRIPT FIRST DRAWS A
+# PLAIN STAND-IN BUTTON IN THE PAGE, THEN ABOUT HALF A SECOND LATER ITS REAL
+# BUTTON LOADS IN A FRAME OF A DIFFERENT SIZE, BOTH SHOWING FOR A MOMENT
+# BEFORE THE STAND-IN COLLAPSES. THAT SWAP IS THE FLICKER. KEEP THE SLOT
+# INVISIBLE (IT STILL TAKES ITS SPACE) UNTIL THE FRAME HAS A SIZE, THE
+# STAND-IN HAS GONE AND NOTHING HAS CHANGED FOR 0.2s, THEN FADE IT IN. AFTER
+# 3s SHOW WHATEVER IS THERE (THE FRAME NEVER LOADS ON AN ORIGIN GOOGLE
+# HASN'T AUTHORISED, SUCH AS A LOCAL TEST SERVER). A SIGNED-IN VISITOR SEES
+# PLAIN TEXT THERE, SO NOTHING WAITS.
+{+local_header
+ifstring google_client_id = ""
+   return
+endif
+write "<script>document.addEventListener('DOMContentLoaded', function() { "
+write "var s = document.getElementById('jaclAuthSlot'); "
+write "if (!s || window.JACL_GOOGLE_SIGNED_IN) return; "
+write "s.classList.add('settling'); "
+write "var last = '', same = 0, ticks = 0; "
+write "var t = setInterval(function() { "
+write "ticks++; var f = s.querySelector('iframe'), c = s.firstElementChild, k = ''; "
+write "if (f && c && f.offsetWidth > 0 && c.firstElementChild && c.firstElementChild.offsetHeight == 0) "
+write "k = f.offsetWidth + 'x' + f.offsetHeight + '/' + c.offsetHeight; "
+write "if (k && k == last) same++; else same = 0; last = k; "
+write "if (same >= 2 || ticks >= 30) { clearInterval(t); s.classList.remove('settling'); } "
+write "}, 100); });</script>"
+}
+
 {+user_styles
 print:
    <style>^
@@ -2606,8 +2633,8 @@ print:
    span.expires { font-size: 9pt; color: #555555; white-space: nowrap; }^
    span.authslot { display: inline-block; vertical-align: middle; margin-left: 14px; text-shadow: none; }^
    span.authslot a.signout { text-shadow: 0 0 4px black; }^
-   span.authslot > div { animation: authfade 0.4s ease-in; }^
-   @keyframes authfade { from { opacity: 0; } to { opacity: 1; } }^
+   span.authslot { transition: opacity 0.3s ease-in; }^
+   span.authslot.settling { opacity: 0; }^
    a.signout { color: white; font-size: 10pt; }^
    div.confirm { background-color: #fbe9e7; border: 1px solid #c62828; padding: 6px 14px 12px 14px; margin-bottom: 14px; font-family: Verdana, Arial, sans-serif; }^
    input.danger { background-color: #c62828; color: white; border: none; padding: 4px 14px; }^
