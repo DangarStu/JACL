@@ -2576,11 +2576,12 @@ print:
    p.formerror { color: #a02020; font-family: Verdana, Arial, sans-serif; }^
    select.goals { width: 4em; }^
    table.league td.date { text-align: left; white-space: nowrap; }^
-   table.games { table-layout: fixed; width: 100%; max-width: 920px; }^
+   table.games { table-layout: fixed; width: 100%; max-width: 64em; }^
    table.games th:nth-child(1) { width: 9.5em; }^
    table.games th:nth-child(2) { width: 4.5em; }^
    table.games th:nth-child(4) { width: 4em; }^
-   table.games th:nth-child(6) { width: 17em; }^
+   table.games th:nth-child(6) { width: 22em; }^
+   table.games td:nth-child(6) { white-space: nowrap; }^
    table.games td { overflow: hidden; text-overflow: ellipsis; }^
    table.games tr.played td { background-color: #eef4ee; }^
    select.datepart { width: auto; margin-right: 4px; }^
