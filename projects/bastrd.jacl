@@ -9,8 +9,9 @@
 #   bastrd-competitions.csv   id, name, season, owner
 #   bastrd-teams.csv          id, competition id, name
 #   bastrd-players.csv        id, team id, name, position, shirt number
-#   bastrd-results.csv        id, competition id, date, home id, home goals,
-#                             away goals, away id
+#   bastrd-fixtures.csv       id, competition id, date (yyyymmdd), home id,
+#                             away id, home goals, away goals -- the goals
+#                             are "-" until the result is entered
 #   bastrd-organisers.csv     id, competition id, Google account id, name
 #   bastrd-invites.csv        id, code, competition id, expiry (unixtime),
 #                             name
@@ -73,7 +74,7 @@ constant TEAMS            2
 constant RESULTS          3
 constant TABLE            4
 
-string tab_names     "BASTRD" "Competitions" "Teams" "Results" "League table"
+string tab_names     "BASTRD" "Competitions" "Teams" "Fixtures & results" "League table"
 
 # THE CURRENTLY SELECTED COMPETITION AND TEAM ARE PART OF THE SAVED SESSION
 # STATE, SO THEY CARRY FROM ONE REQUEST TO THE NEXT
@@ -95,9 +96,7 @@ string player_name_error
 string position_data
 string shirt_data
 string shirt_error
-string date_data
-string date_error
-string result_error
+string fixture_error
 
 integer home_team        0
 integer away_team        0
@@ -110,13 +109,69 @@ parameter team_name      team_name_data
 parameter player_name    player_name_data
 parameter position       position_data
 parameter shirt          shirt_data
-parameter date           date_data
 parameter home_team      home_team     0 65535
 parameter away_team      away_team     0 65535
 parameter home_goals     home_goals    0 99
 parameter away_goals     away_goals    0 99
 
 constant position_values     "Goalkeeper" "Defender" "Midfielder" "Forward"
+
+# A FIXTURE'S DATE IS CHOSEN FROM THREE DROP-DOWNS RATHER THAN TYPED, SO
+# cgijacl RANGE-CHECKS EACH PART AS AN INTEGER AND THE PROGRAM NEVER HAS TO
+# PARSE FREE TEXT (split LEAVES OLD ELEMENTS BEHIND AND A NON-NUMBER ABORTS
+# THE FUNCTION). IT'S STORED AS yyyymmdd SO IT SORTS AS A NUMBER.
+# cgijacl CLAMPS AN OUT-OF-RANGE NUMBER TO THE RANGE BUT LEAVES THE VARIABLE
+# UNCHANGED WHEN THE VALUE ISN'T A NUMBER OR ISN'T SENT, SO THE SUBMITTED
+# fixture_* ARE CLEARED AFTER EVERY REQUEST (A MISSING PART THEN READS AS 0)
+# AND THE DATE THE FORM REMEMBERS -- SO A WHOLE ROUND CAN BE ENTERED
+# QUICKLY -- IS KEPT SEPARATELY IN chosen_*.
+integer fixture_day      0
+integer fixture_month    0
+integer fixture_year     0
+integer chosen_day       0
+integer chosen_month     0
+integer chosen_year      0
+parameter fx_day         fixture_day      1 31
+parameter fx_month       fixture_month    1 12
+parameter fx_year        fixture_year     2000 2100
+
+string day_abbr          "Sat" "Sun" "Mon" "Tue" "Wed" "Thu" "Fri"
+string month_abbr        "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"
+string date_label
+string team_label
+string score_none        "-"
+
+# THE CURRENT COMPETITION'S FIXTURES, LOADED BY +load_games IN DATE ORDER.
+# g_hg / g_ag ARE -1 UNTIL THE RESULT IS ENTERED.
+constant MAX_GAMES       400
+integer game_count
+integer_array g_id       MAX_GAMES
+integer_array g_key      MAX_GAMES
+integer_array g_home     MAX_GAMES
+integer_array g_away     MAX_GAMES
+integer_array g_hg       MAX_GAMES
+integer_array g_ag       MAX_GAMES
+integer game_key
+integer game_pos
+integer game_prev
+integer game_home
+integer game_away
+integer game_hg
+integer game_ag
+integer game_team
+integer edit_id
+integer moving
+integer team_scan
+integer days_in_month
+integer year_from
+integer year_to
+integer dl_d
+integer dl_m
+integer dl_y
+integer dl_k
+integer dl_j
+integer dl_h
+integer dl_t
 
 # TEAMS OF THE CURRENT COMPETITION, LOADED BY +load_teams. INDEXED 0 TO
 # team_count - 1. t_order HOLDS THE INDEXES SORTED INTO LEAGUE TABLE ORDER
@@ -425,9 +480,10 @@ setstring player_name_error   ""
 setstring position_data       ""
 setstring shirt_data          ""
 setstring shirt_error         ""
-setstring date_data           ""
-setstring date_error          ""
-setstring result_error        ""
+setstring fixture_error       ""
+set fixture_day = 0
+set fixture_month = 0
+set fixture_year = 0
 setstring organiser_id_data   ""
 setstring organiser_id_error  ""
 setstring organiser_name_data ""
@@ -490,9 +546,9 @@ enditerate
 set new_id + 1
 }
 
-{+next_result_id
+{+next_fixture_id
 set new_id = 0
-iterate results
+iterate fixtures
    if field[0] > new_id
       set new_id = field[0]
    endif
@@ -651,7 +707,7 @@ execute "+purge_invites<new_id"
 execute "+load_teams<new_id"
 execute "+purge_players"
 execute "+purge_teams<new_id"
-execute "+purge_results<new_id"
+execute "+purge_fixtures<new_id"
 execute "+purge_competition<new_id"
 if current_comp = new_id
    set current_comp = 0
@@ -660,7 +716,7 @@ if current_comp = new_id
    setstring current_team_name ""
 endif
 write "<p class=~notice~>Competition deleted along with its teams, "
-write "players and results.</p>"
+write "players, fixtures and results.</p>"
 execute "+refresh_permissions"
 }
 
@@ -685,8 +741,8 @@ update teams
 endupdate
 }
 
-{+purge_results
-update results
+{+purge_fixtures
+update fixtures
    if field[1] != arg[0]
       insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
    endif
@@ -857,8 +913,8 @@ set current_team = $integer
 
 grammar delete team $integer     >delete_team
 
-# A TEAM WITH RESULTS CAN'T BE DELETED: THE RESULTS WOULD BE LEFT POINTING AT
-# A TEAM THAT NO LONGER EXISTS AND THE OPPONENTS' TABLE ENTRIES WOULD CHANGE
+# A TEAM WITH FIXTURES CAN'T BE DELETED: THEY WOULD BE LEFT POINTING AT A
+# TEAM THAT NO LONGER EXISTS AND THE OPPONENTS' TABLE ENTRIES WOULD CHANGE
 {+delete_team
 set delete_id = $integer
 execute "+token_ok<team<delete_id"
@@ -878,17 +934,17 @@ if allowed = false
 endif
 
 set COUNT = 0
-iterate results
+iterate fixtures
    if field[3] = $integer
       set COUNT + 1
    endif
-   if field[6] = $integer
+   if field[4] = $integer
       set COUNT + 1
    endif
 enditerate
 if COUNT > 0
-   write "<p class=~notice~>That team has " COUNT " result(s) recorded. "
-   write "Delete them from the <b>Results</b> tab first.</p>"
+   write "<p class=~notice~>That team has " COUNT " fixture(s) or result(s). "
+   write "Delete them from the <b>Fixtures &amp; results</b> tab first.</p>"
    return
 endif
 set new_id = $integer
@@ -1032,60 +1088,49 @@ if current_comp = 0
 endif
 
 escapestring escaped current_comp_name
-write "<h2>Results in " escaped "</h2>"
+write "<h2>Fixtures &amp; results in " escaped "</h2>"
 
 execute "+load_teams<current_comp"
-if team_count < 2
-   write "<p>Add at least two teams to this competition on the "
-   write "<b>Teams</b> tab before entering results.</p>"
-   return
-endif
+execute "+load_games<current_comp"
 
+# FIXTURES STILL TO BE PLAYED, SOONEST FIRST
+write "<h3>Fixtures</h3>"
 set COUNT = 0
-write "<table class=~league~>"
-write "<tr><th>Date</th><th class=~home~>Home</th><th>Score</th><th>Away</th><th>Action</th></tr>"
-iterate results
-   if field[1] = current_comp
-      # LOOK UP BOTH TEAM NAMES IN THE ARRAYS LOADED ABOVE
-      set home_index = -1
-      set away_index = -1
-      set INDEX = 0
-      while INDEX < team_count
-         if t_id[INDEX] = field[3]
-            set home_index = INDEX
-         endif
-         if t_id[INDEX] = field[6]
-            set away_index = INDEX
-         endif
-         set INDEX + 1
-      endwhile
-      escapestring escaped2 field[2]
-      write "<tr><td>" escaped2 "</td><td class=~home~>"
-      if home_index = -1
-         write "?"
-      else
-         escapestring escaped t_name[home_index]
-         write escaped
+set INDEX = 0
+while INDEX < game_count
+   if g_hg[INDEX] = -1
+      if COUNT = 0
+         execute "+game_table_head"
       endif
-      write "</td><td class=~score~>" field[4] " - " field[5] "</td><td>"
-      if away_index = -1
-         write "?"
-      else
-         escapestring escaped t_name[away_index]
-         write escaped
-      endif
-      write "</td><td>"
-      if can_edit = true
-         setstring action "confirm delete result " field[0]
-         hyperlinkNE "Delete" action
-      endif
-      write "</td></tr>"
+      execute "+game_row<INDEX"
       set COUNT + 1
    endif
-enditerate
-write "</table>"
+   set INDEX + 1
+endwhile
+if COUNT = 0
+   write "<p>No fixtures are waiting to be played.</p>"
+else
+   write "</table>"
+endif
+
+# RESULTS, MOST RECENT FIRST
+write "<h3>Results</h3>"
+set COUNT = 0
+set INDEX = game_count
+while INDEX > 0
+   set INDEX - 1
+   if g_hg[INDEX] != -1
+      if COUNT = 0
+         execute "+game_table_head"
+      endif
+      execute "+game_row<INDEX"
+      set COUNT + 1
+   endif
+endwhile
 if COUNT = 0
    write "<p>No results have been entered yet.</p>"
+else
+   write "</table>"
 endif
 
 if can_edit = false
@@ -1093,74 +1138,320 @@ if can_edit = false
    return
 endif
 
-write "<h3>Enter a result</h3>"
+write "<h3>Add a fixture</h3>"
+if team_count < 2
+   write "<p>Add at least two teams to this competition on the "
+   write "<b>Teams</b> tab before adding fixtures.</p>"
+   return
+endif
+write "<p class=~key~>To record a result, use <b>Enter result</b> next to its fixture.</p>"
 write "<form>"
-ifstring result_error != ""
-   escapestring escaped result_error
+ifstring fixture_error != ""
+   escapestring escaped fixture_error
    write "<p class=~formerror~>" escaped "</p>"
 endif
-# DEFAULT THE DATE TO TODAY
-ifstring date_data = ""
-   set gmt = unixtime
-   set now = +adjusted_time<gmt
-   setstring date_data now{integer_date}
-endif
-execute "+text<Date<date<12<date_data"
+execute "+default_date"
+write "<div class=~row~><div class=~label~>Date:</div><div class=~input~>"
+execute "+number_select<fx_day<1<31<chosen_day"
+execute "+month_select<chosen_month"
+set year_from = chosen_year
+set year_from - 1
+set year_to = chosen_year
+set year_to + 2
+execute "+number_select<fx_year<year_from<year_to<chosen_year"
+write "</div></div>"
 write "<div class=~row~><div class=~label~>Home team:</div><div class=~input~>"
-execute "+team_select<home_team<home_goals<home_team<home_goals"
+execute "+team_select<home_team<home_team"
 write "</div></div>"
 write "<div class=~row~><div class=~label~>Away team:</div><div class=~input~>"
-execute "+team_select<away_team<away_goals<away_team<away_goals"
+execute "+team_select<away_team<away_team"
 write "</div></div>"
-execute "+submit_row<Enter result"
-write "<input type=~hidden~ name=~command~ value=~add result~/>"
+execute "+submit_row<Add fixture"
+write "<input type=~hidden~ name=~command~ value=~add fixture~/>"
 hidden
 write "</form>"
 }
 
-# WRITES A TEAM DROP-DOWN (FROM THE LOADED t_* ARRAYS) AND A GOALS DROP-DOWN
-# arg[0] = team field name, arg[1] = goals field name,
-# arg[2] = team id to preselect, arg[3] = goals to preselect (so a rejected
-# result comes back as the user entered it)
+{+game_table_head
+write "<table class=~league games~>"
+write "<tr><th class=~home~>Date</th><th class=~home~>Home</th><th></th><th class=~home~>Away</th>"
+if can_edit = true
+   write "<th>Action</th>"
+endif
+write "</tr>"
+}
+
+# ONE ROW OF THE FIXTURES OR RESULTS TABLE. arg[0] = INDEX INTO THE g_* ARRAYS
+{+game_row
+set game_pos = arg[0]
+set game_key = g_key[game_pos]
+execute "+date_label<game_key"
+write "<tr><td class=~date~>" date_label "</td><td class=~home~>"
+set game_team = g_home[game_pos]
+execute "+team_label<game_team"
+escapestring escaped team_label
+write escaped "</td><td class=~score~>"
+if g_hg[game_pos] = -1
+   write "v"
+else
+   write g_hg[game_pos] " - " g_ag[game_pos]
+endif
+write "</td><td class=~home~>"
+set game_team = g_away[game_pos]
+execute "+team_label<game_team"
+escapestring escaped team_label
+write escaped "</td>"
+if can_edit = true
+   write "<td>"
+   setstring action "score fixture " g_id[game_pos]
+   if g_hg[game_pos] = -1
+      hyperlinkNE "Enter result" action
+   else
+      hyperlinkNE "Edit score" action
+   endif
+   write " &middot; "
+   setstring action "confirm delete fixture " g_id[game_pos]
+   hyperlinkNE "Delete" action
+   write "</td>"
+endif
+write "</tr>"
+}
+
+# LOADS competition arg[0]'S FIXTURES INTO THE g_* ARRAYS IN DATE ORDER. AN
+# INSERTION SORT AS EACH ROW ARRIVES: FIXTURES ARE USUALLY ADDED ROUND BY
+# ROUND, SO MOST ROWS DON'T MOVE. EQUAL DATES KEEP THE ORDER THEY WERE ADDED.
+{+load_games
+set game_count = 0
+iterate fixtures
+   if field[1] = arg[0]
+      if game_count < MAX_GAMES
+         set game_key = field[2]
+         set game_pos = game_count
+         set moving = true
+         while moving = true
+            if game_pos = 0
+               set moving = false
+            else
+               set game_prev = game_pos
+               set game_prev - 1
+               if g_key[game_prev] > game_key
+                  set g_id[game_pos] = g_id[game_prev]
+                  set g_key[game_pos] = g_key[game_prev]
+                  set g_home[game_pos] = g_home[game_prev]
+                  set g_away[game_pos] = g_away[game_prev]
+                  set g_hg[game_pos] = g_hg[game_prev]
+                  set g_ag[game_pos] = g_ag[game_prev]
+                  set game_pos - 1
+               else
+                  set moving = false
+               endif
+            endif
+         endwhile
+         set g_id[game_pos] = field[0]
+         set g_key[game_pos] = game_key
+         set g_home[game_pos] = field[3]
+         set g_away[game_pos] = field[4]
+         set g_hg[game_pos] = -1
+         set g_ag[game_pos] = -1
+         ifstring field[5] != "-"
+            set g_hg[game_pos] = field[5]
+            set g_ag[game_pos] = field[6]
+         endif
+         set game_count + 1
+      endif
+   endif
+enditerate
+}
+
+# SETS team_label TO THE NAME OF TEAM arg[0] FROM THE LOADED t_* ARRAYS
+{+team_label
+setstring team_label "?"
+set team_scan = 0
+while team_scan < team_count
+   if t_id[team_scan] = arg[0]
+      setstring team_label t_name[team_scan]
+   endif
+   set team_scan + 1
+endwhile
+}
+
+# SETS date_label TO yyyymmdd arg[0] AS E.G. "Sat 21 Nov 2026". THE DAY OF
+# THE WEEK IS ZELLER'S CONGRUENCE (0 = SATURDAY), TREATING JANUARY AND
+# FEBRUARY AS MONTHS 13 AND 14 OF THE PREVIOUS YEAR.
+{+date_label
+set dl_y = arg[0]
+set dl_y / 10000
+set dl_m = arg[0]
+set dl_m / 100
+set dl_m % 100
+set dl_d = arg[0]
+set dl_d % 100
+if dl_m < 1 : dl_m > 12
+   setstring date_label "-"
+   return
+endif
+set dl_t = dl_m
+set dl_k = dl_y
+if dl_t < 3
+   set dl_t + 12
+   set dl_k - 1
+endif
+set dl_j = dl_k
+set dl_j / 100
+set dl_k % 100
+set dl_t + 1
+set dl_t * 13
+set dl_t / 5
+set dl_h = dl_d
+set dl_h + dl_t
+set dl_h + dl_k
+set dl_t = dl_k
+set dl_t / 4
+set dl_h + dl_t
+set dl_t = dl_j
+set dl_t / 4
+set dl_h + dl_t
+set dl_t = dl_j
+set dl_t * 5
+set dl_h + dl_t
+set dl_h % 7
+setstring date_label day_abbr[dl_h] " " dl_d " " month_abbr[dl_m] " " dl_y
+}
+
+# THE FORM STARTS AT TODAY UNTIL A DATE HAS BEEN CHOSEN
+{+default_date
+ifall chosen_day != 0 : chosen_month != 0 : chosen_year != 0
+   return
+endif
+set gmt = unixtime
+set now = +adjusted_time<gmt
+execute "+process_epoch<now"
+set chosen_day = TIME_date
+set chosen_month = TIME_month
+set chosen_month + 1
+set chosen_year = TIME_year
+}
+
+# arg[0] = field name, arg[1]..arg[2] = range, arg[3] = value to preselect
+{+number_select
+write "<select name=~" string_arg[0] "~ class=~jaclform datepart~>"
+set team_scan = arg[1]
+while team_scan <= arg[2]
+   write "<option value=~" team_scan "~"
+   if team_scan = arg[3]
+      write " selected"
+   endif
+   write ">" team_scan "</option>"
+   set team_scan + 1
+endwhile
+write "</select> "
+}
+
+# arg[0] = month to preselect
+{+month_select
+write "<select name=~fx_month~ class=~jaclform datepart~>"
+set team_scan = 1
+while team_scan <= 12
+   write "<option value=~" team_scan "~"
+   if team_scan = arg[0]
+      write " selected"
+   endif
+   write ">" month_abbr[team_scan] "</option>"
+   set team_scan + 1
+endwhile
+write "</select> "
+}
+
+# WRITES A TEAM DROP-DOWN FROM THE LOADED t_* ARRAYS
+# arg[0] = field name, arg[1] = team id to preselect
 {+team_select
 write "<select name=~" string_arg[0] "~ class=~jaclform~>"
-set INDEX = 0
-while INDEX < team_count
-   escapestring escaped t_name[INDEX]
-   write "<option value=~" t_id[INDEX] "~"
-   if t_id[INDEX] = arg[2]
+set team_scan = 0
+while team_scan < team_count
+   escapestring escaped t_name[team_scan]
+   write "<option value=~" t_id[team_scan] "~"
+   if t_id[team_scan] = arg[1]
       write " selected"
    endif
    write ">" escaped "</option>"
-   set INDEX + 1
-endwhile
-write "</select> "
-write "<select name=~" string_arg[1] "~ class=~jaclform goals~>"
-set INDEX = 0
-while INDEX < 21
-   write "<option value=~" INDEX "~"
-   if INDEX = arg[3]
-      write " selected"
-   endif
-   write ">" INDEX "</option>"
-   set INDEX + 1
+   set team_scan + 1
 endwhile
 write "</select>"
 }
 
-grammar add result     >add_result
+# arg[0] = field name, arg[1] = goals to preselect
+{+goals_select
+write "<select name=~" string_arg[0] "~ class=~jaclform goals~>"
+set team_scan = 0
+while team_scan < 21
+   write "<option value=~" team_scan "~"
+   if team_scan = arg[1]
+      write " selected"
+   endif
+   write ">" team_scan "</option>"
+   set team_scan + 1
+endwhile
+write "</select>"
+}
 
-{+add_result
+grammar add fixture     >add_fixture
+
+{+add_fixture
 if current_comp = 0
-   write "<p class=~notice~>Select a competition before entering results.</p>"
+   write "<p class=~notice~>Select a competition before adding fixtures.</p>"
    return
 endif
 if can_edit = false
    execute "+deny"
    return
 endif
+
+# REMEMBER WHAT WAS PICKED SO THE FORM COMES BACK WITH IT, RIGHT OR WRONG
+if fixture_day != 0
+   set chosen_day = fixture_day
+endif
+if fixture_month != 0
+   set chosen_month = fixture_month
+endif
+if fixture_year != 0
+   set chosen_year = fixture_year
+endif
+# A PART THAT WASN'T SENT, OR WASN'T A NUMBER, IS 0
+if fixture_day = 0 : fixture_month = 0 : fixture_year = 0
+   setstring fixture_error "Please choose the fixture's date."
+   set errors + 1
+   return
+endif
+# THE PARAMETER RANGES STOP IMPOSSIBLE NUMBERS; THIS CATCHES 31 APRIL AND
+# 29 FEBRUARY IN A NON-LEAP YEAR
+set days_in_month = 31
+if fixture_month = 4
+   set days_in_month = 30
+endif
+if fixture_month = 6
+   set days_in_month = 30
+endif
+if fixture_month = 9
+   set days_in_month = 30
+endif
+if fixture_month = 11
+   set days_in_month = 30
+endif
+if fixture_month = 2
+   set days_in_month = 28
+   execute "+is_leap_year?<fixture_year"
+   if TIME_leapyear = true
+      set days_in_month = 29
+   endif
+endif
+if fixture_day > days_in_month
+   setstring fixture_error "That date doesn't exist; check the day and month."
+   set errors + 1
+   return
+endif
+
 if home_team = away_team
-   setstring result_error "A team can't play itself; choose two different teams."
+   setstring fixture_error "A team can't play itself; choose two different teams."
    set errors + 1
    return
 endif
@@ -1178,45 +1469,234 @@ iterate teams
    endif
 enditerate
 if COUNT != 2
-   setstring result_error "Both teams must be in the current competition."
+   setstring fixture_error "Both teams must be in the current competition."
    set errors + 1
    return
 endif
 
-ifstring date_data = ""
-   setstring date_data "-"
-endif
-execute "+next_result_id"
-append results new_id current_comp date_data home_team home_goals away_goals away_team
-write "<p class=~notice~>Result entered.</p>"
-}
+set game_key = fixture_year
+set game_key * 100
+set game_key + fixture_month
+set game_key * 100
+set game_key + fixture_day
 
-grammar delete result $integer     >delete_result
-
-{+delete_result
-set delete_id = $integer
-execute "+token_ok<result<delete_id"
-if allowed = false
-   return
-endif
-set target_comp = 0
-iterate results
-   if field[0] = $integer
-      set target_comp = field[1]
+set COUNT = 0
+iterate fixtures
+   if field[1] = current_comp
+      if field[2] = game_key
+         if field[3] = home_team
+            if field[4] = away_team
+               set COUNT + 1
+            endif
+         endif
+      endif
    endif
 enditerate
+if COUNT != 0
+   setstring fixture_error "That fixture is already on the list."
+   set errors + 1
+   return
+endif
+
+execute "+next_fixture_id"
+append fixtures new_id current_comp game_key home_team away_team score_none score_none
+execute "+load_teams<current_comp"
+execute "+date_label<game_key"
+write "<p class=~notice~>Fixture added: "
+execute "+write_teams<home_team<away_team"
+write ", " date_label ".</p>"
+# THE DATE STAYS FOR THE NEXT FIXTURE OF THE ROUND; THE TEAMS DON'T
+set home_team = 0
+set away_team = 0
+}
+
+# SETS target_comp, game_key, game_home, game_away, game_hg, game_ag AND
+# date_label FROM FIXTURE arg[0]. target_comp IS 0 IF THERE'S NO SUCH FIXTURE.
+{+find_fixture
+set target_comp = 0
+iterate fixtures
+   if field[0] = arg[0]
+      set target_comp = field[1]
+      set game_key = field[2]
+      set game_home = field[3]
+      set game_away = field[4]
+      set game_hg = -1
+      set game_ag = -1
+      ifstring field[5] != "-"
+         set game_hg = field[5]
+         set game_ag = field[6]
+      endif
+   endif
+enditerate
+execute "+date_label<game_key"
+}
+
+# WRITES "Home v Away", OR "Home 2 - 1 Away" ONCE PLAYED, FOR THE FIXTURE
+# +find_fixture LAST FOUND. NEEDS ITS COMPETITION'S TEAMS LOADED.
+{+write_match
+execute "+team_label<game_home"
+escapestring escaped team_label
+write escaped
+if game_hg = -1
+   write " v "
+else
+   write " " game_hg " - " game_ag " "
+endif
+execute "+team_label<game_away"
+escapestring escaped team_label
+write escaped
+}
+
+# arg[0] = home team id, arg[1] = away team id
+{+write_teams
+execute "+team_label<arg[0]"
+escapestring escaped team_label
+write escaped " v "
+execute "+team_label<arg[1]"
+escapestring escaped team_label
+write escaped
+}
+
+# SHOWS THE FORM FOR ENTERING OR CORRECTING A FIXTURE'S SCORE. IT ONLY SHOWS
+# A FORM, SO IT'S SAFE AS A LINK; THE CHANGE IS MADE BY 'save score'.
+grammar score fixture $integer     >score_fixture
+
+{+score_fixture
+set edit_id = $integer
+execute "+find_fixture<edit_id"
+if target_comp = 0
+   return
+endif
 execute "+comp_editable<target_comp"
 if allowed = false
    execute "+deny"
    return
 endif
+execute "+load_teams<target_comp"
+write "<div class=~scoreform~><p><b>"
+if game_hg = -1
+   write "Enter the result"
+else
+   write "Correct the score"
+endif
+write "</b> &middot; " date_label "</p>"
+write "<form>"
+execute "+team_label<game_home"
+escapestring escaped team_label
+write escaped " "
+if game_hg = -1
+   set game_hg = 0
+   set game_ag = 0
+endif
+execute "+goals_select<home_goals<game_hg"
+write " - "
+execute "+goals_select<away_goals<game_ag"
+execute "+team_label<game_away"
+escapestring escaped team_label
+write " " escaped " &nbsp; "
+write "<input type=~hidden~ name=~command~ value=~save score " edit_id "~/>"
+hidden
+write "<input type=~submit~ value=~Save result~> &nbsp; "
+hyperlinkNE "Cancel" "blankjacl"
+write "</form>"
+execute "+find_fixture<edit_id"
+if game_hg != -1
+   write "<form>"
+   write "<input type=~hidden~ name=~command~ value=~clear score " edit_id "~/>"
+   hidden
+   write "<input type=~submit~ value=~Clear result~> "
+   write "<span class=~key~>(back to a fixture not yet played)</span>"
+   write "</form>"
+endif
+write "</div>"
+}
 
-update results
-   if field[0] != $integer
+grammar save score $integer     >save_score
+
+{+save_score
+set edit_id = $integer
+execute "+find_fixture<edit_id"
+if target_comp = 0
+   return
+endif
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+execute "+set_score<edit_id<home_goals<away_goals"
+execute "+find_fixture<edit_id"
+execute "+load_teams<target_comp"
+write "<p class=~notice~>Result saved: "
+execute "+write_match"
+write ".</p>"
+}
+
+grammar clear score $integer     >clear_score
+
+{+clear_score
+set edit_id = $integer
+execute "+find_fixture<edit_id"
+if target_comp = 0
+   return
+endif
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+set game_hg = -1
+execute "+set_score<edit_id<game_hg<game_hg"
+write "<p class=~notice~>Result cleared; it's back in the fixtures.</p>"
+}
+
+# REWRITES FIXTURE arg[0] WITH SCORE arg[1] - arg[2], OR AS NOT PLAYED IF
+# arg[1] IS -1
+{+set_score
+update fixtures
+   if field[0] = arg[0]
+      if arg[1] = -1
+         insert field[0] field[1] field[2] field[3] field[4] score_none score_none
+      else
+         insert field[0] field[1] field[2] field[3] field[4] arg[1] arg[2]
+      endif
+   else
       insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
    endif
 endupdate
-write "<p class=~notice~>Result deleted.</p>"
+}
+
+grammar delete fixture $integer     >delete_fixture
+
+{+delete_fixture
+set edit_id = $integer
+execute "+token_ok<fixture<edit_id"
+if allowed = false
+   return
+endif
+execute "+find_fixture<edit_id"
+if target_comp = 0
+   return
+endif
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+execute "+remove_fixture<edit_id"
+if game_hg = -1
+   write "<p class=~notice~>Fixture deleted.</p>"
+else
+   write "<p class=~notice~>Result deleted.</p>"
+endif
+}
+
+{+remove_fixture
+update fixtures
+   if field[0] != arg[0]
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
+   endif
+endupdate
 }
 
 # -----------------------------------------------------------------------------
@@ -1240,8 +1720,15 @@ endif
 
 # ONE PASS OVER THE RESULTS ACCUMULATING EACH TEAM'S RECORD. THREE POINTS
 # FOR A WIN, ONE FOR A DRAW.
-iterate results
+iterate fixtures
+   set found = false
    if field[1] = current_comp
+      # FIXTURES NOT YET PLAYED HAVE "-" FOR THE GOALS
+      ifstring field[5] != "-"
+         set found = true
+      endif
+   endif
+   if found = true
       set home_index = -1
       set away_index = -1
       set INDEX = 0
@@ -1249,14 +1736,14 @@ iterate results
          if t_id[INDEX] = field[3]
             set home_index = INDEX
          endif
-         if t_id[INDEX] = field[6]
+         if t_id[INDEX] = field[4]
             set away_index = INDEX
          endif
          set INDEX + 1
       endwhile
       ifall home_index != -1 : away_index != -1
-         set goals_for = field[4]
-         set goals_against = field[5]
+         set goals_for = field[5]
+         set goals_against = field[6]
          set t_p[home_index] + 1
          set t_p[away_index] + 1
          set t_gf[home_index] + goals_for
@@ -1373,7 +1860,7 @@ if found = false
    return
 endif
 write "<div class=~confirm~><p>Delete the competition <b>" escaped "</b>? "
-write "This also deletes all its teams, their players, its results and its "
+write "This also deletes all its teams, their players, its fixtures and results and its "
 write "organisers, and can't be undone.</p>"
 execute "+confirm_form<competition<delete_id"
 }
@@ -1395,17 +1882,17 @@ if allowed = false
    return
 endif
 set COUNT = 0
-iterate results
+iterate fixtures
    if field[3] = delete_id
       set COUNT + 1
    endif
-   if field[6] = delete_id
+   if field[4] = delete_id
       set COUNT + 1
    endif
 enditerate
 if COUNT > 0
-   write "<p class=~notice~>That team has " COUNT " result(s) recorded. "
-   write "Delete them from the <b>Results</b> tab first.</p>"
+   write "<p class=~notice~>That team has " COUNT " fixture(s) or result(s). "
+   write "Delete them from the <b>Fixtures &amp; results</b> tab first.</p>"
    return
 endif
 write "<div class=~confirm~><p>Delete the team <b>" escaped "</b> and its squad?</p>"
@@ -1438,56 +1925,30 @@ write "<div class=~confirm~><p>Remove <b>" escaped "</b> from the squad?</p>"
 execute "+confirm_form<player<delete_id"
 }
 
-grammar confirm delete result $integer     >confirm_delete_result
+grammar confirm delete fixture $integer     >confirm_delete_fixture
 
-{+confirm_delete_result
-set delete_id = $integer
-set target_comp = 0
-iterate results
-   if field[0] = delete_id
-      set target_comp = field[1]
-      set home_team = field[3]
-      set home_goals = field[4]
-      set away_goals = field[5]
-      set away_team = field[6]
-      escapestring escaped2 field[2]
-   endif
-enditerate
+{+confirm_delete_fixture
+set edit_id = $integer
+execute "+find_fixture<edit_id"
+if target_comp = 0
+   return
+endif
 execute "+comp_editable<target_comp"
 if allowed = false
    execute "+deny"
    return
 endif
 execute "+load_teams<target_comp"
-set home_index = -1
-set away_index = -1
-set INDEX = 0
-while INDEX < team_count
-   if t_id[INDEX] = home_team
-      set home_index = INDEX
-   endif
-   if t_id[INDEX] = away_team
-      set away_index = INDEX
-   endif
-   set INDEX + 1
-endwhile
-write "<div class=~confirm~><p>Delete the result <b>"
-if home_index != -1
-   escapestring escaped t_name[home_index]
-   write escaped " "
+write "<div class=~confirm~><p>Delete the "
+if game_hg = -1
+   write "fixture"
+else
+   write "result"
 endif
-write home_goals " - " away_goals
-if away_index != -1
-   escapestring escaped t_name[away_index]
-   write " " escaped
-endif
-write "</b> (" escaped2 ")?</p>"
-# THE FORM'S PRESELECTED TEAMS AND SCORES CAME FROM THESE; DON'T LEAVE THEM SET
-set home_team = 0
-set away_team = 0
-set home_goals = 0
-set away_goals = 0
-execute "+confirm_form<result<delete_id"
+write " <b>"
+execute "+write_match"
+write "</b> (" date_label ")?</p>"
+execute "+confirm_form<fixture<edit_id"
 }
 
 # -----------------------------------------------------------------------------
@@ -1898,6 +2359,15 @@ print:
    input.danger { background-color: #c62828; color: white; border: none; padding: 4px 14px; }^
    p.formerror { color: #a02020; font-family: Verdana, Arial, sans-serif; }^
    select.goals { width: 4em; }^
+   table.league td.date { text-align: left; white-space: nowrap; }^
+   table.games { table-layout: fixed; width: 100%; max-width: 760px; }^
+   table.games th:nth-child(1) { width: 9.5em; }^
+   table.games th:nth-child(3) { width: 4em; }^
+   table.games th:nth-child(5) { width: 11em; }^
+   table.games td { overflow: hidden; text-overflow: ellipsis; }^
+   select.datepart { width: auto; margin-right: 4px; }^
+   div.scoreform { background-color: #e6f2e6; border: 1px solid #2e5e2e; padding: 6px 14px 12px 14px; margin-bottom: 14px; font-family: Verdana, Arial, sans-serif; }^
+   div.scoreform form { display: inline-block; margin-right: 12px; }^
    </style>^
 .
 }
