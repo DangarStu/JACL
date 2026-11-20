@@ -2734,6 +2734,8 @@ print:
       table.games td:nth-child(5) { grid-column: 3; grid-row: 2; text-align: left; padding-top: 3px; }^
       table.games td:nth-child(6) { grid-column: 1 / 4; grid-row: 3; text-align: center; white-space: normal; padding-top: 2px; }^
       table.games td:nth-child(6) a { display: inline-block; padding: 8px 6px; font-size: 11pt; }^
+      input.invitelink { display: block; width: 100%; box-sizing: border-box; margin: 4px 0; }^
+      span.expires { display: block; white-space: normal; margin-top: 4px; }^
       div.row { display: block; margin-bottom: 8px; }^
       div.label { float: none; display: block; width: auto; text-align: left; margin: 0 0 2px 0; }^
       div.input { float: none; display: block; margin: 0; }^
