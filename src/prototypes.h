@@ -38,6 +38,7 @@ int object_element_resolve(const char *testString);
 int execute(const char *funcname);
 int object_resolve(const char *object_string);
 int random_number(void);
+int secure_random_number(void);
 void log_access(const char *message);
 void log_error(const char *message, int console);
 int parent_of(int parent, int child, int restricted);

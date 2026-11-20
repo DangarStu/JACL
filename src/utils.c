@@ -3,6 +3,11 @@
  * according to GNU GPL, see file COPYING for details.
  */
 
+#ifdef _WIN32
+/* MUST PRECEDE <stdlib.h> FOR rand_s(), USED BY secure_random_number() */
+#define _CRT_RAND_S
+#endif
+
 
 #include "jacl.h"
 #include "language.h"
@@ -96,6 +101,37 @@ random_number()
 
 	rand();
 	return (1 + (int) ((float) MAX_RAND->value * rand() / (RAND_MAX + 1.0)));
+}
+
+int
+secure_random_number()
+{
+	/* LIKE random_number() BUT DRAWN FROM THE OPERATING SYSTEM'S
+	 * CRYPTOGRAPHIC SOURCE, FOR VALUES A PLAYER MUST NOT BE ABLE TO
+	 * PREDICT (ONE-TIME TOKENS, INVITE CODES). rand() IS SEEDED FROM THE
+	 * CLOCK AND ITS OUTPUTS GIVE AWAY ITS STATE. FALLS BACK TO
+	 * random_number() WHERE NO SUCH SOURCE IS AVAILABLE. */
+
+	unsigned int	r;
+	int				max = MAX_RAND->value;
+
+	if (max < 1) return (random_number());
+#if defined(_WIN32)
+	if (rand_s(&r) != 0) return (random_number());
+#elif defined(__NDS__)
+	return (random_number());
+#else
+	{
+		FILE *urandom = fopen("/dev/urandom", "rb");
+		size_t got;
+
+		if (urandom == NULL) return (random_number());
+		got = fread(&r, sizeof(r), 1, urandom);
+		fclose(urandom);
+		if (got != 1) return (random_number());
+	}
+#endif
+	return (1 + (int) (r % (unsigned int) max));
 }
 
 void
