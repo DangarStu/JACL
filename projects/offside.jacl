@@ -2606,6 +2606,8 @@ print:
    span.expires { font-size: 9pt; color: #555555; white-space: nowrap; }^
    span.authslot { display: inline-block; vertical-align: middle; margin-left: 14px; text-shadow: none; }^
    span.authslot a.signout { text-shadow: 0 0 4px black; }^
+   span.authslot > div { animation: authfade 0.4s ease-in; }^
+   @keyframes authfade { from { opacity: 0; } to { opacity: 1; } }^
    a.signout { color: white; font-size: 10pt; }^
    div.confirm { background-color: #fbe9e7; border: 1px solid #c62828; padding: 6px 14px 12px 14px; margin-bottom: 14px; font-family: Verdana, Arial, sans-serif; }^
    input.danger { background-color: #c62828; color: white; border: none; padding: 4px 14px; }^
@@ -2633,6 +2635,7 @@ print:
       span#compname { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }^
       span.authslot { margin-left: auto; flex: none; }^
       div.mode { align-items: stretch; }^
+      div#header::before { background-image: url(/images/offside-mobile.jpg); }^
       div.tab, div.selectedtab { flex: 1 1 0; min-width: 0; padding: 0; height: auto; line-height: 1.25; display: flex; align-items: center; justify-content: center; font-size: 10pt; }^
       div.selectedtab { padding: 10px 3px; }^
       a.tablink { display: block; width: 100%; padding: 10px 3px; font-size: 10pt; }^
@@ -2679,7 +2682,9 @@ object you
 
 constant title_image         "/images/offside.jpg"
 constant desktop_title_image "/images/offside.jpg"
-constant mobile_title_image  "/images/offside.jpg"
+# A PHONE GETS A LIGHTER COPY OF THE BANNER: 1200px WIDE IS STILL SHARP ON A
+# 3x SCREEN, AT A FIFTH OF THE SIZE, WHICH MATTERS ON MOBILE DATA AT THE GROUND
+constant mobile_title_image  "/images/offside-mobile.jpg"
 constant footer_image        "none"
 constant header_colour       "#1e3e1e"
 constant header_height       280
