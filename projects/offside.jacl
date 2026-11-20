@@ -114,6 +114,22 @@ string row_contact
 string org_line
 integer org_count
 string_array org_names   20
+
+# ANYONE SIGNED IN CAN CREATE A COMPETITION, UP TO MAX_OWNED OF THEM (SITE
+# ADMINS ARE EXEMPT). THE COMPETITIONS LIST SHOWS EACH VISITOR ONLY THE ONE
+# THEY'RE VIEWING AND ANY THEY CREATED OR ORGANISE, SO CLUBS DON'T SEE EACH
+# OTHER'S; ANOTHER IS OPENED BY ITS SHARE LINK. (THE IDS ARE SEQUENTIAL, SO
+# THIS TIDIES THE LIST RATHER THAN MAKING ANYTHING SECRET.)
+constant MAX_OWNED       3
+constant MAX_MINE        40
+integer_array my_comps   MAX_MINE
+integer my_count
+integer owned_count
+integer comp_shown
+# TRUE WHILE THE CURRENT COMPETITION IS ONLY THE DEFAULT A NEW SESSION
+# STARTED ON, NOT ONE THE VISITOR CHOSE; THE PAGE THEN SWAPS TO THE ONE
+# THEIR BROWSER REMEMBERS (SEE +remember_comp)
+integer comp_defaulted   false
 string season_data
 string season_error
 string team_name_data
@@ -480,6 +496,9 @@ if comp_link = 0
 endif
 set edit_id = comp_link
 set comp_link = 0
+# A LINK IS A CHOICE EVEN IF ITS COMPETITION HAS GONE: THE PAGE THEN STAYS ON
+# THE FIRST ONE AND REMEMBERS THAT, RATHER THAN CHASING THE LINK AGAIN
+set comp_defaulted = false
 set found = false
 iterate competitions
    if field[0] = edit_id
@@ -493,6 +512,7 @@ if found = false
 endif
 set current_team = 0
 setstring current_team_name ""
+set comp_defaulted = false
 set WEBAPP_mode = RESULTS
 execute "+refresh_permissions"
 }
@@ -540,6 +560,7 @@ setstring current_contact "-"
 iterate competitions
    if current_comp = 0
       set current_comp = field[0]
+      set comp_defaulted = true
    endif
    if field[0] = current_comp
       set found = true
@@ -760,6 +781,7 @@ ifall current_comp != 0 : WEBAPP_mode != COMPETITIONS
    endif
 endif
 write "<p class=~sitefoot~><a href=~/privacy.html#offside~ target=~_blank~>Privacy</a></p>"
+execute "+remember_comp"
 
 # CLEAR THE PARAMETERS SO THEY DON'T LEAK INTO THE NEXT REQUEST VIA THE
 # SAVED SESSION STATE
@@ -872,46 +894,75 @@ set new_id + 1
 {+display_competitions
 write "<h2>Competitions</h2>"
 set COUNT = 0
+execute "+load_my_comps"
 write "<table class=~league~>"
 write "<tr><th>Competition</th><th>Season</th><th>Action</th></tr>"
 iterate competitions
-   escapestring escaped field[1]
-   escapestring escaped2 field[2]
+   # ONLY THE ONE BEING VIEWED, ONES THIS PERSON CREATED OR ORGANISES, OR
+   # EVERY ONE FOR A SITE ADMIN
+   set comp_shown = is_admin
    if field[0] = current_comp
-      write "<tr class=~selected~>"
-   else
-      write "<tr>"
+      set comp_shown = true
    endif
-   write "<td>" escaped "</td><td>" escaped2 "</td><td>"
-   if field[0] = current_comp
-      write "<i>selected</i>"
-   else
-      setstring action "select competition " field[0] "&mode=" TEAMS
-      hyperlinkNE "Select" action
-   endif
-   # INLINE VERSION OF +comp_editable: NO FUNCTION CALLS INSIDE iterate
-   setstring row_owner "-"
-   if field_count > 3
-      setstring row_owner field[3]
-   endif
-   set allowed = is_admin
    if google_signed_in = true
-      ifstring row_owner = google_sub
-         set allowed = true
-         write " &middot; <i>yours</i>"
+      if field_count > 3
+         ifstring field[3] = google_sub
+            set comp_shown = true
+         endif
       endif
+      set INDEX = 0
+      while INDEX < my_count
+         if my_comps[INDEX] = field[0]
+            set comp_shown = true
+         endif
+         set INDEX + 1
+      endwhile
    endif
-   if allowed = true
-      write " &middot; "
-      setstring action "confirm delete competition " field[0]
-      hyperlinkNE "Delete" action
+   if comp_shown = true
+      escapestring escaped field[1]
+      escapestring escaped2 field[2]
+      if field[0] = current_comp
+         write "<tr class=~selected~>"
+      else
+         write "<tr>"
+      endif
+      write "<td>" escaped "</td><td>" escaped2 "</td><td>"
+      if field[0] = current_comp
+         write "<i>selected</i>"
+      else
+         setstring action "select competition " field[0] "&mode=" TEAMS
+         hyperlinkNE "Select" action
+      endif
+      # INLINE VERSION OF +comp_editable: NO FUNCTION CALLS INSIDE iterate
+      setstring row_owner "-"
+      if field_count > 3
+         setstring row_owner field[3]
+      endif
+      set allowed = is_admin
+      if google_signed_in = true
+         ifstring row_owner = google_sub
+            set allowed = true
+            write " &middot; <i>yours</i>"
+         endif
+      endif
+      if allowed = true
+         write " &middot; "
+         setstring action "confirm delete competition " field[0]
+         hyperlinkNE "Delete" action
+      endif
+      write "</td></tr>"
+      set COUNT + 1
    endif
-   write "</td></tr>"
-   set COUNT + 1
 enditerate
 write "</table>"
 if COUNT = 0
    write "<p>There are no competitions yet.</p>"
+endif
+if is_admin = true
+   write "<p class=~key~>As a site admin you see every competition.</p>"
+else
+   write "<p class=~key~>Only the competition you're viewing and any you run are listed. "
+   write "To open another, use its share link.</p>"
 endif
 
 # THE SELECTED COMPETITION'S OWN LINK, FOR ITS PLAYERS' GROUP CHAT. THE PAGE
@@ -953,6 +1004,11 @@ if google_signed_in = false
 endif
 
 write "<h3>Add a competition</h3>"
+execute "+count_owned"
+ifall owned_count >= MAX_OWNED : is_admin = false
+   write "<p class=~key~>You've created " MAX_OWNED " competitions, the most one account can. "
+   write "Delete one you no longer need to start another.</p>"
+else
 write "<form>"
 execute "+text<Name<comp_name<40"
 execute "+text<Season<season<20"
@@ -963,6 +1019,7 @@ execute "+submit_row<Add competition"
 write "<input type=~hidden~ name=~command~ value=~add competition~/>"
 hidden
 write "</form>"
+endif
 
 if can_manage = true
    execute "+display_organisers"
@@ -995,6 +1052,11 @@ ifstring owner_name_data = ""
    setstring owner_name_error "Please enter your name, as players will know you."
    set errors + 1
 endif
+execute "+count_owned"
+ifall owned_count >= MAX_OWNED : is_admin = false
+   write "<p class=~notice~>You've already created " MAX_OWNED " competitions, the most one account can.</p>"
+   return
+endif
 if errors != 0
    return
 endif
@@ -1009,10 +1071,54 @@ setstring current_comp_name comp_name_data
 set current_team = 0
 setstring current_team_name ""
 setstring current_comp_owner google_sub
+set comp_defaulted = false
 setstring current_owner_name owner_name_data
 setstring current_contact "-"
 set can_edit = true
 set can_manage = true
+}
+
+# THE COMPETITIONS THE SIGNED-IN PERSON ORGANISES, INTO my_comps
+{+load_my_comps
+set my_count = 0
+if google_signed_in = false
+   return
+endif
+iterate organisers
+   ifstring field[2] = google_sub
+      if my_count < MAX_MINE
+         set my_comps[my_count] = field[1]
+         set my_count + 1
+      endif
+   endif
+enditerate
+}
+
+# HOW MANY COMPETITIONS THE SIGNED-IN PERSON CREATED, IN owned_count
+{+count_owned
+set owned_count = 0
+iterate competitions
+   if field_count > 3
+      ifstring field[3] = google_sub
+         set owned_count + 1
+      endif
+   endif
+enditerate
+}
+
+# THE BROWSER REMEMBERS THE LAST COMPETITION VIEWED. A NEW SESSION (A FIRST
+# VISIT, AN EXPIRED COOKIE, OR A DEPLOY CLEARING THE SERVER'S SESSIONS)
+# STARTS ON THE FIRST COMPETITION; IF THE BROWSER REMEMBERS ANOTHER, THE
+# PAGE REOPENS THAT ONE THROUGH ITS ?comp= LINK. A LINK ALREADY IN THE
+# ADDRESS ALWAYS WINS, AND A REMEMBERED ONE THAT'S BEEN DELETED JUST FALLS
+# BACK TO THE FIRST AND IS FORGOTTEN (+check_comp_link CLEARS comp_defaulted
+# FOR ANY LINK, SO THE ADDRESS TIDY-UP REMOVING comp= CAN'T CAUSE A LOOP).
+{+remember_comp
+write "<script>(function() { try { var KEY = 'offside-comp', cur = '" current_comp "', was = localStorage.getItem(KEY); "
+if comp_defaulted = true
+   write "if (was && was != cur && location.search.indexOf('comp=') < 0) { location.replace(location.pathname + '?comp=' + encodeURIComponent(was)); return; } "
+endif
+write "if (cur != '0') localStorage.setItem(KEY, cur); } catch (e) {} })();</script>"
 }
 
 # THE CURRENT COMPETITION'S ORGANISERS' NAMES AS ONE LINE IN org_line ("Stuart,
@@ -1151,6 +1257,7 @@ if found = false
 endif
 set current_team = 0
 setstring current_team_name ""
+set comp_defaulted = false
 # +before WORKED OUT can_edit FOR THE PREVIOUS COMPETITION
 execute "+refresh_permissions"
 }
