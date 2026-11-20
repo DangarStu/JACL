@@ -273,6 +273,10 @@ integer invite_days
 integer now_time
 integer invite_count
 parameter invite         invite_data
+
+# A COMPETITION'S OWN LINK, ?comp=<id>, OPENS ITS FIXTURES & RESULTS
+parameter comp           comp_link     0 2000000000
+integer comp_link        0
 parameter invite_name    invite_name_data
 
 # -----------------------------------------------------------------------------
@@ -284,9 +288,37 @@ parameter invite_name    invite_name_data
 {+links_div
 execute "+refresh_permissions"
 execute "+check_invite"
+execute "+check_comp_link"
 write "<span id=~compname~>"
 execute "+write_comp_label"
 write "</span>"
+}
+
+# RUN ON EVERY FULL PAGE LOAD. IF THE ADDRESS CARRIED ?comp=<id> (A LINK
+# SHARED FROM THE COMPETITIONS TAB), SELECT THAT COMPETITION AND SHOW ITS
+# FIXTURES & RESULTS. AN INTEGER PARAMETER KEEPS ITS VALUE WHEN A LATER
+# REQUEST DOESN'T SEND IT, SO IT'S CLEARED ONCE READ.
+{+check_comp_link
+if comp_link = 0
+   return
+endif
+set edit_id = comp_link
+set comp_link = 0
+set found = false
+iterate competitions
+   if field[0] = edit_id
+      set found = true
+      set current_comp = edit_id
+      setstring current_comp_name field[1]
+   endif
+enditerate
+if found = false
+   return
+endif
+set current_team = 0
+setstring current_team_name ""
+set WEBAPP_mode = RESULTS
+execute "+refresh_permissions"
 }
 
 {+write_comp_label
@@ -666,6 +698,19 @@ enditerate
 write "</table>"
 if COUNT = 0
    write "<p>There are no competitions yet.</p>"
+endif
+
+# THE SELECTED COMPETITION'S OWN LINK, FOR ITS PLAYERS' GROUP CHAT. THE PAGE
+# FILLS IN ITS OWN ADDRESS, SO IT'S RIGHT ON WHATEVER HOST SERVES IT.
+if current_comp != 0
+   escapestring escaped current_comp_name
+   write "<div class=~addway~><h4>Share " escaped "</h4>"
+   write "<p class=~key~>This link opens its fixtures and results. Pin it in the "
+   write "competition's group chat so players can check the draw and the table.</p>"
+   write "<p><input class=~sharelink~ readonly size=~40~ value=~?comp=" current_comp "~> "
+   write "<button type=~button~ onclick=~navigator.clipboard.writeText(this.previousElementSibling.value); this.textContent = 'Copied';~>Copy</button></p></div>"
+   write "<script>document.querySelectorAll('input.sharelink').forEach(function(i) { "
+   write "if (i.value.charAt(0) == '?') i.value = location.origin + location.pathname + i.value; });</script>"
 endif
 
 if google_signed_in = false
@@ -2734,7 +2779,7 @@ print:
       table.games td:nth-child(5) { grid-column: 3; grid-row: 2; text-align: left; padding-top: 3px; }^
       table.games td:nth-child(6) { grid-column: 1 / 4; grid-row: 3; text-align: center; white-space: normal; padding-top: 2px; }^
       table.games td:nth-child(6) a { display: inline-block; padding: 8px 6px; font-size: 11pt; }^
-      input.invitelink { display: block; width: 100%; box-sizing: border-box; margin: 4px 0; }^
+      input.invitelink, input.sharelink { display: block; width: 100%; box-sizing: border-box; margin: 4px 0; }^
       span.expires { display: block; white-space: normal; margin-top: 4px; }^
       div.row { display: block; margin-bottom: 8px; }^
       div.label { float: none; display: block; width: auto; text-align: left; margin: 0 0 2px 0; }^
