@@ -6,11 +6,23 @@
 # A webapp.library program for running a set of football (soccer)
 # competitions. Everything is stored in per-game CSV files in projects/data:
 #
-#   bastrd-competitions.csv   id, name, season
+#   bastrd-competitions.csv   id, name, season, owner
 #   bastrd-teams.csv          id, competition id, name
 #   bastrd-players.csv        id, team id, name, position, shirt number
 #   bastrd-results.csv        id, competition id, date, home id, home goals,
 #                             away goals, away id
+#   bastrd-admins.csv         Google account id, name (maintained by hand)
+#
+# PERMISSIONS: anyone can view everything. Signing in with Google lets you
+# create competitions; a competition can only be changed by the account that
+# created it (its owner) or by a site admin listed in bastrd-admins.csv.
+# Every handler that changes data checks this itself -- hiding the forms and
+# links is only presentation, since anyone can type ?command=delete+team+3.
+#
+# Competitions created before owners were recorded have only three columns
+# and so no owner; only admins can change them. NOTE: field[] values are NOT
+# cleared between rows, so a short row would show the previous row's
+# field[3]. Always check field_count before reading the owner.
 #
 # NOTE: the interpreter has a single CSV file handle and closes it whenever
 # ANY function exits. That means an iterate/update loop must never call a
@@ -121,21 +133,30 @@ string action
 string escaped
 string escaped2
 
+# PERMISSIONS, RECALCULATED ON EVERY REQUEST BY +refresh_permissions.
+# google_signed_in AND google_sub ARE SET BY THE INTERPRETER, AND ONLY FROM A
+# VERIFIED SESSION COOKIE, SO THEY CAN'T BE FORGED WITH A user_id PARAMETER.
+integer is_admin
+integer can_edit
+integer allowed
+integer target_comp
+string current_comp_owner
+string row_owner
+
 # -----------------------------------------------------------------------------
 # PAGE FRAMEWORK
 # -----------------------------------------------------------------------------
 
-# +header (WHICH CALLS THIS) RUNS BEFORE ANYTHING ELSE ON EVERY REQUEST, SO
-# IT'S ALSO WHERE A NEW SESSION GETS PUT ON THE FIRST COMPETITION, IF ANY
+# +header (WHICH CALLS THIS) RUNS BEFORE ANYTHING ELSE ON A FULL PAGE LOAD.
+# AJAX REQUESTS SKIP THE HEADER, SO +before REFRESHES THE PERMISSIONS TOO.
 {+links_div
-if current_comp = 0
-   iterate competitions
-      if current_comp = 0
-         set current_comp = field[0]
-         setstring current_comp_name field[1]
-      endif
-   enditerate
-endif
+execute "+refresh_permissions"
+write "<span id=~compname~>"
+execute "+write_comp_label"
+write "</span>"
+}
+
+{+write_comp_label
 ifstring current_comp_name != ""
    escapestring escaped current_comp_name
    write "Competition: <b>" escaped "</b>"
@@ -148,6 +169,7 @@ endif
 # SO +after DOESN'T FIRE), SO DRAW THE CURRENT TAB FROM HERE AS WELL
 {+intro
 set player = you
+execute "+refresh_permissions"
 execute "+after"
 }
 
@@ -155,6 +177,84 @@ execute "+after"
 # OR SHARED LINK) SKIPS +intro AND GETS +setup INSTEAD
 {+setup
 set player = you
+}
+
+# WORKS OUT WHO THE VISITOR IS AND WHAT THEY MAY CHANGE, AND REFRESHES THE
+# CURRENT COMPETITION FROM THE FILE (IT MAY HAVE BEEN DELETED BY SOMEONE ELSE)
+{+refresh_permissions
+set is_admin = false
+if google_signed_in = true
+   iterate admins
+      ifstring field[0] = google_sub
+         set is_admin = true
+      endif
+   enditerate
+endif
+
+# A NEW SESSION STARTS ON THE FIRST COMPETITION, IF THERE IS ONE
+set found = false
+setstring current_comp_owner "-"
+iterate competitions
+   if current_comp = 0
+      set current_comp = field[0]
+   endif
+   if field[0] = current_comp
+      set found = true
+      setstring current_comp_name field[1]
+      if field_count > 3
+         setstring current_comp_owner field[3]
+      endif
+   endif
+enditerate
+if found = false
+   set current_comp = 0
+   setstring current_comp_name ""
+   set current_team = 0
+   setstring current_team_name ""
+endif
+
+set can_edit = false
+if current_comp != 0
+   set can_edit = is_admin
+   if google_signed_in = true
+      ifstring current_comp_owner = google_sub
+         set can_edit = true
+      endif
+   endif
+endif
+}
+
+# SETS allowed TO WHETHER THE VISITOR MAY CHANGE COMPETITION arg[0]
+{+comp_editable
+set allowed = is_admin
+if google_signed_in = true
+   iterate competitions
+      if field[0] = arg[0]
+         if field_count > 3
+            ifstring field[3] = google_sub
+               set allowed = true
+            endif
+         endif
+      endif
+   enditerate
+endif
+}
+
+{+deny
+write "<p class=~notice~>Only the person who created this competition can "
+write "change it.</p>"
+}
+
+{+view_only_note
+if can_edit = false
+   write "<p class=~key~>View only. "
+   if google_signed_in = false
+      write "Sign in with Google (top right) to create and run your own competitions."
+   else
+      write "Only the person who created this competition can change it."
+   endif
+   write "</p>"
+endif
 }
 
 # A TAB CLICK ARRIVES WITH NO COMMAND, WHICH THE INTERPRETER TURNS INTO
@@ -167,10 +267,20 @@ grammar blankjacl     >blankjacl
 
 {+before
 set errors = 0
+execute "+refresh_permissions"
 return false
 }
 
 {+after
+# THE HEADER WAS DRAWN BEFORE THE COMMAND RAN, SO A 'select competition' OR
+# 'delete competition' WOULD LEAVE IT NAMING THE OLD ONE. COPY THE CURRENT
+# LABEL ACROSS. (IT GOES VIA A HIDDEN ELEMENT SO THE NAME NEVER HAS TO BE
+# QUOTED AS A JAVASCRIPT STRING.)
+write "<span id=~compnow~ hidden>"
+execute "+write_comp_label"
+write "</span><script>var c = document.getElementById('compname'); "
+write "if (c) c.innerHTML = document.getElementById('compnow').innerHTML;</script>"
+
 if WEBAPP_mode = COMPETITIONS
    execute "+display_competitions"
 endif
@@ -289,15 +399,35 @@ iterate competitions
       setstring action "select competition " field[0] "&mode=" TEAMS
       hyperlinkNE "Select" action
    endif
-   write " &middot; "
-   setstring action "delete competition " field[0]
-   hyperlinkNE "Delete" action
+   # INLINE VERSION OF +comp_editable: NO FUNCTION CALLS INSIDE iterate
+   setstring row_owner "-"
+   if field_count > 3
+      setstring row_owner field[3]
+   endif
+   set allowed = is_admin
+   if google_signed_in = true
+      ifstring row_owner = google_sub
+         set allowed = true
+         write " &middot; <i>yours</i>"
+      endif
+   endif
+   if allowed = true
+      write " &middot; "
+      setstring action "delete competition " field[0]
+      hyperlinkNE "Delete" action
+   endif
    write "</td></tr>"
    set COUNT + 1
 enditerate
 write "</table>"
 if COUNT = 0
    write "<p>There are no competitions yet.</p>"
+endif
+
+if google_signed_in = false
+   write "<p class=~key~>Sign in with Google (top right) to create and run "
+   write "your own competitions.</p>"
+   return
 endif
 
 write "<h3>Add a competition</h3>"
@@ -308,11 +438,23 @@ execute "+submit_row<Add competition"
 write "<input type=~hidden~ name=~command~ value=~add competition~/>"
 hidden
 write "</form>"
+
+# AN ADMIN IS ADDED BY PUTTING THEIR ACCOUNT ID IN bastrd-admins.csv, SO
+# SHOW SIGNED-IN USERS THEIRS
+if is_admin = true
+   write "<p class=~key~>You're a site admin and can change any competition.</p>"
+else
+   write "<p class=~key~>Your account ID is " google_sub ".</p>"
+endif
 }
 
 grammar add competition     >add_competition
 
 {+add_competition
+if google_signed_in = false
+   write "<p class=~notice~>Sign in with Google to create a competition.</p>"
+   return
+endif
 ifstring comp_name_data = ""
    setstring comp_name_error "Please enter a name for the competition."
    set errors + 1
@@ -324,15 +466,16 @@ if errors != 0
    return
 endif
 execute "+next_comp_id"
-append competitions new_id comp_name_data season_data
+append competitions new_id comp_name_data season_data google_sub
 escapestring escaped comp_name_data
 write "<p class=~notice~>Competition <b>" escaped "</b> added.</p>"
 
-# A NEW USER'S FIRST COMPETITION BECOMES THE CURRENT ONE AUTOMATICALLY
-if current_comp = 0
-   set current_comp = new_id
-   setstring current_comp_name comp_name_data
-endif
+# THE CREATOR WILL WANT TO SET IT UP NEXT, SO MAKE IT THE CURRENT ONE
+set current_comp = new_id
+setstring current_comp_name comp_name_data
+set current_team = 0
+setstring current_team_name ""
+set can_edit = true
 }
 
 grammar select competition $integer     >select_competition
@@ -352,6 +495,8 @@ if found = false
 endif
 set current_team = 0
 setstring current_team_name ""
+# +before WORKED OUT can_edit FOR THE PREVIOUS COMPETITION
+execute "+refresh_permissions"
 }
 
 grammar delete competition $integer     >delete_competition
@@ -361,6 +506,11 @@ grammar delete competition $integer     >delete_competition
 # CALLING FUNCTION IF ITS FILE DOESN'T EXIST YET.
 {+delete_competition
 set new_id = $integer
+execute "+comp_editable<new_id"
+if allowed = false
+   execute "+deny"
+   return
+endif
 execute "+load_teams<new_id"
 execute "+purge_players"
 execute "+purge_teams<new_id"
@@ -374,12 +524,18 @@ if current_comp = new_id
 endif
 write "<p class=~notice~>Competition deleted along with its teams, "
 write "players and results.</p>"
+execute "+refresh_permissions"
 }
 
 {+purge_competition
 update competitions
    if field[0] != arg[0]
-      insert field[0] field[1] field[2]
+      # REWRITING A PRE-OWNER ROW GIVES IT AN EXPLICIT "NO OWNER"
+      setstring row_owner "-"
+      if field_count > 3
+         setstring row_owner field[3]
+      endif
+      insert field[0] field[1] field[2] row_owner
    endif
 endupdate
 }
@@ -480,22 +636,28 @@ else
       write "<td>" escaped "</td><td>" t_p[INDEX] "</td><td>"
       setstring action "squad " t_id[INDEX]
       hyperlinkNE "Squad" action
-      write " &middot; "
-      setstring action "delete team " t_id[INDEX]
-      hyperlinkNE "Delete" action
+      if can_edit = true
+         write " &middot; "
+         setstring action "delete team " t_id[INDEX]
+         hyperlinkNE "Delete" action
+      endif
       write "</td></tr>"
       set INDEX + 1
    endwhile
    write "</table>"
 endif
 
-write "<h3>Add a team</h3>"
-write "<form>"
-execute "+text<Team name<team_name<40"
-execute "+submit_row<Add team"
-write "<input type=~hidden~ name=~command~ value=~add team~/>"
-hidden
-write "</form>"
+if can_edit = true
+   write "<h3>Add a team</h3>"
+   write "<form>"
+   execute "+text<Team name<team_name<40"
+   execute "+submit_row<Add team"
+   write "<input type=~hidden~ name=~command~ value=~add team~/>"
+   hidden
+   write "</form>"
+else
+   execute "+view_only_note"
+endif
 
 if current_team != 0
    execute "+display_squad"
@@ -507,6 +669,10 @@ grammar add team     >add_team
 {+add_team
 if current_comp = 0
    write "<p class=~notice~>Select a competition before adding teams.</p>"
+   return
+endif
+if can_edit = false
+   execute "+deny"
    return
 endif
 ifstring team_name_data = ""
@@ -557,6 +723,18 @@ grammar delete team $integer     >delete_team
 # A TEAM WITH RESULTS CAN'T BE DELETED: THE RESULTS WOULD BE LEFT POINTING AT
 # A TEAM THAT NO LONGER EXISTS AND THE OPPONENTS' TABLE ENTRIES WOULD CHANGE
 {+delete_team
+set target_comp = 0
+iterate teams
+   if field[0] = $integer
+      set target_comp = field[1]
+   endif
+enditerate
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+
 set COUNT = 0
 iterate results
    if field[3] = $integer
@@ -608,8 +786,10 @@ iterate players
       escapestring escaped field[2]
       escapestring escaped2 field[4]
       write "<tr><td>" escaped2 "</td><td>" escaped "</td><td>" field[3] "</td><td>"
-      setstring action "delete player " field[0]
-      hyperlinkNE "Delete" action
+      if can_edit = true
+         setstring action "delete player " field[0]
+         hyperlinkNE "Delete" action
+      endif
       write "</td></tr>"
       set COUNT + 1
    endif
@@ -619,6 +799,9 @@ if COUNT = 0
    write "<p>No players have been added to this team yet.</p>"
 endif
 
+if can_edit = false
+   return
+endif
 write "<h3>Add a player</h3>"
 write "<form>"
 execute "+text<Player name<player_name<40"
@@ -635,6 +818,11 @@ grammar add player     >add_player
 {+add_player
 if current_team = 0
    write "<p class=~notice~>Choose a team's <b>Squad</b> before adding players.</p>"
+   return
+endif
+# current_team IS ONLY EVER SET TO A TEAM IN THE CURRENT COMPETITION
+if can_edit = false
+   execute "+deny"
    return
 endif
 ifstring player_name_data = ""
@@ -659,6 +847,25 @@ write "<p class=~notice~>" escaped " added to the squad.</p>"
 grammar delete player $integer     >delete_player
 
 {+delete_player
+# PLAYER -> TEAM -> COMPETITION, ONE FILE AT A TIME
+set new_id = 0
+iterate players
+   if field[0] = $integer
+      set new_id = field[1]
+   endif
+enditerate
+set target_comp = 0
+iterate teams
+   if field[0] = new_id
+      set target_comp = field[1]
+   endif
+enditerate
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+
 update players
    if field[0] != $integer
       insert field[0] field[1] field[2] field[3] field[4]
@@ -721,8 +928,10 @@ iterate results
          write escaped
       endif
       write "</td><td>"
-      setstring action "delete result " field[0]
-      hyperlinkNE "Delete" action
+      if can_edit = true
+         setstring action "delete result " field[0]
+         hyperlinkNE "Delete" action
+      endif
       write "</td></tr>"
       set COUNT + 1
    endif
@@ -730,6 +939,11 @@ enditerate
 write "</table>"
 if COUNT = 0
    write "<p>No results have been entered yet.</p>"
+endif
+
+if can_edit = false
+   execute "+view_only_note"
+   return
 endif
 
 write "<h3>Enter a result</h3>"
@@ -794,6 +1008,10 @@ if current_comp = 0
    write "<p class=~notice~>Select a competition before entering results.</p>"
    return
 endif
+if can_edit = false
+   execute "+deny"
+   return
+endif
 if home_team = away_team
    setstring result_error "A team can't play itself; choose two different teams."
    set errors + 1
@@ -829,6 +1047,18 @@ write "<p class=~notice~>Result entered.</p>"
 grammar delete result $integer     >delete_result
 
 {+delete_result
+set target_comp = 0
+iterate results
+   if field[0] = $integer
+      set target_comp = field[1]
+   endif
+enditerate
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+
 update results
    if field[0] != $integer
       insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
@@ -991,6 +1221,8 @@ print:
    table.standings tr:nth-child(even) td { background-color: #eef4ee; }^
    p.notice { background-color: #fff6d0; border: 1px solid #d8c070; padding: 6px 10px; }^
    p.key { font-size: 9pt; color: #555555; }^
+   span.authslot { display: inline-block; vertical-align: middle; margin-left: 14px; }^
+   a.signout { color: white; font-size: 10pt; }^
    p.formerror { color: #a02020; font-family: Verdana, Arial, sans-serif; }^
    select.goals { width: 4em; }^
    </style>^
