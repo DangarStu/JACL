@@ -10,8 +10,10 @@
 #   bastrd-teams.csv          id, competition id, name
 #   bastrd-players.csv        id, team id, name, position, shirt number
 #   bastrd-fixtures.csv       id, competition id, date (yyyymmdd), home id,
-#                             away id, home goals, away goals -- the goals
-#                             are "-" until the result is entered
+#                             away id, home goals, away goals, kick-off
+#                             (hhmm) -- the goals are "-" until the result
+#                             is entered; kick-off 2400 means "to be
+#                             confirmed", as does a row without the column
 #   bastrd-organisers.csv     id, competition id, Google account id, name
 #   bastrd-invites.csv        id, code, competition id, expiry (unixtime),
 #                             name
@@ -131,6 +133,15 @@ integer fixture_year     0
 integer chosen_day       0
 integer chosen_month     0
 integer chosen_year      0
+
+# KICK-OFF AS hhmm (1830 = 6:30pm). 2400 MEANS "TO BE CONFIRMED"; 0 MEANS
+# THE FIELD WASN'T SENT. SAME SUBMITTED/REMEMBERED SPLIT AS THE DATE.
+constant TIME_TBC        2400
+integer fixture_time     0
+integer chosen_time      0
+parameter fx_time        fixture_time     0 2400
+string time_label
+string row_time
 parameter fx_day         fixture_day      1 31
 parameter fx_month       fixture_month    1 12
 parameter fx_year        fixture_year     2000 2100
@@ -151,6 +162,10 @@ integer_array g_home     MAX_GAMES
 integer_array g_away     MAX_GAMES
 integer_array g_hg       MAX_GAMES
 integer_array g_ag       MAX_GAMES
+integer_array g_time     MAX_GAMES
+integer game_time
+integer tl_h
+integer tl_m
 integer game_key
 integer game_pos
 integer game_prev
@@ -484,6 +499,7 @@ setstring fixture_error       ""
 set fixture_day = 0
 set fixture_month = 0
 set fixture_year = 0
+set fixture_time = 0
 setstring organiser_id_data   ""
 setstring organiser_id_error  ""
 setstring organiser_name_data ""
@@ -743,8 +759,12 @@ endupdate
 
 {+purge_fixtures
 update fixtures
+   setstring row_time "2400"
+   if field_count > 7
+      setstring row_time field[7]
+   endif
    if field[1] != arg[0]
-      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6] row_time
    endif
 endupdate
 }
@@ -1160,6 +1180,9 @@ set year_to = chosen_year
 set year_to + 2
 execute "+number_select<fx_year<year_from<year_to<chosen_year"
 write "</div></div>"
+write "<div class=~row~><div class=~label~>Kick-off:</div><div class=~input~>"
+execute "+time_select<chosen_time"
+write "</div></div>"
 write "<div class=~row~><div class=~label~>Home team:</div><div class=~input~>"
 execute "+team_select<home_team<home_team"
 write "</div></div>"
@@ -1174,7 +1197,7 @@ write "</form>"
 
 {+game_table_head
 write "<table class=~league games~>"
-write "<tr><th class=~home~>Date</th><th class=~home~>Home</th><th></th><th class=~home~>Away</th>"
+write "<tr><th class=~home~>Date</th><th class=~home~>Time</th><th class=~home~>Home</th><th></th><th class=~home~>Away</th>"
 if can_edit = true
    write "<th>Action</th>"
 endif
@@ -1186,7 +1209,9 @@ write "</tr>"
 set game_pos = arg[0]
 set game_key = g_key[game_pos]
 execute "+date_label<game_key"
-write "<tr><td class=~date~>" date_label "</td><td class=~home~>"
+set game_time = g_time[game_pos]
+execute "+time_label<game_time"
+write "<tr><td class=~date~>" date_label "</td><td class=~date~>" time_label "</td><td class=~home~>"
 set game_team = g_home[game_pos]
 execute "+team_label<game_team"
 escapestring escaped team_label
@@ -1206,6 +1231,9 @@ if can_edit = true
    setstring action "score fixture " g_id[game_pos]
    if g_hg[game_pos] = -1
       hyperlinkNE "Enter result" action
+      write " &middot; "
+      setstring action "reschedule fixture " g_id[game_pos]
+      hyperlinkNE "Change time" action
    else
       hyperlinkNE "Edit score" action
    endif
@@ -1217,15 +1245,20 @@ endif
 write "</tr>"
 }
 
-# LOADS competition arg[0]'S FIXTURES INTO THE g_* ARRAYS IN DATE ORDER. AN
-# INSERTION SORT AS EACH ROW ARRIVES: FIXTURES ARE USUALLY ADDED ROUND BY
-# ROUND, SO MOST ROWS DON'T MOVE. EQUAL DATES KEEP THE ORDER THEY WERE ADDED.
+# LOADS competition arg[0]'S FIXTURES INTO THE g_* ARRAYS IN DATE AND
+# KICK-OFF ORDER (TBC LAST ON ITS DAY). AN INSERTION SORT AS EACH ROW
+# ARRIVES: FIXTURES ARE USUALLY ADDED ROUND BY ROUND, SO MOST ROWS DON'T
+# MOVE. GAMES AT THE SAME DATE AND TIME KEEP THE ORDER THEY WERE ADDED.
 {+load_games
 set game_count = 0
 iterate fixtures
    if field[1] = arg[0]
       if game_count < MAX_GAMES
          set game_key = field[2]
+         set game_time = TIME_TBC
+         if field_count > 7
+            set game_time = field[7]
+         endif
          set game_pos = game_count
          set moving = true
          while moving = true
@@ -1234,8 +1267,16 @@ iterate fixtures
             else
                set game_prev = game_pos
                set game_prev - 1
+               set found = false
                if g_key[game_prev] > game_key
+                  set found = true
+               endif
+               ifall g_key[game_prev] = game_key : g_time[game_prev] > game_time
+                  set found = true
+               endif
+               if found = true
                   set g_id[game_pos] = g_id[game_prev]
+                  set g_time[game_pos] = g_time[game_prev]
                   set g_key[game_pos] = g_key[game_prev]
                   set g_home[game_pos] = g_home[game_prev]
                   set g_away[game_pos] = g_away[game_prev]
@@ -1249,6 +1290,7 @@ iterate fixtures
          endwhile
          set g_id[game_pos] = field[0]
          set g_key[game_pos] = game_key
+         set g_time[game_pos] = game_time
          set g_home[game_pos] = field[3]
          set g_away[game_pos] = field[4]
          set g_hg[game_pos] = -1
@@ -1318,9 +1360,64 @@ set dl_h % 7
 setstring date_label day_abbr[dl_h] " " dl_d " " month_abbr[dl_m] " " dl_y
 }
 
+# SETS time_label TO hhmm arg[0] AS E.G. "6:30pm", OR "TBC"
+{+time_label
+ifall arg[0] > 0 : arg[0] < TIME_TBC
+   set tl_h = arg[0]
+   set tl_h / 100
+   set tl_m = arg[0]
+   set tl_m % 100
+   set dl_t = tl_h
+   set dl_t % 12
+   if dl_t = 0
+      set dl_t = 12
+   endif
+   if tl_m < 10
+      setstring time_label dl_t ":0" tl_m
+   else
+      setstring time_label dl_t ":" tl_m
+   endif
+   if tl_h < 12
+      setstring time_label time_label "am"
+   else
+      setstring time_label time_label "pm"
+   endif
+else
+   setstring time_label "TBC"
+endif
+}
+
+# KICK-OFF DROP-DOWN: TBC, THEN EVERY QUARTER HOUR FROM 6:00am TO 10:45pm
+# arg[0] = hhmm TO PRESELECT
+{+time_select
+write "<select name=~fx_time~ class=~jaclform datepart~>"
+write "<option value=~" TIME_TBC "~"
+if arg[0] = TIME_TBC
+   write " selected"
+endif
+write ">TBC</option>"
+set team_scan = 600
+while team_scan < 2300
+   execute "+time_label<team_scan"
+   write "<option value=~" team_scan "~"
+   if team_scan = arg[0]
+      write " selected"
+   endif
+   write ">" time_label "</option>"
+   set tl_m = team_scan
+   set tl_m % 100
+   if tl_m = 45
+      set team_scan + 55
+   else
+      set team_scan + 15
+   endif
+endwhile
+write "</select>"
+}
+
 # THE FORM STARTS AT TODAY UNTIL A DATE HAS BEEN CHOSEN
 {+default_date
-ifall chosen_day != 0 : chosen_month != 0 : chosen_year != 0
+ifall chosen_day != 0 : chosen_month != 0 : chosen_year != 0 : chosen_time != 0
    return
 endif
 set gmt = unixtime
@@ -1330,6 +1427,9 @@ set chosen_day = TIME_date
 set chosen_month = TIME_month
 set chosen_month + 1
 set chosen_year = TIME_year
+if chosen_time = 0
+   set chosen_time = TIME_TBC
+endif
 }
 
 # arg[0] = field name, arg[1]..arg[2] = range, arg[3] = value to preselect
@@ -1416,37 +1516,11 @@ endif
 if fixture_year != 0
    set chosen_year = fixture_year
 endif
-# A PART THAT WASN'T SENT, OR WASN'T A NUMBER, IS 0
-if fixture_day = 0 : fixture_month = 0 : fixture_year = 0
-   setstring fixture_error "Please choose the fixture's date."
-   set errors + 1
-   return
+if fixture_time != 0
+   set chosen_time = fixture_time
 endif
-# THE PARAMETER RANGES STOP IMPOSSIBLE NUMBERS; THIS CATCHES 31 APRIL AND
-# 29 FEBRUARY IN A NON-LEAP YEAR
-set days_in_month = 31
-if fixture_month = 4
-   set days_in_month = 30
-endif
-if fixture_month = 6
-   set days_in_month = 30
-endif
-if fixture_month = 9
-   set days_in_month = 30
-endif
-if fixture_month = 11
-   set days_in_month = 30
-endif
-if fixture_month = 2
-   set days_in_month = 28
-   execute "+is_leap_year?<fixture_year"
-   if TIME_leapyear = true
-      set days_in_month = 29
-   endif
-endif
-if fixture_day > days_in_month
-   setstring fixture_error "That date doesn't exist; check the day and month."
-   set errors + 1
+execute "+validate_when"
+if errors != 0
    return
 endif
 
@@ -1499,15 +1573,65 @@ if COUNT != 0
 endif
 
 execute "+next_fixture_id"
-append fixtures new_id current_comp game_key home_team away_team score_none score_none
+append fixtures new_id current_comp game_key home_team away_team score_none score_none fixture_time
 execute "+load_teams<current_comp"
 execute "+date_label<game_key"
+execute "+time_label<fixture_time"
+setstring date_label date_label ", " time_label
 write "<p class=~notice~>Fixture added: "
 execute "+write_teams<home_team<away_team"
 write ", " date_label ".</p>"
 # THE DATE STAYS FOR THE NEXT FIXTURE OF THE ROUND; THE TEAMS DON'T
 set home_team = 0
 set away_team = 0
+}
+
+# CHECKS THE SUBMITTED fixture_day/month/year/time, SETTING fixture_error
+# AND errors IF THEY DON'T MAKE A REAL DATE AND KICK-OFF
+{+validate_when
+# A PART THAT WASN'T SENT, OR WASN'T A NUMBER, IS 0
+if fixture_day = 0 : fixture_month = 0 : fixture_year = 0
+   setstring fixture_error "Please choose the fixture's date."
+   set errors + 1
+   return
+endif
+# THE PARAMETER RANGES STOP IMPOSSIBLE NUMBERS; THIS CATCHES 31 APRIL AND
+# 29 FEBRUARY IN A NON-LEAP YEAR
+set days_in_month = 31
+if fixture_month = 4
+   set days_in_month = 30
+endif
+if fixture_month = 6
+   set days_in_month = 30
+endif
+if fixture_month = 9
+   set days_in_month = 30
+endif
+if fixture_month = 11
+   set days_in_month = 30
+endif
+if fixture_month = 2
+   set days_in_month = 28
+   execute "+is_leap_year?<fixture_year"
+   if TIME_leapyear = true
+      set days_in_month = 29
+   endif
+endif
+if fixture_day > days_in_month
+   setstring fixture_error "That date doesn't exist; check the day and month."
+   set errors + 1
+   return
+endif
+# ONLY THE DROP-DOWN'S VALUES (OR TBC); A HAND-MADE VALUE LIKE 1890 ISN'T A TIME
+set tl_m = fixture_time
+set tl_m % 100
+if fixture_time != TIME_TBC
+   if fixture_time = 0 : tl_m > 59 : fixture_time < 600
+      setstring fixture_error "Please choose the kick-off time, or TBC."
+      set errors + 1
+      return
+   endif
+endif
 }
 
 # SETS target_comp, game_key, game_home, game_away, game_hg, game_ag AND
@@ -1526,9 +1650,15 @@ iterate fixtures
          set game_hg = field[5]
          set game_ag = field[6]
       endif
+      set game_time = TIME_TBC
+      if field_count > 7
+         set game_time = field[7]
+      endif
    endif
 enditerate
 execute "+date_label<game_key"
+execute "+time_label<game_time"
+setstring date_label date_label ", " time_label
 }
 
 # WRITES "Home v Away", OR "Home 2 - 1 Away" ONCE PLAYED, FOR THE FIXTURE
@@ -1611,6 +1741,103 @@ endif
 write "</div>"
 }
 
+# SHOWS THE FORM FOR MOVING A FIXTURE TO ANOTHER KICK-OFF OR DATE. LIKE
+# 'score fixture' IT ONLY SHOWS A FORM; 'save schedule' MAKES THE CHANGE.
+grammar reschedule fixture $integer     >reschedule_fixture
+
+{+reschedule_fixture
+set edit_id = $integer
+execute "+find_fixture<edit_id"
+if target_comp = 0
+   return
+endif
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+execute "+schedule_form<edit_id"
+}
+
+# WRITES THE RESCHEDULE FORM FOR FIXTURE arg[0], PRESELECTING THE DATE AND
+# KICK-OFF +find_fixture LAST FOUND
+{+schedule_form
+execute "+load_teams<target_comp"
+write "<div class=~scoreform~><p><b>Change the kick-off</b> &middot; "
+execute "+write_match"
+write "</p><form>"
+set dl_y = game_key
+set dl_y / 10000
+set dl_m = game_key
+set dl_m / 100
+set dl_m % 100
+set dl_d = game_key
+set dl_d % 100
+execute "+number_select<fx_day<1<31<dl_d"
+execute "+month_select<dl_m"
+set year_from = dl_y
+set year_from - 1
+set year_to = dl_y
+set year_to + 2
+execute "+number_select<fx_year<year_from<year_to<dl_y"
+write " &nbsp; "
+execute "+time_select<game_time"
+write " &nbsp; <input type=~hidden~ name=~command~ value=~save schedule " arg[0] "~/>"
+hidden
+write "<input type=~submit~ value=~Save~> &nbsp; "
+hyperlinkNE "Cancel" "blankjacl"
+write "</form></div>"
+}
+
+grammar save schedule $integer     >save_schedule
+
+{+save_schedule
+set edit_id = $integer
+execute "+find_fixture<edit_id"
+if target_comp = 0
+   return
+endif
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+execute "+validate_when"
+if errors != 0
+   escapestring escaped fixture_error
+   write "<p class=~notice~>" escaped "</p>"
+   setstring fixture_error ""
+   execute "+schedule_form<edit_id"
+   return
+endif
+set game_key = fixture_year
+set game_key * 100
+set game_key + fixture_month
+set game_key * 100
+set game_key + fixture_day
+execute "+set_when<edit_id<game_key<fixture_time"
+execute "+find_fixture<edit_id"
+execute "+load_teams<target_comp"
+write "<p class=~notice~>Moved: "
+execute "+write_match"
+write ", now " date_label ".</p>"
+}
+
+# REWRITES FIXTURE arg[0] WITH DATE arg[1] (yyyymmdd) AND KICK-OFF arg[2]
+{+set_when
+update fixtures
+   setstring row_time "2400"
+   if field_count > 7
+      setstring row_time field[7]
+   endif
+   if field[0] = arg[0]
+      insert field[0] field[1] arg[1] field[3] field[4] field[5] field[6] arg[2]
+   else
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6] row_time
+   endif
+endupdate
+}
+
 grammar save score $integer     >save_score
 
 {+save_score
@@ -1654,14 +1881,19 @@ write "<p class=~notice~>Result cleared; it's back in the fixtures.</p>"
 # arg[1] IS -1
 {+set_score
 update fixtures
+   # field[] ISN'T CLEARED BETWEEN ROWS, SO CHECK A KICK-OFF IS REALLY THERE
+   setstring row_time "2400"
+   if field_count > 7
+      setstring row_time field[7]
+   endif
    if field[0] = arg[0]
       if arg[1] = -1
-         insert field[0] field[1] field[2] field[3] field[4] score_none score_none
+         insert field[0] field[1] field[2] field[3] field[4] score_none score_none row_time
       else
-         insert field[0] field[1] field[2] field[3] field[4] arg[1] arg[2]
+         insert field[0] field[1] field[2] field[3] field[4] arg[1] arg[2] row_time
       endif
    else
-      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6] row_time
    endif
 endupdate
 }
@@ -1693,8 +1925,12 @@ endif
 
 {+remove_fixture
 update fixtures
+   setstring row_time "2400"
+   if field_count > 7
+      setstring row_time field[7]
+   endif
    if field[0] != arg[0]
-      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6]
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6] row_time
    endif
 endupdate
 }
@@ -2360,10 +2596,11 @@ print:
    p.formerror { color: #a02020; font-family: Verdana, Arial, sans-serif; }^
    select.goals { width: 4em; }^
    table.league td.date { text-align: left; white-space: nowrap; }^
-   table.games { table-layout: fixed; width: 100%; max-width: 760px; }^
+   table.games { table-layout: fixed; width: 100%; max-width: 920px; }^
    table.games th:nth-child(1) { width: 9.5em; }^
-   table.games th:nth-child(3) { width: 4em; }^
-   table.games th:nth-child(5) { width: 11em; }^
+   table.games th:nth-child(2) { width: 4.5em; }^
+   table.games th:nth-child(4) { width: 4em; }^
+   table.games th:nth-child(6) { width: 17em; }^
    table.games td { overflow: hidden; text-overflow: ellipsis; }^
    select.datepart { width: auto; margin-right: 4px; }^
    div.scoreform { background-color: #e6f2e6; border: 1px solid #2e5e2e; padding: 6px 14px 12px 14px; margin-bottom: 14px; font-family: Verdana, Arial, sans-serif; }^
