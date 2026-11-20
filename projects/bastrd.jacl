@@ -151,6 +151,12 @@ set player = you
 execute "+after"
 }
 
+# A NEW SESSION WHOSE FIRST REQUEST ALREADY CARRIES A COMMAND (A BOOKMARKED
+# OR SHARED LINK) SKIPS +intro AND GETS +setup INSTEAD
+{+setup
+set player = you
+}
+
 # A TAB CLICK ARRIVES WITH NO COMMAND, WHICH THE INTERPRETER TURNS INTO
 # 'blankjacl'. IT ONLY NEEDS TO EXIST SO THE PARSER IS HAPPY; +after DOES
 # THE DRAWING.
@@ -967,12 +973,12 @@ endwhile
 {+user_styles
 print:
    <style>^
-   div#header { position: relative; overflow: hidden; }^
+   div#header { position: relative; overflow: hidden; height: auto; }^
    div#header::before { content: ""; position: absolute; top: -30px; left: -30px; right: -30px; bottom: -30px; background: url(/images/bastrd.jpg) center / cover; filter: blur(16px) brightness(0.5); }^
    div#headerimages { position: relative; z-index: 1; }^
-   img.titleimage { display: block; margin: 0px auto; width: auto; max-width: 100%; object-fit: contain; }^
+   img.titleimage { display: block; margin: 0px auto; width: 100%; max-width: 1800px; height: min(25vw, 280px); object-fit: cover; object-position: center 55%; }^
    div.linkbar { display: none; }^
-   div.links { z-index: 1; top: -30px; color: white; text-shadow: 0 0 4px black; }^
+   div.links { position: absolute; z-index: 1; top: auto; right: 0px; bottom: 6px; color: white; text-shadow: 0 0 4px black; }^
    h2 { font-family: Verdana, Arial, sans-serif; font-size: 16pt; margin: 18px 0 8px 0; }^
    h3 { font-family: Verdana, Arial, sans-serif; font-size: 12pt; margin: 22px 0 6px 0; }^
    table.league { border-collapse: collapse; font-family: Verdana, Arial, sans-serif; font-size: 11pt; min-width: 50%; }^
@@ -1000,7 +1006,7 @@ constant desktop_title_image "/images/bastrd.jpg"
 constant mobile_title_image  "/images/bastrd.jpg"
 constant footer_image        "none"
 constant header_colour       "#1e3e1e"
-constant header_height       180
+constant header_height       280
 constant linkbar_colour      "#c0b098"
 constant maintext_colour     "#dddddd"
 constant tab_colour          "#2e5e2e"
