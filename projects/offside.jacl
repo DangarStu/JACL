@@ -231,6 +231,19 @@ string row_owner
 # E.G. "team 3", SO A TOKEN CAN'T BE USED ON A DIFFERENT RECORD.
 integer delete_token     0
 integer token_param      0
+
+# ONE-USE FORM TOKENS. EVERY FORM IS GIVEN A RANDOM ONE BY THE PAGE'S SCRIPT
+# WHEN IT'S SUBMITTED (+local_header), AND +before REFUSES A COMMAND WHOSE
+# TOKEN THIS VISITOR HAS ALREADY USED: A SECOND TAP ON A SLOW CONNECTION, OR
+# THE SAME FORM SENT AGAIN FROM THE BROWSER'S HISTORY. THE LAST USED_TOKENS
+# ARE KEPT, IN A RING, IN THE VISITOR'S OWN SESSION.
+constant USED_TOKENS     16
+parameter ftoken         form_token    0 2000000000
+integer form_token       0
+integer_array used_tokens USED_TOKENS
+integer used_pos         0
+integer used_scan
+integer ftoken_seen
 integer delete_id
 string delete_pending
 string delete_check
@@ -447,6 +460,29 @@ grammar blankjacl     >blankjacl
 {+before
 set errors = 0
 execute "+refresh_permissions"
+if form_token = 0
+   return false
+endif
+# AN INTEGER PARAMETER KEEPS ITS OLD VALUE WHEN A REQUEST DOESN'T SEND IT,
+# SO TAKE THE TOKEN AND CLEAR IT AT ONCE
+set ftoken_seen = form_token
+set form_token = 0
+set used_scan = 0
+while used_scan < USED_TOKENS
+   if used_tokens[used_scan] = ftoken_seen
+      write "<p class=~notice~>That form had already been sent, so it wasn't "
+      write "done a second time.</p>"
+      # THE COMMAND (AND SO +after, WHICH DRAWS THE TAB) IS SKIPPED
+      execute "+after"
+      return true
+   endif
+   set used_scan + 1
+endwhile
+set used_tokens[used_pos] = ftoken_seen
+set used_pos + 1
+if used_pos = USED_TOKENS
+   set used_pos = 0
+endif
 return false
 }
 
@@ -2587,6 +2623,22 @@ endupdate
 # HASN'T AUTHORISED, SUCH AS A LOCAL TEST SERVER). A SIGNED-IN VISITOR SEES
 # PLAIN TEXT THERE, SO NOTHING WAITS.
 {+local_header
+# STOP A FORM BEING SENT TWICE (SEE USED_TOKENS): ONCE ONE HAS BEEN SUBMITTED,
+# FURTHER SUBMITS OF IT DO NOTHING UNTIL THE NEXT PAGE ARRIVES, AND EACH
+# SUBMIT CARRIES A ONE-USE TOKEN SO THE SERVER CAN REFUSE A REPEAT. A PAGE
+# BROUGHT BACK BY THE BACK BUTTON GETS FRESH TOKENS, SO A NEW ENTRY MADE ON
+# IT STILL GOES THROUGH.
+write "<script>(function() { "
+write "function fresh() { document.querySelectorAll('form').forEach(function(f) { f.jaclToken = 1 + Math.floor(Math.random() * 1999999999); f.jaclSent = false; f.classList.remove('sending'); }); } "
+write "document.addEventListener('DOMContentLoaded', fresh); "
+write "window.addEventListener('pageshow', function(e) { if (e.persisted) fresh(); }); "
+write "document.addEventListener('submit', function(e) { var f = e.target; "
+write "if (f.jaclSent) { e.preventDefault(); return; } "
+write "f.jaclSent = true; f.classList.add('sending'); "
+write "var t = f.querySelector('input[name=ftoken]'); "
+write "if (!t) { t = document.createElement('input'); t.type = 'hidden'; t.name = 'ftoken'; f.appendChild(t); } "
+write "t.value = f.jaclToken || (1 + Math.floor(Math.random() * 1999999999)); }, true); })();</script>"
+
 ifstring google_client_id = ""
    return
 endif
@@ -2635,6 +2687,7 @@ print:
    span.authslot a.signout { text-shadow: 0 0 4px black; }^
    span.authslot { transition: opacity 0.3s ease-in; }^
    span.authslot.settling { opacity: 0; }^
+   form.sending input[type=submit] { opacity: 0.5; }^
    a.signout { color: white; font-size: 10pt; }^
    div.confirm { background-color: #fbe9e7; border: 1px solid #c62828; padding: 6px 14px 12px 14px; margin-bottom: 14px; font-family: Verdana, Arial, sans-serif; }^
    input.danger { background-color: #c62828; color: white; border: none; padding: 4px 14px; }^
