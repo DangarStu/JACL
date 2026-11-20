@@ -2188,6 +2188,56 @@ execute(const char *funcname)
                         write_text(output);
                     }
                 }
+            } else if (!strcmp(word[0], "substring")) {
+                /* substring destination source start count
+                 * COPIES count CHARACTERS OF source, FROM CHARACTER start,
+                 * INTO destination. start COUNTS FROM 0; A NEGATIVE start
+                 * COUNTS BACK FROM THE END, SO -1 IS THE LAST CHARACTER.
+                 * IT COUNTS CHARACTERS, NOT BYTES, SO A UTF-8 SEQUENCE
+                 * (AN ACCENTED LETTER) IS NEVER CUT IN HALF. A RANGE
+                 * PAST EITHER END IS SIMPLY CLIPPED. */
+                struct string_type *resolved_substring = NULL;
+                char sub_source[1024];
+                char sub_result[1024];
+                int sub_start, sub_count, sub_chars = 0, sub_index = -1;
+                size_t sub_used = 0;
+                const char *sub_p;
+
+                if (word[4] == NULL) {
+                    /* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
+                    noproprun();
+                    return (exit_function(TRUE));
+                }
+                if ((resolved_substring = string_resolve(word[1])) == NULL) {
+                    unkstrrun(word[1]);
+                    return (exit_function(TRUE));
+                }
+                /* COPY FIRST: THE DESTINATION MAY ALSO BE THE SOURCE */
+                strncpy(sub_source, text_of_word(2), sizeof sub_source - 1);
+                sub_source[sizeof sub_source - 1] = 0;
+                sub_start = value_of(word[3], TRUE);
+                sub_count = value_of(word[4], TRUE);
+
+                /* A CHARACTER STARTS AT EVERY BYTE THAT ISN'T A UTF-8
+                 * CONTINUATION BYTE (10xxxxxx) */
+                for (sub_p = sub_source; *sub_p; sub_p++) {
+                    if ((*sub_p & 0xC0) != 0x80) sub_chars++;
+                }
+                if (sub_start < 0) sub_start += sub_chars;
+                if (sub_start < 0) sub_start = 0;
+                if (sub_count < 0) sub_count = 0;
+
+                for (sub_p = sub_source; *sub_p; sub_p++) {
+                    if ((*sub_p & 0xC0) != 0x80) sub_index++;
+                    if (sub_index >= sub_start + sub_count) break;
+                    if (sub_index >= sub_start && sub_used < sizeof sub_result - 1) {
+                        sub_result[sub_used++] = *sub_p;
+                    }
+                }
+                sub_result[sub_used] = 0;
+
+                strncpy(resolved_substring->value, sub_result, 1023);
+                resolved_substring->value[1023] = 0;
             } else if (!strcmp(word[0], "length")) {
                 if (word[2] == NULL) {
                     /* NOT ENOUGH PARAMETERS SUPPLIED FOR THIS COMMAND */
