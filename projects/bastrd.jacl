@@ -258,6 +258,7 @@ integer invite_comp
 integer invite_expires
 integer invite_days
 integer now_time
+integer invite_count
 parameter invite         invite_data
 parameter invite_name    invite_name_data
 
@@ -2176,23 +2177,59 @@ execute "+confirm_form<fixture<edit_id"
 escapestring escaped current_comp_name
 write "<h3>Organisers of " escaped "</h3>"
 write "<p class=~key~>Organisers can change this competition's teams, players "
-write "and results. To add one, create an invite link and send it to them.</p>"
+write "and results, as well as whoever created it and the site admins.</p>"
+
+# ORGANISERS AND OPEN INVITES ARE ONE LIST: AN INVITE IS AN ORGANISER WHO
+# HASN'T ACCEPTED YET, AND THEIR ROW TURNS INTO AN ORGANISER ROW WHEN THEY DO.
+# THE TABLE STARTS AT THE FIRST ROW, SO AN EMPTY LIST IS JUST A LINE
 set COUNT = 0
-write "<table class=~league~>"
-write "<tr><th class=~home~>Name</th><th>Account ID</th><th>Action</th></tr>"
 iterate organisers
    if field[1] = current_comp
+      if COUNT = 0
+         execute "+organiser_table_head"
+      endif
       escapestring escaped field[3]
       escapestring escaped2 field[2]
-      write "<tr><td class=~home~>" escaped "</td><td>" escaped2 "</td><td>"
+      write "<tr><td class=~home~>" escaped "</td><td class=~home~ title=~Account ID "
+      write escaped2 "~>Organiser</td><td>"
       setstring action "confirm delete organiser " field[0]
       hyperlinkNE "Remove" action
       write "</td></tr>"
       set COUNT + 1
    endif
 enditerate
-write "</table>"
-if COUNT = 0
+set now_time = unixtime
+set invite_count = 0
+iterate invites
+   if field[2] = current_comp
+      if field[3] > now_time
+         if COUNT = 0
+            execute "+organiser_table_head"
+         endif
+         escapestring escaped field[4]
+         set invite_days = field[3]
+         set invite_days - now_time
+         set invite_days + 86399
+         set invite_days / 86400
+         write "<tr><td class=~home~>" escaped "</td><td class=~home~>Invited &middot; "
+         write "<input class=~invitelink~ readonly size=~26~ value=~?invite=" field[1] "~> "
+         write "<button type=~button~ onclick=~navigator.clipboard.writeText(this.previousElementSibling.value); this.textContent = 'Copied';~>Copy</button>"
+         write " <span class=~expires~>link works once, expires in " invite_days " day"
+         if invite_days != 1
+            write "s"
+         endif
+         write "</span></td><td>"
+         setstring action "confirm delete invite " field[0]
+         hyperlinkNE "Cancel" action
+         write "</td></tr>"
+         set COUNT + 1
+         set invite_count + 1
+      endif
+   endif
+enditerate
+if COUNT != 0
+   write "</table>"
+else
    write "<p>No organisers yet: only "
    ifstring current_comp_owner = google_sub
       write "you"
@@ -2205,12 +2242,29 @@ if COUNT = 0
    endif
    write " can change this competition.</p>"
 endif
+if invite_count != 0
+   write "<script>document.querySelectorAll('input.invitelink').forEach(function(i) { "
+   write "if (i.value.charAt(0) == '?') i.value = location.origin + location.pathname + i.value; });</script>"
+endif
 
-execute "+display_invites"
+write "<div class=~addway~>"
+write "<h4>Invite an organiser</h4>"
+write "<p class=~key~>Enter their name and create a link, then send it to them "
+write "by message or email. When they open it and sign in with Google, they "
+write "become an organiser. Each link works once and expires after 7 days.</p>"
+write "<form>"
+execute "+text<Their name<invite_name<30"
+execute "+submit_row<Create invite link"
+write "<input type=~hidden~ name=~command~ value=~create invite~/>"
+hidden
+write "</form>"
 
-write "<h4>Add by account ID</h4>"
-write "<p class=~key~>If they've already signed in here, they can read their "
-write "account ID off this tab and you can add them directly.</p>"
+# THE OLDER WAY, KEPT FOR SOMEONE ALREADY SIGNED IN BUT FOLDED AWAY SINCE AN
+# INVITE LINK COVERS THEM TOO
+write "<details><summary>Add someone who has already signed in, by account ID</summary>"
+write "<p class=~key~>Their account ID is shown at the bottom of their "
+write "Competitions tab. Ask them for it and they're added straight away, with "
+write "no link to send.</p>"
 write "<form>"
 execute "+text<Name<organiser_name<30"
 execute "+text<Account ID<organiser_id<30"
@@ -2218,6 +2272,13 @@ execute "+submit_row<Add organiser"
 write "<input type=~hidden~ name=~command~ value=~add organiser~/>"
 hidden
 write "</form>"
+write "</details>"
+write "</div>"
+}
+
+{+organiser_table_head
+write "<table class=~league~>"
+write "<tr><th class=~home~>Name</th><th class=~home~>Status</th><th>Action</th></tr>"
 }
 
 {+next_organiser_id
@@ -2321,50 +2382,6 @@ execute "+refresh_permissions"
 # PENDING INVITES FOR THE CURRENT COMPETITION, EACH WITH ITS LINK. THE PAGE
 # ONLY KNOWS ITS OWN ADDRESS IN THE BROWSER, SO THE LINKS ARE WRITTEN AS
 # ?invite=... AND A SCRIPT MAKES THEM ABSOLUTE.
-{+display_invites
-write "<h4>Invite an organiser</h4>"
-set now_time = unixtime
-set COUNT = 0
-iterate invites
-   if field[2] = current_comp
-      if field[3] > now_time
-         if COUNT = 0
-            write "<table class=~league~>"
-            write "<tr><th class=~home~>Invited</th><th>Link (works once)</th><th>Expires</th><th>Action</th></tr>"
-         endif
-         escapestring escaped field[4]
-         set invite_days = field[3]
-         set invite_days - now_time
-         set invite_days + 86399
-         set invite_days / 86400
-         write "<tr><td class=~home~>" escaped "</td><td>"
-         write "<input class=~invitelink~ readonly size=~34~ value=~?invite=" field[1] "~> "
-         write "<button type=~button~ onclick=~navigator.clipboard.writeText(this.previousElementSibling.value); this.textContent = 'Copied';~>Copy</button>"
-         write "</td><td>in " invite_days " day"
-         if invite_days != 1
-            write "s"
-         endif
-         write "</td><td>"
-         setstring action "confirm delete invite " field[0]
-         hyperlinkNE "Cancel" action
-         write "</td></tr>"
-         set COUNT + 1
-      endif
-   endif
-enditerate
-if COUNT != 0
-   write "</table>"
-   write "<script>document.querySelectorAll('input.invitelink').forEach(function(i) { "
-   write "if (i.value.charAt(0) == '?') i.value = location.origin + location.pathname + i.value; });</script>"
-endif
-write "<form>"
-execute "+text<Their name<invite_name<30"
-execute "+submit_row<Create invite link"
-write "<input type=~hidden~ name=~command~ value=~create invite~/>"
-hidden
-write "</form>"
-}
-
 grammar create invite     >create_invite
 
 {+create_invite
@@ -2569,6 +2586,12 @@ print:
    table.standings tr:nth-child(even) td { background-color: #eef4ee; }^
    p.notice { background-color: #fff6d0; border: 1px solid #d8c070; padding: 6px 10px; }^
    p.key { font-size: 9pt; color: #555555; }^
+   div.addway { border-top: 1px solid #b8c8b8; margin-top: 20px; padding-top: 2px; max-width: 920px; }^
+   div.addway h4 { margin: 12px 0 2px 0; }^
+   div.addway p.key { margin-top: 2px; }^
+   div.addway details { margin-top: 14px; }^
+   div.addway summary { cursor: pointer; font-size: 10pt; color: #2e5e2e; }^
+   span.expires { font-size: 9pt; color: #555555; white-space: nowrap; }^
    span.authslot { display: inline-block; vertical-align: middle; margin-left: 14px; }^
    a.signout { color: white; font-size: 10pt; }^
    div.confirm { background-color: #fbe9e7; border: 1px solid #c62828; padding: 6px 14px 12px 14px; margin-bottom: 14px; font-family: Verdana, Arial, sans-serif; }^
