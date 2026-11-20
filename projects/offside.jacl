@@ -6,7 +6,8 @@
 # A webapp.library program for running a set of football (soccer)
 # competitions. Everything is stored in per-game CSV files in projects/data:
 #
-#   offside-competitions.csv   id, name, season, owner
+#   offside-competitions.csv   id, name, season, owner, the owner's name as
+#                              shown to players, a contact note ("-" if none)
 #   offside-teams.csv          id, competition id, name
 #   offside-players.csv        id, team id, name, position, shirt number,
 #                              gender ("Female", "Male" or "-"), "Hidden"
@@ -98,6 +99,21 @@ string current_team_name
 # forms.library USES TO REDISPLAY STICKY VALUES AND ERROR MESSAGES
 string comp_name_data
 string comp_name_error
+# WHO RUNS A COMPETITION IS PUBLIC, SO PLAYERS KNOW WHO TO ASK: THE CREATOR'S
+# NAME (ASKED FOR WHEN IT'S CREATED), ITS ORGANISERS' NAMES, AND A CONTACT
+# NOTE THE ORGANISERS WRITE (E.G. "message Flyn in the group chat")
+parameter owner_name     owner_name_data
+parameter comp_contact   comp_contact_data
+string owner_name_data
+string owner_name_error
+string comp_contact_data
+string current_owner_name
+string current_contact
+string row_owner_name
+string row_contact
+string org_line
+integer org_count
+string_array org_names   20
 string season_data
 string season_error
 string team_name_data
@@ -519,6 +535,8 @@ endif
 # A NEW SESSION STARTS ON THE FIRST COMPETITION, IF THERE IS ONE
 set found = false
 setstring current_comp_owner "-"
+setstring current_owner_name "-"
+setstring current_contact "-"
 iterate competitions
    if current_comp = 0
       set current_comp = field[0]
@@ -528,6 +546,12 @@ iterate competitions
       setstring current_comp_name field[1]
       if field_count > 3
          setstring current_comp_owner field[3]
+      endif
+      if field_count > 4
+         setstring current_owner_name field[4]
+      endif
+      if field_count > 5
+         setstring current_contact field[5]
       endif
    endif
 enditerate
@@ -720,6 +744,21 @@ endif
 if WEBAPP_mode = TABLE
    execute "+display_table"
 endif
+# EVERY TAB SAYS WHO RUNS THE COMPETITION, SO PLAYERS KNOW WHO TO ASK (THE
+# COMPETITIONS TAB HAS ITS OWN, FULLER BOX)
+ifall current_comp != 0 : WEBAPP_mode != COMPETITIONS
+   execute "+organised_by"
+   if org_count > 0
+      escapestring escaped current_comp_name
+      escapestring escaped2 org_line
+      write "<p class=~runby~>" escaped " is run by " escaped2 "."
+      ifstring current_contact != "-"
+         escapestring escaped3 current_contact
+         write " " escaped3
+      endif
+      write "</p>"
+   endif
+endif
 write "<p class=~sitefoot~><a href=~/privacy.html#offside~ target=~_blank~>Privacy</a></p>"
 
 # CLEAR THE PARAMETERS SO THEY DON'T LEAK INTO THE NEXT REQUEST VIA THE
@@ -728,6 +767,9 @@ setstring comp_name_data      ""
 setstring comp_name_error     ""
 setstring season_data         ""
 setstring season_error        ""
+setstring owner_name_data     ""
+setstring owner_name_error    ""
+setstring comp_contact_data   ""
 setstring team_name_data      ""
 setstring team_name_error     ""
 setstring player_name_data    ""
@@ -885,6 +927,25 @@ if current_comp != 0
    write "if (i.value.charAt(0) == '?') i.value = location.origin + location.pathname + i.value; });</script>"
 endif
 
+if current_comp != 0
+   execute "+organised_by"
+   write "<div class=~addway~><h4>Who runs " escaped "</h4>"
+   escapestring escaped2 org_line
+   if org_count = 0
+      write "<p>No organisers are listed for this competition yet.</p>"
+   else
+      write "<p>Organised by " escaped2 ".</p>"
+   endif
+   ifstring current_contact != "-"
+      escapestring escaped3 current_contact
+      write "<p>" escaped3 "</p>"
+   endif
+   if can_edit = true
+      execute "+contact_form"
+   endif
+   write "</div>"
+endif
+
 if google_signed_in = false
    write "<p class=~key~>Sign in with Google (the button at the bottom right of the banner) to create and run "
    write "your own competitions.</p>"
@@ -895,6 +956,9 @@ write "<h3>Add a competition</h3>"
 write "<form>"
 execute "+text<Name<comp_name<40"
 execute "+text<Season<season<20"
+execute "+text<Your name<owner_name<30"
+write "<div class=~row~><div class=~label~></div><div class=~input~><div class=~hint~>"
+write "Shown to players as one of its organisers, so they know who to ask.</div></div></div>"
 execute "+submit_row<Add competition"
 write "<input type=~hidden~ name=~command~ value=~add competition~/>"
 hidden
@@ -927,11 +991,15 @@ endif
 ifstring season_data = ""
    setstring season_data "-"
 endif
+ifstring owner_name_data = ""
+   setstring owner_name_error "Please enter your name, as players will know you."
+   set errors + 1
+endif
 if errors != 0
    return
 endif
 execute "+next_comp_id"
-append competitions new_id comp_name_data season_data google_sub
+append competitions new_id comp_name_data season_data google_sub owner_name_data score_none
 escapestring escaped comp_name_data
 write "<p class=~notice~>Competition <b>" escaped "</b> added.</p>"
 
@@ -941,8 +1009,129 @@ setstring current_comp_name comp_name_data
 set current_team = 0
 setstring current_team_name ""
 setstring current_comp_owner google_sub
+setstring current_owner_name owner_name_data
+setstring current_contact "-"
 set can_edit = true
 set can_manage = true
+}
+
+# THE CURRENT COMPETITION'S ORGANISERS' NAMES AS ONE LINE IN org_line ("Stuart,
+# Flyn and Jo"), THE CREATOR FIRST, AND HOW MANY IN org_count
+{+organised_by
+set org_count = 0
+ifstring current_owner_name != "-"
+   setstring org_names[0] current_owner_name
+   set org_count = 1
+endif
+iterate organisers
+   ifall field[1] = current_comp : org_count < 20
+      setstring org_names[org_count] field[3]
+      set org_count + 1
+   endif
+enditerate
+setstring org_line ""
+set INDEX = 0
+while INDEX < org_count
+   if INDEX > 0
+      set COUNT = org_count
+      set COUNT - 1
+      if INDEX = COUNT
+         setstring org_line org_line " and "
+      else
+         setstring org_line org_line ", "
+      endif
+   endif
+   setstring org_line org_line org_names[INDEX]
+   set INDEX + 1
+endwhile
+}
+
+# ORGANISERS EDIT THE CONTACT NOTE; THE CREATOR AND ADMINS ALSO THE NAME
+# THE CREATOR IS SHOWN UNDER
+{+contact_form
+write "<form class=~contactform~>"
+if can_manage = true
+   ifstring current_comp_owner != "-"
+      setstring row_owner_name current_owner_name
+      ifstring row_owner_name = "-"
+         setstring row_owner_name ""
+      endif
+      escapestring escaped row_owner_name
+      write "<div class=~row~><div class=~label~>Creator's name:</div><div class=~input~>"
+      write "<input type=~text~ name=~owner_name~ value=~" escaped "~ class=~jaclform~ size=~30~ maxlength=~60~></div></div>"
+   endif
+endif
+setstring row_contact current_contact
+ifstring row_contact = "-"
+   setstring row_contact ""
+endif
+escapestring escaped row_contact
+write "<div class=~row~><div class=~label~>Contact note:</div><div class=~input~>"
+write "<input type=~text~ name=~comp_contact~ value=~" escaped "~ class=~jaclform~ size=~50~ maxlength=~200~>"
+write "<div class=~hint~>Shown to everyone. Say how players can reach you, e.g. "
+write "&ldquo;Message Flyn in the team group chat.&rdquo; Don't put phone numbers or emails here.</div></div></div>"
+execute "+submit_row<Save"
+write "<input type=~hidden~ name=~command~ value=~save contact~/>"
+hidden
+write "</form>"
+}
+
+grammar save contact     >save_contact
+
+{+save_contact
+if current_comp = 0
+   execute "+no_competition"
+   return
+endif
+if can_edit = false
+   execute "+deny"
+   return
+endif
+setstring row_contact comp_contact_data
+ifstring row_contact = ""
+   setstring row_contact "-"
+endif
+setstring row_owner_name current_owner_name
+if can_manage = true
+   ifstring current_comp_owner != "-"
+      ifstring owner_name_data != ""
+         setstring row_owner_name owner_name_data
+      endif
+   endif
+endif
+set edit_id = current_comp
+execute "+rewrite_comp_people<edit_id"
+setstring current_contact row_contact
+setstring current_owner_name row_owner_name
+write "<p class=~notice~>Saved what players see about who runs this competition.</p>"
+set target_comp = current_comp
+setstring log_what "updated who runs the competition and how to contact them"
+set dr_t = 0
+execute "+log_change<dr_t"
+}
+
+# REWRITES COMPETITION arg[0]'S OWNER NAME AND CONTACT FROM row_owner_name
+# AND row_contact
+{+rewrite_comp_people
+update competitions
+   setstring row_owner "-"
+   if field_count > 3
+      setstring row_owner field[3]
+   endif
+   if field[0] = arg[0]
+      insert field[0] field[1] field[2] row_owner row_owner_name row_contact
+   else
+      setstring wh_first "-"
+      if field_count > 4
+         setstring wh_first field[4]
+      endif
+      setstring wh_last "-"
+      if field_count > 5
+         setstring wh_last field[5]
+      endif
+      insert field[0] field[1] field[2] row_owner wh_first wh_last
+   endif
+endupdate
 }
 
 grammar select competition $integer     >select_competition
@@ -1010,7 +1199,15 @@ update competitions
       if field_count > 3
          setstring row_owner field[3]
       endif
-      insert field[0] field[1] field[2] row_owner
+      setstring row_owner_name "-"
+      if field_count > 4
+         setstring row_owner_name field[4]
+      endif
+      setstring row_contact "-"
+      if field_count > 5
+         setstring row_contact field[5]
+      endif
+      insert field[0] field[1] field[2] row_owner row_owner_name row_contact
    endif
 endupdate
 }
@@ -4625,6 +4822,9 @@ print:
    ul.history span.when { color: #777777; white-space: nowrap; }^
    p.historyhead { margin: 12px 0 0 0; font-size: 10pt; font-weight: bold; }^
    span.withheld { color: #777777; font-style: italic; font-size: 9pt; }^
+   p.runby { margin: 28px 0 0 0; font-size: 9pt; color: #555555; text-align: center; }^
+   form.contactform { margin-top: 8px; }^
+   p.runby + p.sitefoot { margin-top: 6px; }^
    p.sitefoot { margin: 28px 0 6px 0; font-size: 8.5pt; text-align: center; }^
    p.sitefoot a { color: #777777; }^
    p.notplayed { margin-top: 12px; font-size: 10pt; line-height: 1.6; }^
