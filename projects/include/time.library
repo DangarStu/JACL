@@ -73,7 +73,10 @@ string TIME_buffer
 
 {+macro_integer_date
 execute "+process_epoch<arg[0]"
-setstring return_value TIME_date "/" TIME_month "/" TIME_year
+# TIME_month IS A ZERO-BASED INDEX INTO THE MONTH NAMES; A NUMERIC DATE
+# NEEDS IT ONE-BASED (NOVEMBER IS 11, NOT 10)
+set TIME_temp = TIME_month + 1
+setstring return_value TIME_date "/" TIME_temp "/" TIME_year
 }
 
 {+macro_full_date
