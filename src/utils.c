@@ -4,7 +4,7 @@
  */
 
 #ifdef _WIN32
-/* MUST PRECEDE <stdlib.h> FOR rand_s(), USED BY secure_random_number() */
+/* MUST PRECEDE <stdlib.h> FOR rand_s(), USED BY random_number() */
 #define _CRT_RAND_S
 #endif
 
@@ -93,45 +93,62 @@ strip_return (char *string)
 	return string;
 }
 
+#if defined(__APPLE__) || defined(__ANDROID__) || defined(__FreeBSD__) || \
+    defined(__OpenBSD__) || defined(__NetBSD__) || \
+    (defined(__GLIBC__) && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 36)))
+#define JACL_HAVE_ARC4RANDOM
+#elif !defined(_WIN32) && !defined(__NDS__)
+#include <fcntl.h>
+#include <unistd.h>
+
+/* A UNIFORM 32-BIT DRAW FROM /dev/urandom, KEPT OPEN ACROSS CALLS.
+ * RETURNS 0 IF IT ISN'T AVAILABLE. */
+static int
+urandom_u32(unsigned int *r)
+{
+	static int	fd = -1;
+
+	if (fd < 0) fd = open("/dev/urandom", O_RDONLY);
+	if (fd < 0) return (0);
+	return (read(fd, r, sizeof(*r)) == (ssize_t) sizeof(*r));
+}
+#endif
+
 int
 random_number()
 {
-	/* GENERATE A RANDOM NUMBER BETWEEN 0 AND THE CURRENT VALUE OF
-	 * THE JACL VARIABLE MAX_RAND */
+	/* GENERATE A RANDOM NUMBER BETWEEN 1 AND THE CURRENT VALUE OF THE
+	 * JACL VARIABLE max_rand. IT COMES FROM THE OPERATING SYSTEM'S
+	 * CRYPTOGRAPHIC SOURCE SO PLAYERS CAN'T PREDICT IT: GAMES USE IT FOR
+	 * ONE-TIME TOKENS AND INVITE CODES AS WELL AS DICE AND CARDS, AND
+	 * rand() IS CLOCK-SEEDED AND GIVES ITS STATE AWAY IN ITS OUTPUT. ONLY
+	 * FALLS BACK TO rand() WHERE THERE'S NO SUCH SOURCE (THE NDS). */
 
-	rand();
-	return (1 + (int) ((float) MAX_RAND->value * rand() / (RAND_MAX + 1.0)));
-}
-
-int
-secure_random_number()
-{
-	/* LIKE random_number() BUT DRAWN FROM THE OPERATING SYSTEM'S
-	 * CRYPTOGRAPHIC SOURCE, FOR VALUES A PLAYER MUST NOT BE ABLE TO
-	 * PREDICT (ONE-TIME TOKENS, INVITE CODES). rand() IS SEEDED FROM THE
-	 * CLOCK AND ITS OUTPUTS GIVE AWAY ITS STATE. FALLS BACK TO
-	 * random_number() WHERE NO SUCH SOURCE IS AVAILABLE. */
-
-	unsigned int	r;
 	int				max = MAX_RAND->value;
 
-	if (max < 1) return (random_number());
-#if defined(_WIN32)
-	if (rand_s(&r) != 0) return (random_number());
-#elif defined(__NDS__)
-	return (random_number());
-#else
-	{
-		FILE *urandom = fopen("/dev/urandom", "rb");
-		size_t got;
+	if (max <= 1) return (1);
 
-		if (urandom == NULL) return (random_number());
-		got = fread(&r, sizeof(r), 1, urandom);
-		fclose(urandom);
-		if (got != 1) return (random_number());
+#if defined(JACL_HAVE_ARC4RANDOM)
+	return (1 + (int) arc4random_uniform((unsigned int) max));
+#elif !defined(__NDS__)
+	{
+		/* REJECT DRAWS FROM THE INCOMPLETE TOP BAND SO EVERY VALUE IS
+		 * EQUALLY LIKELY (PLAIN MODULO WOULD FAVOUR THE LOW ONES) */
+		unsigned int	r;
+		unsigned int	limit = UINT_MAX - (UINT_MAX % (unsigned int) max);
+
+		for (;;) {
+#ifdef _WIN32
+			if (rand_s(&r) != 0) break;
+#else
+			if (!urandom_u32(&r)) break;
+#endif
+			if (r < limit) return (1 + (int) (r % (unsigned int) max));
+		}
 	}
 #endif
-	return (1 + (int) (r % (unsigned int) max));
+	rand();
+	return (1 + (int) ((float) max * rand() / (RAND_MAX + 1.0)));
 }
 
 void

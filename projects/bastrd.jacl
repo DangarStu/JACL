@@ -23,7 +23,7 @@
 # competition and choosing its organisers is for the owner and admins only.
 # The owner usually adds an organiser with an invite link: whoever opens it
 # and signs in becomes an organiser. Each link works once, for a week, and
-# its code comes from secure_random so it can't be guessed.
+# its code comes from random, which is drawn from the OS, so it can't be guessed.
 #
 # DELETES: a Delete link only shows a confirmation; the Confirm button does
 # the delete and must carry the one-time token that confirmation issued.
@@ -1701,16 +1701,16 @@ ifstring invite_name_data = ""
    return
 endif
 execute "+purge_expired_invites"
-# THREE DRAWS OF 900000 FROM THE OS'S SECURE SOURCE: ABOUT 59 BITS, FAR
-# TOO MANY TO GUESS. EACH PART IS SIX DIGITS SO EVERY CODE LOOKS THE SAME.
+# THREE DRAWS OF 900000 (random COMES FROM THE OS'S SECURE SOURCE): ABOUT
+# 59 BITS, FAR TOO MANY TO GUESS. EACH PART IS SIX DIGITS SO EVERY CODE LOOKS THE SAME.
 set max_rand = 900000
-set invite_id = secure_random
+set invite_id = random
 set invite_id + 99999
 setstring invite_code invite_id
-set invite_id = secure_random
+set invite_id = random
 set invite_id + 99999
 setstring invite_code invite_code "-" invite_id
-set invite_id = secure_random
+set invite_id = random
 set invite_id + 99999
 setstring invite_code invite_code "-" invite_id
 set new_id = 0

@@ -262,8 +262,6 @@ value_of(const char *value, int run_time)
 		return (FALSE);
 	} else if (!strcmp(value, "random")) {
 		return random_number();
-	} else if (!strcmp(value, "secure_random")) {
-		return secure_random_number();
 #ifdef GLK
 	} else if (!strcmp(value, "status_height")) {
 		glk_window_get_size(statuswin, &status_width, &status_height);
