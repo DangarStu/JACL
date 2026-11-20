@@ -1231,6 +1231,9 @@ if can_edit = true
    setstring action "score fixture " g_id[game_pos]
    if g_hg[game_pos] = -1
       hyperlinkNE "Enter result" action
+      write " &middot; "
+      setstring action "reschedule fixture " g_id[game_pos]
+      hyperlinkNE "Change time" action
    else
       hyperlinkNE "Edit score" action
    endif
@@ -1516,48 +1519,9 @@ endif
 if fixture_time != 0
    set chosen_time = fixture_time
 endif
-# A PART THAT WASN'T SENT, OR WASN'T A NUMBER, IS 0
-if fixture_day = 0 : fixture_month = 0 : fixture_year = 0
-   setstring fixture_error "Please choose the fixture's date."
-   set errors + 1
+execute "+validate_when"
+if errors != 0
    return
-endif
-# THE PARAMETER RANGES STOP IMPOSSIBLE NUMBERS; THIS CATCHES 31 APRIL AND
-# 29 FEBRUARY IN A NON-LEAP YEAR
-set days_in_month = 31
-if fixture_month = 4
-   set days_in_month = 30
-endif
-if fixture_month = 6
-   set days_in_month = 30
-endif
-if fixture_month = 9
-   set days_in_month = 30
-endif
-if fixture_month = 11
-   set days_in_month = 30
-endif
-if fixture_month = 2
-   set days_in_month = 28
-   execute "+is_leap_year?<fixture_year"
-   if TIME_leapyear = true
-      set days_in_month = 29
-   endif
-endif
-if fixture_day > days_in_month
-   setstring fixture_error "That date doesn't exist; check the day and month."
-   set errors + 1
-   return
-endif
-# ONLY THE DROP-DOWN'S VALUES (OR TBC); A HAND-MADE VALUE LIKE 1890 ISN'T A TIME
-set tl_m = fixture_time
-set tl_m % 100
-if fixture_time != TIME_TBC
-   if fixture_time = 0 : tl_m > 59 : fixture_time < 600
-      setstring fixture_error "Please choose the kick-off time, or TBC."
-      set errors + 1
-      return
-   endif
 endif
 
 if home_team = away_team
@@ -1620,6 +1584,54 @@ write ", " date_label ".</p>"
 # THE DATE STAYS FOR THE NEXT FIXTURE OF THE ROUND; THE TEAMS DON'T
 set home_team = 0
 set away_team = 0
+}
+
+# CHECKS THE SUBMITTED fixture_day/month/year/time, SETTING fixture_error
+# AND errors IF THEY DON'T MAKE A REAL DATE AND KICK-OFF
+{+validate_when
+# A PART THAT WASN'T SENT, OR WASN'T A NUMBER, IS 0
+if fixture_day = 0 : fixture_month = 0 : fixture_year = 0
+   setstring fixture_error "Please choose the fixture's date."
+   set errors + 1
+   return
+endif
+# THE PARAMETER RANGES STOP IMPOSSIBLE NUMBERS; THIS CATCHES 31 APRIL AND
+# 29 FEBRUARY IN A NON-LEAP YEAR
+set days_in_month = 31
+if fixture_month = 4
+   set days_in_month = 30
+endif
+if fixture_month = 6
+   set days_in_month = 30
+endif
+if fixture_month = 9
+   set days_in_month = 30
+endif
+if fixture_month = 11
+   set days_in_month = 30
+endif
+if fixture_month = 2
+   set days_in_month = 28
+   execute "+is_leap_year?<fixture_year"
+   if TIME_leapyear = true
+      set days_in_month = 29
+   endif
+endif
+if fixture_day > days_in_month
+   setstring fixture_error "That date doesn't exist; check the day and month."
+   set errors + 1
+   return
+endif
+# ONLY THE DROP-DOWN'S VALUES (OR TBC); A HAND-MADE VALUE LIKE 1890 ISN'T A TIME
+set tl_m = fixture_time
+set tl_m % 100
+if fixture_time != TIME_TBC
+   if fixture_time = 0 : tl_m > 59 : fixture_time < 600
+      setstring fixture_error "Please choose the kick-off time, or TBC."
+      set errors + 1
+      return
+   endif
+endif
 }
 
 # SETS target_comp, game_key, game_home, game_away, game_hg, game_ag AND
@@ -1727,6 +1739,103 @@ if game_hg != -1
    write "</form>"
 endif
 write "</div>"
+}
+
+# SHOWS THE FORM FOR MOVING A FIXTURE TO ANOTHER KICK-OFF OR DATE. LIKE
+# 'score fixture' IT ONLY SHOWS A FORM; 'save schedule' MAKES THE CHANGE.
+grammar reschedule fixture $integer     >reschedule_fixture
+
+{+reschedule_fixture
+set edit_id = $integer
+execute "+find_fixture<edit_id"
+if target_comp = 0
+   return
+endif
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+execute "+schedule_form<edit_id"
+}
+
+# WRITES THE RESCHEDULE FORM FOR FIXTURE arg[0], PRESELECTING THE DATE AND
+# KICK-OFF +find_fixture LAST FOUND
+{+schedule_form
+execute "+load_teams<target_comp"
+write "<div class=~scoreform~><p><b>Change the kick-off</b> &middot; "
+execute "+write_match"
+write "</p><form>"
+set dl_y = game_key
+set dl_y / 10000
+set dl_m = game_key
+set dl_m / 100
+set dl_m % 100
+set dl_d = game_key
+set dl_d % 100
+execute "+number_select<fx_day<1<31<dl_d"
+execute "+month_select<dl_m"
+set year_from = dl_y
+set year_from - 1
+set year_to = dl_y
+set year_to + 2
+execute "+number_select<fx_year<year_from<year_to<dl_y"
+write " &nbsp; "
+execute "+time_select<game_time"
+write " &nbsp; <input type=~hidden~ name=~command~ value=~save schedule " arg[0] "~/>"
+hidden
+write "<input type=~submit~ value=~Save~> &nbsp; "
+hyperlinkNE "Cancel" "blankjacl"
+write "</form></div>"
+}
+
+grammar save schedule $integer     >save_schedule
+
+{+save_schedule
+set edit_id = $integer
+execute "+find_fixture<edit_id"
+if target_comp = 0
+   return
+endif
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+execute "+validate_when"
+if errors != 0
+   escapestring escaped fixture_error
+   write "<p class=~notice~>" escaped "</p>"
+   setstring fixture_error ""
+   execute "+schedule_form<edit_id"
+   return
+endif
+set game_key = fixture_year
+set game_key * 100
+set game_key + fixture_month
+set game_key * 100
+set game_key + fixture_day
+execute "+set_when<edit_id<game_key<fixture_time"
+execute "+find_fixture<edit_id"
+execute "+load_teams<target_comp"
+write "<p class=~notice~>Moved: "
+execute "+write_match"
+write ", now " date_label ".</p>"
+}
+
+# REWRITES FIXTURE arg[0] WITH DATE arg[1] (yyyymmdd) AND KICK-OFF arg[2]
+{+set_when
+update fixtures
+   setstring row_time "2400"
+   if field_count > 7
+      setstring row_time field[7]
+   endif
+   if field[0] = arg[0]
+      insert field[0] field[1] arg[1] field[3] field[4] field[5] field[6] arg[2]
+   else
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6] row_time
+   endif
+endupdate
 }
 
 grammar save score $integer     >save_score
@@ -2487,11 +2596,11 @@ print:
    p.formerror { color: #a02020; font-family: Verdana, Arial, sans-serif; }^
    select.goals { width: 4em; }^
    table.league td.date { text-align: left; white-space: nowrap; }^
-   table.games { table-layout: fixed; width: 100%; max-width: 840px; }^
+   table.games { table-layout: fixed; width: 100%; max-width: 920px; }^
    table.games th:nth-child(1) { width: 9.5em; }^
    table.games th:nth-child(2) { width: 4.5em; }^
    table.games th:nth-child(4) { width: 4em; }^
-   table.games th:nth-child(6) { width: 11em; }^
+   table.games th:nth-child(6) { width: 17em; }^
    table.games td { overflow: hidden; text-overflow: ellipsis; }^
    select.datepart { width: auto; margin-right: 4px; }^
    div.scoreform { background-color: #e6f2e6; border: 1px solid #2e5e2e; padding: 6px 14px 12px 14px; margin-bottom: 14px; font-family: Verdana, Arial, sans-serif; }^
