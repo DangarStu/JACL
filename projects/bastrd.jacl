@@ -11,11 +11,19 @@
 #   bastrd-players.csv        id, team id, name, position, shirt number
 #   bastrd-results.csv        id, competition id, date, home id, home goals,
 #                             away goals, away id
+#   bastrd-organisers.csv     id, competition id, Google account id, name
 #   bastrd-admins.csv         Google account id, name (maintained by hand)
 #
 # PERMISSIONS: anyone can view everything. Signing in with Google lets you
-# create competitions; a competition can only be changed by the account that
-# created it (its owner) or by a site admin listed in bastrd-admins.csv.
+# create competitions. A competition's teams, players and results can be
+# changed by the account that created it (its owner), by the organisers the
+# owner adds, and by site admins listed in bastrd-admins.csv. Deleting a
+# competition and choosing its organisers is for the owner and admins only.
+#
+# DELETES: a Delete link only shows a confirmation; the Confirm button does
+# the delete and must carry the one-time token that confirmation issued.
+# Link prefetchers and crawlers follow links but don't submit forms, and a
+# delete URL left in the history or shared can't be replayed.
 # Every handler that changes data checks this itself -- hiding the forms and
 # links is only presentation, since anyone can type ?command=delete+team+3.
 #
@@ -138,10 +146,28 @@ string escaped2
 # VERIFIED SESSION COOKIE, SO THEY CAN'T BE FORGED WITH A user_id PARAMETER.
 integer is_admin
 integer can_edit
+integer can_manage
 integer allowed
 integer target_comp
 string current_comp_owner
 string row_owner
+
+# ONE-TIME DELETE CONFIRMATION. delete_pending NAMES WHAT THE TOKEN IS FOR,
+# E.G. "team 3", SO A TOKEN CAN'T BE USED ON A DIFFERENT RECORD.
+integer delete_token     0
+integer token_param      0
+integer delete_id
+string delete_pending
+string delete_check
+parameter token          token_param   0 999999
+
+# ADDING AN ORGANISER
+string organiser_id_data
+string organiser_id_error
+string organiser_name_data
+string organiser_name_error
+parameter organiser_id   organiser_id_data
+parameter organiser_name organiser_name_data
 
 # -----------------------------------------------------------------------------
 # PAGE FRAMEWORK
@@ -213,19 +239,23 @@ if found = false
    setstring current_team_name ""
 endif
 
+set can_manage = false
 set can_edit = false
 if current_comp != 0
-   set can_edit = is_admin
+   set can_manage = is_admin
    if google_signed_in = true
       ifstring current_comp_owner = google_sub
-         set can_edit = true
+         set can_manage = true
       endif
    endif
+   execute "+comp_editable<current_comp"
+   set can_edit = allowed
 endif
 }
 
-# SETS allowed TO WHETHER THE VISITOR MAY CHANGE COMPETITION arg[0]
-{+comp_editable
+# SETS allowed TO WHETHER THE VISITOR IS COMPETITION arg[0]'S OWNER OR AN
+# ADMIN: THE PEOPLE WHO CAN DELETE IT AND CHOOSE ITS ORGANISERS
+{+comp_manageable
 set allowed = is_admin
 if google_signed_in = true
    iterate competitions
@@ -240,9 +270,63 @@ if google_signed_in = true
 endif
 }
 
+# SETS allowed TO WHETHER THE VISITOR MAY CHANGE COMPETITION arg[0]'S TEAMS,
+# PLAYERS AND RESULTS: ITS OWNER, AN ADMIN, OR ONE OF ITS ORGANISERS
+{+comp_editable
+execute "+comp_manageable<arg[0]"
+if allowed = false
+   if google_signed_in = true
+      iterate organisers
+         if field[1] = arg[0]
+            ifstring field[2] = google_sub
+               set allowed = true
+            endif
+         endif
+      enditerate
+   endif
+endif
+}
+
 {+deny
-write "<p class=~notice~>Only the person who created this competition can "
-write "change it.</p>"
+write "<p class=~notice~>Only this competition's organisers can change it.</p>"
+}
+
+{+deny_manage
+write "<p class=~notice~>Only the person who created this competition can do that.</p>"
+}
+
+# WRITES THE CONFIRM/CANCEL HALF OF A DELETE CONFIRMATION AND ISSUES THE
+# ONE-TIME TOKEN. THE CALLER HAS ALREADY WRITTEN THE QUESTION.
+# arg[0] = kind ("team" etc.), arg[1] = id
+{+confirm_form
+set max_rand = 999999
+set delete_token = random
+setstring delete_pending string_arg[0] " " arg[1]
+write "<form>"
+write "<input type=~hidden~ name=~command~ value=~delete " string_arg[0] " " arg[1] "~/>"
+write "<input type=~hidden~ name=~token~ value=~" delete_token "~/>"
+hidden
+write "<input type=~submit~ class=~danger~ value=~Delete~> &nbsp; "
+hyperlinkNE "Cancel" "blankjacl"
+write "</form></div>"
+}
+
+# SETS allowed TO WHETHER THIS DELETE CARRIES THE TOKEN ISSUED FOR IT. THE
+# TOKEN IS SPENT EITHER WAY. arg[0] = kind, arg[1] = id
+{+token_ok
+set allowed = false
+setstring delete_check string_arg[0] " " arg[1]
+ifall token_param != 0 : token_param = delete_token
+   ifstring delete_check = delete_pending
+      set allowed = true
+   endif
+endif
+set delete_token = 0
+setstring delete_pending ""
+if allowed = false
+   write "<p class=~notice~>Nothing was deleted: that confirmation has expired. "
+   write "Use the Delete link again.</p>"
+endif
 }
 
 {+view_only_note
@@ -251,7 +335,8 @@ if can_edit = false
    if google_signed_in = false
       write "Sign in with Google (top right) to create and run your own competitions."
    else
-      write "Only the person who created this competition can change it."
+      write "Only this competition's organisers can change it. To become one, "
+      write "give its creator your account ID from the <b>Competitions</b> tab."
    endif
    write "</p>"
 endif
@@ -310,6 +395,11 @@ setstring shirt_error         ""
 setstring date_data           ""
 setstring date_error          ""
 setstring result_error        ""
+setstring organiser_id_data   ""
+setstring organiser_id_error  ""
+setstring organiser_name_data ""
+setstring organiser_name_error ""
+set token_param = 0
 set home_team = 0
 set away_team = 0
 set home_goals = 0
@@ -413,7 +503,7 @@ iterate competitions
    endif
    if allowed = true
       write " &middot; "
-      setstring action "delete competition " field[0]
+      setstring action "confirm delete competition " field[0]
       hyperlinkNE "Delete" action
    endif
    write "</td></tr>"
@@ -439,8 +529,12 @@ write "<input type=~hidden~ name=~command~ value=~add competition~/>"
 hidden
 write "</form>"
 
-# AN ADMIN IS ADDED BY PUTTING THEIR ACCOUNT ID IN bastrd-admins.csv, SO
-# SHOW SIGNED-IN USERS THEIRS
+if can_manage = true
+   execute "+display_organisers"
+endif
+
+# AN ADMIN OR ORGANISER IS ADDED BY THEIR ACCOUNT ID, SO SHOW SIGNED-IN
+# USERS THEIRS
 if is_admin = true
    write "<p class=~key~>You're a site admin and can change any competition.</p>"
 else
@@ -475,7 +569,9 @@ set current_comp = new_id
 setstring current_comp_name comp_name_data
 set current_team = 0
 setstring current_team_name ""
+setstring current_comp_owner google_sub
 set can_edit = true
+set can_manage = true
 }
 
 grammar select competition $integer     >select_competition
@@ -506,11 +602,16 @@ grammar delete competition $integer     >delete_competition
 # CALLING FUNCTION IF ITS FILE DOESN'T EXIST YET.
 {+delete_competition
 set new_id = $integer
-execute "+comp_editable<new_id"
+execute "+token_ok<competition<new_id"
 if allowed = false
-   execute "+deny"
    return
 endif
+execute "+comp_manageable<new_id"
+if allowed = false
+   execute "+deny_manage"
+   return
+endif
+execute "+purge_organisers<new_id"
 execute "+load_teams<new_id"
 execute "+purge_players"
 execute "+purge_teams<new_id"
@@ -638,7 +739,7 @@ else
       hyperlinkNE "Squad" action
       if can_edit = true
          write " &middot; "
-         setstring action "delete team " t_id[INDEX]
+         setstring action "confirm delete team " t_id[INDEX]
          hyperlinkNE "Delete" action
       endif
       write "</td></tr>"
@@ -723,6 +824,11 @@ grammar delete team $integer     >delete_team
 # A TEAM WITH RESULTS CAN'T BE DELETED: THE RESULTS WOULD BE LEFT POINTING AT
 # A TEAM THAT NO LONGER EXISTS AND THE OPPONENTS' TABLE ENTRIES WOULD CHANGE
 {+delete_team
+set delete_id = $integer
+execute "+token_ok<team<delete_id"
+if allowed = false
+   return
+endif
 set target_comp = 0
 iterate teams
    if field[0] = $integer
@@ -787,7 +893,7 @@ iterate players
       escapestring escaped2 field[4]
       write "<tr><td>" escaped2 "</td><td>" escaped "</td><td>" field[3] "</td><td>"
       if can_edit = true
-         setstring action "delete player " field[0]
+         setstring action "confirm delete player " field[0]
          hyperlinkNE "Delete" action
       endif
       write "</td></tr>"
@@ -847,6 +953,11 @@ write "<p class=~notice~>" escaped " added to the squad.</p>"
 grammar delete player $integer     >delete_player
 
 {+delete_player
+set delete_id = $integer
+execute "+token_ok<player<delete_id"
+if allowed = false
+   return
+endif
 # PLAYER -> TEAM -> COMPETITION, ONE FILE AT A TIME
 set new_id = 0
 iterate players
@@ -929,7 +1040,7 @@ iterate results
       endif
       write "</td><td>"
       if can_edit = true
-         setstring action "delete result " field[0]
+         setstring action "confirm delete result " field[0]
          hyperlinkNE "Delete" action
       endif
       write "</td></tr>"
@@ -1047,6 +1158,11 @@ write "<p class=~notice~>Result entered.</p>"
 grammar delete result $integer     >delete_result
 
 {+delete_result
+set delete_id = $integer
+execute "+token_ok<result<delete_id"
+if allowed = false
+   return
+endif
 set target_comp = 0
 iterate results
    if field[0] = $integer
@@ -1196,6 +1312,293 @@ endwhile
 }
 
 # -----------------------------------------------------------------------------
+# DELETE CONFIRMATIONS. EACH CHECKS PERMISSION SO IT DOESN'T OFFER A DELETE
+# THAT WOULD BE REFUSED, NAMES WHAT WILL GO, AND HANDS OVER TO +confirm_form.
+# THE DELETE HANDLERS CHECK EVERYTHING AGAIN.
+# -----------------------------------------------------------------------------
+
+grammar confirm delete competition $integer     >confirm_delete_competition
+
+{+confirm_delete_competition
+set delete_id = $integer
+execute "+comp_manageable<delete_id"
+if allowed = false
+   execute "+deny_manage"
+   return
+endif
+set found = false
+iterate competitions
+   if field[0] = delete_id
+      set found = true
+      escapestring escaped field[1]
+   endif
+enditerate
+if found = false
+   return
+endif
+write "<div class=~confirm~><p>Delete the competition <b>" escaped "</b>? "
+write "This also deletes all its teams, their players, its results and its "
+write "organisers, and can't be undone.</p>"
+execute "+confirm_form<competition<delete_id"
+}
+
+grammar confirm delete team $integer     >confirm_delete_team
+
+{+confirm_delete_team
+set delete_id = $integer
+set target_comp = 0
+iterate teams
+   if field[0] = delete_id
+      set target_comp = field[1]
+      escapestring escaped field[2]
+   endif
+enditerate
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+set COUNT = 0
+iterate results
+   if field[3] = delete_id
+      set COUNT + 1
+   endif
+   if field[6] = delete_id
+      set COUNT + 1
+   endif
+enditerate
+if COUNT > 0
+   write "<p class=~notice~>That team has " COUNT " result(s) recorded. "
+   write "Delete them from the <b>Results</b> tab first.</p>"
+   return
+endif
+write "<div class=~confirm~><p>Delete the team <b>" escaped "</b> and its squad?</p>"
+execute "+confirm_form<team<delete_id"
+}
+
+grammar confirm delete player $integer     >confirm_delete_player
+
+{+confirm_delete_player
+set delete_id = $integer
+set new_id = 0
+iterate players
+   if field[0] = delete_id
+      set new_id = field[1]
+      escapestring escaped field[2]
+   endif
+enditerate
+set target_comp = 0
+iterate teams
+   if field[0] = new_id
+      set target_comp = field[1]
+   endif
+enditerate
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+write "<div class=~confirm~><p>Remove <b>" escaped "</b> from the squad?</p>"
+execute "+confirm_form<player<delete_id"
+}
+
+grammar confirm delete result $integer     >confirm_delete_result
+
+{+confirm_delete_result
+set delete_id = $integer
+set target_comp = 0
+iterate results
+   if field[0] = delete_id
+      set target_comp = field[1]
+      set home_team = field[3]
+      set home_goals = field[4]
+      set away_goals = field[5]
+      set away_team = field[6]
+      escapestring escaped2 field[2]
+   endif
+enditerate
+execute "+comp_editable<target_comp"
+if allowed = false
+   execute "+deny"
+   return
+endif
+execute "+load_teams<target_comp"
+set home_index = -1
+set away_index = -1
+set INDEX = 0
+while INDEX < team_count
+   if t_id[INDEX] = home_team
+      set home_index = INDEX
+   endif
+   if t_id[INDEX] = away_team
+      set away_index = INDEX
+   endif
+   set INDEX + 1
+endwhile
+write "<div class=~confirm~><p>Delete the result <b>"
+if home_index != -1
+   escapestring escaped t_name[home_index]
+   write escaped " "
+endif
+write home_goals " - " away_goals
+if away_index != -1
+   escapestring escaped t_name[away_index]
+   write " " escaped
+endif
+write "</b> (" escaped2 ")?</p>"
+# THE FORM'S PRESELECTED TEAMS AND SCORES CAME FROM THESE; DON'T LEAVE THEM SET
+set home_team = 0
+set away_team = 0
+set home_goals = 0
+set away_goals = 0
+execute "+confirm_form<result<delete_id"
+}
+
+# -----------------------------------------------------------------------------
+# ORGANISERS: PEOPLE THE OWNER LETS CHANGE A COMPETITION'S TEAMS, PLAYERS
+# AND RESULTS. ONLY THE OWNER AND ADMINS SEE OR CHANGE THE LIST.
+# -----------------------------------------------------------------------------
+
+{+display_organisers
+escapestring escaped current_comp_name
+write "<h3>Organisers of " escaped "</h3>"
+write "<p class=~key~>Organisers can change this competition's teams, players "
+write "and results. Each person can find their account ID on this tab once "
+write "they've signed in.</p>"
+set COUNT = 0
+write "<table class=~league~>"
+write "<tr><th class=~home~>Name</th><th>Account ID</th><th>Action</th></tr>"
+iterate organisers
+   if field[1] = current_comp
+      escapestring escaped field[3]
+      escapestring escaped2 field[2]
+      write "<tr><td class=~home~>" escaped "</td><td>" escaped2 "</td><td>"
+      setstring action "confirm delete organiser " field[0]
+      hyperlinkNE "Remove" action
+      write "</td></tr>"
+      set COUNT + 1
+   endif
+enditerate
+write "</table>"
+if COUNT = 0
+   write "<p>No organisers yet: only you can change this competition.</p>"
+endif
+write "<form>"
+execute "+text<Name<organiser_name<30"
+execute "+text<Account ID<organiser_id<30"
+execute "+submit_row<Add organiser"
+write "<input type=~hidden~ name=~command~ value=~add organiser~/>"
+hidden
+write "</form>"
+}
+
+{+next_organiser_id
+set new_id = 0
+iterate organisers
+   if field[0] > new_id
+      set new_id = field[0]
+   endif
+enditerate
+set new_id + 1
+}
+
+grammar add organiser     >add_organiser
+
+{+add_organiser
+if can_manage = false
+   execute "+deny_manage"
+   return
+endif
+ifstring organiser_name_data = ""
+   setstring organiser_name_error "Please enter their name."
+   set errors + 1
+endif
+ifstring organiser_id_data = ""
+   setstring organiser_id_error "Please enter their account ID."
+   set errors + 1
+endif
+if errors != 0
+   return
+endif
+ifstring organiser_id_data = current_comp_owner
+   setstring organiser_id_error "That's the competition's creator, who can already change it."
+   set errors + 1
+   return
+endif
+iterate organisers
+   if field[1] = current_comp
+      ifstring field[2] = organiser_id_data
+         set errors + 1
+      endif
+   endif
+enditerate
+if errors != 0
+   setstring organiser_id_error "They're already an organiser."
+   return
+endif
+execute "+next_organiser_id"
+append organisers new_id current_comp organiser_id_data organiser_name_data
+escapestring escaped organiser_name_data
+write "<p class=~notice~>" escaped " can now change this competition.</p>"
+}
+
+grammar confirm delete organiser $integer     >confirm_delete_organiser
+
+{+confirm_delete_organiser
+set delete_id = $integer
+set target_comp = 0
+iterate organisers
+   if field[0] = delete_id
+      set target_comp = field[1]
+      escapestring escaped field[3]
+   endif
+enditerate
+execute "+comp_manageable<target_comp"
+if allowed = false
+   execute "+deny_manage"
+   return
+endif
+write "<div class=~confirm~><p>Stop <b>" escaped "</b> being an organiser?</p>"
+execute "+confirm_form<organiser<delete_id"
+}
+
+grammar delete organiser $integer     >delete_organiser
+
+{+delete_organiser
+set delete_id = $integer
+execute "+token_ok<organiser<delete_id"
+if allowed = false
+   return
+endif
+set target_comp = 0
+iterate organisers
+   if field[0] = delete_id
+      set target_comp = field[1]
+   endif
+enditerate
+execute "+comp_manageable<target_comp"
+if allowed = false
+   execute "+deny_manage"
+   return
+endif
+update organisers
+   if field[0] != delete_id
+      insert field[0] field[1] field[2] field[3]
+   endif
+endupdate
+write "<p class=~notice~>Organiser removed.</p>"
+execute "+refresh_permissions"
+}
+
+{+purge_organisers
+update organisers
+   if field[1] != arg[0]
+      insert field[0] field[1] field[2] field[3]
+   endif
+endupdate
+}
+
+# -----------------------------------------------------------------------------
 # STYLES. NO LINE MAY START WITH A '.' (IT WOULD END THE print: BLOCK), SO
 # EVERY CLASS SELECTOR IS QUALIFIED WITH ITS ELEMENT NAME.
 # -----------------------------------------------------------------------------
@@ -1223,6 +1626,8 @@ print:
    p.key { font-size: 9pt; color: #555555; }^
    span.authslot { display: inline-block; vertical-align: middle; margin-left: 14px; }^
    a.signout { color: white; font-size: 10pt; }^
+   div.confirm { background-color: #fbe9e7; border: 1px solid #c62828; padding: 6px 14px 12px 14px; margin-bottom: 14px; font-family: Verdana, Arial, sans-serif; }^
+   input.danger { background-color: #c62828; color: white; border: none; padding: 4px 14px; }^
    p.formerror { color: #a02020; font-family: Verdana, Arial, sans-serif; }^
    select.goals { width: 4em; }^
    </style>^
