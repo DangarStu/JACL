@@ -1,0 +1,15 @@
+{
+  "name": "OFFSIDE",
+  "short_name": "OFFSIDE",
+  "description": "Fixtures, results and the league table for social football competitions.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#dddddd",
+  "theme_color": "#2e5e2e",
+  "icons": [
+    { "src": "/images/offside-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/images/offside-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/images/offside-icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
