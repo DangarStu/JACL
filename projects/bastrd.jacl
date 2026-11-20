@@ -12,6 +12,8 @@
 #   bastrd-results.csv        id, competition id, date, home id, home goals,
 #                             away goals, away id
 #   bastrd-organisers.csv     id, competition id, Google account id, name
+#   bastrd-invites.csv        id, code, competition id, expiry (unixtime),
+#                             name
 #   bastrd-admins.csv         Google account id, name (maintained by hand)
 #
 # PERMISSIONS: anyone can view everything. Signing in with Google lets you
@@ -19,6 +21,9 @@
 # changed by the account that created it (its owner), by the organisers the
 # owner adds, and by site admins listed in bastrd-admins.csv. Deleting a
 # competition and choosing its organisers is for the owner and admins only.
+# The owner usually adds an organiser with an invite link: whoever opens it
+# and signs in becomes an organiser. Each link works once, for a week, and
+# its code comes from random, which is drawn from the OS, so it can't be guessed.
 #
 # DELETES: a Delete link only shows a confirmation; the Confirm button does
 # the delete and must carry the one-time token that confirmation issued.
@@ -169,6 +174,23 @@ string organiser_name_error
 parameter organiser_id   organiser_id_data
 parameter organiser_name organiser_name_data
 
+# INVITE LINKS. invite_data IS THE CODE FROM AN OPENED LINK (?invite=...);
+# IT STAYS SET UNTIL THE VISITOR HAS SIGNED IN AND IT'S BEEN USED.
+constant INVITE_DAYS     7
+string invite_data
+string invite_name_data
+string invite_name_error
+string invite_code
+string invite_message
+string invite_comp_name
+integer invite_id
+integer invite_comp
+integer invite_expires
+integer invite_days
+integer now_time
+parameter invite         invite_data
+parameter invite_name    invite_name_data
+
 # -----------------------------------------------------------------------------
 # PAGE FRAMEWORK
 # -----------------------------------------------------------------------------
@@ -177,6 +199,7 @@ parameter organiser_name organiser_name_data
 # AJAX REQUESTS SKIP THE HEADER, SO +before REFRESHES THE PERMISSIONS TOO.
 {+links_div
 execute "+refresh_permissions"
+execute "+check_invite"
 write "<span id=~compname~>"
 execute "+write_comp_label"
 write "</span>"
@@ -366,6 +389,16 @@ execute "+write_comp_label"
 write "</span><script>var c = document.getElementById('compname'); "
 write "if (c) c.innerHTML = document.getElementById('compnow').innerHTML;</script>"
 
+ifstring invite_message != ""
+   write invite_message
+   setstring invite_message ""
+   # DROP ?invite=... FROM THE ADDRESS BAR SO A RELOAD OR BOOKMARK DOESN'T
+   # CARRY THE CODE ROUND
+   ifstring invite_data = ""
+      write "<script>history.replaceState(null, '', location.pathname);</script>"
+   endif
+endif
+
 if WEBAPP_mode = COMPETITIONS
    execute "+display_competitions"
 endif
@@ -399,6 +432,8 @@ setstring organiser_id_data   ""
 setstring organiser_id_error  ""
 setstring organiser_name_data ""
 setstring organiser_name_error ""
+setstring invite_name_data    ""
+setstring invite_name_error   ""
 set token_param = 0
 set home_team = 0
 set away_team = 0
@@ -612,6 +647,7 @@ if allowed = false
    return
 endif
 execute "+purge_organisers<new_id"
+execute "+purge_invites<new_id"
 execute "+load_teams<new_id"
 execute "+purge_players"
 execute "+purge_teams<new_id"
@@ -1463,8 +1499,7 @@ execute "+confirm_form<result<delete_id"
 escapestring escaped current_comp_name
 write "<h3>Organisers of " escaped "</h3>"
 write "<p class=~key~>Organisers can change this competition's teams, players "
-write "and results. Each person can find their account ID on this tab once "
-write "they've signed in.</p>"
+write "and results. To add one, create an invite link and send it to them.</p>"
 set COUNT = 0
 write "<table class=~league~>"
 write "<tr><th class=~home~>Name</th><th>Account ID</th><th>Action</th></tr>"
@@ -1481,8 +1516,24 @@ iterate organisers
 enditerate
 write "</table>"
 if COUNT = 0
-   write "<p>No organisers yet: only you can change this competition.</p>"
+   write "<p>No organisers yet: only "
+   ifstring current_comp_owner = google_sub
+      write "you"
+   else
+      ifstring current_comp_owner = "-"
+         write "site admins"
+      else
+         write "its creator and site admins"
+      endif
+   endif
+   write " can change this competition.</p>"
 endif
+
+execute "+display_invites"
+
+write "<h4>Add by account ID</h4>"
+write "<p class=~key~>If they've already signed in here, they can read their "
+write "account ID off this tab and you can add them directly.</p>"
 write "<form>"
 execute "+text<Name<organiser_name<30"
 execute "+text<Account ID<organiser_id<30"
@@ -1588,6 +1639,223 @@ update organisers
 endupdate
 write "<p class=~notice~>Organiser removed.</p>"
 execute "+refresh_permissions"
+}
+
+# PENDING INVITES FOR THE CURRENT COMPETITION, EACH WITH ITS LINK. THE PAGE
+# ONLY KNOWS ITS OWN ADDRESS IN THE BROWSER, SO THE LINKS ARE WRITTEN AS
+# ?invite=... AND A SCRIPT MAKES THEM ABSOLUTE.
+{+display_invites
+write "<h4>Invite an organiser</h4>"
+set now_time = unixtime
+set COUNT = 0
+iterate invites
+   if field[2] = current_comp
+      if field[3] > now_time
+         if COUNT = 0
+            write "<table class=~league~>"
+            write "<tr><th class=~home~>Invited</th><th>Link (works once)</th><th>Expires</th><th>Action</th></tr>"
+         endif
+         escapestring escaped field[4]
+         set invite_days = field[3]
+         set invite_days - now_time
+         set invite_days + 86399
+         set invite_days / 86400
+         write "<tr><td class=~home~>" escaped "</td><td>"
+         write "<input class=~invitelink~ readonly size=~34~ value=~?invite=" field[1] "~> "
+         write "<button type=~button~ onclick=~navigator.clipboard.writeText(this.previousElementSibling.value); this.textContent = 'Copied';~>Copy</button>"
+         write "</td><td>in " invite_days " day"
+         if invite_days != 1
+            write "s"
+         endif
+         write "</td><td>"
+         setstring action "confirm delete invite " field[0]
+         hyperlinkNE "Cancel" action
+         write "</td></tr>"
+         set COUNT + 1
+      endif
+   endif
+enditerate
+if COUNT != 0
+   write "</table>"
+   write "<script>document.querySelectorAll('input.invitelink').forEach(function(i) { "
+   write "if (i.value.charAt(0) == '?') i.value = location.origin + location.pathname + i.value; });</script>"
+endif
+write "<form>"
+execute "+text<Their name<invite_name<30"
+execute "+submit_row<Create invite link"
+write "<input type=~hidden~ name=~command~ value=~create invite~/>"
+hidden
+write "</form>"
+}
+
+grammar create invite     >create_invite
+
+{+create_invite
+if can_manage = false
+   execute "+deny_manage"
+   return
+endif
+ifstring invite_name_data = ""
+   setstring invite_name_error "Please enter the name of the person you're inviting."
+   set errors + 1
+   return
+endif
+execute "+purge_expired_invites"
+# THREE DRAWS OF 900000 (random COMES FROM THE OS'S SECURE SOURCE): ABOUT
+# 59 BITS, FAR TOO MANY TO GUESS. EACH PART IS SIX DIGITS SO EVERY CODE LOOKS THE SAME.
+set max_rand = 900000
+set invite_id = random
+set invite_id + 99999
+setstring invite_code invite_id
+set invite_id = random
+set invite_id + 99999
+setstring invite_code invite_code "-" invite_id
+set invite_id = random
+set invite_id + 99999
+setstring invite_code invite_code "-" invite_id
+set new_id = 0
+iterate invites
+   if field[0] > new_id
+      set new_id = field[0]
+   endif
+enditerate
+set new_id + 1
+set invite_expires = unixtime
+set invite_days = INVITE_DAYS
+set invite_days * 86400
+set invite_expires + invite_days
+append invites new_id invite_code current_comp invite_expires invite_name_data
+escapestring escaped invite_name_data
+write "<p class=~notice~>Invite link for " escaped " created: copy it from "
+write "<b>Invite an organiser</b> below and send it to them.</p>"
+}
+
+# RUN ON EVERY FULL PAGE LOAD. IF THE ADDRESS CARRIED ?invite=..., ACCEPT IT
+# ONCE THE VISITOR IS SIGNED IN, OR ASK THEM TO SIGN IN. LEAVES ITS MESSAGE
+# IN invite_message FOR +after TO SHOW ABOVE THE TAB.
+{+check_invite
+ifstring invite_data = ""
+   return
+endif
+set invite_id = 0
+set now_time = unixtime
+iterate invites
+   ifstring field[1] = invite_data
+      set invite_id = field[0]
+      set invite_comp = field[2]
+      set invite_expires = field[3]
+      setstring invite_name_data field[4]
+   endif
+enditerate
+if invite_id = 0
+   setstring invite_message "<p class=~notice~>That invite link has already been used or cancelled. Ask for a new one.</p>"
+   setstring invite_data ""
+   setstring invite_name_data ""
+   return
+endif
+if invite_expires <= now_time
+   setstring invite_message "<p class=~notice~>That invite link has expired. Ask for a new one.</p>"
+   setstring invite_data ""
+   setstring invite_name_data ""
+   return
+endif
+setstring invite_comp_name ""
+iterate competitions
+   if field[0] = invite_comp
+      escapestring invite_comp_name field[1]
+   endif
+enditerate
+set WEBAPP_mode = COMPETITIONS
+if google_signed_in = false
+   # KEEP invite_data: SIGNING IN RELOADS THIS ADDRESS AND COMES BACK HERE
+   setstring invite_message "<p class=~notice~>You've been invited to help run <b>" invite_comp_name "</b>. Sign in with Google (bottom right of the banner) to accept.</p>"
+   setstring invite_name_data ""
+   return
+endif
+set current_comp = invite_comp
+setstring invite_data ""
+execute "+comp_editable<invite_comp"
+if allowed = true
+   # PROBABLY THE OWNER CHECKING THEIR OWN LINK: LEAVE IT FOR ITS RECIPIENT
+   setstring invite_message "<p class=~notice~>You can already change <b>" invite_comp_name "</b>, so this invite hasn't been used. Send the link to the person it's for.</p>"
+   setstring invite_name_data ""
+   execute "+refresh_permissions"
+   return
+endif
+execute "+next_organiser_id"
+append organisers new_id invite_comp google_sub invite_name_data
+execute "+remove_invite<invite_id"
+setstring invite_name_data ""
+setstring invite_message "<p class=~notice~>Welcome! You're now an organiser of <b>" invite_comp_name "</b> and can change its teams, players and results.</p>"
+execute "+refresh_permissions"
+}
+
+{+remove_invite
+update invites
+   if field[0] != arg[0]
+      insert field[0] field[1] field[2] field[3] field[4]
+   endif
+endupdate
+}
+
+{+purge_invites
+update invites
+   if field[2] != arg[0]
+      insert field[0] field[1] field[2] field[3] field[4]
+   endif
+endupdate
+}
+
+{+purge_expired_invites
+set now_time = unixtime
+update invites
+   if field[3] > now_time
+      insert field[0] field[1] field[2] field[3] field[4]
+   endif
+endupdate
+}
+
+grammar confirm delete invite $integer     >confirm_delete_invite
+
+{+confirm_delete_invite
+set delete_id = $integer
+set target_comp = 0
+iterate invites
+   if field[0] = delete_id
+      set target_comp = field[2]
+      escapestring escaped field[4]
+   endif
+enditerate
+execute "+comp_manageable<target_comp"
+if allowed = false
+   execute "+deny_manage"
+   return
+endif
+write "<div class=~confirm~><p>Cancel the invite for <b>" escaped "</b>? Its link will stop working.</p>"
+execute "+confirm_form<invite<delete_id"
+}
+
+grammar delete invite $integer     >delete_invite
+
+{+delete_invite
+set delete_id = $integer
+execute "+token_ok<invite<delete_id"
+if allowed = false
+   return
+endif
+set target_comp = 0
+iterate invites
+   if field[0] = delete_id
+      set target_comp = field[2]
+   endif
+enditerate
+execute "+comp_manageable<target_comp"
+if allowed = false
+   execute "+deny_manage"
+   return
+endif
+execute "+remove_invite<delete_id"
+write "<p class=~notice~>Invite cancelled.</p>"
 }
 
 {+purge_organisers
