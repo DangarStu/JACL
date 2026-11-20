@@ -199,6 +199,61 @@ parameter fx_day         fixture_day      1 31
 parameter fx_month       fixture_month    1 12
 parameter fx_year        fixture_year     2000 2100
 
+# FIXTURE GENERATOR. THE FIRST ROUND'S DATE AND FIRST KICK-OFF USE THE
+# fx_* FIELDS ABOVE; THE REST ARE ITS OWN, SUBMITTED INTO *_p AND
+# REMEMBERED IN gen_* SO THE FORM COMES BACK WITH THEM. A SECOND OR THIRD
+# KICK-OFF OF 1 MEANS "NONE".
+integer gen_s2_p         0
+integer gen_s3_p         0
+integer gen_every_p      0
+integer gen_times_p      0
+integer gen_break_p      0
+integer gen_breakw_p     0
+integer gen_replace_p    0
+parameter gs2            gen_s2_p         0 2400
+parameter gs3            gen_s3_p         0 2400
+parameter gev            gen_every_p      1 4
+parameter gtm            gen_times_p      1 4
+parameter gbr            gen_break_p      0 200
+parameter gbw            gen_breakw_p     1 8
+parameter grp            gen_replace_p    0 1
+integer gen_s2           1
+integer gen_s3           1
+integer gen_every        1
+integer gen_times        1
+integer gen_break        0
+integer gen_breakw       2
+integer_array slot_t     3
+integer dr_slots
+integer dr_create
+integer dr_n
+integer dr_pairs
+integer dr_rounds
+integer dr_round
+integer dr_cycle
+integer dr_r
+integer dr_i
+integer dr_k
+integer dr_bye
+integer dr_g
+integer dr_p
+integer dr_a
+integer dr_b
+integer dr_t
+integer dr_home
+integer dr_away
+integer dr_time
+integer dr_y
+integer dr_m
+integer dr_d
+integer dr_key
+integer dr_first
+integer dr_left
+integer dr_days
+integer dr_total
+integer dr_unplayed
+integer days_in_month
+
 string day_abbr          "Sat" "Sun" "Mon" "Tue" "Wed" "Thu" "Fri"
 string month_abbr        "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"
 string date_label
@@ -636,6 +691,13 @@ set fixture_day = 0
 set fixture_month = 0
 set fixture_year = 0
 set fixture_time = 0
+set gen_s2_p = 0
+set gen_s3_p = 0
+set gen_every_p = 0
+set gen_times_p = 0
+set gen_break_p = 0
+set gen_breakw_p = 0
+set gen_replace_p = 0
 setstring organiser_id_data   ""
 setstring organiser_id_error  ""
 setstring organiser_name_data ""
@@ -1954,6 +2016,7 @@ execute "+submit_row<Add fixture"
 write "<input type=~hidden~ name=~command~ value=~add fixture~/>"
 hidden
 write "</form>"
+execute "+draw_form"
 }
 
 {+game_table_head
@@ -2275,6 +2338,517 @@ endwhile
 write "</select>"
 }
 
+# -----------------------------------------------------------------------------
+# FIXTURE GENERATOR
+# -----------------------------------------------------------------------------
+# A ROUND ROBIN BY THE CIRCLE METHOD: TEAM 0 STAYS PUT AND THE OTHERS ROTATE
+# ONE PLACE A ROUND, AND POSITION i PLAYS POSITION n-1-i. WITH AN ODD
+# NUMBER OF TEAMS A DUMMY MAKES IT EVEN AND WHOEVER DRAWS IT HAS THE BYE.
+# EACH ROUND IS ONE NIGHT; ITS GAMES TAKE TURNS AT THE KICK-OFF TIMES, THE
+# FIRST TURN MOVING ROUND THE PAIRINGS SO NO TEAM ALWAYS GETS THE EARLY GAME. EVERY
+# SECOND TIME THROUGH THE TEAMS, HOME AND AWAY SWAP.
+
+# THE "GENERATE A WHOLE DRAW" FORM, AT THE END OF THE FIXTURES TAB. NEEDS
+# +load_teams AND +load_games.
+{+draw_form
+set dr_unplayed = 0
+set INDEX = 0
+while INDEX < game_count
+   if g_hg[INDEX] = -1
+      set dr_unplayed + 1
+   endif
+   set INDEX + 1
+endwhile
+write "<details class=~generator~"
+if game_count = 0
+   write " open"
+endif
+write "><summary>Generate a whole draw</summary>"
+write "<p class=~key~>Every team plays every other team, one round a night. "
+write "You'll see the draw before anything is added, and any game can be "
+write "moved afterwards with <b>Change time</b>.</p>"
+write "<form>"
+execute "+default_date"
+write "<div class=~row~><div class=~label~>First round:</div><div class=~input~>"
+execute "+number_select<fx_day<1<31<chosen_day"
+execute "+month_select<chosen_month"
+set year_from = chosen_year
+set year_from - 1
+set year_to = chosen_year
+set year_to + 2
+execute "+number_select<fx_year<year_from<year_to<chosen_year"
+write "</div></div>"
+write "<div class=~row~><div class=~label~>Kick-offs:</div><div class=~input~>"
+execute "+time_select<chosen_time"
+write " "
+execute "+slot_select<gs2<gen_s2"
+write " "
+execute "+slot_select<gs3<gen_s3"
+write "<div class=~hint~>A round's games take turns at these times. If there "
+write "are more games than times, some share a time on different pitches.</div>"
+write "</div></div>"
+write "<div class=~row~><div class=~label~>A round every:</div><div class=~input~>"
+write "<select name=~gev~ class=~jaclform datepart~>"
+set dr_t = 1
+while dr_t <= 4
+   write "<option value=~" dr_t "~"
+   if dr_t = gen_every
+      write " selected"
+   endif
+   if dr_t = 1
+      write ">week</option>"
+   else
+      write ">" dr_t " weeks</option>"
+   endif
+   set dr_t + 1
+endwhile
+write "</select></div></div>"
+write "<div class=~row~><div class=~label~>Each pair plays:</div><div class=~input~>"
+write "<select name=~gtm~ class=~jaclform datepart~>"
+execute "+times_option<1<Once"
+execute "+times_option<2<Twice (home and away)"
+execute "+times_option<3<Three times"
+execute "+times_option<4<Four times"
+write "</select></div></div>"
+# A ROUND COUNT FOR THE BREAK MENU: n-1 ROUNDS A TIME THROUGH, OR n IF ODD
+set dr_rounds = team_count
+set dr_t = team_count
+set dr_t % 2
+if dr_t = 0
+   set dr_rounds - 1
+endif
+set dr_rounds * 4
+write "<div class=~row~><div class=~label~>Break:</div><div class=~input~>"
+write "<select name=~gbr~ class=~jaclform datepart~><option value=~0~>No break</option>"
+set dr_t = 1
+while dr_t < dr_rounds
+   write "<option value=~" dr_t "~"
+   if dr_t = gen_break
+      write " selected"
+   endif
+   write ">After round " dr_t "</option>"
+   set dr_t + 1
+endwhile
+write "</select> for "
+execute "+number_select<gbw<1<8<gen_breakw"
+write "weeks<div class=~hint~>For Christmas, say.</div></div></div>"
+if dr_unplayed > 0
+   write "<div class=~row~><div class=~label~></div><div class=~input~>"
+   write "<label><input type=~checkbox~ name=~grp~ value=~1~> Replace the "
+   write dr_unplayed " fixture"
+   if dr_unplayed != 1
+      write "s"
+   endif
+   write " not yet played</label></div></div>"
+endif
+execute "+submit_row<Preview draw"
+write "<input type=~hidden~ name=~command~ value=~preview draw~/>"
+hidden
+write "</form></details>"
+}
+
+{+times_option
+write "<option value=~" arg[0] "~"
+if arg[0] = gen_times
+   write " selected"
+endif
+write ">" string_arg[1] "</option>"
+}
+
+# A SECOND OR THIRD KICK-OFF: "None" (1) OR A TIME
+# arg[0] = field name, arg[1] = hhmm TO PRESELECT
+{+slot_select
+write "<select name=~" string_arg[0] "~ class=~jaclform datepart~>"
+write "<option value=~1~>None</option>"
+set dr_t = 600
+while dr_t < 2300
+   execute "+time_label<dr_t"
+   write "<option value=~" dr_t "~"
+   if dr_t = arg[1]
+      write " selected"
+   endif
+   write ">" time_label "</option>"
+   set tl_m = dr_t
+   set tl_m % 100
+   if tl_m = 45
+      set dr_t + 55
+   else
+      set dr_t + 15
+   endif
+endwhile
+write "</select>"
+}
+
+# READS AND CHECKS THE GENERATOR'S FIELDS, REMEMBERING THEM. LEAVES THE
+# KICK-OFFS IN slot_t[0..dr_slots-1]; SETS fixture_error AND errors IF
+# SOMETHING'S WRONG.
+{+draw_settings
+if fixture_day != 0
+   set chosen_day = fixture_day
+endif
+if fixture_month != 0
+   set chosen_month = fixture_month
+endif
+if fixture_year != 0
+   set chosen_year = fixture_year
+endif
+if fixture_time != 0
+   set chosen_time = fixture_time
+endif
+set gen_s2 = gen_s2_p
+set gen_s3 = gen_s3_p
+set gen_every = gen_every_p
+if gen_every = 0
+   set gen_every = 1
+endif
+set gen_times = gen_times_p
+if gen_times = 0
+   set gen_times = 1
+endif
+set gen_break = gen_break_p
+set gen_breakw = gen_breakw_p
+if gen_breakw = 0
+   set gen_breakw = 2
+endif
+execute "+validate_when"
+if errors != 0
+   return
+endif
+set slot_t[0] = fixture_time
+set dr_slots = 1
+execute "+add_slot<gen_s2"
+execute "+add_slot<gen_s3"
+if team_count < 2
+   setstring fixture_error "Add at least two teams before generating a draw."
+   set errors + 1
+endif
+}
+
+# ADDS KICK-OFF arg[0] IF IT'S A REAL TIME FROM THE MENU (NOT "None")
+{+add_slot
+set tl_m = arg[0]
+set tl_m % 100
+ifall arg[0] >= 600 : arg[0] < TIME_TBC : tl_m < 60
+   set slot_t[dr_slots] = arg[0]
+   set dr_slots + 1
+endif
+}
+
+grammar preview draw     >preview_draw
+
+{+preview_draw
+if current_comp = 0
+   execute "+no_competition"
+   return
+endif
+if can_edit = false
+   execute "+deny"
+   return
+endif
+execute "+load_teams<current_comp"
+execute "+draw_settings"
+if errors != 0
+   escapestring escaped fixture_error
+   write "<p class=~notice~>" escaped "</p>"
+   setstring fixture_error ""
+   set errors = 0
+   return
+endif
+execute "+draw_size"
+if errors != 0
+   return
+endif
+write "<div class=~scoreform~><p><b>Draw preview</b> &middot; "
+write dr_total " fixtures over " dr_rounds " rounds</p>"
+if gen_replace_p = 1
+   write "<p class=~key~>The fixtures not yet played will be replaced by these. "
+   write "Results already entered are kept.</p>"
+else
+   execute "+count_unplayed"
+   if dr_unplayed > 0
+      write "<p class=~key~>These are added to the " dr_unplayed " fixture"
+      if dr_unplayed != 1
+         write "s"
+      endif
+      write " already on the list. To swap those for this draw instead, "
+      write "tick <b>Replace</b> and preview again.</p>"
+   endif
+endif
+set dr_create = false
+write "<table class=~league draw~>"
+execute "+build_draw"
+write "</table>"
+write "<form>"
+write "<input type=~hidden~ name=~fx_day~ value=~" fixture_day "~>"
+write "<input type=~hidden~ name=~fx_month~ value=~" fixture_month "~>"
+write "<input type=~hidden~ name=~fx_year~ value=~" fixture_year "~>"
+write "<input type=~hidden~ name=~fx_time~ value=~" fixture_time "~>"
+write "<input type=~hidden~ name=~gs2~ value=~" gen_s2 "~>"
+write "<input type=~hidden~ name=~gs3~ value=~" gen_s3 "~>"
+write "<input type=~hidden~ name=~gev~ value=~" gen_every "~>"
+write "<input type=~hidden~ name=~gtm~ value=~" gen_times "~>"
+write "<input type=~hidden~ name=~gbr~ value=~" gen_break "~>"
+write "<input type=~hidden~ name=~gbw~ value=~" gen_breakw "~>"
+write "<input type=~hidden~ name=~grp~ value=~" gen_replace_p "~>"
+write "<input type=~hidden~ name=~command~ value=~generate draw~/>"
+hidden
+write "<p><input type=~submit~ value=~Create these " dr_total " fixtures~> &nbsp; "
+hyperlinkNE "Cancel" "blankjacl"
+write "</p></form></div>"
+}
+
+grammar generate draw     >generate_draw
+
+{+generate_draw
+if current_comp = 0
+   execute "+no_competition"
+   return
+endif
+if can_edit = false
+   execute "+deny"
+   return
+endif
+execute "+load_teams<current_comp"
+execute "+draw_settings"
+if errors != 0
+   escapestring escaped fixture_error
+   write "<p class=~notice~>" escaped "</p>"
+   setstring fixture_error ""
+   set errors = 0
+   return
+endif
+if gen_replace_p = 1
+   execute "+purge_unplayed<current_comp"
+endif
+execute "+draw_size"
+if errors != 0
+   return
+endif
+execute "+next_fixture_id"
+set dr_create = true
+execute "+build_draw"
+write "<p class=~notice~>Draw created: " dr_total " fixtures over " dr_rounds " rounds.</p>"
+}
+
+# dr_n (TEAMS, PLUS A DUMMY IF ODD), dr_pairs, dr_rounds (ALL TIMES
+# THROUGH) AND dr_total (GAMES, NOT COUNTING BYES). REFUSES A DRAW THAT
+# WOULD TAKE THE COMPETITION PAST MAX_GAMES.
+{+draw_size
+set dr_n = team_count
+set dr_t = team_count
+set dr_t % 2
+if dr_t = 1
+   set dr_n + 1
+endif
+set dr_pairs = dr_n
+set dr_pairs / 2
+set dr_rounds = dr_n
+set dr_rounds - 1
+set dr_rounds * gen_times
+set dr_total = team_count
+set dr_total / 2
+set dr_total * dr_rounds
+set COUNT = 0
+iterate fixtures
+   if field[1] = current_comp
+      set COUNT + 1
+   endif
+enditerate
+set COUNT + dr_total
+if COUNT > MAX_GAMES
+   write "<p class=~notice~>That's more fixtures than one competition can hold ("
+   write MAX_GAMES "). Choose fewer times through, or replace the fixtures not yet played.</p>"
+   set errors + 1
+endif
+}
+
+{+count_unplayed
+set dr_unplayed = 0
+iterate fixtures
+   if field[1] = current_comp
+      ifstring field[5] = "-"
+         set dr_unplayed + 1
+      endif
+   endif
+enditerate
+}
+
+# DROPS COMPETITION arg[0]'S FIXTURES THAT HAVEN'T BEEN PLAYED (THEY HAVE
+# NO SCORERS TO TIDY UP)
+{+purge_unplayed
+update fixtures
+   setstring row_time "2400"
+   if field_count > 7
+      setstring row_time field[7]
+   endif
+   set found = true
+   if field[1] = arg[0]
+      ifstring field[5] = "-"
+         set found = false
+      endif
+   endif
+   if found = true
+      insert field[0] field[1] field[2] field[3] field[4] field[5] field[6] row_time
+   endif
+endupdate
+}
+
+# WRITES THE DRAW'S ROWS (dr_create false) OR ADDS ITS FIXTURES FROM new_id
+# (dr_create true). NEEDS +draw_settings AND +draw_size.
+{+build_draw
+set dr_y = fixture_year
+set dr_m = fixture_month
+set dr_d = fixture_day
+set dr_rounds = dr_n
+set dr_rounds - 1
+set dr_round = 0
+set dr_total = 0
+set dr_cycle = 0
+while dr_cycle < gen_times
+   execute "+draw_cycle"
+   set dr_cycle + 1
+endwhile
+set dr_rounds * gen_times
+}
+
+{+draw_cycle
+set dr_r = 0
+while dr_r < dr_rounds
+   execute "+draw_round"
+   set dr_r + 1
+   set dr_round + 1
+   set dr_days = gen_every
+   set dr_days * 7
+   if dr_round = gen_break
+      set dr_t = gen_breakw
+      set dr_t * 7
+      set dr_days + dr_t
+   endif
+   execute "+advance_days<dr_days"
+endwhile
+}
+
+{+draw_round
+set dr_key = dr_y
+set dr_key * 100
+set dr_key + dr_m
+set dr_key * 100
+set dr_key + dr_d
+if dr_create = false
+   execute "+date_label<dr_key"
+   set dr_t = dr_round
+   set dr_t + 1
+   write "<tr><th colspan=~2~ class=~home~>Round " dr_t " &middot; " date_label "</th></tr>"
+endif
+# THE KICK-OFFS GO OUT IN ORDER, STARTING FROM A DIFFERENT PAIRING EACH
+# ROUND SO THE EARLY GAME MOVES AROUND
+set dr_g = 0
+set dr_bye = -1
+set dr_k = 0
+while dr_k < dr_pairs
+   set dr_i = dr_k
+   set dr_i + dr_round
+   set dr_i % dr_pairs
+   execute "+draw_pair"
+   set dr_k + 1
+endwhile
+if dr_bye != -1
+   escapestring escaped t_name[dr_bye]
+   write "<tr><td></td><td class=~home~>" escaped " has a bye</td></tr>"
+endif
+}
+
+# THE GAME BETWEEN CIRCLE POSITIONS dr_i AND dr_n-1-dr_i IN ROUND dr_r
+{+draw_pair
+set dr_p = dr_i
+execute "+circle_team"
+set dr_a = dr_t
+set dr_p = dr_n
+set dr_p - 1
+set dr_p - dr_i
+execute "+circle_team"
+set dr_b = dr_t
+# THE DUMMY (INDEX team_count) MEANS A BYE, LISTED AT THE END OF THE ROUND
+if dr_a = team_count : dr_b = team_count
+   set dr_bye = dr_a
+   if dr_a = team_count
+      set dr_bye = dr_b
+   endif
+   if dr_create = true
+      set dr_bye = -1
+   endif
+   return
+endif
+# THE FIXED TEAM ALTERNATES HOME AND AWAY; ELSEWHERE THE TOP OF THE CIRCLE
+# IS HOME, AND EACH TEAM SPENDS ABOUT HALF ITS ROUNDS THERE
+set dr_home = dr_a
+set dr_away = dr_b
+if dr_i = 0
+   set dr_t = dr_r
+   set dr_t % 2
+   if dr_t = 1
+      set dr_home = dr_b
+      set dr_away = dr_a
+   endif
+endif
+set dr_t = dr_cycle
+set dr_t % 2
+if dr_t = 1
+   set dr_t = dr_home
+   set dr_home = dr_away
+   set dr_away = dr_t
+endif
+set dr_t = dr_g
+set dr_t % dr_slots
+set dr_time = slot_t[dr_t]
+set dr_g + 1
+set dr_total + 1
+if dr_create = true
+   set dr_a = t_id[dr_home]
+   set dr_b = t_id[dr_away]
+   append fixtures new_id current_comp dr_key dr_a dr_b score_none score_none dr_time
+   set new_id + 1
+else
+   execute "+time_label<dr_time"
+   escapestring escaped t_name[dr_home]
+   escapestring escaped2 t_name[dr_away]
+   write "<tr><td>" time_label "</td><td class=~home~>" escaped " v " escaped2 "</td></tr>"
+endif
+}
+
+# THE TEAM INDEX AT CIRCLE POSITION dr_p IN ROUND dr_r, IN dr_t
+{+circle_team
+if dr_p = 0
+   set dr_t = 0
+   return
+endif
+set dr_t = dr_p
+set dr_t - 1
+set dr_t + dr_r
+set dr_first = dr_n
+set dr_first - 1
+set dr_t % dr_first
+set dr_t + 1
+}
+
+# MOVES dr_y/dr_m/dr_d ON BY arg[0] DAYS
+{+advance_days
+set dr_left = arg[0]
+while dr_left > 0
+   set dr_d + 1
+   execute "+month_length<dr_m<dr_y"
+   if dr_d > days_in_month
+      set dr_d = 1
+      set dr_m + 1
+      if dr_m > 12
+         set dr_m = 1
+         set dr_y + 1
+      endif
+   endif
+   set dr_left - 1
+endwhile
+}
+
 grammar add fixture     >add_fixture
 
 {+add_fixture
@@ -2378,26 +2952,7 @@ if fixture_day = 0 : fixture_month = 0 : fixture_year = 0
 endif
 # THE PARAMETER RANGES STOP IMPOSSIBLE NUMBERS; THIS CATCHES 31 APRIL AND
 # 29 FEBRUARY IN A NON-LEAP YEAR
-set days_in_month = 31
-if fixture_month = 4
-   set days_in_month = 30
-endif
-if fixture_month = 6
-   set days_in_month = 30
-endif
-if fixture_month = 9
-   set days_in_month = 30
-endif
-if fixture_month = 11
-   set days_in_month = 30
-endif
-if fixture_month = 2
-   set days_in_month = 28
-   execute "+is_leap_year?<fixture_year"
-   if TIME_leapyear = true
-      set days_in_month = 29
-   endif
-endif
+execute "+month_length<fixture_month<fixture_year"
 if fixture_day > days_in_month
    setstring fixture_error "That date doesn't exist; check the day and month."
    set errors + 1
@@ -2411,6 +2966,21 @@ if fixture_time != TIME_TBC
       setstring fixture_error "Please choose the kick-off time, or TBC."
       set errors + 1
       return
+   endif
+endif
+}
+
+# SETS days_in_month FOR MONTH arg[0] OF YEAR arg[1]
+{+month_length
+set days_in_month = 31
+if arg[0] = 4 : arg[0] = 6 : arg[0] = 9 : arg[0] = 11
+   set days_in_month = 30
+endif
+if arg[0] = 2
+   set days_in_month = 28
+   execute "+is_leap_year?<arg[1]"
+   if TIME_leapyear = true
+      set days_in_month = 29
    endif
 endif
 }
@@ -3458,6 +4028,12 @@ print:
    span.authslot.settling { opacity: 0; }^
    form.sending input[type=submit] { opacity: 0.5; }^
    span.scorers { display: block; font-size: 8.5pt; color: #555555; font-weight: normal; white-space: normal; }^
+   details.generator { margin-top: 24px; }^
+   details.generator summary { font-weight: bold; font-size: 12pt; cursor: pointer; }^
+   div.hint { font-size: 9pt; color: #555555; margin-top: 3px; }^
+   table.draw { margin: 6px 0 10px 0; }^
+   table.draw th { text-align: left; }^
+   table.draw td:first-child { white-space: nowrap; width: 5em; text-align: left; }^
    p.scoringteam { margin: 10px 0 4px 0; font-weight: bold; }^
    form.scorersform select { width: auto; max-width: 100%; margin: 0 6px 6px 0; }^
    a.signout { color: white; font-size: 10pt; }^
