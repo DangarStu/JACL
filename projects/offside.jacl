@@ -1,28 +1,28 @@
 #!../bin/cgijacl
 
 # -----------------------------------------------------------------------------
-# BASTRD -- BROOKLYN ALL-STARS TEAM REGISTRATION DATABASE
+# OFFSIDE -- ORGANISING FIXTURES FOR SOCIAL IDIOTS DOING EXERCISE
 #
 # A webapp.library program for running a set of football (soccer)
 # competitions. Everything is stored in per-game CSV files in projects/data:
 #
-#   bastrd-competitions.csv   id, name, season, owner
-#   bastrd-teams.csv          id, competition id, name
-#   bastrd-players.csv        id, team id, name, position, shirt number
-#   bastrd-fixtures.csv       id, competition id, date (yyyymmdd), home id,
-#                             away id, home goals, away goals, kick-off
-#                             (hhmm) -- the goals are "-" until the result
-#                             is entered; kick-off 2400 means "to be
-#                             confirmed", as does a row without the column
-#   bastrd-organisers.csv     id, competition id, Google account id, name
-#   bastrd-invites.csv        id, code, competition id, expiry (unixtime),
-#                             name
-#   bastrd-admins.csv         Google account id, name (maintained by hand)
+#   offside-competitions.csv   id, name, season, owner
+#   offside-teams.csv          id, competition id, name
+#   offside-players.csv        id, team id, name, position, shirt number
+#   offside-fixtures.csv       id, competition id, date (yyyymmdd), home id,
+#                              away id, home goals, away goals, kick-off
+#                              (hhmm) -- the goals are "-" until the result
+#                              is entered; kick-off 2400 means "to be
+#                              confirmed", as does a row without the column
+#   offside-organisers.csv     id, competition id, Google account id, name
+#   offside-invites.csv        id, code, competition id, expiry (unixtime),
+#                              name
+#   offside-admins.csv         Google account id, name (maintained by hand)
 #
 # PERMISSIONS: anyone can view everything. Signing in with Google lets you
 # create competitions. A competition's teams, players and results can be
 # changed by the account that created it (its owner), by the organisers the
-# owner adds, and by site admins listed in bastrd-admins.csv. Deleting a
+# owner adds, and by site admins listed in offside-admins.csv. Deleting a
 # competition and choosing its organisers is for the owner and admins only.
 # The owner usually adds an organiser with an invite link: whoever opens it
 # and signs in becomes an organiser. Each link works once, for a week, and
@@ -53,7 +53,7 @@
 # -----------------------------------------------------------------------------
 
 constant status_window     0
-constant game_title        "BASTRD"
+constant game_title        "OFFSIDE"
 constant game_author       "Stuart Allen"
 constant game_release      1
 constant game_build        1
@@ -76,7 +76,7 @@ constant TEAMS            2
 constant RESULTS          3
 constant TABLE            4
 
-string tab_names     "BASTRD" "Competitions" "Teams" "Fixtures & results" "League table"
+string tab_names     "OFFSIDE" "Competitions" "Teams" "Fixtures & results" "League table"
 
 # THE CURRENTLY SELECTED COMPETITION AND TEAM ARE PART OF THE SAVED SESSION
 # STATE, SO THEY CARRY FROM ONE REQUEST TO THE NEXT
@@ -2579,7 +2579,7 @@ endupdate
 print:
    <style>^
    div#header { position: relative; overflow: hidden; height: auto; }^
-   div#header::before { content: ""; position: absolute; top: -30px; left: -30px; right: -30px; bottom: -30px; background: url(/images/bastrd.jpg) center / cover; filter: blur(16px) brightness(0.5); }^
+   div#header::before { content: ""; position: absolute; top: -30px; left: -30px; right: -30px; bottom: -30px; background: url(/images/offside.jpg) center / cover; filter: blur(16px) brightness(0.5); }^
    div#headerimages { position: relative; z-index: 1; }^
    img.titleimage { display: block; margin: 0px auto; width: 100%; max-width: 1800px; height: min(25vw, 280px); object-fit: cover; object-position: center 55%; }^
    div.linkbar { display: none; }^
@@ -2628,9 +2628,9 @@ location stadium
 
 object you
 
-constant title_image         "/images/bastrd.jpg"
-constant desktop_title_image "/images/bastrd.jpg"
-constant mobile_title_image  "/images/bastrd.jpg"
+constant title_image         "/images/offside.jpg"
+constant desktop_title_image "/images/offside.jpg"
+constant mobile_title_image  "/images/offside.jpg"
 constant footer_image        "none"
 constant header_colour       "#1e3e1e"
 constant header_height       280

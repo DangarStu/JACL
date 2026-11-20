@@ -137,7 +137,7 @@ apache: install
 	@echo "Setting permissions..."
 	chown -R www-data:www-data $(JACL_TEMP)
 	chown -R www-data:www-data $(JACL_LOGS)
-	@# Programs like contacts and bastrd write their CSVs here as www-data
+	@# Programs like contacts and offside write their CSVs here as www-data
 	chown -R www-data:www-data /usr/local/jacl/projects/data
 	chmod 755 /usr/local/jacl/projects
 	chmod 775 $(JACL_TEMP)
