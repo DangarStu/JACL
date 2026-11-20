@@ -1701,25 +1701,27 @@ else
    write "Correct the score"
 endif
 write "</b> &middot; " date_label "</p>"
-write "<form>"
+# EACH PART IS ITS OWN ELEMENT SO A PHONE CAN LAY IT OUT AS ONE LINE PER
+# TEAM (NAME, THEN ITS GOALS) WHILE A WIDE SCREEN KEEPS "Home 2 - 1 Away"
+write "<form class=~scoreentry~>"
 execute "+team_label<game_home"
 escapestring escaped team_label
-write escaped " "
+write "<span class=~hometeam~>" escaped "</span>"
 if game_hg = -1
    set game_hg = 0
    set game_ag = 0
 endif
 execute "+goals_select<home_goals<game_hg"
-write " - "
+write "<span class=~dash~>-</span>"
 execute "+goals_select<away_goals<game_ag"
 execute "+team_label<game_away"
 escapestring escaped team_label
-write " " escaped " &nbsp; "
+write "<span class=~awayteam~>" escaped "</span>"
 write "<input type=~hidden~ name=~command~ value=~save score " edit_id "~/>"
 hidden
-write "<input type=~submit~ value=~Save result~> &nbsp; "
+write "<span class=~buttons~><input type=~submit~ value=~Save result~> "
 hyperlinkNE "Cancel" "blankjacl"
-write "</form>"
+write "</span></form>"
 execute "+find_fixture<edit_id"
 if game_hg != -1
    write "<form>"
@@ -2620,6 +2622,50 @@ print:
    select.datepart { width: auto; margin-right: 4px; }^
    div.scoreform { background-color: #e6f2e6; border: 1px solid #2e5e2e; padding: 6px 14px 12px 14px; margin-bottom: 14px; font-family: Verdana, Arial, sans-serif; }^
    div.scoreform form { display: inline-block; margin-right: 12px; }^
+   form.scoreentry span { margin: 0 4px; }^
+   form.scoreentry span.buttons { margin-left: 14px; }^
+   form.scoreentry span.buttons a { margin-left: 8px; }^
+   @media (max-width: 700px) {^
+      div#main { padding: 12px 10px; }^
+      h2 { font-size: 14pt; margin-top: 4px; }^
+      div.links { position: relative; top: auto; bottom: auto; right: auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; height: auto; padding: 6px 10px; font-size: 10pt; text-align: left; white-space: normal; }^
+      span.authslot { margin-left: auto; flex: none; }^
+      div.tab, div.selectedtab { flex: 1 1 0; min-width: 0; padding: 0; height: auto; line-height: 1.25; display: flex; align-items: center; justify-content: center; font-size: 10pt; }^
+      div.selectedtab { padding: 10px 3px; }^
+      a.tablink { display: block; width: 100%; padding: 10px 3px; font-size: 10pt; }^
+      table.league { font-size: 10pt; min-width: 0; width: 100%; }^
+      table.league th, table.league td { padding: 5px 3px; }^
+      table.games, table.games tbody { display: block; width: 100%; max-width: none; }^
+      table.games tr:has(th) { display: none; }^
+      table.games tr { display: grid; grid-template-columns: 1fr auto 1fr; column-gap: 10px; padding: 8px 4px; border-bottom: 1px solid #b8c8b8; }^
+      table.games tr.played { background-color: #eef4ee; }^
+      table.games td { display: block; border: none; padding: 0; overflow: visible; white-space: normal; background: none; }^
+      table.games tr.played td { background: none; }^
+      table.games td:nth-child(1) { grid-column: 1 / 3; grid-row: 1; font-size: 9pt; color: #555555; }^
+      table.games td:nth-child(2) { grid-column: 3; grid-row: 1; font-size: 9pt; color: #555555; text-align: right; }^
+      table.games td:nth-child(3) { grid-column: 1; grid-row: 2; text-align: right; padding-top: 3px; }^
+      table.games td:nth-child(4) { grid-column: 2; grid-row: 2; text-align: center; padding-top: 3px; }^
+      table.games td:nth-child(5) { grid-column: 3; grid-row: 2; text-align: left; padding-top: 3px; }^
+      table.games td:nth-child(6) { grid-column: 1 / 4; grid-row: 3; text-align: center; white-space: normal; padding-top: 2px; }^
+      table.games td:nth-child(6) a { display: inline-block; padding: 8px 6px; font-size: 11pt; }^
+      div.row { display: block; margin-bottom: 8px; }^
+      div.label { float: none; display: block; width: auto; text-align: left; margin: 0 0 2px 0; }^
+      div.input { float: none; display: block; margin: 0; }^
+      input, select { font-size: 16px; max-width: 100%; }^
+      div.scoreform { padding: 6px 10px 12px 10px; }^
+      div.scoreform form { display: block; margin: 8px 0 0 0; }^
+      div.scoreform form.scoreentry { display: grid; grid-template-columns: 1fr auto; gap: 10px 12px; align-items: center; }^
+      form.scoreentry select { width: 5em; }^
+      form.scoreentry span { margin: 0; }^
+      form.scoreentry span.hometeam { grid-row: 1; grid-column: 1; }^
+      form.scoreentry select:nth-of-type(1) { grid-row: 1; grid-column: 2; }^
+      form.scoreentry span.dash { display: none; }^
+      form.scoreentry span.awayteam { grid-row: 2; grid-column: 1; }^
+      form.scoreentry select:nth-of-type(2) { grid-row: 2; grid-column: 2; }^
+      form.scoreentry span.buttons { grid-row: 3; grid-column: 1 / 3; margin: 4px 0 0 0; }^
+      form.scoreentry span.buttons input { padding: 8px 18px; }^
+      form.scoreentry span.buttons a { margin-left: 16px; }^
+   }^
    </style>^
 .
 }
