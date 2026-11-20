@@ -4,3 +4,9 @@
 /include/fonts/merriweather-latin-ext.woff2 font/woff2 www/fonts/merriweather-latin-ext.woff2
 /images/offside.jpg image/jpeg images/offside.jpg
 /images/offside-mobile.jpg image/jpeg images/offside-mobile.jpg
+/images/offside.webmanifest application/manifest+json images/offside.webmanifest
+/images/offside-icon-192.png image/png images/offside-icon-192.png
+/images/offside-icon-512.png image/png images/offside-icon-512.png
+/images/offside-icon-maskable.png image/png images/offside-icon-maskable.png
+/images/offside-apple-touch.png image/png images/offside-apple-touch.png
+/images/offside-favicon.png image/png images/offside-favicon.png

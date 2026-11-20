@@ -3392,6 +3392,17 @@ endupdate
 # HASN'T AUTHORISED, SUCH AS A LOCAL TEST SERVER). A SIGNED-IN VISITOR SEES
 # PLAIN TEXT THERE, SO NOTHING WAITS.
 {+local_header
+# ADD TO HOME SCREEN: THE MANIFEST AND ICONS (images/offside-icon.svg IS THE
+# SOURCE; THE PNGS ARE MADE FROM IT WITH rsvg-convert, THE MASKABLE ONE WITH
+# THE "O" SHRUNK TO FIT ANDROID'S CIRCLE). THESE LINKS COME AFTER THE
+# LIBRARY'S favicon.ico ONE, SO THEY WIN.
+write "<link rel=~manifest~ href=~/images/offside.webmanifest~>"
+write "<link rel=~icon~ href=~/images/offside-favicon.png~ type=~image/png~>"
+write "<link rel=~apple-touch-icon~ href=~/images/offside-apple-touch.png~>"
+write "<meta name=~theme-color~ content=~#2e5e2e~>"
+write "<meta name=~apple-mobile-web-app-title~ content=~OFFSIDE~>"
+write "<meta name=~mobile-web-app-capable~ content=~yes~>"
+write "<meta name=~apple-mobile-web-app-capable~ content=~yes~>"
 # STOP A FORM BEING SENT TWICE (SEE USED_TOKENS): ONCE ONE HAS BEEN SUBMITTED,
 # FURTHER SUBMITS OF IT DO NOTHING UNTIL THE NEXT PAGE ARRIVES, AND EACH
 # SUBMIT CARRIES A ONE-USE TOKEN SO THE SERVER CAN REFUSE A REPEAT. A PAGE

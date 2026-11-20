@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <pattern id="stripes" width="128" height="512" patternUnits="userSpaceOnUse">
+      <rect width="64" height="512" fill="#3d8b38"/>
+      <rect x="64" width="64" height="512" fill="#47984140"/>
+      <rect x="64" width="64" height="512" fill="#459640"/>
+    </pattern>
+  </defs>
+  <rect width="512" height="512" fill="url(#stripes)"/>
+  <g transform="translate(256 256) skewX(-12) translate(-256 -256)">
+    <!-- O: an octagon with a rectangular counter, like the wordmark's slab O -->
+    <path fill-rule="evenodd" d="M176 96 H336 L396 156 V356 L336 416 H176 L116 356 V156 Z M206 176 V336 H306 V176 Z"
+          fill="#d71920" stroke="#ffffff" stroke-width="34" stroke-linejoin="round" paint-order="stroke"/>
+    <path fill-rule="evenodd" d="M176 96 H336 L396 156 V356 L336 416 H176 L116 356 V156 Z M206 176 V336 H306 V176 Z"
+          fill="#d71920" stroke="#111111" stroke-width="12" stroke-linejoin="round" paint-order="stroke"/>
+  </g>
+</svg>
