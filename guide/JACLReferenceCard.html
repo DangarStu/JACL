@@ -392,6 +392,7 @@ parameter  <i>Name</i> <i>Target</i> [<i>min</i> <i>max</i>]
 <h2>Library Hooks</h2>
 <table class="kv">
 <tr><td class="key">+intro</td>             <td>Runs once at game start (and re-runs while web-side pending questions are unresolved).</td></tr>
+<tr><td class="key">+setup</td>             <td>Web: runs instead of +intro when a new visitor's first request carries a command; if player still isn't placed afterwards, +intro runs and the command is ignored.</td></tr>
 <tr><td class="key">+eachturn</td>          <td>After every turn-consuming command.</td></tr>
 <tr><td class="key">eachturn</td>           <td>On a location, fires when the player is there.</td></tr>
 <tr><td class="key">+timer</td>             <td>Periodic, scheduled by the <b>timer</b> opcode.</td></tr>
