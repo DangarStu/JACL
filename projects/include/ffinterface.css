@@ -89,6 +89,7 @@ print:
 			padding-right: 10px;
 			text-align: right;
 			color: black; }
+.
 print:
      div.maintext {
      		font-family: Verdana, Arial, Sanserif;
@@ -99,6 +100,7 @@ print:
 			overflow: auto;
 .
 write " background-color: " maintext_colour "; }^"
+print:
      -->
    </style>
 .

@@ -98,7 +98,7 @@ is_safe_user_id(const char *s, size_t max)
 
 /* Same charset as is_safe_user_id, and additionally rejects ".." to
  * defang path-traversal attempts through save-game filenames coming
- * from game-supplied text (text_of() in save_interaction). */
+ * from game-supplied text (the savegame/restoregame filename). */
 static int
 is_safe_filename_component(const char *s, size_t max)
 {
@@ -1930,7 +1930,12 @@ restore_interaction(const char *filename)
     if (filename == NULL) {
         sprintf(file_buffer, "%s%s-%s-bookmark", temp_directory, prefix, user_id);
     } else {
-        const char *raw = text_of(filename);
+        /* filename HAS ALREADY BEEN RESOLVED TO TEXT BY THE CALLER
+         * (arg_text_of_word IN interpreter.c), AS THE GLK BUILD ASSUMES.
+         * RESOLVING IT AGAIN WITH text_of() TURNED A NAME SUCH AS
+         * "diary.sav" INTO A LOOKUP OF THE CONTAINER "diary", SO SAVING
+         * OR RESTORING TO A NAMED FILE NEVER WORKED ON THE WEB. */
+        const char *raw = filename;
         /* `raw` is game-supplied (the JACL author passes a noun or a
          * literal). Reject anything that could escape temp_directory:
          * slashes, backslashes, "..", control chars. */
@@ -1956,7 +1961,7 @@ save_interaction(const char *filename)
     if (filename == NULL) {
         sprintf(file_buffer, "%s%s-%s-bookmark", temp_directory, prefix, user_id);
     } else {
-        const char *raw = text_of(filename);
+        const char *raw = filename;     /* ALREADY TEXT; SEE restore_interaction */
         if (!is_safe_filename_component(raw, 81)) {
             write_text(cstring_resolve("CANT_SAVE")->value);
             return (FALSE);

@@ -38,6 +38,11 @@ cursor 0 2
 write status_text
 cursor 1 1
 write "BlackJACL"
+# score IS ALSO SET IN +bottom, BUT ONLY THE DESKTOP INTERPRETER RUNS THAT;
+# READ THE MONEY HERE SO THE WEB VERSION DOESN'T ALWAYS SHOW $0
+if current_player != 0
+   set score = current_player(money)
+endif
 setstring status_text "Bankroll: $" score 
 set OFFSET = status_width
 length INDEX status_text
@@ -183,6 +188,9 @@ integer THIS_HAND
 {+display_hand
 set THIS_HAND = arg[0]
 
+# THE BORDER LOOPS ARE while LOOPS SO THAT A HAND WITH NO CARDS DRAWS
+# NOTHING (A repeat ... until INDEX = 0 COUNTED DOWN FROM 0 FOREVER)
+
 if GAME_PHASE = place_bet
   write "^No cards will be dealt until you place a bet. Use the command 'bet [amount]'.^"   
   return
@@ -191,18 +199,18 @@ endif
 style pre
 write "^"
 set INDEX = THIS_HAND(cards)
-repeat
+while INDEX > 0
    write " +---+"
    set INDEX - 1
-until INDEX = 0
+endwhile
   
 write "^"
   
 set INDEX = THIS_HAND(cards)
-repeat
+while INDEX > 0
    write " |   |"
    set INDEX - 1
-until INDEX = 0
+endwhile
  
 write "^"
   
@@ -222,18 +230,18 @@ endif
 write "^"
   
 set INDEX = THIS_HAND(cards)
-repeat
+while INDEX > 0
    write " |   |"
    set INDEX - 1
-until INDEX = 0
+endwhile
   
 write "^"
   
 set INDEX = THIS_HAND(cards)
-repeat
+while INDEX > 0
    write " +---+"
    set INDEX - 1
-until INDEX = 0
+endwhile
   
 write "^"
 style normal

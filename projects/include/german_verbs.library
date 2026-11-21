@@ -307,7 +307,7 @@ set INDEX = 0
 set EXITS_AVAILABLE = 0
 repeat
    if here(COUNTER) != nowhere
-      execute "+in_list" here(COUNTER)
+      execute "+in_list<here(COUNTER)"
       if RETURN_VALUE = false
 	 set previous_exits(COUNTER) = here(COUNTER)
          set INDEX + 1
@@ -333,7 +333,7 @@ endif
 set COUNTER = 0
 repeat
    if here(COUNTER) != nowhere
-      execute "+in_list" here(COUNTER)
+      execute "+in_list<here(COUNTER)"
       if RETURN_VALUE = false
          set noun4 = here(COUNTER)
 	 set previous_exits(COUNTER) = noun4
@@ -352,16 +352,17 @@ endif
 write .
 }
 
+# SETS RETURN_VALUE TO true IF arg[0] IS ALREADY ONE OF THE EXITS LISTED
 {+in_list
+set RETURN_VALUE = false
 set TEMP = 0
 repeat
    if previous_exits(TEMP) = arg[0]
       set RETURN_VALUE = true
-      break
+      return
    endif
    set TEMP + 1
 until TEMP = 12
-set RETURN_VALUE = false
 }
 
 {+show_link

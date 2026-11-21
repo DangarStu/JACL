@@ -130,7 +130,7 @@ if current_note = 40
    write "There are no empty spaces left to store notes in.^"
    return
 endif
-setstring note_content[current_note] = $string
+setstring note_content[current_note] $string
 set note_date[current_note] = now
 write "Note " current_note " stored.^"
 set notes + 1
