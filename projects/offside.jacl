@@ -466,6 +466,53 @@ integer now_time
 integer invite_count
 parameter invite         invite_data
 
+# IMPORTING TEAMS AND PLAYERS FROM A CSV FILE. THE BROWSER READS THE FILE
+# (www/offside-import.js) AND SENDS IT A BATCH AT A TIME WITH THE COMMAND
+# 'import rows', ONE ROW PER PARAMETER imp0..imp9, EACH ROW BEING
+# team|player|position|shirt|gender|hidden WITH "-" FOR ANYTHING BLANK.
+# NOTHING IS UPLOADED: JACL DOESN'T ACCEPT FILE UPLOADS.
+constant IMPORT_BATCH    10
+parameter imp0           imp_0
+parameter imp1           imp_1
+parameter imp2           imp_2
+parameter imp3           imp_3
+parameter imp4           imp_4
+parameter imp5           imp_5
+parameter imp6           imp_6
+parameter imp7           imp_7
+parameter imp8           imp_8
+parameter imp9           imp_9
+string imp_0
+string imp_1
+string imp_2
+string imp_3
+string imp_4
+string imp_5
+string imp_6
+string imp_7
+string imp_8
+string imp_9
+string imp_line
+string_array imp_field   8
+integer imp_fields
+integer imp_n
+integer imp_t
+integer imp_team
+integer imp_team_id
+integer imp_player_id
+integer imp_teams
+integer imp_players
+integer imp_skipped
+integer imp_full
+integer imp_bad
+string imp_position
+string imp_gender
+string imp_hidden
+string imp_shirt
+integer_array ex_team    MAX_PLAYERS
+string_array ex_name     MAX_PLAYERS
+integer ex_count
+
 # A COMPETITION'S OWN LINK, ?comp=<id>, OPENS ITS FIXTURES & RESULTS
 parameter comp           comp_link     0 2000000000
 integer comp_link        0
@@ -821,6 +868,16 @@ setstring organiser_name_data ""
 setstring organiser_name_error ""
 setstring invite_name_data    ""
 setstring invite_name_error   ""
+setstring imp_0 ""
+setstring imp_1 ""
+setstring imp_2 ""
+setstring imp_3 ""
+setstring imp_4 ""
+setstring imp_5 ""
+setstring imp_6 ""
+setstring imp_7 ""
+setstring imp_8 ""
+setstring imp_9 ""
 set token_param = 0
 set home_team = 0
 set away_team = 0
@@ -1450,6 +1507,7 @@ if can_edit = true
    write "<input type=~hidden~ name=~command~ value=~add team~/>"
    hidden
    write "</form>"
+   execute "+import_box"
 else
    execute "+view_only_note"
 endif
@@ -1494,6 +1552,218 @@ execute "+next_team_id"
 append teams new_id current_comp team_name_data
 escapestring escaped team_name_data
 write "<p class=~notice~>Team <b>" escaped "</b> added.</p>"
+}
+
+# THE "IMPORT FROM A SPREADSHEET" BOX ON THE TEAMS TAB. THE WORK IS DONE BY
+# www/offside-import.js, WHICH IS TOLD THE POSITIONS SO THEY STAY IN STEP
+# WITH position_values.
+{+import_box
+write "<details class=~import~ id=~importbox~><summary>Import teams and players from a spreadsheet</summary>"
+write "<p class=~key~>Save the spreadsheet as a CSV file, one row per player, with the columns "
+write "<b>Team, Player, Position, Number, Gender, Hidden</b> in that order, or in any order "
+write "under a header row with those names. Only Team is needed: a row with no player just adds the team.</p>"
+write "<p class=~key~>Position is one of "
+set sc_scan = 0
+setstring FORMS_string "@position_values"
+set sc_limit = FORMS_string
+while sc_scan < sc_limit
+   setstring FORMS_string "position_values[" sc_scan "]"
+   escapestring escaped %FORMS_string
+   if sc_scan != 0
+      write ", "
+   endif
+   write escaped
+   set sc_scan + 1
+endwhile
+write ". Gender is Female, Male or blank. Put <i>yes</i> under Hidden to hide a player's name from the public. "
+write "Teams are matched by name, and a player already in their team is skipped, so importing "
+write "a corrected file again only adds what's new. "
+write "<a href=~/www/offside-import-example.csv~ download>Example file</a></p>"
+write "<form class=~importform~ onsubmit=~return false~>"
+hidden
+write "<input type=~file~ id=~importfile~ accept=~.csv,text/csv,text/plain~ class=~jaclform~>"
+write "</form>"
+write "<div id=~importpreview~ data-positions=~"
+set sc_scan = 0
+while sc_scan < sc_limit
+   setstring FORMS_string "position_values[" sc_scan "]"
+   escapestring escaped %FORMS_string
+   if sc_scan != 0
+      write "|"
+   endif
+   write escaped
+   set sc_scan + 1
+endwhile
+write "~ data-maxteams=~" MAX_TEAMS "~ data-batch=~" IMPORT_BATCH "~></div>"
+write "</details>"
+write "<script src=~/www/offside-import.js~></script>"
+}
+
+grammar import rows     >import_rows
+
+# ONE BATCH OF AN IMPORT (SEE IMPORT_BATCH). TEAMS ARE MATCHED BY NAME AND
+# ADDED IF NEW; A PLAYER WHOSE NAME IS ALREADY IN THAT TEAM IS SKIPPED. THE
+# RESULT GOES IN p#importresult'S data- ATTRIBUTES FOR THE SCRIPT TO ADD UP.
+{+import_rows
+if current_comp = 0
+   execute "+no_competition"
+   return
+endif
+if can_edit = false
+   execute "+deny"
+   return
+endif
+set imp_teams = 0
+set imp_players = 0
+set imp_skipped = 0
+set imp_full = 0
+set imp_bad = 0
+
+# THE COMPETITION'S TEAMS, AND ITS PLAYERS FOR SPOTTING ONES ALREADY THERE
+execute "+load_teams<current_comp"
+set ex_count = 0
+iterate players
+   set INDEX = 0
+   while INDEX < team_count
+      if field[1] = t_id[INDEX]
+         if ex_count < MAX_PLAYERS
+            set ex_team[ex_count] = field[1]
+            setstring ex_name[ex_count] field[2]
+            set ex_count + 1
+         endif
+      endif
+      set INDEX + 1
+   endwhile
+enditerate
+
+# NEW IDS ARE FOUND ONCE AND COUNTED UP, RATHER THAN RESCANNING THE FILES
+# FOR EVERY ROW
+execute "+next_team_id"
+set imp_team_id = new_id
+execute "+next_player_id"
+set imp_player_id = new_id
+
+set imp_n = 0
+while imp_n < IMPORT_BATCH
+   execute "+import_row<imp_n"
+   set imp_n + 1
+endwhile
+
+write "<p class=~notice~ id=~importresult~ data-teams=~" imp_teams "~ data-players=~" imp_players
+write "~ data-skipped=~" imp_skipped "~ data-full=~" imp_full "~ data-bad=~" imp_bad "~>"
+write "Imported " imp_teams " team(s) and " imp_players " player(s).</p>"
+}
+
+# IMPORTS ROW imp<arg[0]>
+{+import_row
+setstring FORMS_string "imp_" arg[0]
+setstring imp_line %FORMS_string
+ifstring imp_line = ""
+   return
+endif
+# THE SCRIPT SENDS EXACTLY SIX FIELDS, WITH ANY | IN THE TEXT REPLACED. A
+# ROW WITH MORE THAN imp_field HOLDS MAKES split ABORT THIS FUNCTION, SO THE
+# ROW IS COUNTED AS BAD FIRST AND ONLY UN-COUNTED ONCE IT HAS SPLIT CLEANLY.
+set imp_bad + 1
+set imp_fields = 0
+split imp_fields imp_line "|" imp_field
+if imp_fields != 6
+   return
+endif
+ifstring imp_field[0] = "-"
+   return
+endif
+set imp_bad - 1
+
+execute "+import_find_team"
+if imp_t = -1
+   if team_count >= MAX_TEAMS
+      set imp_full + 1
+      return
+   endif
+   set imp_t = team_count
+   set t_id[imp_t] = imp_team_id
+   setstring t_name[imp_t] imp_field[0]
+   set team_count + 1
+   append teams imp_team_id current_comp imp_field[0]
+   set imp_team_id + 1
+   set imp_teams + 1
+endif
+ifstring imp_field[1] = "-"
+   return
+endif
+set imp_team = t_id[imp_t]
+
+execute "+import_find_player"
+if found = true
+   set imp_skipped + 1
+   return
+endif
+if ex_count >= MAX_PLAYERS
+   set imp_full + 1
+   return
+endif
+
+execute "+import_position"
+setstring imp_gender "-"
+ifstring imp_field[4] = "Female"
+   setstring imp_gender "Female"
+endif
+ifstring imp_field[4] = "Male"
+   setstring imp_gender "Male"
+endif
+setstring imp_hidden "-"
+ifstring imp_field[5] = "Hidden"
+   setstring imp_hidden "Hidden"
+endif
+setstring imp_shirt imp_field[3]
+append players imp_player_id imp_team imp_field[1] imp_position imp_shirt imp_gender imp_hidden
+set ex_team[ex_count] = imp_team
+setstring ex_name[ex_count] imp_field[1]
+set ex_count + 1
+set imp_player_id + 1
+set imp_players + 1
+}
+
+# imp_t = THE INDEX IN t_* OF THE TEAM NAMED imp_field[0], OR -1
+{+import_find_team
+set imp_t = -1
+set INDEX = 0
+while INDEX < team_count
+   ifstring t_name[INDEX] = imp_field[0]
+      set imp_t = INDEX
+   endif
+   set INDEX + 1
+endwhile
+}
+
+# found = WHETHER TEAM imp_team ALREADY HAS A PLAYER NAMED imp_field[1]
+{+import_find_player
+set found = false
+set INDEX = 0
+while INDEX < ex_count
+   if ex_team[INDEX] = imp_team
+      ifstring ex_name[INDEX] = imp_field[1]
+         set found = true
+      endif
+   endif
+   set INDEX + 1
+endwhile
+}
+
+# imp_position = imp_field[2] IF IT'S ONE OF position_values, ELSE "-"
+{+import_position
+setstring imp_position "-"
+set sc_scan = 0
+setstring FORMS_string "@position_values"
+set sc_limit = FORMS_string
+while sc_scan < sc_limit
+   setstring FORMS_string "position_values[" sc_scan "]"
+   ifstring %FORMS_string = imp_field[2]
+      setstring imp_position %FORMS_string
+   endif
+   set sc_scan + 1
+endwhile
 }
 
 grammar squad $integer     >squad
@@ -4893,6 +5163,12 @@ print:
    div.addway p.key { margin-top: 2px; }^
    div.addway details { margin-top: 14px; }^
    div.addway summary { cursor: pointer; font-size: 10pt; color: #2e5e2e; }^
+   details.import { margin-top: 18px; max-width: 920px; }^
+   details.import summary { cursor: pointer; font-family: Verdana, Arial, sans-serif; font-size: 11pt; font-weight: bold; color: #2e5e2e; }^
+   ul.importteams { margin: 4px 0 8px 0; }^
+   details.importwarn { margin: 4px 0 10px 0; }^
+   details.importwarn summary { cursor: pointer; font-size: 10pt; color: #a02020; }^
+   details.importwarn ul { font-size: 9pt; margin: 4px 0; }^
    span.expires { font-size: 9pt; color: #555555; white-space: nowrap; }^
    span.authslot { display: inline-block; vertical-align: middle; margin-left: 14px; text-shadow: none; }^
    span.authslot a.signout { text-shadow: 0 0 4px black; }^
