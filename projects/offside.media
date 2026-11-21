@@ -10,3 +10,5 @@
 /images/offside-icon-maskable.png image/png images/offside-icon-maskable.png
 /images/offside-apple-touch.png image/png images/offside-apple-touch.png
 /images/offside-favicon.png image/png images/offside-favicon.png
+/www/offside-import.js application/javascript www/offside-import.js
+/www/offside-import-example.csv text/csv www/offside-import-example.csv
