@@ -13,8 +13,8 @@
 struct proxy_type {
     int				object_pointers[4];				// NOUN1 -> NOUN4
 	int             integer[MAX_WORDS];				// THE COMANDS INTEGERS
-	char			text[MAX_WORDS][256];			// THE COMANDS STRINGS
-	char			command[MAX_WORDS][256];		// THE WHOLE COMMAND
+	char			text[MAX_WORDS][1024];			// THE COMANDS STRINGS (A STRING IS UP TO 1023)
+	char			command[MAX_WORDS][1024];		// THE WHOLE COMMAND
 	int				object_list[4][MAX_OBJECTS];	// THE RESOLVED OBJECTS
 	int				list_size[4];					// THE SIZE OF THE ABOVE LISTS
 	int				max_size[4];					// THE LAST USED INDEX OF THE ABOVE LISTS
@@ -30,7 +30,7 @@ struct proxy_type {
 struct stack_type {
 	FILE 			*infile, *outfile;
 	int             arguments[MAX_WORDS];
-    char			str_arguments[MAX_WORDS][256];
+    char			str_arguments[MAX_WORDS][1024];	// WAS 256, WHICH CUT LONG string_arg VALUES AFTER ANY NESTED CALL
 	char            text_buffer[1024];
 	char            called_name[1024];
 	char			override[256];

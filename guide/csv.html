@@ -43,6 +43,10 @@ enditerate
 
 <p>The quotes are required to prevent the dot in the filename from being interpreted as a scope separator.</p>
 
+<p>Either kind of name must be a plain file name: a name containing <b>/</b>, <b>\</b> or <b>..</b> is refused (and logged), so a name built from a string variable can never reach outside the data directory.</p>
+
+<p>Each field read into <b>field[]</b> holds up to 1023 characters; anything longer is cut off. The last line of a file is read whether or not it ends with a newline, so a file saved by a spreadsheet or text editor works as it is.</p>
+
 <p>This is useful for reference data that is shared across multiple programs.</p>
 
 <h2><a class="section" name="csv1">The ITERATE and ENDITERATE Commands</a></h2>

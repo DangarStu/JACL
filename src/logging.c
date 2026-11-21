@@ -117,7 +117,30 @@ log_error(const char *message, int console)
 
 	/* SEND THE MESSAGE TO STANDARD ERROR OR STANDARD OUT AS REQUIRED */
 	if (console == PLUS_STDOUT || console == ONLY_STDOUT) {
+#if !defined(GLK) && !defined(__NDS__)
+		/* ON THE WEB THE MESSAGE GOES INTO THE PAGE AS HTML, AND MANY
+		 * MESSAGES QUOTE WHAT A VISITOR SENT (AN UNDEFINED FUNCTION NAME
+		 * BUILT FROM A PARAMETER, SAY), SO ESCAPE IT */
+		char escapedMessage[sizeof consoleMessage * 5];
+		const char *from;
+		char *to = escapedMessage;
+
+		for (from = consoleMessage; *from != 0; from++) {
+			if (*from == '<') {
+				memcpy(to, "&lt;", 4); to += 4;
+			} else if (*from == '>') {
+				memcpy(to, "&gt;", 4); to += 4;
+			} else if (*from == '&') {
+				memcpy(to, "&amp;", 5); to += 5;
+			} else {
+				*to++ = *from;
+			}
+		}
+		*to = 0;
+		write_text(escapedMessage);
+#else
 		write_text(consoleMessage);
+#endif
 		write_text("^");
 	} else if (console == PLUS_STDERR || console == ONLY_STDERR) {
 		fprintf(stderr, "%s", consoleMessage);

@@ -68,7 +68,8 @@ jpp()
 
 		result = fgets(text_buffer, 1024, inputFile);
 		if (!result) {
-			sprintf(error_buffer, CANT_OPEN_SOURCE, game_file);
+			snprintf(error_buffer, 1024, CANT_OPEN_SOURCE, game_file);
+			fclose(inputFile);
 			return (FALSE);
 		}
 
@@ -78,12 +79,16 @@ jpp()
 				 * DIRECTLY */
 				if (sscanf(text_buffer, "#processed:%d", &game_version) == 1) {
 					if (INTERPRETER_VERSION < game_version) {
-						sprintf (error_buffer, OLD_INTERPRETER, game_version);
+						snprintf(error_buffer, 1024, OLD_INTERPRETER, game_version);
+						fclose(inputFile);
 						return (FALSE);
 					}
 				}
 				strcpy(processed_file, game_file);
 				
+				/* THESE RETURNS USED TO LEAVE THE FILE OPEN, A LEAK IN THE
+				 * WEB SERVER, WHICH RUNS jpp AGAIN WHENEVER THE GAME CHANGES */
+				fclose(inputFile);
 				return (TRUE);	
 			}					
 			result = fgets(text_buffer, 1024, inputFile);
@@ -96,7 +101,7 @@ jpp()
 
 		fclose(inputFile);
 	} else {
-		sprintf (error_buffer, NOT_FOUND);
+		snprintf(error_buffer, 1024, NOT_FOUND);
 		return (FALSE);
 	}
 
@@ -111,12 +116,21 @@ jpp()
 		snprintf(processed_file, 256, "%s.j2", prefix);
 		if ((outputFile = fopen(processed_file, "w")) == NULL) {
 			/* NO LUCK, CAN'T CONTINUE */
-			sprintf(error_buffer, CANT_OPEN_PROCESSED, processed_file);
+			snprintf(error_buffer, 1024, CANT_OPEN_PROCESSED, processed_file);
 			return (FALSE);
 		}
 	}
 
+	/* THE VERSION STAMP GOES FIRST. IT USED TO FOLLOW THE FIRST LINE OF
+	 * THE GAME, BUT A RELEASE BUILD STARTS ENCRYPTING AT THE FIRST LINE THAT
+	 * ISN'T A COMMENT, SO A GAME BEGINNING WITH CODE OR A BLANK LINE HAD ITS
+	 * STAMP WRITTEN AFTER "#encrypted", WHERE THE LOADER DECRYPTED IT INTO
+	 * GARBAGE AND REFUSED THE GAME. */
+	sprintf(temp_buffer, "#processed:%d\n", INTERPRETER_VERSION);
+	fputs(temp_buffer, outputFile);
+
 	if (process_file(game_file, (char *) NULL) == FALSE) {
+		fclose(outputFile);
 		return (FALSE);
 	}
 
@@ -150,22 +164,26 @@ process_file(const char *sourceFile1, const char *sourceFile2)
 	if ((inputFile = fopen(sourceFile1, "r")) == NULL) {
 		if (sourceFile2 != NULL) {
 			if ((inputFile = fopen(sourceFile2, "r")) == NULL) {
-				sprintf(error_buffer, CANT_OPEN_OR, sourceFile1, sourceFile2);
+				snprintf(error_buffer, 1024, CANT_OPEN_OR, sourceFile1, sourceFile2);
 				return (FALSE);
 			}
 
 		} else {
-			sprintf(error_buffer, CANT_OPEN_SOURCE, sourceFile1);
+			snprintf(error_buffer, 1024, CANT_OPEN_SOURCE, sourceFile1);
 			return (FALSE);
 		}
 	}
 
 	*text_buffer = 0;
 
-	if (fgets(text_buffer, 1024, inputFile) == NULL) {
-		sprintf (error_buffer, READ_ERROR);
+	/* 1021, NOT 1024: stripwhite() ADDS A NEWLINE (AND A RETURN ON
+	 * WINDOWS) AFTER THE TEXT, WHICH OVERRAN text_buffer ON A FULL LINE */
+	if (fgets(text_buffer, 1021, inputFile) == NULL) {
+		/* AN EMPTY FILE HAS NOTHING TO ADD; IT USED TO BE AN ERROR THAT
+		 * STOPPED THE WHOLE GAME LOADING (THE GAME FILE ITSELF HAS ALREADY
+		 * BEEN CHECKED FOR BEING EMPTY BY jpp()) */
 		fclose(inputFile);
-		return (FALSE);
+		return (TRUE);
 	}
 
 	while (!feof(inputFile) || *text_buffer != 0) {
@@ -196,7 +214,7 @@ process_file(const char *sourceFile1, const char *sourceFile2)
 				}
 				include_depth--;
 			} else {
-				sprintf (error_buffer, BAD_INCLUDE);
+				snprintf(error_buffer, 1024, BAD_INCLUDE);
 				fclose(inputFile);
 				return (FALSE);
 			}
@@ -204,7 +222,8 @@ process_file(const char *sourceFile1, const char *sourceFile2)
 			/* STRIP WHITESPACE FROM LINE BEFORE WRITING TO OUTPUTFILE. */
 			stripped_line = stripwhite(text_buffer);
 
-			if (!encrypting && *stripped_line != '#' && *stripped_line != '\0' && do_encrypt && release) {
+			if (!encrypting && *stripped_line != '#' && *stripped_line != '\0'
+				&& *stripped_line != '\n' && *stripped_line != '\r' && do_encrypt && release) {
 				/* START ENCRYPTING FROM THE FIRST NON-COMMENT LINE IN
 				 * THE SOURCE FILE */
 				fputs("#encrypted\n", outputFile);
@@ -219,15 +238,11 @@ process_file(const char *sourceFile1, const char *sourceFile2)
 			fputs(stripped_line, outputFile);
 
 			lines_written++;
-			if (lines_written == 1) {
-				sprintf(temp_buffer, "#processed:%d\n", INTERPRETER_VERSION);
-				fputs(temp_buffer, outputFile);
-			}
 		}
 
 		*text_buffer = 0;
 
-		if (fgets(text_buffer, 1024, inputFile) == NULL) {
+		if (fgets(text_buffer, 1021, inputFile) == NULL) {	/* SEE ABOVE */
 			// EOF HAS BEEN REACHED
 			break;
 		}

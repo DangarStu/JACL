@@ -61,7 +61,7 @@ winglk_startup_code(const char* cmdline)
 	filename = (char*)winglk_get_initial_filename(cmdline, "JACL", "JACL Files (.jacl;.j2)|*.jacl;*.j2|All Files (*.*)|*.*||");
 
 	if (filename == NULL) {
-		sprintf (error_buffer, "%s^", NO_GAME);
+		snprintf(error_buffer, 1024, "%s^", NO_GAME);
 		jpp_error = TRUE;
 
 		/* WE NEED TO RETURN TRUE HERE SO THE INTERPRETER WILL OPEN A
@@ -94,7 +94,7 @@ winglk_startup_code(const char* cmdline)
 	game_fref = winglk_fileref_create_by_name(fileusage_BinaryMode, processed_file, 0, 0);
 
 	if (game_fref == NULL) {
-		sprintf (error_buffer, "%s^", NOT_FOUND);
+		snprintf(error_buffer, 1024, "%s^", NOT_FOUND);
 		jpp_error = TRUE;
 
 		/* WE NEED TO RETURN TRUE HERE SO THE INTERPRETER WILL OPEN A

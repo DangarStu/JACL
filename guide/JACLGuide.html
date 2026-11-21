@@ -559,6 +559,8 @@ WebJACL server configured on localhost:4269
 
 <p>To play this game, open your favourite web browser and navigate to the URL <b>http://localhost:4269</b>. When you do so, you should see something like the screen below. If not, see the section on <a href="#installation8">Troubleshooting</a>.
 
+<p>This built-in server only accepts connections from the same computer. To try a game from another device on your network, such as a phone, start it with the environment variable <b>JACL_LISTEN_ALL</b> set to <b>1</b> (for example <b>JACL_LISTEN_ALL=1 ./cgijacl ../projects/desa.jacl</b>), and only on a network you trust.
+
 <p>To play this same game from the console, try the following command from the <b>bin</b> directory:
 
 <pre>
@@ -3931,6 +3933,8 @@ Set the value of the specified container to the specified value.</TD>
 </TABLE>
 </center>
 
+<p>Dividing by zero with <b>/</b> or <b>%</b> leaves the container unchanged and reports an error rather than stopping the game.</p>
+
 The following example demonstrates how to add 7 and 8 then divide the result by 5:
 
 <pre>
@@ -3974,6 +3978,7 @@ set indirection = 1
 }
 </pre>
 <p>This technique can be particularly useful when the need arises to pass a reference to an array as a function argument.
+<p>A string used this way can name a variable, constant, object or count, but never a function: if its value is the name of a function (such as <b>+game_over</b>), the function is not called. Strings often hold what a player typed or a web visitor sent, and that must never be able to run game code.
 </td>
 </tr></table>
 
@@ -6353,6 +6358,10 @@ enditerate
 </pre>
 
 <p>The quotes are required to prevent the dot in the filename from being interpreted as a scope separator.</p>
+
+<p>Either kind of name must be a plain file name: a name containing <b>/</b>, <b>\</b> or <b>..</b> is refused (and logged), so a name built from a string variable can never reach outside the data directory.</p>
+
+<p>Each field read into <b>field[]</b> holds up to 1023 characters; anything longer is cut off. The last line of a file is read whether or not it ends with a newline, so a file saved by a spreadsheet or text editor works as it is.</p>
 
 <p>This is useful for reference data that is shared across multiple programs.</p>
 

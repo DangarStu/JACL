@@ -18,9 +18,13 @@ char            text_buffer[1024];
  * USED IN THE PLAYER'S INPUT */
 const char     *comma = "comma\0";
 const char     *then = "then\0";
-const char     *word[MAX_WORDS];
-int				quoted[MAX_WORDS];
-int				percented[MAX_WORDS];
+/* ONE EXTRA SLOT, NEVER WRITTEN, SO word[] IS ALWAYS NULL-TERMINATED: A
+ * COMMAND OF MAX_WORDS WORDS FILLED EVERY SLOT AND THE MANY
+ * while (word[x] != NULL) LOOPS READ PAST THE END INTO WHATEVER FOLLOWED,
+ * CRASHING THE SERVER ON A 20-WORD COMMAND. */
+const char     *word[MAX_WORDS + 1];
+int				quoted[MAX_WORDS + 1];
+int				percented[MAX_WORDS + 1];
 int             wp;
 
 void

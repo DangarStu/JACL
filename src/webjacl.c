@@ -666,7 +666,15 @@ listen_again:
 		serverLen = sizeof(serverAddress);
 		memset((char *) &serverAddress, 0, serverLen);
 		serverAddress.sin_family = AF_INET;
-		serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+		/* THIS COPY OF THE INTERPRETER IS FOR ONE PERSON'S OWN
+		 * MACHINE (TESTING, AND THE DESKTOP APP), SO ONLY ACCEPT
+		 * CONNECTIONS FROM IT: LISTENING ON EVERY INTERFACE PUT IT ON
+		 * THE LOCAL NETWORK. SET JACL_LISTEN_ALL=1 TO SERVE OTHER
+		 * DEVICES DELIBERATELY (E.G. TRYING A GAME ON A PHONE). */
+		if (getenv("JACL_LISTEN_ALL") != NULL && !strcmp(getenv("JACL_LISTEN_ALL"), "1"))
+			serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+		else
+			serverAddress.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 		serverAddress.sin_port = htons(port);
 		serverSockAddrPtr = (struct sockaddr *) & serverAddress;
 

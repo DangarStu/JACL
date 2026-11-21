@@ -81,6 +81,8 @@ qPop(Queue *q, int *val, int *val2)
 {
 	//assert(q->head != NULL);
 
+	QueueNode *old = q->head;
+
 	*val = q->head->val;
 	*val2 = q->head->val2;
 
@@ -92,6 +94,10 @@ qPop(Queue *q, int *val, int *val2)
 	{
 		q->head = q->head->next;
 	}
+
+	/* FREE THE NODE: IT USED TO LEAK, ONE PER ROOM VISITED PER ROUTE
+	 * SEARCH, WHICH GROWS FOREVER IN THE WEB SERVER AND THE APPS */
+	free(old);
 }
 
 /**************************************/

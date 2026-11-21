@@ -497,7 +497,7 @@ read_gamefile()
                 } else {
                     int sidx = stylehint_index_from_name(word[1]);
                     if (sidx < 0) {
-                        sprintf(error_buffer,
+                        snprintf(error_buffer, 1024,
                                 "Line %d: stylehint: unknown style name '%s'.\n",
                                 line, word[1]);
                         log_error(error_buffer, PLUS_STDERR);
@@ -507,7 +507,7 @@ read_gamefile()
                                || !strcmp(word[2], "colour")) {
                         unsigned long c;
                         if (stylehint_parse_color(word[3], &c) != 0) {
-                            sprintf(error_buffer,
+                            snprintf(error_buffer, 1024,
                                     "Line %d: stylehint: cannot parse colour '%s'.\n",
                                     line, word[3]);
                             log_error(error_buffer, PLUS_STDERR);
@@ -522,7 +522,7 @@ read_gamefile()
                                || !strcmp(word[2], "bgcolor")) {
                         unsigned long c;
                         if (stylehint_parse_color(word[3], &c) != 0) {
-                            sprintf(error_buffer,
+                            snprintf(error_buffer, 1024,
                                     "Line %d: stylehint: cannot parse colour '%s'.\n",
                                     line, word[3]);
                             log_error(error_buffer, PLUS_STDERR);
@@ -538,7 +538,7 @@ read_gamefile()
                         jacl_stylehints[sidx].reverse_value = atoi(word[3]) ? 1 : 0;
                         jacl_stylehints_dirty = 1;
                     } else {
-                        sprintf(error_buffer,
+                        snprintf(error_buffer, 1024,
                                 "Line %d: stylehint: unknown attribute '%s'.\n",
                                 line, word[2]);
                         log_error(error_buffer, PLUS_STDERR);
@@ -670,7 +670,7 @@ read_gamefile()
                      * them as separate slots. Surface the shadow so
                      * the author sees it. */
                     if (integer_resolve(word[1]) != NULL) {
-                        sprintf(error_buffer,
+                        snprintf(error_buffer, 1024,
                                 "Line %d: integer '%s' shadows an existing integer of the same name.",
                                 line, word[1]);
                         log_error(error_buffer, PLUS_STDERR);
@@ -1207,7 +1207,7 @@ legal_label_check(const char *word, int line, int type)
         !strcmp(word, "noun4") ||
         !strcmp(word, "objects") ||
         validate (word)) {
-        sprintf(error_buffer, ILLEGAL_LABEL, line, word);
+        snprintf(error_buffer, 1024, ILLEGAL_LABEL, line, word);
         log_error(error_buffer, PLUS_STDERR);
 
         return (TRUE);
@@ -1215,7 +1215,7 @@ legal_label_check(const char *word, int line, int type)
 
     if (type == CSTR_TYPE) {
         if (!strcmp(word, "command_prompt")) {
-            sprintf(error_buffer, USED_LABEL_STR, line, word);
+            snprintf(error_buffer, 1024, USED_LABEL_STR, line, word);
             log_error(error_buffer, PLUS_STDERR);
 
             return (TRUE);
@@ -1224,7 +1224,7 @@ legal_label_check(const char *word, int line, int type)
 
     while (integer_pointer != NULL && type != INT_TYPE) {
         if (!strcmp(word, integer_pointer->name)) {
-            sprintf(error_buffer, USED_LABEL_INT, line, word);
+            snprintf(error_buffer, 1024, USED_LABEL_INT, line, word);
             log_error(error_buffer, PLUS_STDERR);
 
             return (TRUE);
@@ -1235,7 +1235,7 @@ legal_label_check(const char *word, int line, int type)
 
     while (cinteger_pointer != NULL && type != CINT_TYPE) {
         if (!strcmp(word, cinteger_pointer->name)) {
-            sprintf(error_buffer, USED_LABEL_CINT, line, word);
+            snprintf(error_buffer, 1024, USED_LABEL_CINT, line, word);
             log_error(error_buffer, PLUS_STDERR);
 
             return (TRUE);
@@ -1245,7 +1245,7 @@ legal_label_check(const char *word, int line, int type)
 
     while (string_pointer != NULL && type != STR_TYPE) {
         if (!strcmp(word, string_pointer->name)) {
-            sprintf(error_buffer, USED_LABEL_STR, line, word);
+            snprintf(error_buffer, 1024, USED_LABEL_STR, line, word);
             log_error(error_buffer, PLUS_STDERR);
 
             return (TRUE);
@@ -1255,7 +1255,7 @@ legal_label_check(const char *word, int line, int type)
 
     while (cstring_pointer != NULL && type != CSTR_TYPE) {
         if (!strcmp(word, cstring_pointer->name)) {
-            sprintf(error_buffer, USED_LABEL_CSTR, line, word);
+            snprintf(error_buffer, 1024, USED_LABEL_CSTR, line, word);
             log_error(error_buffer, PLUS_STDERR);
 
             return (TRUE);
@@ -1266,7 +1266,7 @@ legal_label_check(const char *word, int line, int type)
     /* DON'T CHECK FOR ATT_TYPE AS YOU CAN'T HAVE ATTRIBUTE ARRAYS. */
     while (attribute_pointer != NULL) {
         if (!strcmp(word, attribute_pointer->name)) {
-            sprintf(error_buffer, USED_LABEL_ATT, line, word);
+            snprintf(error_buffer, 1024, USED_LABEL_ATT, line, word);
             write_text(error_buffer);
 
             return (TRUE);
@@ -1276,7 +1276,7 @@ legal_label_check(const char *word, int line, int type)
 
     for (index = 1; index <= objects; index++) {
         if (!strcmp(word, object[index]->label)) {
-            sprintf(error_buffer, USED_LABEL_OBJ,
+            snprintf(error_buffer, 1024, USED_LABEL_OBJ,
                 line, word);
             log_error(error_buffer, PLUS_STDERR);
 
@@ -1313,6 +1313,19 @@ clear_game_data()
     struct cinteger_type *previous_cinteger;
     struct filter_type *current_filter;
     struct filter_type *previous_filter;
+
+#if !defined(GLK) && !defined(__NDS__)
+    /* FREE THE REQUEST PARAMETERS. THEY WERE NEVER FREED, SO EACH RELOAD
+     * (THE WEB SERVER RELOADS THE GAME WHEN ITS FILE CHANGES) ADDED ANOTHER
+     * COPY OF EVERY parameter, AND ONE REMOVED FROM THE GAME KEPT WRITING
+     * ITS OLD VARIABLE UNTIL THE PROCESS RESTARTED */
+    while (parameter_table != NULL) {
+        struct parameter_type *next = parameter_table->next_parameter;
+        free(parameter_table);
+        parameter_table = next;
+    }
+    current_parameter = NULL;
+#endif
 
     /* FREE ALL OBJECTS */
     for (index = 1; index <= objects; index++) {
@@ -1716,7 +1729,7 @@ create_language_constants()
     if (cstring_resolve("SCRIPTING_ALREADY_OFF") == NULL)
         create_cstring    ("SCRIPTING_ALREADY_OFF", SCRIPTING_ALREADY_OFF);
     if (cstring_resolve("SCRIPTING_ALREADY_ON") == NULL)
-        create_cstring    ("SCRIPTING_ALREADY_OFF", SCRIPTING_ALREADY_OFF);
+        create_cstring    ("SCRIPTING_ALREADY_ON", SCRIPTING_ALREADY_ON);
     if (cstring_resolve("CANT_WRITE_SCRIPT") == NULL)
         create_cstring    ("CANT_WRITE_SCRIPT", CANT_WRITE_SCRIPT);
     if (cstring_resolve("ERROR_READING_WALKTHRU") == NULL)

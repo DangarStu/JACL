@@ -254,7 +254,7 @@ main(int argc, char *argv[])
 			strcat (game_file, ".j2");
 
 			if ((file = fopen(game_file, "r")) == NULL) {
-				sprintf(error_buffer, CANT_OPEN_SOURCE, game_file);
+				snprintf(error_buffer, 1024, CANT_OPEN_SOURCE, game_file);
 				log_error(error_buffer, ONLY_STDERR);
 			} else {
 				break;

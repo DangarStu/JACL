@@ -197,7 +197,7 @@ parser()
 					if (last_exact == -1) {
 						write_text (cstring_resolve("NO_MULTI_START")->value);
 					} else {
-						sprintf(error_buffer, cstring_resolve("NO_MULTI_VERB")->value, word[last_exact]);
+						snprintf(error_buffer, 1024, cstring_resolve("NO_MULTI_VERB")->value, word[last_exact]);
 						write_text(error_buffer);
 					}
 
@@ -309,8 +309,9 @@ parser()
 							noun[1] = object_list[1][index];
 
 							if (MULTI_PREFIX->value) {
-								// DISPLAY THE OBJECT BEING ACTED ON
-								plain_output(noun[0], FALSE);
+								// DISPLAY THE OBJECT BEING ACTED ON (THE SECOND
+								// NOUN HERE: noun[0] IS THE SAME EVERY TIME)
+								plain_output(noun[1], FALSE);
 								write_text(temp_buffer);
 								write_text(": ");
 							}
@@ -711,7 +712,7 @@ build_object_list(struct word_type *scope_word, int noun_number)
 				 * RESOLVED LIST */
 				noun_number = noun_number + 2;
 			} else {
-				sprintf (error_buffer, cstring_resolve("DOUBLE_EXCEPT")->value, except_word);	
+				snprintf(error_buffer, 1024, cstring_resolve("DOUBLE_EXCEPT")->value, except_word);	
 				write_text (error_buffer);
 				custom_error = TRUE;
 				return (FALSE);
@@ -1060,7 +1061,7 @@ verify_from_object(int from_object)
 	//if (!(object[from_object]->attributes & CONTAINER) &&
 	//	!(object[from_object]->attributes & SURFACE) &&
 	//	!(object[from_object]->attributes & ANIMATE)) {
-	//	sprintf (error_buffer, FROM_NON_CONTAINER, from_word);	
+	//	snprintf(error_buffer, 1024, FROM_NON_CONTAINER, from_word);	
 	//	write_text (error_buffer);
 	//	custom_error = TRUE;
 	//	return (FALSE);
@@ -1068,9 +1069,9 @@ verify_from_object(int from_object)
 	if (object[from_object]->attributes & CONTAINER && object[from_object]->attributes & CLOSED) {
 		//printf("--- container is concealing\n");
         if (object[from_object]->attributes & FEMALE) {
-			sprintf (error_buffer, cstring_resolve("CONTAINER_CLOSED_FEM")->value, sentence_output(from_object, TRUE));	
+			snprintf(error_buffer, 1024, cstring_resolve("CONTAINER_CLOSED_FEM")->value, sentence_output(from_object, TRUE));	
 		} else {
-			sprintf (error_buffer, cstring_resolve("CONTAINER_CLOSED")->value, sentence_output(from_object, TRUE));	
+			snprintf(error_buffer, 1024, cstring_resolve("CONTAINER_CLOSED")->value, sentence_output(from_object, TRUE));	
 		}
 		write_text(error_buffer);
 		custom_error = TRUE;
@@ -1079,13 +1080,13 @@ verify_from_object(int from_object)
 	 * IF THE PERSON IS POSSESSIVE LET THE LIBRARY HANDLE THE RESPONSE
 	} else if (object[from_object]->attributes & POSSESSIVE) {
 		//printf("--- container is closed\n");
-		sprintf (error_buffer, PERSON_POSSESSIVE, sentence_output(from_object, TRUE));	
+		snprintf(error_buffer, 1024, PERSON_POSSESSIVE, sentence_output(from_object, TRUE));	
 		write_text(error_buffer);
 		custom_error = TRUE;
 		return (FALSE);
 	} else if (object[from_object]->attributes & CONCEALING) {
 		//printf("--- container is closed\n");
-		sprintf (error_buffer, PERSON_CONCEALING, sentence_output(from_object, TRUE));	
+		snprintf(error_buffer, 1024, PERSON_CONCEALING, sentence_output(from_object, TRUE));	
 		write_text(error_buffer);
 		custom_error = TRUE;
 		return (FALSE);*/
@@ -1110,6 +1111,11 @@ add_to_list(int noun_number, int resolved_object)
 	him = resolved_object;
 	
 	//printf("--- adding_object %s to list %d at index %d\n", object[resolved_object]->label, noun_number, max_size[noun_number]);
+	/* BOUNDED: A COMMAND LIKE "take all, all, all ..." ADDED EVERY OBJECT
+	 * ONCE PER "all", WHICH IN A BIG ENOUGH GAME WROTE PAST THE LIST (AND
+	 * THEN PAST them[] WHEN IT WAS COPIED THERE) */
+	if (max_size[noun_number] >= MAX_OBJECTS - 1)
+		return;
 	object_list[noun_number][max_size[noun_number]] = resolved_object;
 	list_size[noun_number]++;
 	max_size[noun_number]++;
@@ -1718,6 +1724,8 @@ noun_resolve(struct word_type *scope_word, int finding_from, int noun_number)
 #if defined GLK || defined __NDS__
 	/* NO OBJECT HAS CLAIMED OWNERSHIP, PROMPT THE PLAYER TO SPECIFY 
 	 * WHICH ONE THEY REQUIRE. */
+	char option_label[16];
+
 	counter = 1;
 	write_text(cstring_resolve("BY")->value);
 	write_text(error_buffer);
@@ -1725,8 +1733,11 @@ noun_resolve(struct word_type *scope_word, int finding_from, int noun_number)
 	for (index = 1; index <= objects; index++) {
 		if (confidence[index] != FALSE) {
 			possible_objects[counter] = index;
-			sprintf(text_buffer, "  [%d] ", counter);
-			write_text(text_buffer);
+			/* A LOCAL BUFFER: text_buffer HOLDS THE PLAYER'S COMMAND, WHICH
+			 * word[] STILL POINTS INTO, SO WRITING THE LABEL THERE CORRUPTED
+			 * THE REST OF THE COMMAND */
+			snprintf(option_label, sizeof option_label, "  [%d] ", counter);
+			write_text(option_label);
 			sentence_output(index, 0);
 			write_text(temp_buffer);
 			matches--;
@@ -1743,8 +1754,11 @@ noun_resolve(struct word_type *scope_word, int finding_from, int noun_number)
 		}
 	}
 
-	/* GET A NUMBER: don't insist, low = 1, high = counter */
-	selection = get_number(FALSE, 1, counter);
+	/* GET A NUMBER: don't insist, low = 1, high = THE LAST ONE SHOWN. counter
+	 * IS ONE PAST IT WHEN THE LOOP RAN OUT RATHER THAN STOPPING AT 9, AND
+	 * ACCEPTING THAT NUMBER RETURNED A STALE possible_objects ENTRY. (THE
+	 * LOOP ONLY ENDS WITH index <= objects WHEN IT STOPPED AT 9.) */
+	selection = get_number(FALSE, 1, index > objects ? counter - 1 : counter);
 
 	if (selection == -1) {
 		write_text (cstring_resolve("INVALID_SELECTION")->value);
@@ -1895,7 +1909,7 @@ find_parent_impl(int index, int depth)
 	//printf("--- find parent of %s\n", object[index]->label);
 
 	if (depth >= MAX_PARENT_DEPTH) {
-		sprintf(error_buffer,
+		snprintf(error_buffer, 1024,
 		        "Object parent chain exceeded depth %d starting at '%s'; possible cycle.",
 		        MAX_PARENT_DEPTH, object[index]->label);
 		log_error(error_buffer, PLUS_STDOUT);
@@ -1910,7 +1924,7 @@ find_parent_impl(int index, int depth)
 
 		if (index == parent) {
 			/* THIS OBJECT HAS ITS PARENT SET TO ITSELF */
-			sprintf(error_buffer, SELF_REFERENCE, executing_function->name, object[index]->label);
+			snprintf(error_buffer, 1024, SELF_REFERENCE, executing_function->name, object[index]->label);
 			log_error(error_buffer, PLUS_STDOUT);
 			return (FALSE);
 		} else	if (!(object[parent]->attributes & LOCATION) 
@@ -1961,7 +1975,7 @@ parent_of_impl(int parent, int child, int restricted, int depth)
 	int             index;
 
 	if (depth >= MAX_PARENT_DEPTH) {
-		sprintf(error_buffer,
+		snprintf(error_buffer, 1024,
 		        "Object parent chain exceeded depth %d (parent=%d, child=%d); possible cycle.",
 		        MAX_PARENT_DEPTH, parent, child);
 		log_error(error_buffer, PLUS_STDOUT);
@@ -1979,7 +1993,7 @@ parent_of_impl(int parent, int child, int restricted, int depth)
 
 		if (index == child) {
 			/* THIS CHILD HAS IT'S PARENT SET TO ITSELF */
-			sprintf(error_buffer, SELF_REFERENCE, executing_function->name, object[index]->label);
+			snprintf(error_buffer, 1024, SELF_REFERENCE, executing_function->name, object[index]->label);
 			log_error(error_buffer, PLUS_STDOUT);
 			//printf("--- self parent.\n");
 			return (FALSE);

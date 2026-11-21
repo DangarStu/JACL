@@ -230,14 +230,41 @@ validate(const char *string)
 	return (TRUE);
 }
 
+/* HOW DEEP value_of() IS IN RESOLVING TEXT THAT CAME OUT OF A STRING
+ * VARIABLE RATHER THAN FROM THE GAME'S SOURCE. SEE value_of(). */
+static int      untrusted_depth = 0;
+
+static long     value_of_text(const char *value, int run_time);
+
+/* THE INTEGER VALUE OF value: A NUMBER, A VARIABLE, AN OBJECT, A COUNT, ...
+ * A STRING VARIABLE IS FIRST REPLACED BY ITS CONTENTS, AND THOSE CONTENTS
+ * MAY NAME ANOTHER VARIABLE OR A COUNT (forms.library RELIES ON THAT, E.G.
+ * set n = FORMS_string HOLDING "@position_values"). BUT A STRING CAN HOLD
+ * WHAT A PLAYER TYPED, A REQUEST PARAMETER OR A CSV FIELD, SO WHILE
+ * RESOLVING ITS CONTENTS -- INCLUDING ANY ARRAY INDEX INSIDE THEM -- A
+ * FUNCTION IS NEVER CALLED: set n = $string WITH "+game_over" TYPED USED TO
+ * RUN +game_over. */
 long
 value_of(const char *value, int run_time)
+{
+	const char     *resolved = arg_text_of(value);
+	long            result;
+
+	if (resolved == value)
+		return (value_of_text(resolved, run_time));
+
+	untrusted_depth++;
+	result = value_of_text(resolved, run_time);
+	untrusted_depth--;
+	return (result);
+}
+
+static long
+value_of_text(const char *value, int run_time)
 {
 	long            compare;
 
     value_resolved = TRUE;
-
-	value = arg_text_of(value);
 
 	/* RETURN THE INTEGER VALUE OF A STRING */
 	struct integer_type *resolved_integer;
@@ -298,7 +325,7 @@ value_of(const char *value, int run_time)
 		return (resolved_cinteger->value);
 	} else if ((resolved_integer = integer_resolve(value)) != NULL) {
 		return (resolved_integer->value);
-	} else if (function_resolve(value) != NULL) {
+	} else if (untrusted_depth == 0 && function_resolve(value) != NULL) {
 		return (execute(value));
 	} else if (object_element_resolve(value)) {
 		return (oec);
@@ -864,12 +891,12 @@ expand_function(const char *name)
 		object_element_resolve(&expression[delimiter])) {
 		/* THE DELIMETER RESOLVES TO A CONSTANT, VARIABLE OR OBJECT
 		 * ELEMENT, SO TAKE NOTE OF THAT */
-		sprintf(function_name, "%ld", value_of(&expression[delimiter], TRUE));
+		snprintf(function_name, 81, "%ld_%s", value_of(&expression[delimiter], TRUE),
+				 object[index]->label);
 	} else {
-		strcpy(function_name, &expression[delimiter]);
+		/* BOUNDED: function_name IS 81 BYTES AND THIS COULD REACH ~120 */
+		snprintf(function_name, 81, "%s_%s", &expression[delimiter], object[index]->label);
 	}
-	strcat(function_name, "_");
-	strcat(function_name, object[index]->label);
 
 	return ((char *) function_name);
 }
@@ -1095,11 +1122,10 @@ macro_resolve(const char *testString)
 			return (sentence_output(index, TRUE));
 		}
 	} else {
-		strcpy (macro_function, "+macro_");
-		strcat (macro_function, &expression[delimiter]);
-		strcat (macro_function, "<");
-		sprintf (temp_buffer, "%d", index);
-		strcat (macro_function, temp_buffer);
+		/* BOUNDED: THE NAME PART CAN BE 82 BYTES, WHICH OVERRAN THE
+		 * 84-BYTE macro_function */
+		snprintf (macro_function, sizeof macro_function, "+macro_%s<%d",
+				  &expression[delimiter], index);
 
 		// BUILD THE FUNCTION NAME AND PASS THE OBJECT AS 
 		// THE ONLY ARGUMENT
@@ -1284,7 +1310,7 @@ object_element_resolve(const char *testString)
 	counter = value_of(&expression[delimiter], TRUE);
 
 	if (counter < 0 || counter > 15) {
-		sprintf(error_buffer,
+		snprintf(error_buffer, 1024,
 				"ERROR: In function \"%s\", element \"%s\" out of range (%d).^",
 				executing_function->name, &expression[delimiter], counter);
 		write_text(error_buffer);
@@ -1320,11 +1346,11 @@ object_resolve(const char *object_string)
 		 * executing_function->self even when executing_function was
 		 * NULL because the && short-circuited the first check. */
 		if (executing_function == NULL) {
-			sprintf(error_buffer,
+			snprintf(error_buffer, 1024,
 					"ERROR: Reference to 'self' outside any function.^");
 			write_text(error_buffer);
 		} else if (executing_function->self == 0) {
-			sprintf(error_buffer,
+			snprintf(error_buffer, 1024,
 					"ERROR: Reference to 'self' from global function \"%s\".^",
 					executing_function->name);
 			write_text(error_buffer);

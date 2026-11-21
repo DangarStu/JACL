@@ -31,7 +31,7 @@ main(int argc, char *argv[])
 
 	/* Drive the loop off fgets so a read error / EOF doesn't leave
 	 * the last line in text_buffer to be re-printed. */
-	while (fgets(text_buffer, 1024, file) != NULL) {
+	while (fgets(text_buffer, 1021, file) != NULL) {	/* ROOM FOR WHAT stripwhite() APPENDS */
 		if (strstr(text_buffer, "#encrypted")) {
 			encrypted = 1;
 			continue;

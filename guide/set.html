@@ -53,6 +53,8 @@ Set the value of the specified container to the specified value.</TD>
 </TABLE>
 </center>
 
+<p>Dividing by zero with <b>/</b> or <b>%</b> leaves the container unchanged and reports an error rather than stopping the game.</p>
+
 The following example demonstrates how to add 7 and 8 then divide the result by 5:
 
 <pre>
@@ -96,6 +98,7 @@ set indirection = 1
 }
 </pre>
 <p>This technique can be particularly useful when the need arises to pass a reference to an array as a function argument.
+<p>A string used this way can name a variable, constant, object or count, but never a function: if its value is the name of a function (such as <b>+game_over</b>), the function is not called. Strings often hold what a player typed or a web visitor sent, and that must never be able to run game code.
 </td>
 </tr></table>
 

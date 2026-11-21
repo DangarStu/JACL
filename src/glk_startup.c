@@ -52,7 +52,7 @@ int glkunix_startup_code(glkunix_startup_t *data)
 	 * GENERALLY BE LIMITED TO FINDING AND OPENING DATA FILES.  */
 
 	if (arguments->argc == 1) {
-		sprintf (error_buffer, "%s^", NO_GAME);
+		snprintf(error_buffer, 1024, "%s^", NO_GAME);
 		jpp_error = TRUE;
 
 		/* WE NEED TO RETURN TRUE HERE SO THE INTERPRETER WILL OPEN A

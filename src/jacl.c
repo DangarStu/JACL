@@ -571,8 +571,12 @@ glk_main(void)
 		interrupted = FALSE;
 
 		if (word[0] != NULL) {
-			if (strcmp(word[0], "undo")) {
-				/* COMMAND DOES NOT EQUAL undo */
+			/* THE GAME'S OWN WORD FOR undo (E.G. "annuler"): COMPARING WITH
+			 * "undo" SNAPSHOTTED THE STATE JUST BEFORE A LOCALISED undo, WHICH
+			 * THEN RESTORED THAT SNAPSHOT AND CHANGED NOTHING */
+			if (strcmp(word[0], cstring_resolve("UNDO_WORD")->value)
+				&& strcmp(word[0], "undo")) {
+				/* COMMAND IS NOT undo */
 				save_game_state();
 			}
 
@@ -697,6 +701,11 @@ word_check()
 				index = 0;
 
 				while (word[index] != NULL) {
+					/* BOUNDED: THE OLD COMMAND PLUS A LONG REPLACEMENT WORD
+					 * (MULTI-BYTE CHARACTERS COUNT SEVERAL TIMES) RAN PAST
+					 * oopsed_current INTO THE VARIABLES AFTER IT */
+					if (strlen(oopsed_current) + strlen(word[index]) + 2 > sizeof oopsed_current)
+						break;
 					if (oopsed_current[0] != 0) {
 						strcat(oopsed_current, " ");
 					}
@@ -1612,15 +1621,20 @@ glk_get_bin_line_stream(strid_t file_stream, char *buffer, glui32 max_length)
 
 	register int index = 0;
 
-	character = glk_get_char_stream(file_stream);
-	while (character != -1 && index < (int) max_length) {
+	/* LEAVE ROOM FOR THE TERMINATOR: THIS USED TO FILL ALL max_length
+	 * BYTES AND THEN WRITE THE 0 ONE PAST THE END (EVERY CALLER PASSES
+	 * ITS BUFFER'S FULL SIZE). A CHARACTER IS ONLY READ ONCE THERE IS ROOM
+	 * FOR IT, SO NONE IS LOST AT THE LIMIT. */
+	while (index < (int) max_length - 1) {
+		character = glk_get_char_stream(file_stream);
+		if (character == -1)
+			break;
 		*(buffer + index) = (char) character;
 		index++;
 		if (character == (glsi32) '\n' ||
             character == (glsi32) '\r') {
 			break;
 		}
-		character = glk_get_char_stream(file_stream);
 	};
 
 	*(buffer + index) = 0;
