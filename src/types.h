@@ -85,6 +85,13 @@ struct object_type {
 	int				nosave;
 };
 
+/* THE FOUR VARIABLE LISTS THAT HAVE A NAME INDEX (SEE resolvers.c) */
+#define VI_INTEGER  0
+#define VI_CINTEGER 1
+#define VI_STRING   2
+#define VI_CSTRING  3
+#define VI_TABLES   4
+
 struct integer_type {
 	char            name[44];
 	int             value;

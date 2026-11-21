@@ -321,6 +321,119 @@ value_of(const char *value, int run_time)
 	}
 }
 
+/* NAME INDEX FOR THE VARIABLE LISTS
+ *
+ * Integers, strings and their constant forms are kept in singly linked lists
+ * in declaration order, with each element of an array as its own node. Every
+ * reference to a variable used to walk its list from the head comparing names,
+ * which in a program with a few thousand nodes was most of the interpreter's
+ * running time. This hashes each name to the FIRST node that has it; a lookup
+ * jumps there and, for an array element, walks forward from it exactly as the
+ * full walk did (later nodes with the same name are the later elements), so
+ * which node a name resolves to is unchanged.
+ *
+ * The index must be told about every change to a list: the loader's create_*
+ * functions and its freeing of everything, and add_/clear_cinteger and
+ * add_/clear_cstring, which replace arg, string_arg and the like on every
+ * function call. Entries point into the nodes' own name fields, so an entry
+ * is removed whenever the nodes with its name are freed. */
+
+#define VI_BUCKETS 1024
+
+struct variable_index_entry {
+	const char                  *name;
+	void                        *node;
+	struct variable_index_entry *next;
+};
+
+static struct variable_index_entry *variable_index[VI_TABLES][VI_BUCKETS];
+
+static unsigned int
+variable_hash(const char *name)
+{
+	/* FNV-1a */
+	unsigned int hash = 2166136261u;
+
+	while (*name) {
+		hash ^= (unsigned char) *name++;
+		hash *= 16777619u;
+	}
+
+	return (hash & (VI_BUCKETS - 1));
+}
+
+static void *
+variable_index_find(int table, const char *name)
+{
+	struct variable_index_entry *entry = variable_index[table][variable_hash(name)];
+
+	while (entry != NULL) {
+		if (!strcmp(entry->name, name))
+			return (entry->node);
+		entry = entry->next;
+	}
+
+	return (NULL);
+}
+
+/* RECORD node AS HOLDING name, UNLESS AN EARLIER NODE ALREADY DOES (NEW NODES
+ * ARE ALWAYS ADDED AT THE END OF THEIR LIST, SO THE FIRST ONE STAYS FIRST) */
+void
+variable_index_add(int table, const char *name, void *node)
+{
+	unsigned int                 bucket = variable_hash(name);
+	struct variable_index_entry *entry;
+
+	for (entry = variable_index[table][bucket]; entry != NULL; entry = entry->next) {
+		if (!strcmp(entry->name, name))
+			return;
+	}
+
+	if ((entry = (struct variable_index_entry *) malloc(sizeof(struct variable_index_entry))) == NULL) {
+		outofmem();
+		return;
+	}
+
+	entry->name = name;
+	entry->node = node;
+	entry->next = variable_index[table][bucket];
+	variable_index[table][bucket] = entry;
+}
+
+/* FORGET name, WHOSE NODES HAVE ALL BEEN FREED */
+void
+variable_index_remove(int table, const char *name)
+{
+	struct variable_index_entry **link = &variable_index[table][variable_hash(name)];
+	struct variable_index_entry  *entry;
+
+	while ((entry = *link) != NULL) {
+		if (!strcmp(entry->name, name)) {
+			*link = entry->next;
+			free(entry);
+			return;
+		}
+		link = &entry->next;
+	}
+}
+
+/* FORGET EVERY NAME IN table, WHOSE WHOLE LIST HAS BEEN FREED */
+void
+variable_index_reset(int table)
+{
+	int                          bucket;
+	struct variable_index_entry *entry,
+	                            *next;
+
+	for (bucket = 0; bucket < VI_BUCKETS; bucket++) {
+		for (entry = variable_index[table][bucket]; entry != NULL; entry = next) {
+			next = entry->next;
+			free(entry);
+		}
+		variable_index[table][bucket] = NULL;
+	}
+}
+
 struct integer_type *
 integer_resolve(const char *name)
 {
@@ -388,7 +501,7 @@ integer_resolve(const char *name)
 struct integer_type *
 integer_resolve_indexed(const char *name, int index)
 {
-	struct integer_type *pointer = integer_table;
+	struct integer_type *pointer = (struct integer_type *) variable_index_find(VI_INTEGER, name);
 
 	if (pointer == NULL)
 		return (NULL);
@@ -479,7 +592,7 @@ cinteger_resolve(const char *name)
 struct cinteger_type *
 cinteger_resolve_indexed(const char *name, int index)
 {
-	struct cinteger_type *pointer = cinteger_table;
+	struct cinteger_type *pointer = (struct cinteger_type *) variable_index_find(VI_CINTEGER, name);
 
 	if (pointer == NULL)
 		return (NULL);
@@ -561,7 +674,7 @@ string_resolve(const char *name)
 struct string_type *
 string_resolve_indexed(const char *name, int index)
 {
-	struct string_type *pointer = string_table;
+	struct string_type *pointer = (struct string_type *) variable_index_find(VI_STRING, name);
 
 	if (pointer == NULL)
 		return (NULL);
@@ -643,7 +756,7 @@ cstring_resolve(const char *name)
 struct string_type *
 cstring_resolve_indexed(const char *name, int index)
 {
-	struct string_type *pointer = cstring_table;
+	struct string_type *pointer = (struct string_type *) variable_index_find(VI_CSTRING, name);
 
 	if (pointer == NULL)
 		return (NULL);
