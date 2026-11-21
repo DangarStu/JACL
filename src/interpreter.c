@@ -1948,6 +1948,11 @@ execute(const char *funcname)
                 write_text("<jacl-clear></jacl-clear>");
             } else if (!strcmp(word[0], "more")) {
             } else if (!strcmp(word[0], "terminate")) {
+                /* A WEB SERVER PROCESS SERVES EVERY VISITOR, SO IT CAN'T
+                 * EXIT FOR ONE OF THEM. IT USED TO IGNORE terminate AND RUN
+                 * THE REST OF THE FUNCTION, WHICH ON THE DESKTOP WOULD NEVER
+                 * RUN; THE NEAREST SAFE EQUIVALENT IS TO END THIS FUNCTION. */
+                return (exit_function(TRUE));
 #endif
 #endif
             } else if (!strcmp(word[0], "proxy")) {

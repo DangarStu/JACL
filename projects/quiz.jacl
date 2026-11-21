@@ -89,6 +89,7 @@ object you
 constant title_image         "none"
 constant footer_image        "none"
 constant header_colour       "#000000"
+constant header_height       87
 constant linkbar_colour      "#c0b098"
 constant maintext_colour     "#dddddd"
 

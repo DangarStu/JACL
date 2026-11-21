@@ -231,6 +231,8 @@ flush
 
 <p>The <b>terminate</b> command will directly initiate the termination of the JACL interpreter.
 
+<p>A web interpreter can't stop, as one server process serves every player, so there <b>terminate</b> ends the function it's in, the same as <b>return</b>: nothing after it in that function is run, but the function that called it carries on. To end a game on the web, tell the player so and stop accepting further commands, for example by setting a variable that your command functions check.
+
 <h2><a class="section" name="special13">The UNDOMOVE Command</a></h2> 
 
 <p>The <b>undomove</b> command will take the game back to the state it was in prior to the player's last command.

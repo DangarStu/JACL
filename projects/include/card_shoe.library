@@ -3039,6 +3039,15 @@ if $integer < 25 : $integer > 1000
    execute "+display_table"
    return
 endif
+if $integer > current_player(money)
+   write PARA_OPEN "You only have $" current_player(money) " left.^"
+   execute "+display_table"
+   return
+endif
+# THE STAKE LEAVES THE BANKROLL WHEN THE BET IS PLACED; +determine_winner PAYS
+# IT BACK (WITH ANY WINNINGS) ON A PUSH OR A WIN, AS +double AND +split ALSO
+# ASSUME. WITHOUT THIS A LOST HAND COST NOTHING.
+set current_player(money) - $integer
 set hand_one(bet) = $integer
 set GAME_PHASE = players_turn
 execute "+deal_initial"
