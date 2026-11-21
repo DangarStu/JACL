@@ -379,9 +379,18 @@ int read_cgi_input(llist* entries)
      In the future, I may modify parse_CGI_encoded so that it also
      parses POST directly from stdin.  I'm undecided on this issue,
      because doing so will make parse_CGI_encoded less general. */
+  /* JACL: FILE UPLOADS ARE REFUSED. parse_form_encoded() WRITES EACH
+     UPLOADED FILE TO UPLOADDIR UNDER THE NAME THE CLIENT SENT, WITH NO
+     CHECKS, SO filename="../some/path" COULD OVERWRITE ANY FILE THE WEB
+     SERVER CAN WRITE (GAME DATA INCLUDED). NOTHING IN JACL USES UPLOADS
+     -- GAMES THAT IMPORT A FILE READ IT IN THE BROWSER AND SEND ITS
+     CONTENTS AS ORDINARY PARAMETERS -- SO A multipart REQUEST GETS AN
+     EMPTY FORM INSTEAD. */
   if ((CONTENT_TYPE != NULL) &&
-      (strstr(CONTENT_TYPE,"multipart/form-data") != NULL) )
-    return parse_form_encoded(entries);
+      (strstr(CONTENT_TYPE,"multipart/form-data") != NULL) ) {
+    list_create(entries);
+    return 0;
+  }
 
   /* get the input */
   if (REQUEST_METHOD == NULL)
@@ -404,7 +413,9 @@ int read_cgi_input(llist* entries)
 
 int read_file_upload(llist *entries, int maxfilesize)
 {
-  return parse_form_encoded(entries);
+  /* JACL: REFUSED FOR THE SAME REASON AS IN read_cgi_input() */
+  list_create(entries);
+  return 0;
 }
 
 char *cgi_val(llist l, char *name)
