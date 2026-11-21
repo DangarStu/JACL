@@ -286,12 +286,26 @@ static void version_info(void);
 static void read_config_file(void);
 static void word_check(void);
 
+/* TRUE WHEN player IS AN OBJECT IN A VALID LOCATION, I.E. WHEN get_here()
+ * CAN BE CALLED WITHOUT TERMINATING (SAME TESTS AS get_here IN utils.c) */
+static int
+player_in_play(void)
+{
+    if (player < 1 || player > objects)
+        return (FALSE);
+    if (object[player]->PARENT < 1 || object[player]->PARENT > objects
+        || object[player]->PARENT == player)
+        return (FALSE);
+    return (TRUE);
+}
+
 int
 main(int argc, char *argv[])
 {
     int             index;
     char           *last_slash;
     short int       returning_player = FALSE;
+    short int       new_game = FALSE;
 
     time_t          tnow;
     time_t          current_last_modified,
@@ -924,9 +938,33 @@ main(int argc, char *argv[])
             returning_player = FALSE;
         }
 
-        if (returning_player == FALSE
-            && (cgi_val(entries, "command") == NULL)
-            && (cgi_val(entries, "rpc") == NULL)) {
+        /* A NEW PLAYER (NO SAVED GAME) NORMALLY STARTS WITH +intro. ONE
+         * WHOSE FIRST REQUEST ALREADY CARRIES A command OR rpc (A WEB APP
+         * TAB CLICK AFTER THEIR SESSION EXPIRED, OR SIMPLY A LINK SUCH AS
+         * ?command=look) GETS +setup AND THE COMMAND INSTEAD -- BUT ONLY IF
+         * THE GAME CAN TAKE A COMMAND YET. A GAME THAT SETS player IN +intro
+         * HAS NO PLAYER AT THIS POINT, AND THE FIRST get_here() WOULD CALL
+         * terminate(44), TAKING THE WHOLE SERVER PROCESS DOWN FOR EVERY
+         * VISITOR. SUCH A REQUEST STARTS THE GAME PROPERLY INSTEAD, AND
+         * THE COMMAND IS DROPPED. */
+        new_game = FALSE;
+        if (returning_player == FALSE) {
+            if ((cgi_val(entries, "command") == NULL)
+                && (cgi_val(entries, "rpc") == NULL)) {
+                new_game = TRUE;
+            } else {
+                // SETUP THE GAME STATE IF THERE IS A COMMAND
+                // BUT IT IS NOT A RETURNING PLAYER
+                execute("+setup");
+
+                if (!player_in_play()) {
+                    log_error("First request carried a command before the game had started; showing the introduction instead.", LOG_ONLY);
+                    new_game = TRUE;
+                }
+            }
+        }
+
+        if (new_game) {
             /* THIS IS THE START OF A NEW GAME, NOT AN EXISTING USER
              * CONTINUING A GAME */
 
@@ -948,13 +986,8 @@ main(int argc, char *argv[])
 
         } else {
 
-            /* THIS MOVE IS A CONTINUATION OF A GAME THAT IS IN PROGRESS */
-
-            if (returning_player == FALSE) {
-                // SETUP THE GAME STATE IF THERE IS A COMMAND 
-                // BUT IT IS NOT A RETURNING PLAYER
-                execute("+setup");
-            }
+            /* THIS MOVE IS A CONTINUATION OF A GAME THAT IS IN PROGRESS
+             * (+setup HAS ALREADY RUN ABOVE FOR A NEW PLAYER) */
 
             TIME->value = TRUE;
             custom_error = FALSE;

@@ -483,6 +483,9 @@ endif
 <td valign="top"><B>+intro</B></TD>
 <td>This function is executed when a game is first run or restarted. It is used to display introductory text and set the starting values for any variables required.</td>
 </tr><tr>
+<td valign="top"><B>+setup</B></TD>
+<td>With a web interpreter, a visitor's first request normally runs <b>+intro</b>. If their first request already carries a command instead (for example, a web application's tab was clicked after their session had expired, or someone followed a link ending in <tt>?command=look</tt>), <b>+setup</b> is run and then the command is processed, without <b>+intro</b>. Use it to set up whatever the command needs. If, after <b>+setup</b>, the <b>player</b> pointer still doesn't point to an object in a valid location (as in a game that sets <b>player</b> in <b>+intro</b>), the command is ignored and the game is started with <b>+intro</b> as normal.</td>
+</tr><tr>
 <td valign="top"><B>+header</B></td>
 <td>This function is the very first to be executed before the player's command is processed when playing with a CGI interpreter.</td>
 </tr><tr>
