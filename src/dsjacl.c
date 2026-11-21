@@ -1032,6 +1032,71 @@ reset_styles()
 	if (note_mode) printf("\x1b[34;1m");
 }
 
+/* UNDO SNAPSHOT OF EVERY STRING VARIABLE, KEPT AS ONE BUFFER RATHER THAN
+ * A FIELD IN string_type, WHICH CONSTANTS SHARE AND WOULD DOUBLE IN SIZE.
+ * undo_strings IS THE NUMBER OF STRINGS IN THE SNAPSHOT, SO A SNAPSHOT
+ * TAKEN BEFORE THE GAME WAS RELOADED WITH A DIFFERENT SET IS NEVER APPLIED */
+static char    *string_backup = NULL;
+static int      string_backup_size = 0;
+static int      undo_strings = -1;
+
+static void
+save_string_state()
+{
+	struct string_type *current_string;
+	int             count = 0;
+	char           *slot;
+
+	for (current_string = string_table; current_string != NULL;
+		 current_string = current_string->next_string)
+		count++;
+
+	if (count > string_backup_size) {
+		char *grown = realloc(string_backup, (size_t) count * 1025);
+
+		if (grown == NULL) {
+			/* KEEP UNDOING INTEGERS AND OBJECTS; JUST LEAVE STRINGS ALONE */
+			undo_strings = -1;
+			return;
+		}
+
+		string_backup = grown;
+		string_backup_size = count;
+	}
+
+	slot = string_backup;
+	for (current_string = string_table; current_string != NULL;
+		 current_string = current_string->next_string) {
+		memcpy(slot, current_string->value, 1025);
+		slot += 1025;
+	}
+
+	undo_strings = count;
+}
+
+static void
+restore_string_state()
+{
+	struct string_type *current_string;
+	int             count = 0;
+	char           *slot;
+
+	for (current_string = string_table; current_string != NULL;
+		 current_string = current_string->next_string)
+		count++;
+
+	if (undo_strings < 0 || count != undo_strings)
+		return;
+
+	slot = string_backup;
+	for (current_string = string_table; current_string != NULL;
+		 current_string = current_string->next_string) {
+		memcpy(current_string->value, slot, 1025);
+		current_string->value[1024] = 0;
+		slot += 1025;
+	}
+}
+
 void
 save_game_state()
 {
@@ -1067,6 +1132,8 @@ save_game_state()
 		object[index]->attributes_backup = object[index]->attributes;
 		object[index]->user_attributes_backup = object[index]->user_attributes;
 	}
+
+	save_string_state();
 
 	player_backup = player;
 	noun3_backup = noun[3];
@@ -1107,6 +1174,8 @@ restore_game_state()
 		object[index]->attributes = object[index]->attributes_backup;
 		object[index]->user_attributes = object[index]->user_attributes_backup;
 	}
+
+	restore_string_state();
 
 	player = player_backup;
 	noun[3] = noun3_backup;
