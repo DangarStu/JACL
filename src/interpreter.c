@@ -3933,6 +3933,7 @@ add_cinteger(const char *name, int value)
         strncpy(new_cinteger->name, name, 40);
         new_cinteger->name[40] = 0;
         new_cinteger->value = value;
+        variable_index_add(VI_CINTEGER, new_cinteger->name, new_cinteger);
         new_cinteger->next_cinteger = NULL;
     }
 }
@@ -3941,6 +3942,9 @@ void
 clear_cinteger(const char *name)
 {
     /* FREE CONSTANTS THAT HAVE SUPPLIED NAME*/
+
+    /* FIRST, WHILE THE INDEX ENTRY'S NAME (THE FIRST NODE'S) IS STILL VALID */
+    variable_index_remove(VI_CINTEGER, name);
 
     //printf("--- clear integer %s\n", name);
     if (cinteger_table != NULL) {
@@ -4002,6 +4006,7 @@ add_cstring(const char *name, const char *value)
          * callers on a 1023+-char source. */
         new_string->value[1023] = 0;
         new_string->next_string = NULL;
+        variable_index_add(VI_CSTRING, new_string->name, new_string);
     }
 }
 
@@ -4009,6 +4014,10 @@ void
 clear_cstring(const char *name)
 {
     /* FREE CONSTANTS THAT HAVE SUPPLIED NAME*/
+
+    /* FIRST, WHILE THE INDEX ENTRY'S NAME (THE FIRST NODE'S) IS STILL VALID */
+    variable_index_remove(VI_CSTRING, name);
+
     if (cstring_table != NULL) {
         current_cstring = cstring_table;
         previous_cstring = cstring_table;

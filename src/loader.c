@@ -1346,6 +1346,7 @@ clear_game_data()
 
         free(integer_table);
         integer_table = NULL;
+        variable_index_reset(VI_INTEGER);
     }
 
     /* FREE ALL FUNCTIONS */
@@ -1403,6 +1404,7 @@ clear_game_data()
 
         free(string_table);
         string_table = NULL;
+        variable_index_reset(VI_STRING);
     }
 
     /* FREE ALL ATTRIBUTES */
@@ -1441,6 +1443,7 @@ clear_game_data()
 
         free(cinteger_table);
         cinteger_table = NULL;
+        variable_index_reset(VI_CINTEGER);
     }
 
     if (cstring_table != NULL) {
@@ -1459,6 +1462,7 @@ clear_game_data()
 
         free(cstring_table);
         cstring_table = NULL;
+        variable_index_reset(VI_CSTRING);
     }
 
     /* FREE ALL SYNONYMS */
@@ -1581,6 +1585,7 @@ create_cinteger (const char *name, int value)
         strncpy(current_cinteger->name, name, 40);
         current_cinteger->name[40] = 0;
         current_cinteger->value = value;
+        variable_index_add(VI_CINTEGER, current_cinteger->name, current_cinteger);
         current_cinteger->next_cinteger = NULL;
     }
 }
@@ -1607,6 +1612,7 @@ create_integer (const char *name, int value)
         strncpy(current_integer->name, name, 40);
         current_integer->name[40] = 0;
         current_integer->value = value;
+        variable_index_add(VI_INTEGER, current_integer->name, current_integer);
         current_integer->next_integer = NULL;
     }
 }
@@ -1643,6 +1649,7 @@ create_string (const char *name, const char *value)
 
         current_string->value[1024] = 0;
         current_string->next_string = NULL;
+        variable_index_add(VI_STRING, current_string->name, current_string);
     }
 }
 
@@ -1674,6 +1681,7 @@ create_cstring (const char *name, const char *value)
 
         current_cstring->value[1024] = 0;
         current_cstring->next_string = NULL;
+        variable_index_add(VI_CSTRING, current_cstring->name, current_cstring);
     }
 }
 
