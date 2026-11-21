@@ -143,6 +143,51 @@ restore_game(frefid_t saveref, int warn)
 		return (FALSE);
 	}
 
+	/* CHECK THE WHOLE FILE BEFORE CHANGING ANYTHING. VALUES USED TO BE
+	 * WRITTEN STRAIGHT INTO THE GAME AS THEY WERE READ, SO A TRUNCATED SAVE
+	 * (E.G. THE APP KILLED WHILE WRITING ITS AUTOSAVE) OR ONE WITH A BAD
+	 * PLAYER LEFT THE GAME HALF-OVERWRITTEN AND BROKEN -- ON EVERY LAUNCH,
+	 * FOR THE AUTOSAVE. A SAVE FOR THIS GAME HAS AN EXACT SIZE. */
+	{
+		/* COUNTED THE WAY save_game WRITES THEM: BY WALKING THE LISTS
+		 * (integers AND strings COUNT DECLARATIONS, NOT ARRAY ELEMENTS) */
+		glui32 expected = 16 + 1024 + 8 + 4 * 8 + 4;
+		glui32 actual;
+		glui32 player_at;
+		int saved_player;
+		struct function_type *f;
+		struct integer_type *i;
+		struct string_type *t;
+
+		for (i = integer_table; i != NULL; i = i->next_integer)
+			expected += 4;
+		for (t = string_table; t != NULL; t = t->next_string)
+			expected += 1024;
+		for (f = function_table; f != NULL; f = f->next_function) {
+			if (f->nosave == FALSE)
+				expected += 4;
+		}
+		for (index = 1; index <= objects; index++) {
+			if (!object[index]->nosave)
+				expected += 4 * (16 + 2);
+		}
+		player_at = expected - (8 + 4 * 8 + 4);
+
+		glk_stream_set_position(bookmark, 0, seekmode_End);
+		actual = glk_stream_get_position(bookmark);
+		glk_stream_set_position(bookmark, player_at, seekmode_Start);
+		saved_player = read_integer(bookmark);
+		glk_stream_set_position(bookmark, 16, seekmode_Start);
+
+		if (actual != expected || saved_player < 0 || saved_player > objects) {
+			if (warn == FALSE) {
+				log_error(cstring_resolve("BAD_SAVED_GAME")->value, PLUS_STDOUT);
+			}
+			glk_stream_close(bookmark, NULL);
+			return (FALSE);
+		}
+	}
+
 	while (current_integer != NULL) {
 		current_integer->value = read_integer (bookmark);
 		current_integer = current_integer->next_integer;
@@ -203,7 +248,7 @@ restore_game(frefid_t saveref, int warn)
 		 * ("no second noun") and 0 (FALSE) are both legal. */
 		if (saved_player < 0 || saved_player > objects) {
 			if (warn == FALSE) {
-				sprintf(error_buffer,
+				snprintf(error_buffer, 1024,
 				        "Saved file has out-of-range player (%d, objects=%d); refusing restore.",
 				        saved_player, objects);
 				log_error(error_buffer, PLUS_STDOUT);

@@ -321,7 +321,7 @@ main(int argc, char *argv[])
 
     override[0] = 0;
 
-    sprintf(error_buffer, "CGIJACL Interpreter v%d.%d.%d\n", J_VERSION, J_RELEASE, J_BUILD);
+    snprintf(error_buffer, 1024, "CGIJACL Interpreter v%d.%d.%d\n", J_VERSION, J_RELEASE, J_BUILD);
     log_message(error_buffer, PLUS_STDERR);
 
     if (argc == 1) {
@@ -331,11 +331,11 @@ main(int argc, char *argv[])
 
 #ifdef WEBJACL
     if (wj_setup(&argc, argv) == WJ_NOPORT) {
-        sprintf(error_buffer, NO_PORT, WJ_DEFAULT_PORT);
+        snprintf(error_buffer, 1024, NO_PORT, WJ_DEFAULT_PORT);
         log_message(error_buffer, PLUS_STDERR);
     }
 
-    sprintf(error_buffer, WEBJACL_CONFIGURED, wj_hostname, wj_port);
+    snprintf(error_buffer, 1024, WEBJACL_CONFIGURED, wj_hostname, wj_port);
     log_message(error_buffer, PLUS_STDERR);
 #endif
 
@@ -401,17 +401,17 @@ main(int argc, char *argv[])
 
     if ((file = fopen("cgijacl.conf", "r")) != NULL) {
         /* FOUND THE CONFIGURATION FILE IN THE CURRENT DIRECTORY */
-        sprintf(error_buffer, "Using configuration file \"./cgijacl.conf\"");
+        snprintf(error_buffer, 1024, "Using configuration file \"./cgijacl.conf\"");
         log_message(error_buffer, PLUS_STDERR);
         read_config_file();
     } else if ((file = fopen(temp_buffer, "r")) != NULL) {
         /* FOUND THE CONFIGURATION FILE IN THE JACL ETC LOCATION */
-        sprintf(error_buffer, "Using configuration file \"%s\"", temp_buffer);
+        snprintf(error_buffer, 1024, "Using configuration file \"%s\"", temp_buffer);
         log_message(error_buffer, PLUS_STDERR);
         read_config_file();
     } else if ((file = fopen("/etc/cgijacl.conf", "r")) != NULL) {
         /* FOUND THE CONFIGURATION FILE IN THE GLOBAL ETC DIRECTORY */
-        sprintf(error_buffer, "Using configuration file \"/etc/cgijacl.conf\"");
+        snprintf(error_buffer, 1024, "Using configuration file \"/etc/cgijacl.conf\"");
         log_message(error_buffer, PLUS_STDERR);
         read_config_file();
     }
@@ -420,61 +420,61 @@ main(int argc, char *argv[])
     if (error_log[0] == 0) {
         strcpy(error_log, game_path);
         strcat(error_log, "../logs/error.log");
-        sprintf(error_buffer, "Using default error log \"%s\"", error_log);
+        snprintf(error_buffer, 1024, "Using default error log \"%s\"", error_log);
         log_message(error_buffer, PLUS_STDERR);
     } else {
-        sprintf(error_buffer, "Using configured error log \"%s\"", error_log);
+        snprintf(error_buffer, 1024, "Using configured error log \"%s\"", error_log);
         log_message(error_buffer, PLUS_STDERR);
     }
 
     if (access_log[0] == 0) {
         strcpy(access_log, game_path);
         strcat(access_log, "../logs/access.log");
-        sprintf(error_buffer, "Using default access log \"%s\"", access_log);
+        snprintf(error_buffer, 1024, "Using default access log \"%s\"", access_log);
         log_message(error_buffer, PLUS_STDERR);
     } else {
-        sprintf(error_buffer, "Using configured access log \"%s\"", access_log);
+        snprintf(error_buffer, 1024, "Using configured access log \"%s\"", access_log);
         log_message(error_buffer, PLUS_STDERR);
     }
 
     if (include_directory[0] == 0) {
         strcpy(include_directory, game_path);
         strcat(include_directory, "include/");
-        sprintf(error_buffer, "Using default include location \"%s\"", include_directory);
+        snprintf(error_buffer, 1024, "Using default include location \"%s\"", include_directory);
         log_message(error_buffer, PLUS_STDERR);
     } else {
-        sprintf(error_buffer, "Using configured include location \"%s\"", include_directory);
+        snprintf(error_buffer, 1024, "Using configured include location \"%s\"", include_directory);
         log_message(error_buffer, PLUS_STDERR);
     }
 
     if (data_directory[0] == 0) {
         strcpy(data_directory, game_path);
         strcat(data_directory, "data/");
-        sprintf(error_buffer, "Using default data location \"%s\"", data_directory);
+        snprintf(error_buffer, 1024, "Using default data location \"%s\"", data_directory);
         log_message(error_buffer, PLUS_STDERR);
     } else {
-        sprintf(error_buffer, "Using configured data location \"%s\"", data_directory);
+        snprintf(error_buffer, 1024, "Using configured data location \"%s\"", data_directory);
         log_message(error_buffer, PLUS_STDERR);
     }
 
     if (temp_directory[0] == 0) {
         strcpy(temp_directory, game_path);
         strcat(temp_directory, "temp/");
-        sprintf(error_buffer, "Using default temp location \"%s\"", temp_directory);
+        snprintf(error_buffer, 1024, "Using default temp location \"%s\"", temp_directory);
         log_message(error_buffer, PLUS_STDERR);
     } else {
-        sprintf(error_buffer, "Using configured temp location \"%s\"", temp_directory);
+        snprintf(error_buffer, 1024, "Using configured temp location \"%s\"", temp_directory);
         log_message(error_buffer, PLUS_STDERR);
     }
 
     if (mkdir(temp_directory, 0755) != 0 && errno != EEXIST) {
-        sprintf(error_buffer, "Cannot create temp directory \"%s\": %s",
+        snprintf(error_buffer, 1024, "Cannot create temp directory \"%s\": %s",
                 temp_directory, strerror(errno));
         log_error(error_buffer, PLUS_STDERR);
         terminate(42);
     }
 
-    sprintf(error_buffer, "Cookie expiry set to \"%s\"", cookie_expiry);
+    snprintf(error_buffer, 1024, "Cookie expiry set to \"%s\"", cookie_expiry);
     log_message(error_buffer, PLUS_STDERR);
 
     /* PREPROCESS THE FILE AND WRITE IT OUT TO THE NEW FILE */
@@ -485,7 +485,7 @@ main(int argc, char *argv[])
 
     /* ...AND OPEN THE RESULTING FILE AS OUR INPUT */
     if ((file = fopen(processed_file, "r")) == NULL) {
-        sprintf(error_buffer, CANT_OPEN, processed_file);
+        snprintf(error_buffer, 1024, CANT_OPEN, processed_file);
         log_error(error_buffer, PLUS_STDERR);
         terminate(42);
     }
@@ -577,7 +577,7 @@ main(int argc, char *argv[])
                 fclose(file);
 
             if ((file = fopen(processed_file, "r")) == NULL) {
-                sprintf(error_buffer, CANT_OPEN, temp_buffer);
+                snprintf(error_buffer, 1024, CANT_OPEN, temp_buffer);
                 log_error(error_buffer, PLUS_STDERR);
                 terminate(42);
             }
@@ -626,7 +626,22 @@ main(int argc, char *argv[])
          * reload and pick up the cookie. */
         if (auth_is_enabled() && cgi_val(entries, "auth") != NULL) {
             const char *auth_action = cgi_val(entries, "auth");
-            if (!strcmp(auth_action, "google")) {
+            /* THE SIGN-IN SCRIPT CALLS THIS FROM THE SITE'S OWN PAGE, WHICH
+             * BROWSERS MARK Sec-Fetch-Site: same-origin. REFUSE IT FROM
+             * ANOTHER SITE: A LINK CARRYING AN ATTACKER'S OWN TOKEN WOULD
+             * OTHERWISE SIGN THE VISITOR IN AS THE ATTACKER AND HAND THE
+             * ATTACKER THE VISITOR'S GAME (THE MIGRATION BELOW). */
+            const char *fetch_site = getenv("HTTP_SEC_FETCH_SITE");
+            int cross_site = fetch_site != NULL && strcmp(fetch_site, "same-origin") != 0;
+            if (!strcmp(auth_action, "google") && cross_site) {
+                log_error("Refused a cross-site sign-in request.", LOG_ONLY);
+                printf("Status: 403 Forbidden\r\n");
+                printf("Content-type: application/json\r\n");
+                printf("Cache-Control: no-store, private\r\n\r\n");
+                printf("{\"ok\":false}\n");
+                list_clear(&entries);
+                continue;
+            } else if (!strcmp(auth_action, "google")) {
                 const char *credential = cgi_val(entries, "credential");
                 char sub[AUTH_SUB_MAX];
                 char err[128];
@@ -647,7 +662,8 @@ main(int argc, char *argv[])
                         const char *prior_uid =
                             cgi_val(jacl_cookies, "user_id");
                         if (prior_uid != NULL && prior_uid[0] != 0 &&
-                            strncmp(prior_uid, "google_", 7) != 0) {
+                            strncmp(prior_uid, "google_", 7) != 0 &&
+                            is_safe_user_id(prior_uid, sizeof(user_id))) {
                             char old_auto[1024];
                             char new_auto[1024];
                             struct stat sb;
@@ -744,10 +760,10 @@ main(int argc, char *argv[])
             }
         }
 
-        //sprintf (error_buffer, "HTTP_COOKIE: %s", getenv("HTTP_COOKIE"));
+        //snprintf(error_buffer, 1024, "HTTP_COOKIE: %s", getenv("HTTP_COOKIE"));
         //log_message(error_buffer, PLUS_STDERR);
 
-        //sprintf (error_buffer, "user_id value pulled from cookies: %s", cgi_val(jacl_cookies, "user_id"));
+        //snprintf(error_buffer, 1024, "user_id value pulled from cookies: %s", cgi_val(jacl_cookies, "user_id"));
         //log_message(error_buffer, PLUS_STDERR);
 
         /* Every code path that assigns user_id below routes through
@@ -774,13 +790,19 @@ main(int argc, char *argv[])
             } else {
                 candidate = cgi_val(entries, "user_id");
             }
-            if (is_safe_user_id(candidate, sizeof(user_id))) {
+            /* A google_ ID BELONGS TO A SIGNED-IN ACCOUNT AND IS ONLY EVER
+             * TAKEN FROM THE VERIFIED jacl_session ABOVE. A Google account
+             * ID ISN'T SECRET, SO ACCEPTING user_id=google_<sub> FROM A
+             * COOKIE OR PARAMETER LET ANYONE LOAD AND OVERWRITE THAT
+             * PLAYER'S SAVED GAME. */
+            if (is_safe_user_id(candidate, sizeof(user_id))
+                && strncmp(candidate, "google_", 7) != 0) {
                 strcpy(user_id, candidate);
                 REMOTE_USER_USED->value = (from_cookie || candidate == REMOTE_USER) ? TRUE : FALSE;
                 cookie_read_successfully = from_cookie ? TRUE : cookie_read_successfully;
                 returning_player = TRUE;
             } else {
-                sprintf(error_buffer,
+                snprintf(error_buffer, 1024,
                         "Rejected unsafe user_id (length or charset); using a fresh anonymous id.");
                 log_error(error_buffer, LOG_ONLY);
                 /* Leave user_id untouched; the else-branch below will
@@ -788,12 +810,13 @@ main(int argc, char *argv[])
             }
         } else if (REMOTE_USER != NULL && strcmp("", REMOTE_USER)) {
             // REMOTE_USER IS SET AND user_id IS NULL SO USE REMOTE_USER
-            if (is_safe_user_id(REMOTE_USER, sizeof(user_id))) {
+            if (is_safe_user_id(REMOTE_USER, sizeof(user_id))
+                && strncmp(REMOTE_USER, "google_", 7) != 0) {
                 strcpy(user_id, REMOTE_USER);
                 REMOTE_USER_USED->value = TRUE;
                 returning_player = TRUE;
             } else {
-                sprintf(error_buffer,
+                snprintf(error_buffer, 1024,
                         "Rejected unsafe REMOTE_USER value; using a fresh anonymous id.");
                 log_error(error_buffer, LOG_ONLY);
             }
@@ -825,7 +848,7 @@ main(int argc, char *argv[])
             if (restore_game(temp_buffer, FALSE)) {
                 returning_player = TRUE;
             } else {
-                sprintf(error_buffer, "Unable to restore saved file for program \"%s\" and returning user \"%s\"", prefix, user_id);
+                snprintf(error_buffer, 1024, "Unable to restore saved file for program \"%s\" and returning user \"%s\"", prefix, user_id);
                 log_error(error_buffer, LOG_ONLY);
                 returning_player = FALSE;
             }
@@ -867,19 +890,28 @@ main(int argc, char *argv[])
             }
         }
 
-        /* COPY THE VALUE OF ANY DEFINED PARAMETERS FROM THE HTTP
-         * PARAMETERS INTO THE SPECIFIED JACL INTEGER ELEMENTS */
-        update_parameters();
-
         // OUTPUT THE HTTP HEADER
         puts("Content-type: text/html");
 
         if (cookie_read_successfully == FALSE) {
             // COOKIE WASN'T READ SO THIS IS EITHER THE FIRST TRANSACTION
             // OR COOKIES AREN'T SUPPORTED BY THE USER'S CLIENT
-            printf("Set-Cookie: user_id=%s; SameSite=Strict; Max-Age=%s\n", user_id, cookie_expiry);
+            /* THIS COOKIE IS AN ANONYMOUS PLAYER'S ONLY KEY TO THEIR GAME,
+             * SO KEEP IT FROM PAGE SCRIPTS (NOTHING READS IT) AND, OVER
+             * HTTPS, FROM PLAIN-HTTP REQUESTS */
+            const char *https_on = getenv("HTTPS");
+            printf("Set-Cookie: user_id=%s; SameSite=Strict; HttpOnly;%s Max-Age=%s\n", user_id,
+                   (https_on != NULL && !strcasecmp(https_on, "on")) ? " Secure;" : "",
+                   cookie_expiry);
         }
         puts("Expires: -1\n");
+
+        /* COPY THE VALUE OF ANY DEFINED PARAMETERS FROM THE HTTP
+         * PARAMETERS INTO THE SPECIFIED JACL INTEGER ELEMENTS. THIS USED
+         * TO RUN BEFORE THE HEADER ABOVE, SO AN ERROR MESSAGE ECHOING A
+         * SUBMITTED VALUE WITH A LINE BREAK IN IT LANDED AMONG THE
+         * HEADERS -- ANYONE COULD SET A COOKIE OR INJECT A PAGE. */
+        update_parameters();
 
         /* RESET GLOBAL VARIABLES THAT ARE INTERNAL TO THE INTERPRETER */
         style_index = 0;
@@ -1029,14 +1061,16 @@ main(int argc, char *argv[])
                 }
             } else {
                 /* GET THE REQUEST PARAMETERS CONTAINING THE PLAYER'S MOVE */
+                /* BOUNDED: A LONG command (OR verb + noun) USED TO RUN
+                 * PAST THE 1024-BYTE text_buffer INTO THE GLOBALS AFTER IT
+                 * AND CRASH THE SERVER. text_buffer IS 1024 BYTES BUT
+                 * stripwhite-STYLE CODE MAY ADD A NEWLINE, SO KEEP 1000. */
                 if (cgi_val(entries, "verb") != NULL) {
-                    strcpy(text_buffer, cgi_val(entries, "verb"));
-    
-                    if (cgi_val(entries, "noun") != NULL)
-                        strcat(text_buffer, cgi_val(entries, "noun"));
+                    snprintf(text_buffer, 1000, "%s%s", cgi_val(entries, "verb"),
+                             cgi_val(entries, "noun") != NULL ? cgi_val(entries, "noun") : "");
                 } else {
                     if (cgi_val(entries, "command") != NULL)
-                        strcpy(text_buffer, cgi_val(entries, "command"));
+                        snprintf(text_buffer, 1000, "%s", cgi_val(entries, "command"));
                     else
                         strcpy(text_buffer, "");
                 }
@@ -1054,7 +1088,7 @@ main(int argc, char *argv[])
                 time(&tnow);
     
                 /* LOG THIS MOVE TO THE ACCESS LOG */
-                sprintf(temp_buffer, "%s - %s - %s - %s\n", strip_return(ctime(&tnow)), user_id, prefix, text_buffer);
+                snprintf(temp_buffer, 1024, "%s - %s - %s - %.700s\n", strip_return(ctime(&tnow)), user_id, prefix, text_buffer);
                 log_access(temp_buffer);
     
                 strcpy(current_command, text_buffer);
@@ -1461,8 +1495,19 @@ update_parameters()
                     if (*container > pointer->high)
                         *container = pointer->high;
                 } else {
-                    sprintf(error_buffer, BAD_VALUE, cgi_val(entries, pointer->name), pointer->container);
-                    log_error(error_buffer, PLUS_STDOUT);
+                    /* LOGGED ONLY, AND CUT SHORT WITH LINE BREAKS AND TAGS
+                     * REMOVED: THE VALUE IS WHATEVER THE VISITOR SENT, SO
+                     * SHOWING IT ON THE PAGE WOULD LET A LINK INJECT HTML,
+                     * AND A HUGE ONE OVERRAN error_buffer */
+                    char shown[101];
+                    int k;
+                    snprintf(shown, sizeof shown, "%s", cgi_val(entries, pointer->name));
+                    for (k = 0; shown[k] != 0; k++) {
+                        if (shown[k] == '\r' || shown[k] == '\n' || shown[k] == '<' || shown[k] == '>')
+                            shown[k] = ' ';
+                    }
+                    snprintf(error_buffer, 1024, BAD_VALUE, shown, pointer->container);
+                    log_error(error_buffer, LOG_ONLY);
                 }
                 
             } else {
@@ -1470,9 +1515,10 @@ update_parameters()
                 string = string_resolve(pointer->container);
                 if (string != NULL) {
                     strncpy (string->value, cgi_val(entries, pointer->name), 1023);
+                    string->value[1023] = 0;
                 } else {
                     // APPARENTLY IT'S NEITHER AN INTEGER OR A STRING, DISPLAY AN ERROR
-                    sprintf(error_buffer, BAD_PARAMETER, pointer->container, pointer->name);
+                    snprintf(error_buffer, 1024, BAD_PARAMETER, pointer->container, pointer->name);
                     log_error(error_buffer, PLUS_STDOUT);
                 }
             }
@@ -1518,6 +1564,21 @@ preparse()
     }
 }
 
+/* WHETHER word[i] IS A WORD OF THE CURRENT COMMAND */
+static int
+word_index_ok(int i)
+{
+    int j;
+
+    if (i < 0 || i >= MAX_WORDS)
+        return (FALSE);
+    for (j = 0; j <= i; j++) {
+        if (word[j] == NULL)
+            return (FALSE);
+    }
+    return (TRUE);
+}
+
 void
 word_check()
 {
@@ -1559,12 +1620,23 @@ word_check()
                     TIME->value = FALSE;
                 }
             } else {
-                strcpy(oops_buffer, word[wp]);
+                strncpy(oops_buffer, word[wp], sizeof oops_buffer - 1);
+                oops_buffer[sizeof oops_buffer - 1] = 0;
                 strcpy(text_buffer, last_command);
 
                 command_encapsulate();
 
                 jacl_truncate();
+                /* oops_word AND start_of_last_command ARE SHARED BY EVERY
+                 * VISITOR TO THIS PROCESS, NOT SAVED PER PLAYER, SO THEY CAN
+                 * POINT PAST THE END OF THIS PLAYER'S LAST COMMAND (ANOTHER
+                 * VISITOR'S WAS LONGER). CHECK THEM AGAINST IT BEFORE USE:
+                 * word[] PAST THE END IS NULL, AND strcmp ON IT CRASHED. */
+                if (!word_index_ok(oops_word)) {
+                    write_text(cstring_resolve("CANT_CORRECT")->value);
+                    TIME->value = FALSE;
+                    return;
+                }
                 word[oops_word] = (char *) &oops_buffer;
 
                 /* BUILD A PLAIN STRING REPRESENTING THE NEW COMMAND */
@@ -1572,6 +1644,10 @@ word_check()
                 index = 0;
 
                 while (word[index] != NULL) {
+                    /* BOUNDED: THE OLD COMMAND PLUS A LONG REPLACEMENT
+                     * WORD COULD OVERRUN last_command */
+                    if (strlen(last_command) + strlen(word[index]) + 2 > sizeof last_command)
+                        break;
                     if (last_command[0] != 0) {
                         strcat(last_command, " ");
                     }
@@ -1582,7 +1658,7 @@ word_check()
                 }
 
                 /* PROCESS THE FIXED COMMAND ONLY */
-                wp = start_of_last_command;
+                wp = word_index_ok(start_of_last_command) ? start_of_last_command : 0;
                 
                 word_check();
             }
@@ -1602,7 +1678,14 @@ word_check()
             strcpy(text_buffer, last_command);
             command_encapsulate();
             jacl_truncate();
-            wp = start_of_last_command;
+            /* SEE oops ABOVE: start_of_last_command MAY BELONG TO ANOTHER
+             * VISITOR'S LONGER COMMAND */
+            wp = word_index_ok(start_of_last_command) ? start_of_last_command : 0;
+            if (word[wp] == NULL) {
+                write_text(cstring_resolve("NOT_CLEVER")->value);
+                TIME->value = FALSE;
+                return;
+            }
             word_check();
         }
     } else if (!strcmp(word[wp], cstring_resolve("UNDO_WORD")->value)) {

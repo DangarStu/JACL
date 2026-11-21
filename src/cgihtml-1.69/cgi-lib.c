@@ -52,8 +52,12 @@ void unescape_url(char *url)
 {
   register int x,y;
 
+  /* JACL: ONLY DECODE A % FOLLOWED BY TWO HEX DIGITS. A TRAILING "%" OR
+     "%4" USED TO READ PAST THE END, STEP OVER THE TERMINATOR AND COPY
+     HEAP MEMORY ON PAST THE END OF THE STRING. */
   for (x=0,y=0; url[y]; ++x,++y) {
-    if((url[x] = url[y]) == '%') {
+    if((url[x] = url[y]) == '%' && isxdigit((unsigned char) url[y+1])
+       && isxdigit((unsigned char) url[y+2])) {
       url[x] = x2c(&url[y+1]);
       y+=2;
     }
@@ -93,10 +97,14 @@ char *get_POST()
   if (CONTENT_LENGTH != NULL) {
     content_length = atoi(CONTENT_LENGTH);
     buffer = (char *)malloc(sizeof(char) * content_length + 1);
+    if (buffer == NULL)
+      return NULL;
     if (fread(buffer,sizeof(char),content_length,stdin) != content_length) {
-      /* consistency error. */
+      /* consistency error. JACL: IGNORE THE BODY RATHER THAN exit(), WHICH
+         KILLED THE LONG-RUNNING FastCGI PROCESS FOR EVERY VISITOR */
       fprintf(stderr,"caught by cgihtml: input length < CONTENT_LENGTH\n");
-      exit(1);
+      free(buffer);
+      return NULL;
     }
     buffer[content_length] = '\0';
   }
@@ -392,6 +400,11 @@ int read_cgi_input(llist* entries)
     return 0;
   }
 
+  /* JACL: ALWAYS START WITH AN EMPTY LIST. THE EARLY RETURNS BELOW USED TO
+     LEAVE IT AS THE CALLER HAD IT -- IN THE FastCGI LOOP, THE LAST
+     REQUEST'S FREED NODES, READ AND THEN FREED AGAIN */
+  list_create(entries);
+
   /* get the input */
   if (REQUEST_METHOD == NULL)
     input = get_DEBUG();
@@ -400,8 +413,10 @@ int read_cgi_input(llist* entries)
   else if (!strcmp(REQUEST_METHOD,"GET"))
     input = get_GET();
   else { /* error: invalid request method */
+    /* JACL: TREAT IT AS AN EMPTY FORM. exit() HERE KILLED THE FastCGI
+       PROCESS ON EVERY HEAD OR OPTIONS REQUEST (LINK CHECKERS, MONITORS) */
     fprintf(stderr,"caught by cgihtml: REQUEST_METHOD invalid\n");
-    exit(1);
+    return 0;
   }
   /* parse the input */
   if (input == NULL)
@@ -593,6 +608,10 @@ int parse_cookies(llist *entries)
       j++;
     }
   }
+  /* JACL: list_insafter() COPIES THE NAME AND VALUE, SO THESE WORK BUFFERS
+     (EACH AS LONG AS THE WHOLE Cookie HEADER) LEAKED ON EVERY REQUEST */
+  free(entry.name);
+  free(entry.value);
   return numcookies;
 }
 

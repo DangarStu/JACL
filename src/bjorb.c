@@ -150,9 +150,10 @@ ReadChunk (FILE * f)
   int current = 0;
   int c;
   // Read in the BLC line
-  fscanf (f, "%s %d %s ", N->Use, &(N->Res), N->Type);
+  // WIDTHS MATCH Use[5] AND Type[5]: AN UNBOUNDED %s OVERRAN THEM
+  int fields = fscanf (f, "%4s %d %4s ", N->Use, &(N->Res), N->Type);
   // Abort if anything went wrong
-  if (feof (f))
+  if (fields != 3 || feof (f))
     {
       free (N);
       return NULL;

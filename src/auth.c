@@ -520,7 +520,16 @@ auth_verify_id_token(const char *id_token,
     EVP_PKEY *pkey = jwks_lookup(kid_local);
     time_t now = time(NULL);
     int stale = (now - jwks_cache_ts) > JWKS_CACHE_TTL;
-    if (pkey == NULL || stale) {
+    /* A MISSING kid FORCES A REFETCH ONLY ONCE A MINUTE: ANYONE CAN SEND A
+     * TOKEN WITH A MADE-UP kid, AND EACH USED TO BLOCK THIS SINGLE-THREADED
+     * WORKER ON A FETCH FROM GOOGLE OF UP TO 10 SECONDS. Google publishes
+     * new keys well before using them, so a real one is never refused for
+     * long. A STALE CACHE IS STILL REFRESHED AS BEFORE. */
+    static time_t last_miss_fetch = 0;
+    int miss_fetch_ok = (now - last_miss_fetch) >= 60;
+    if (stale || (pkey == NULL && miss_fetch_ok)) {
+        if (!stale)
+            last_miss_fetch = now;
         int fetch_rc = jwks_fetch();
         if (fetch_rc != 0
             && stale

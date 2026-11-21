@@ -95,4 +95,7 @@ void list_clear(llist* l)
     free(current);
     current=nextnode;
   }
+  /* JACL: THE NODES ARE GONE, SO SAY SO. LEAVING head POINTING AT THEM LET
+     A LATER cgi_val() OR list_clear() USE OR FREE THEM AGAIN */
+  l->head = NULL;
 }
