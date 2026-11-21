@@ -7,6 +7,13 @@
 #include "types.h"
 #include "prototypes.h"
 
+#ifdef _WIN32
+#include <process.h>
+#define getpid _getpid
+#else
+#include <unistd.h>
+#endif
+
 
 static void write_integer(FILE *file, int x);
 static void write_long(FILE *file, long x);
@@ -21,8 +28,19 @@ save_game(const char *filename)
 
 	int             index, counter;
 	FILE			*bookmark = NULL;
-		
-    if ((bookmark = fopen(filename, "wb")) == NULL) {
+	char			partial[1100];
+
+	/* WRITE TO A TEMPORARY FILE AND RENAME IT OVER THE SAVE ONCE IT IS
+	 * COMPLETE. WRITING IN PLACE MEANT TWO OVERLAPPING REQUESTS FROM ONE
+	 * PLAYER (OR A CRASH PART WAY) COULD LEAVE A TRUNCATED SAVE, AND THE
+	 * PLAYER SILENTLY STARTED AGAIN. THE PROCESS ID KEEPS TWO WEB SERVER
+	 * PROCESSES FROM SHARING A TEMPORARY FILE. */
+	if (snprintf(partial, sizeof partial, "%s.%ld.part", filename, (long) getpid())
+	    >= (int) sizeof partial) {
+		return (FALSE);
+	}
+
+    if ((bookmark = fopen(partial, "wb")) == NULL) {
         return (FALSE);
     }
 
@@ -72,8 +90,19 @@ save_game(const char *filename)
 	write_integer (bookmark, player);
 	write_integer (bookmark, noun[3]);
 
-	/* CLOSE THE STREAM */
-    fclose(bookmark);
+	/* CLOSE THE STREAM, THEN PUT THE COMPLETE FILE IN PLACE */
+    if (ferror(bookmark) | fclose(bookmark)) {
+		remove(partial);
+		return (FALSE);
+	}
+#ifdef _WIN32
+	/* rename() WON'T REPLACE AN EXISTING FILE ON WINDOWS */
+	remove(filename);
+#endif
+	if (rename(partial, filename) != 0) {
+		remove(partial);
+		return (FALSE);
+	}
 
 	TIME->value = FALSE;
 	return (TRUE);
@@ -179,7 +208,7 @@ restore_game(const char *filename, int warn)
 		 * verb code already guards before dereferencing. */
 		if (saved_player < 0 || saved_player > objects) {
 			if (warn == FALSE) {
-				sprintf(error_buffer,
+				snprintf(error_buffer, 1024,
 				        "Saved file has out-of-range player (%d, objects=%d); refusing restore.",
 				        saved_player, objects);
 				log_error(error_buffer, PLUS_STDOUT);

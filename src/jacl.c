@@ -571,8 +571,12 @@ glk_main(void)
 		interrupted = FALSE;
 
 		if (word[0] != NULL) {
-			if (strcmp(word[0], "undo")) {
-				/* COMMAND DOES NOT EQUAL undo */
+			/* THE GAME'S OWN WORD FOR undo (E.G. "annuler"): COMPARING WITH
+			 * "undo" SNAPSHOTTED THE STATE JUST BEFORE A LOCALISED undo, WHICH
+			 * THEN RESTORED THAT SNAPSHOT AND CHANGED NOTHING */
+			if (strcmp(word[0], cstring_resolve("UNDO_WORD")->value)
+				&& strcmp(word[0], "undo")) {
+				/* COMMAND IS NOT undo */
 				save_game_state();
 			}
 
@@ -697,6 +701,11 @@ word_check()
 				index = 0;
 
 				while (word[index] != NULL) {
+					/* BOUNDED: THE OLD COMMAND PLUS A LONG REPLACEMENT WORD
+					 * (MULTI-BYTE CHARACTERS COUNT SEVERAL TIMES) RAN PAST
+					 * oopsed_current INTO THE VARIABLES AFTER IT */
+					if (strlen(oopsed_current) + strlen(word[index]) + 2 > sizeof oopsed_current)
+						break;
 					if (oopsed_current[0] != 0) {
 						strcat(oopsed_current, " ");
 					}
@@ -788,6 +797,71 @@ version_info()
 	write_text("Copyright (c) 1992-2010 Stuart Allen.^^");
 }
 
+/* UNDO SNAPSHOT OF EVERY STRING VARIABLE, KEPT AS ONE BUFFER RATHER THAN
+ * A FIELD IN string_type, WHICH CONSTANTS SHARE AND WOULD DOUBLE IN SIZE.
+ * undo_strings IS THE NUMBER OF STRINGS IN THE SNAPSHOT, SO A SNAPSHOT
+ * TAKEN BEFORE THE GAME WAS RELOADED WITH A DIFFERENT SET IS NEVER APPLIED */
+static char    *string_backup = NULL;
+static int      string_backup_size = 0;
+static int      undo_strings = -1;
+
+static void
+save_string_state()
+{
+	struct string_type *current_string;
+	int             count = 0;
+	char           *slot;
+
+	for (current_string = string_table; current_string != NULL;
+		 current_string = current_string->next_string)
+		count++;
+
+	if (count > string_backup_size) {
+		char *grown = realloc(string_backup, (size_t) count * 1025);
+
+		if (grown == NULL) {
+			/* KEEP UNDOING INTEGERS AND OBJECTS; JUST LEAVE STRINGS ALONE */
+			undo_strings = -1;
+			return;
+		}
+
+		string_backup = grown;
+		string_backup_size = count;
+	}
+
+	slot = string_backup;
+	for (current_string = string_table; current_string != NULL;
+		 current_string = current_string->next_string) {
+		memcpy(slot, current_string->value, 1025);
+		slot += 1025;
+	}
+
+	undo_strings = count;
+}
+
+static void
+restore_string_state()
+{
+	struct string_type *current_string;
+	int             count = 0;
+	char           *slot;
+
+	for (current_string = string_table; current_string != NULL;
+		 current_string = current_string->next_string)
+		count++;
+
+	if (undo_strings < 0 || count != undo_strings)
+		return;
+
+	slot = string_backup;
+	for (current_string = string_table; current_string != NULL;
+		 current_string = current_string->next_string) {
+		memcpy(current_string->value, slot, 1025);
+		current_string->value[1024] = 0;
+		slot += 1025;
+	}
+}
+
 void
 save_game_state()
 {
@@ -823,6 +897,8 @@ save_game_state()
 		object[index]->attributes_backup = object[index]->attributes;
 		object[index]->user_attributes_backup = object[index]->user_attributes;
 	}
+
+	save_string_state();
 
 	player_backup = player;
 	noun3_backup = noun[3];
@@ -897,6 +973,8 @@ restore_game_state()
 		object[index]->attributes = object[index]->attributes_backup;
 		object[index]->user_attributes = object[index]->user_attributes_backup;
 	}
+
+	restore_string_state();
 
 	player = player_backup;
 	noun[3] = noun3_backup;
@@ -1612,15 +1690,20 @@ glk_get_bin_line_stream(strid_t file_stream, char *buffer, glui32 max_length)
 
 	register int index = 0;
 
-	character = glk_get_char_stream(file_stream);
-	while (character != -1 && index < (int) max_length) {
+	/* LEAVE ROOM FOR THE TERMINATOR: THIS USED TO FILL ALL max_length
+	 * BYTES AND THEN WRITE THE 0 ONE PAST THE END (EVERY CALLER PASSES
+	 * ITS BUFFER'S FULL SIZE). A CHARACTER IS ONLY READ ONCE THERE IS ROOM
+	 * FOR IT, SO NONE IS LOST AT THE LIMIT. */
+	while (index < (int) max_length - 1) {
+		character = glk_get_char_stream(file_stream);
+		if (character == -1)
+			break;
 		*(buffer + index) = (char) character;
 		index++;
 		if (character == (glsi32) '\n' ||
             character == (glsi32) '\r') {
 			break;
 		}
-		character = glk_get_char_stream(file_stream);
 	};
 
 	*(buffer + index) = 0;

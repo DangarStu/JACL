@@ -314,6 +314,95 @@ static int distance(double x1, double y1, double x2, double y2);
 static int strcondition(void);
 static void set_arguments(const char *function_call);
 
+/* WHETHER name IS SAFE AS A DATA FILE NAME: NOT EMPTY AND NO DIRECTORY
+ * PARTS, SO A NAME BUILT FROM A STRING VARIABLE CAN'T REACH OUTSIDE THE
+ * DATA DIRECTORY */
+static int
+safe_data_name(const char *name)
+{
+    if (name == NULL || name[0] == 0 || strchr(name, '/') != NULL
+        || strchr(name, '\\') != NULL || strstr(name, "..") != NULL) {
+        snprintf(error_buffer, 1024, "Refusing data file name \"%.100s\".\n",
+                 name == NULL ? "" : name);
+        log_error(error_buffer, LOG_ONLY);
+        return (FALSE);
+    }
+    return (TRUE);
+}
+
+/* BUILDS THE PATH OF THE CSV FILE name IN out (size BYTES). A NAME
+ * CONTAINING .csv IS A GLOBAL FILE USED AS IT IS; ANY OTHER BECOMES
+ * <prefix>-<name>.csv. WITH user GIVEN, -<user> GOES BEFORE THE .csv (THE
+ * TEMPORARY FILE update WRITES). AN UNSAFE OR TOO-LONG NAME LEAVES out EMPTY,
+ * SO OPENING IT FAILS AND THE CALLER REPORTS THAT. THIS USED TO BE strcpy/
+ * strcat INTO 1024-BYTE BUFFERS WITH NO BOUND. */
+static void
+data_file_path(char *out, size_t size, const char *name, const char *user)
+{
+    int written;
+    size_t len;
+
+    out[0] = 0;
+    if (!safe_data_name(name))
+        return;
+
+    if (strstr(name, ".csv") != NULL) {
+        len = strlen(name);
+        if (user == NULL) {
+            written = snprintf(out, size, "%s%s", data_directory, name);
+        } else if (len >= 4 && !strcmp(name + len - 4, ".csv")) {
+            written = snprintf(out, size, "%s%.*s-%s.csv", data_directory,
+                               (int) (len - 4), name, user);
+        } else {
+            written = snprintf(out, size, "%s%s-%s.csv", data_directory, name, user);
+        }
+    } else if (user == NULL) {
+        written = snprintf(out, size, "%s%s-%s.csv", data_directory, prefix, name);
+    } else {
+        written = snprintf(out, size, "%s%s-%s-%s.csv", data_directory, prefix, name, user);
+    }
+
+    if (written < 0 || (size_t) written >= size)
+        out[0] = 0;
+}
+
+/* READS THE NEXT LINE OF THE GAME INTO text_buffer, DECRYPTED. AT THE END
+ * OF THE FILE text_buffer IS LEFT EMPTY AND IT RETURNS FALSE, SO A LOOP
+ * SKIPPING FORWARD CAN'T SPIN FOREVER ON THE LAST LINE. */
+static int
+read_game_line(void)
+{
+#ifdef GLK
+    if (glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024) == 0) {
+        text_buffer[0] = 0;
+        return (FALSE);
+    }
+#else
+    if (fgets(text_buffer, 1024, file) == NULL) {
+        text_buffer[0] = 0;
+        return (FALSE);
+    }
+#endif
+    if (encrypted) jacl_deobfuscate(text_buffer);
+    return (TRUE);
+}
+
+/* RETURNS THE LENGTH OF A LINE READ FROM A CSV FILE, FIRST GIVING IT A
+ * NEWLINE IF IT HAS NONE (THE LAST LINE OF A FILE THAT DOESN'T END IN ONE),
+ * SINCE THE PARSER ONLY FINISHES A RECORD WHEN IT SEES THE LINE END. csv_buffer
+ * IS 2048 BYTES AND fgets READS AT MOST 2047, SO A FULL LINE IS LEFT AS IT IS. */
+static int
+csv_line_end(char *line)
+{
+    size_t len = strlen(line);
+
+    if (len > 0 && line[len - 1] != '\n' && len < 2046) {
+        line[len++] = '\n';
+        line[len] = 0;
+    }
+    return (int) len;
+}
+
 void
 terminate(int code)
 {
@@ -403,6 +492,10 @@ cb1 (void *s, size_t i, void *not_used) {
         //write_text("Resolved ");
         //write_text(temp_buffer);
         //write_text("^");
+        /* A FIELD CAN BE LONGER THAN A STRING HOLDS (A HAND-MADE OR
+         * IMPORTED FILE), WHICH OVERRAN THE HEAP; KEEP THE FIRST 1023 BYTES */
+        if (i > 1023)
+            i = 1023;
         strncpy (resolved_cstring->value, s, i);
         resolved_cstring->value[i] = 0;
         //sprintf(temp_buffer, "Setting field %d to ~%s~^", field_no, (char *) s);
@@ -537,7 +630,7 @@ execute(const char *funcname)
                 // THIS ENDWHILE COMMAND WAS BEING EXECUTED, 
                 // NOT JUST COUNTED.
                 if (top_of_while == FALSE) {
-                    sprintf(error_buffer, NO_WHILE, executing_function->name);
+                    snprintf(error_buffer, 1024, NO_WHILE, executing_function->name);
                     log_error(error_buffer, PLUS_STDOUT);
                 } else {
 #ifdef GLK
@@ -554,7 +647,7 @@ execute(const char *funcname)
                 // THIS ENDITERATE COMMAND WAS BEING EXECUTED, 
                 // NOT JUST COUNTED.
                 if (top_of_iterate == FALSE) {
-                    sprintf(error_buffer, NO_ITERATE, executing_function->name);
+                    snprintf(error_buffer, 1024, NO_ITERATE, executing_function->name);
                     log_error(error_buffer, PLUS_STDOUT);
                 } else {
 #ifdef GLK
@@ -571,7 +664,7 @@ execute(const char *funcname)
                 // THIS ENDUPDATE COMMAND WAS BEING EXECUTED, 
                 // NOT JUST COUNTED.
                 if (top_of_update == FALSE) {
-                    sprintf(error_buffer, NO_UPDATE, executing_function->name);
+                    snprintf(error_buffer, 1024, NO_UPDATE, executing_function->name);
                     log_error(error_buffer, PLUS_STDOUT);
                 } else {
 #ifdef GLK
@@ -584,25 +677,9 @@ execute(const char *funcname)
             }
         } else if (!strcmp(word[0], "print") && current_level != execution_level) {
             // SKIP THIS BLOCK OF PLAIN TEXT UNTIL IT FINDS A 
-            // LINE THAT STARTS WITH A '.'
-#ifdef GLK
-            glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
-#else
-            fgets(text_buffer, 1024, file);
-#endif
-
-            if (encrypted) jacl_deobfuscate(text_buffer);
-
-            while (text_buffer[0] != '.') {
-                // GET THE NEXT LINE
-#ifdef GLK
-                glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
-#else
-                fgets(text_buffer, 1024, file);
-#endif
-
-                if (encrypted) jacl_deobfuscate(text_buffer);
-
+            // LINE THAT STARTS WITH A '.' (OR THE FILE ENDS: A BLOCK
+            // MISSING ITS '.' USED TO LOOP FOREVER)
+            while (read_game_line() && text_buffer[0] != '.') {
             }
         } else if (!strcmp(word[0], "endif")) {
             current_level--;
@@ -637,7 +714,7 @@ execute(const char *funcname)
                     return(exit_function (TRUE));
                 } else {
                     if (top_of_do_loop == FALSE) {
-                        sprintf(error_buffer, NO_REPEAT, executing_function->name);
+                        snprintf(error_buffer, 1024, NO_REPEAT, executing_function->name);
                         log_error(error_buffer, PLUS_STDOUT);
                     } else if (!condition()) {
 #ifdef GLK
@@ -654,7 +731,7 @@ execute(const char *funcname)
                     return(exit_function (TRUE));
                 } else {
                     if (top_of_do_loop == FALSE) {
-                        sprintf(error_buffer, NO_REPEAT, executing_function->name);
+                        snprintf(error_buffer, 1024, NO_REPEAT, executing_function->name);
                         log_error(error_buffer, PLUS_STDOUT);
                     } else if (!and_condition()) {
 #ifdef GLK
@@ -680,18 +757,16 @@ execute(const char *funcname)
                 // infile REMAINS OPEN DURING THE ITERATION, ONLY NEEDS
                 // OPENING THE FIRST TIME
                 if (infile == NULL) {
-                    strcpy (temp_buffer, data_directory);
-                    if (strstr(text_of_word(1), ".csv") != NULL) {
-                        // NAME CONTAINS .csv, USE AS-IS (GLOBAL FILE)
-                        strcat (temp_buffer, text_of_word(1));
-                    } else {
-                        // PREFIX WITH GAME NAME (PER-GAME FILE)
-                        strcat (temp_buffer, prefix);
-                        strcat (temp_buffer, "-");
-                        strcat (temp_buffer, text_of_word(1));
-                        strcat (temp_buffer, ".csv");
-                    }
+                    // A NAME CONTAINING .csv IS A GLOBAL FILE, USED AS IT
+                    // IS; ANY OTHER IS PREFIXED WITH THE GAME'S NAME
+                    data_file_path(temp_buffer, 1024, text_of_word(1), NULL);
 
+                    /* START EACH FILE WITH A CLEAN PARSER: A LOOP LEFT
+                     * PART WAY THROUGH A QUOTED FIELD THAT SPANS LINES
+                     * USED TO CARRY THE HALF-READ RECORD INTO THE NEXT
+                     * FILE, EVEN IN A LATER REQUEST */
+                    csv_free(&parser_csv);
+                    csv_init(&parser_csv, CSV_APPEND_NULL);
                     infile = fopen(temp_buffer, "rb");
 
                     if (infile != NULL
@@ -702,7 +777,7 @@ execute(const char *funcname)
                 }
 
                 if (infile == NULL) {
-                        sprintf(error_buffer, "Failed to open file %s: %s\n", temp_buffer, strerror(errno));
+                        snprintf(error_buffer, 1024, "Failed to open file %s: %s\n", temp_buffer, strerror(errno));
                     log_error(error_buffer, LOG_ONLY);
                   } else {
                     if (word[1] == NULL) {
@@ -712,13 +787,15 @@ execute(const char *funcname)
                     } else {
                         // IF THERE IS ANOTHER RECORD TO READ FROM THE CSV FILE THEN
                         // SET THE field[] CONSTANTS AND INCREMENT THE execution_level
-                        fgets(csv_buffer, 2048, infile);
-                        if (!feof(infile)) {
-                              i = strlen(csv_buffer);
+                        /* TEST WHAT fgets RETURNS, NOT feof(): A LAST LINE
+                         * WITH NO NEWLINE SETS EOF AS IT IS READ, SO IT WAS
+                         * SKIPPED (AND update THEN DROPPED IT FROM THE FILE) */
+                        if (fgets(csv_buffer, 2048, infile) != NULL) {
+                              i = csv_line_end(csv_buffer);
                             //sprintf (temp_buffer, "Read ~%s~ with %d bytes.^", csv_buffer, i);
                             //write_text(temp_buffer);
                             if (csv_parse(&parser_csv, csv_buffer, i, cb1, cb2, (void *) NULL) != i) {
-                                  sprintf(error_buffer, "Error parsing file: %s\n", csv_strerror(csv_error(&parser_csv)));
+                                  snprintf(error_buffer, 1024, "Error parsing file: %s\n", csv_strerror(csv_error(&parser_csv)));
                                 log_error(error_buffer, PLUS_STDOUT);
                                   fclose(infile);
                                   infile = NULL;
@@ -760,43 +837,27 @@ execute(const char *funcname)
                 // infile REMAINS OPEN DURING THE ITERATION, ONLY NEEDS 
                 // OPENING THE FIRST TIME
                 if (infile == NULL) {
-                    strcpy (in_name, data_directory);
-                    if (strstr(text_of_word(1), ".csv") != NULL) {
-                        strcat (in_name, text_of_word(1));
-                    } else {
-                        strcat (in_name, prefix);
-                        strcat (in_name, "-");
-                        strcat (in_name, text_of_word(1));
-                        strcat (in_name, ".csv");
-                    }
+                    data_file_path(in_name, sizeof in_name, text_of_word(1), NULL);
 
+                    /* START EACH FILE WITH A CLEAN PARSER: A LOOP LEFT
+                     * PART WAY THROUGH A QUOTED FIELD THAT SPANS LINES
+                     * USED TO CARRY THE HALF-READ RECORD INTO THE NEXT
+                     * FILE, EVEN IN A LATER REQUEST */
+                    csv_free(&parser_csv);
+                    csv_init(&parser_csv, CSV_APPEND_NULL);
                     infile = fopen(in_name, "rb");
                 }
 
                 if (outfile == NULL) {
                     // OPEN A TEMPORARY OUTPUT FILE TO WRITE THE MODIFICATIONS TO
-                    strcpy (out_name, data_directory);
-                    if (strstr(text_of_word(1), ".csv") != NULL) {
-                        // STRIP .csv AND ADD -<user_id>.csv
-                        strcat (out_name, text_of_word(1));
-                        out_name[strlen(out_name) - 4] = 0;
-                        strcat (out_name, "-");
-                        strcat (out_name, user_id);
-                        strcat (out_name, ".csv");
-                    } else {
-                        strcat (out_name, prefix);
-                        strcat (out_name, "-");
-                        strcat (out_name, text_of_word(1));
-                        strcat (out_name, "-");
-                        strcat (out_name, user_id);
-                        strcat (out_name, ".csv");
-                    }
+                    // THE SAME NAME WITH -<user_id> BEFORE THE .csv
+                    data_file_path(out_name, sizeof out_name, text_of_word(1), user_id);
 
                     outfile = fopen(out_name, "wb");
                 }
 
                 if (infile == NULL) {
-                    sprintf(error_buffer, "Failed to open input CSV file ~%s~: %s\n", in_name, strerror(errno));
+                    snprintf(error_buffer, 1024, "Failed to open input CSV file ~%.900s~: %s\n", in_name, strerror(errno));
                     log_error(error_buffer, LOG_ONLY);
                     if (outfile != NULL) {
                         /* NOTHING WAS WRITTEN; DON'T LEAVE THE EMPTY
@@ -808,7 +869,7 @@ execute(const char *funcname)
                     return(exit_function (TRUE));
                   } else {
                     if (outfile == NULL) {
-                        sprintf(error_buffer, "Failed to open output CSV file ~%s~: %s\n", out_name, strerror(errno));
+                        snprintf(error_buffer, 1024, "Failed to open output CSV file ~%.900s~: %s\n", out_name, strerror(errno));
                         log_error(error_buffer, LOG_ONLY);
                         if (infile != NULL) {
                             fclose(infile);
@@ -826,7 +887,7 @@ execute(const char *funcname)
                                        jacl_sleep(1000); 
                                        continue; 
                                   } 
-                                 sprintf(error_buffer, "File busy unable to get lock on output file.\n"); 
+                                 snprintf(error_buffer, 1024, "File busy unable to get lock on output file.\n"); 
                                 log_error(error_buffer, PLUS_STDOUT);
                                 return(exit_function (TRUE));
                               } 
@@ -844,7 +905,7 @@ execute(const char *funcname)
                                        jacl_sleep(1000); 
                                        continue; 
                                   } 
-                                 sprintf(error_buffer, "File busy unable to get lock on input file.\n"); 
+                                 snprintf(error_buffer, 1024, "File busy unable to get lock on input file.\n"); 
                                 log_error(error_buffer, PLUS_STDOUT);
                                 return(exit_function (TRUE));
                               } 
@@ -857,11 +918,11 @@ execute(const char *funcname)
                         } else {
                             // IF THERE IS ANOTHER RECORD TO READ FROM THE CSV FILE THEN
                             // SET THE field[] CONSTANTS AND INCREMENT THE execution_level
-                            fgets(csv_buffer, 2048, infile);
-                            if (!feof(infile)) {
-                                  i = strlen(csv_buffer);
+                            /* SEE iterate: TEST fgets, NOT feof() */
+                            if (fgets(csv_buffer, 2048, infile) != NULL) {
+                                  i = csv_line_end(csv_buffer);
                                 if (csv_parse(&parser_csv, csv_buffer, i, cb1, cb2, (int *) &field_no) != i) {
-                                      sprintf(error_buffer, "Error parsing file: %s\n", csv_strerror(csv_error(&parser_csv)));
+                                      snprintf(error_buffer, 1024, "Error parsing file: %s\n", csv_strerror(csv_error(&parser_csv)));
                                     log_error(error_buffer, PLUS_STDOUT);
                                     read_lck.l_type = F_UNLCK;    // SETTING A READ LOCK
                                       fcntl(read_fd, F_SETLK, &read_lck);
@@ -938,7 +999,7 @@ execute(const char *funcname)
 
             } else if (!strcmp(word[0], "endloop")) {
                 if (top_of_loop == FALSE) {
-                    sprintf(error_buffer, NO_LOOP, executing_function->name);
+                    snprintf(error_buffer, 1024, NO_LOOP, executing_function->name);
                     log_error(error_buffer, PLUS_STDOUT);
                 } else {
                     *loop_integer += 1;
@@ -1026,30 +1087,20 @@ execute(const char *funcname)
                 }
 
                 if (*select_integer == 0) {
-                    // THERE ARE NO MATCHING OBJECTS SO JUMP TO THE endselect
-#ifdef GLK
-                    glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
-#else
-                    fgets(text_buffer, 1024, file);
-#endif
-
-                    if (encrypted) jacl_deobfuscate(text_buffer);
-
-                    while (text_buffer[0] != '}') {
+                    // THERE ARE NO MATCHING OBJECTS SO JUMP TO THE endselect.
+                    // EACH LINE IS DECRYPTED (IN AN ENCRYPTED GAME THIS LOOP
+                    // NEVER SAW endselect OR } AND SPUN FOREVER AT THE END OF
+                    // THE FILE) AND THE END OF THE FILE STOPS IT
+                    while (read_game_line() && text_buffer[0] != '}') {
                         encapsulate();
                         if (word[0] != NULL && !strcmp(word[0], "endselect")) {
                             break;
                         }
-#ifdef GLK
-                        glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
-#else
-                        fgets(text_buffer, 1024, file);
-#endif
                     }
                 }
             } else if (!strcmp(word[0], "endselect")) {
                 if (top_of_select == FALSE) {
-                    sprintf(error_buffer, NO_LOOP, executing_function->name);
+                    snprintf(error_buffer, 1024, NO_LOOP, executing_function->name);
                     log_error(error_buffer, PLUS_STDOUT);
                 } else {
                     if (select_next()) {
@@ -1222,7 +1273,7 @@ execute(const char *funcname)
                              * NOTIFICATION EVENT CAN USE THE INFORMATION
                              * IT HAS 1 ADDED TO IT SO THAT IT IS A NON-ZERO
                              * NUMBER AND THE EVENT IS ACTIVATED */
-                            sprintf(error_buffer, "Unable to play sound: %ld", value_of(word[1], FALSE));
+                            snprintf(error_buffer, 1024, "Unable to play sound: %ld", value_of(word[1], FALSE));
                             log_error(error_buffer, PLUS_STDERR);
                         } else {
                             glk_schannel_set_volume_ext(sound_channel[channel],
@@ -1243,7 +1294,7 @@ execute(const char *funcname)
                         return(exit_function (TRUE));
                     } else {
                         if (glk_image_draw(mainwin, (glui32) value_of(word[1], TRUE), imagealign_InlineDown, 0) == 0) {
-                            sprintf(error_buffer, "Unable to draw image: %ld", value_of(word[1], FALSE));
+                            snprintf(error_buffer, 1024, "Unable to draw image: %ld", value_of(word[1], FALSE));
                             log_error(error_buffer, PLUS_STDERR);
                         }
                     }
@@ -1743,7 +1794,11 @@ execute(const char *funcname)
                             sprintf(tag_buffer, "<%s>", open_tag);
                         }
                         write_text(tag_buffer);
-                        style_stack[style_index++] = push_kind;
+                        /* BOUNDED: MORE THAN 100 UNCLOSED STYLES IN ONE
+                         * TURN WROTE PAST THE STACK (THE TAG IS STILL
+                         * WRITTEN, IT JUST WON'T BE CLOSED BY normal) */
+                        if (style_index < (int) (sizeof style_stack / sizeof style_stack[0]))
+                            style_stack[style_index++] = push_kind;
                     } else if (!strcmp(word[1], "normal")) {
                         style_index--;
                         for(; style_index > -1; style_index--) {
@@ -1790,9 +1845,9 @@ execute(const char *funcname)
                     return (exit_function(TRUE));
                 } else {
                     if (word[2] == NULL) {
-                        sprintf(option_buffer, "<img src=~%s~>", text_of_word(1));
+                        snprintf(option_buffer, sizeof option_buffer, "<img src=~%s~>", text_of_word(1));
                     } else {
-                        sprintf(option_buffer, "<img class=~%s~ src=~%s~>", text_of_word(2), text_of_word(1));
+                        snprintf(option_buffer, sizeof option_buffer, "<img class=~%s~ src=~%s~>", text_of_word(2), text_of_word(1));
                     }
 
                     write_text(option_buffer);
@@ -1819,7 +1874,7 @@ execute(const char *funcname)
                 } else if (quoted[1] == 0) {
                     /* Stop form. */
                     int stop_channel = (int) value_of(word[2], TRUE);
-                    sprintf(option_buffer,
+                    snprintf(option_buffer, sizeof option_buffer,
                             "<jacl-sound-stop data-jacl-channel=~%d~></jacl-sound-stop>",
                             stop_channel);
                     write_text(option_buffer);
@@ -1841,18 +1896,18 @@ execute(const char *funcname)
                         }
                     }
                     if (looping) {
-                        sprintf(option_buffer,
+                        snprintf(option_buffer, sizeof option_buffer,
                                 "<audio autoplay=~autoplay~ loop=~loop~ "
                                 "data-jacl-channel=~%d~ data-jacl-pending=~1~>",
                                 play_channel);
                     } else {
-                        sprintf(option_buffer,
+                        snprintf(option_buffer, sizeof option_buffer,
                                 "<audio autoplay=~autoplay~ "
                                 "data-jacl-channel=~%d~ data-jacl-pending=~1~>",
                                 play_channel);
                     }
                     write_text(option_buffer);
-                    sprintf(option_buffer, "<source src=~%s~ type=~%s~>",
+                    snprintf(option_buffer, sizeof option_buffer, "<source src=~%s~ type=~%s~>",
                             text_of_word(1), text_of_word(2));
                     write_text(option_buffer);
                     write_text("</audio>");
@@ -1867,7 +1922,7 @@ execute(const char *funcname)
                 if (word[1] != NULL) {
                     int interval_ms = (int) value_of(word[1], TRUE);
                     if (interval_ms < 0) interval_ms = 0;
-                    sprintf(option_buffer,
+                    snprintf(option_buffer, sizeof option_buffer,
                             "<jacl-timer data-ms=~%d~></jacl-timer>",
                             interval_ms);
                     write_text(option_buffer);
@@ -1890,7 +1945,7 @@ execute(const char *funcname)
                 if (SOUND_ENABLED->value && word[2] != NULL) {
                     int vol_level = (int) value_of(word[1], TRUE);
                     int vol_channel = (int) value_of(word[2], TRUE);
-                    sprintf(option_buffer,
+                    snprintf(option_buffer, sizeof option_buffer,
                             "<jacl-sound-volume data-jacl-channel=~%d~ "
                             "data-jacl-level=~%d~></jacl-sound-volume>",
                             vol_channel, vol_level);
@@ -2016,8 +2071,11 @@ execute(const char *funcname)
                     /* RESOLVE ALL THE TEXT AND STORE IT IN A TEMPORARY BUFFER*/
                     string_buffer[0] = 0;
 
+                    /* BOUNDED: ARGUMENTS BUILT FROM LONG STRINGS OVERRAN
+                     * string_buffer */
                     for (counter = 1; word[counter] != NULL && counter < MAX_WORDS; counter++) {
-                        strcat(string_buffer, arg_text_of_word(counter));
+                        strncat(string_buffer, arg_text_of_word(counter),
+                                sizeof string_buffer - strlen(string_buffer) - 1);
                     }
 
                     if (function_resolve(string_buffer) == NULL && !strcmp(word[0], "execute")) {
@@ -2029,7 +2087,7 @@ execute(const char *funcname)
                         if (argstart != NULL)
                             *argstart = 0;
                         
-                        sprintf(error_buffer, UNDEFINED_FUNCTION, executing_function->name, string_buffer);
+                        snprintf(error_buffer, 1024, UNDEFINED_FUNCTION, executing_function->name, string_buffer);
                         log_error(error_buffer, PLUS_STDOUT);
                     } else {
                         execute(string_buffer);
@@ -2076,12 +2134,15 @@ execute(const char *funcname)
                 }
             } else if (!strcmp(word[0], "output")) {
                 if (word[1] != NULL) {
-                    strcpy (temp_buffer, data_directory);
-                    strcat (temp_buffer, text_of_word(1));
-                    tempfile = fopen(temp_buffer, "r");
+                    if (safe_data_name(text_of_word(1))
+                        && snprintf(temp_buffer, 1024, "%s%s", data_directory, text_of_word(1)) < 1024) {
+                        tempfile = fopen(temp_buffer, "r");
+                    } else {
+                        tempfile = NULL;
+                    }
 
                     if (tempfile == NULL) {
-                            sprintf(error_buffer, "Failed to open file %s to output: %s\n", temp_buffer, strerror(errno));
+                            snprintf(error_buffer, 1024, "Failed to open file %s to output: %s\n", temp_buffer, strerror(errno));
                             log_error(error_buffer, PLUS_STDOUT);
                     } else {
                         /* Drive the loop off the read return, not feof,
@@ -2106,16 +2167,10 @@ execute(const char *funcname)
                 int non_space = FALSE;
 
                 // DISPLAYS A BLOCK OF PLAIN TEXT UNTIL IT FINDS A 
-                // LINE THAT STARTS WITH A '.'
-#ifdef GLK
-                glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
-#else
-                fgets(text_buffer, 1024, file);
-#endif
+                // LINE THAT STARTS WITH A '.' OR THE FILE ENDS
+                read_game_line();
 
-                if (encrypted) jacl_deobfuscate(text_buffer);
-
-                while (text_buffer[0] != '.') {
+                while (text_buffer[0] != '.' && text_buffer[0] != 0) {
                     index = 0;
                     non_space = FALSE;
 
@@ -2161,13 +2216,7 @@ execute(const char *funcname)
                     }
 
                     // GET THE NEXT LINE
-#ifdef GLK
-                    glk_get_bin_line_stream(game_stream, text_buffer, (glui32) 1024);
-#else
-                    fgets(text_buffer, 1024, file);
-#endif
-
-                    if (encrypted) jacl_deobfuscate(text_buffer);
+                    read_game_line();
                 }
             } else if (!strcmp(word[0], "mesg")) {
                 for (counter = 1; word[counter] != NULL && counter < MAX_WORDS; counter++) {
@@ -2398,8 +2447,12 @@ execute(const char *funcname)
                     }
 
                     /* RESOLVE ALL THE TEXT AND STORE IT IN A TEMPORARY BUFFER*/
+                    /* BOUNDED: EACH WORD CAN BE A STRING OF UP TO 1023 BYTES,
+                     * SO THREE LONG ONES (E.G. FROM REQUEST PARAMETERS)
+                     * OVERRAN THE 2048-BYTE BUFFER */
                     for (counter = 2; word[counter] != NULL && counter < MAX_WORDS; counter++) {
-                        strcat(setstring_buffer, text_of_word(counter));
+                        strncat(setstring_buffer, text_of_word(counter),
+                                sizeof setstring_buffer - strlen(setstring_buffer) - 1);
                     }
 
                     /* setstring_buffer IS NOW FILLED, COPY THE UP TO 1023 BYTES OF
@@ -2708,15 +2761,23 @@ execute(const char *funcname)
                                 *container -= counter;
                             else if (word[mark][0] == '*')
                                 *container = *container * counter;
-                            else if (word[mark][0] == '%')
-                                *container = *container % counter;
-                            else if (word[mark][0] == '/') {
+                            else if (word[mark][0] == '/' || word[mark][0] == '%') {
+                                /* BOTH TRAP ON x86 FOR A ZERO DIVISOR AND FOR
+                                 * INT_MIN BY -1, KILLING THE PROCESS; % USED
+                                 * TO HAVE NO CHECK AT ALL */
                                 if (counter == 0) {
-                                    sprintf(error_buffer, DIVIDE_BY_ZERO,
+                                    snprintf(error_buffer, 1024, DIVIDE_BY_ZERO,
                                             executing_function->name);
                                     log_error(error_buffer, PLUS_STDOUT);
-                                } else
+                                } else if (counter == -1) {
+                                    if (word[mark][0] == '/')
+                                        *container = (int) (0u - (unsigned int) *container);
+                                    else
+                                        *container = 0;
+                                } else if (word[mark][0] == '/')
                                     *container = *container / counter;
+                                else
+                                    *container = *container % counter;
                             } else if (!strcmp(word[mark], "locationof")) {
                                 /* grand_of dereferences object[counter];
                                  * validate before calling so a stale
@@ -2736,7 +2797,7 @@ execute(const char *funcname)
                             } else if (word[mark][0] == '=') {
                                 *container = counter; 
                             } else {
-                                sprintf(error_buffer, ILLEGAL_OPERATOR,
+                                snprintf(error_buffer, 1024, ILLEGAL_OPERATOR,
                                         executing_function->name,
                                         word[2]);
                                 log_error(error_buffer, PLUS_STDOUT);
@@ -2809,17 +2870,19 @@ execute(const char *funcname)
                     return (exit_function(TRUE));
                 } else {
                     if (outfile == NULL) {
-                        strcpy (temp_buffer, data_directory);
-                        strcat (temp_buffer, prefix);
-                        strcat (temp_buffer, "-");
-                        strcat (temp_buffer, text_of_word(1));
-                        strcat (temp_buffer, ".csv");
-
-                        outfile = fopen(temp_buffer, "ab");
+                        // append HAS ALWAYS PREFIXED THE GAME NAME, EVEN
+                        // FOR A NAME CONTAINING .csv, SO KEEP THAT
+                        if (safe_data_name(text_of_word(1))
+                            && snprintf(temp_buffer, 1024, "%s%s-%s.csv", data_directory,
+                                        prefix, text_of_word(1)) < 1024) {
+                            outfile = fopen(temp_buffer, "ab");
+                        } else {
+                            outfile = NULL;
+                        }
                     }
 
                     if (outfile == NULL) {
-                        sprintf(error_buffer, "Failed to open file %s: %s\n", temp_buffer, strerror(errno));
+                        snprintf(error_buffer, 1024, "Failed to open file %s: %s\n", temp_buffer, strerror(errno));
                         log_error(error_buffer, PLUS_STDOUT);
                       } else {
                         for (counter = 2; word[counter] != NULL && counter < MAX_WORDS; counter++) {
@@ -2940,8 +3003,11 @@ execute(const char *funcname)
                     /* RESOLVE ALL THE TEXT AND STORE IT IN A TEMPORARY BUFFER*/
                     string_buffer[0] = 0;
 
+                    /* BOUNDED: ARGUMENTS BUILT FROM LONG STRINGS OVERRAN
+                     * string_buffer */
                     for (counter = 1; word[counter] != NULL && counter < MAX_WORDS; counter++) {
-                        strcat(string_buffer, arg_text_of_word(counter));
+                        strncat(string_buffer, arg_text_of_word(counter),
+                                sizeof string_buffer - strlen(string_buffer) - 1);
                     }
 
                     if (execute(string_buffer)) {
@@ -2967,7 +3033,7 @@ execute(const char *funcname)
                     execution_level++;
                 }
             } else {
-                sprintf(error_buffer, UNKNOWN_COMMAND,
+                snprintf(error_buffer, 1024, UNKNOWN_COMMAND,
                         executing_function->name, word[0]);
                 log_error(error_buffer, PLUS_STDOUT);
             }
@@ -3254,9 +3320,14 @@ set_arguments(const char *function_call)
             arg_value[index] = oec;
         } else if ((counter = object_resolve(arg_ptr[index])) != -1) {
             if (counter < 1 || counter > objects) {
+                /* REPORT IT AND PASS 0. THIS USED TO pop_stack() AND
+                 * RETURN, BUT THE CALLER CARRIES ON RUNNING THE FUNCTION
+                 * REGARDLESS, SO THE FRAME IT HAD JUST PUSHED WAS GONE:
+                 * THE STACK FELL OUT OF STEP AND THE FUNCTION RE-RAN
+                 * UNTIL THE PROCESS OVERFLOWED ITS C STACK AND DIED.
+                 * (E.G. execute "+fn<noun2" WHILE noun2 IS 0.) */
                 badptrrun(arg_ptr[index], counter);
-                pop_stack();
-                return;
+                arg_value[index] = 0;
             } else {
                 arg_value[index] = counter;
             }
@@ -3406,8 +3477,8 @@ push_stack(long file_pointer)
          * FALSE as "function not callable" and returns up the chain;
          * the player sees an error and the next request handles
          * cleanly. */
-        sprintf(error_buffer,
-                "Stack overflow at depth %d while trying to call '%s'; aborting this call.",
+        snprintf(error_buffer, 1024,
+                "Stack overflow at depth %d while trying to call '%.900s'; aborting this call.",
                 STACK_SIZE, called_name);
         log_error(error_buffer, PLUS_STDERR);
         return (FALSE);
@@ -3485,8 +3556,8 @@ push_stack(long file_pointer)
         if (current_cstring != NULL) {
             do {
                 if (!strcmp(current_cstring->name, "string_arg")) {
-                    strncpy(backup[stack].str_arguments[index], current_cstring->value, 255);
-                    backup[stack].str_arguments[index][255] = 0;
+                    strncpy(backup[stack].str_arguments[index], current_cstring->value, 1023);
+                    backup[stack].str_arguments[index][1023] = 0;
                     index++;
                 }
 
@@ -3562,7 +3633,7 @@ push_proxy()
         /* Same change-of-policy as push_stack: refuse to recurse
          * rather than killing the worker. Callers handle FALSE by
          * exiting the current function cleanly. */
-        sprintf(error_buffer,
+        snprintf(error_buffer, 1024,
                 "Proxy stack overflow at depth %d; aborting this call.",
                 STACK_SIZE);
         log_error(error_buffer, PLUS_STDERR);
@@ -3606,12 +3677,12 @@ push_proxy()
         if (current_cstring != NULL) {
             do {
                 if (!strcmp(current_cstring->name, "$string")) {
-                    strncpy(proxy_backup[proxy_stack].text[text], current_cstring->value, 255);
-                    proxy_backup[proxy_stack].text[text][255] = 0;
+                    strncpy(proxy_backup[proxy_stack].text[text], current_cstring->value, 1023);
+                    proxy_backup[proxy_stack].text[text][1023] = 0;
                     text++;
                 } else if (!strcmp(current_cstring->name, "$word")) {
-                    strncpy(proxy_backup[proxy_stack].command[command], current_cstring->value, 255);
-                    proxy_backup[proxy_stack].command[command][255] = 0;
+                    strncpy(proxy_backup[proxy_stack].command[command], current_cstring->value, 1023);
+                    proxy_backup[proxy_stack].command[command][1023] = 0;
                     command++;
                 }
 
@@ -3804,7 +3875,7 @@ logic_test(int first)
         /* The operator slot is word[first + 1]; the old form quoted
          * word[2], which was the operator of the FIRST triple in a
          * compound condition, not the failing one. */
-        sprintf(error_buffer,
+        snprintf(error_buffer, 1024,
                 "ERROR: In function \"%s\", illegal operator \"%s\".^",
                 executing_function->name, word[first + 1]);
         write_text(error_buffer);
@@ -3908,7 +3979,7 @@ str_test(int first)
         else
             return (FALSE);
     } else {
-        sprintf(error_buffer,
+        snprintf(error_buffer, 1024,
                 "ERROR: In function \"%s\", illegal operator \"%s\".^",
                 executing_function->name, word[2]);
         write_text(error_buffer);
