@@ -297,7 +297,7 @@ integer MOTOR_POWER       DEFAULT_POWER
 </TR>
 <TR><td>
 <B>max_rand</B></TD>
-<td>When the word <B>random</B> is supplied as a parameter to a command expecting an integer value, a random number between one and the current value of <B>max_rand</B> will be generated. The default value is 100.</TD>
+<td>When the word <B>random</B> is supplied as a parameter to a command expecting an integer value, a random number between one and the current value of <B>max_rand</B> will be generated. The default value is 100. The numbers come from the operating system's secure random source, so they are unpredictable enough to use for things such as invitation codes and other tokens in a web application, not just for games.</TD>
 </TR>
 <tr><td><b>notify</b></td>
 <td>When set to <b>true</b> the player will be notified of any increase in their score when the <b>points</b> command is used.</td>

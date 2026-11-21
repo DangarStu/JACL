@@ -197,6 +197,7 @@ Ave, Cambridge, MA 02139, USA.
 	<li><a href="#set4">The ESCAPESTRING Command</a>
 	<li><a href="#set5">The PADSTRING Command</a>
 	<li><a href="#set6">The SPLIT Command</a>
+	<li><a href="#set7">The SUBSTRING Command</a>
 </ol>
 
 <li><a href="#movement0">Movement</a>
@@ -4057,6 +4058,18 @@ padstring status_text " " status_width
 split VALID_count string_arg[0] "/" VALID_string
 </pre>
 
+<h2><a class="section" name="set7">The SUBSTRING Command</a></h2>
+
+<p>The <b>substring</b> command copies part of a string into another string. It takes four parameters: the string to copy into, the text to copy from, the position of the first character to copy and the number of characters to copy. Positions count from 0; a negative position counts back from the end, so <b>-1</b> is the last character. A range that runs past either end of the text is simply cut short. It counts characters rather than bytes, so an accented letter is never cut in half.
+
+<p>The following code turns a name such as &quot;Shona&quot; into &quot;S&hellip;a&quot;:
+
+<pre>
+substring first_letter player_name 0 1
+substring last_letter player_name -1 1
+setstring short_name first_letter "&hellip;" last_letter
+</pre>
+
 
 
 <h1><a class="title" name="movement0">Movement</a></h1>
@@ -5788,7 +5801,7 @@ integer MOTOR_POWER       DEFAULT_POWER
 </TR>
 <TR><td>
 <B>max_rand</B></TD>
-<td>When the word <B>random</B> is supplied as a parameter to a command expecting an integer value, a random number between one and the current value of <B>max_rand</B> will be generated. The default value is 100.</TD>
+<td>When the word <B>random</B> is supplied as a parameter to a command expecting an integer value, a random number between one and the current value of <B>max_rand</B> will be generated. The default value is 100. The numbers come from the operating system's secure random source, so they are unpredictable enough to use for things such as invitation codes and other tokens in a web application, not just for games.</TD>
 </TR>
 <tr><td><b>notify</b></td>
 <td>When set to <b>true</b> the player will be notified of any increase in their score when the <b>points</b> command is used.</td>
@@ -6417,6 +6430,8 @@ write "Record " $integer " updated.^^"
 </pre>
 
 <p>This function uses the <b>update</b> command to modify the details for the contact with the ID (<b>field[0]</b>) that is equal to <b>$integer</b>. This is achieved by looping through each line of the file (using the <b>update</b> command) and then checking if the current line is the line that is to be edited. If so, the new values are written out (using the <b>insert</b> command). If not, the existing values are written back to the file (also using the <b>insert</b> command.)</p>
+
+<p>If the file named by an <b>update</b> command doesn't exist yet, there is nothing to rewrite: the error is written to the log, the file is left as it is (no empty file is created), and the function containing the <b>update</b> ends at that point, so nothing after <b>endupdate</b> in that function is run. A program that tidies files which may not have been created yet (for example, removing a deleted team's rows from several files) should therefore put each <b>update</b> in its own small function, so that one missing file doesn't stop the others being processed.</p>
 
 <p>The <b>update</b> and <b>insert</b> commands are also used to delete a record in <b>contacts.jacl</b>. This is achieved by inserting all the existing rows from within an <b>update</b> loop except the record to be deleted:
 

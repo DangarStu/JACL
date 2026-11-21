@@ -125,6 +125,8 @@ write "Record " $integer " updated.^^"
 
 <p>This function uses the <b>update</b> command to modify the details for the contact with the ID (<b>field[0]</b>) that is equal to <b>$integer</b>. This is achieved by looping through each line of the file (using the <b>update</b> command) and then checking if the current line is the line that is to be edited. If so, the new values are written out (using the <b>insert</b> command). If not, the existing values are written back to the file (also using the <b>insert</b> command.)</p>
 
+<p>If the file named by an <b>update</b> command doesn't exist yet, there is nothing to rewrite: the error is written to the log, the file is left as it is (no empty file is created), and the function containing the <b>update</b> ends at that point, so nothing after <b>endupdate</b> in that function is run. A program that tidies files which may not have been created yet (for example, removing a deleted team's rows from several files) should therefore put each <b>update</b> in its own small function, so that one missing file doesn't stop the others being processed.</p>
+
 <p>The <b>update</b> and <b>insert</b> commands are also used to delete a record in <b>contacts.jacl</b>. This is achieved by inserting all the existing rows from within an <b>update</b> loop except the record to be deleted:
 
 <pre>
