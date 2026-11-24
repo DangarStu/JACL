@@ -1,1 +1,1 @@
-Status bar polish: the score no longer crowds the room name, and the layout stays steady as you move between rooms.
+Reliability fixes from a full review of the JACL interpreter (now 4.7.1): a damaged autosave no longer breaks a game every time it opens, "which do you mean?" answers can no longer pick the wrong thing, undo now restores everything (including in French, German and Indonesian games), and very long commands are handled safely.
