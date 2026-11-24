@@ -10,7 +10,7 @@
 # the www-data group). A day's folder is replaced if it's run again that day.
 set -e
 
-HOST=stuart@jacl.dangarmarine.com.au
+HOST=stuart@dmsyd1.dangarmarine.com.au
 DATA=/usr/local/jacl/projects/data
 DEST="$HOME/Backups/OFFSIDE"
 KEEP_DAYS=30
