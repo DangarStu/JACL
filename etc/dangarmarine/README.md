@@ -17,8 +17,8 @@ The two files here are copies of the live ones, with a comment added at the
 top, so they're a record rather than something to install unchanged. Copy
 a changed one back with:
 
-    scp etc/dangarmarine/jacl-ssl.conf stuart@jacl.dangarmarine.com.au:
-    ssh -t stuart@jacl.dangarmarine.com.au 'sudo cp ~/jacl-ssl.conf /etc/apache2/sites-available/ && sudo apache2ctl configtest && sudo systemctl reload apache2'
+    scp etc/dangarmarine/jacl-ssl.conf stuart@dmsyd1.dangarmarine.com.au:
+    ssh -t stuart@dmsyd1.dangarmarine.com.au 'sudo cp ~/jacl-ssl.conf /etc/apache2/sites-available/ && sudo apache2ctl configtest && sudo systemctl reload apache2'
 
 Note that `000-default.conf` has no `ServerName`, so it's the catch-all for
 port 80: any host no other vhost names lands on the JACL pages. Before
@@ -34,8 +34,8 @@ load until it exists). It needs the DNS A record for `offside` pointing at
 the VM first. To run it without a checkout on the VM, copy the files over
 and run it there:
 
-    scp etc/dangarmarine/offside*.conf etc/dangarmarine/setup-offside-site.sh stuart@jacl.dangarmarine.com.au:
-    ssh -t stuart@jacl.dangarmarine.com.au 'sudo sh ~/setup-offside-site.sh'
+    scp etc/dangarmarine/offside*.conf etc/dangarmarine/setup-offside-site.sh stuart@dmsyd1.dangarmarine.com.au:
+    ssh -t stuart@dmsyd1.dangarmarine.com.au 'sudo sh ~/setup-offside-site.sh'
 
 The app was called BASTRD and served from bastrd.dangarmarine.com.au until
 it was renamed. That name's DNS record, sites and certificate have been
@@ -51,4 +51,4 @@ OFFSIDE's data is only the `offside-*.csv` files in
 log is `~/Library/Logs/offside-backup.log`. To restore a file, copy it back
 into the data folder (the stuart account can write there without sudo):
 
-    scp ~/Backups/OFFSIDE/<date>/offside-fixtures.csv stuart@jacl.dangarmarine.com.au:/usr/local/jacl/projects/data/
+    scp ~/Backups/OFFSIDE/<date>/offside-fixtures.csv stuart@dmsyd1.dangarmarine.com.au:/usr/local/jacl/projects/data/
