@@ -172,14 +172,26 @@ if r.status_code != 204:
     sys.exit(f"Failed to attach build {build_ver} (HTTP {r.status_code})")
 
 if AGE_RATING:
-    # The declaration shares the version's id (as Apple's own errors show it).
-    r = show("PATCH ageRatingDeclaration",
-             requests.patch(f"{BASE}/v1/ageRatingDeclarations/{version_id}", headers=HEADERS,
-                            data=json.dumps({"data": {"type": "ageRatingDeclarations",
-                                                      "id": version_id,
-                                                      "attributes": AGE_RATING}})))
-    if r.status_code != 200:
-        sys.exit(f"Failed to set age rating answers (HTTP {r.status_code})")
+    # The declaration belongs to the app's App Info, not the version. There is
+    # one App Info for what's live and one for the version being prepared;
+    # only the one being prepared can be changed, so try each and need one.
+    r = show("GET appInfos", requests.get(f"{BASE}/v1/apps/{app_id}/appInfos", headers=HEADERS))
+    changed = 0
+    for info in r.json().get("data", []):
+        rr = show(f"GET ageRatingDeclaration [{info['attributes'].get('state')}]",
+                  requests.get(f"{BASE}/v1/appInfos/{info['id']}/ageRatingDeclaration",
+                               headers=HEADERS))
+        decl = rr.json().get("data") if rr.status_code == 200 else None
+        if not decl:
+            continue
+        rr = show("PATCH ageRatingDeclaration",
+                  requests.patch(f"{BASE}/v1/ageRatingDeclarations/{decl['id']}", headers=HEADERS,
+                                 data=json.dumps({"data": {"type": "ageRatingDeclarations",
+                                                           "id": decl["id"],
+                                                           "attributes": AGE_RATING}})))
+        changed += rr.status_code == 200
+    if not changed:
+        sys.exit("Failed to set the age rating answers on any App Info")
 
 if not SUBMIT:
     print("\nSUBMIT=false -> build attached + What's New set; not submitting.")
