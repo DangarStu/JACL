@@ -23,7 +23,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: macos-latest
+          # Pinned: on the macOS 26 image (macos-latest from late 2026)
+          # electron-builder 25 can't unlock the temporary signing keychain it
+          # creates ("SecKeychainUnlock: ... passphrase ... not correct"),
+          # which left desktop-v0.2.16 without a Mac build. macos-15 is what
+          # 0.2.15 built on.
+          - os: macos-15
             target: mac
           - os: ubuntu-latest
             target: linux
