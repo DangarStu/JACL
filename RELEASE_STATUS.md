@@ -30,7 +30,7 @@ _Last updated: 2026-11-25_
 
 | Channel | Platforms | Distribution | Feature level |
 |---|---|---|---|
-| **Desktop app (Electron) — DEFAULT** | Mac, Windows, Linux (incl. arm64) | **GitHub Releases** (`desktop-v*` tags → `desktop.yml`, all four targets build); current **`desktop-v0.2.15`** (mac signed + notarized) | **Full web parity:** HTML forms, the **live map window**, the iPad-style bookshelf, Library button, reading controls. Hosts `cgijacl` locally. **This is now the primary desktop build.** |
+| **Desktop app (Electron) — DEFAULT** | Mac, Windows, Linux (incl. arm64) | **GitHub Releases** (`desktop-v*` tags → `desktop.yml`, all four targets build); current **`desktop-v0.2.17`** with interpreter 4.7.1 (mac signed + notarized; the Mac job is pinned to `macos-15` because electron-builder 25 cannot unlock its keychain on macOS 26; 0.2.16 has no Mac build) | **Full web parity:** HTML forms, the **live map window**, the iPad-style bookshelf, Library button, reading controls. Hosts `cgijacl` locally. **This is now the primary desktop build.** |
 | Desktop (Gargoyle/Glk) — *legacy* | Mac, Linux, Windows | prebuilt in `bin/` | Classic two-window Glk (text + status, inline images). **No** map window / reading polish. Superseded by the Electron app. |
 | Web interpreter | Browser — jacl.dangarmarine.com.au | `cgijacl`/`fcgijacl`, deployed to the site | Full modern UI — the same engine the Electron app hosts. |
 | Nintendo DS | DS | `jacl.nds` (legacy) | Historical. |
@@ -86,7 +86,7 @@ change.
 |---|---|---|---|
 | iOS / iPadOS | **1.4** (build 1014) — WAITING_FOR_REVIEW since 2026-11-25 (1.3 build 1013 live until approved; age rating "Social media" answered No via ios-appstore-api.yml age_rating) | tag `ios-v1.4` | none |
 | Android | **1.4** (vc 1012) — on `"1.0 Testing"` — published in the Play Console 2026-11-25 | `android-release.yml` run 45508432221 on `11c9f14` | none |
-| Desktop (Electron) | **0.2.15** — GitHub Releases | tag `desktop-v0.2.15` | none |
+| Desktop (Electron) | **0.2.17** — GitHub Releases, interpreter 4.7.1, released 2026-11-25 | tag `desktop-v0.2.17` | none |
 | Interpreter core | **4.7.1** (`INTERPRETER_VERSION` still 470: the game-file format is unchanged, so 4.7.0 apps keep loading rebuilt downloads) | `11c9f14` | unchanged |
 
 The `mac-native` branch (the old home of this changelog) is **merged into `master`**;
