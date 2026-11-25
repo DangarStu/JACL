@@ -6,7 +6,7 @@ whenever you submit a build or sideload a device.
 
 Structured version log: [`android/release-tracker.csv`](android/release-tracker.csv).
 
-_Last updated: 2026-08-30_
+_Last updated: 2026-11-25_
 
 ---
 
@@ -47,7 +47,7 @@ _Last updated: 2026-08-30_
 - **App marketing version** (App Store / Google Play): **iOS and Android kept in
   sync — both currently 1.3.** They drifted early (iOS 1.1 vs Android 1.0.1), then
   reconciled at 1.2 and have stayed in lockstep since.
-- **Interpreter core** (`src/version.h`, shown in-app as "JACL v4.7.0"): **4.7.0**,
+- **Interpreter core** (`src/version.h`, shown in-app as "JACL v4.7.1"): **4.7.1**,
   shared by every platform (apps, web, desktop). Independent of the app version.
 
 ---
@@ -84,10 +84,10 @@ change.
 
 | Platform | Shipped | Release point | Newer app code on `master`? |
 |---|---|---|---|
-| iOS / iPadOS | **1.3** (build 1013) — App Store live | tag `ios-v1.3` | none |
-| Android | **1.3** (vc 1008) — closed test | tag `android-v1.3` (@ `9b932e1`) | none |
+| iOS / iPadOS | **1.4** (build 1014) — WAITING_FOR_REVIEW since 2026-11-25 (1.3 build 1013 live until approved; age rating "Social media" answered No via ios-appstore-api.yml age_rating) | tag `ios-v1.4` | none |
+| Android | **1.4** (vc 1012) — uploaded to `"1.0 Testing"` 2026-11-25, needs Publish (managed publishing) | `android-release.yml` run 45508432221 on `11c9f14` | none |
 | Desktop (Electron) | **0.2.15** — GitHub Releases | tag `desktop-v0.2.15` | none |
-| Interpreter core | **4.7.0** (`INTERPRETER_VERSION 470`) | — | unchanged |
+| Interpreter core | **4.7.1** (`INTERPRETER_VERSION` still 470: the game-file format is unchanged, so 4.7.0 apps keep loading rebuilt downloads) | `11c9f14` | unchanged |
 
 The `mac-native` branch (the old home of this changelog) is **merged into `master`**;
 the 1.2/1.3 App Store work and the new Mac Catalyst platform once listed here have all
