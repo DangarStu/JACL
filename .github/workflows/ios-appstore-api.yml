@@ -25,6 +25,9 @@ on:
       submit:
         description: "Submit for review (false = set build + What's New only)"
         default: "true"
+      age_rating:
+        description: 'Age-rating answers to set first, as JSON (e.g. {"socialMedia": false}); blank = leave alone'
+        default: ""
 
 permissions:
   contents: read
@@ -42,6 +45,7 @@ jobs:
           APP_VERSION: ${{ inputs.app_version }}
           BUILD_NUMBER: ${{ inputs.build_number }}
           SUBMIT: ${{ inputs.submit }}
+          AGE_RATING: ${{ inputs.age_rating }}
           BUNDLE_ID: au.com.dangarmarine.JACL
         run: |
           python3 -m pip install --quiet pyjwt cryptography requests

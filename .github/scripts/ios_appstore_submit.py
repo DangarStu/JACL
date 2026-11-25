@@ -17,7 +17,13 @@ required whatsNew came up empty; here we PATCH whatsNew on the version's own
 localizations directly. The submit logic mirrors the proven ios-submit.yml.
 
 Env: ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_P8_BASE64, BUNDLE_ID, APP_VERSION,
-     BUILD_NUMBER (optional), SUBMIT ("true"/"false").
+     BUILD_NUMBER (optional), SUBMIT ("true"/"false"),
+     AGE_RATING (optional JSON of age-rating answers, e.g. {"socialMedia": false}).
+
+Apple adds age-rating questions from time to time, and a submission is refused
+until each is answered ("You must provide a value for the attribute
+'socialMedia'", 1.4 in Nov 2026). AGE_RATING sets them on the version's
+ageRatingDeclaration before submitting.
 """
 import os
 import sys
@@ -35,6 +41,7 @@ BUNDLE_ID = os.environ["BUNDLE_ID"]
 APP_VERSION = os.environ["APP_VERSION"]
 BUILD_NUMBER = os.environ.get("BUILD_NUMBER", "").strip()
 SUBMIT = os.environ.get("SUBMIT", "true").strip().lower() == "true"
+AGE_RATING = json.loads(os.environ.get("AGE_RATING", "").strip() or "{}")
 PLATFORM = "IOS"
 BASE = "https://api.appstoreconnect.apple.com"
 
@@ -163,6 +170,16 @@ r = show("PATCH version build relationship",
              data=json.dumps({"data": {"type": "builds", "id": build_id}})))
 if r.status_code != 204:
     sys.exit(f"Failed to attach build {build_ver} (HTTP {r.status_code})")
+
+if AGE_RATING:
+    # The declaration shares the version's id (as Apple's own errors show it).
+    r = show("PATCH ageRatingDeclaration",
+             requests.patch(f"{BASE}/v1/ageRatingDeclarations/{version_id}", headers=HEADERS,
+                            data=json.dumps({"data": {"type": "ageRatingDeclarations",
+                                                      "id": version_id,
+                                                      "attributes": AGE_RATING}})))
+    if r.status_code != 200:
+        sys.exit(f"Failed to set age rating answers (HTTP {r.status_code})")
 
 if not SUBMIT:
     print("\nSUBMIT=false -> build attached + What's New set; not submitting.")
