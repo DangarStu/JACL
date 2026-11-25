@@ -85,7 +85,7 @@ change.
 | Platform | Shipped | Release point | Newer app code on `master`? |
 |---|---|---|---|
 | iOS / iPadOS | **1.4** (build 1014) — WAITING_FOR_REVIEW since 2026-11-25 (1.3 build 1013 live until approved; age rating "Social media" answered No via ios-appstore-api.yml age_rating) | tag `ios-v1.4` | none |
-| Android | **1.4** (vc 1012) — uploaded to `"1.0 Testing"` 2026-11-25, needs Publish (managed publishing) | `android-release.yml` run 45508432221 on `11c9f14` | none |
+| Android | **1.4** (vc 1012) — on `"1.0 Testing"` — published in the Play Console 2026-11-25 | `android-release.yml` run 45508432221 on `11c9f14` | none |
 | Desktop (Electron) | **0.2.15** — GitHub Releases | tag `desktop-v0.2.15` | none |
 | Interpreter core | **4.7.1** (`INTERPRETER_VERSION` still 470: the game-file format is unchanged, so 4.7.0 apps keep loading rebuilt downloads) | `11c9f14` | unchanged |
 
