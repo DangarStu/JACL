@@ -1,6 +1,7 @@
 /*
  * OFFSIDE: import teams and players from a CSV file (the Teams tab's
- * "Import teams and players from a spreadsheet" box, +import_box).
+ * "Import teams and players from a spreadsheet" box, +import_box, offered
+ * while a competition has no teams or is in its setup wizard).
  *
  * JACL doesn't accept file uploads, so the file is read and checked here in
  * the browser and its rows are sent to the game as ordinary parameters, a

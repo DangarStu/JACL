@@ -130,6 +130,10 @@ integer comp_shown
 # STARTED ON, NOT ONE THE VISITOR CHOSE; THE PAGE THEN SWAPS TO THE ONE
 # THEIR BROWSER REMEMBERS (SEE +remember_comp)
 integer comp_defaulted   false
+# THE COMPETITION WHOSE SETUP IS UNDER WAY: CREATING ONE GOES STRAIGHT TO ITS
+# TEAMS TAB AS A SHORT WIZARD (IMPORT THE TEAMS AND PLAYERS, THEN CHECK THEM
+# OVER) UNTIL THE ORGANISER CLICKS FINISHED. 0 FOR NONE
+integer setup_comp       0
 string season_data
 string season_error
 string team_name_data
@@ -1119,10 +1123,12 @@ if errors != 0
 endif
 execute "+next_comp_id"
 append competitions new_id comp_name_data season_data google_sub owner_name_data score_none
-escapestring escaped comp_name_data
-write "<p class=~notice~>Competition <b>" escaped "</b> added.</p>"
 
-# THE CREATOR WILL WANT TO SET IT UP NEXT, SO MAKE IT THE CURRENT ONE
+# THE CREATOR WILL WANT TO SET IT UP NEXT, SO GO ON TO ITS TEAMS
+set setup_comp = new_id
+execute "+show_tab<TEAMS"
+
+# AND MAKE IT THE CURRENT ONE
 set current_comp = new_id
 setstring current_comp_name comp_name_data
 set current_team = 0
@@ -1133,6 +1139,20 @@ setstring current_owner_name owner_name_data
 setstring current_contact "-"
 set can_edit = true
 set can_manage = true
+}
+
+# SWITCHES TO TAB arg[0] PART WAY THROUGH A REQUEST. +header DREW THE TAB BAR
+# BEFORE THE COMMAND RAN, SO THE PAGE SWAPS WHICH TAB IS SHOWN AS SELECTED
+# (+after PUTS THE NEW mode IN THE ADDRESS BAR, SO A RELOAD STAYS THERE)
+{+show_tab
+set WEBAPP_mode = arg[0]
+write "<script>(function() { var tabs = document.querySelectorAll('div.mode > div'), "
+write "want = tabs[" arg[0] " - 1], cur = document.querySelector('div.mode > div.selectedtab'), "
+write "a = want && want.querySelector('a'); if (!a || !cur || want == cur) return; "
+write "var link = document.createElement('a'); link.className = 'tablink'; link.textContent = cur.textContent; "
+write "link.href = a.href.replace(/mode=[0-9]+/, 'mode=' + (Array.prototype.indexOf.call(tabs, cur) + 1)); "
+write "cur.className = 'tab'; cur.textContent = ''; cur.appendChild(link); "
+write "want.className = 'selectedtab'; want.textContent = a.textContent; })();</script>"
 }
 
 # THE COMPETITIONS THE SIGNED-IN PERSON ORGANISES, INTO my_comps
@@ -1472,6 +1492,10 @@ iterate players
    endwhile
 enditerate
 
+ifall setup_comp = current_comp : can_edit = true
+   execute "+setup_steps"
+endif
+
 if team_count = 0
    write "<p>This competition has no teams yet.</p>"
 else
@@ -1499,15 +1523,25 @@ else
    write "</table>"
 endif
 
+# THE IMPORT IS FOR FILLING A COMPETITION, NOT FOR LATER TWEAKS: IT'S
+# OFFERED WHILE IT HAS NO TEAMS (OPEN, AHEAD OF THE ONE-AT-A-TIME FORM) AND,
+# FOR RE-IMPORTING A CORRECTED FILE, UNTIL ITS SETUP IS FINISHED
 if can_edit = true
-   write "<h3>Add a team</h3>"
+   if team_count = 0
+      execute "+import_box<true"
+      write "<h3>Or add teams one at a time</h3>"
+   else
+      write "<h3>Add a team</h3>"
+   endif
    write "<form>"
    execute "+text<Team name<team_name<40"
    execute "+submit_row<Add team"
    write "<input type=~hidden~ name=~command~ value=~add team~/>"
    hidden
    write "</form>"
-   execute "+import_box"
+   ifall team_count != 0 : setup_comp = current_comp
+      execute "+import_box<false"
+   endif
 else
    execute "+view_only_note"
 endif
@@ -1554,11 +1588,43 @@ escapestring escaped team_name_data
 write "<p class=~notice~>Team <b>" escaped "</b> added.</p>"
 }
 
-# THE "IMPORT FROM A SPREADSHEET" BOX ON THE TEAMS TAB. THE WORK IS DONE BY
-# www/offside-import.js, WHICH IS TOLD THE POSITIONS SO THEY STAY IN STEP
-# WITH position_values.
+# THE SETUP WIZARD'S STEPS, AT THE TOP OF THE TEAMS TAB OF A COMPETITION
+# THAT'S JUST BEEN CREATED (SEE setup_comp). team_count IS ALREADY LOADED.
+{+setup_steps
+escapestring escaped current_comp_name
+write "<div class=~setup~><h4>Setting up " escaped "</h4><ol>"
+write "<li class=~done~>Create the competition</li>"
+if team_count = 0
+   write "<li class=~now~>Add the teams and players. If they're in a spreadsheet, import it "
+   write "below; otherwise add the teams one at a time and then their squads.</li>"
+   write "<li>Check them over and fix anything by hand</li>"
+else
+   write "<li class=~done~>Add the teams and players</li>"
+   write "<li class=~now~>Check them over: open a team's <b>Squad</b> to fix a player, add a "
+   write "team that's missing or delete one that shouldn't be here.</li>"
+endif
+write "</ol><p>"
+setstring action "finish setup&mode=" RESULTS
+hyperlinkNE "Finished: on to the fixtures" action
+write "</p></div>"
+}
+
+grammar finish setup     >finish_setup
+
+{+finish_setup
+set setup_comp = 0
+}
+
+# THE "IMPORT FROM A SPREADSHEET" BOX ON THE TEAMS TAB, OPEN IF arg[0] IS
+# true. THE WORK IS DONE BY www/offside-import.js, WHICH IS TOLD THE
+# POSITIONS SO THEY STAY IN STEP WITH position_values.
 {+import_box
-write "<details class=~import~ id=~importbox~><summary>Import teams and players from a spreadsheet</summary>"
+if arg[0] = true
+   write "<details class=~import~ id=~importbox~ open>"
+else
+   write "<details class=~import~ id=~importbox~>"
+endif
+write "<summary>Import teams and players from a spreadsheet</summary>"
 write "<p class=~key~>Save the spreadsheet as a CSV file, one row per player, with the columns "
 write "<b>Team, Player, Position, Number, Gender, Hidden</b> in that order, or in any order "
 write "under a header row with those names. Only Team is needed: a row with no player just adds the team.</p>"
@@ -5164,6 +5230,12 @@ print:
    div.addway details { margin-top: 14px; }^
    div.addway summary { cursor: pointer; font-size: 10pt; color: #2e5e2e; }^
    details.import { margin-top: 18px; max-width: 920px; }^
+   div.setup { background-color: #eef4ee; border: 1px solid #b8c8b8; padding: 2px 14px; margin: 0 0 16px 0; max-width: 892px; }^
+   div.setup h4 { margin: 10px 0 4px 0; }^
+   div.setup ol { margin: 4px 0; padding-left: 22px; }^
+   div.setup li { margin: 3px 0; color: #555555; }^
+   div.setup li.done { text-decoration: line-through; }^
+   div.setup li.now { color: black; font-weight: bold; }^
    details.import summary { cursor: pointer; font-family: Verdana, Arial, sans-serif; font-size: 11pt; font-weight: bold; color: #2e5e2e; }^
    ul.importteams { margin: 4px 0 8px 0; }^
    details.importwarn { margin: 4px 0 10px 0; }^
